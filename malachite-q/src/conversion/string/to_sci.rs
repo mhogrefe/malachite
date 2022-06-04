@@ -55,7 +55,35 @@ const BASE_PRIME_FACTORS: [[(u8, u8); 3]; 37] = [
 ];
 
 impl Rational {
-    // TODO doc
+    /// When expanding a [`Rational`] in a small base $b$, determines how many digits after the
+    /// decimal (or other-base) point are in the base-$b$ expansion.
+    ///
+    /// If the expansion is non-terminating, this method returns `None`. This happens iff the
+    /// [`Rational`]'s denominator has prime factors not present in $b$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2 or greater than 36.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// // 3/8 is 0.375 in base 10.
+    /// assert_eq!(Rational::from_signeds(3, 8).length_after_point_in_small_base(10), Some(3));
+    /// // 1/20 is 0.05 in base 10.
+    /// assert_eq!(Rational::from_signeds(1, 20).length_after_point_in_small_base(10), Some(2));
+    /// // 1/7 is non-terminating in base 10.
+    /// assert_eq!(Rational::from_signeds(1, 7).length_after_point_in_small_base(10), None);
+    /// // 1/7 is 0.3 in base 21.
+    /// assert_eq!(Rational::from_signeds(1, 7).length_after_point_in_small_base(21), Some(1));
+    /// ```
     pub fn length_after_point_in_small_base(&self, base: u8) -> Option<u64> {
         let d = self.denominator_ref();
         assert!((2..=36).contains(&base));
@@ -156,8 +184,23 @@ fn fmt_zero(f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
 }
 
 impl ToSci for Rational {
-    /// Determines whether a `Rational` can be converted to a string using `to_sci` and a particular
-    /// set of options.
+    /// Determines whether a [`Rational`] can be converted to a string using
+    /// [`to_sci`](malachite_base::num::conversion::traits::ToSci::to_sci) and a particular set of
+    /// options.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), s)`, where `s` depends on the size type specified in
+    /// `options`.
+    /// - If `options` has `scale` specified, then `s` is `options.scale`.
+    /// - If `options` has `precision` specified, then `s` is `options.precision`.
+    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log
+    ///   of the denominator!). This reflects the fact that setting `size_complete` might result in
+    ///   a very long string.
     ///
     /// # Examples
     /// ```
@@ -211,13 +254,25 @@ impl ToSci for Rational {
         (self * q_base.pow(scale)).is_integer()
     }
 
-    /// Converts a `Rational` to a string using a specified base, possibly formatting the number
+    /// Converts a [`Rational` ]to a string using a specified base, possibly formatting the number
     /// using scientific notation.
     ///
-    /// See `ToSciOptions` for details on the available options.
+    /// See [`ToSciOptions`](malachite_base::num::conversion::string::options::ToSciOptions) for
+    /// details on the available options.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), s)`, where `s` depends on the size type specified in
+    /// `options`.
+    /// - If `options` has `scale` specified, then `s` is `options.scale`.
+    /// - If `options` has `precision` specified, then `s` is `options.precision`.
+    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log
+    ///   of the denominator!). This reflects the fact that setting `size_complete` might result in
+    ///   a very long string.
     ///
     /// # Panics
     /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the input

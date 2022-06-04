@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYIsZZ, XXDivModYIsQR,
+    WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Zero};
@@ -43,23 +43,21 @@ use std::mem::swap;
 
 // The highest bit of the input must be set.
 //
-// Time: O(1)
-//
-// Additional memory: O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `d` is zero.
 //
-// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `mpn_invert_limb`, or `invert_limb`, from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_invert_limb(d: Limb) -> Limb {
     (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
 }}
 
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `udiv_qrnnd_preinv` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {div_mod_by_preinversion(
     n_high: Limb,
     n_low: Limb,
@@ -87,18 +85,19 @@ pub_crate_test! {div_mod_by_preinversion(
 // quotient limbs and remainder of the `Natural` divided by a `Limb`. The divisor limb cannot be
 // zero and the limb slice must have at least two elements.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if the length of `ns` is less than 2 or if `d` is zero.
 //
-// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0, un > 1, and both
-// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
-// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
+// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`,
+// `un > 1`, and both results are returned. Experiments show that `DIVREM_1_NORM_THRESHOLD` and
+// `DIVREM_1_UNNORM_THRESHOLD` are unnecessary (they would always be 0).
 pub_test! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
     let mut qs = vec![0; ns.len()];
     let r = limbs_div_limb_to_out_mod(&mut qs, ns, d);
@@ -110,18 +109,19 @@ pub_test! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 // remainder. The output slice must be at least as long as the input slice. The divisor limb cannot
 // be zero and the input limb slice must have at least two elements.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
 //
-// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1.
-// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
-// (they would always be 0).
+// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`
+// and `un > 1`. Experiments show that `DIVREM_1_NORM_THRESHOLD` and `DIVREM_1_UNNORM_THRESHOLD`
+// are unnecessary (they would always be 0).
 pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -178,18 +178,19 @@ pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Lim
 // remainder. The divisor limb cannot be zero and the input limb slice must have at least two
 // elements.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if the length of `ns` is less than 2 or if `d` is zero.
 //
-// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
-// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
-// unnecessary (they would always be 0).
+// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qp == up`,
+// `qxn == 0`, and `un > 1`. Experiments show that `DIVREM_1_NORM_THRESHOLD` and
+// `DIVREM_1_UNNORM_THRESHOLD` are unnecessary (they would always be 0).
 pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -246,17 +247,19 @@ pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 // `shift` must be the number of leading zeros of `d`, and `d_inv` must be
 // `limbs_invert_limb(d << shift)`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()` + `fraction_len`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len() + fraction_len`.
 //
 // # Panics
 // Panics if `out` is shorter than `ns.len()` + `fraction_len`, if `ns` is empty, or if `d` is
 // zero.
 //
-// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp != ap.
+// This is equivalent to `mpn_preinv_divrem_1` from `mpn/generic/pre_divrem_1.c`, GMP 6.2.1, where
+// `qp != ap`.
 pub_test! {limbs_div_mod_extra(
     out: &mut [Limb],
     fraction_len: usize,
@@ -325,16 +328,18 @@ pub_test! {limbs_div_mod_extra(
 // `shift` must be the number of leading zeros of `d`, and `d_inv` must be
 // `limbs_invert_limb(d << shift)`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()` + `fraction_len`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len() + fraction_len`.
 //
 // # Panics
 // Panics if `ns` is empty, if `ns.len()` is less than `fraction_len`, or if `d` is zero.
 //
-// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp == ap.
+// This is equivalent to `mpn_preinv_divrem_1` from `mpn/generic/pre_divrem_1.c`, GMP 6.2.1, where
+// `qp == ap`.
 pub_crate_test! {limbs_div_mod_extra_in_place(
     ns: &mut [Limb],
     fraction_len: usize,
@@ -393,15 +398,14 @@ pub_crate_test! {limbs_div_mod_extra_in_place(
 // Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
 // highest bit of `hi` is set.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `hi` is zero.
 //
-// This is invert_pi1 from gmp-impl.h, GMP 6.2.1, where the result is returned instead of being
-// written to dinv.
+// This is equivalent to `invert_pi1` from `gmp-impl.h`, GMP 6.2.1, where the result is returned
+// instead of being written to `dinv`.
 pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     let mut d_inv = limbs_invert_limb(hi);
     let mut hi_product = hi.wrapping_mul(d_inv);
@@ -414,7 +418,7 @@ pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
         }
         hi_product.wrapping_sub_assign(hi);
     }
-    let (lo_product_hi, lo_product_lo) = Limb::x_mul_y_is_zz(lo, d_inv);
+    let (lo_product_hi, lo_product_lo) = Limb::x_mul_y_to_zz(lo, d_inv);
     hi_product.wrapping_add_assign(lo_product_hi);
     if hi_product < lo_product_hi {
         d_inv.wrapping_sub_assign(1);
@@ -429,11 +433,10 @@ pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 // bit of `d_1` to be set, and `[n_2, n_1]` < `[d_1, d_0]`. `d_inv` is the inverse of `[d_1, d_0]`
 // computed by `limbs_two_limb_inverse_helper`.
 //
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `udiv_qr_3by2` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_div_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
@@ -470,17 +473,18 @@ pub_crate_test! {limbs_div_mod_three_limb_by_two_limb(
 // and `false` means 0. `ds` must have length 2, `ns` must have length at least 2, and the most
 // significant bit of `ds[1]` must be set.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
 // `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 //
-// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1.
+// This is equivalent to `mpn_divrem_2` from `mpn/generic/divrem_2.c`, GMP 6.2.1.
 pub_crate_test! {limbs_div_mod_by_two_limb_normalized(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -520,18 +524,18 @@ pub_crate_test! {limbs_div_mod_by_two_limb_normalized(
 // the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
 // denominator.
 //
-// Time: worst case O(d * (n - d + 1)); also, O(n ^ 2)
+// # Worst-case complexity
+// $T(n, d) = O(d(n - d + 1)) = O(n^2)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
-//       d = `ds.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
 // # Panics
 // Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
 // `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
-// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_sbpi1_div_qr` from `mpn/generic/sbpi1_div_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -561,7 +565,6 @@ pub_crate_test! {limbs_div_mod_schoolbook(
             limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j..i], ds, q);
             n_1 = ns[i - 1]; // update n_1, last loop's value will now be invalid
         } else {
-            let carry;
             let (ns_lo, ns_hi) = ns.split_at_mut(i - 2);
             let n;
             (q, n) = limbs_div_mod_three_limb_by_two_limb(n_1, ns_hi[1], ns_hi[0], d_1, d_0, d_inv);
@@ -574,7 +577,7 @@ pub_crate_test! {limbs_div_mod_schoolbook(
             );
             let local_carry_2 = n_0 < local_carry_1;
             n_0.wrapping_sub_assign(local_carry_1);
-            carry = local_carry_2 && n_1 == 0;
+            let carry = local_carry_2 && n_1 == 0;
             if local_carry_2 {
                 n_1.wrapping_sub_assign(1);
             }
@@ -593,13 +596,14 @@ pub_crate_test! {limbs_div_mod_schoolbook(
     highest_q
 }}
 
-// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ds.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 //
-// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_dcpi1_div_qr_n` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1.
 pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -610,10 +614,9 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     let n = ds.len();
     let lo = n >> 1; // floor(n / 2)
     let hi = n - lo; // ceil(n / 2)
-    let mut highest_q;
     let qs_hi = &mut qs[lo..];
     let (ds_lo, ds_hi) = ds.split_at(lo);
-    highest_q = if hi < DC_DIV_QR_THRESHOLD {
+    let mut highest_q = if hi < DC_DIV_QR_THRESHOLD {
         limbs_div_mod_schoolbook(qs_hi, &mut ns[lo << 1..n << 1], ds_hi, d_inv)
     } else {
         limbs_div_mod_divide_and_conquer_helper(qs_hi, &mut ns[lo << 1..], ds_hi, d_inv, scratch)
@@ -659,6 +662,12 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     highest_q
 }
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 pub_test! {limbs_div_dc_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -675,18 +684,19 @@ pub_test! {limbs_div_dc_helper(
 
 // Recursive divide-and-conquer division.
 //
-// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ds.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 //
 // # Panics
 // Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has
 // length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
 // set.
 //
-// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_dcpi1_div_qr` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1.
 pub_test! {limbs_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -849,18 +859,19 @@ pub_test! {limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]
 // computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
 // `limbs_invert_approx` for an explanation of the return value.
 //
-// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ds.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 //
 // # Panics
 // Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 // of `ds`, or the last limb of `ds` does not have its highest bit set.
 //
-// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-// `true` iff the return value of mpn_bc_invertappr would be 0.
+// This is equivalent to `mpn_bc_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
+// return value is `true` iff the return value of `mpn_bc_invertappr` would be 0.
 pub_test! {limbs_invert_basecase_approx(
     is: &mut [Limb],
     ds: &[Limb],
@@ -915,18 +926,19 @@ pub_test! {limbs_invert_basecase_approx(
 //
 // We use a wrapped product modulo B ^ m - 1.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `is.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `is.len()`.
 //
 // # Panics
 // Panics if `ds` has length less than 5, `is` is shorter than `ds`, `scratch` is shorter than
 // twice the length of `ds`, or the last limb of `ds` does not have its highest bit set.
 //
-// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-// `true` iff the return value of mpn_ni_invertappr would be 0.
+// This is equivalent to `mpn_ni_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
+// return value is `true` iff the return value of `mpn_ni_invertappr` would be 0.
 pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
     assert!(d_len > 4);
@@ -1081,18 +1093,19 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
 // When the strict result is needed, i.e., e = 0 in the relation above, the function `mpn_invert`
 // (TODO!) should be used instead.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `is.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `is.len()`.
 //
 // # Panics
 // Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 // of `ds`, or the last limb of `ds` does not have its highest bit set.
 //
-// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-// `true` iff the return value of mpn_invertappr would be 0.
+// This is equivalent to `mpn_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
+// return value is `true` iff the return value of `mpn_invertappr` would be 0.
 pub_crate_test! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
         limbs_invert_basecase_approx(is, ds, scratch)
@@ -1104,6 +1117,13 @@ pub_crate_test! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
 //TODO tune
 pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
+//
 // ds.len() >= 2
 // n_len >= 3
 // n_len >= ds.len()
@@ -1135,13 +1155,14 @@ pub_crate_test! {limbs_div_barrett_large_product(
     }
 }}
 
-// Time: Worst case O(n * log(d) * log(log(d)))
+// # Worst-case complexity
+// $T(n, d) = O(n \log d \log\log d)$
 //
-// Additional memory: Worst case O(d * log(d))
+// $M(n) = O(d \log d)$
 //
-// where n = `ns.len()`, d = `ds.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
-// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_preinv_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
 fn limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1242,13 +1263,13 @@ fn limbs_div_mod_barrett_preinverted(
 //
 // In all cases we have i_len <= d_len.
 //
-// Time: Worst case O(1)
-//
-// Additional memory: Worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // Result is O(`q_len`)
 //
-// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.2.1, where k == 0.
+// This is equivalent to `mpn_mu_div_qr_choose_in` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
+// `k == 0`.
 pub_const_crate_test! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
@@ -1262,13 +1283,14 @@ pub_const_crate_test! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) 
     }
 }}
 
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1306,36 +1328,34 @@ pub_crate_test! {limbs_div_mod_barrett_helper(
     limbs_div_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi)
 }}
 
-// Time: Worst case O(1)
-//
-// Additional memory: Worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // Result is O(`d_len`)
 //
-// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, but nn is omitted
-// from the arguments as it is unused.
+// This is equivalent to `mpn_preinv_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, but
+// `nn` is omitted from the arguments as it is unused.
 fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
     itch_local + itch_out
 }
 
-// Time: Worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: Worst case O(1)
-//
-// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `mpn_invertappr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub(crate) const fn limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     is_len << 1
 }
 
-// Time: Worst case O(1)
-//
-// Additional memory: Worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // Result is O(`n_len`)
 //
-// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, where mua_k == 0.
+// This is equivalent to `mpn_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
+// `mua_k == 0`.
 pub_crate_test! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
@@ -1345,6 +1365,12 @@ pub_crate_test! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -
     is_len + preinverse_len
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 pub_test! {limbs_div_mod_barrett_large_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1393,18 +1419,19 @@ pub_test! {limbs_div_mod_barrett_large_helper(
 // `ns` must have length at least 3, `ds` must have length at least 2 and be no longer than `ns`,
 // and the most significant bit of `ds` must be set.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
 // less than `ns.len()` - `ds.len()`, `scratch` is too short, or the last limb of `ds` does not
 // have its highest bit set.
 //
-// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
 pub_test! {limbs_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1428,11 +1455,12 @@ pub_test! {limbs_div_mod_barrett(
 // `ns.len() - 2`, `rs` must have length at least 2, and the most-significant limb of `ds` must be
 // nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let ds_1 = ds[1];
@@ -1470,6 +1498,8 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
 //TODO tune
 pub(crate) const MUPI_DIV_QR_THRESHOLD: usize = 74;
 
+// # Worst-case complexity
+// Constant time and additional memory.
 fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let n_64 = n_len as f64;
     let d_64 = d_len as f64;
@@ -1487,11 +1517,12 @@ fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
 // at least `ns.len() - ds.len() + 1`, `rs` must have the same length as `ds`, and the most-
 // significant limb of `ds` must be nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_mod_unbalanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1547,42 +1578,43 @@ fn limbs_div_mod_unbalanced(
     }
 }
 
-/// The numerator must have less than twice the length of the denominator.
-///
-/// Problem:
-///
-/// Divide a numerator N with `n_len` limbs by a denominator D with `d_len` limbs, forming a
-/// quotient of `q_len` = `n_len` - `d_len` + 1 limbs. When `q_len` is small compared to `d_len`,
-/// conventional division algorithms perform poorly. We want an algorithm that has an expected
-/// running time that is dependent only on `q_len`.
-///
-/// Algorithm (very informally stated):
-///
-/// 1) Divide the 2 * `q_len` most significant limbs from the numerator by the `q_len` most-
-/// significant limbs from the denominator. Call the result `qest`. This is either the correct
-/// quotient, or 1 or 2 too large. Compute the remainder from the division.
-///
-/// 2) Is the most significant limb from the remainder < p, where p is the product of the most-
-/// significant limb from the quotient and the next(d)? (Next(d) denotes the next ignored limb from
-/// the denominator.)  If it is, decrement `qest`, and adjust the remainder accordingly.
-///
-/// 3) Is the remainder >= `qest`?  If it is, `qest` is the desired quotient. The algorithm
-/// terminates.
-///
-/// 4) Subtract `qest` * next(d) from the remainder. If there is borrow out, decrement `qest`, and
-/// adjust the remainder accordingly.
-///
-/// 5) Skip one word from the denominator (i.e., let next(d) denote the next less significant limb).
-///
-/// `ds` must have length at least 3, `ns` must be at least as long as `ds` but no more than twice
-/// as long, `qs` must have length at least `ns.len() - ds.len() + 1`,`rs` must have the same length
-/// as `ds`, and the most-significant limb of `ds` must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
+// The numerator must have less than twice the length of the denominator.
+//
+// Problem:
+//
+// Divide a numerator N with `n_len` limbs by a denominator D with `d_len` limbs, forming a
+// quotient of `q_len` = `n_len` - `d_len` + 1 limbs. When `q_len` is small compared to `d_len`,
+// conventional division algorithms perform poorly. We want an algorithm that has an expected
+// running time that is dependent only on `q_len`.
+//
+// Algorithm (very informally stated):
+//
+// 1) Divide the 2 * `q_len` most significant limbs from the numerator by the `q_len` most-
+// significant limbs from the denominator. Call the result `qest`. This is either the correct
+// quotient, or 1 or 2 too large. Compute the remainder from the division.
+//
+// 2) Is the most significant limb from the remainder < p, where p is the product of the most-
+// significant limb from the quotient and the next(d)? (Next(d) denotes the next ignored limb from
+// the denominator.)  If it is, decrement `qest`, and adjust the remainder accordingly.
+//
+// 3) Is the remainder >= `qest`?  If it is, `qest` is the desired quotient. The algorithm
+// terminates.
+//
+// 4) Subtract `qest` * next(d) from the remainder. If there is borrow out, decrement `qest`, and
+// adjust the remainder accordingly.
+//
+// 5) Skip one word from the denominator (i.e., let next(d) denote the next less significant limb).
+//
+// `ds` must have length at least 3, `ns` must be at least as long as `ds` but no more than twice
+// as long, `qs` must have length at least `ns.len() - ds.len() + 1`,`rs` must have the same length
+// as `ds`, and the most-significant limb of `ds` must be nonzero.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 pub(crate) fn limbs_div_mod_balanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1639,7 +1671,7 @@ pub(crate) fn limbs_div_mod_balanced(
     // Get an approximate quotient using the extracted operands.
     if q_len == 1 {
         (qs[0], ns_shifted[0]) =
-            Limb::xx_div_mod_y_is_qr(ns_shifted[1], ns_shifted[0], ds_shifted[0]);
+            Limb::xx_div_mod_y_to_qr(ns_shifted[1], ns_shifted[0], ds_shifted[0]);
     } else if q_len == 2 {
         limbs_div_mod_by_two_limb_normalized(qs, ns_shifted, ds_shifted);
     } else {
@@ -1730,18 +1762,19 @@ pub(crate) fn limbs_div_mod_balanced(
 // `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
 // significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 // of `ds` is zero.
 //
-// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1 and qp and rp are
-// returned.
+// This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `dn > 1` and
+// `qp` and `rp` are returned.
 pub_test! {limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
@@ -1758,17 +1791,18 @@ pub_test! {limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 // `rs` must be at least as long as `ds`, and `ds` must have length at least 2 and its most
 // significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
 // the most-significant limb of `ds` is zero.
 //
-// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1.
+// This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `dn > 1`.
 pub_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1792,7 +1826,14 @@ pub_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], d
     }
 }}
 
-//TODO improve!
+// TODO improve!
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 pub_crate_test! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let ns_copy = ns.to_vec();
     limbs_div_mod_to_out(qs, ns, &ns_copy, ds);
@@ -1832,15 +1873,22 @@ impl DivMod<Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -1848,23 +1896,20 @@ impl DivMod<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).div_mod(Natural::from(10u32))),
-    ///     "(2, 3)"
-    /// );
+    /// assert_eq!(Natural::from(23u32).div_mod(Natural::from(10u32)).to_debug_string(), "(2, 3)");
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .div_mod(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .div_mod(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -1878,16 +1923,23 @@ impl<'a> DivMod<&'a Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
-    /// reference, and returning the quotient and remainder. The quotient is rounded towards
-    /// negative infinity. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and returning the quotient and remainder. The quotient is rounded towards
+    /// negative infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -1895,23 +1947,23 @@ impl<'a> DivMod<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).div_mod(&Natural::from(10u32))),
+    ///     Natural::from(23u32).div_mod(&Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .div_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .div_mod(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -1925,15 +1977,23 @@ impl<'a> DivMod<Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
-    /// by value, and returning the quotient and remainder. The quotient is rounded towards negative
-    /// infinity. The quotient and remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and returning the quotient and remainder. The quotient is rounded towards negative
+    /// infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -1941,23 +2001,23 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).div_mod(Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).div_mod(Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .div_mod(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .div_mod(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
@@ -1990,15 +2050,22 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards negative infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2006,23 +2073,23 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).div_mod(&Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).div_mod(&Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .div_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .div_mod(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     fn div_mod(self, other: &'b Natural) -> (Natural, Natural) {
@@ -2055,15 +2122,25 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
 impl DivAssignMod<Natural> for Natural {
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value and
-    /// returning the remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and returning the remainder. The quotient is rounded towards
+    /// negative infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
+    /// $$
+    /// $$
+    /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2071,7 +2148,6 @@ impl DivAssignMod<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
@@ -2079,14 +2155,13 @@ impl DivAssignMod<Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.div_assign_mod(Natural::from(10u32)).to_string(), "3");
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x.div_assign_mod(Natural::from(10u32)), 3);
+    /// assert_eq!(x, 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_mod(Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///     "530068894399");
-    /// assert_eq!(x.to_string(), "810000006723");
+    /// assert_eq!(x.div_assign_mod(Natural::from_str("1234567890987").unwrap()), 530068894399u64);
+    /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
         if *self == other {
@@ -2123,15 +2198,25 @@ impl DivAssignMod<Natural> for Natural {
 impl<'a> DivAssignMod<&'a Natural> for Natural {
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference and
-    /// returning the remainder. The quotient is rounded towards negative infinity. The quotient and
-    /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and returning the remainder. The quotient is rounded towards
+    /// negative infinity.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
+    /// $$
+    /// $$
+    /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2139,7 +2224,6 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
@@ -2147,14 +2231,16 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.div_assign_mod(&Natural::from(10u32)).to_string(), "3");
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x.div_assign_mod(&Natural::from(10u32)), 3);
+    /// assert_eq!(x, 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_mod(&Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///     "530068894399");
-    /// assert_eq!(x.to_string(), "810000006723");
+    /// assert_eq!(
+    ///     x.div_assign_mod(&Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
+    /// );
+    /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign_mod(&mut self, other: &'a Natural) -> Natural {
         if self == other {
@@ -2190,16 +2276,25 @@ impl DivRem<Natural> for Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value and returning the
-    /// quotient and remainder. The quotient is rounded towards zero. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
+    /// quotient and remainder. The quotient is rounded towards zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_rem` is equivalent to
+    /// [`div_mod`](malachite_base::num::arithmetic::traits::DivMod::div_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2207,23 +2302,20 @@ impl DivRem<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).div_rem(Natural::from(10u32))),
-    ///     "(2, 3)"
-    /// );
+    /// assert_eq!(Natural::from(23u32).div_rem(Natural::from(10u32)).to_debug_string(), "(2, 3)");
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .div_rem(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .div_rem(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -2236,16 +2328,25 @@ impl<'a> DivRem<&'a Natural> for Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
-    /// reference, and returning the quotient and remainder. The quotient is rounded towards zero.
-    /// The quotient and remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For
-    /// `Natural`s, rem is equivalent to mod.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and returning the quotient and remainder. The quotient is rounded towards zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_rem` is equivalent to
+    /// [`div_mod`](malachite_base::num::arithmetic::traits::DivMod::div_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2253,23 +2354,23 @@ impl<'a> DivRem<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).div_rem(&Natural::from(10u32))),
+    ///     Natural::from(23u32).div_rem(&Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .div_rem(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .div_rem(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -2282,16 +2383,25 @@ impl<'a> DivRem<Natural> for &'a Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
-    /// by value, and returning the quotient and remainder. The quotient is rounded towards zero.
-    /// The quotient and remainder satisfy `self` = q * `other` + r and 0 <= r < `other`. For
-    /// `Natural`s, rem is equivalent to mod.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and returning the quotient and remainder. The quotient is rounded towards zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_rem` is equivalent to
+    /// [`div_mod`](malachite_base::num::arithmetic::traits::DivMod::div_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2299,23 +2409,23 @@ impl<'a> DivRem<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).div_rem(Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).div_rem(Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .div_rem(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .div_rem(Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -2328,16 +2438,25 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     type DivOutput = Natural;
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference and returning the
-    /// quotient and remainder. The quotient is rounded towards zero. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning the
+    /// quotient and remainder. The quotient is rounded towards zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_rem` is equivalent to
+    /// [`div_mod`](malachite_base::num::arithmetic::traits::DivMod::div_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2345,23 +2464,23 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).div_rem(&Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).div_rem(&Natural::from(10u32)).to_debug_string(),
     ///     "(2, 3)"
     /// );
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .div_rem(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006723, 530068894399)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .div_rem(&Natural::from_str("1234567890987").unwrap()).to_debug_string(),
+    ///     "(810000006723, 530068894399)"
     /// );
     /// ```
     #[inline]
@@ -2373,16 +2492,27 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
 impl DivAssignRem<Natural> for Natural {
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value and
-    /// returning the remainder. The quotient is rounded towards zero. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and returning the remainder. The quotient is rounded towards zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
+    /// $$
+    /// $$
+    /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_assign_rem` is equivalent to
+    /// [`div_assign_mod`](malachite_base::num::arithmetic::traits::DivAssignMod::div_assign_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2390,7 +2520,6 @@ impl DivAssignRem<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
@@ -2398,14 +2527,13 @@ impl DivAssignRem<Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.div_assign_rem(Natural::from(10u32)).to_string(), "3");
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x.div_assign_rem(Natural::from(10u32)), 3);
+    /// assert_eq!(x, 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_rem(Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///     "530068894399");
-    /// assert_eq!(x.to_string(), "810000006723");
+    /// assert_eq!(x.div_assign_rem(Natural::from_str("1234567890987").unwrap()), 530068894399u64);
+    /// assert_eq!(x, 810000006723u64);
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: Natural) -> Natural {
@@ -2416,16 +2544,28 @@ impl DivAssignRem<Natural> for Natural {
 impl<'a> DivAssignRem<&'a Natural> for Natural {
     type RemOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference and
-    /// returning the remainder. The quotient is rounded towards zero. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= r < `other`. For `Natural`s, rem is equivalent to
-    /// mod.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference and returning the remainder. The quotient is rounded towards
+    /// zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
+    /// $$
+    /// $$
+    /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// For [`Natural`]s, `div_assign_rem` is equivalent to
+    /// [`div_assign_mod`](malachite_base::num::arithmetic::traits::DivAssignMod::div_assign_mod).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2433,7 +2573,6 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
@@ -2441,14 +2580,16 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.div_assign_rem(&Natural::from(10u32)).to_string(), "3");
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x.div_assign_rem(&Natural::from(10u32)), 3);
+    /// assert_eq!(x, 2);
     ///
     /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    /// assert_eq!(x.div_assign_rem(&Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///     "530068894399");
-    /// assert_eq!(x.to_string(), "810000006723");
+    /// assert_eq!(
+    ///     x.div_assign_rem(&Natural::from_str("1234567890987").unwrap()),
+    ///     530068894399u64
+    /// );
+    /// assert_eq!(x, 810000006723u64);
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: &'a Natural) -> Natural {
@@ -2460,16 +2601,23 @@ impl CeilingDivNegMod<Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value and returning the
-    /// ceiling of the quotient and the remainder of the negative of the first `Natural` divided by
-    /// the second. The quotient and remainder satisfy `self` = q * `other` - r and
-    /// 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
+    /// ceiling of the quotient and the remainder of the negative of the first [`Natural`] divided
+    /// by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lceil \frac{x}{y} \right \rceil, \space
+    /// y\left \lceil \frac{x}{y} \right \rceil - x \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2477,23 +2625,24 @@ impl CeilingDivNegMod<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///     Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32)).to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006724, 704498996588)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
+    ///             .to_debug_string(),
+    ///     "(810000006724, 704498996588)"
     /// );
     /// ```
     #[inline]
@@ -2507,16 +2656,23 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
-    /// reference, and returning the ceiling of the quotient and the remainder of the negative of
-    /// the first `Natural` divided by the second. The quotient and remainder satisfy `self` =
-    /// q * `other` - r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and returning the ceiling of the quotient and the remainder of the negative of
+    /// the first [`Natural`] divided by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lceil \frac{x}{y} \right \rceil, \space
+    /// y\left \lceil \frac{x}{y} \right \rceil - x \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2524,23 +2680,24 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///     Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32)).to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///          .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006724, 704498996588)"
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
+    ///             .to_debug_string(),
+    ///     "(810000006724, 704498996588)"
     /// );
     /// ```
     #[inline]
@@ -2554,16 +2711,23 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
-    /// by value, and returning the ceiling of the quotient and the remainder of the negative of the
-    /// first `Natural` divided by the second. The quotient and remainder satisfy `self` =
-    /// q * `other` - r and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and returning the ceiling of the quotient and the remainder of the negative of the
+    /// first [`Natural`] divided by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lceil \frac{x}{y} \right \rceil, \space
+    /// y\left \lceil \frac{x}{y} \right \rceil - x \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2571,23 +2735,24 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32)).to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006724, 704498996588)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())
+    ///             .to_debug_string(),
+    ///     "(810000006724, 704498996588)"
     /// );
     /// ```
     fn ceiling_div_neg_mod(self, other: Natural) -> (Natural, Natural) {
@@ -2604,16 +2769,23 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference and returning the
-    /// ceiling of the quotient and the remainder of the negative of the first `Natural` divided by
-    /// the second. The quotient and remainder satisfy `self` = q * `other` - r and
-    /// 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning the
+    /// ceiling of the quotient and the remainder of the negative of the first [`Natural`] divided
+    /// by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = \left ( \left \lceil \frac{x}{y} \right \rceil, \space
+    /// y\left \lceil \frac{x}{y} \right \rceil - x \right ).
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2621,23 +2793,24 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
-    ///     format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///     (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32)).to_debug_string(),
     ///     "(3, 7)"
     /// );
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// assert_eq!(
-    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///          .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///      "(810000006724, 704498996588)"
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())
+    ///             .to_debug_string(),
+    ///     "(810000006724, 704498996588)"
     /// );
     /// ```
     fn ceiling_div_neg_mod(self, other: &'b Natural) -> (Natural, Natural) {
@@ -2653,16 +2826,25 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
 impl CeilingDivAssignNegMod<Natural> for Natural {
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value, taking
-    /// the ceiling of the quotient, and returning the remainder of the negative of the first
-    /// `Natural` divided by the second. The quotient and remainder satisfy `self` = q * `other` - r
-    /// and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and returning the remainder of the negative of the first number
+    /// divided by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x,
+    /// $$
+    /// $$
+    /// x \gets \left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2670,7 +2852,6 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
@@ -2678,18 +2859,16 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)).to_string(), "7");
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)), 7);
+    /// assert_eq!(x, 3);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
     /// assert_eq!(
-    ///     x.ceiling_div_assign_neg_mod(
-    ///         Natural::from_str("1234567890987").unwrap()
-    ///     ).to_string(),
-    ///     "704498996588",
+    ///     x.ceiling_div_assign_neg_mod(Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64,
     /// );
-    /// assert_eq!(x.to_string(), "810000006724");
+    /// assert_eq!(x, 810000006724u64);
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
         let r = self.div_assign_mod(&other);
@@ -2705,16 +2884,25 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
 impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     type ModOutput = Natural;
 
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference,
-    /// taking the ceiling of the quotient, and returning the remainder of the negative of the first
-    /// `Natural` divided by the second. The quotient and remainder satisfy `self` = q * `other` - r
-    /// and 0 <= r < `other`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference and returning the remainder of the negative of the first
+    /// number divided by the second.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x,
+    /// $$
+    /// $$
+    /// x \gets \left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -2722,7 +2910,6 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
@@ -2730,18 +2917,16 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)).to_string(), "7");
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)), 7);
+    /// assert_eq!(x, 3);
     ///
     /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
     /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
     /// assert_eq!(
-    ///     x.ceiling_div_assign_neg_mod(
-    ///         &Natural::from_str("1234567890987").unwrap()
-    ///     ).to_string(),
-    ///     "704498996588",
+    ///     x.ceiling_div_assign_neg_mod(&Natural::from_str("1234567890987").unwrap()),
+    ///     704498996588u64,
     /// );
-    /// assert_eq!(x.to_string(), "810000006724");
+    /// assert_eq!(x, 810000006724u64);
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &'a Natural) -> Natural {
         let r = self.div_assign_mod(other);

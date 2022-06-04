@@ -1,16 +1,11 @@
-use num::arithmetic::traits::{ModMul, ModMulAssign, ModPow, ModShl, ModShlAssign, UnsignedAbs};
+use num::arithmetic::traits::{ModShl, ModShlAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::traits::ExactFrom;
 use std::ops::{Shr, ShrAssign};
 
-//TODO simplify generics
-
-fn mod_shl_unsigned<T: ModMul<T, Output = T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
-    x: T,
-    other: U,
-    m: T,
-) -> T
+fn mod_shl_unsigned<T: PrimitiveUnsigned, U>(x: T, other: U, m: T) -> T
 where
     u64: ExactFrom<U>,
 {
@@ -21,11 +16,8 @@ where
     }
 }
 
-fn mod_shl_assign_unsigned<T: ModMulAssign<T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
-    x: &mut T,
-    other: U,
-    m: T,
-) where
+fn mod_shl_assign_unsigned<T: PrimitiveUnsigned, U>(x: &mut T, other: U, m: T)
+where
     u64: ExactFrom<U>,
 {
     if m == T::ONE {
@@ -42,8 +34,8 @@ macro_rules! impl_mod_shl_unsigned {
                 impl ModShl<$u, $t> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod `m`. Assumes the input is already reduced mod
-                    /// `m`.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$.
+                    /// Assumes the input is already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
@@ -56,7 +48,7 @@ macro_rules! impl_mod_shl_unsigned {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shl` module.
+                    /// See [here](super::mod_shl#mod_shl).
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
                         mod_shl_unsigned(self, other, m)
@@ -64,8 +56,8 @@ macro_rules! impl_mod_shl_unsigned {
                 }
 
                 impl ModShlAssign<$u, $t> for $t {
-                    /// Replaces `self` with `self << other` mod `m`. Assumes the input is already
-                    /// reduced mod `m`.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
+                    /// in place. Assumes the input is already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
@@ -78,7 +70,7 @@ macro_rules! impl_mod_shl_unsigned {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shl` module.
+                    /// See [here](super::mod_shl#mod_shl_assign).
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
                         mod_shl_assign_unsigned(self, other, m);
@@ -93,8 +85,8 @@ apply_to_unsigneds!(impl_mod_shl_unsigned);
 
 fn mod_shl_signed<
     T: ModShl<U, T, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     other: S,
@@ -114,9 +106,9 @@ fn mod_shl_signed<
 }
 
 fn mod_shl_assign_signed<
-    T: ModShlAssign<U, T> + PrimitiveInt + ShrAssign<U>,
-    U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ModShlAssign<U, T> + PrimitiveUnsigned + ShrAssign<U>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     other: S,
@@ -142,8 +134,8 @@ macro_rules! impl_mod_shl_signed {
                 impl ModShl<$u, $t> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod `m`. Assumes the input is already reduced mod
-                    /// `m`.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$.
+                    /// Assumes the input is already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
@@ -157,7 +149,7 @@ macro_rules! impl_mod_shl_signed {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shl` module.
+                    /// See [here](super::mod_shl#mod_shl).
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
                         mod_shl_signed(self, other, m)
@@ -165,8 +157,8 @@ macro_rules! impl_mod_shl_signed {
                 }
 
                 impl ModShlAssign<$u, $t> for $t {
-                    /// Replaces `self` with `self << other` mod `m`. Assumes the input is already
-                    /// reduced mod `m`.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
+                    /// in place. Assumes the input is already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
@@ -180,7 +172,7 @@ macro_rules! impl_mod_shl_signed {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shl` module.
+                    /// See [here](super::mod_shl#mod_shl_assign).
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
                         mod_shl_assign_signed(self, other, m);

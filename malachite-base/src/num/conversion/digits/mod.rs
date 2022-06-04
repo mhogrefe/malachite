@@ -1,7 +1,5 @@
-/// Traits for extracting digits from numbers and constructing numbers from
-/// digits.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Digits`](super::traits::Digits), a trait for extracting digits from numbers and constructing
+/// numbers from digits.
 ///
 /// # to_digits_asc
 /// ```
@@ -71,16 +69,15 @@
 /// assert!(u8::from_digits_desc(&1000, [1u16, 2, 3].iter().cloned()).is_none());
 /// ```
 pub mod general_digits;
-/// A double-ended iterator for iterating over a number's digits, if the base is a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`PowerOf2DigitIterable`](super::traits::PowerOf2DigitIterable), a trait for producing
+/// [`PrimitivePowerOf2DigitIterator`](power_of_2_digit_iterable::PrimitivePowerOf2DigitIterator),
+/// a double-ended iterator for iterating over a number's base-$2^k$ digits.
 ///
 /// # power_of_2_digits
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
 /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 ///
@@ -99,10 +96,8 @@ pub mod general_digits;
 /// assert_eq!(digits.rev().collect_vec(), &[1, 2, 2, 3]);
 /// ```
 pub mod power_of_2_digit_iterable;
-/// Traits for extracting digits from numbers and constructing numbers from digits, where the base
-/// is a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`PowerOf2Digits`](super::traits::PowerOf2Digits), a trait for extracting base-$2^k$ $digits
+/// from numbers and constructing numbers from digits.
 ///
 /// # to_power_of_2_digits_asc
 /// ```

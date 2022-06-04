@@ -58,6 +58,13 @@ use std::marker::PhantomData;
 use std::mem::swap;
 use strings::random::{random_strings, random_strings_using_chars};
 use strings::strings_from_char_vecs;
+use test_util::extra_variadic::{
+    random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
+    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_quadruples_xyzz, random_sextuples_from_single, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
+    random_union3s, Union3,
+};
 use test_util::generators::common::{
     reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
 };
@@ -71,15 +78,9 @@ use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use test_util::num::float::PRIMITIVE_FLOAT_CHARS;
 use test_util::rounding_modes::ROUNDING_MODE_CHARS;
-use tuples::random::{
-    random_octuples_from_single, random_ordered_unique_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples_from_single, random_quadruples_xxxy,
-    random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
-    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyx, random_triples_xyy,
-};
-use unions::random::{random_union2s, random_union3s};
-use unions::{Union2, Union3};
+use tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
+use unions::random::random_union2s;
+use unions::Union2;
 use vecs::random::{
     random_vecs, random_vecs_fixed_length_from_single, random_vecs_length_inclusive_range,
     random_vecs_min_length,
@@ -1146,12 +1147,9 @@ pub fn random_primitive_int_nonuple_gen_var_1<T: PrimitiveInt>(
 pub fn random_primitive_int_duodecuple_gen_var_1<T: PrimitiveInt>(
     _config: &GenConfig,
 ) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
-    Box::new(
-        random_triples_from_single(random_quadruples_from_single(random_primitive_ints(
-            EXAMPLE_SEED,
-        )))
-        .map(|((a, b, c, d), (e, f, g, h), (i, j, k, l))| (a, b, c, d, e, f, g, h, i, j, k, l)),
-    )
+    Box::new(random_duodecuples_from_single(random_primitive_ints(
+        EXAMPLE_SEED,
+    )))
 }
 
 // -- (PrimitiveInt, PrimitiveInt, PrimitiveUnsigned) --
@@ -3457,8 +3455,8 @@ fn wrapping_shr<T: PrimitiveInt>(x: T, bits: u64) -> T {
 }
 
 pub(crate) fn reduce_to_fit_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, T, T) {
-    let (p_hi, p_lo) = T::x_mul_y_is_zz(y, z);
-    let r_hi = T::xx_add_yy_is_zz(T::ZERO, x, p_hi, p_lo).0;
+    let (p_hi, p_lo) = T::x_mul_y_to_zz(y, z);
+    let r_hi = T::xx_add_yy_to_zz(T::ZERO, x, p_hi, p_lo).0;
     if r_hi == T::ZERO {
         (x, y, z)
     } else {
@@ -3483,7 +3481,7 @@ pub fn random_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
 
 pub(crate) fn reduce_to_fit_sub_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, T, T) {
     let x_bits = x.significant_bits();
-    let (p_hi, p_lo) = T::x_mul_y_is_zz(y, z);
+    let (p_hi, p_lo) = T::x_mul_y_to_zz(y, z);
     let product_bits = if p_hi == T::ZERO {
         p_lo.significant_bits()
     } else {

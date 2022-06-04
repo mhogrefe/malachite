@@ -9,9 +9,12 @@ use platform::Limb;
 
 // Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
 //
-// Time: worst case O(`bits`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(`bits`)
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
     let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
     let remaining_bits = bits & Limb::WIDTH_MASK;
@@ -23,22 +26,27 @@ pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
 }}
 
 impl LowMask for Natural {
-    /// Returns a `Natural` with the least significant `bits` bits on and the remaining bits off.
+    /// Returns a [`Natural`] whose least significant $b$ bits are `true` and whose other bits are
+    /// `false`.
     ///
-    /// Time: worst case O(`bits`)
+    /// $f(b) = 2^b - 1$.
     ///
-    /// Additional memory: worst case O(`bits`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::low_mask(0).to_string(), "0");
-    /// assert_eq!(Natural::low_mask(3).to_string(), "7");
+    /// assert_eq!(Natural::low_mask(0), 0);
+    /// assert_eq!(Natural::low_mask(3), 7);
     /// assert_eq!(Natural::low_mask(100).to_string(), "1267650600228229401496703205375");
     /// ```
     fn low_mask(bits: u64) -> Natural {

@@ -39,6 +39,7 @@ fn test_shortlex_vecs_length_range() {
         &[&[], &[()], &[(), ()], &[(), (), ()], &[(), (), (), ()]],
     );
     shortlex_vecs_length_range_small_helper(1, 1, exhaustive_bools(), 0, &[]);
+    shortlex_vecs_length_range_small_helper(5, 3, exhaustive_bools(), 0, &[]);
     shortlex_vecs_length_range_small_helper(
         0,
         3,
@@ -94,10 +95,4 @@ fn test_shortlex_vecs_length_range() {
             &['a', 'a', 'c', 'a', 'b'],
         ],
     );
-}
-
-#[test]
-#[should_panic]
-fn shortlex_vecs_length_range_fail() {
-    shortlex_vecs_length_range(1, 0, exhaustive_bools());
 }

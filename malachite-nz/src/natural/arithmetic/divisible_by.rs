@@ -19,14 +19,15 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 //
 // This function assumes that `ns` has at least two elements and that `d` is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
-// ABOVE_THRESHOLD branch is excluded.
+// This is equivalent to `mpz_divisible_ui_p` from `mpz/divis_ui.c`, GMP 6.2.1, where `a` is
+// non-negative and the `ABOVE_THRESHOLD` branch is excluded.
 pub_crate_test! {limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
     if d.even() {
@@ -52,18 +53,21 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
 // `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
 // must be nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 //
-// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-// zero.
-pub_crate_test! {limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
+// This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
+// and neither are zero.
+pub_crate_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -145,18 +149,21 @@ pub_crate_test! {limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 // `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
 // must be nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 //
-// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-// zero.
-pub_crate_test! {limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
+// This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
+// and neither are zero.
+pub_crate_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -241,18 +248,21 @@ pub_crate_test! {limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> boo
 // `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
 // must be nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 //
-// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-// zero.
-pub_test! {limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
+// This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
+// and neither are zero.
+pub_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -333,18 +343,21 @@ pub_test! {limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 // `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
 // must be nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 //
-// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-// zero.
-pub_test! {limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
+// This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
+// and neither are zero.
+pub_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -441,23 +454,25 @@ impl Natural {
 }
 
 impl DivisibleBy<Natural> for Natural {
-    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
-    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
-    /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
-    /// taken by value.
+    /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
+    /// the first is a multiple of the second. Both [`Natural`]s are taken by value.
     ///
-    /// This function is more efficient than finding a remainder and checking whether it's zero.
+    /// This means that zero is divisible by any [`Natural`], including zero; but a nonzero
+    /// [`Natural`] is never divisible by zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// It's more efficient to use this function than to compute the remainder and check whether
+    /// it's zero.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
@@ -467,8 +482,11 @@ impl DivisibleBy<Natural> for Natural {
     /// assert_eq!(Natural::ZERO.divisible_by(Natural::ZERO), true);
     /// assert_eq!(Natural::from(100u32).divisible_by(Natural::from(3u32)), false);
     /// assert_eq!(Natural::from(102u32).divisible_by(Natural::from(3u32)), true);
-    /// assert_eq!(Natural::from_str("1000000000000000000000000").unwrap()
-    ///     .divisible_by(Natural::from_str("1000000000000").unwrap()), true);
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .divisible_by(Natural::from_str("1000000000000").unwrap()),
+    ///     true
+    /// );
     /// ```
     fn divisible_by(mut self, mut other: Natural) -> bool {
         match (&mut self, &mut other) {
@@ -482,23 +500,26 @@ impl DivisibleBy<Natural> for Natural {
 }
 
 impl<'a> DivisibleBy<&'a Natural> for Natural {
-    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
-    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
-    /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
-    /// is taken by value and the second by reference.
+    /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
+    /// the first is a multiple of the second. The first [`Natural`]s is taken by reference and the
+    /// second by value.
     ///
-    /// This function is more efficient than finding a remainder and checking whether it's zero.
+    /// This means that zero is divisible by any [`Natural`], including zero; but a nonzero
+    /// [`Natural`] is never divisible by zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// It's more efficient to use this function than to compute the remainder and check whether
+    /// it's zero.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
@@ -508,8 +529,11 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     /// assert_eq!(Natural::ZERO.divisible_by(&Natural::ZERO), true);
     /// assert_eq!(Natural::from(100u32).divisible_by(&Natural::from(3u32)), false);
     /// assert_eq!(Natural::from(102u32).divisible_by(&Natural::from(3u32)), true);
-    /// assert_eq!(Natural::from_str("1000000000000000000000000").unwrap()
-    ///     .divisible_by(&Natural::from_str("1000000000000").unwrap()), true);
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000000000000000").unwrap()
+    ///             .divisible_by(&Natural::from_str("1000000000000").unwrap()),
+    ///     true
+    /// );
     /// ```
     fn divisible_by(mut self, other: &'a Natural) -> bool {
         match (&mut self, other) {
@@ -523,23 +547,26 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
 }
 
 impl<'a> DivisibleBy<Natural> for &'a Natural {
-    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
-    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
-    /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
-    /// is taken by reference and the second by value.
+    /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
+    /// the first is a multiple of the second. The first [`Natural`]s are taken by reference and
+    /// the second by value.
     ///
-    /// This function is more efficient than finding a remainder and checking whether it's zero.
+    /// This means that zero is divisible by any [`Natural`], including zero; but a nonzero
+    /// [`Natural`] is never divisible by zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// It's more efficient to use this function than to compute the remainder and check whether
+    /// it's zero.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
@@ -549,8 +576,11 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// assert_eq!((&Natural::ZERO).divisible_by(Natural::ZERO), true);
     /// assert_eq!((&Natural::from(100u32)).divisible_by(Natural::from(3u32)), false);
     /// assert_eq!((&Natural::from(102u32)).divisible_by(Natural::from(3u32)), true);
-    /// assert_eq!((&Natural::from_str("1000000000000000000000000").unwrap())
-    ///     .divisible_by(Natural::from_str("1000000000000").unwrap()), true);
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .divisible_by(Natural::from_str("1000000000000").unwrap()),
+    ///     true
+    /// );
     /// ```
     fn divisible_by(self, mut other: Natural) -> bool {
         match (self, &mut other) {
@@ -564,23 +594,25 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
 }
 
 impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
-    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
-    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
-    /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
-    /// taken by reference.
+    /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
+    /// the first is a multiple of the second. Both [`Natural`]s are taken by reference.
     ///
-    /// This function is more efficient than finding a remainder and checking whether it's zero.
+    /// This means that zero is divisible by any [`Natural`], including zero; but a nonzero
+    /// [`Natural`] is never divisible by zero.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// It's more efficient to use this function than to compute the remainder and check whether
+    /// it's zero.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
@@ -590,8 +622,11 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     /// assert_eq!((&Natural::ZERO).divisible_by(&Natural::ZERO), true);
     /// assert_eq!((&Natural::from(100u32)).divisible_by(&Natural::from(3u32)), false);
     /// assert_eq!((&Natural::from(102u32)).divisible_by(&Natural::from(3u32)), true);
-    /// assert_eq!((&Natural::from_str("1000000000000000000000000").unwrap())
-    ///     .divisible_by(&Natural::from_str("1000000000000").unwrap()), true);
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///             .divisible_by(&Natural::from_str("1000000000000").unwrap()),
+    ///     true
+    /// );
     /// ```
     fn divisible_by(self, other: &'b Natural) -> bool {
         match (self, other) {

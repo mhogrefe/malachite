@@ -4,9 +4,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper,
+    digit_to_display_byte_lower, digit_to_display_byte_upper, BaseFmtWrapper,
 };
-use malachite_base::num::conversion::string::BaseFmtWrapper;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString,

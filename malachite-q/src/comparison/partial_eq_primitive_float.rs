@@ -4,13 +4,20 @@ use Rational;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialEq<$t> for Rational {
-            /// Determines whether a `Rational` is equal to a value of primitive float type.
+            /// Determines whether a [`Rational`] is equal to a primitive float.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n)$
+            ///
+            /// $M(m) = O(m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is
+            /// `max(self.significant_bits(), other.sci_exponent())`, and $m$ is
+            /// `other.sci_exponent()`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_eq_primitive_float` module.
+            /// See [here](super::partial_eq_primitive_float#partial_eq).
+            #[allow(clippy::cmp_owned)]
             fn eq(&self, other: &$t) -> bool {
                 if !other.is_finite() {
                     false
@@ -27,13 +34,19 @@ macro_rules! impl_float {
         }
 
         impl PartialEq<Rational> for $t {
-            /// Determines whether a value of primitive float type is equal to a `Rational`.
+            /// Determines whether a primitive float is equal to a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n)$
+            ///
+            /// $M(m) = O(m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is
+            /// `max(self.sci_exponent(), other.significant_bits())`, and $m$ is
+            /// `self.sci_exponent()`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_eq_primitive_float` module.
+            /// See [here](super::partial_eq_primitive_float#partial_eq).
             #[inline]
             fn eq(&self, other: &Rational) -> bool {
                 other == self

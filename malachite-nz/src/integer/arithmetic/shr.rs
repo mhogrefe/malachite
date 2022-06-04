@@ -62,25 +62,23 @@ macro_rules! impl_shr_unsigned {
         impl Shr<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor), taking
-            /// the `Integer` by value.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor),
+            /// taking it by value.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!((Integer::ZERO >> 10u8).to_string(), "0");
-            /// assert_eq!((Integer::from(492) >> 2u16).to_string(), "123");
-            /// assert_eq!((-Integer::trillion() >> 10u32).to_string(), "-976562500");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Integer {
                 self >>= bits;
@@ -91,25 +89,23 @@ macro_rules! impl_shr_unsigned {
         impl<'a> Shr<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor), taking
-            /// the `Integer` by reference.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor),
+            /// taking it by reference.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!((&Integer::ZERO >> 10u8).to_string(), "0");
-            /// assert_eq!((&Integer::from(492) >> 2u16).to_string(), "123");
-            /// assert_eq!((&(-Integer::trillion()) >> 10u64).to_string(), "-976562500");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Integer {
                 shr_unsigned_ref(self, bits)
@@ -117,23 +113,23 @@ macro_rules! impl_shr_unsigned {
         }
 
         impl ShrAssign<$t> for Integer {
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor) in place.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor), in
+            /// place.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// x \gets \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// let mut x = Integer::from(1024);
-            /// x >>= 1u8;
-            /// x >>= 2u16;
-            /// x >>= 3u32;
-            /// x >>= 4u64;
-            /// assert_eq!(x.to_string(), "1");
-            /// ```
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign_unsigned(self, bits);
@@ -173,36 +169,23 @@ macro_rules! impl_shr_signed {
         impl Shr<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2), taking the `Integer` by value.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), taking it by value.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!((Integer::ZERO >> 10i8).to_string(), "0");
-            /// assert_eq!((Integer::from(492) >> 2i16).to_string(), "123");
-            /// assert_eq!((-Integer::trillion() >> 10i64).to_string(), "-976562500");
-            /// assert_eq!((Integer::ZERO >> -10i8).to_string(), "0");
-            /// assert_eq!((Integer::from(123) >> -2i16).to_string(), "492");
-            /// assert_eq!(
-            ///     (Integer::from(123) >> -100i32).to_string(),
-            ///     "155921023828072216384094494261248"
-            /// );
-            /// assert_eq!((Integer::from(-123) >> -2i64).to_string(), "-492");
-            /// assert_eq!(
-            ///     (Integer::from(-123) >> -100i8).to_string(),
-            ///     "-155921023828072216384094494261248"
-            /// );
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Integer {
                 self >>= bits;
@@ -213,36 +196,23 @@ macro_rules! impl_shr_signed {
         impl<'a> Shr<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2), taking the `Integer` by reference.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), taking it by reference.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!((&Integer::ZERO >> 10i8).to_string(), "0");
-            /// assert_eq!((&Integer::from(492) >> 2i16).to_string(), "123");
-            /// assert_eq!((&(-Integer::trillion()) >> 10i32).to_string(), "-976562500");
-            /// assert_eq!((&Integer::ZERO >> -10i64).to_string(), "0");
-            /// assert_eq!((&Integer::from(123) >> -2i8).to_string(), "492");
-            /// assert_eq!(
-            ///     (&Integer::from(123) >> -100i16).to_string(),
-            ///     "155921023828072216384094494261248"
-            /// );
-            /// assert_eq!((&Integer::from(-123) >> -2i32).to_string(), "-492");
-            /// assert_eq!(
-            ///     (&Integer::from(-123) >> -100i64).to_string(),
-            ///     "-155921023828072216384094494261248"
-            /// );
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Integer {
                 shr_signed_ref(self, bits)
@@ -250,41 +220,23 @@ macro_rules! impl_shr_signed {
         }
 
         impl ShrAssign<$t> for Integer {
-            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2) in place.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), in place.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// x \gets \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::{NegativeOne, One};
-            /// use malachite_nz::integer::Integer;
-            ///
-            ///     let mut x = Integer::from(1024);
-            ///     x >>= 1i8;
-            ///     x >>= 2i16;
-            ///     x >>= 3i32;
-            ///     x >>= 4i64;
-            ///     assert_eq!(x.to_string(), "1");
-            ///
-            ///     let mut x = Integer::ONE;
-            ///     x >>= -1i8;
-            ///     x >>= -2i16;
-            ///     x >>= -3i32;
-            ///     x >>= -4i64;
-            ///     assert_eq!(x.to_string(), "1024");
-            ///     let mut x = Integer::NEGATIVE_ONE;
-            ///     x >>= -1i8;
-            ///     x >>= -2i16;
-            ///     x >>= -3i32;
-            ///     x >>= -4i64;
-            ///     assert_eq!(x.to_string(), "-1024");
-            /// ```
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign_signed(self, bits)

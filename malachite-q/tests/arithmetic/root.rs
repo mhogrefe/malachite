@@ -16,7 +16,7 @@ where
     for<'a> &'a Rational: CheckedRoot<T, Output = Rational>,
 {
     let n = Rational::from_str(s).unwrap();
-    let out = out.map(|s| s.to_string());
+    let out = out.map(ToString::to_string);
 
     assert_eq!(n.clone().checked_root(exp).map(|x| x.to_string()), out);
     assert_eq!((&n).checked_root(exp).map(|x| x.to_string()), out);
@@ -126,7 +126,7 @@ fn checked_root_properties() {
         if n != 0 {
             assert_eq!(
                 (&n).reciprocal().checked_root(exp),
-                root.as_ref().map(|q| q.reciprocal())
+                root.as_ref().map(Reciprocal::reciprocal)
             );
         }
         if let Some(root) = root {
@@ -144,11 +144,11 @@ fn checked_root_properties() {
         if n != 0u32 {
             assert_eq!(
                 (&n).checked_root(-exp),
-                root.as_ref().map(|q| q.reciprocal())
+                root.as_ref().map(Reciprocal::reciprocal)
             );
             assert_eq!(
                 (&n).reciprocal().checked_root(exp),
-                root.as_ref().map(|q| q.reciprocal())
+                root.as_ref().map(Reciprocal::reciprocal)
             );
         }
         if let Some(root) = root {

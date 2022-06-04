@@ -11,7 +11,8 @@ pub fn num_divisible_by(x: &BigUint, y: &BigUint) -> bool {
 ///
 /// ns.len() must be greater than 1; divisor must be nonzero.
 ///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative.
+/// This is equivalent to `mpz_divisible_ui_p` from `mpz/divis_ui.c`, GMP 6.2.1, where `a` is
+/// non-negative.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn combined_limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     if ns.len() <= BMOD_1_TO_MOD_1_THRESHOLD {

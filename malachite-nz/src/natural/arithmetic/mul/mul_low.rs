@@ -13,13 +13,15 @@ use platform::{
     MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
 
-// Time: worst case O(n<sup>2</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 2.
+// This is equivalent to `mpn_mullo_basecase` from `mpn/generic/mullo_basecase.c`, GMP 6.2.1,
+// `MULLO_VARIANT == 2`.
 pub_crate_test! {limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);
@@ -68,8 +70,8 @@ const MAYBE_RANGE_TOOM22_MUL_LOW: bool = TUNE_PROGRAM_BUILD
     || (MULLO_DC_THRESHOLD == 0 && MULLO_BASECASE_THRESHOLD < SCALED_MUL_TOOM33_THRESHOLD
         || MULLO_DC_THRESHOLD != 0 && MULLO_DC_THRESHOLD < SCALED_MUL_TOOM33_THRESHOLD);
 
-/// We need fractional approximation of the value 0 < a <= 1/2
-/// giving the minimum in the function k = (1 - a) ^ e / (1 - 2 * a ^ e).
+// We need fractional approximation of the value 0 < a <= 1/2
+// giving the minimum in the function k = (1 - a) ^ e / (1 - 2 * a ^ e).
 const fn get_n_lo(n: usize) -> usize {
     if MAYBE_RANGE_BASECASE_MUL_LOW && n < SCALED_MUL_TOOM22_THRESHOLD {
         n >> 1
@@ -86,14 +88,18 @@ const fn get_n_lo(n: usize) -> usize {
 
 // See `limbs_mul_low_same_length_divide_and_conquer` documentation for more details.
 //
-// Time: worst case O(n<sup>log<sub>8</sub>15</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp == tp.
-pub_test! {limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
+// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where
+// `rp == tp`.
+pub_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -196,14 +202,18 @@ pub_test! {limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 //   log(3) / log(2), a = 0.3058... (the optimal value), and k(a) = 0.808...,  the mul / mul_low
 //   speed ratio. We get k * (a + 1 / 6) = 0.929..., but k(a - 1/6) = 0.865....
 //
-// Time: worst case O(n<sup>log<sub>8</sub>15</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp != tp.
-pub_test! {limbs_mul_low_same_length_divide_and_conquer(
+// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where
+// `rp != tp`.
+pub_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_mul_low_same_length_divide_and_conquer(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -244,11 +254,10 @@ pub_test! {limbs_mul_low_same_length_divide_and_conquer(
     limbs_slice_add_same_length_in_place_left(out_hi, &scratch_hi[..n_lo]);
 }}
 
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is mpn_mullo_n_itch from mpn/generic/mullo_n.c, GMP 6.1.2.
+// This is equivalent to `mpn_mullo_n_itch` from `mpn/generic/mullo_n.c`, GMP 6.2.1.
 pub_const_test! {limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
     n << 1
 }}
@@ -275,14 +284,17 @@ pub_test! {limbs_mul_low_same_length_large(
 
 // Multiply two n-limb numbers and return the lowest n limbs of their products.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2.
-pub_crate_test! {limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// This is equivalent to `mpn_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1.
+pub_crate_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_eq!(ys.len(), n);
     assert!(n >= 1);
@@ -304,13 +316,15 @@ pub_crate_test! {limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[
     }
 }}
 
-// Time: worst case O(n<sup>2</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 1.
+// This is equivalent to `mpn_mullo_basecase` from `mpn/generic/mullo_basecase.c`, GMP 6.2.1,
+// `MULLO_VARIANT == 1`.
 pub_crate_test! {limbs_mul_low_same_length_basecase_alt(
     out: &mut [Limb],
     xs: &[Limb],

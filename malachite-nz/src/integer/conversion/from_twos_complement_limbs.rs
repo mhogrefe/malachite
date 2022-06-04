@@ -8,21 +8,26 @@ use natural::Natural;
 use platform::Limb;
 
 impl Integer {
-    /// Converts a slice of limbs to an `Integer`, in ascending order, so that less significant
-    /// limbs have lower indices in the input slice. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is non-
-    /// negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that
+    /// less significant limbs have lower indices in the input slice.
     ///
-    /// This function borrows `xs`. If taking ownership of `xs` is possible,
-    /// `from_owned_twos_complement_limbs_asc` is more efficient.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
+    /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function is more efficient than `from_twos_complement_limbs_desc`.
+    /// This function borrows a slice. If taking ownership of a [`Vec`] is possible instead,
+    /// [`from_owned_twos_complement_limbs_asc`](`Self::from_owned_twos_complement_limbs_asc`) is
+    /// more efficient.
     ///
-    /// Time: worst case O(n)
+    /// This function is more efficient than
+    /// [`from_twos_complement_limbs_desc`](`Self::from_twos_complement_limbs_desc`).
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     ///
     /// # Examples
     /// ```
@@ -33,26 +38,17 @@ impl Integer {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_asc(&[]).to_string(),
-    ///         "0"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_asc(&[123]).to_string(),
-    ///         "123"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_asc(&[4294967173]).to_string(),
-    ///         "-123"
-    ///     );
+    ///     assert_eq!(Integer::from_twos_complement_limbs_asc(&[]), 0);
+    ///     assert_eq!(Integer::from_twos_complement_limbs_asc(&[123]), 123);
+    ///     assert_eq!(Integer::from_twos_complement_limbs_asc(&[4294967173]), -123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_asc(&[3567587328, 232]).to_string(),
-    ///         "1000000000000"
+    ///         Integer::from_twos_complement_limbs_asc(&[3567587328, 232]),
+    ///         1000000000000u64
     ///     );
     ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]).to_string(),
-    ///         "-1000000000000"
+    ///         Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]),
+    ///         -1000000000000i64
     ///     );
     /// }
     /// ```
@@ -64,22 +60,26 @@ impl Integer {
         }
     }
 
-    /// Converts a slice of limbs to an `Integer`, in descending
-    /// order, so that less significant limbs have higher indices in the input slice. The limbs are
-    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
-    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `xs` is
-    /// empty, zero is returned.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in descending order, so that
+    /// less significant limbs have higher indices in the input slice.
     ///
-    /// This function borrows `xs`. If taking ownership of `xs` is possible,
-    /// `from_owned_twos_complement_limbs_desc` is more efficient.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
+    /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function is less efficient than `from_twos_complement_limbs_asc`.
+    /// This function borrows a slice. If taking ownership of a [`Vec`] is possible instead,
+    /// [`from_owned_twos_complement_limbs_desc`](`Self::from_owned_twos_complement_limbs_desc`) is
+    /// more efficient.
     ///
-    /// Time: worst case O(n)
+    /// This function is less efficient than
+    /// [`from_twos_complement_limbs_asc`](`Self::from_twos_complement_limbs_asc`).
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     ///
     /// # Examples
     /// ```
@@ -90,26 +90,17 @@ impl Integer {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_desc(&[]).to_string(),
-    ///         "0"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_desc(&[123]).to_string(),
-    ///         "123"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_desc(&[4294967173]).to_string(),
-    ///         "-123"
-    ///     );
+    ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[]), 0);
+    ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[123]), 123);
+    ///     assert_eq!(Integer::from_twos_complement_limbs_desc(&[4294967173]), -123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_desc(&[232, 3567587328]).to_string(),
-    ///         "1000000000000"
+    ///         Integer::from_twos_complement_limbs_desc(&[232, 3567587328]),
+    ///         1000000000000u64
     ///     );
     ///     assert_eq!(
-    ///         Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]).to_string(),
-    ///         "-1000000000000"
+    ///         Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]),
+    ///         -1000000000000i64
     ///     );
     /// }
     /// ```
@@ -117,21 +108,25 @@ impl Integer {
         Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect())
     }
 
-    /// Converts a slice of limbs to an `Integer`, in ascending order, so that less significant
-    /// limbs have lower indices in the input slice. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is non-
-    /// negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that
+    /// less significant limbs have lower indices in the input slice.
     ///
-    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
-    /// `from_twos_complement_limbs_asc`.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
+    /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function is more efficient than `from_owned_twos_complement_limbs_desc`.
+    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead,
+    /// use [`from_twos_complement_limbs_asc`](`Self::from_twos_complement_limbs_asc`)
     ///
-    /// Time: worst case O(n)
+    /// This function is more efficient than
+    /// [`from_owned_twos_complement_limbs_desc`](`Self::from_owned_twos_complement_limbs_desc`).
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     ///
     /// # Examples
     /// ```
@@ -142,18 +137,9 @@ impl Integer {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_asc(vec![]).to_string(),
-    ///         "0"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_asc(vec![123]).to_string(),
-    ///         "123"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]).to_string(),
-    ///         "-123"
-    ///     );
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![]), 0);
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![123]), 123);
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]), -123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from_owned_twos_complement_limbs_asc(vec![3567587328, 232]),
@@ -178,21 +164,25 @@ impl Integer {
         }
     }
 
-    /// Converts a slice of limbs to an `Integer`, in descending order, so that less significant
-    /// limbs have higher indices in the input slice. The limbs are in two's complement, and the
-    /// most significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
-    /// non-negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in descending order, so that
+    /// less significant limbs have higher indices in the input slice.
     ///
-    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
-    /// `from_twos_complement_limbs_desc`.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
+    /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function is less efficient than `from_owned_twos_complement_limbs_asc`.
+    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead,
+    /// use [`from_twos_complement_limbs_desc`](`Self::from_twos_complement_limbs_desc`).
     ///
-    /// Time: worst case O(n)
+    /// This function is less efficient than
+    /// [`from_owned_twos_complement_limbs_asc`](`Self::from_owned_twos_complement_limbs_asc`).
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     ///
     /// # Examples
     /// ```
@@ -203,18 +193,9 @@ impl Integer {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_desc(vec![]).to_string(),
-    ///         "0"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_desc(vec![123]).to_string(),
-    ///         "123"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]).to_string(),
-    ///         "-123"
-    ///     );
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![]), 0);
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![123]), 123);
+    ///     assert_eq!(Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]), -123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
     ///         Integer::from_owned_twos_complement_limbs_desc(vec![232, 3567587328]),

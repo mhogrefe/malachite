@@ -5,6 +5,8 @@ macro_rules! impl_saturating_abs {
         impl SaturatingAbs for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `saturating_abs` functions in the standard library, for
+            /// example [this one](i32::saturating_abs).
             #[inline]
             fn saturating_abs(self) -> $t {
                 $t::saturating_abs(self)
@@ -12,22 +14,22 @@ macro_rules! impl_saturating_abs {
         }
 
         impl SaturatingAbsAssign for $t {
-            /// Replace `self` with its absolute value, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Replaces a number with its absolute value, saturating at the numeric bounds instead
+            /// of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     |x| & x > -2^{W-1} \\\\
-            ///     2^{W-1} - 1 & x = -2^{W-1},
+            ///     |x| & \text{if} \\quad x > -2^{W-1}, \\\\
+            ///     2^{W-1} - 1 & \text{if} \\quad x = -2^{W-1},
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_abs` module.
+            /// See [here](super::saturating_abs#saturating_abs_assign).
             #[inline]
             fn saturating_abs_assign(&mut self) {
                 *self = self.saturating_abs();

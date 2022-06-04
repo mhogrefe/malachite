@@ -4,36 +4,32 @@ use natural::Natural;
 impl ModAdd<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking all three `Natural`s by value.
-    /// Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::ZERO.mod_add(Natural::from(3u32), Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(7u32).mod_add(Natural::from(5u32), Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_add(Natural::from(3u32), Natural::from(5u32)), 3);
+    /// assert_eq!(Natural::from(7u32).mod_add(Natural::from(5u32), Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// value.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by value.
     #[inline]
     fn mod_add(mut self, other: Natural, m: Natural) -> Natural {
         self.mod_add_assign(other, m);
@@ -44,36 +40,33 @@ impl ModAdd<Natural, Natural> for Natural {
 impl<'a> ModAdd<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking the first two `Natural`s by value
-    /// and the last by reference. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::ZERO.mod_add(Natural::from(3u32), &Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(7u32).mod_add(Natural::from(5u32), &Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_add(Natural::from(3u32), &Natural::from(5u32)), 3);
+    /// assert_eq!(Natural::from(7u32).mod_add(Natural::from(5u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by value
-    /// and m is taken by reference.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by value and `m` is taken by reference.
     #[inline]
     fn mod_add(mut self, other: Natural, m: &'a Natural) -> Natural {
         self.mod_add_assign(other, m);
@@ -84,36 +77,33 @@ impl<'a> ModAdd<Natural, &'a Natural> for Natural {
 impl<'a> ModAdd<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking the first and third `Natural`s by
-    /// value and the second by reference. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first and third [`Natural`]s are taken by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::ZERO.mod_add(&Natural::from(3u32), Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(7u32).mod_add(&Natural::from(5u32), Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_add(&Natural::from(3u32), Natural::from(5u32)), 3);
+    /// assert_eq!(Natural::from(7u32).mod_add(&Natural::from(5u32), Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by value
-    /// and c is taken by reference.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `m` are taken by value and `c` is taken by reference.
     #[inline]
     fn mod_add(mut self, other: &'a Natural, m: Natural) -> Natural {
         self.mod_add_assign(other, m);
@@ -124,36 +114,33 @@ impl<'a> ModAdd<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking the first `Natural` by value and the
-    /// other two by reference. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first [`Natural`] is taken by value and the second and third by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::ZERO.mod_add(&Natural::from(3u32), &Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(7u32).mod_add(&Natural::from(5u32), &Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_add(&Natural::from(3u32), &Natural::from(5u32)), 3);
+    /// assert_eq!(Natural::from(7u32).mod_add(&Natural::from(5u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by value and c and
-    /// m are taken by reference.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
+    /// taken by value and `c` and `m` are taken by reference.
     #[inline]
     fn mod_add(mut self, other: &'a Natural, m: &'b Natural) -> Natural {
         self.mod_add_assign(other, m);
@@ -164,19 +151,18 @@ impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
 impl<'a> ModAdd<Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking the first `Natural` by reference and
-    /// the other two by value. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first [`Natural`] is taken by reference and the second and third by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
-    ///
-    /// where n = `m.significant_bits()`
+    /// assert_eq!((&Natural::ZERO).mod_add(Natural::from(3u32), Natural::from(5u32)), 3);
+    /// assert_eq!((&Natural::from(7u32)).mod_add(Natural::from(5u32), Natural::from(10u32)), 2);
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
@@ -192,8 +178,8 @@ impl<'a> ModAdd<Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by reference and c
-    /// and m are taken by value.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
+    /// taken by reference and `c` and `m` are taken by value.
     #[inline]
     fn mod_add(self, mut other: Natural, m: Natural) -> Natural {
         other.mod_add_assign(self, m);
@@ -204,36 +190,33 @@ impl<'a> ModAdd<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking all the first and third `Natural`s
-    /// by reference and the second by value. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the second
+    /// by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::ZERO).mod_add(Natural::from(3u32), &Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_add(Natural::from(5u32), &Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_add(Natural::from(3u32), &Natural::from(5u32)), 3);
+    /// assert_eq!((&Natural::from(7u32)).mod_add(Natural::from(5u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by
-    /// reference and c is taken by value.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `m` are taken by reference and `c` is taken by value.
     #[inline]
     fn mod_add(self, mut other: Natural, m: &'b Natural) -> Natural {
         other.mod_add_assign(self, m);
@@ -244,36 +227,33 @@ impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking the first two `Natural`s by
-    /// reference and the third by value. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::ZERO).mod_add(&Natural::from(3u32), Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_add(&Natural::from(5u32), Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_add(&Natural::from(3u32), Natural::from(5u32)), 3);
+    /// assert_eq!((&Natural::from(7u32)).mod_add(&Natural::from(5u32), Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by
-    /// reference and m is taken by value.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by reference and `m` is taken by value.
     fn mod_add(self, other: &'b Natural, m: Natural) -> Natural {
         let sum = self + other;
         if sum < m {
@@ -287,36 +267,32 @@ impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod a `Natural`, taking all three `Natural`s by reference.
-    /// Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAdd;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::ZERO).mod_add(&Natural::from(3u32), &Natural::from(5u32)).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(7u32)).mod_add(&Natural::from(5u32), &Natural::from(10u32)).to_string(),
-    ///     "2"
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_add(&Natural::from(3u32), &Natural::from(5u32)), 3);
+    /// assert_eq!((&Natural::from(7u32)).mod_add(&Natural::from(5u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// reference.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by reference.
     fn mod_add(self, other: &'b Natural, m: &'c Natural) -> Natural {
         let sum = self + other;
         if sum < *m {
@@ -328,19 +304,21 @@ impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModAddAssign<Natural, Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod a `Natural` in place, taking the second and third
-    /// `Natural`s by value. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -348,15 +326,15 @@ impl ModAddAssign<Natural, Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_add_assign(Natural::from(3u32), Natural::from(5u32));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// let mut x = Natural::from(7u32);
     /// x.mod_add_assign(Natural::from(5u32), Natural::from(10u32));
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// value and a == b.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by value and `a == b`.
     fn mod_add_assign(&mut self, other: Natural, m: Natural) {
         *self += other;
         if *self >= m {
@@ -366,19 +344,22 @@ impl ModAddAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod a `Natural` in place, taking the second `Natural` by
-    /// value and the third by reference. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value
+    /// and the second by reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -386,15 +367,15 @@ impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_add_assign(Natural::from(3u32), &Natural::from(5u32));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// let mut x = Natural::from(7u32);
     /// x.mod_add_assign(Natural::from(5u32), &Natural::from(10u32));
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by value,
-    /// m is taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_add_assign(&mut self, other: Natural, m: &'a Natural) {
         *self += other;
         if *self >= *m {
@@ -404,19 +385,22 @@ impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod a `Natural` in place, taking the second `Natural` by
-    /// reference and the third by value. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
+    /// reference and the second by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -424,15 +408,15 @@ impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_add_assign(&Natural::from(3u32), Natural::from(5u32));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// let mut x = Natural::from(7u32);
     /// x.mod_add_assign(&Natural::from(5u32), Natural::from(10u32));
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by value,
-    /// c is taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` and
+    /// `m` are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_add_assign(&mut self, other: &'a Natural, m: Natural) {
         *self += other;
         if *self >= m {
@@ -442,19 +426,22 @@ impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModAddAssign<&'a Natural, &'b Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod a `Natural` in place, taking the second and third
-    /// `Natural`s by reference. Assumes the inputs are already reduced mod `m`.
+    /// Adds two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -462,15 +449,15 @@ impl<'a, 'b> ModAddAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_add_assign(&Natural::from(3u32), &Natural::from(5u32));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// let mut x = Natural::from(7u32);
     /// x.mod_add_assign(&Natural::from(5u32), &Natural::from(10u32));
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by value, c and m
-    /// are taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_addN` from `fmpz_mod/add.c`, FLINT 2.7.1, where `b` is
+    /// taken by value, `c` and `m` are taken by reference, and `a == b`.
     fn mod_add_assign(&mut self, other: &'a Natural, m: &'b Natural) {
         *self += other;
         if *self >= *m {

@@ -38,16 +38,19 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod $2^p$. Assumes the input is already reduced
-                    /// mod $2^p$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. Assumes
+                    /// the input is already reduced modulo $2^k$.
                     ///
-                    /// $f(x, n, p) = y$, where $x, y < 2^p$ and $2^nx \equiv y \mod 2^p$.
+                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
+                    /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
                         mod_power_of_2_shl_unsigned(self, other, pow)
@@ -55,16 +58,19 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Replaces `self` with `self << other` mod $2^p$. Assumes the input is
-                    /// already reduced mod $2^p$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
+                    /// place. Assumes the input is already reduced modulo $2^k$.
                     ///
-                    /// $x \gets y$, where $x, y < 2^p$ and $2^nx \equiv y \mod 2^p$.
+                    /// $x \gets y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
+                    /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
                         mod_power_of_2_shl_assign_unsigned(self, other, pow);
@@ -130,17 +136,20 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod $2^p$. Assumes the input is already reduced
-                    /// mod $2^p$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. Assumes
+                    /// the input is already reduced modulo $2^k$.
                     ///
-                    /// $f(x, n, p) = y$, where $x, y < 2^p$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^p$.
+                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
+                    ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
+                    /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
                         mod_power_of_2_shl_signed(self, other, pow)
@@ -148,17 +157,20 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Replaces `self` with `self << other` mod $2^p$. Assumes the input is
-                    /// already reduced mod $2^p$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
+                    /// place. Assumes the input is already reduced modulo $2^k$.
                     ///
-                    /// $x \gets y$, where $x, y < 2^p$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^p$.
+                    /// $x \gets y$, where $x, y < 2^k$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
+                    /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
                         mod_power_of_2_shl_assign_signed(self, other, pow);

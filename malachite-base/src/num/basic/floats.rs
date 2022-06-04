@@ -6,7 +6,7 @@ use num::arithmetic::traits::{
     FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
     Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
-use num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
+use num::basic::traits::{Iverson, NegativeOne, One, OneHalf, Two, Zero};
 use num::conversion::traits::{
     CheckedFrom, CheckedInto, ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger,
     RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
@@ -22,15 +22,16 @@ use std::ops::{
 };
 use std::str::FromStr;
 
-/// This trait defines functions on primitive float types: `f32` and `f64`.
+/// This trait defines functions on primitive float types: [`f32`] and [`f64`].
 ///
 /// Many of the functions here concern exponents and mantissas. We define three ways to express a
 /// float, each with its own exponent and mantissa. In the following, let $x$ be an arbitrary
 /// positive, finite, non-zero, non-NaN float. Let $M$ and $E$ be the mantissa width and exponent
-/// width of the floating point type; for `f32`s, this is 23 and 8, and for `f64`s it's 52 and 11.
+/// width of the floating point type; for [`f32`]s, this is 23 and 8, and for [`f64`]s it's 52 and
+/// 11.
 ///
-/// These mantissas and exponents are defined for negative numbers too; just work with the absolute
-/// value.
+/// In the following we assume that $x$ is positive, but you can easily extend these definitions to
+/// negative floats by first taking their absolute value.
 ///
 /// # raw form
 /// The raw exponent and raw mantissa are the actual bit patterns used to represent the components
@@ -39,19 +40,19 @@ use std::str::FromStr;
 /// from both being zero. We have
 /// $$
 /// x = \\begin{cases}
-///     2^{2-2^{E-1}-M}m_r & e_r = 0 \\\\
+///     2^{2-2^{E-1}-M}m_r & \text{if} \quad e_r = 0, \\\\
 ///     2^{e_r-2^{E-1}+1}(2^{-M}m_r+1) & \textrm{otherwise},
 /// \\end{cases}
 /// $$
 /// $$
 /// e_r = \\begin{cases}
-///     0 & x < 2^{2-2^{E-1}} \\\\
+///     0 & \text{if} \quad x < 2^{2-2^{E-1}}, \\\\
 ///     \lfloor \log_2 x \rfloor + 2^{E-1} - 1 & \textrm{otherwise},
 /// \\end{cases}
 /// $$
 /// $$
 /// m_r = \\begin{cases}
-///     2^{M+2^{E-1}-2}x & x < 2^{2-2^{E-1}} \\\\
+///     2^{M+2^{E-1}-2}x & \text{if} \quad x < 2^{2-2^{E-1}}, \\\\
 ///     2^M \left ( \frac{x}{2^{\lfloor \log_2 x \rfloor}}-1\right ) & \textrm{otherwise}.
 /// \\end{cases}
 /// $$
@@ -212,55 +213,63 @@ pub trait PrimitiveFloat:
     + UpperExp
     + Zero
 {
-    /// $M+E+1$
-    /// - For `f32`, this is 32.
-    /// - For `f64`, this is 64.
+    /// The number of bits taken up by the type.
+    ///
+    /// This is $M+E+1$. The three terms in the sum correspond to the width of the mantissa, the
+    /// width of the exponent, and the sign bit.
+    /// - For [`f32`]s, this is 32.
+    /// - For [`f64`]s, this is 64.
     const WIDTH: u64;
-    /// - For `f32`, this is 8.
-    /// - For `f64`, this is 11.
+    /// The number of bits taken up by the exponent.
+    /// - For [`f32`]s, this is 8.
+    /// - For [`f64`]s, this is 11.
     const EXPONENT_WIDTH: u64 = Self::WIDTH - Self::MANTISSA_WIDTH - 1;
-    /// - For `f32`, this is 23.
-    /// - For `f64`, this is 52.
+    /// The number of bits taken up by the mantissa.
+    /// - For [`f32`]s, this is 23.
+    /// - For [`f64`]s, this is 52.
     const MANTISSA_WIDTH: u64;
-    /// $2-2^{E-1}$
-    /// - For `f32`, this is -126.
-    /// - For `f64`, this is -1022.
+    /// The smallest possible exponent of a float in the normal range. Any floats with smaller
+    /// exponents are subnormal and thus have reduced precision. This is $2-2^{E-1}$.
+    /// - For [`f32`]s, this is -126.
+    /// - For [`f64`]s, this is -1022.
     const MIN_NORMAL_EXPONENT: i64 = -(1 << (Self::EXPONENT_WIDTH - 1)) + 2;
-    /// $2-2^{E-1}-M$
-    /// - For `f32`, this is -149.
-    /// - For `f64`, this is -1074.
+    /// The smallest possible exponent of a float. This is $2-2^{E-1}-M$.
+    /// - For [`f32`]s, this is -149.
+    /// - For [`f64`]s, this is -1074.
     const MIN_EXPONENT: i64 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i64);
-    /// $2^{E-1}-1$
-    /// - For `f32`, this is 127.
-    /// - For `f64`, this is 1023.
+    /// The largest possible exponent of a float. This is $2^{E-1}-1$.
+    /// - For [`f32`]s, this is 127.
+    /// - For [`f64`]s, this is 1023.
     const MAX_EXPONENT: i64 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
-    /// $2^{2-2^{E-1}-M}$
-    /// - For `f32`, this is $2^{-149}$, or `1.0e-45`.
-    /// - For `f64`, this is $2^{-1074}$, or `5.0e-324`.
+    /// The smallest positive float. This is $2^{2-2^{E-1}-M}$.
+    /// - For [`f32`]s, this is $2^{-149}$, or `1.0e-45`.
+    /// - For [`f64`]s, this is $2^{-1074}$, or `5.0e-324`.
     const MIN_POSITIVE_SUBNORMAL: Self;
-    /// $2^{2-2^{E-1}-M}(2^M-1)$
-    /// - For `f32`, this is $2^{-149}(2^{23}-1)$, or `1.1754942e-38`.
-    /// - For `f64`, this is $2^{-1074}(2^{52}-1)$, or `2.225073858507201e-308`.
+    /// The largest float in the subnormal range. This is $2^{2-2^{E-1}-M}(2^M-1)$.
+    /// - For [`f32`]s, this is $2^{-149}(2^{23}-1)$, or `1.1754942e-38`.
+    /// - For [`f64`]s, this is $2^{-1074}(2^{52}-1)$, or `2.225073858507201e-308`.
     const MAX_SUBNORMAL: Self;
-    /// $2^{2-2^{E-1}}$
-    /// - For `f32`, this is $2^{-126}$, or `1.1754944e-38`.
-    /// - For `f64`, this is $2^{-1022}$, or `2.2250738585072014e-308`.
+    /// The smallest positive normal float. This is $2^{2-2^{E-1}}$.
+    /// - For [`f32`]s, this is $2^{-126}$, or `1.1754944e-38`.
+    /// - For [`f64`]s, this is $2^{-1022}$, or `2.2250738585072014e-308`.
     const MIN_POSITIVE_NORMAL: Self;
-    /// $2^{2^{E-1}-1}(2-2^{-M})$
-    /// - For `f32`, this is $2^{127}(2-2^{-23})$, or `3.4028235e38`.
-    /// - For `f64`, this is $2^{1023}(2-2^{-52})$, or `1.7976931348623157e308`.
+    /// The largest finite float. This is $2^{2^{E-1}-1}(2-2^{-M})$.
+    /// - For [`f32`]s, this is $2^{127}(2-2^{-23})$, or `3.4028235e38`.
+    /// - For [`f64`]s, this is $2^{1023}(2-2^{-52})$, or `1.7976931348623157e308`.
     const MAX_FINITE: Self;
     const NEGATIVE_ZERO: Self;
     const POSITIVE_INFINITY: Self;
     const NEGATIVE_INFINITY: Self;
     const NAN: Self;
-    /// $2^{M+1}+1$
-    /// - For `f32`, this is $2^{24}+1$, or 16777217.
-    /// - For `f64`, this is $2^{53}+1$, or 9007199254740993.
+    /// The smallest positive integer that cannot be represented as a float. This is $2^{M+1}+1$.
+    /// - For [`f32`]s, this is $2^{24}+1$, or 16777217.
+    /// - For [`f64`]s, this is $2^{53}+1$, or 9007199254740993.
     const SMALLEST_UNREPRESENTABLE_UINT: u64;
-    /// $2^{M+1}(2^E-1)+1$
-    /// - For `f32`, this is $2^{32}-2^{24}+1$, or 4278190081.
-    /// - For `f64`, this is $2^{64}-2^{53}+1$, or 18437736874454810625.
+    /// If you list all floats in increasing order, excluding NaN and giving negative and positive
+    /// zero separate adjacent spots, this will be index of the last element, positive infinity. It
+    /// is $2^{M+1}(2^E-1)+1$.
+    /// - For [`f32`]s, this is $2^{32}-2^{24}+1$, or 4278190081.
+    /// - For [`f64`]s, this is $2^{64}-2^{53}+1$, or 18437736874454810625.
     const LARGEST_ORDERED_REPRESENTATION: u64;
 
     fn is_nan(self) -> bool;
@@ -430,10 +439,11 @@ pub trait PrimitiveFloat:
     /// adjacent integers.
     ///
     /// Negative infinity is mapped to 0, and positive infinity is mapped to the largest value,
-    /// `LARGEST_ORDERED_REPRESENTATION`. Negative and positive zero are mapped to distinct
-    /// adjacent values. Passing in `NaN` panics.
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION).
+    /// Negative and positive zero are mapped to distinct adjacent values. Passing in `NaN` panics.
     ///
-    /// The inverse operation is `from_ordered_representation`.
+    /// The inverse operation is
+    /// [`from_ordered_representation`](PrimitiveFloat::from_ordered_representation).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -464,20 +474,24 @@ pub trait PrimitiveFloat:
         }
     }
 
-    /// Maps a non-negative integer, less than or equal to `LARGEST_ORDERED_REPRESENTATION`, to a
+    /// Maps a non-negative integer, less than or equal to
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION), to a
     /// float. The map preserves ordering, and adjacent integers are mapped to adjacent floats.
     ///
-    /// Zero is mapped to negative infinity, and `LARGEST_ORDERED_REPRESENTATION` is mapped to
-    /// positive infinity. Negative and positive zero are produced by two distinct adjacent
-    /// integers. `NaN` is never produced.
+    /// Zero is mapped to negative infinity, and
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION) is
+    /// mapped to positive infinity. Negative and positive zero are produced by two distinct
+    /// adjacent integers. `NaN` is never produced.
     ///
-    /// The inverse operation is `to_ordered_representation`.
+    /// The inverse operation is
+    /// [`to_ordered_representation`](PrimitiveFloat::to_ordered_representation).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `self` is greater than `LARGEST_ORDERED_REPRESENTATION`.
+    /// Panics if `self` is greater than
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION).
     ///
     /// # Examples
     /// ```
@@ -542,9 +556,11 @@ pub trait PrimitiveFloat:
     /// Given a scientific exponent, returns the largest possible precision for a float with that
     /// exponent.
     ///
-    /// See the documentation of the `precision` function for a definition of precision.
+    /// See the documentation of the [`precision`](PrimitiveFloat::precision) function for a
+    /// definition of precision.
     ///
-    /// For exponents greater than or equal to `MIN_NORMAL_EXPONENT`, the maximum precision is one
+    /// For exponents greater than or equal to
+    /// [`MIN_NORMAL_EXPONENT`](PrimitiveFloat::MIN_NORMAL_EXPONENT), the maximum precision is one
     /// more than the mantissa width. For smaller exponents (corresponding to the subnormal range),
     /// the precision is lower.
     ///
@@ -552,7 +568,8 @@ pub trait PrimitiveFloat:
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `self` is less than `MIN_EXPONENT` or greater than `MAX_EXPONENT`.
+    /// Panics if `self` is less than [`MIN_EXPONENT`](PrimitiveFloat::MIN_EXPONENT) or greater
+    /// than [`MAX_EXPONENT`](PrimitiveFloat::MAX_EXPONENT).
     ///
     /// # Examples
     /// ```
@@ -575,7 +592,7 @@ pub trait PrimitiveFloat:
     }
 }
 
-/// This macro defines basic trait implementations for floating-point types.
+/// Defines basic trait implementations for floating-point types.
 macro_rules! impl_basic_traits_primitive_float {
     (
         $t: ident,
@@ -641,49 +658,36 @@ macro_rules! impl_basic_traits_primitive_float {
         impl_named!($t);
 
         /// The constant 0.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
         impl Zero for $t {
             const ZERO: $t = 0.0;
         }
 
         /// The constant 1.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
         impl One for $t {
             const ONE: $t = 1.0;
         }
 
         /// The constant 2.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
         impl Two for $t {
             const TWO: $t = 2.0;
         }
 
+        /// The constant 1/2.
+        impl OneHalf for $t {
+            const ONE_HALF: $t = 0.5;
+        }
+
         /// The constant -1.0 for primitive floating-point types.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
         impl NegativeOne for $t {
             const NEGATIVE_ONE: $t = -1.0;
         }
 
         /// The lowest value representable by this type, negative infinity.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
         impl Min for $t {
             const MIN: $t = $t::NEGATIVE_INFINITY;
         }
 
-        /// The highest value representable by this type, negative infinity.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// The highest value representable by this type, positive infinity.
         impl Max for $t {
             const MAX: $t = $t::POSITIVE_INFINITY;
         }

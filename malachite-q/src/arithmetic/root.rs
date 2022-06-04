@@ -6,18 +6,22 @@ use Rational;
 impl CheckedRoot<u64> for Rational {
     type Output = Rational;
 
-    /// Returns the the $n$th root of a `Rational`, or `None` if the `Rational` is not the $n$th
-    /// power of a `Rational`. The `Rational` is taken by value.
+    /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a
+    /// perfect $n$th power. The [`Rational`] is taken by value.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -25,7 +29,6 @@ impl CheckedRoot<u64> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -68,18 +71,22 @@ impl CheckedRoot<u64> for Rational {
 impl<'a> CheckedRoot<u64> for &'a Rational {
     type Output = Rational;
 
-    /// Returns the the $n$th root of a `Rational`, or `None` if the `Rational` is not the $n$th
-    /// power of a `Rational`. The `Rational` is taken by reference.
+    /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a
+    /// perfect $n$th power. The [`Rational`] is taken by reference.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -87,7 +94,6 @@ impl<'a> CheckedRoot<u64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -129,18 +135,22 @@ impl<'a> CheckedRoot<u64> for &'a Rational {
 impl CheckedRoot<i64> for Rational {
     type Output = Rational;
 
-    /// Returns the the $n$th root of a `Rational`, or `None` if the `Rational` is not the $n$th
-    /// power of a `Rational`. The `Rational` is taken by value.
+    /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a
+    /// perfect $n$th power. The [`Rational`] is taken by value.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, if `exp` is even and `self` is negative, or if `self` is zero and
@@ -149,7 +159,6 @@ impl CheckedRoot<i64> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -188,18 +197,22 @@ impl CheckedRoot<i64> for Rational {
 impl<'a> CheckedRoot<i64> for &'a Rational {
     type Output = Rational;
 
-    /// Returns the the $n$th root of a `Rational`, or `None` if the `Rational` is not the $n$th
-    /// power of a `Rational`. The `Rational` is taken by reference.
+    /// Returns the the $n$th root of a [`Rational`], or `None` if the [`Rational`] is not a
+    /// perfect $n$th power. The [`Rational`] is taken by reference.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, if `exp` is even and `self` is negative, or if `self` is zero and
@@ -208,7 +221,6 @@ impl<'a> CheckedRoot<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;

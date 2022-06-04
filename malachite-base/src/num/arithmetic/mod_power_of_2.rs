@@ -35,20 +35,20 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl ModPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides a value by a power of 2, returning just the remainder.
+            /// Divides a number by $2^k$, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#mod_power_of_2).
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $s {
                 mod_power_of_2_unsigned(self, pow)
@@ -56,20 +56,20 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl ModPowerOf2Assign for $s {
-            /// Divides a value by a power of 2, replacing the first value by the remainder.
+            /// Divides a number by $2^k$, replacing the first number by the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#mod_power_of_2_assign).
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
                 mod_power_of_2_assign_unsigned(self, pow);
@@ -79,21 +79,22 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl RemPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides a value by a power of 2, returning just the remainder. For unsigned
-            /// integers, rem is equivalent to mod.
+            /// Divides a number by $2^k$, returning just the remainder. For unsigned
+            /// integers, `rem_power_of_2` is equivalent to
+            /// [`mod_power_of_2`](super::traits::ModPowerOf2).
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#rem_power_of_2).
             #[inline]
             fn rem_power_of_2(self, pow: u64) -> $s {
                 self.mod_power_of_2(pow)
@@ -101,21 +102,22 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl RemPowerOf2Assign for $s {
-            /// Divides a value by a power of 2, replacing the first value by the remainder. For
-            /// unsigned integers, rem is equivalent to mod.
+            /// Divides a number by $2^k$, replacing the first number by the remainder. For
+            /// unsigned integers, `rem_power_of_2_assign` is equivalent to
+            /// [`mod_power_of_2_assign`](super::traits::ModPowerOf2Assign).
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#rem_power_of_2_assign).
             #[inline]
             fn rem_power_of_2_assign(&mut self, pow: u64) {
                 self.mod_power_of_2_assign(pow)
@@ -125,23 +127,23 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl NegModPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides the negative of a value by a power of 2, returning just the remainder.
+            /// Divides the negative of a number by a $2^k$, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p - r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k - r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// f(x, p) = 2^p\left \lceil \frac{x}{2^p} \right \rceil - x.
+            /// f(x, k) = 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
+            /// Panics if `self` is nonzero and `pow` is greater than `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#neg_mod_power_of_2).
             #[inline]
             fn neg_mod_power_of_2(self, pow: u64) -> $s {
                 neg_mod_power_of_2_unsigned(self, pow)
@@ -149,23 +151,23 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl NegModPowerOf2Assign for $s {
-            /// Divides the negative of a value by a power of 2, returning just the remainder.
+            /// Divides the negative of a number by $2^k$, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p - r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k - r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// x \gets 2^p\left \lceil \frac{x}{2^p} \right \rceil - x.
+            /// x \gets 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
+            /// Panics if `self` is nonzero and `pow` is greater than `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#neg_mod_power_of_2_assign).
             #[inline]
             fn neg_mod_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.neg_mod_power_of_2(pow)
@@ -232,24 +234,24 @@ macro_rules! impl_mod_power_of_2_signed {
         impl ModPowerOf2 for $s {
             type Output = $u;
 
-            /// Divides a value by a power of 2, returning just the remainder. The remainder is
+            /// Divides a number by $2^k$, returning just the remainder. The remainder is
             /// non-negative.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is negative and `pow` is greater than `$s::WIDTH`.
+            /// Panics if `self` is negative and `pow` is greater than `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#mod_power_of_2).
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $u {
                 mod_power_of_2_signed(self, pow)
@@ -257,24 +259,24 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl ModPowerOf2Assign for $s {
-            /// Divides a value by a power of 2, replacing the first value by the remainder. The
+            /// Divides a number by $2^k$, replacing the first number by the remainder. The
             /// remainder is non-negative.
             ///
             /// If the quotient were computed, he quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is negative and `pow` is greater than or equal to `$s::WIDTH`.
+            /// Panics if `self` is negative and `pow` is greater than or equal to `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#mod_power_of_2_assign).
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
                 mod_power_of_2_assign_signed(self, pow);
@@ -284,21 +286,21 @@ macro_rules! impl_mod_power_of_2_signed {
         impl RemPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides a value by a power of 2, returning just the remainder. The remainder has
-            /// the same sign as the first value.
+            /// Divides a number by $2^k$, returning just the remainder. The remainder has the same
+            /// sign as the first number.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq |r| < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq |r| < 2^k$.
             ///
             /// $$
-            /// f(x, p) = x - 2^p\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^p} \right \rfloor.
+            /// f(x, k) = x - 2^k\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#rem_power_of_2).
             #[inline]
             fn rem_power_of_2(self, pow: u64) -> $s {
                 rem_power_of_2_signed::<$u, $s>(self, pow)
@@ -306,21 +308,21 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl RemPowerOf2Assign for $s {
-            /// Divides a value by a power of 2, replacing the first value by the remainder. The
-            /// remainder has the same sign as the first value.
+            /// Divides a number by $2^k$, replacing the first number by the remainder. The
+            /// remainder has the same sign as the first number.
             ///
             /// If the quotient were computed, he quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
             ///
             /// $$
-            /// x \gets x - 2^p\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^p} \right \rfloor.
+            /// x \gets x - 2^k\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^k} \right \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#rem_power_of_2_assign).
             #[inline]
             fn rem_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.rem_power_of_2(pow)
@@ -330,25 +332,25 @@ macro_rules! impl_mod_power_of_2_signed {
         impl CeilingModPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides a value by a power of 2, returning just the remainder. The remainder is
+            /// Divides a number by $2^k$, returning just the remainder. The remainder is
             /// non-positive.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq -r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq -r < 2^k$.
             ///
             /// $$
-            /// f(x, y) =  x - 2^p\left \lceil \frac{x}{2^p} \right \rceil.
+            /// f(x, y) =  x - 2^k\left \lceil \frac{x}{2^k} \right \rceil.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
-            /// `$s::WIDTH`.
+            /// Panics if `self` is positive or `Self::MIN`, and `pow` is greater than or equal to
+            /// `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#ceiling_mod_power_of_2).
             #[inline]
             fn ceiling_mod_power_of_2(self, pow: u64) -> $s {
                 ceiling_mod_power_of_2_signed::<$u, $s>(self, pow)
@@ -356,25 +358,25 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl CeilingModPowerOf2Assign for $s {
-            /// Divides a value by a power of 2, replacing the first value by the remainder. The
-            /// remainder has the opposite sign of the second value.
+            /// Divides a number by $2^k$, replacing the first number by the remainder. The
+            /// remainder is non-positive.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^p + r$ and $0 \leq -r < 2^p$.
+            /// $x = q2^k + r$ and $0 \leq -r < 2^k$.
             ///
             /// $$
-            /// x \gets x - 2^p\left \lceil\frac{x}{2^p} \right \rceil.
+            /// x \gets x - 2^k\left \lceil\frac{x}{2^k} \right \rceil.
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
-            /// `$s::WIDTH`.
+            /// Panics if `self` is positive or `Self::MIN`, and `pow` is greater than or equal to
+            /// `Self::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
+            /// See [here](super::mod_power_of_2#ceiling_mod_power_of_2_assign).
             #[inline]
             fn ceiling_mod_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.ceiling_mod_power_of_2(pow)

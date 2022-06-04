@@ -7,8 +7,8 @@ use vecs::exhaustive::{
     ShortlexVecs,
 };
 
-/// Generates all `String`s of a given length with `char`s from a single iterator, in lexicographic
-/// order.
+/// Generates all [`String`]s of a given length with [`char`]s from a single iterator, in
+/// lexicographic order.
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
 ///
@@ -16,28 +16,15 @@ use vecs::exhaustive::{
 ///
 /// The output length is $\ell^n$, where $\ell$ is `cs.count()` and $n$ is `len`.
 ///
-/// If `len` is 0, the output consists of one empty `String`.
+/// If `len` is 0, the output consists of one empty [`String`].
 ///
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, n) = O(n + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, n) = O(n + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory functions of `cs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
 ///
 /// let ss = lex_fixed_length_strings_using_chars(2, ['c', 'a', 't'].iter().cloned()).collect_vec();
@@ -54,15 +41,17 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     strings_from_char_vecs(lex_vecs_fixed_length_from_single(len, cs))
 }
 
-/// Generates all `String`s of a given length in lexicographic order.
+/// Generates all [`String`]s of a given length in lexicographic order.
 ///
-/// The order is lexicographic with respect to the order of `exhaustive_chars`, which is not the
-/// default lexicographic order for `char`s. If you want that order, use
+/// The order is lexicographic with respect to the order of
+/// [`exhaustive_chars`](crate::chars::exhaustive::exhaustive_chars), which is not the default
+/// lexicographic order for [`char`]s. (For example, the first characters are not control
+/// characters, but lowercase Latin letters.) If you want the default [`char`] order, use
 /// `lex_fixed_length_strings_using_chars(len, chars_increasing())`.
 ///
 /// The output length is $1112064^n$, where $n$ is `len`.
 ///
-/// If `len` is 0, the output consists of one empty `String`.
+/// If `len` is 0, the output consists of one empty [`String`].
 ///
 /// # Complexity per iteration
 /// $T(i, n) = O(n)$
@@ -76,7 +65,6 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings;
 ///
 /// let ss = lex_fixed_length_strings(2).take(20).collect_vec();
@@ -95,37 +83,20 @@ pub fn lex_fixed_length_strings(
     lex_fixed_length_strings_using_chars(len, exhaustive_chars())
 }
 
-/// Generates all `String`s of a given length with `char`s from a single iterator.
+/// Generates all `String`s of a given length with [`char`]s from a single iterator.
 ///
 /// If `cs` is finite, the output length is $\ell^n$, where $\ell$ is `cs.count()` and $n$ is `len`.
 /// If `cs` is infinite, the output is also infinite.
 ///
-/// If `len` is 0, the output consists of one empty `String`.
+/// If `len` is 0, the output consists of one empty [`String`].
 ///
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
-///
-/// # Complexity per iteration
-/// If `cs` is finite:
-///
-/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
-///
-/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
-///
-/// If `cs` is infinite:
-///
-/// $T(i, n) = O(n + T^\prime(\sqrt\[n\]{i}))$
-///
-/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory functions of `cs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings_using_chars;
 ///
 /// let ss = exhaustive_fixed_length_strings_using_chars(2, ['c', 'a', 't'].iter().cloned())
@@ -143,27 +114,17 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     strings_from_char_vecs(exhaustive_vecs_fixed_length_from_single(len, cs))
 }
 
-/// Generates all `String`s of a given length.
+/// Generates all [`String`]s of a given length.
 ///
 /// The output length is $1112064^n$, where $n$ is `len`.
 ///
-/// If `len` is 0, the output consists of one empty `String`.
-///
-/// # Complexity per iteration
-/// If `cs` is finite:
-///
-/// $T(i, n) = O(556032^n \sqrt\[n\]{i})$
-///
-/// $M(i, n) = O(n + \sqrt\[n\]{i})$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+/// If `len` is 0, the output consists of one empty [`String`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings;
 ///
 /// let ss = exhaustive_fixed_length_strings(2).take(20).collect_vec();
@@ -182,17 +143,17 @@ pub fn exhaustive_fixed_length_strings(
     exhaustive_fixed_length_strings_using_chars(len, exhaustive_chars())
 }
 
-/// Generates `String`s with `char`s from a specified iterator, in shortlex order.
+/// Generates [`String`]s with [`char`]s from a specified iterator, in shortlex order.
 ///
-/// Shortlex order means that the `String`s are output from shortest to longest, and `String`s of
-/// the same length are output in lexicographic order with respect to the ordering of the `char`s
-/// specified by the input iterator.
+/// Shortlex order means that the [`String`]s are output from shortest to longest, and [`String`]s
+/// of the same length are output in lexicographic order with respect to the ordering of the
+/// [`char`]s specified by the input iterator.
 ///
-/// `cs` must be finite; if it's infinite, only `String`s of length 0 and 1 are ever produced.
+/// `cs` must be finite; if it's infinite, only [`String`]s of length 0 and 1 are ever produced.
 ///
 /// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
-/// The lengths of the output `String`s grow logarithmically.
+/// The lengths of the output [`String`]s grow logarithmically.
 ///
 /// # Complexity per iteration
 /// $T(i) = O(\log i)$
@@ -206,7 +167,6 @@ pub fn exhaustive_fixed_length_strings(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
 ///
 /// let ss = shortlex_strings_using_chars('x'..='z')
@@ -227,16 +187,18 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
     strings_from_char_vecs(shortlex_vecs(cs))
 }
 
-/// Generates `String`s in shortlex order.
+/// Generates [`String`]s in shortlex order.
 ///
-/// Shortlex order means that the `String`s are output from shortest to longest, and `String`s of
-/// the same length are output in lexicographic order with respect to the order of
-/// `exhaustive_chars`, which is not the  default lexicographic order for `char`s. If you want that
-/// order, use `shortlex_strings_using_chars(chars_increasing())`.
+/// Shortlex order means that the [`String`]s are output from shortest to longest, and [`String`]s
+/// of the same length are output in lexicographic order with respect to the order of
+/// [`exhaustive_chars`](crate::chars::exhaustive::exhaustive_chars), which is not the default
+/// lexicographic order for [`char`]s. (For example, the first characters are not control
+/// characters, but lowercase Latin letters.) If you want the default [`char`] order, use
+/// `shortlex_strings_using_chars(chars_increasing())`.
 ///
 /// The output is infinite.
 ///
-/// The lengths of the output `String`s grow logarithmically.
+/// The lengths of the output [`String`]s grow logarithmically.
 ///
 /// # Complexity per iteration
 /// $T(i) = O(\log i)$
@@ -250,7 +212,6 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::shortlex_strings;
 ///
 /// let ss = shortlex_strings().take(20).collect_vec();
@@ -268,11 +229,11 @@ pub fn shortlex_strings(
     shortlex_strings_using_chars(exhaustive_chars())
 }
 
-/// Generates all `String`s with `char`s from a specified iterator.
+/// Generates all [`String`]s with [`char`]s from a specified iterator.
 ///
 /// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
-/// The lengths of the output `String`s grow logarithmically.
+/// The lengths of the output [`String`]s grow logarithmically.
 ///
 /// # Complexity per iteration
 /// $T(i) = O(\log i)$
@@ -286,7 +247,6 @@ pub fn shortlex_strings(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 ///
 /// let ss = exhaustive_strings_using_chars('x'..='z')
@@ -307,9 +267,9 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
     strings_from_char_vecs(exhaustive_vecs(cs))
 }
 
-/// Generates all `String`s.
+/// Generates all [`String`]s.
 ///
-/// The lengths of the output `String`s grow logarithmically.
+/// The lengths of the output [`String`]s grow logarithmically.
 ///
 /// # Complexity per iteration
 /// $T(i) = O(\log i)$
@@ -323,7 +283,6 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::exhaustive::exhaustive_strings;
 ///
 /// let ss = exhaustive_strings().take(20).collect_vec();

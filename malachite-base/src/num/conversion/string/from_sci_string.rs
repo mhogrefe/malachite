@@ -262,18 +262,18 @@ fn from_sci_string_with_options_primitive_int<T: PrimitiveInt>(
 macro_rules! impl_from_sci_string {
     ($t:ident) => {
         impl FromSciString for $t {
-            /// Converts a string, possibly in scientfic notation, to a primitive integer.
+            /// Converts a [`String`], possibly in scientfic notation, to a primitive integer.
             ///
-            /// Use `FromSciStringOptions` to specify the base (from 2 to 36, inclusive) and the
-            /// rounding mode, in case rounding is necessary because the string represents a
-            /// non-integer.
+            /// Use [`FromSciStringOptions`](super::options::FromSciStringOptions) to specify the
+            /// base (from 2 to 36, inclusive) and the rounding mode, in case rounding is necessary
+            /// because the string represents a non-integer.
             ///
             /// If the base is greater than 10, the higher digits are represented by the letters
             /// `'a'` through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't
             /// need to be consistent.
             ///
             /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the
-            /// base is 15 or greater, and ambiguity arises where it may not be clear whether `'e'`
+            /// base is 15 or greater, an ambiguity arises where it may not be clear whether `'e'`
             /// is a digit or an exponent indicator. To resolve this ambiguity, always use a `'+'`
             /// or `'-'` sign after the exponent indicator when the base is 15 or greater.
             ///
@@ -289,10 +289,14 @@ macro_rules! impl_from_sci_string {
             /// rounding is necessary.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::from_sci_string` module.
+            /// See [here](super::from_sci_string).
             #[inline]
             fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<$t> {
                 from_sci_string_with_options_primitive_int(s, options)

@@ -9,19 +9,21 @@ use natural::Natural;
 use platform::Limb;
 
 impl BitConvertible for Natural {
-    /// Returns the bits of a `Natural` in ascending order, so that less significant bits have lower
-    /// indices in the output vector. There are no trailing false bits.
+    /// Returns a [`Vec`] containing the bits of a [`Natural`] in ascending order: least- to
+    /// most-significant.
     ///
-    /// Time: worst case O(n)
+    /// If the number is 0, the [`Vec`] is empty; otherwise, it ends with `true`.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
@@ -29,8 +31,10 @@ impl BitConvertible for Natural {
     ///
     /// assert!(Natural::ZERO.to_bits_asc().is_empty());
     /// // 105 = 1101001b
-    /// assert_eq!(Natural::from(105u32).to_bits_asc(),
-    ///     vec![true, false, false, true, false, true, true]);
+    /// assert_eq!(
+    ///     Natural::from(105u32).to_bits_asc(),
+    ///     &[true, false, false, true, false, true, true]
+    /// );
     /// ```
     fn to_bits_asc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
@@ -52,19 +56,21 @@ impl BitConvertible for Natural {
         bits
     }
 
-    /// Returns the bits of a `Natural` in ascending order, so that less significant bits have lower
-    /// indices in the output vector. There are no leading false bits.
+    /// Returns a [`Vec`] containing the bits of a [`Natural`] in descending order: most- to
+    /// least-significant.
     ///
-    /// Time: worst case O(n)
+    /// If the number is 0, the [`Vec`] is empty; otherwise, it begins with `true`.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
@@ -72,8 +78,10 @@ impl BitConvertible for Natural {
     ///
     /// assert!(Natural::ZERO.to_bits_desc().is_empty());
     /// // 105 = 1101001b
-    /// assert_eq!(Natural::from(105u32).to_bits_desc(),
-    ///     vec![true, true, false, true, false, false, true]);
+    /// assert_eq!(
+    ///     Natural::from(105u32).to_bits_desc(),
+    ///     &[true, true, false, true, false, false, true]
+    /// );
     /// ```
     fn to_bits_desc(&self) -> Vec<bool> {
         let mut bits = self.to_bits_asc();
@@ -81,12 +89,24 @@ impl BitConvertible for Natural {
         bits
     }
 
-    /// TODO doc
+    /// Converts an iterator of bits into a [`Natural`]. The bits should be in ascending order
+    /// (least- to most-significant).
+    ///
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^i \[b_i\],
+    /// $$
+    /// where braces denote the Iverson bracket, which converts a bit to 0 or 1.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
@@ -108,12 +128,24 @@ impl BitConvertible for Natural {
         )
     }
 
-    /// TODO doc
+    /// Converts an iterator of bits into a [`Natural`]. The bits should be in descending order
+    /// (most- to least-significant).
+    ///
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\],
+    /// $$
+    /// where braces denote the Iverson bracket, which converts a bit to 0 or 1.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;

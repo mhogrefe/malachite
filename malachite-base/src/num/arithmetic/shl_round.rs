@@ -1,14 +1,13 @@
 use num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::WrappingFrom;
+use num::basic::signeds::PrimitiveSigned;
 use rounding_modes::RoundingMode;
 use std::ops::{Shl, ShlAssign};
 
 fn shl_round<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
     U,
-    S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,
@@ -29,7 +28,7 @@ fn shl_round<
 fn shl_round_assign<
     T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
     U,
-    S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     bits: S,
@@ -54,39 +53,37 @@ macro_rules! impl_shl_round {
                 impl ShlRound<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` left (multiplies it by a power of 2 or divides it by a power
-                    /// of 2 and takes the floor) and rounds according to the specified rounding
-                    /// mode.
+                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
+                    /// power of 2 and takes the floor) and rounds according to the specified
+                    /// rounding mode.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-                    /// necessary if `bits` is non-negative.
+                    /// necessary if `bits` is negative.
                     ///
-                    /// # Worst-case complexity
-                    /// Constant time and additional memory.
+                    /// Let $q = x2^k$:
                     ///
-                    /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$
+                    /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
                     ///
-                    /// # Examples
-                    /// See the documentation of the `num::arithmetic::shl_round` module.
-                    #[inline]
-                    fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        shl_round(self, bits, rm)
-                    }
-                }
-
-                impl ShlRoundAssign<$u> for $t {
-                    /// Shifts `self` left (multiplies it by a power of 2 or divides it by a power
-                    /// of 2 and takes the floor) and rounds according to the specified rounding
-                    /// mode, in place.
+                    /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-                    /// necessary if `bits` is non-negative.
+                    /// $$
+                    /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+                    ///     \lfloor q \rfloor & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+                    ///     \lceil q \rceil & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+                    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+                    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even}, \\\\
+                    ///     \lceil q \rceil &
+                    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+                    ///         \\ \lfloor q \rfloor \\ \text{is odd}.
+                    /// \end{cases}
+                    /// $$
+                    ///
+                    /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -96,7 +93,34 @@ macro_rules! impl_shl_round {
                     /// not divisible by $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shl_round` module.
+                    /// See [here](super::shl_round#shl_round).
+                    #[inline]
+                    fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
+                        shl_round(self, bits, rm)
+                    }
+                }
+
+                impl ShlRoundAssign<$u> for $t {
+                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
+                    /// power of 2 and takes the floor) and rounds according to the specified
+                    /// rounding mode, in place.
+                    ///
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
+                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
+                    /// necessary if `bits` is negative.
+                    ///
+                    /// See the [`ShlRound`](super::traits::ShlRound) documentation for details.
+                    ///
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
+                    ///
+                    /// # Panics
+                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
+                    /// not divisible by $2^b$.
+                    ///
+                    /// # Examples
+                    /// See [here](super::shl_round#shl_round_assign).
                     #[inline]
                     fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) {
                         shl_round_assign(self, bits, rm)

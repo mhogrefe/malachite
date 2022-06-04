@@ -38,7 +38,7 @@ fn demo_length_after_point_in_small_base(gm: GenMode, config: GenConfig, limit: 
 
 fn demo_rational_to_sci(gm: GenMode, config: GenConfig, limit: usize) {
     for q in rational_gen().get(gm, &config).take(limit) {
-        println!("{}.to_sci() = {}", q, q.to_sci().to_string());
+        println!("{}.to_sci() = {}", q, q.to_sci());
     }
 }
 

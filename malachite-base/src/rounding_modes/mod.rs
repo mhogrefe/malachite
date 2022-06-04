@@ -4,35 +4,12 @@ use named::Named;
 ///
 /// A `RoundingMode` can often be specified when a function conceptually returns a value of one
 /// type, but must be rounded to another type. The most common case is a conceptually real-valued
-/// function whose result must be rounded to an integer, like `div_round`.
-///
-/// When converting a real value to an integer, the different `RoundingMode`s act as follows:
-/// - `Floor` applies the floor function: $x \mapsto \lfloor x \rfloor$. In other words, the value
-///   is rounded towards $-\infty$.
-/// - `Ceiling` applies the ceiling function: $x \mapsto \lceil x \rceil$. In other words, the value
-///   is rounded towards $\infty$.
-/// - `Down` applies the function $x \mapsto \operatorname{sgn}(x) \lfloor |x| \rfloor$. In other
-///   words, the value is rounded towards $0$.
-/// - `Up` applies the function $x \mapsto \operatorname{sgn}(x) \lceil |x| \rceil$. In other words,
-///   the value is rounded away from $0$.
-/// - `Nearest` applies the function
-///   $$
-///     x \mapsto \\begin{cases}
-///         \lfloor x \rfloor & x - \lfloor x \rfloor < \frac{1}{2} \\\\
-///         \lceil x \rceil & x - \lfloor x \rfloor > \frac{1}{2} \\\\
-///         \lfloor x \rfloor &
-///    x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor x \rfloor \\ \text{is even} \\\\
-///         \lceil x \rceil &
-///    x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor x \rfloor \\ \text{is odd.}
-///     \\end{cases}
-///   $$
-///   In other words, it rounds to the nearest integer, and when there's a tie, it rounds to the
-///   nearest even integer. This is also called _bankers' rounding_ and is often used as a default.
-/// - `Exact` panics if the value is not already rounded.
+/// function whose result must be rounded to an integer, like
+/// [`div_round`](crate::num::arithmetic::traits::DivRound::div_round).
 ///
 /// # Examples
-/// Here are some examples of how floating-point values would be rounded to integer values using the
-/// different `RoundingMode`s.
+/// Here are some examples of how floating-point values would be rounded to integer values using
+/// the different `RoundingMode`s.
 ///
 /// | x    | `Floor` | `Ceiling` | `Down` | `Up` | `Nearest` | `Exact`    |
 /// |------|---------|-----------|--------|------|-----------|------------|
@@ -53,11 +30,35 @@ use named::Named;
 /// A `RoundingMode` takes up 1 byte of space.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum RoundingMode {
+    /// Applies the function $x \mapsto \operatorname{sgn}(x) \lfloor |x| \rfloor$. In other words,
+    /// the value is rounded towards $0$.
     Down,
+    /// Applies the function $x \mapsto \operatorname{sgn}(x) \lceil |x| \rceil$. In other words,
+    /// the value is rounded away from $0$.
     Up,
+    /// Applies the floor function: $x \mapsto \lfloor x \rfloor$. In other words, the value is
+    /// rounded towards $-\infty$.
     Floor,
+    /// Applies the ceiling function: $x \mapsto \lceil x \rceil$. In other words, the value is
+    /// towards $\infty$.
     Ceiling,
+    /// Applies the function
+    /// $$
+    ///   x \mapsto \\begin{cases}
+    ///       \lfloor x \rfloor & x - \lfloor x \rfloor < \frac{1}{2} \\\\
+    ///       \lceil x \rceil & x - \lfloor x \rfloor > \frac{1}{2} \\\\
+    ///       \lfloor x \rfloor &
+    ///  x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and}
+    ///         \\ \lfloor x \rfloor \\ \text{is even} \\\\
+    ///       \lceil x \rceil &
+    ///  x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor x \rfloor \\ \text{is odd.}
+    ///   \\end{cases}
+    /// $$
+    /// In other words, it rounds to the nearest integer, and when there's a tie, it rounds to the
+    /// nearest even integer. This is also called _bankers' rounding_ and is often used as a
+    /// default.
     Nearest,
+    /// Panics if the value is not already rounded.
     Exact,
 }
 
@@ -73,13 +74,13 @@ pub const ROUNDING_MODES: [RoundingMode; 6] = [
     RoundingMode::Exact,
 ];
 
-/// The `Display` impl for `RoundingMode`.
-pub mod display;
-/// Iterators that generate `RoundingMode`s without repetition.
+/// Iterators that generate [`RoundingMode`]s without repetition.
 pub mod exhaustive;
-/// The `FromStr` impl for `RoundingMode`.
+/// Functions for converting a string to a [`RoundingMode`].
 pub mod from_str;
-/// The `Neg` and `NegAssign` impls for `RoundingMode`.
+/// Functions for negating a [`RoundingMode`].
 pub mod neg;
-/// Iterators that generate `RoundingMode`s randomly.
+/// Iterators that generate [`RoundingMode`]s randomly.
 pub mod random;
+/// Functions for displaying a [`RoundingMode`].
+pub mod to_string;

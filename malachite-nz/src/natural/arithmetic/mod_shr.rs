@@ -1,13 +1,14 @@
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShr, ModShrAssign, UnsignedAbs,
 };
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Two, Zero};
 use natural::InnerNatural::Small;
 use natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 
-fn mod_shr_ref_val<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_ref_val<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
     m: Natural,
@@ -27,7 +28,7 @@ where
     }
 }
 
-fn mod_shr_ref_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_ref_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
     m: &Natural,
@@ -47,7 +48,7 @@ where
     }
 }
 
-fn mod_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_assign<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &mut Natural,
     bits: S,
     m: Natural,
@@ -65,7 +66,7 @@ fn mod_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     }
 }
 
-fn mod_shr_assign_ref<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_assign_ref<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &mut Natural,
     bits: S,
     m: &Natural,
@@ -88,30 +89,22 @@ macro_rules! impl_mod_shr {
         impl ModShr<$t, Natural> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m`, taking `self` and `m`
-            /// by value. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s are taken
+            /// by value.
             ///
-            /// TODO complexity
+            /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(8u32).mod_shr(-2i8, Natural::from(10u32)), 2);
-            /// assert_eq!(Natural::from(10u32).mod_shr(100i32, Natural::from(10u32)), 0);
-            /// assert_eq!(
-            ///     Natural::from(123456u32).mod_shr(
-            ///         -100i64,
-            ///         Natural::from_str("12345678987654321").unwrap()
-            ///     ),
-            ///     Natural::from_str("7436663564915145").unwrap()
-            /// );
-            /// ```
+            /// See [here](super::mod_shr#mod_shr).
             #[inline]
             fn mod_shr(mut self, bits: $t, m: Natural) -> Natural {
                 self.mod_shr_assign(bits, m);
@@ -122,30 +115,22 @@ macro_rules! impl_mod_shr {
         impl<'a> ModShr<$t, &'a Natural> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m`, taking `self` by
-            /// value and `m` by reference. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$. Assumes the input is already reduced modulo $m$. The first [`Natural`] is
+            /// taken by value and the second by reference.
             ///
-            /// TODO complexity
+            /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(8u32).mod_shr(-2i8, &Natural::from(10u32)), 2);
-            /// assert_eq!(Natural::from(10u32).mod_shr(100i32, &Natural::from(10u32)), 0);
-            /// assert_eq!(
-            ///     Natural::from(123456u32).mod_shr(
-            ///         -100i64,
-            ///         &Natural::from_str("12345678987654321").unwrap()
-            ///     ),
-            ///     Natural::from_str("7436663564915145").unwrap()
-            /// );
-            /// ```
+            /// See [here](super::mod_shr#mod_shr).
             #[inline]
             fn mod_shr(mut self, bits: $t, m: &'a Natural) -> Natural {
                 self.mod_shr_assign(bits, m);
@@ -156,30 +141,22 @@ macro_rules! impl_mod_shr {
         impl<'a> ModShr<$t, Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m`, taking `self` by
-            /// reference and `m` by value. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$. Assumes the input is already reduced modulo $m$. The first [`Natural`] is
+            /// taken by reference and the second by value.
             ///
-            /// TODO complexity
+            /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::from(8u32)).mod_shr(-2i8, Natural::from(10u32)), 2);
-            /// assert_eq!((&Natural::from(10u32)).mod_shr(100i32, Natural::from(10u32)), 0);
-            /// assert_eq!(
-            ///     (&Natural::from(123456u32)).mod_shr(
-            ///         -100i64,
-            ///         Natural::from_str("12345678987654321").unwrap()
-            ///     ),
-            ///     Natural::from_str("7436663564915145").unwrap()
-            /// );
-            /// ```
+            /// See [here](super::mod_shr#mod_shr).
             #[inline]
             fn mod_shr(self, bits: $t, m: Natural) -> Natural {
                 mod_shr_ref_val(self, bits, m)
@@ -189,30 +166,22 @@ macro_rules! impl_mod_shr {
         impl<'a, 'b> ModShr<$t, &'b Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m`, taking `self` and `m`
-            /// by reference. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s are taken
+            /// by reference.
             ///
-            /// TODO complexity
+            /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::from(8u32)).mod_shr(-2i8, &Natural::from(10u32)), 2);
-            /// assert_eq!((&Natural::from(10u32)).mod_shr(100i32, &Natural::from(10u32)), 0);
-            /// assert_eq!(
-            ///     (&Natural::from(123456u32)).mod_shr(
-            ///         -100i64,
-            ///         &Natural::from_str("12345678987654321").unwrap()
-            ///     ),
-            ///     Natural::from_str("7436663564915145").unwrap()
-            /// );
-            /// ```
+            /// See [here](super::mod_shr#mod_shr).
             #[inline]
             fn mod_shr(self, bits: $t, m: &'b Natural) -> Natural {
                 mod_shr_ref_ref(self, bits, m)
@@ -220,32 +189,22 @@ macro_rules! impl_mod_shr {
         }
 
         impl ModShrAssign<$t, Natural> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m` in place, taking `m`
-            /// by value. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. Assumes the input is already reduced modulo $m$. The [`Natural`] on
+            /// the right-hand side is taken by value.
             ///
-            /// TODO complexity
+            /// $x \gets y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShrAssign;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut x = Natural::from(8u32);
-            /// x.mod_shr_assign(-2i8, Natural::from(10u32));
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = Natural::from(10u32);
-            /// x.mod_shr_assign(100i32, Natural::from(10u32));
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = Natural::from(123456u32);
-            /// x.mod_shr_assign(-100i64, Natural::from_str("12345678987654321").unwrap());
-            /// assert_eq!(x, Natural::from_str("7436663564915145").unwrap());
-            /// ```
+            /// See [here](super::mod_shr#mod_shr_assign).
             #[inline]
             fn mod_shr_assign(&mut self, bits: $t, m: Natural) {
                 mod_shr_assign(self, bits, m);
@@ -253,32 +212,22 @@ macro_rules! impl_mod_shr {
         }
 
         impl<'a> ModShrAssign<$t, &'a Natural> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2) mod `m` in place, taking `m`
-            /// by reference. Assumes that `self` is already reduced mod `m`.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. Assumes the input is already reduced modulo $m$. The [`Natural`] on
+            /// the right-hand side is taken by reference.
             ///
-            /// TODO complexity
+            /// $x \gets y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(mn \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
+            /// is `bits`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use std::str::FromStr;
-            /// use malachite_base::num::arithmetic::traits::ModShrAssign;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut x = Natural::from(8u32);
-            /// x.mod_shr_assign(-2i8, &Natural::from(10u32));
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = Natural::from(10u32);
-            /// x.mod_shr_assign(100i32, &Natural::from(10u32));
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = Natural::from(123456u32);
-            /// x.mod_shr_assign(-100i64, &Natural::from_str("12345678987654321").unwrap());
-            /// assert_eq!(x, Natural::from_str("7436663564915145").unwrap());
-            /// ```
+            /// See [here](super::mod_shr#mod_shr_assign).
             #[inline]
             fn mod_shr_assign(&mut self, bits: $t, m: &'a Natural) {
                 mod_shr_assign_ref(self, bits, m);

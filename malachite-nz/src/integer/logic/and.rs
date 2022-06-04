@@ -13,11 +13,12 @@ use std::ops::{BitAnd, BitAndAssign};
 // limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
 // `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -32,11 +33,12 @@ pub_test! {limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // `y` and whose other limbs are full of `true` bits, to an output slice. `xs` may not be empty.
 // The output slice must be at least as long as the input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
@@ -53,9 +55,8 @@ pub_test! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 // limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
 // `y` and whose other limbs are full of `true` bits, to the input slice. `xs` may not be empty.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -68,11 +69,12 @@ pub_test! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 // lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
 // or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -88,11 +90,12 @@ pub_test! {limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // `xs` may not be empty or only contain zeros. Returns whether a carry occurs. The output slice
 // must be at least as long as the input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
@@ -121,11 +124,12 @@ pub_test! {limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 // given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
 // only contain zeros. Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -149,11 +153,12 @@ pub_test! {limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bo
 // given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
 // only contain zeros. If there is a carry, increases the length of the `Vec` by 1.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -167,17 +172,18 @@ pub_test! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 // negative of another, returns the limbs of the bitwise and of the `Integer`s. `xs` and `ys` may
 // not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`, m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res is returned, the first input is positive,
-// and the second is negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned, the first
+// input is positive, and the second is negative.
 pub_test! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -218,17 +224,18 @@ pub_test! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // as the first input slice. `xs.len()` limbs will be written; if the number of significant limbs
 // of the result is lower, some of the written limbs will be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `xs`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where the first input is positive and the second is
-// negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where the first input is positive
+// and the second is negative.
 pub_test! {limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -267,17 +274,18 @@ pub_test! {limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 // negative of another, writes the limbs of the bitwise and of the `Integer`s to the first (left)
 // slice. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res == op1, the first input is positive, and
-// the second is negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, the first input
+// is positive, and the second is negative.
 pub_test! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -309,17 +317,19 @@ pub_test! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 // zeros. If `ys` is shorter than `xs`, the result may be too long to fit in `ys`. The extra limbs
 // in this case are just `xs[ys.len()..]`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res == op2, the first input is positive, the
-// second is negative, and the length of op2 is not changed; instead, a carry is returned.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op2`, the first input
+// is positive, the second is negative, and the length of `op2` is not changed; instead, a carry is
+// returned.
 pub_test! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -351,17 +361,18 @@ pub_test! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) 
 // `Integer` and the negative of another, writes the limbs of the bitwise and of the `Integer`s to
 // the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res == op2, the first input is positive and the
-// second is negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op2`, the first input
+// is positive, and the second is negative.
 pub_test! {limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
@@ -394,16 +405,18 @@ fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb 
 // `Integer`s, returns the limbs of the bitwise and of the `Integer`s. `xs` and `ys` may not be
 // empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(n)$
 //
-// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res is returned and both inputs are negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned and both
+// inputs are negative.
 pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -464,17 +477,18 @@ pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // least-significant max(`xs.len()`, `ys.len()`) limbs of the output are not all zero. The output
 // slice must be at least as long as the longer input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 // longer of `xs` and `ys`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where both inputs are negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -543,17 +557,18 @@ pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 // long as `ys`. Returns whether the least-significant `xs.len()` limbs of the output are not all
 // zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `xs` is shorter than `ys`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res == op1, both inputs are negative, and the
-// length of op1 is not changed; instead, a carry is returned.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, both inputs
+// are negative, and the length of `op1` is not changed; instead, a carry is returned.
 pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -603,16 +618,18 @@ pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 // negatives of two `Integer`s, writes the limbs of the bitwise and of the `Integer`s to the `Vec`.
 // `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(n)$
 //
-// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where res == op1 and both inputs are negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are negative.
 pub_test! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -649,17 +666,19 @@ pub_test! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) 
 // output is to the first slice and `true` when it's to the second slice, and the second is whether
 // the least-significant max(`xs.len()`, `ys.len()`) limbs of the output are not all zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where both inputs are negative, the result is written
-// to the longer input slice, and the length of op1 is not changed; instead, a carry is returned.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative, the
+// result is written to the longer input slice, and the length of `op1` is not changed; instead, a
+// carry is returned.
 pub_test! {limbs_slice_and_neg_neg_in_place_either(
     xs: &mut [Limb],
     ys: &mut [Limb]
@@ -677,17 +696,18 @@ pub_test! {limbs_slice_and_neg_neg_in_place_either(
 // Returns a `bool` which is `false` when the output is to the first slice and `true` when it's to
 // the second slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_and from mpz/and.c, GMP 6.2.1, where both inputs are negative and the result is
-// written to the longer input slice.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative and
+// the result is written to the longer input slice.
 pub_test! {limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         limbs_vec_and_neg_neg_in_place_left(xs, ys);
@@ -821,25 +841,33 @@ impl Natural {
 impl BitAnd<Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise and of two `Integer`s, taking both by value.
+    /// Takes the bitwise and of two [`Integer`]s, taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-    /// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-1000000004096");
+    /// assert_eq!(Integer::from(-123) & Integer::from(-456), -512);
+    /// assert_eq!(
+    ///     -Integer::from(10u32).pow(12) & -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -1000000004096i64
+    /// );
     /// ```
     #[inline]
     fn bitand(mut self, other: Integer) -> Integer {
@@ -851,27 +879,35 @@ impl BitAnd<Integer> for Integer {
 impl<'a> BitAnd<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise and of two `Integer`s, taking the left `Integer` by value and the right
-    /// `Integer` by reference.
+    /// Takes the bitwise and of two [`Integer`]s, taking the first by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`,
-    ///       m = `other.significant_bits()`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-    /// assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-1000000004096");
+    /// assert_eq!(Integer::from(-123) & &Integer::from(-456), -512);
+    /// assert_eq!(
+    ///     -Integer::from(10u32).pow(12) & &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -1000000004096i64
+    /// );
     /// ```
     #[inline]
     fn bitand(mut self, other: &'a Integer) -> Integer {
@@ -883,28 +919,35 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Takes the bitwise and of two `Integer`s, taking the left `Integer` by reference and the
-    /// right `Integer` by value.
+    /// Takes the bitwise and of two [`Integer`]s, taking the first by reference and the seocnd by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!(&Integer::from(-123) & Integer::from(-456), -512);
     /// assert_eq!(
-    ///     (&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-1000000004096"
+    ///     &-Integer::from(10u32).pow(12) & -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -1000000004096i64
     /// );
     /// ```
     #[inline]
@@ -917,28 +960,33 @@ impl<'a> BitAnd<Integer> for &'a Integer {
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    /// Takes the bitwise and of two `Integer`s, taking both `Integer`s by reference.
+    /// Takes the bitwise and of two [`Integer`]s, taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`,
-    ///     m = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!(&Integer::from(-123) & &Integer::from(-456), -512);
     /// assert_eq!(
-    ///     (&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-1000000004096"
+    ///     &-Integer::from(10u32).pow(12) & &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -1000000004096i64
     /// );
     /// ```
     fn bitand(self, other: &'a Integer) -> Integer {
@@ -964,20 +1012,24 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 }
 
 impl BitAndAssign<Integer> for Integer {
-    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the
-    /// right-hand side
-    /// by value.
+    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
+    /// the right-hand side by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
@@ -1003,19 +1055,25 @@ impl BitAndAssign<Integer> for Integer {
 }
 
 impl<'a> BitAndAssign<&'a Integer> for Integer {
-    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the
-    /// right-hand side by reference.
+    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
+    /// the right-hand side by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x \wedge y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;

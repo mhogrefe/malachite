@@ -17,11 +17,12 @@ use platform::Limb;
 // limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is
 // already reduced mod 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
         limbs_add_limb(xs, y)
@@ -38,11 +39,12 @@ pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<
 // limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input slice.
 // Returns whether there is a carry. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
     xs: &mut [Limb],
     y: Limb,
@@ -62,11 +64,12 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
 // writes the limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input
 // `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -82,11 +85,12 @@ pub_crate_test! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, 
 // the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 // 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
@@ -102,11 +106,12 @@ pub_test! {limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) 
 // a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
 // already reduced mod 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mod_power_of_2_add_greater(xs, ys, pow)
@@ -121,11 +126,12 @@ pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<L
 // first (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod
 // 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
@@ -148,11 +154,13 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 // `Natural`s, writes the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the first
 // (left) slice. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -183,11 +191,12 @@ pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[
 // first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod
 // 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 pub_test! {limbs_mod_power_of_2_add_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -254,29 +263,29 @@ impl Natural {
 impl ModPowerOf2Add<Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup>, taking both `Natural`s by value.
-    /// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(Natural::from(2u32), 5).to_string(), "2");
-    /// assert_eq!(
-    ///     Natural::from(10u32).mod_power_of_2_add(Natural::from(14u32), 4).to_string(),
-    ///     "8"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(Natural::from(2u32), 5), 2);
+    /// assert_eq!(Natural::from(10u32).mod_power_of_2_add(Natural::from(14u32), 4), 8);
     /// ```
     fn mod_power_of_2_add(mut self, other: Natural, pow: u64) -> Natural {
         self.mod_power_of_2_add_assign(other, pow);
@@ -287,30 +296,28 @@ impl ModPowerOf2Add<Natural> for Natural {
 impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup>, taking the left `Natural` by value
-    /// and the right `Natural` by reference. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by value and the second by reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(&Natural::from(2u32), 5).to_string(), "2");
-    /// assert_eq!(
-    ///     Natural::from(10u32).mod_power_of_2_add(&Natural::from(14u32), 4).to_string(),
-    ///     "8"
-    /// );
+    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(&Natural::from(2u32), 5), 2);
+    /// assert_eq!(Natural::from(10u32).mod_power_of_2_add(&Natural::from(14u32), 4), 8);
     /// ```
     #[inline]
     fn mod_power_of_2_add(mut self, other: &'a Natural, pow: u64) -> Natural {
@@ -322,30 +329,28 @@ impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup>, taking the left `Natural` by
-    /// reference and the right `Natural` by value. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by reference and the second by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(Natural::from(2u32), 5).to_string(), "2");
-    /// assert_eq!(
-    ///     (&Natural::from(10u32)).mod_power_of_2_add(Natural::from(14u32), 4).to_string(),
-    ///     "8"
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(Natural::from(2u32), 5), 2);
+    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_add(Natural::from(14u32), 4), 8);
     /// ```
     #[inline]
     fn mod_power_of_2_add(self, mut other: Natural, pow: u64) -> Natural {
@@ -357,29 +362,29 @@ impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup>, taking both `Natural`s by reference.
-    /// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(&Natural::from(2u32), 5).to_string(), "2");
-    /// assert_eq!(
-    ///     (&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4).to_string(),
-    ///     "8"
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(&Natural::from(2u32), 5), 2);
+    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4), 8);
     /// ```
     fn mod_power_of_2_add(self, other: &'a Natural, pow: u64) -> Natural {
         match (self, other) {
@@ -394,19 +399,22 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
 }
 
 impl ModPowerOf2AddAssign<Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural` on the
-    /// right-hand side by value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced modulo
+    /// $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -414,11 +422,11 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_power_of_2_add_assign(Natural::from(2u32), 5);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     ///
     /// let mut x = Natural::from(10u32);
     /// x.mod_power_of_2_add_assign(Natural::from(14u32), 4);
-    /// assert_eq!(x.to_string(), "8");
+    /// assert_eq!(x, 8);
     /// ```
     fn mod_power_of_2_add_assign(&mut self, mut other: Natural, pow: u64) {
         match (&mut *self, &mut other) {
@@ -437,19 +445,21 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural` on the
-    /// right-hand side by reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Adds two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced modulo
+    /// $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -457,11 +467,11 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
     ///
     /// let mut x = Natural::ZERO;
     /// x.mod_power_of_2_add_assign(&Natural::from(2u32), 5);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     ///
     /// let mut x = Natural::from(10u32);
     /// x.mod_power_of_2_add_assign(&Natural::from(14u32), 4);
-    /// assert_eq!(x.to_string(), "8");
+    /// assert_eq!(x, 8);
     /// ```
     fn mod_power_of_2_add_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {

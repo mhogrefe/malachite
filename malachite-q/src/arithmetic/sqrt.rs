@@ -6,18 +6,22 @@ use Rational;
 impl CheckedSqrt for Rational {
     type Output = Rational;
 
-    /// Returns the the square root of a `Rational`, or `None` if the `Integer` is not the square
-    /// of a `Rational`. The `Rational` is taken by value.
+    /// Returns the the square root of a [`Rational`], or `None` if it is not a perfect square. The
+    /// [`Rational`] is taken by value.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -25,7 +29,6 @@ impl CheckedSqrt for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
@@ -60,18 +63,22 @@ impl CheckedSqrt for Rational {
 impl<'a> CheckedSqrt for &'a Rational {
     type Output = Rational;
 
-    /// Returns the the square root of a `Rational`, or `None` if the `Integer` is not the square
-    /// of a `Rational`. The `Rational` is taken by reference.
+    /// Returns the the square root of a [`Rational`], or `None` if it is not a perfect square. The
+    /// [`Rational`] is taken by reference.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Q \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in ℚ, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -79,7 +86,6 @@ impl<'a> CheckedSqrt for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;

@@ -1,8 +1,7 @@
-use comparison::traits::{Max, Min};
 use num::arithmetic::traits::{ShrRoundAssign, UnsignedAbs};
 use num::basic::floats::PrimitiveFloat;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::Zero;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
 use num::conversion::traits::{
@@ -12,7 +11,7 @@ use num::conversion::traits::{
 use rounding_modes::RoundingMode;
 use std::ops::Neg;
 
-/// This macro defines conversions from a type to itself.
+// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
     ($t:ty) => {
         impl CheckedFrom<$t> for $t {
@@ -23,7 +22,7 @@ macro_rules! identity_conversion {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::from` module.
+            /// See [here](super::from#checked_from).
             #[inline]
             fn checked_from(value: $t) -> Option<$t> {
                 Some(value)
@@ -38,7 +37,7 @@ macro_rules! identity_conversion {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::from` module.
+            /// See [here](super::from#wrapping_from).
             #[inline]
             fn wrapping_from(value: $t) -> $t {
                 value
@@ -53,7 +52,7 @@ macro_rules! identity_conversion {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::from` module.
+            /// See [here](super::from#saturating_from).
             #[inline]
             fn saturating_from(value: $t) -> $t {
                 value
@@ -69,7 +68,7 @@ macro_rules! identity_conversion {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::from` module.
+            /// See [here](super::from#overflowing_from).
             #[inline]
             fn overflowing_from(value: $t) -> ($t, bool) {
                 (value, false)
@@ -83,7 +82,7 @@ macro_rules! identity_conversion {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::from` module.
+            /// See [here](super::from#convertible_from).
             #[inline]
             fn convertible_from(_: $t) -> bool {
                 true
@@ -92,79 +91,80 @@ macro_rules! identity_conversion {
     };
 }
 
-/// This macro defines conversions from type $a to type $b, where every value of type $a is
-/// representable by a value of type $b.
+// This macro defines conversions from type $a to type $b, where every value of type $a is
+// representable by a value of type $b.
 macro_rules! lossless_conversion {
     ($a:ty, $b:ident) => {
-        /// Converts a value to another type. Since this conversion is always lossless and leaves
-        /// the value unchanged, `None` is never returned.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
+            /// Converts a value to another type. Since this conversion is always lossless and
+            /// leaves the value unchanged, `None` is never returned.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#checked_from).
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
                 Some($b::from(value))
             }
         }
 
-        /// Converts a value to another type. This conversion is always valid and always leaves the
-        /// value unchanged.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl WrappingFrom<$a> for $b {
+            /// Converts a value to another type. This conversion is always valid and always leaves
+            /// the value unchanged.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#wrapping_from).
             #[inline]
             fn wrapping_from(value: $a) -> $b {
                 $b::from(value)
             }
         }
 
-        /// Converts a value to another type. This conversion is always valid and always leaves the
-        /// value unchanged.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
+            /// Converts a value to another type. This conversion is always valid and always leaves
+            /// the value unchanged.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#saturating_from).
             #[inline]
             fn saturating_from(value: $a) -> $b {
                 $b::from(value)
             }
         }
 
-        /// Converts a value to the value's type. Since this conversion is always valid and always
-        /// leaves the value unchanged, the second component of the result is always false (no
-        /// overflow).
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
+            /// Converts a value to the value's type. Since this conversion is always valid and
+            /// always leaves the value unchanged, the second component of the result is always
+            /// false (no overflow).
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#overflowing_from).
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
                 ($b::from(value), false)
             }
         }
 
-        /// Checks whether a value is convertible to a different type. The result is always `true`.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
+            /// Checks whether a value is convertible to a different type. The result is always
+            /// `true`.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#convertible_from).
             #[inline]
             fn convertible_from(_: $a) -> bool {
                 true
@@ -173,10 +173,7 @@ macro_rules! lossless_conversion {
     };
 }
 
-fn checked_from_lossy<
-    A: Copy + Ord + WrappingFrom<B> + Zero,
-    B: Copy + Ord + WrappingFrom<A> + Zero,
->(
+fn checked_from_lossy<A: PrimitiveInt + WrappingFrom<B>, B: PrimitiveInt + WrappingFrom<A>>(
     value: A,
 ) -> Option<B> {
     let result = B::wrapping_from(value);
@@ -187,7 +184,9 @@ fn checked_from_lossy<
     }
 }
 
-fn saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A>>(value: A) -> B {
+fn saturating_from_lossy<A: CheckedFrom<B> + PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+    value: A,
+) -> B {
     if let Some(b_max) = A::checked_from(B::MAX) {
         if value >= b_max {
             return B::MAX;
@@ -201,10 +200,7 @@ fn saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A>
     B::wrapping_from(value)
 }
 
-fn overflowing_from_lossy<
-    A: Copy + Ord + WrappingFrom<B> + Zero,
-    B: Copy + Ord + WrappingFrom<A> + Zero,
->(
+fn overflowing_from_lossy<A: PrimitiveInt + WrappingFrom<B>, B: PrimitiveInt + WrappingFrom<A>>(
     value: A,
 ) -> (B, bool) {
     let result = B::wrapping_from(value);
@@ -214,157 +210,156 @@ fn overflowing_from_lossy<
     )
 }
 
-fn convertible_from_lossy<
-    A: Copy + Ord + WrappingFrom<B> + Zero,
-    B: Copy + Ord + WrappingFrom<A> + Zero,
->(
+fn convertible_from_lossy<A: PrimitiveInt + WrappingFrom<B>, B: PrimitiveInt + WrappingFrom<A>>(
     value: A,
 ) -> bool {
     let result = B::wrapping_from(value);
     (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value
 }
 
-/// This macro defines conversions from type $a to type $b, where not every value of type $a is
-/// representable by a value of type $b.
+// This macro defines conversions from type $a to type $b, where not every value of type $a is
+// representable by a value of type $b.
 macro_rules! lossy_conversion {
     ($a:ident, $b:ident) => {
-        /// Converts a value to another type. If the value cannot be represented in the new type,
-        /// `None` is returned.
-        ///
-        /// Let $W$ be `$b::WIDTH`.
-        ///
-        /// If the target type `$b` is unsigned,
-        /// $$
-        /// f_W(n) = \\begin{cases}
-        ///     \operatorname{Some}(n) & 0 \leq n < 2^W \\\\
-        ///     \operatorname{None} & \\text{otherwise}.
-        /// \\end{cases}
-        /// $$
-        ///
-        /// If the target type is signed,
-        /// $$
-        /// f_W(n) = \\begin{cases}
-        ///     \operatorname{Some}(n) & -2^{W-1} \leq n < 2^{W-1}-1 \\\\
-        ///     \operatorname{None} & \\text{otherwise}.
-        /// \\end{cases}
-        /// $$
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
+            /// Converts a value to another type. If the value cannot be represented in the new
+            /// type, `None` is returned.
+            ///
+            /// Let $W$ be the width of the target type.
+            ///
+            /// If the target type is unsigned, then
+            /// $$
+            /// f_W(n) = \\begin{cases}
+            ///     \operatorname{Some}(n) & \text{if} \\quad 0 \leq n < 2^W, \\\\
+            ///     \operatorname{None} & \\text{otherwise}.
+            /// \\end{cases}
+            /// $$
+            ///
+            /// If the target type is signed, then
+            /// $$
+            /// f_W(n) = \\begin{cases}
+            ///     \operatorname{Some}(n) & \text{if} \\quad -2^{W-1} \leq n < 2^{W-1}-1, \\\\
+            ///     \operatorname{None} & \\text{otherwise}.
+            /// \\end{cases}
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#checked_from).
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
                 checked_from_lossy(value)
             }
         }
 
-        /// Converts a value to another type. If the value cannot be represented in the new type, it
-        /// is wrapped.
-        ///
-        /// Let $W$ be `$b::WIDTH`.
-        ///
-        /// If the target type `$b` is unsigned,
-        /// $f_W(n) = m$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
-        ///
-        /// If the target type is signed,
-        /// $f_W(n) = m$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
-        /// $k \in \Z$.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
+            /// Converts a value to another type. If the value cannot be represented in the new
+            /// type, it is wrapped.
+            ///
+            /// Let $W$ be the width of the target type.
+            ///
+            /// If the target type is unsigned, then
+            /// $f_W(n) = m$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+            ///
+            /// If the target type is signed, then
+            /// $f_W(n) = m$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
+            /// $k \in \Z$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#wrapping_from).
             #[inline]
             fn wrapping_from(value: $a) -> $b {
                 value as $b
             }
         }
 
-        /// Converts a value to another type. If the value cannot be represented in the new type,
-        /// the maximum or minimum value of the new type, whichever is closer, is returned.
-        ///
-        /// Let $W$ be `$b::WIDTH`.
-        ///
-        /// If the target type `$b` is unsigned,
-        /// $$
-        /// f_W(n) = \\begin{cases}
-        ///     0 & n < 0 \\\\
-        ///     2^W-1 & n \geq 2^W \\\\
-        ///     n & \\text{otherwise}.
-        /// \\end{cases}
-        /// $$
-        ///
-        /// If the target type is signed,
-        /// $$
-        /// f_W(n) = \\begin{cases}
-        ///     -2^{W-1} & n < -2^{W-1} \\\\
-        ///     2^{W-1}-1 & n \geq 2^{W-1} \\\\
-        ///     n & \\text{otherwise}.
-        /// \\end{cases}
-        /// $$
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
+            /// Converts a value to another type. If the value cannot be represented in the new
+            /// type, the maximum or minimum value of the new type, whichever is closer, is
+            /// returned.
+            ///
+            /// Let $W$ be the width of the target type.
+            ///
+            /// If the target type is unsigned, then
+            /// $$
+            /// f_W(n) = \\begin{cases}
+            ///     0 & n < 0 \\\\
+            ///     2^W-1 & \text{if} \\quad n \geq 2^W, \\\\
+            ///     n & \\text{otherwise}.
+            /// \\end{cases}
+            /// $$
+            ///
+            /// If the target type is signed, then
+            /// $$
+            /// f_W(n) = \\begin{cases}
+            ///     -2^{W-1} & \text{if} \\quad n < -2^{W-1}, \\\\
+            ///     2^{W-1}-1 & \text{if} \\quad n \geq 2^{W-1}, \\\\
+            ///     n & \\text{otherwise}.
+            /// \\end{cases}
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#saturating_from).
             #[inline]
             fn saturating_from(value: $a) -> $b {
                 saturating_from_lossy(value)
             }
         }
 
-        /// Converts a value to another type. If the value cannot be represented in the new type, it
-        /// is wrapped. The second component of the result indicates whether overflow occurred.
-        ///
-        /// Let $W$ be `$b::WIDTH`.
-        ///
-        /// If the target type `$b` is unsigned,
-        /// $f_W(n) = (m, k \neq 0)$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
-        ///
-        /// If the target type is signed,
-        /// $f_W(n) = (m, k \neq 0)$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
-        /// $k \in \Z$.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
+            /// Converts a value to another type. If the value cannot be represented in the new
+            /// type, it is wrapped. The second component of the result indicates whether overflow
+            /// occurred.
+            ///
+            /// Let $W$ be the width of the target type.
+            ///
+            /// If the target type is unsigned, then
+            /// $f_W(n) = (m, k \neq 0)$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+            ///
+            /// If the target type is signed, then
+            /// $f_W(n) = (m, k \neq 0)$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for
+            /// some $k \in \Z$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#overflowing_from).
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
                 overflowing_from_lossy(value)
             }
         }
 
-        /// Determines whether a value is convertible to a different type.
-        ///
-        /// Let $W$ be `$b::WIDTH`.
-        ///
-        /// If the target type `$b` is unsigned,
-        /// $$
-        /// f_W(n) = (0 \leq n < 2^W).
-        /// $$
-        ///
-        /// If the target type is signed,
-        /// $$
-        /// f_W(n) = (-2^{W-1} \leq n < 2^{W-1}-1).
-        /// $$
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
+            /// Determines whether a value is convertible to a different type.
+            ///
+            /// Let $W$ be the width of the target type.
+            ///
+            /// If the target type is unsigned then,
+            /// $$
+            /// f_W(n) = (0 \leq n < 2^W).
+            /// $$
+            ///
+            /// If the target type is signed then,
+            /// $$
+            /// f_W(n) = (-2^{W-1} \leq n < 2^{W-1}-1).
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from#convertible_from).
             #[inline]
             fn convertible_from(value: $a) -> bool {
                 convertible_from_lossy::<$a, $b>(value)
@@ -373,8 +368,8 @@ macro_rules! lossy_conversion {
     };
 }
 
-/// This macro defines conversions from type $a to type $b, where the set of values representable by
-/// type $a is a proper subset of the set of values representable by type $b.
+// This macro defines conversions from type $a to type $b, where the set of values representable by
+// type $a is a proper subset of the set of values representable by type $b.
 macro_rules! proper_subset_conversion {
     ($a:ident, $b:ident) => {
         lossless_conversion!($a, $b);
@@ -382,8 +377,8 @@ macro_rules! proper_subset_conversion {
     };
 }
 
-/// This macro defines conversions from type $a to type $b, where the set of values representable by
-/// type $a is neither a subset nor a superset of the set of values representable by type $b.
+// This macro defines conversions from type $a to type $b, where the set of values representable by
+// type $a is neither a subset nor a superset of the set of values representable by type $b.
 macro_rules! no_containment_conversion {
     ($a:ident, $b:ident) => {
         lossy_conversion!($a, $b);
@@ -594,7 +589,8 @@ macro_rules! impl_from_float_unsigned {
             ($f:ident) => {
                 impl RoundingFrom<$u> for $f {
                     /// Converts a value of an unsigned type to a value of a floating point type
-                    /// according to a specified `RoundingMode`.
+                    /// according to a specified
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
                     ///
                     /// - If the rounding mode is `Floor` or `Down`, the largest float less than or
                     ///   equal to the value is returned.
@@ -614,7 +610,7 @@ macro_rules! impl_from_float_unsigned {
                     /// the primitive float type.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#rounding_from).
                     #[inline]
                     fn rounding_from(value: $u, rm: RoundingMode) -> $f {
                         primitive_float_rounding_from_unsigned(value, rm)
@@ -623,7 +619,8 @@ macro_rules! impl_from_float_unsigned {
 
                 impl RoundingFrom<$f> for $u {
                     /// Converts a value of a floating point type to a value of an unsigned type
-                    /// according to a specified `RoundingMode`.
+                    /// according to a specified
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -657,7 +654,7 @@ macro_rules! impl_from_float_unsigned {
                     /// - If `value` is negative and `rm` is `Floor` or `Up`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#rounding_from).
                     #[inline]
                     fn rounding_from(value: $f, rm: RoundingMode) -> $u {
                         unsigned_rounding_from_primitive_float(value, rm)
@@ -669,14 +666,14 @@ macro_rules! impl_from_float_unsigned {
                     /// returning `None` if an exact conversion is not possible.
                     ///
                     /// The conversion succeeds if the unsigned value is not too large to represent
-                    /// (which can only happen when converting a `u128` to an `f32`) and the
+                    /// (which can only happen when converting a [`u128`] to an [`f32`]) and the
                     /// precision of the unsigned value is not too high.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#checked_from).
                     #[inline]
                     fn checked_from(value: $u) -> Option<$f> {
                         primitive_float_checked_from_unsigned(value)
@@ -694,7 +691,7 @@ macro_rules! impl_from_float_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#checked_from).
                     #[inline]
                     fn checked_from(value: $f) -> Option<$u> {
                         unsigned_checked_from_primitive_float(value)
@@ -706,14 +703,14 @@ macro_rules! impl_from_float_unsigned {
                     /// point type.
                     ///
                     /// An exact conversion is possible if the unsigned value is not too large to
-                    /// represent (which can only happen when converting a `u128` to an `f32`) and
-                    /// the precision of the unsigned value is not too high.
+                    /// represent (which can only happen when converting a [`u128`] to an [`f32`])
+                    /// and the precision of the unsigned value is not too high.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#convertible_from).
                     #[inline]
                     fn convertible_from(value: $u) -> bool {
                         primitive_float_convertible_from_unsigned::<$f, $u>(value)
@@ -731,7 +728,7 @@ macro_rules! impl_from_float_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#convertible_from).
                     #[inline]
                     fn convertible_from(value: $f) -> bool {
                         unsigned_convertible_from_primitive_float::<$u, $f>(value)
@@ -900,7 +897,8 @@ macro_rules! impl_from_float_signed {
             ($f:ident) => {
                 impl RoundingFrom<$i> for $f {
                     /// Converts a value of a signed type to a value of a floating point type
-                    /// according to a specified `RoundingMode`.
+                    /// according to a specified
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
                     ///
                     /// - If the rounding mode is `Floor`, the largest float less than or equal to
                     ///   the value is returned.
@@ -924,7 +922,7 @@ macro_rules! impl_from_float_signed {
                     /// the primitive float type.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#rounding_from).
                     #[inline]
                     fn rounding_from(value: $i, rm: RoundingMode) -> $f {
                         primitive_float_rounding_from_signed::<$u, $i, $f>(value, rm)
@@ -933,7 +931,8 @@ macro_rules! impl_from_float_signed {
 
                 impl RoundingFrom<$f> for $i {
                     /// Converts a value of a floating point type to a value of a signed type
-                    /// according to a specified `RoundingMode`.
+                    /// according to a specified
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -970,7 +969,7 @@ macro_rules! impl_from_float_signed {
                     ///   is `Floor` or `Up`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#rounding_from).
                     #[inline]
                     fn rounding_from(value: $f, rm: RoundingMode) -> $i {
                         signed_rounding_from_primitive_float::<$u, $i, $f>(value, rm)
@@ -988,7 +987,7 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#checked_from).
                     #[inline]
                     fn checked_from(value: $i) -> Option<$f> {
                         primitive_float_checked_from_signed(value)
@@ -1006,7 +1005,7 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#checked_from).
                     #[inline]
                     fn checked_from(value: $f) -> Option<$i> {
                         signed_checked_from_primitive_float::<$u, $i, $f>(value)
@@ -1024,7 +1023,7 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#convertible_from).
                     #[inline]
                     fn convertible_from(value: $i) -> bool {
                         primitive_float_convertible_from_signed::<$u, $i, $f>(value)
@@ -1042,7 +1041,7 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::from` module.
+                    /// See [here](super::from#convertible_from).
                     #[inline]
                     fn convertible_from(value: $f) -> bool {
                         signed_convertible_from_primitive_float::<$u, $i, $f>(value)

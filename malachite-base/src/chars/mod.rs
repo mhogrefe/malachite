@@ -1,8 +1,19 @@
 use strings::ToDebugString;
 
-#[doc(hidden)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[cfg(feature = "test_build")]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum CharType {
+    AsciiLower,
+    AsciiUpper,
+    AsciiNumeric,
+    AsciiNonAlphanumericGraphic,
+    NonAsciiGraphic,
+    NonGraphic,
+}
+
+#[cfg(not(feature = "test_build"))]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+enum CharType {
     AsciiLower,
     AsciiUpper,
     AsciiNumeric,
@@ -16,14 +27,18 @@ fn debug_starts_with_slash(c: char) -> bool {
     c.to_debug_string().chars().nth(1) == Some('\\')
 }
 
-/// Determines whether a `char` is "graphic".
+/// Determines whether a [`char`] is graphic.
 ///
-/// A `char` is considered graphic if it is ASCII and not a control character, or non-ASCII and its
-/// debug string does not begin with a backslash. This function can be used as a guide to whether a
-/// `char` can be displayed on a screen without resorting to some sort of escape sequence. Of
-/// course, many typefaces will not be able to render many graphic `char`s.
+/// There is an
+/// [official Unicode definition](https://www.unicode.org/versions/Unicode14.0.0/ch03.pdf#G30602)
+/// of _graphic character_, but that definition is not followed here. In Malachite, a [`char`] is
+/// considered graphic if it is ASCII and not a
+/// [C0 control](https://unicode.org/charts/PDF/U0000.pdf), or non-ASCII and its debug string does
+/// not begin with a backslash. This function can be used as a guide to whether a [`char`] can be
+/// displayed on a screen without resorting to some sort of escape sequence. Of course, many
+/// typefaces will not be able to render many graphic [`char`]s.
 ///
-/// The ASCII space ' ' is the only graphic whitespace `char`.
+/// The ASCII space `' '` is the only graphic whitespace [`char`].
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -63,11 +78,15 @@ impl CharType {
     }}
 }
 
-/// Constants associated with `char`s.
+/// Constants associated with [`char`]s.
+///
+/// Apart from the constants visibile on this page, the trait-based constants
+/// [`MIN`](crate::comparison::traits::Min::MIN), [`MAX`](crate::comparison::traits::Max::MAX), and
+/// [`NAME`](crate::named::Named::NAME) are also defined.
 pub mod constants;
-/// Functions for incrementing and decrementing `char`s.
+/// Functions for incrementing and decrementing [`char`]s.
 pub mod crement;
-/// Iterators that generate `char`s without repetition.
+/// Iterators that generate [`char`]s without repetition.
 pub mod exhaustive;
-/// Iterators that generate `char`s randomly.
+/// Iterators that generate [`char`]s randomly.
 pub mod random;

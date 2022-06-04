@@ -5,6 +5,8 @@ macro_rules! impl_wrapping_abs {
         impl WrappingAbs for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `wrapping_abs` functions in the standard library, for
+            /// example [this one](i32::wrapping_abs).
             #[inline]
             fn wrapping_abs(self) -> $t {
                 $t::wrapping_abs(self)
@@ -12,22 +14,22 @@ macro_rules! impl_wrapping_abs {
         }
 
         impl WrappingAbsAssign for $t {
-            /// Replaces `self` with its absolute value, wrapping around at the boundary of the
+            /// Replaces a number with its absolute value, wrapping around at the boundary of the
             /// type.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     |x| & x > -2^{W-1} \\\\
-            ///     -2^{W-1} & x = -2^{W-1},
+            ///     |x| & \text{if} \\quad x > -2^{W-1}, \\\\
+            ///     -2^{W-1} & \text{if} \\quad x = -2^{W-1},
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::wrapping_abs` module.
+            /// See [here](super::wrapping_abs#wrapping_abs_assign).
             #[inline]
             fn wrapping_abs_assign(&mut self) {
                 *self = self.wrapping_abs();

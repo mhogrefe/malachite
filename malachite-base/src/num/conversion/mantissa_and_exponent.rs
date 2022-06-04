@@ -220,8 +220,6 @@ fn from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
@@ -306,8 +304,6 @@ pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: Primitiv
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
@@ -378,7 +374,8 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// $$
             /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
             ///
-            /// The inverse operation is `from_integer_mantissa_and_exponent`.
+            /// The inverse operation is
+            /// [`from_integer_mantissa_and_exponent`](Self::from_integer_mantissa_and_exponent).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -387,7 +384,7 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// Panics if `self` is zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_mantissa_and_exponent).
             #[inline]
             fn integer_mantissa_and_exponent(self) -> ($t, u64) {
                 assert_ne!(self, 0);
@@ -411,7 +408,7 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// Panics if `self` is zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_mantissa).
             #[inline]
             fn integer_mantissa(self) -> $t {
                 assert_ne!(self, 0);
@@ -434,14 +431,14 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// Panics if `self` is zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_exponent).
             #[inline]
             fn integer_exponent(self) -> u64 {
                 assert_ne!(self, 0);
                 TrailingZeros::trailing_zeros(self)
             }
 
-            /// Constructs a primitive unsigned integer from its integer mantissa and exponent.
+            /// Constructs an unsigned primitive integer from its integer mantissa and exponent.
             ///
             /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
             /// $m_i$ is an odd integer.
@@ -452,14 +449,14 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// or `None` if the result cannot be exactly represented as an integer of the desired
             /// type (this happens if the exponent is too large).
             ///
-            /// The input does not have to be reduced; that is, the mantissa does not have to be
-            /// odd.
+            /// The input does not have to be reduced; that is to say, the mantissa does not have
+            /// to be odd.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#from_integer_mantissa_and_exponent).
             #[inline]
             fn from_integer_mantissa_and_exponent(
                 integer_mantissa: $t,
@@ -483,7 +480,7 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                     /// integer and $m_s$ is a rational number with $1 \leq m_s < 2$. We represent
                     /// the rational mantissa as a float. The conversion might not be exact, so we
                     /// round to the nearest float using the `Nearest` rounding mode. To use other
-                    /// rounding modes, use `sci_mantissa_and_exponent`.
+                    /// rounding modes, use [`sci_mantissa_and_exponent_with_rounding`].
                     ///
                     /// If the result cannot be expressed as an integer of the specified type,
                     /// `None` is returned.
@@ -499,8 +496,7 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                     /// Panics if `self` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::mantissa_and_exponent`
-                    /// module.
+                    /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
                     #[inline]
                     fn sci_mantissa_and_exponent(self) -> ($f, u64) {
                         sci_mantissa_and_exponent_with_rounding(self, RoundingMode::Nearest)
@@ -517,7 +513,7 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                     /// Some combinations of mantissas and exponents do not specify an integer, in
                     /// which case the resulting value is rounded to an integer using the `Nearest`
                     /// rounding mode. To specify other rounding modes, use
-                    /// `from_sci_mantissa_and_exponent_with_rounding`.
+                    /// [`from_sci_mantissa_and_exponent_with_rounding`].
                     ///
                     /// $$
                     /// f(x) \approx 2^{e_s}m_s.
@@ -530,8 +526,7 @@ macro_rules! impl_sci_mantissa_and_exponent_unsigned {
                     /// Panics if `sci_mantissa` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::mantissa_and_exponent`
-                    /// module.
+                    /// See [here](super::mantissa_and_exponent#from_sci_mantissa_and_exponent).
                     #[inline]
                     fn from_sci_mantissa_and_exponent(
                         sci_mantissa: $f,
@@ -564,29 +559,31 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// When `self` is nonzero and finite, $f(x) = (m_r, e_r)$, where
             /// $$
             /// m_r = \\begin{cases}
-            ///     2^{M+2^{E-1}-2}|x| & |x| < 2^{2-2^{E-1}} \\\\
+            ///     2^{M+2^{E-1}-2}|x| & \text{if} \\quad |x| < 2^{2-2^{E-1},} \\\\
             ///     2^M \left ( \frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}}-1\right ) &
-            ///     \textrm{otherwise}
+            ///     \textrm{otherwise},
             /// \\end{cases}
             /// $$
             /// and
             /// $$
             /// e_r = \\begin{cases}
-            ///     0 & |x| < 2^{2-2^{E-1}} \\\\
+            ///     0 & \text{if} \\quad |x| < 2^{2-2^{E-1}} \\\\
             ///     \lfloor \log_2 |x| \rfloor + 2^{E-1} - 1 & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             /// and $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to IEEE 754 or look at the examples below.
+            /// For zeros, infinities, or `NaN`, refer to
+            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
+            /// below.
             ///
-            /// The inverse operation is `from_raw_mantissa_and_exponent`.
+            /// The inverse operation is [`Self::from_raw_mantissa_and_exponent`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#raw_mantissa_and_exponent).
             #[inline]
             fn raw_mantissa_and_exponent(self) -> (u64, u64) {
                 raw_mantissa_and_exponent(self)
@@ -600,20 +597,22 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// When `self` is nonzero and finite,
             /// $$
             /// f(x) = \\begin{cases}
-            ///     2^{M+2^{E-1}-2}|x| & |x| < 2^{2-2^{E-1}} \\\\
+            ///     2^{M+2^{E-1}-2}|x| & \text{if} \\quad |x| < 2^{2-2^{E-1}}, \\\\
             ///     2^M \left ( \frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}}-1\right )
             ///     & \textrm{otherwise},
             /// \\end{cases}
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to IEEE 754 or look at the examples below.
+            /// For zeros, infinities, or `NaN`, refer to
+            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
+            /// below.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#raw_mantissa).
             #[inline]
             fn raw_mantissa(self) -> u64 {
                 raw_mantissa(self)
@@ -627,19 +626,21 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// When `self` is nonzero and finite,
             /// $$
             /// f(x) = \\begin{cases}
-            ///     0 & |x| < 2^{2-2^{E-1}} \\\\
+            ///     0 & \text{if} \\quad |x| < 2^{2-2^{E-1}}, \\\\
             ///     \lfloor \log_2 |x| \rfloor + 2^{E-1} - 1 & \textrm{otherwise},
             /// \\end{cases}
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to IEEE 754 or look at the examples below.
+            /// For zeros, infinities, or `NaN`, refer to
+            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
+            /// below.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#raw_exponent).
             #[inline]
             fn raw_exponent(self) -> u64 {
                 raw_exponent(self)
@@ -655,21 +656,23 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// When the exponent is not `2^E-1`,
             /// $$
             /// f(m_r, e_r) = \\begin{cases}
-            ///     2^{2-2^{E-1}-M}m_r & e_r = 0 \\\\
+            ///     2^{2-2^{E-1}-M}m_r & \text{if} \\quad e_r = 0, \\\\
             ///     2^{e_r-2^{E-1}+1}(2^{-M}m_r+1) & \textrm{otherwise},
             /// \\end{cases}
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to IEEE 754 or look at the examples below.
+            /// For zeros, infinities, or `NaN`, refer to
+            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
+            /// below.
             ///
-            /// This function only outputs a single, canonical `NaN`.
+            /// This function only outputs a single, canonical, `NaN`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#from_raw_mantissa_and_exponent).
             #[inline]
             fn from_raw_mantissa_and_exponent(raw_mantissa: u64, raw_exponent: u64) -> $t {
                 from_raw_mantissa_and_exponent(raw_mantissa, raw_exponent)
@@ -686,7 +689,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
             ///
-            /// The inverse operation is `from_integer_mantissa_and_exponent`.
+            /// The inverse operation is [`Self::from_integer_mantissa_and_exponent`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -695,7 +698,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_mantissa_and_exponent).
             #[inline]
             fn integer_mantissa_and_exponent(self) -> (u64, i64) {
                 integer_mantissa_and_exponent_primitive_float(self)
@@ -717,7 +720,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_mantissa).
             #[inline]
             fn integer_mantissa(self) -> u64 {
                 integer_mantissa_primitive_float(self)
@@ -739,7 +742,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#integer_exponent).
             #[inline]
             fn integer_exponent(self) -> i64 {
                 integer_exponent_primitive_float(self)
@@ -757,14 +760,14 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// type (this happens if the exponent is too large or too small, or if the mantissa's
             /// precision is too high for the exponent).
             ///
-            /// The input does not have to be reduced; that is, the mantissa does not have to be
-            /// odd.
+            /// The input does not have to be reduced; that is to say, the mantissa does not have to
+            /// be odd.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#from_integer_mantissa_and_exponent).
             #[inline]
             fn from_integer_mantissa_and_exponent(
                 integer_mantissa: u64,
@@ -797,7 +800,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
                 sci_mantissa_and_exponent_primitive_float(self)
@@ -820,7 +823,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_mantissa).
             #[inline]
             fn sci_mantissa(self) -> $t {
                 sci_mantissa_primitive_float(self)
@@ -841,7 +844,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `self` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_exponent).
             #[inline]
             fn sci_exponent(self) -> i64 {
                 sci_exponent_primitive_float(self)
@@ -867,7 +870,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Panics if `mantissa` is zero, infinite, or `NaN`.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#from_sci_mantissa_and_exponent).
             #[inline]
             fn from_sci_mantissa_and_exponent(sci_mantissa: $t, sci_exponent: i64) -> Option<$t> {
                 from_sci_mantissa_and_exponent_primitive_float(sci_mantissa, sci_exponent)

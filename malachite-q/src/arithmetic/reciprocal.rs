@@ -5,7 +5,11 @@ use Rational;
 impl Reciprocal for Rational {
     type Output = Rational;
 
-    /// Finds the reciprocal of a `Rational`, taking the `Rational` by value.
+    /// Reciprocates a [`Rational`], taking it by value.
+    ///
+    /// $$
+    /// f(x) = 1/x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -13,7 +17,6 @@ impl Reciprocal for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
@@ -31,7 +34,11 @@ impl Reciprocal for Rational {
 impl<'a> Reciprocal for &'a Rational {
     type Output = Rational;
 
-    /// Returns the reciprocal of a `Rational`, taking the `Rational` by reference.
+    /// Reciprocates a [`Rational`], taking it by reference.
+    ///
+    /// $$
+    /// f(x) = 1/x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -43,7 +50,6 @@ impl<'a> Reciprocal for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
@@ -62,7 +68,11 @@ impl<'a> Reciprocal for &'a Rational {
 }
 
 impl ReciprocalAssign for Rational {
-    /// Replaces a `Rational` with its reciprocal
+    /// Reciprocates a [`Rational`] in place.
+    ///
+    /// $$
+    /// x \gets 1/x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -70,7 +80,6 @@ impl ReciprocalAssign for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::ReciprocalAssign;
     /// use malachite_q::Rational;

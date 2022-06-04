@@ -4,38 +4,46 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrdAbs for Rational {
-    /// Compares the absolute value of an `Rational` to the absolute value of another `Rational`.
+    /// Compares the absolute values of two [`Rational`]s.
     ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_q;
-    ///
-    /// use malachite_base::num::comparison::traits::OrdAbs;
-    /// use malachite_q::Rational;
-    /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
-    ///
-    /// assert_eq!(
-    ///     Rational::from_str("2/3").unwrap().cmp_abs(&Rational::from_str("1/2").unwrap()),
-    ///     Ordering::Greater
-    /// );
-    /// assert_eq!(
-    ///     Rational::from_str("-2/3").unwrap().cmp_abs(&Rational::from_str("1/2").unwrap()),
-    ///     Ordering::Greater
-    /// );
-    /// ```
+    /// See the documentation for the
+    /// [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) implementation.
     #[inline]
     fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
         Some(self.cmp_abs(other))
     }
 }
 
-/// Asserts that `Rational` absolute value ordering is a total order.
 impl OrdAbs for Rational {
+    /// Compares the absolute values of two [`Rational`]s.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::basic::traits::OneHalf;
+    /// use malachite_base::num::comparison::traits::OrdAbs;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!(
+    ///     Rational::from_str("2/3").unwrap().cmp_abs(&Rational::ONE_HALF),
+    ///     Ordering::Greater
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_str("-2/3").unwrap().cmp_abs(&Rational::ONE_HALF),
+    ///     Ordering::Greater
+    /// );
+    /// ```
     fn cmp_abs(&self, other: &Rational) -> Ordering {
         if std::ptr::eq(self, other) {
             return Ordering::Equal;

@@ -2,7 +2,7 @@ use rational_sequences::RationalSequence;
 use std::fmt::{Debug, Display, Formatter, Result, Write};
 
 impl<T: Display + Eq> Display for RationalSequence<T> {
-    /// Converts a `RationalSequence` to a `String`.
+    /// Converts a [`RationalSequence`] to a [`String`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -55,9 +55,9 @@ impl<T: Display + Eq> Display for RationalSequence<T> {
 }
 
 impl<T: Display + Eq> Debug for RationalSequence<T> {
-    /// Converts a `RationalSequence` to a `String`.
+    /// Converts a [`RationalSequence`] to a [`String`].
     ///
-    /// This is the same implementation as for `Display`.
+    /// This is the same implementation as for [`Display`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

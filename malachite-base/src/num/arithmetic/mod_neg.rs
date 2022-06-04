@@ -20,7 +20,8 @@ macro_rules! impl_mod_neg {
         impl ModNeg for $t {
             type Output = $t;
 
-            /// Computes `-self` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Negates a number modulo another number $m$, in place. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// $f(x, m) = y$, where $x, y < m$ and $-x \equiv y \mod m$.
             ///
@@ -28,9 +29,9 @@ macro_rules! impl_mod_neg {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_neg` module.
+            /// See [here](super::mod_neg#mod_neg).
             ///
-            /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1.
+            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1.
             #[inline]
             fn mod_neg(self, m: $t) -> $t {
                 mod_neg(self, m)
@@ -38,7 +39,8 @@ macro_rules! impl_mod_neg {
         }
 
         impl ModNegAssign for $t {
-            /// Replaces `self` with `-self` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Negates a number modulo another number $m$. Assumes the input is already reduced
+            /// modulo $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.
             ///
@@ -46,9 +48,10 @@ macro_rules! impl_mod_neg {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_neg` module.
+            /// See [here](super::mod_neg#mod_neg_assign).
             ///
-            /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1, where the output is assigned to a.
+            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1, where the output
+            /// is assigned to `a`.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
                 mod_neg_assign(self, m)

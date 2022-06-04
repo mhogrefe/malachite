@@ -40,20 +40,24 @@ macro_rules! impl_div_round_unsigned {
             ///
             /// Let $q = \frac{x}{y}$:
             ///
-            /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            /// $$
+            /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+            /// $$
             ///
-            /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            /// $$
+            /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+            /// $$
             ///
             /// $$
             /// f(x, y, \mathrm{Nearest}) = \begin{cases}
-            ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
-            ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
             ///     \lfloor q \rfloor &
-            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-            ///     \\ \text{is even} \\\\
+            ///     \text{if} \\quad  q - \lfloor q \rfloor = \frac{1}{2}
+            ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is even}, \\\\
             ///     \lceil q \rceil &
-            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-            ///     \\ \text{is odd.}
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+            ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
             /// \end{cases}
             /// $$
             ///
@@ -67,7 +71,7 @@ macro_rules! impl_div_round_unsigned {
             /// `other`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_round` module.
+            /// See [here](super::div_round#div_round).
             #[inline]
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
                 div_round_unsigned(self, other, rm)
@@ -78,7 +82,7 @@ macro_rules! impl_div_round_unsigned {
             /// Divides a value by another value in place and rounds according to a specified
             /// rounding mode.
             ///
-            /// See the `DivRound` documentation for details.
+            /// See the [`DivRound`](super::traits::DivRound) documentation for details.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -88,7 +92,7 @@ macro_rules! impl_div_round_unsigned {
             /// `other`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_round` module.
+            /// See [here](super::div_round#div_round_assign).
             #[inline]
             fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.div_round(other, rm);
@@ -123,24 +127,32 @@ macro_rules! impl_div_round_signed {
             ///
             /// Let $q = \frac{x}{y}$:
             ///
-            /// $f(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.$
+            /// $$
+            /// f(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
+            /// $$
             ///
-            /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.$
+            /// $$
+            /// f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.
+            /// $$
             ///
-            /// $f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            /// $$
+            /// f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+            /// $$
             ///
-            /// $f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            /// $$
+            /// f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+            /// $$
             ///
             /// $$
             /// f(x, y, \mathrm{Nearest}) = \begin{cases}
-            ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
-            ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2}, \\\\
             ///     \lfloor q \rfloor &
-            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-            ///     \\ \text{is even} \\\\
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///     \\ \lfloor q \rfloor \\ \text{is even}, \\\\
             ///     \lceil q \rceil &
-            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-            ///     \\ \text{is odd.}
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///     \\ \lfloor q \rfloor \\ \text{is odd.}
             /// \end{cases}
             /// $$
             ///
@@ -150,11 +162,11 @@ macro_rules! impl_div_round_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `other` is zero, if `self` is `$t::MIN` and `other` is `-1`, or if `rm` is
-            /// `Exact` but `self` is not divisible by `other`.
+            /// Panics if `other` is zero, if `self` is `Self::MIN` and `other` is `-1`, or if `rm`
+            /// is `Exact` but `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_round` module.
+            /// See [here](super::div_round#div_round).
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
                 div_round_signed(self, other, rm)
             }
@@ -164,17 +176,17 @@ macro_rules! impl_div_round_signed {
             /// Divides a value by another value in place and rounds according to a specified
             /// rounding mode.
             ///
-            /// See the `DivRound` documentation for details.
+            /// See the [`DivRound`](super::traits::DivRound) documentation for details.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `other` is zero, if `self` is `$t::MIN` and `other` is `-1`, or if `rm` is
-            /// `Exact` but `self` is not divisible by `other`.
+            /// Panics if `other` is zero, if `self` is `Self::MIN` and `other` is `-1`, or if `rm`
+            /// is `Exact` but `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_round` module.
+            /// See [here](super::div_round#div_round_assign).
             #[inline]
             fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.div_round(other, rm);

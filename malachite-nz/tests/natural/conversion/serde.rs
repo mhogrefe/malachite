@@ -46,7 +46,8 @@ fn serde_properties() {
     });
 
     string_gen_var_8().test_properties(|s| {
-        let _n: Natural = serde_json::from_str(&s).unwrap();
-        let _n: Integer = serde_json::from_str(&s).unwrap();
+        let n: Natural = serde_json::from_str(&s).unwrap();
+        let i: Integer = serde_json::from_str(&s).unwrap();
+        assert_eq!(n, i);
     });
 }

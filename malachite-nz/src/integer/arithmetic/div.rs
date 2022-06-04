@@ -4,15 +4,20 @@ use std::ops::{Div, DivAssign};
 impl Div<Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by value. The quotient is
-    /// rounded towards zero. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by value. The quotient is
+    /// rounded towards zero. The quotient and remainder (which is not computed) satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -22,16 +27,16 @@ impl Div<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((Integer::from(23) / Integer::from(10)).to_string(), "2");
+    /// assert_eq!(Integer::from(23) / Integer::from(10), 2);
     ///
     /// // -2 * -10 + 3 = 23
-    /// assert_eq!((Integer::from(23) / Integer::from(-10)).to_string(), "-2");
+    /// assert_eq!(Integer::from(23) / Integer::from(-10), -2);
     ///
     /// // -2 * 10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) / Integer::from(10)).to_string(), "-2");
+    /// assert_eq!(Integer::from(-23) / Integer::from(10), -2);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) / Integer::from(-10)).to_string(), "2");
+    /// assert_eq!(Integer::from(-23) / Integer::from(-10), 2);
     /// ```
     #[inline]
     fn div(mut self, other: Integer) -> Integer {
@@ -43,15 +48,20 @@ impl Div<Integer> for Integer {
 impl<'a> Div<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by value and the second by
-    /// reference. The quotient is rounded towards zero. The quotient and remainder satisfy
-    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
+    /// reference. The quotient is rounded towards zero. The quotient and remainder (which is not
+    /// computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -61,16 +71,16 @@ impl<'a> Div<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((Integer::from(23) / &Integer::from(10)).to_string(), "2");
+    /// assert_eq!(Integer::from(23) / &Integer::from(10), 2);
     ///
     /// // -2 * -10 + 3 = 23
-    /// assert_eq!((Integer::from(23) / &Integer::from(-10)).to_string(), "-2");
+    /// assert_eq!(Integer::from(23) / &Integer::from(-10), -2);
     ///
     /// // -2 * 10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) / &Integer::from(10)).to_string(), "-2");
+    /// assert_eq!(Integer::from(-23) / &Integer::from(10), -2);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) / &Integer::from(-10)).to_string(), "2");
+    /// assert_eq!(Integer::from(-23) / &Integer::from(-10), 2);
     /// ```
     #[inline]
     fn div(mut self, other: &'a Integer) -> Integer {
@@ -82,15 +92,20 @@ impl<'a> Div<&'a Integer> for Integer {
 impl<'a> Div<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by reference and the second
-    /// by value. The quotient is rounded towards zero. The quotient and remainder satisfy
-    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
+    /// by value. The quotient is rounded towards zero. The quotient and remainder (which is not
+    /// computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -100,16 +115,16 @@ impl<'a> Div<Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) / Integer::from(10)).to_string(), "2");
+    /// assert_eq!(&Integer::from(23) / Integer::from(10), 2);
     ///
     /// // -2 * -10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) / Integer::from(-10)).to_string(), "-2");
+    /// assert_eq!(&Integer::from(23) / Integer::from(-10), -2);
     ///
     /// // -2 * 10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) / Integer::from(10)).to_string(), "-2");
+    /// assert_eq!(&Integer::from(-23) / Integer::from(10), -2);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) / Integer::from(-10)).to_string(), "2");
+    /// assert_eq!(&Integer::from(-23) / Integer::from(-10), 2);
     /// ```
     #[inline]
     fn div(self, other: Integer) -> Integer {
@@ -120,15 +135,20 @@ impl<'a> Div<Integer> for &'a Integer {
 impl<'a, 'b> Div<&'b Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by reference. The quotient is
-    /// rounded towards zero. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by reference. The quotient is
+    /// rounded towards zero. The quotient and remainder (which is not computed) satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -138,16 +158,16 @@ impl<'a, 'b> Div<&'b Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) / &Integer::from(10)).to_string(), "2");
+    /// assert_eq!(&Integer::from(23) / &Integer::from(10), 2);
     ///
     /// // -2 * -10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) / &Integer::from(-10)).to_string(), "-2");
+    /// assert_eq!(&Integer::from(23) / &Integer::from(-10), -2);
     ///
     /// // -2 * 10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) / &Integer::from(10)).to_string(), "-2");
+    /// assert_eq!(&Integer::from(-23) / &Integer::from(10), -2);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) / &Integer::from(-10)).to_string(), "2");
+    /// assert_eq!(&Integer::from(-23) / &Integer::from(-10), 2);
     /// ```
     #[inline]
     fn div(self, other: &'b Integer) -> Integer {
@@ -156,15 +176,20 @@ impl<'a, 'b> Div<&'b Integer> for &'a Integer {
 }
 
 impl DivAssign<Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value. The
-    /// quotient is rounded towards zero. The quotient and remainder satisfy
-    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by value. The quotient is rounded towards zero. The quotient and remainder
+    /// (which is not computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -176,22 +201,22 @@ impl DivAssign<Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x /= Integer::from(10);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     ///
     /// // -2 * -10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x /= Integer::from(-10);
-    /// assert_eq!(x.to_string(), "-2");
+    /// assert_eq!(x, -2);
     ///
     /// // -2 * 10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x /= Integer::from(10);
-    /// assert_eq!(x.to_string(), "-2");
+    /// assert_eq!(x, -2);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x /= Integer::from(-10);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     #[inline]
     fn div_assign(&mut self, other: Integer) {
@@ -201,15 +226,20 @@ impl DivAssign<Integer> for Integer {
 }
 
 impl<'a> DivAssign<&'a Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference and
-    /// returning the remainder. The quotient is rounded towards zero. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by reference. The quotient is rounded towards zero. The quotient and
+    /// remainder (which is not computed) satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets \operatorname{sgn}(xy) \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -221,22 +251,22 @@ impl<'a> DivAssign<&'a Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x /= &Integer::from(10);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     ///
     /// // -2 * -10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x /= &Integer::from(-10);
-    /// assert_eq!(x.to_string(), "-2");
+    /// assert_eq!(x, -2);
     ///
     /// // -2 * 10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x /= &Integer::from(10);
-    /// assert_eq!(x.to_string(), "-2");
+    /// assert_eq!(x, -2);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x /= &Integer::from(-10);
-    /// assert_eq!(x.to_string(), "2");
+    /// assert_eq!(x, 2);
     /// ```
     #[inline]
     fn div_assign(&mut self, other: &'a Integer) {

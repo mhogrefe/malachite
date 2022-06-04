@@ -153,14 +153,14 @@ where
 macro_rules! impl_from_unsigned {
     ($u: ident) => {
         impl<'a> CheckedFrom<&'a Rational> for $u {
-            /// Converts a `Rational` to an unsigned integer, taking the `Rational` by reference.
-            /// If the `Rational` is negative, too large, or not an integer, `None` is returned.
+            /// Converts a [`Rational`] to an unsigned primitive integer, returning `None` if the
+            /// [`Rational`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#checked_from).
             #[inline]
             fn checked_from(value: &Rational) -> Option<$u> {
                 checked_from_unsigned(value)
@@ -168,14 +168,14 @@ macro_rules! impl_from_unsigned {
         }
 
         impl<'a> ConvertibleFrom<&'a Rational> for $u {
-            /// Determines whether a `Rational` can be converted to an unsigned integer, taking
-            /// the `Rational` by reference.
+            /// Determines whether a [`Rational`] can be converted to an unsigned primitive
+            /// integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#convertible_from).
             #[inline]
             fn convertible_from(value: &Rational) -> bool {
                 convertible_from_unsigned::<$u>(value)
@@ -183,28 +183,31 @@ macro_rules! impl_from_unsigned {
         }
 
         impl<'a> RoundingFrom<&'a Rational> for $u {
-            /// Converts a `Rational` to an unsigned integer, using a specified `RoundingMode` and
-            /// taking the `Rational` by reference.
+            /// Converts a [`Rational`] to an unsigned integer, using a specified
+            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
             ///
-            /// If the `Rational` is negative, then it will be rounded to zero when the
-            /// `RoundingMode` is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
-            /// panic.
+            /// If the [`Rational`] is negative, then it will be rounded to zero when `rm` is
+            /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
             ///
-            /// If the `Rational` is larger than the maximum value of the unsigned type, then it
-            /// will be rounded to the maximum value when the `RoundingMode` is `Floor`, `Down`, or
-            /// `Nearest`. Otherwise, this function will panic.
+            /// If the [`Rational`] is larger than the maximum value of the unsigned type, then it
+            /// will be rounded to the maximum value when `rm` is `Floor`, `Down`, or `Nearest`.
+            /// Otherwise, this function will panic.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, if the
-            /// `Rational` is less than zero and `RoundingMode` is not `Down`, `Ceiling`, or
-            /// `Nearest`, or if the `Rational` is greater than `T::MAX` and `RoundingMode` is not
+            /// Panics if the [`Rational`] is not an integer and `rm` is `Exact`, if the
+            /// [`Rational`] is less than zero and `rm` is not `Down`, `Ceiling`, or
+            /// `Nearest`, or if the [`Rational`] is greater than `T::MAX` and `rm` is not
             /// `Down`, `Floor`, or `Nearest`.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#rounding_from).
             #[inline]
             fn rounding_from(value: &Rational, rm: RoundingMode) -> $u {
                 rounding_from_unsigned(value, rm)
@@ -217,14 +220,14 @@ apply_to_unsigneds!(impl_from_unsigned);
 macro_rules! impl_from_signed {
     ($u: ident, $s: ident) => {
         impl<'a> CheckedFrom<&'a Rational> for $s {
-            /// Converts a `Rational` to a signed integer, taking the `Rational` by reference. If
-            /// the `Rational` is too small, too large, or not an integer, `None` is returned.
+            /// Converts a [`Rational`] to a signed primitive integer, returning `None` if the
+            /// [`Rational`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#checked_from).
             #[inline]
             fn checked_from(value: &Rational) -> Option<$s> {
                 checked_from_signed::<$u, $s>(value)
@@ -232,14 +235,14 @@ macro_rules! impl_from_signed {
         }
 
         impl<'a> ConvertibleFrom<&'a Rational> for $s {
-            /// Determines whether a `Rational` can be converted to a signed integer, taking the
-            /// `Rational` by reference.
+            /// Determines whether a [`Rational`] can be converted to a signed primitive
+            /// integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#convertible_from).
             #[inline]
             fn convertible_from(value: &Rational) -> bool {
                 convertible_from_signed::<$s>(value)
@@ -247,28 +250,32 @@ macro_rules! impl_from_signed {
         }
 
         impl<'a> RoundingFrom<&'a Rational> for $s {
-            /// Converts a `Rational` to a signed integer, using a specified `RoundingMode` and
-            /// taking the `Rational` by reference.
+            /// Converts a [`Rational`] to a signed integer, using a specified
+            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
             ///
-            /// If the `Rational` is smaller than the minimum value of the unsigned type, then it
-            /// will be rounded to the minimum value when the `RoundingMode` is `Ceiling`, `Down`,
-            /// or `Nearest`. Otherwise, this function will panic.
+            /// If the [`Rational`] is smaller than the minimum value of the unsigned type, then it
+            /// will be rounded to the minimum value when `rm` is `Ceiling`, `Down`, or `Nearest`.
+            /// Otherwise, this function will panic.
             ///
-            /// If the `Rational` is larger than the maximum value of the unsigned type, then it
-            /// will be rounded to the maximum value when the `RoundingMode` is `Floor`, `Down`, or
-            /// `Nearest`. Otherwise, this function will panic.
+            /// If the [`Rational`] is larger than the maximum value of the unsigned type, then it
+            /// will be rounded to the maximum value when `rm` is `Floor`, `Down`, or `Nearest`.
+            /// Otherwise, this function will panic.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, if the
-            /// `Rational` is less than `T::MIN` and `RoundingMode` is not `Down`, `Ceiling`, or
-            /// `Nearest`, or if the `Rational` is greater than `T::MAX` and `RoundingMode` is not
-            /// `Down`, `Floor`, or `Nearest`.
+            /// Panics if the [`Rational`] is not an integer and `rm` is `Exact`, if the
+            /// [`Rational`] is less than `T::MIN` and `rm` is not `Down`, `Ceiling`, or `Nearest`,
+            /// or if the [`Rational`] is greater than `T::MAX` and `rm` is not `Down`, `Floor`, or
+            /// `Nearest`.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            /// See [here](super::primitive_int_from_rational#rounding_from).
             #[inline]
             fn rounding_from(value: &Rational, rm: RoundingMode) -> $s {
                 rounding_from_signed(value, rm)

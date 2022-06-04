@@ -1,13 +1,12 @@
 use num::arithmetic::traits::{ModShl, ModShlAssign, ModShr, ModShrAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::WrappingFrom;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_shr_signed<
-    T: ModShl<U, T, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ModShl<U, T, Output = T> + PrimitiveUnsigned + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     other: S,
@@ -27,9 +26,9 @@ fn mod_shr_signed<
 }
 
 fn mod_shr_assign_signed<
-    T: ModShlAssign<U, T> + PrimitiveInt + ShrAssign<U>,
-    U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ModShlAssign<U, T> + PrimitiveUnsigned + ShrAssign<U>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     other: S,
@@ -55,8 +54,8 @@ macro_rules! impl_mod_shr_signed {
                 impl ModShr<$u, $t> for $t {
                     type Output = $t;
 
-                    /// Computes `self >> other` mod `m`. Assumes the input is already reduced mod
-                    /// `m`.
+                    /// Right-shifts a number (divides it by a power of 2) modulo a number $m$.
+                    /// Assumes the input is already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and
                     /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
@@ -70,7 +69,7 @@ macro_rules! impl_mod_shr_signed {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shr` module.
+                    /// See [here](super::mod_shr#mod_shr).
                     #[inline]
                     fn mod_shr(self, other: $u, m: $t) -> $t {
                         mod_shr_signed(self, other, m)
@@ -78,8 +77,8 @@ macro_rules! impl_mod_shr_signed {
                 }
 
                 impl ModShrAssign<$u, $t> for $t {
-                    /// Replaces `self` with `self >> other` mod `m`. Assumes the input is already
-                    /// reduced mod `m`.
+                    /// Right-shifts a number (divides it by a power of 2) modulo a number $m$, in
+                    /// place. Assumes the input is already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and
                     /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
@@ -93,7 +92,7 @@ macro_rules! impl_mod_shr_signed {
                     /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_shr` module.
+                    /// See [here](super::mod_shr#mod_shr).
                     #[inline]
                     fn mod_shr_assign(&mut self, other: $u, m: $t) {
                         mod_shr_assign_signed(self, other, m)

@@ -4,8 +4,15 @@ use malachite_base::num::conversion::traits::ToSci;
 use std::fmt::{Formatter, Write};
 
 impl ToSci for Integer {
-    /// Determines whether an `Integer` can be converted to a string using `to_sci` and a
-    /// particular set of options.
+    /// Determines whether an [`Integer`] can be converted to a string using
+    /// [`to_sci`](`Self::to_sci`) and a particular set of options.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -30,15 +37,19 @@ impl ToSci for Integer {
         self.unsigned_abs_ref().fmt_sci_valid(options)
     }
 
-    /// Converts an `Integer to a string using a specified base, possibly formatting the number
+    /// Converts an [`Integer`] to a string using a specified base, possibly formatting the number
     /// using scientific notation.
     ///
-    /// See `ToSciOptions` for details on the available options. Note that setting
+    /// See [`ToSciOptions`] for details on the available options. Note that setting
     /// `neg_exp_threshold` has no effect, since there is never a need to use negative exponents
-    /// when representing an integer.
+    /// when representing an [`Integer`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the input

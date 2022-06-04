@@ -18,7 +18,7 @@ use std::marker::PhantomData;
 
 /// Generates bits from a striped random sequence.
 ///
-/// See the module-level documentation.
+/// See [here](self) for more information.
 #[derive(Clone, Debug)]
 pub struct StripedBitSource {
     first_bit_of_block: bool,
@@ -35,9 +35,9 @@ impl Iterator for StripedBitSource {
     /// probability of getting a bit different from the previous one is $1 / m$.
     ///
     /// To reset the bit source, so that the next call to `next` has equal probabilities of `true`
-    /// or `false`, call `end_block`.
+    /// or `false`, call [`end_block`](Self::end_block).
     ///
-    /// # Expected worst-case complexity
+    /// # Expected complexity
     /// Constant time and additional memory.
     #[inline]
     fn next(&mut self) -> Option<bool> {
@@ -52,14 +52,15 @@ impl Iterator for StripedBitSource {
 }
 
 impl StripedBitSource {
-    /// Creates a new `StripedBitSource` with mean run length $m$, where $m$ is
-    /// `m_numerator` / `m_denominator`.
+    /// Creates a new `StripedBitSource`.
     ///
-    /// # Expected worst-case complexity
+    /// The mean run length is $m$, where $m$ is `m_numerator / m_denominator`.
+    ///
+    /// # Expected complexity
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `m_denominator` is zero or if `m_numerator` < `m_denominator`.
+    /// Panics if `m_denominator` is zero or if `m_numerator <= m_denominator`.
     ///
     /// # Examples
     /// ```
@@ -89,10 +90,10 @@ impl StripedBitSource {
         }
     }
 
-    /// Resets this `StripedBitSource`, so that the next time `next` is called, the probabilities of
-    /// `true` or `false` will be equal.
+    /// Resets this `StripedBitSource`, so that the next time [`next`](Self::next) is called, the
+    /// probabilities of `true` or `false` will be equal.
     ///
-    /// # Expected worst-case complexity
+    /// # Expected complexity
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -136,7 +137,7 @@ impl StripedBitSource {
     /// Sets the previous bit of a `StripedBitSource`. This will affect the probability of the next
     /// bit.
     ///
-    /// # Expected worst-case complexity
+    /// # Expected complexity
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -180,6 +181,9 @@ impl StripedBitSource {
 }
 
 /// Generates random unsigned integers from a random striped distribution.
+///
+/// This `struct` is created by [`striped_random_unsigned_bit_chunks`]; see its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsignedBitChunks<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
@@ -205,8 +209,7 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedBitChunks<T> {
 
 /// Generates random signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_signeds` function. See its documentation for
-/// more.
+/// This `struct` is created by [`striped_random_signeds`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomSigneds<T: PrimitiveSigned> {
     phantom: PhantomData<*const T>,
@@ -235,8 +238,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomSigneds<T> {
 
 /// Generates random natural (non-negative) signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_natural_signeds` function. See its documentation
-/// for more.
+/// This `struct` is created by [`striped_random_natural_signeds`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalSigneds<T: PrimitiveSigned> {
     phantom: PhantomData<*const T>,
@@ -261,8 +263,8 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
 
 /// Generates random negative signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_negative_signeds` function. See its
-/// documentation for more.
+/// This `struct` is created by [`striped_random_negative_signeds`]; see its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
     phantom: PhantomData<*const T>,
@@ -289,8 +291,8 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 /// Generates random unsigned integers less than a positive limit, from a random striped
 /// distribution.
 ///
-/// This `struct` is created by the `striped_random_unsigneds_less_than` function. See its
-/// documentation for more.
+/// This `struct` is created by [`striped_random_unsigneds_less_than`]; see its documentation for
+/// more.
 #[derive(Clone, Debug)]
 struct StripedRandomUnsignedsLessThan<T: PrimitiveUnsigned> {
     pub(crate) xs: StripedRandomUnsignedBitChunks<T>,
@@ -313,37 +315,36 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedsLessThan<T> {
 
 /// Generates random unsigned integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "1", "1001100", "1111111", "11000011", "0", "10000000", "1111", "1110110", "0",
-///         "11111000"
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1, 1001100, 1111111, 11000011, 0, 10000000, 1111, 1110110, 0, 11111000, ...]"
 /// )
 /// ```
 #[inline]
@@ -357,37 +358,38 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 
 /// Generates random positive unsigned integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_positive_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "1", "1001100", "1111111", "11000011", "10000000", "1111", "1110110", "11111000",
-///         "11111111", "11111101"
-///     ]
+///     prefix_to_string(
+///         striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1, 1001100, 1111111, 11000011, 10000000, 1111, 1110110, 11111000, 11111111, 11111101, \
+///     ...]"
 /// )
 /// ```
 pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
@@ -400,37 +402,37 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 
 /// Generates random signed integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
-///         "111101", "11111100"
-///     ]
+///     prefix_to_string(
+///         striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1100001, 1000000, 1100000, 10000111, 1111, 10000001, 1111000, 100011, 111101, 11111100, \
+///     ...]"
 /// )
 /// ```
 pub fn striped_random_signeds<T: PrimitiveSigned>(
@@ -447,34 +449,36 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 
 /// Generates random natural (non-negative) signed integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_natural_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &["0", "101100", "110000", "1111100", "1111", "1111110", "0", "111", "11101", "1100000"]
+///     prefix_to_string(
+///         striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[0, 101100, 110000, 1111100, 1111, 1111110, 0, 111, 11101, 1100000, ...]"
 /// )
 /// ```
 pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
@@ -490,37 +494,37 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 
 /// Generates random positive signed integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_positive_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "101100", "110000", "1111100", "1111", "1111110", "111", "11101", "1100000", "1111111",
-///         "1100000"
-///     ]
+///     prefix_to_string(
+///         striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[101100, 110000, 1111100, 1111, 1111110, 111, 11101, 1100000, 1111111, 1100000, ...]"
 /// )
 /// ```
 pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
@@ -537,37 +541,38 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 
 /// Generates random negative signed integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_negative_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "10000000", "10101100", "10110000", "11111100", "10001111", "11111110", "10000000",
-///         "10000111", "10011101", "11100000"
-///     ]
+///     prefix_to_string(
+///         striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[10000000, 10101100, 10110000, 11111100, 10001111, 11111110, 10000000, 10000111, \
+///     10011101, 11100000, ...]"
 /// )
 /// ```
 pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
@@ -583,37 +588,37 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 
 /// Generates random nonzero signed integers from a random striped distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
+/// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_nonzero_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &[
-///         "1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
-///         "111101", "11111100"
-///     ]
+///     prefix_to_string(
+///         striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1100001, 1000000, 1100000, 10000111, 1111, 10000001, 1111000, 100011, 111101, 11111100, \
+///     ...]"
 /// )
 /// ```
 pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
@@ -627,35 +632,38 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
 /// Generates random unsigned integers of up to `chunk_size` bits from a random striped
 /// distribution.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+/// $m$ = `m_numerator / m_denominator`.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// Constant time and additional memory.
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and `n` is `chunk_size`.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero, if `m_numerator` <= `m_denominator`, or if `chunk_size` is
-/// greater than `T::WIDTH`.
+/// Panics if `m_denominator` is zero, if m_numerator <= m_denominator, or if `chunk_size` is
+/// greater than the width of the type.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_bit_chunks;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3, 4, 1)
-///         .take(10)
-///         .map(|x| x.to_binary_string())
-///         .collect_vec(),
-///     &["0", "0", "0", "101", "11", "100", "11", "11", "0", "111"]
+///     prefix_to_string(
+///         striped_random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[0, 0, 0, 101, 11, 100, 11, 11, 0, 111, ...]"
 /// )
 /// ```
 pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
@@ -672,13 +680,13 @@ pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     }
 }
 
-/// Generates a striped `Vec<bool>`, with a given length, from a `StripedBitSource`.
+/// Generates a striped `Vec<bool>`, with a given length, from a [`StripedBitSource`].
 ///
-/// See the module-level documentation.
+/// See [here](self) for more information.
 ///
 /// The output length is `len`.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -722,39 +730,35 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomBoolVecs<I> {
 
 /// Generates random striped `Vec<bool>`s, with lengths from an iterator.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero or if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`.
+/// `mean_stripe_numerator <= mean_stripe_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_bool_vecs_from_length_iterator;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 /// use malachite_base::vecs::random_values_from_vec;
 ///
-/// let bss = striped_random_bool_vecs_from_length_iterator(
-///     EXAMPLE_SEED,
-///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
-///     10,
-///     1,
-/// )
-/// .take(20)
-/// .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-/// .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "00", "0000", "00", "0000", "0000", "11", "", "00", "", "1111", "0001", "11", "1100",
-///         "00", "0000", "0000", "1110", "", "0000", ""
-///     ]
+///     prefix_to_string(
+///         striped_random_bool_vecs_from_length_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///             10,
+///             1,
+///         ).map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()),
+///         20
+///     ),
+///     "[00, 0000, 00, 0000, 0000, 11, , 00, , 1111, 0001, 11, 1100, 00, 0000, 0000, 1110, , \
+///     0000, , ...]"
 /// );
 /// ```
 #[inline]
@@ -776,8 +780,10 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 
 /// Generates random striped `Vec<bool>`s of a given length.
 ///
+/// See [here](self) for more information.
+///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
@@ -790,25 +796,21 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_fixed_length_bool_vecs;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 5, 10, 1)
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "00000", "00000", "00000", "00000", "00011", "11000", "00000", "11111", "01111",
-///         "11111", "10000", "00011", "00000", "00000", "11000", "00000", "11111", "00000",
-///         "00000", "11111"
-///     ]
+///     prefix_to_string(
+///         striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 5, 10, 1)
+///                 .map(
+///                     |bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()
+///                 ),
+///         20
+///     ),
+///     "[00000, 00000, 00000, 00000, 00011, 11000, 00000, 11111, 01111, 11111, 10000, 00011, \
+///     00000, 00000, 11000, 00000, 11111, 00000, 00000, 11111, ...]"
 /// );
 /// ```
 pub fn striped_random_fixed_length_bool_vecs(
@@ -827,11 +829,13 @@ pub fn striped_random_fixed_length_bool_vecs(
 
 /// Generates random striped `Vec<bool>`s.
 ///
-/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
-/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
+/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -839,52 +843,31 @@ pub fn striped_random_fixed_length_bool_vecs(
 /// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator` / `mean_length_denominator`.
+/// `mean_length_numerator / mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, if `mean_length_numerator` or
+/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
 /// `mean_length_denominator` are zero, or, if after being reduced to lowest terms, their sum is
 /// greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_bool_vecs;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs(EXAMPLE_SEED, 10, 1, 2, 1)
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "000000",
-///         "0",
-///         "00000000",
-///         "0",
-///         "00000001110000",
-///         "",
-///         "11111",
-///         "0000",
-///         "1",
-///         "",
-///         "011111",
-///         "11",
-///         "",
-///         "",
-///         "1",
-///         "000",
-///         "",
-///         "0",
-///         "",
-///         "0"
-///     ]
+///     prefix_to_string(
+///         striped_random_bool_vecs(EXAMPLE_SEED, 10, 1, 2, 1)
+///                 .map(
+///                     |bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()
+///                 ),
+///         20
+///     ),
+///     "[000000, 0, 00000000, 0, 00000001110000, , 11111, 0000, 1, , 011111, 11, , , 1, 000, , \
+///     0, , 0, ...]"
 /// );
 /// ```
 #[inline]
@@ -907,12 +890,14 @@ pub fn striped_random_bool_vecs(
 
 /// Generates random striped `Vec<bool>`s, with a minimum length.
 ///
-/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
-/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
+/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
 /// `min_length`.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -920,52 +905,31 @@ pub fn striped_random_bool_vecs(
 /// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator` / `mean_length_denominator`.
+/// `mean_length_numerator / mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, if `mean_length_numerator` or
+/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
 /// `mean_length_denominator` are zero, if their ratio is less than or equal to `min_length`, or if
 /// they are too large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_bool_vecs_min_length;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 10, 1, 5, 1)
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "000000000",
-///         "0000",
-///         "00000000111",
-///         "0111",
-///         "00000000011111111",
-///         "100",
-///         "00000111",
-///         "1111111",
-///         "0001",
-///         "111",
-///         "111111111",
-///         "00000",
-///         "000",
-///         "000",
-///         "1111",
-///         "000000",
-///         "111",
-///         "0011",
-///         "000",
-///         "1111"
-///     ]
+///     prefix_to_string(
+///         striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 10, 1, 5, 1)
+///                 .map(
+///                     |bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()
+///                 ),
+///         20
+///     ),
+///     "[000000000, 0000, 00000000111, 0111, 00000000011111111, 100, 00000111, 1111111, 0001, \
+///     111, 111111111, 00000, 000, 000, 1111, 000000, 111, 0011, 000, 1111, ...]"
 /// );
 /// ```
 #[inline]
@@ -995,68 +959,50 @@ pub fn striped_random_bool_vecs_min_length(
 
 /// Generates random striped `Vec<bool>`s, with lengths in $[a, b)$.
 ///
-/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b)$. $a$ must be less
-/// than $b$.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b)$. $a$ must be
+/// less than $b$.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
-///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & a \leq n < b \\\\
+///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & \text{if} \\quad a \leq n < b, \\\\
 ///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(a + b)$
+/// $T(n) = O(b)$
 ///
-/// $M(n) = O(a + b)$
+/// $M(n) = O(b)$
 ///
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_bool_vecs_length_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_length_range(EXAMPLE_SEED, 4, 10, 10, 1)
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "000000000",
-///         "000000000",
-///         "000111000",
-///         "000000000",
-///         "0111",
-///         "11111",
-///         "00111111",
-///         "1000000",
-///         "00000011",
-///         "111111111",
-///         "111111",
-///         "00000000",
-///         "00000000",
-///         "001111",
-///         "111111111",
-///         "000000000",
-///         "110000",
-///         "0001111",
-///         "0000000",
-///         "111101111"
-///     ]
+///     prefix_to_string(
+///         striped_random_bool_vecs_length_range(EXAMPLE_SEED, 4, 10, 10, 1)
+///                 .map(
+///                     |bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()
+///                 ),
+///         20
+///     ),
+///     "[000000000, 000000000, 000111000, 000000000, 0111, 11111, 00111111, 1000000, 00000011, \
+///     111111111, 111111, 00000000, 00000000, 001111, 111111111, 000000000, 110000, 0001111, \
+///     0000000, 111101111, ...]"
 /// );
 /// ```
 #[inline]
@@ -1077,68 +1023,50 @@ pub fn striped_random_bool_vecs_length_range(
 
 /// Generates random striped `Vec<bool>`s, with lengths in $[a, b]$.
 ///
-/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b]$. $a$ must be less
-/// than $b$.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b]$. $a$ must be
+/// less than $b$.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
-///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & a \leq n \leq b \\\\
+///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & \text{if} \\quad a \leq n \leq b, \\\\
 ///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(a + b)$
+/// $T(n) = O(b)$
 ///
-/// $M(n) = O(a + b)$
+/// $M(n) = O(b)$
 ///
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_bool_vecs_length_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_length_inclusive_range(EXAMPLE_SEED, 4, 9, 10, 1)
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
 /// assert_eq!(
-///     bss.iter().map(String::as_str).collect_vec(),
-///     &[
-///         "000000000",
-///         "000000000",
-///         "000111000",
-///         "000000000",
-///         "0111",
-///         "11111",
-///         "00111111",
-///         "1000000",
-///         "00000011",
-///         "111111111",
-///         "111111",
-///         "00000000",
-///         "00000000",
-///         "001111",
-///         "111111111",
-///         "000000000",
-///         "110000",
-///         "0001111",
-///         "0000000",
-///         "111101111"
-///     ]
+///     prefix_to_string(
+///         striped_random_bool_vecs_length_inclusive_range(EXAMPLE_SEED, 4, 9, 10, 1)
+///                 .map(
+///                     |bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect::<String>()
+///                 ),
+///         20
+///     ),
+///     "[000000000, 000000000, 000111000, 000000000, 0111, 11111, 00111111, 1000000, 00000011, \
+///     111111111, 111111, 00000000, 00000000, 001111, 111111111, 000000000, 110000, 0001111, \
+///     0000000, 111101111, ...]"
 /// );
 /// ```
 #[inline]
@@ -1157,25 +1085,25 @@ pub fn striped_random_bool_vecs_length_inclusive_range(
     )
 }
 
-/// Generates a striped unsigned `Vec`, with a given length, from a `StripedBitSource`.
+/// Generates a striped unsigned [`Vec`], with a given number of bits (not length!), from a
+/// [`StripedBitSource`].
 ///
-/// See the module-level documentation.
+/// See [here](self) for more information.
 ///
-/// The output length is ceil(`bit_len` / `T::WIDTH`).
+/// The output length is `bit_len.div_round(T::WIDTH, RoundingMode::Ceiling)`.
 ///
-/// # Expected worst-case complexity
+/// # Expected complexity
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bit_len`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `bit_len`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
@@ -1206,7 +1134,7 @@ pub fn get_striped_unsigned_vec<T: PrimitiveUnsigned>(
         .collect()
 }
 
-/// Generates random striped `Vec`s of unsigneds.
+/// Generates random striped [`Vec`]s of unsigneds.
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsignedVecs<T: PrimitiveUnsigned, I: Iterator<Item = u64>> {
     phantom: PhantomData<*const T>,
@@ -1225,57 +1153,38 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = u64>> Iterator for StripedRandomUn
     }
 }
 
-/// Generates random striped `Vec`s of unsigneds, with lengths from an iterator.
+/// Generates random striped [`Vec`]s of unsigneds, with lengths from an iterator.
+///
+/// See [here](self) for more information.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero or if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`.
+/// `mean_stripe_numerator <= mean_stripe_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_vecs_from_length_iterator;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::strings::ToBinaryString;
+/// use malachite_base::strings::{ToBinaryString, ToDebugString};
 /// use malachite_base::vecs::random_values_from_vec;
 ///
-/// let xss = striped_random_unsigned_vecs_from_length_iterator::<u8, _>(
-///     EXAMPLE_SEED,
-///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
-///     10,
-///     1,
-/// )
-/// .take(10)
-/// .map(|xs| {
-///     xs.into_iter()
-///         .map(|x: u8| x.to_binary_string())
-///         .collect_vec()
-/// })
-/// .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0"][..],
-///         &["1110000", "0", "11111100", "11"],
-///         &["11111110", "1111"],
-///         &["0", "0", "0", "11111000"],
-///         &["0", "0", "1111110", "0"],
-///         &["11011111", "11111111"],
-///         &[],
-///         &["11110000", "11111111"],
-///         &[],
-///         &["11111111", "11000011", "11111", "0"]
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigned_vecs_from_length_iterator::<u8, _>(
+///             EXAMPLE_SEED,
+///             &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///             10,
+///             1,
+///         ).map(|xs| prefix_to_string(xs.into_iter().map(|x: u8| x.to_binary_string()), 100)),
+///         10,
+///     ),
+///     "[[0, 0], [1110000, 0, 11111100, 11], [11111110, 1111], [0, 0, 0, 11111000], \
+///     [0, 0, 1111110, 0], [11011111, 11111111], [], [11110000, 11111111], [], \
+///     [11111111, 11000011, 11111, 0], ...]"
 /// );
 /// ```
 #[inline]
@@ -1299,10 +1208,12 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
     }
 }
 
-/// Generates random striped unsigned `Vec`s of a given length.
+/// Generates random striped unsigned [`Vec`]s of a given length.
+///
+/// See [here](self) for more information.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
@@ -1315,40 +1226,25 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_fixed_length_unsigned_vecs;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::strings::ToBinaryString;
+/// use malachite_base::strings::{ToBinaryString, ToDebugString};
 ///
-/// let xss = striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 3, 10, 1)
-///     .take(10)
-///     .map(|xs| {
-///         xs.into_iter()
-///             .map(|x: u8| x.to_binary_string())
-///             .collect_vec()
-///     })
-///     .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0", "111000"],
-///         &["0", "11111100", "11"],
-///         &["11111110", "1111", "0"],
-///         &["0", "0", "11111000"],
-///         &["0", "0", "1111110"],
-///         &["11111111", "11011111", "11111111"],
-///         &["11110000", "11111111", "11111111"],
-///         &["11000011", "11111", "0"],
-///         &["0", "10000000", "11111001"],
-///         &["11111111", "0", "0"]
-///     ]
+///     prefix_to_string(
+///         striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 3, 10, 1)
+///                 .map(
+///                     |xs| prefix_to_string(
+///                         xs.into_iter().map(|x: u8| x.to_binary_string()),
+///                         100
+///                     )
+///                 ),
+///         10,
+///     ),
+///     "[[0, 0, 111000], [0, 11111100, 11], [11111110, 1111, 0], [0, 0, 11111000], \
+///     [0, 0, 1111110], [11111111, 11011111, 11111111], [11110000, 11111111, 11111111], \
+///     [11000011, 11111, 0], [0, 10000000, 11111001], [11111111, 0, 0], ...]"
 /// );
 /// ```
 #[inline]
@@ -1366,13 +1262,15 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
     )
 }
 
-/// Generates random striped `Vec`s of unsigneds.
+/// Generates random striped [`Vec`]s of unsigneds.
 ///
-/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
-/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
+/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \frac{m^n}{(m+1)^{n+1}}\prod_{i=0}^{n-1}P(x_i).
@@ -1384,53 +1282,37 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 /// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator` / `mean_length_denominator`.
+/// `mean_length_numerator / mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, if `mean_length_numerator` or
+/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
 /// `mean_length_denominator` are zero, or, if after being reduced to lowest terms, their sum is
 /// greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_vecs;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::strings::ToBinaryString;
+/// use malachite_base::strings::{ToBinaryString, ToDebugString};
 ///
-/// let xss = striped_random_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 2, 1)
-///     .take(10)
-///     .map(|xs| {
-///         xs.into_iter()
-///             .map(|x: u8| x.to_binary_string())
-///             .collect_vec()
-///     })
-///     .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0", "111000", "0", "11111110", "10000001"][..],
-///         &["0"],
-///         &["11110000", "11111111", "11111111", "11111111", "11", "0", "10000000", "11111"],
-///         &["0"],
-///         &[
-///             "10000", "0", "11111100", "11111111", "1111111", "11111000", "11", "0", "0",
-///             "10011000", "11111111", "111", "0", "0"
-///         ],
-///         &[],
-///         &["11111111", "11111111", "11111111", "11111111", "10111111"],
-///         &["0", "0", "0", "11110000"],
-///         &["11111111"],
-///         &[]
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 2, 1)
+///                 .map(
+///                     |xs| prefix_to_string(
+///                         xs.into_iter().map(|x: u8| x.to_binary_string()),
+///                         100
+///                     )
+///                 ),
+///         10,
+///     ),
+///     "[[0, 0, 111000, 0, 11111110, 10000001], [0], \
+///     [11110000, 11111111, 11111111, 11111111, 11, 0, 10000000, 11111], [0], \
+///     [10000, 0, 11111100, 11111111, 1111111, 11111000, 11, 0, 0, 10011000, 11111111, 111, 0, \
+///     0], [], [11111111, 11111111, 11111111, 11111111, 10111111], [0, 0, 0, 11110000], \
+///     [11111111], [], ...]"
 /// );
 /// ```
 #[inline]
@@ -1451,14 +1333,16 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
     )
 }
 
-/// Generates random striped `Vec`s of unsigneds, with a minimum length.
+/// Generates random striped [`Vec`]s of unsigneds, with a minimum length.
 ///
-/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
-/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
+/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
 /// `min_length`.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -1474,50 +1358,36 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 /// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator` / `mean_length_denominator`.
+/// `mean_length_numerator / mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, if `mean_length_numerator` or
+/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
 /// `mean_length_denominator` are zero, if their ratio is less than or equal to `min_length`, or if
 /// they are too large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_vecs_min_length;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 2, 10, 1, 3, 1)
-///     .take(10)
-///     .map(|xs| {
-///         xs.into_iter()
-///             .map(|x: u8| x.to_binary_string())
-///             .collect_vec()
-///     })
-///     .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0", "111000"][..],
-///         &["0", "11111100", "11", "11111111"],
-///         &["11110000", "11111111", "11111111", "11111111"],
-///         &["11111000", "11111111", "11111111", "11000000"],
-///         &["0", "10000", "0"],
-///         &["111", "0", "0", "1111"],
-///         &["11110000", "11111111"],
-///         &["11111111", "111111"],
-///         &["110", "10000000", "11111111"],
-///         &["11111111", "11111111"]
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 2, 10, 1, 3, 1)
+///                 .map(
+///                     |xs| prefix_to_string(
+///                         xs.into_iter().map(|x: u8| x.to_binary_string()),
+///                         100
+///                     )
+///                 ),
+///         10,
+///     ),
+///     "[[0, 0, 111000], [0, 11111100, 11, 11111111], \
+///     [11110000, 11111111, 11111111, 11111111], [11111000, 11111111, 11111111, 11000000], \
+///     [0, 10000, 0], [111, 0, 0, 1111], [11110000, 11111111], [11111111, 111111], \
+///     [110, 10000000, 11111111], [11111111, 11111111], ...]"
 /// );
 /// ```
 #[inline]
@@ -1545,68 +1415,55 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
     )
 }
 
-/// Generates random striped `Vec`s of unsigneds, with lengths in $[a, b)$.
+/// Generates random striped [`Vec`]s of unsigneds, with lengths in $[a, b)$.
 ///
-/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b)$. $a$ must be less
-/// than $b$.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b)$. $a$ must be
+/// less than $b$.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
-///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & a \leq n < b \\\\
+///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & \text{if} \\quad a \leq n < b, \\\\
 ///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(a + b)$
+/// $T(n) = O(b)$
 ///
-/// $M(n) = O(a + b)$
+/// $M(n) = O(b)$
 ///
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_vecs_length_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_length_range::<u8>(EXAMPLE_SEED, 2, 4, 10, 1)
-///     .take(10)
-///     .map(|xs| {
-///         xs.into_iter()
-///             .map(|x: u8| x.to_binary_string())
-///             .collect_vec()
-///     })
-///     .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0", "111000"][..],
-///         &["0", "11111100"],
-///         &["11111000", "1", "11110000"],
-///         &["0", "0", "0"],
-///         &["11110000", "11111111"],
-///         &["11111111", "11", "11111111"],
-///         &["1000000", "0", "11110000"],
-///         &["11111111", "11111111"],
-///         &["1111000", "11000000", "11111111"],
-///         &["11111111", "11111111", "1100"]
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigned_vecs_length_range::<u8>(EXAMPLE_SEED, 2, 4, 10, 1)
+///                 .map(
+///                     |xs| prefix_to_string(
+///                         xs.into_iter().map(|x: u8| x.to_binary_string()),
+///                         100
+///                     )
+///                 ),
+///         10,
+///     ),
+///     "[[0, 0, 111000], [0, 11111100], [11111000, 1, 11110000], [0, 0, 0], \
+///     [11110000, 11111111], [11111111, 11, 11111111], [1000000, 0, 11110000], \
+///     [11111111, 11111111], [1111000, 11000000, 11111111], [11111111, 11111111, 1100], ...]"
 /// );
 /// ```
 #[inline]
@@ -1625,68 +1482,55 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
     )
 }
 
-/// Generates random striped `Vec`s of unsigneds, with lengths in $[a, b]$.
+/// Generates random striped [`Vec`]s of unsigneds, with lengths in $[a, b]$.
 ///
-/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b]$. $a$ must be less
-/// than $b$.
+/// See [here](self) for more information.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b]$. $a$ must be
+/// less than $b$.
 ///
 /// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
-///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & a \leq n \leq b \\\\
+///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & \text{if} \\quad a \leq n \leq b, \\\\
 ///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(a + b)$
+/// $T(n) = O(b)$
 ///
-/// $M(n) = O(a + b)$
+/// $M(n) = O(b)$
 ///
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_vecs_length_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 3, 10, 1)
-///     .take(10)
-///     .map(|xs| {
-///         xs.into_iter()
-///             .map(|x: u8| x.to_binary_string())
-///             .collect_vec()
-///     })
-///     .collect_vec();
-/// let xss = xss
-///     .iter()
-///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
-///     .collect_vec();
 /// assert_eq!(
-///     xss,
-///     &[
-///         &["0", "0", "111000"][..],
-///         &["0", "11111100"],
-///         &["11111000", "1", "11110000"],
-///         &["0", "0", "0"],
-///         &["11110000", "11111111"],
-///         &["11111111", "11", "11111111"],
-///         &["1000000", "0", "11110000"],
-///         &["11111111", "11111111"],
-///         &["1111000", "11000000", "11111111"],
-///         &["11111111", "11111111", "1100"]
-///     ]
+///     prefix_to_string(
+///         striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 3, 10, 1)
+///                 .map(
+///                     |xs| prefix_to_string(
+///                         xs.into_iter().map(|x: u8| x.to_binary_string()),
+///                         100
+///                     )
+///                 ),
+///         10,
+///     ),
+///     "[[0, 0, 111000], [0, 11111100], [11111000, 1, 11110000], [0, 0, 0], \
+///     [11110000, 11111111], [11111111, 11, 11111111], [1000000, 0, 11110000], \
+///     [11111111, 11111111], [1111000, 11000000, 11111111], [11111111, 11111111, 1100], ...]"
 /// );
 /// ```
 #[inline]
@@ -1777,8 +1621,10 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedInclusiveRange<T> {
 
 /// Generates random striped unsigneds in the range $[a, b)$.
 ///
+/// See [here](self) for more information.
+///
 /// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the unsigneds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1793,24 +1639,23 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedInclusiveRange<T> {
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_range::<u8>(EXAMPLE_SEED, 1, 7, 4, 1)
-///     .take(10)
-///     .map(|x: u8| x.to_binary_string())
-///     .collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
-/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_unsigned_range::<u8>(EXAMPLE_SEED, 1, 7, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1, 1, 1, 110, 1, 110, 10, 11, 11, 100, ...]"
+/// );
 /// ```
 #[inline]
 pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
@@ -1832,8 +1677,10 @@ pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
 
 /// Generates random striped unsigneds in the range $[a, b]$.
 ///
+/// See [here](self) for more information.
+///
 /// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the unsigneds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1848,24 +1695,23 @@ pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 6, 4, 1)
-///     .take(10)
-///     .map(|x: u8| x.to_binary_string())
-///     .collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
-/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 6, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[1, 1, 1, 110, 1, 110, 10, 11, 11, 100, ...]"
+/// );
 /// ```
 pub fn striped_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     seed: Seed,
@@ -1931,8 +1777,10 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 
 /// Generates random striped signeds in the range $[a, b]$.
 ///
+/// See [here](self) for more information.
+///
 /// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the signeds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1948,26 +1796,22 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_signed_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_signed_inclusive_range::<u8, i8>(EXAMPLE_SEED, -5, 10, 4, 1)
-///     .take(10)
-///     .map(|x: i8| x.to_binary_string())
-///     .collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
 /// assert_eq!(
-///     xss,
-///     &["11111011", "11111100", "1000", "111", "11111111", "1000", "11", "1000", "0", "1000"]
+///     prefix_to_string(
+///         striped_random_signed_inclusive_range::<u8, i8>(EXAMPLE_SEED, -5, 10, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[11111011, 11111100, 1000, 111, 11111111, 1000, 11, 1000, 0, 1000, ...]"
 /// );
 /// ```
 #[inline]
@@ -1993,8 +1837,10 @@ pub fn striped_random_signed_range<
 
 /// Generates random striped signeds in the range $[a, b)$.
 ///
+/// See [here](self) for more information.
+///
 /// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the signeds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -2010,26 +1856,22 @@ pub fn striped_random_signed_range<
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::striped::striped_random_signed_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_signed_range::<u8, i8>(EXAMPLE_SEED, -5, 11, 4, 1)
-///     .take(10)
-///     .map(|x: i8| x.to_binary_string())
-///     .collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
 /// assert_eq!(
-///     xss,
-///     &["11111011", "11111100", "1000", "111", "11111111", "1000", "11", "1000", "0", "1000"]
+///     prefix_to_string(
+///         striped_random_signed_range::<u8, i8>(EXAMPLE_SEED, -5, 11, 4, 1)
+///                 .map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[11111011, 11111100, 1000, 111, 11111111, 1000, 11, 1000, 0, 1000, ...]"
 /// );
 /// ```
 pub fn striped_random_signed_inclusive_range<

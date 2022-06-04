@@ -1,18 +1,27 @@
+#[cfg(feature = "bin_build")]
 extern crate itertools;
+#[cfg(feature = "bin_build")]
 #[macro_use]
 extern crate malachite_base;
+#[cfg(feature = "bin_build")]
 extern crate walkdir;
 
+#[cfg(feature = "bin_build")]
 use bin_util::demo_and_bench::register;
+#[cfg(feature = "bin_build")]
 use bin_util::generate::max_base::generate_max_base;
+#[cfg(feature = "bin_build")]
 use bin_util::generate::tuning_manager::{build_reference_data, test};
+#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
+#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
-
+#[cfg(feature = "bin_build")]
 // Examples:
 //
-// cargo run --features test_build -- -g max_base
-// cargo run --features test_build --release -- -l 10000 -m exhaustive -b demo_mod_pow_u32
+// cargo run --features bin_build -- -g max_base
+// cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_mod_pow_u32
+#[cfg(feature = "bin_build")]
 fn main() {
     let args = read_command_line_arguments("malachite-base");
     let mut runner = Runner::new();
@@ -38,6 +47,10 @@ fn main() {
     }
 }
 
+#[cfg(not(feature = "bin_build"))]
+fn main() {}
+
+#[cfg(feature = "bin_build")]
 pub mod bin_util {
     pub mod demo_and_bench;
     pub mod generate;

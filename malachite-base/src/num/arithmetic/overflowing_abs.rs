@@ -5,6 +5,8 @@ macro_rules! impl_overflowing_abs {
         impl OverflowingAbs for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `overflowing_abs` functions in the standard library, for
+            /// example [this one](i32::overflowing_abs).
             #[inline]
             fn overflowing_abs(self) -> ($t, bool) {
                 $t::overflowing_abs(self)
@@ -12,16 +14,16 @@ macro_rules! impl_overflowing_abs {
         }
 
         impl OverflowingAbsAssign for $t {
-            /// Replaces `self` with its absolute value.
+            /// Replaces a number with its absolute value.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_abs` module.
+            /// See [here](super::overflowing_abs#overflowing_abs_assign).
             #[inline]
             fn overflowing_abs_assign(&mut self) -> bool {
                 let overflow;

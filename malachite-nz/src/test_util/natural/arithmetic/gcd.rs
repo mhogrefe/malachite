@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivMod, Parity, XXSubYYIsZZ};
+use malachite_base::num::arithmetic::traits::{DivMod, Parity, XXSubYYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
@@ -151,7 +151,8 @@ pub fn half_gcd_matrix_all_elements_nonzero(m: &HalfGcdMatrix) -> bool {
     true
 }
 
-/// This is div2 from mpn/generic/hgcd2.c, GMP 6.2.1, where HGCD2_DIV2_METHOD == 2.
+/// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where
+/// `HGCD2_DIV2_METHOD == 2`.
 pub fn limbs_gcd_div_alt(
     mut n1: Limb,
     mut n0: Limb,
@@ -169,7 +170,7 @@ pub fn limbs_gcd_div_alt(
         q <<= 1;
         if n1 == d1 && n0 >= d0 || n1 != d1 && n1 > d1 {
             q |= 1;
-            (n1, n0) = Limb::xx_sub_yy_is_zz(n1, n0, d1, d0);
+            (n1, n0) = Limb::xx_sub_yy_to_zz(n1, n0, d1, d0);
         }
         d0 = (d1 << (Limb::WIDTH - 1)) | (d0 >> 1);
         d1 >>= 1;

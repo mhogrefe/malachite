@@ -31,6 +31,7 @@ fn shortlex_vecs_length_inclusive_range_small_helper<I: Clone + Iterator>(
 fn test_shortlex_vecs_length_inclusive_range() {
     shortlex_vecs_length_inclusive_range_small_helper(0, 4, nevers(), 1, &[&[]]);
     shortlex_vecs_length_inclusive_range_small_helper(6, 9, nevers(), 0, &[]);
+    shortlex_vecs_length_inclusive_range_small_helper(5, 3, exhaustive_bools(), 0, &[]);
     shortlex_vecs_length_inclusive_range_small_helper(
         0,
         4,
@@ -100,10 +101,4 @@ fn test_shortlex_vecs_length_inclusive_range() {
             &['a', 'a', 'c', 'a', 'b'],
         ],
     );
-}
-
-#[test]
-#[should_panic]
-fn shortlex_vecs_length_inclusive_range_fail() {
-    shortlex_vecs_length_inclusive_range(1, 0, exhaustive_bools());
 }

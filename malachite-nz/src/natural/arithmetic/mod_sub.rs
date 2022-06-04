@@ -4,19 +4,21 @@ use natural::Natural;
 impl ModSub<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking all three `Natural`s by
-    /// value. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -31,8 +33,8 @@ impl ModSub<Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by value.
     #[inline]
     fn mod_sub(mut self, other: Natural, m: Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -43,19 +45,22 @@ impl ModSub<Natural, Natural> for Natural {
 impl<'a> ModSub<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the first two `Natural`s by
-    /// value and the modulus by reference. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -70,8 +75,8 @@ impl<'a> ModSub<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and c are taken by value
-    /// and m is taken by reference.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by value and `m` is taken by reference.
     #[inline]
     fn mod_sub(mut self, other: Natural, m: &'a Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -82,20 +87,22 @@ impl<'a> ModSub<Natural, &'a Natural> for Natural {
 impl<'a> ModSub<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the left `Natural` and the
-    /// modulus by value and the right `Natural` by reference. Assumes the inputs are already
-    /// reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first and third [`Natural`]s are taken by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -110,8 +117,8 @@ impl<'a> ModSub<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and m are taken by value
-    /// and c is taken by reference.
+    /// This isequivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value and `c` is taken by reference.
     #[inline]
     fn mod_sub(mut self, other: &'a Natural, m: Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -122,20 +129,22 @@ impl<'a> ModSub<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModSub<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the left `Natural` by value
-    /// and the right `Natural` and modulus by reference. Assumes the inputs are already reduced mod
-    /// `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first [`Natural`] is taken by value and the second and third by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -150,8 +159,8 @@ impl<'a, 'b> ModSub<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b is taken by value and c and
-    /// m are taken by reference.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` is
+    /// taken by value and `c` and `m` are taken by reference.
     #[inline]
     fn mod_sub(mut self, other: &'a Natural, m: &'b Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -162,20 +171,22 @@ impl<'a, 'b> ModSub<&'a Natural, &'b Natural> for Natural {
 impl<'a> ModSub<Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the left `Natural` by
-    /// reference and the right `Natural` and modulus by value. Assumes the inputs are already
-    /// reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first [`Natural`] is taken by reference and the second and third by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -190,8 +201,8 @@ impl<'a> ModSub<Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b is taken by reference and c
-    /// and m are taken by value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` is
+    /// taken by reference and `c` and `m` are taken by value.
     fn mod_sub(self, other: Natural, m: Natural) -> Natural {
         if *self >= other {
             self - other
@@ -204,20 +215,22 @@ impl<'a> ModSub<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the left `Natural` and
-    /// modulus by reference and the right `Natural` by value. Assumes the inputs are already
-    /// reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the second
+    /// by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -232,8 +245,8 @@ impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and m are taken by
-    /// reference and c is taken by value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
+    /// `m` are taken by reference and `c` is taken by value.
     fn mod_sub(self, other: Natural, m: &'b Natural) -> Natural {
         if *self >= other {
             self - other
@@ -246,19 +259,22 @@ impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModSub<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking the first two `Natural`s by
-    /// reference and the modulus by value. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -273,8 +289,8 @@ impl<'a, 'b> ModSub<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and c are taken by
-    /// reference and m is taken by value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by reference and `m` is taken by value.
     fn mod_sub(self, other: &'b Natural, m: Natural) -> Natural {
         if self >= other {
             self - other
@@ -287,19 +303,21 @@ impl<'a, 'b> ModSub<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModSub<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural`, taking all three `Natural`s by
-    /// reference. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSub;
     /// use malachite_nz::natural::Natural;
@@ -314,8 +332,8 @@ impl<'a, 'b, 'c> ModSub<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// reference.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by reference.
     fn mod_sub(self, other: &'b Natural, m: &'c Natural) -> Natural {
         if self >= other {
             self - other
@@ -326,19 +344,21 @@ impl<'a, 'b, 'c> ModSub<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModSubAssign<Natural, Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural` in place, taking the right `Natural`
-    /// and modulus by value. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSubAssign;
     /// use malachite_nz::natural::Natural;
@@ -352,8 +372,8 @@ impl ModSubAssign<Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b, c, and m are taken by
-    /// value and a == b.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b`, `c`,
+    /// and `m` are taken by value and `a == b`.
     fn mod_sub_assign(&mut self, other: Natural, m: Natural) {
         if *self >= other {
             *self -= other;
@@ -364,19 +384,22 @@ impl ModSubAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModSubAssign<Natural, &'a Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural` in place, taking the right `Natural`
-    /// by value and the modulus by reference. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value
+    /// and the second by reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSubAssign;
     /// use malachite_nz::natural::Natural;
@@ -390,8 +413,8 @@ impl<'a> ModSubAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and c are taken by value,
-    /// m is taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
+    /// `c` are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_sub_assign(&mut self, other: Natural, m: &'a Natural) {
         if *self >= other {
             *self -= other;
@@ -402,19 +425,22 @@ impl<'a> ModSubAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModSubAssign<&'a Natural, Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural` in place, taking the right `Natural`
-    /// by reference and the modulus by value. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
+    /// reference and the second by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSubAssign;
     /// use malachite_nz::natural::Natural;
@@ -428,8 +454,8 @@ impl<'a> ModSubAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b and m are taken by value,
-    /// c is taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
+    /// `m` are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_sub_assign(&mut self, other: &'a Natural, m: Natural) {
         if *self >= *other {
             *self -= other;
@@ -440,19 +466,22 @@ impl<'a> ModSubAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModSubAssign<&'a Natural, &'b Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` mod a `Natural` in place, taking the right `Natural`
-    /// and modulus by reference. Assumes the inputs are already reduced mod `m`.
+    /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs are
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `m.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSubAssign;
     /// use malachite_nz::natural::Natural;
@@ -466,8 +495,8 @@ impl<'a, 'b> ModSubAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT 2.7.1, where b is taken by value, c and m
-    /// are taken by reference, and a == b.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` is
+    /// taken by value, `c` and `m` are taken by reference, and `a == b`.
     fn mod_sub_assign(&mut self, other: &'a Natural, m: &'b Natural) {
         if *self >= *other {
             *self -= other;

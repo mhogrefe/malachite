@@ -12,17 +12,25 @@ name = "malachite_nz_main"
 path = "src/bin.rs"
 
 [dependencies]
+embed-doc-image = "0.1.4"
 itertools = "0.9.0"
 malachite-base = { path = "../malachite-base" }
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }
 num = { version = "0.4.0", optional = true, features = ["serde"] }
-rug = { version = "1.14.1", default-features = false, optional = true, features = ["integer", "serde"] }
+rug = { version = "1.16.0", default-features = false, optional = true, features = ["integer", "serde"] }
 
 [features]
 32_bit_limbs = []
 test_build = ["malachite-base/test_build", "serde", "serde_json", "num", "rug"]
+bin_build = ["test_build"]
+doc-images = []
+
+[package.metadata.docs.rs]
+# docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
+# ensure that it will render any images that we may have in inner attribute documentation.
+features = ["doc-images"]
 
 [profile.release]
 lto = true

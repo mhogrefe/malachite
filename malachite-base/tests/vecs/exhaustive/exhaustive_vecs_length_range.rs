@@ -54,6 +54,7 @@ fn test_exhaustive_vecs_length_range() {
         &[&[], &[()], &[(), ()], &[(), (), (), ()], &[(), (), ()]],
     );
     exhaustive_vecs_length_range_small_helper(1, 1, exhaustive_bools(), 0, &[]);
+    exhaustive_vecs_length_range_small_helper(5, 3, exhaustive_bools(), 0, &[]);
     exhaustive_vecs_length_range_small_helper(
         0,
         3,
@@ -136,10 +137,4 @@ fn test_exhaustive_vecs_length_range() {
             &[2, 3],
         ],
     );
-}
-
-#[test]
-#[should_panic]
-fn exhaustive_vecs_length_range_fail() {
-    exhaustive_vecs_length_range(1, 0, exhaustive_bools());
 }

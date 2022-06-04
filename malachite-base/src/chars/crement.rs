@@ -1,16 +1,18 @@
 use chars::constants::{
-    CHAR_JUST_BELOW_SURROGATES, FIRST_SURROGATE_CODE_POINT, NUMBER_OF_CHARS, SURROGATE_RANGE_SIZE,
+    CHAR_JUST_BELOW_SURROGATES, FIRST_SURROGATE_CODE_POINT, NUMBER_OF_CHARS,
+    NUMBER_OF_SURROGATE_CODE_POINTS,
 };
 use comparison::traits::Min;
 
-/// Converts a `char` to a `u32`.
+/// Converts a [`char`] to a [`u32`].
 ///
-/// The conversion is done in such a way that if the next largest `char` after $x$ is $y$, then
+/// The conversion is done in such a way that if the next largest [`char`] after $x$ is $y$, then
 /// $\mathrm{char\\_to\\_contiguous\\_range(x)}+1 = \mathrm{char\\_to\\_contiguous\\_range(y)}$.
-/// This can't be accomplished just through casting, because there is a range of `u32`s (the
-/// surrogate range) that do not correspond to any `char`.
+/// This can't be accomplished just through casting, because there is a range of [`u32`]s (the
+/// [surrogate code points](https://www.unicode.org/glossary/#surrogate_code_point)) that do not
+/// correspond to any [`char`].
 ///
-/// The inverse of this function is `contiguous_range_to_char`.
+/// The inverse of this function is [`contiguous_range_to_char`].
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -27,15 +29,16 @@ use comparison::traits::Min;
 pub const fn char_to_contiguous_range(c: char) -> u32 {
     match c {
         '\u{0}'..=CHAR_JUST_BELOW_SURROGATES => c as u32,
-        _ => c as u32 - SURROGATE_RANGE_SIZE,
+        _ => c as u32 - NUMBER_OF_SURROGATE_CODE_POINTS,
     }
 }
 
-/// Converts a `u32` to `char`; passing `u` returns the `u`th largest `char`.
+/// Converts a [`u32`] to a [`char`]; if all [`char`]s were arranged in ascending order, passing
+/// $u$ to this function would return the $u$th [`char`].
 ///
-/// This function is the inverse of `char_to_contiguous_range`. Every `u32` between $0$ and
-/// $\mathrm{NUMBER\\_OF\\_CHARS} - 1$, inclusive, is mapped to a distinct `char`. Larger `u32`s
-/// return `None`.
+/// This function is the inverse of [`char_to_contiguous_range`]. Every [`u32`] between $0$ and
+/// $\mathrm{NUMBER\\_OF\\_CHARS} - 1$, inclusive, is mapped to a distinct [`char`]. Passing a
+/// larger [`u32`] yields `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -55,13 +58,14 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     match u {
         0..=ONE_BELOW_FIRST_SURROGATE_CODE_POINT => std::char::from_u32(u),
         FIRST_SURROGATE_CODE_POINT..=ONE_BELOW_NUMBER_OF_CHARS => {
-            std::char::from_u32(u + SURROGATE_RANGE_SIZE)
+            std::char::from_u32(u + NUMBER_OF_SURROGATE_CODE_POINTS)
         }
         _ => None,
     }
 }
 
-/// Increments this `char`, skipping over the surrogate range.
+/// Increments this [`char`], skipping over the
+/// [surrogate code points](https://www.unicode.org/glossary/#surrogate_code_point).
 ///
 /// # Panics
 /// Panics if `self` is `char::MAX`.
@@ -84,7 +88,8 @@ pub fn increment_char(c: &mut char) {
         .expect("Cannot increment char::MAX")
 }
 
-/// Decrements this `char`, skipping over the surrogate range.
+/// Decrements this [`char`], skipping over the
+/// [surrogate code points](https://www.unicode.org/glossary/#surrogate_code_point).
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.

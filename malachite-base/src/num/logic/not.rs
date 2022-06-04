@@ -9,7 +9,7 @@ macro_rules! impl_not {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::not` module.
+            /// See [here](super::not#not_assign).
             #[inline]
             fn not_assign(&mut self) {
                 *self = !*self;

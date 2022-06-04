@@ -25,7 +25,7 @@ use std::cmp::min;
 //TODO tune
 const SQRMOD_BNM1_THRESHOLD: usize = 16;
 
-/// This is mpn_sqrmod_bnm1_next_size from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
+// This is equivalent to `mpn_sqrmod_bnm1_next_size` from `mpn/generic/sqrmod_bnm1.c`, GMP 6.2.1.
 #[inline]
 pub(crate) fn limbs_square_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
@@ -36,7 +36,7 @@ pub(crate) fn limbs_square_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     )
 }
 
-/// This is mpn_sqrmod_bnm1_itch from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `mpn_sqrmod_bnm1_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub(crate) const fn limbs_square_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
@@ -48,11 +48,19 @@ pub(crate) const fn limbs_square_mod_base_pow_n_minus_1_scratch_len(
     }
 }
 
-/// Input is {ap,rn}; output is {rp,rn}, computation is
-/// mod B^rn - 1, and values are semi-normalised; zero is represented
-/// as either 0 or B^n - 1.  Needs a scratch of 2rn limbs at tp.
-///
-/// This is mpn_bc_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2, where rp != tp.
+// Input is {ap,rn}; output is {rp,rn}, computation is
+// mod B^rn - 1, and values are semi-normalised; zero is represented
+// as either 0 or B^n - 1.  Needs a scratch of 2rn limbs at tp.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_bc_sqrmod_bnm1` from `mpn/generic/sqrmod_bnm1.c`, GMP 6.2.1, where
+// `rp != tp`.
 fn limbs_square_mod_base_pow_n_minus_1_basecase(
     out: &mut [Limb],
     xs: &[Limb],
@@ -70,11 +78,19 @@ fn limbs_square_mod_base_pow_n_minus_1_basecase(
     }
 }
 
-/// Input is {xs, n+1}; output is {xs, n + 1}, in
-/// semi-normalised representation, computation is mod B ^ n + 1.
-/// Output is normalised.
-///
-/// This is mpn_bc_sqrmod_bnp1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2, where rp == tp.
+// Input is {xs, n+1}; output is {xs, n + 1}, in
+// semi-normalised representation, computation is mod B ^ n + 1.
+// Output is normalised.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_bc_sqrmod_bnp1` from `mpn/generic/sqrmod_bnm1.c`, GMP 6.2.1, where
+// `rp == tp`.
 fn limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n: usize) {
     assert_ne!(n, 0);
     limbs_square_to_out(out, &xs[..n + 1]);
@@ -95,7 +111,14 @@ fn limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n:
 //
 // S(n) <= n / 2 + MAX (n + 4, S(half_n / 2)) <= 3 / 2 * n + 4
 //
-// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqrmod_bnm1` from `mpn/generic/sqrmod_bnm1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_square_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,

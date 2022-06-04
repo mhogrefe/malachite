@@ -49,7 +49,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// Panics if `self` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#floor_log_base_2).
             #[inline]
             fn floor_log_base_2(self) -> u64 {
                 floor_log_base_2(self)
@@ -70,7 +70,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// Panics if `self` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#ceiling_log_base_2).
             #[inline]
             fn ceiling_log_base_2(self) -> u64 {
                 ceiling_log_base_2(self)
@@ -85,8 +85,8 @@ macro_rules! impl_log_base_2_unsigned {
             ///
             /// $$
             /// f(x) = \\begin{cases}
-            ///     \operatorname{Some}(\log_2 x) & \log_2 x \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            ///     \operatorname{Some}(\log_2 x) & \text{if} \\quad \log_2 x \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -97,7 +97,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// Panics if `self` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#checked_log_base_2).
             #[inline]
             fn checked_log_base_2(self) -> Option<u64> {
                 checked_log_base_2(self)
@@ -123,7 +123,7 @@ macro_rules! impl_log_base_2_primitive_float {
             /// Panics if `self` is infinite, `NaN`, or less than or equal to zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#floor_log_base_2).
             #[inline]
             fn floor_log_base_2(self) -> i64 {
                 assert!(self > 0.0);
@@ -145,7 +145,7 @@ macro_rules! impl_log_base_2_primitive_float {
             /// Panics if `self` is infinite, `NaN`, or less than or equal to zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#ceiling_log_base_2).
             #[inline]
             fn ceiling_log_base_2(self) -> i64 {
                 assert!(self > 0.0);
@@ -166,8 +166,8 @@ macro_rules! impl_log_base_2_primitive_float {
             ///
             /// $$
             /// f(x) = \\begin{cases}
-            ///     \operatorname{Some}(\log_2 x) & \log_2 x \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            ///     \operatorname{Some}(\log_2 x) & \text{if} \\quad \log_2 x \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -178,7 +178,7 @@ macro_rules! impl_log_base_2_primitive_float {
             /// Panics if `self` is infinite, `NaN`, or less than or equal to zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_2` module.
+            /// See [here](super::log_base_2#checked_log_base_2).
             #[inline]
             fn checked_log_base_2(self) -> Option<i64> {
                 assert!(self > 0.0);

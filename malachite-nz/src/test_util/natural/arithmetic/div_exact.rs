@@ -4,15 +4,15 @@ use malachite_base::num::basic::traits::Iverson;
 use natural::arithmetic::div_exact::MAX_OVER_3;
 use platform::Limb;
 
-// This is MODLIMB_INVERSE_3 from gmp-impl.h, GMP 6.1.2.
+// This is equivalent to `MODLIMB_INVERSE_3` from `gmp-impl.h`, GMP 6.2.1.
 const MODLIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) | 1;
 const CEIL_MAX_OVER_3: Limb = MAX_OVER_3 + 1;
 const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH - 1));
 
 /// Benchmarks show that this algorithm is always worse than the default.
 ///
-/// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 1,
-/// no carry-in, and no return value.
+/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic diveby3.c`, GMP 6.2.1, with
+/// `DIVEXACT_BY3_METHOD == 1`, no carry-in, and no return value.
 pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
     let len = ns.len();
     assert_ne!(len, 0);
@@ -39,8 +39,8 @@ pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
 
 /// Benchmarks show that this algorithm is always worse than the default.
 ///
-/// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 1,
-/// no carry-in, and no return value, where rp == up.
+/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic diveby3.c`, GMP 6.2.1, with
+/// `DIVEXACT_BY3_METHOD == 1`, no carry-in, and no return value, where `rp == up`.
 pub fn limbs_div_exact_3_in_place_alt(ns: &mut [Limb]) {
     let len = ns.len();
     assert_ne!(len, 0);

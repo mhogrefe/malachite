@@ -9,13 +9,14 @@ use std::ops::{Add, AddAssign};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the sum of the `Natural` and a `Limb`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `limbs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is returned.
 pub_crate_test! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
@@ -40,16 +41,17 @@ pub_crate_test! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 // limbs of the sum of the `Natural` and a `Limb` to an output slice. The output slice must be at
 // least as long as the input slice. Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`.
 //
-// This is mpn_add_1 from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
@@ -72,13 +74,15 @@ pub_crate_test! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 // limbs of the sum of the `Natural` and a `Limb` to the input slice. Returns whether there is a
 // carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+// This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
+// input slice.
 pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
     xs: &mut [T],
     mut y: T
@@ -96,16 +100,18 @@ pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
 // Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
 // writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$ (only if the `Vec` reallocates)
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
 //
-// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.2.1, where the input is non-negative.
+// This is equivalent to `mpz_add_ui` from `mpz/aors_ui.h`, GMP 6.2.1, where the input is
+// non-negative.
 pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     assert!(!xs.is_empty());
     if limbs_slice_add_limb_in_place(xs, y) {
@@ -113,6 +119,8 @@ pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     }
 }}
 
+// # Worst-case complexity
+// Constant time and additional memory.
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let c = *carry;
     let mut sum;
@@ -127,17 +135,18 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 // the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
 // the `Natural`s.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
-// and the output is returned.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
+// long as the second, and the output is returned.
 pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if std::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
@@ -166,13 +175,14 @@ pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 // a `Vec` of the limbs of the sum of the `Natural`s.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the output is returned.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the output is returned.
 pub_crate_test! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_add_greater(xs, ys)
@@ -186,16 +196,17 @@ pub_crate_test! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // output slice. The output must be at least as long as one of the input slices. Returns whether
 // there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
-// This is mpn_add_n from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_add_n` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -212,16 +223,18 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
 // of the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
 // Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys` or if `out` is too short.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
+// long as the second.
 pub_crate_test! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -243,16 +256,17 @@ pub_crate_test! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // slice. The output must be at least as long as the longer input slice. Returns whether there is a
 // carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `out` is too short.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_add_greater_to_out(out, xs, ys)
@@ -271,17 +285,18 @@ pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) ->
 // `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
 // although the latter expression is not allowed because `xs` cannot be borrowed in that way.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
-// first and the output pointer is the same as the first input pointer.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the second argument is at least
+// as long as the first and the output pointer is the same as the first input pointer.
 pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
@@ -295,16 +310,18 @@ pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[
 // `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to the
 // first (left) slice. Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_add_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+// This is equivalent to `mpn_add_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// first input.
 pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -320,17 +337,18 @@ pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: 
 // `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
 // Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
-// and the output is written to the first input.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
+// long as the second, and the output is written to the first input.
 pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -348,14 +366,16 @@ pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Li
 // Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, writes the limbs of the sum of the `Natural`s to the first (left) slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
-// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
-// written to the first input.
+// This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
+// and the output is written to the first input.
 pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if std::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
@@ -379,20 +399,24 @@ pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     }
 }}
 
+// TODO
+
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to the longer
 // slice (or the first one, if they are equally long). Returns a pair of `bool`s. The first is
 // `false` when the output is to the first slice and `true` when it's to the second slice, and the
 // second is whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpn_add from gmp.h, GMP 6.2.1, where the output is written to the longer input.
-pub_test! {limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// longer input.
+pub_test! {limbs_slice_add_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
     } else {
@@ -405,14 +429,15 @@ pub_test! {limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb
 // equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
 // `true` when it's to the second `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$ (only if the `Vec` reallocates)
 //
-// where n = max(`xs.len`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
-// written to the longer input.
+// This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
+// and the output is written to the longer input.
 pub_test! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
@@ -432,16 +457,18 @@ pub_test! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>)
 // carry (`false` is 0, `true` is 1) to an output slice. The output must be at least as long as one
 // of the input slices. Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
-// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp and up are disjoint.
+// This is equivalent to `mpn_add_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` and `up` are
+// disjoint.
 pub_crate_test! {limbs_add_same_length_with_carry_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -459,16 +486,17 @@ pub_crate_test! {limbs_add_same_length_with_carry_in_to_out(
 // `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
 // carry (`false` is 0, `true` is 1) to the first (left) slice. Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+// This is equivalent to `mpn_add_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `up`.
 pub_crate_test! {limbs_add_same_length_with_carry_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -521,28 +549,34 @@ impl Natural {
 impl Add<Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.
+    /// Adds two [`Natural`]s, taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(Natural::ZERO + Natural::from(123u32), 123);
+    /// assert_eq!(Natural::from(123u32) + Natural::ZERO, 123);
+    /// assert_eq!(Natural::from(123u32) + Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     (Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
-    ///     "3000000000000"
+    ///     Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1),
+    ///     3000000000000u64
     /// );
     /// ```
     fn add(mut self, other: Natural) -> Natural {
@@ -554,29 +588,34 @@ impl Add<Natural> for Natural {
 impl<'a> Add<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural`, taking the left `Natural` by value and the right `Natural`
-    /// by reference.
+    /// Adds two [`Natural`]s, taking the first by reference and the second by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(Natural::ZERO + &Natural::from(123u32), 123);
+    /// assert_eq!(Natural::from(123u32) + &Natural::ZERO, 123);
+    /// assert_eq!(Natural::from(123u32) + &Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     (Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
-    ///     "3000000000000"
+    ///     Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1),
+    ///     3000000000000u64
     /// );
     /// ```
     #[inline]
@@ -589,29 +628,34 @@ impl<'a> Add<&'a Natural> for Natural {
 impl<'a> Add<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural`, taking the left `Natural` by reference and the right
-    /// `Natural` by value.
+    /// Adds two [`Natural`]s, taking the first by value and the second by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(&Natural::ZERO + Natural::from(123u32), 123);
+    /// assert_eq!(&Natural::from(123u32) + Natural::ZERO, 123);
+    /// assert_eq!(&Natural::from(123u32) + Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     (&Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
-    ///     "3000000000000"
+    ///     &Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1),
+    ///     3000000000000u64
     /// );
     /// ```
     #[inline]
@@ -624,28 +668,34 @@ impl<'a> Add<Natural> for &'a Natural {
 impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Adds a `Natural` to a `Natural`, taking both `Natural`s by reference.
+    /// Adds two [`Natural`]s, taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(&Natural::ZERO + &Natural::from(123u32), 123);
+    /// assert_eq!(&Natural::from(123u32) + &Natural::ZERO, 123);
+    /// assert_eq!(&Natural::from(123u32) + &Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     (&Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
-    ///     "3000000000000"
+    ///     &Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1),
+    ///     3000000000000u64
     /// );
     /// ```
     fn add(self, other: &'a Natural) -> Natural {
@@ -658,29 +708,35 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 }
 
 impl AddAssign<Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the right-hand side by
-    /// value.
+    /// Adds a [`Natural`] to a [`Natural`] in place, taking the [`Natural`] on the right-hand side
+    /// by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
-    /// x += Natural::trillion();
-    /// x += Natural::trillion() * Natural::from(2u32);
-    /// x += Natural::trillion() * Natural::from(3u32);
-    /// x += Natural::trillion() * Natural::from(4u32);
-    /// assert_eq!(x.to_string(), "10000000000000");
+    /// x += Natural::from(10u32).pow(12);
+    /// x += Natural::from(10u32).pow(12) * Natural::from(2u32);
+    /// x += Natural::from(10u32).pow(12) * Natural::from(3u32);
+    /// x += Natural::from(10u32).pow(12) * Natural::from(4u32);
+    /// assert_eq!(x, 10000000000000u64);
     /// ```
     fn add_assign(&mut self, mut other: Natural) {
         match (&mut *self, &mut other) {
@@ -696,29 +752,35 @@ impl AddAssign<Natural> for Natural {
 }
 
 impl<'a> AddAssign<&'a Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the right-hand side by
-    /// reference.
+    /// Adds a [`Natural`] to a [`Natural`] in place, taking the [`Natural`] on the right-hand side
+    /// by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
-    /// x += &Natural::trillion();
-    /// x += &(Natural::trillion() * Natural::from(2u32));
-    /// x += &(Natural::trillion() * Natural::from(3u32));
-    /// x += &(Natural::trillion() * Natural::from(4u32));
-    /// assert_eq!(x.to_string(), "10000000000000");
+    /// x += &Natural::from(10u32).pow(12);
+    /// x += &(Natural::from(10u32).pow(12) * Natural::from(2u32));
+    /// x += &(Natural::from(10u32).pow(12) * Natural::from(3u32));
+    /// x += &(Natural::from(10u32).pow(12) * Natural::from(4u32));
+    /// assert_eq!(x, 10000000000000u64);
     /// ```
     fn add_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {

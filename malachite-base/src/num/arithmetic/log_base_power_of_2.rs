@@ -66,10 +66,9 @@ macro_rules! impl_log_base_power_of_2_unsigned {
         impl FloorLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
-            /// Returns the floor of the base-$b$ logarithm of a positive float, where $b$ is a
-            /// power of 2.
+            /// Returns the floor of the base-$2^k$ logarithm of a positive integer.
             ///
-            /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
+            /// $f(x, k) = \lfloor\log_{2^k} x\rfloor$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -79,7 +78,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#floor_log_base_power_of_2).
             #[inline]
             fn floor_log_base_power_of_2(self, pow: u64) -> u64 {
                 floor_log_base_power_of_2(self, pow)
@@ -89,10 +88,9 @@ macro_rules! impl_log_base_power_of_2_unsigned {
         impl CeilingLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
-            /// Returns the ceiling of the base-$b$ logarithm of a positive float, where $b$ is a
-            /// power of 2.
+            /// Returns the ceiling of the base-$2^k$ logarithm of a positive integer.
             ///
-            /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
+            /// $f(x, k) = \lceil\log_{2^k} x\rceil$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -102,7 +100,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#ceiling_log_base_power_of_2).
             #[inline]
             fn ceiling_log_base_power_of_2(self, pow: u64) -> u64 {
                 ceiling_log_base_power_of_2(self, pow)
@@ -112,13 +110,13 @@ macro_rules! impl_log_base_power_of_2_unsigned {
         impl CheckedLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
-            /// Returns the base-$b$ logarithm of a positive float, where $b$ is a power of 2. If
-            /// the float is not a power of $b$, `None` is returned.
+            /// Returns the base-$2^k$ logarithm of a positive integer. If the integer is not a
+            /// power of $2^k$, `None` is returned.
             ///
             /// $$
-            /// f(x, p) = \\begin{cases}
-            ///     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            /// f(x, k) = \\begin{cases}
+            ///     \operatorname{Some}(\log_{2^k} x) & \text{if} \\quad \log_{2^k} x \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -130,7 +128,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// zero.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#ceiling_log_base_power_of_2).
             #[inline]
             fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64> {
                 checked_log_base_power_of_2(self, pow)
@@ -145,10 +143,9 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
         impl FloorLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
-            /// Returns the floor of the base-$b$ logarithm of a positive integer, where $b$ is a
-            /// power of 2.
+            /// Returns the floor of the base-$2^k$ logarithm of a positive float.
             ///
-            /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
+            /// $f(x, k) = \lfloor\log_{2^k} x\rfloor$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -157,7 +154,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             /// Panics if `self` or `pow` are 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#floor_log_base_power_of_2).
             #[inline]
             fn floor_log_base_power_of_2(self, pow: u64) -> i64 {
                 assert!(self > 0.0);
@@ -169,10 +166,9 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
         impl CeilingLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
-            /// Returns the ceiling of the base-$b$ logarithm of a positive integer, where $b$ is a
-            /// power of 2.
+            /// Returns the ceiling of the base-$2^k$ logarithm of a positive float.
             ///
-            /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
+            /// $f(x, k) = \lceil\log_{2^k} x\rceil$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -181,7 +177,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             /// Panics if `self` or `pow` are 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#ceiling_log_base_power_of_2).
             #[inline]
             fn ceiling_log_base_power_of_2(self, pow: u64) -> i64 {
                 assert!(self > 0.0);
@@ -199,13 +195,13 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
         impl CheckedLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
-            /// Returns the base-$b$ logarithm of a positive integer, where $b$ is a power of 2. If
-            /// the integer is not a power of $b$, `None` is returned.
+            /// Returns the base-$2^k$ logarithm of a positive float. If the float is not a power
+            /// of $2^k$, `None` is returned.
             ///
             /// $$
-            /// f(x, p) = \\begin{cases}
-            ///     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            /// f(x, k) = \\begin{cases}
+            ///     \operatorname{Some}(\log_{2^k} x) & \text{if} \\quad \log_{2^k} x \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -216,7 +212,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             /// Panics if `self` or `pow` are 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
+            /// See [here](super::log_base_power_of_2#checked_log_base_power_of_2).
             #[inline]
             fn checked_log_base_power_of_2(self, pow: u64) -> Option<i64> {
                 assert!(self > 0.0);

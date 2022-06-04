@@ -5,11 +5,11 @@ use std::slice::Iter;
 
 pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 
-/// Generates all `Ordering`s, in increasing order.
+/// Generates all [`Ordering`]s, in increasing order.
 ///
 /// The output length is 3.
 ///
-/// # Worst-case complexity
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -17,7 +17,6 @@ pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::orderings::exhaustive::orderings_increasing;
 /// use std::cmp::Ordering;
 ///
@@ -33,11 +32,11 @@ pub fn orderings_increasing() -> ExhaustiveOrderings {
         .cloned()
 }
 
-/// Generates all `Ordering`s, with `Equal` coming first.
+/// Generates all [`Ordering`]s, with `Equal` coming first.
 ///
 /// The output length is 3.
 ///
-/// # Worst-case complexity
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -45,7 +44,6 @@ pub fn orderings_increasing() -> ExhaustiveOrderings {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::orderings::exhaustive::exhaustive_orderings;
 /// use std::cmp::Ordering;
 ///

@@ -4,17 +4,21 @@ use malachite_base::num::conversion::string::to_string::{
 };
 use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
-use natural::conversion::string::BaseFmtWrapper;
+use natural::conversion::string::to_string::BaseFmtWrapper;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 
 impl<'a> Display for BaseFmtWrapper<&'a Integer> {
-    /// Writes a wrapped `Natural` to a string using a specified base.
+    /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
     /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -22,7 +26,7 @@ impl<'a> Display for BaseFmtWrapper<&'a Integer> {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// let n = Integer::from(-1000000000);
     /// let x = BaseFmtWrapper::new(&n, 36);
@@ -60,15 +64,19 @@ impl<'a> Display for BaseFmtWrapper<&'a Integer> {
 }
 
 impl<'a> Debug for BaseFmtWrapper<&'a Integer> {
-    /// Writes a wrapped `Natural` to a string using a specified base.
+    /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
     /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
     ///
-    /// This is the same as the `Display::fmt` implementation.
+    /// This is the same as the [`Display::fmt`] implementation.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -76,7 +84,7 @@ impl<'a> Debug for BaseFmtWrapper<&'a Integer> {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// let n = Integer::from(-1000000000);
     /// let x = BaseFmtWrapper::new(&n, 36);
@@ -92,13 +100,17 @@ impl<'a> Debug for BaseFmtWrapper<&'a Integer> {
 }
 
 impl ToStringBase for Integer {
-    /// Converts an `Integer` to a string using a specified base.
+    /// Converts an [`Integer`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the lowercase
-    /// `char`s 'a' to 'z'.
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
+    /// lowercase [`char`]s `'a'` to `'z'`.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -134,13 +146,17 @@ impl ToStringBase for Integer {
         }
     }
 
-    /// Converts an `Integer` to a string using a specified base.
+    /// Converts an [`Integer`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the uppercase
-    /// `char`s 'A' to 'Z'.
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
+    /// uppercase [`char`]s `'A'` to `'Z'`.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -178,10 +194,14 @@ impl ToStringBase for Integer {
 }
 
 impl Display for Integer {
-    /// Converts an `Integer` to a `String`.
+    /// Converts an [`Integer`] to a [`String`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -224,12 +244,16 @@ impl Display for Integer {
 }
 
 impl Debug for Integer {
-    /// Converts an `Integer` to a `String`.
+    /// Converts an [`Integer`] to a [`String`].
     ///
-    /// This is the same as the `Display::fmt` implementation.
+    /// This is the same as the [`Display::fmt`] implementation.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -267,9 +291,9 @@ impl Debug for Integer {
 }
 
 impl Binary for Integer {
-    /// Converts an `Integer` to a binary `String`.
+    /// Converts an [`Integer`] to a binary [`String`].
     ///
-    /// Using the `#` format flag adds `"0b"` to the string.
+    /// Using the `#` format flag prepends `"0b"` to the string.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -345,7 +369,7 @@ impl Binary for Integer {
 }
 
 impl Octal for Integer {
-    /// Converts an `Integer` to an octal `String`.
+    /// Converts an [`Integer`] to an octal [`String`].
     ///
     /// Using the `#` format flag prepends `"0o"` to the string.
     ///
@@ -423,7 +447,7 @@ impl Octal for Integer {
 }
 
 impl LowerHex for Integer {
-    /// Converts an `Integer` to a hexadecimal `String` using lowercase characters.
+    /// Converts an [`Integer`] to a hexadecimal [`String`] using lowercase characters.
     ///
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///
@@ -501,7 +525,7 @@ impl LowerHex for Integer {
 }
 
 impl UpperHex for Integer {
-    /// Converts an `Integer` to a hexadecimal `String` using uppercase characters.
+    /// Converts an [`Integer`] to a hexadecimal [`String`] using uppercase characters.
     ///
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///

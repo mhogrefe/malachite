@@ -2,11 +2,11 @@ use num::arithmetic::traits::NegAssign;
 use rounding_modes::RoundingMode;
 use std::ops::Neg;
 
-/// Returns the negative of a `RoundingMode`.
+/// Returns the negative of a [`RoundingMode`].
 ///
-/// The negative is defined so that if a `RoundingMode` $m$ is used to round the result of an odd
-/// function $f$, $f(x, -m) = -f(-x, m)$. `Floor` and `Ceiling` are swapped, and the other modes are
-/// unchanged.
+/// The negative is defined so that if a [`RoundingMode`] $m$ is used to round the result of an odd
+/// function $f$, then $f(x, -m) = -f(-x, m)$. `Floor` and `Ceiling` are swapped, and the other
+/// modes are unchanged.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -36,11 +36,11 @@ impl Neg for RoundingMode {
 }
 
 impl NegAssign for RoundingMode {
-    /// Replaces a `RoundingMode` with its negative.
+    /// Replaces a [`RoundingMode`] with its negative.
     ///
-    /// The negative is defined so that if a `RoundingMode` $m$ is used to round the result of an
-    /// odd function $f$, $f(x, -m) = -f(-x, m)$. `Floor` and `Ceiling` are swapped, and the other
-    /// modes are unchanged.
+    /// The negative is defined so that if a [`RoundingMode`] $m$ is used to round the result of an
+    /// odd function $f$, then $f(x, -m) = -f(-x, m)$. `Floor` and `Ceiling` are swapped, and the
+    /// other modes are unchanged.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

@@ -6,7 +6,7 @@ use random::Seed;
 use slices::advance_indices;
 use std::str::FromStr;
 
-/// Inserts several copies of a value at the left (beginning) of a `Vec`.
+/// Inserts several copies of a value at the left (beginning) of a [`Vec`].
 ///
 /// Using this function is more efficient than inserting the values one by one.
 ///
@@ -34,7 +34,7 @@ pub fn vec_pad_left<T: Clone>(xs: &mut Vec<T>, pad_size: usize, pad_value: T) {
     }
 }
 
-/// Deletes several values from the left (beginning) of a `Vec`.
+/// Deletes several values from the left (beginning) of a [`Vec`].
 ///
 /// Using this function is more efficient than deleting the values one by one.
 ///
@@ -63,24 +63,16 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
     xs.truncate(old_len - delete_size);
 }
 
-/// Converts a `&str` to an `Vec<T>`, where `T` implements `FromStr`.
+/// Converts a string to an `Vec<T>`, where `T` implements [`FromStr`].
 ///
-/// If the `&str` does not represent a valid `Vec<T>`, `None` is returned.
+/// If the string does not represent a valid `Vec<T>`, `None` is returned.
 ///
-/// If `T` does not implement `FromStr`, try using `vec_from_str_custom` instead.
+/// If `T` does not implement [`FromStr`], try using [`vec_from_str_custom`] instead.
 ///
 /// Substrings representing `T`s may contain commas. Sometimes this may lead to ambiguities: for
 /// example, the two `Vec<&str>`s `vec!["a, b"]` and `vec!["a", "b"]` both have the string
 /// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as
 /// `vec!["a", "b"]`.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n + T^\prime(n))$
-///
-/// $M(n) = O(n + M^\prime(n))$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ = `src.len()`, and $T^\prime$ and $M^\prime$
-/// are the time and memory complexity functions of `T::from_str`.
 ///
 /// # Examples
 /// ```
@@ -88,11 +80,8 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 /// use malachite_base::vecs::vec_from_str;
 ///
 /// assert_eq!(vec_from_str::<Never>("[]"), Some(vec![]));
-/// assert_eq!(vec_from_str::<u32>("[5, 6, 7]"), Some(vec![5, 6, 7]));
-/// assert_eq!(
-///     vec_from_str::<bool>("[false, false, true]"),
-///     Some(vec![false, false, true])
-/// );
+/// assert_eq!(vec_from_str("[5, 6, 7]"), Some(vec![5, 6, 7]));
+/// assert_eq!(vec_from_str("[false, false, true]"), Some(vec![false, false, true]));
 /// assert_eq!(vec_from_str::<bool>("[false, false, true"), None);
 /// ```
 #[inline]
@@ -100,26 +89,16 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
     vec_from_str_custom(&(|t| t.parse().ok()), src)
 }
 
-/// Converts a `&str` to an `Vec<T>`, given a function to parse a `&str` into a `T`.
+/// Converts a string to an `Vec<T>`, given a function to parse a string into a `T`.
 ///
-/// If the `&str` does not represent a valid `Option<T>`, `None` is returned.
+/// If the string does not represent a valid `Option<T>`, `None` is returned.
 ///
-/// If `f` just uses `T::from_str`, you can use `vec_from_str` instead.
+/// If `f` just uses [`FromStr::from_str`], you can use [`vec_from_str`] instead.
 ///
 /// Substrings representing `T`s may contain commas. Sometimes this may lead to ambiguities: for
 /// example, the two `Vec<&str>`s `vec!["a, b"]` and `vec!["a", "b"]` both have the string
 /// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as
 /// `vec!["a", "b"]`.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n + \max\sum_{p \in P}T^\prime(p))$, where the maximum is taken over all multisets $P$
-/// that sum to $n$.
-///
-/// $M(n) = O(\max\sum_{p \in P}M^\prime(p))$, where the maximum is taken over all multisets $P$
-/// that sum to $n$.
-///
-/// where $T$ is time, $M$ is additional memory, $n$ = `src.len()`, and $T^\prime$ and $M^\prime$
-/// are the time and memory complexity functions of `f`.
 ///
 /// # Examples
 /// ```
@@ -168,7 +147,9 @@ pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Optio
     }
 }
 
-/// Uniformly generates a random value from a nonempty `Vec`.
+/// Uniformly generates a random value from a nonempty [`Vec`].
+///
+/// This `struct` is created by [`random_values_from_vec`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromVec<T: Clone> {
     xs: Vec<T>,
@@ -184,17 +165,15 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
     }
 }
 
-/// Uniformly generates a random value from a nonempty `Vec`.
+/// Uniformly generates a random value from a nonempty [`Vec`].
 ///
 /// The iterator owns the data. It may be more convenient for the iterator to return references to a
-/// pre-existing slice, in which case you may use `random_values_from_slice` instead.
+/// pre-existing slice, in which case you may use
+/// [`random_values_from_slice`](crate::slices::random_values_from_slice) instead.
 ///
 /// The output length is infinite.
 ///
 /// $P(x) = 1/n$, where $n$ is `xs.len()`.
-///
-/// # Expected complexity per iteration
-/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `xs` is empty.
@@ -204,15 +183,12 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_values_from_vec;
 ///
 /// let xs = vec![2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_vec(EXAMPLE_SEED, xs)
-///         .take(10)
-///         .collect_vec(),
+///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -225,7 +201,9 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
     RandomValuesFromVec { xs, indices }
 }
 
-/// Generates every permutation of a `Vec`.
+/// Generates every permutation of a [`Vec`].
+///
+/// This `struct` is created by [`exhaustive_vec_permutations`]; see its documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveVecPermutations<T: Clone> {
     xs: Vec<T>,
@@ -247,28 +225,23 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
     }
 }
 
-/// Generates every permutation of a `Vec`.
+/// Generates every permutation of a [`Vec`].
 ///
-/// The permutations are `Vec`s of cloned items. It may be more convenient for the iterator to
-/// return references to a slice, in which case you may use `exhaustive_slice_permutations` instead.
+/// The permutations are [`Vec`]s of cloned items. It may be more convenient for the iterator to
+/// return references to a slice, in which case you may use
+/// [`exhaustive_slice_permutations`](crate::slices::exhaustive_slice_permutations).
+/// instead.
 ///
-/// The permutations are generated in lexicographic order with respect to the ordering in the `Vec`.
+/// The permutations are generated in lexicographic order with respect to the ordering in the
+/// [`Vec`].
 ///
 /// The output length is $n!$, where $n$ is `xs.len()`.
-///
-/// # Expected complexity per iteration
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(n)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive_vec_permutations;
 ///
 /// let css: Vec<String> = exhaustive_vec_permutations(vec!['a', 'b', 'c', 'd'])
@@ -292,7 +265,9 @@ pub fn exhaustive_vec_permutations<T: Clone>(xs: Vec<T>) -> ExhaustiveVecPermuta
     }
 }
 
-/// Uniformly generates a random `Vec` of values cloned from an original `Vec`.
+/// Uniformly generates a random [`Vec`] of values cloned from an original [`Vec`].
+///
+/// This `struct` is created by [`random_vec_permutations`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomVecPermutations<T: Clone> {
     xs: Vec<T>,
@@ -309,28 +284,21 @@ impl<T: Clone> Iterator for RandomVecPermutations<T> {
     }
 }
 
-/// Uniformly generates a random `Vec` of values cloned from an original `Vec`.
+/// Uniformly generates a random [`Vec`] of values cloned from an original [`Vec`].
 ///
-/// The permutations are `Vec`s of cloned items. It may be more convenient for the iterator to
-/// return references to a slice, in which case you may use `random_slice_permutations` instead.
+/// The permutations are [`Vec`]s of cloned items. It may be more convenient for the iterator to
+/// return references to a slice, in which case you may use
+/// [`random_slice_permutations`](crate::slices::random_slice_permutations) instead.
 ///
 /// The output length is infinite.
 ///
 /// $P(p) = 1/n!$, where $n$ is `xs.len()`.
-///
-/// # Expected complexity per iteration
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(n)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_vec_permutations;
 ///
@@ -355,16 +323,13 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
     }
 }
 
-/// Iterators that generate `Vec`s without repetition.
+/// Iterators that generate [`Vec`]s without repetition.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # lex_length_\[n\]_vecs
+/// # lex_vecs_length_2
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_vecs_length_2;
 ///
 /// let xss = lex_vecs_length_2(
@@ -388,12 +353,11 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 ///
-/// # lex_fixed_length_vecs_\[m\]_inputs
+/// # lex_vecs_fixed_length_2_inputs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_2_inputs;
@@ -440,12 +404,11 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 ///
-/// # exhaustive_length_\[n\]_vecs
+/// # exhaustive_vecs_length_2
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_2;
 ///
 /// let xss = exhaustive_vecs_length_2(
@@ -469,12 +432,11 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 ///
-/// # exhaustive_fixed_length_vecs_\[m\]_inputs
+/// # exhaustive_vecs_fixed_length_2_inputs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_2_inputs;
@@ -527,16 +489,13 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 pub mod exhaustive;
-/// Iterators that generate `Vec`s randomly.
+/// Iterators that generate [`Vec`]s randomly.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # random_length_\[n\]_vecs
+/// # random_vecs_length_2
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_vecs_length_2;
@@ -575,12 +534,11 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_vecs_fixed_length_\[m\]_inputs
+/// # random_vecs_fixed_length_2_inputs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToDebugString;

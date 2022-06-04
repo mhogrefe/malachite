@@ -12,21 +12,22 @@ macro_rules! impl_checked_add_mul_unsigned {
         impl CheckedAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, returning `None` if there is no valid result.
+            /// Adds a number and the product of two other numbers, returning `None` if the result
+            /// cannot be represented.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     \operatorname{Some}(xy + z) & xy + z < 2^W \\\\
-            ///     \operatorname{None} & xy + z \geq 2^W,
+            ///     \operatorname{Some}(x + yz) & \text{if} \\quad x + yz < 2^W, \\\\
+            ///     \operatorname{None} & \text{if} \\quad x + yz \geq 2^W,
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::checked_add_mul` module.
+            /// See [here](super::checked_add_mul#checked_add_mul).
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
                 checked_add_mul_unsigned(self, y, z)
@@ -71,22 +72,25 @@ macro_rules! impl_checked_add_mul_signed {
         impl CheckedAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, returning `None` if there is no valid result.
+            /// Adds a number and the product of two other numbers, returning `None` if the result
+            /// cannot be represented.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     \operatorname{Some}(xy + z) & -2^{W-1} \leq xy + z < 2^{W-1} \\\\
+            ///     \operatorname{Some}(x + yz) &
+            ///         \text{if} \\quad -2^{W-1} \leq x + yz < 2^{W-1}, \\\\
             ///     \operatorname{None} &
-            ///         xy + z < -2^{W-1} \\ \mathrm{or} \\ xy + z \geq 2^{W-1}, \\\\
+            ///         \text{if} \\quad x + yz < -2^{W-1} \\ \mathrm{or}
+            ///         \\ x + yz \geq 2^{W-1}, \\\\
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::checked_add_mul` module.
+            /// See [here](super::checked_add_mul#checked_add_mul).
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
                 checked_add_mul_signed(self, y, z)

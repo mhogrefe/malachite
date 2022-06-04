@@ -5,19 +5,23 @@ use natural::Natural;
 impl Lcm<Natural> for Natural {
     type Output = Natural;
 
-    /// Computes the LCM (least common multiple) of two `Natural`s, taking both `Natural`s by
-    /// value.
+    /// Computes the LCM (least common multiple) of two [`Natural`]s, taking both by value.
     ///
     /// $$
     /// f(x, y) = \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
@@ -34,19 +38,24 @@ impl Lcm<Natural> for Natural {
 impl<'a> Lcm<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Computes the LCM (least common multiple) of two `Natural`s, taking the first `Natural` by
-    /// value and the second by reference.
+    /// Computes the LCM (least common multiple) of two [`Natural`]s, taking the first by value and
+    /// the second by reference.
     ///
     /// $$
     /// f(x, y) = \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
@@ -64,19 +73,24 @@ impl<'a> Lcm<&'a Natural> for Natural {
 impl<'a> Lcm<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Computes the LCM (least common multiple) of two `Natural`s, taking the first `Natural` by
-    /// reference and the second by value.
+    /// Computes the LCM (least common multiple) of two [`Natural`]s, taking the first by reference
+    /// and the second by value.
     ///
     /// $$
     /// f(x, y) = \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
@@ -94,19 +108,23 @@ impl<'a> Lcm<Natural> for &'a Natural {
 impl<'a, 'b> Lcm<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Computes the LCM (least common multiple) of two `Natural`s, taking both `Natural`s by
-    /// reference.
+    /// Computes the LCM (least common multiple) of two [`Natural`]s, taking both by reference.
     ///
     /// $$
     /// f(x, y) = \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
@@ -132,19 +150,24 @@ impl<'a, 'b> Lcm<&'a Natural> for &'b Natural {
 }
 
 impl LcmAssign<Natural> for Natural {
-    /// Replaces a `Natural` by its LCM (least common multiple) with another `Natural`, taking the
-    /// `Natural` on the right-hand side by value.
+    /// Replaces a [`Natural`] by its LCM (least common multiple) with another [`Natural`], taking
+    /// the [`Natural`] on the right-hand side by value.
     ///
     /// $$
     /// x \gets \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::LcmAssign;
     /// use malachite_nz::natural::Natural;
@@ -171,19 +194,24 @@ impl LcmAssign<Natural> for Natural {
 }
 
 impl<'a> LcmAssign<&'a Natural> for Natural {
-    /// Replaces a `Natural` by its LCM (least common multiple) with another `Natural`, taking the
-    /// `Natural` on the right-hand side by reference.
+    /// Replaces a [`Natural`] by its LCM (least common multiple) with another [`Natural`], taking
+    /// the [`Natural`] on the right-hand side by reference.
     ///
     /// $$
     /// x \gets \operatorname{lcm}(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::LcmAssign;
     /// use malachite_nz::natural::Natural;

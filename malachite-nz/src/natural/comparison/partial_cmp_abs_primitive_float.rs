@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Natural {
-            /// Compares a `Natural` to the absolute value of a value of primitive float type.
+            /// Compares a [`Natural`] to the absolute value of a primitive float.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -17,8 +17,7 @@ macro_rules! impl_float {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_abs_primitive_float`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 if other.is_nan() {
                     None
@@ -42,7 +41,7 @@ macro_rules! impl_float {
         }
 
         impl PartialOrdAbs<Natural> for $t {
-            /// Compares the absolute value of a value of primitive float type to a `Natural`.
+            /// Compares the absolute value of a primitive float to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -51,9 +50,7 @@ macro_rules! impl_float {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
             ///
-            /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_float`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

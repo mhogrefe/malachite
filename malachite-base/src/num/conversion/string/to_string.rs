@@ -1,16 +1,62 @@
 use num::arithmetic::traits::UnsignedAbs;
 use num::basic::traits::Zero;
-use num::conversion::string::BaseFmtWrapper;
 use num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
 use std::fmt::{Debug, Display, Formatter, Result, Write};
 use vecs::vec_pad_left;
 
-/// Converts a digit to a byte corresponding to a numeric or lowercase alphabetic `char` that
+/// A `struct` that allows for formatting a numeric type and rendering its digits in a specified
+/// base.
+#[derive(Clone, Eq, Hash, PartialEq)]
+pub struct BaseFmtWrapper<T> {
+    pub(crate) x: T,
+    pub(crate) base: u8,
+}
+
+impl<T> BaseFmtWrapper<T> {
+    /// Creates a new `BaseFmtWrapper`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2 or greater than 36.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::string::to_string::BaseFmtWrapper;
+    ///
+    /// let x = BaseFmtWrapper::new(1000000000u32, 36);
+    /// assert_eq!(format!("{}", x), "gjdgxs");
+    /// assert_eq!(format!("{:#}", x), "GJDGXS");
+    /// ```
+    pub fn new(x: T, base: u8) -> Self {
+        assert!((2..=36).contains(&base), "base out of range");
+        BaseFmtWrapper { x, base }
+    }
+
+    /// Recovers the value from a `BaseFmtWrapper`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::string::to_string::BaseFmtWrapper;
+    ///
+    /// assert_eq!(BaseFmtWrapper::new(1000000000u32, 36).unwrap(), 1000000000);
+    /// ```
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn unwrap(self) -> T {
+        self.x
+    }
+}
+
+/// Converts a digit to a byte corresponding to a numeric or lowercase alphabetic [`char`] that
 /// represents the digit.
 ///
-/// Digits from 0 to 9 become bytes corresponding to `char`s from '0' to '9'. Digits from 10 to 35
-/// become bytes representing the lowercase `char`s 'a' to 'z'. Passing a digit greater than 35
-/// gives a `None`.
+/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to
+/// 35 become bytes representing the lowercase [`char`]s 'a' to 'z'. Passing a digit greater than
+/// 35 gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -33,12 +79,12 @@ pub const fn digit_to_display_byte_lower(b: u8) -> Option<u8> {
     }
 }
 
-/// Converts a digit to a byte corresponding to a numeric or uppercase alphabetic `char` that
+/// Converts a digit to a byte corresponding to a numeric or uppercase alphabetic [`char`] that
 /// represents the digit.
 ///
-/// Digits from 0 to 9 become bytes corresponding to `char`s from '0' to '9'. Digits from 10 to 35
-/// become bytes representing the lowercase `char`s 'A' to 'Z'. Passing a digit greater than 35
-/// gives a `None`.
+/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to
+/// 35 become bytes representing the lowercase [`char`]s 'A' to 'Z'. Passing a digit greater than
+/// 35 gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -116,13 +162,17 @@ macro_rules! impl_to_string_base_unsigned {
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string).
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
                 fmt_unsigned(self, f)
@@ -135,16 +185,20 @@ macro_rules! impl_to_string_base_unsigned {
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
-            /// This is the same as the `Display::fmt` implementation.
+            /// This is the same as the [`Display::fmt`] implementation.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string).
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
                 Display::fmt(self, f)
@@ -155,16 +209,20 @@ macro_rules! impl_to_string_base_unsigned {
             /// Converts an unsigned number to a string using a specified base.
             ///
             /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// lowercase `char`s 'a' to 'z'.
+            /// lowercase [`char`]s 'a' to 'z'.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string#to_string_base).
             #[inline]
             fn to_string_base(&self, base: u8) -> String {
                 to_string_base_unsigned(self, base)
@@ -173,16 +231,20 @@ macro_rules! impl_to_string_base_unsigned {
             /// Converts an unsigned number to a string using a specified base.
             ///
             /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// uppercase `char`s 'A' to 'Z'.
+            /// uppercase [`char`]s 'A' to 'Z'.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string#to_string_base_upper).
             #[inline]
             fn to_string_base_upper(&self, base: u8) -> String {
                 to_string_base_upper_unsigned(self, base)
@@ -271,18 +333,23 @@ macro_rules! impl_to_string_base_signed {
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
-            /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
-            /// `UpperHex`, negative numbers are represented using a negative sign, not two's
-            /// complement.
+            /// Unlike with the default implementations of [`Binary`](std::fmt::Binary),
+            /// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), and
+            /// [`UpperHex`](std::fmt::UpperHex), negative numbers are represented using a negative
+            /// sign, not two's complement.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string).
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
                 fmt_signed(self, f)
@@ -295,20 +362,25 @@ macro_rules! impl_to_string_base_signed {
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
-            /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
-            /// `UpperHex`, negative numbers are represented using a negative sign, not two's
-            /// complement.
+            /// Unlike with the default implementations of [`Binary`](std::fmt::Binary),
+            /// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), and
+            /// [`UpperHex`](std::fmt::UpperHex), negative numbers are represented using a negative
+            /// sign, not two's complement.
             ///
-            /// This is the same as the `Display::fmt` implementation.
+            /// This is the same as the [`Display::fmt`] implementation.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string).
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
                 Display::fmt(self, f)
@@ -319,20 +391,20 @@ macro_rules! impl_to_string_base_signed {
             /// Converts a signed number to a string using a specified base.
             ///
             /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// lowercase `char`s 'a' to 'z'.
-            ///
-            /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
-            /// `UpperHex`, negative numbers are represented using a negative sign, not two's
-            /// complement.
+            /// lowercase [`char`]s 'a' to 'z'.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string#to_string_base).
             #[inline]
             fn to_string_base(&self, base: u8) -> String {
                 to_string_base_signed::<$u, $s>(self, base)
@@ -341,20 +413,20 @@ macro_rules! impl_to_string_base_signed {
             /// Converts a signed number to a string using a specified base.
             ///
             /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// uppercase `char`s 'A' to 'Z'.
-            ///
-            /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
-            /// `UpperHex`, negative numbers are represented using a negative sign, not two's
-            /// complement.
+            /// uppercase [`char`]s 'A' to 'Z'.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_string` module.
+            /// See [here](super::to_string#to_string_base_upper).
             #[inline]
             fn to_string_base_upper(&self, base: u8) -> String {
                 to_string_base_upper_signed::<$u, $s>(self, base)

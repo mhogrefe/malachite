@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
 use natural::InnerNatural::{Large, Small};
@@ -11,13 +12,15 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` left-shifted by a `Limb`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n, m) = O(n + m)$
 //
-// Additional memory: worst case O(n)
+// $M(n, m) = O(n + m)$
 //
-// where n = `xs.len()` + `bits` / Limb::WIDTH
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `bits / Limb::WIDTH`.
 //
-// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where the result is
+// returned.
 pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
@@ -42,17 +45,18 @@ pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1, inclusive.
 // The carry, or the bits that are shifted past the width of the input slice, is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
 // `Limb::WIDTH`.
 //
-// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
+// This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1.
 pub_crate_test! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -70,13 +74,14 @@ pub_crate_test! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
 // and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
 // input slice, is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
+// This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where `rp == up`.
 pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -93,17 +98,16 @@ pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 // Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
 // writes the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n, m) = O(n + m)$
 //
-// Additional memory: worst case O(m)
-//
-// where n = `xs.len()` + `bits` / Limb::WIDTH, m = `bits`
+// $M(n, m) = O(n + m)$
 //
 // # Panics
 // Panics if `xs` is empty.
 //
-// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
-// appended to rp.
+// This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where `rp == up` and
+// the carry is appended to `rp`.
 pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
@@ -123,17 +127,18 @@ pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 // `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
 // input slice, is returned. The carry is not complemented.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
 // equal to `Limb::WIDTH`.
 //
-// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
+// This is equivalent to `mpn_lshiftc` from `mpn/generic/mpn_lshiftc`, GMP 6.2.1.
 pub_crate_test! {limbs_shl_with_complement_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -156,7 +161,7 @@ pub_crate_test! {limbs_shl_with_complement_to_out(
     remaining_bits
 }}
 
-fn shl_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T) -> Natural
+fn shl_ref_unsigned<T: PrimitiveUnsigned>(x: &Natural, bits: T) -> Natural
 where
     u64: ExactFrom<T>,
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
@@ -177,7 +182,7 @@ where
     }
 }
 
-fn shl_assign<T: Copy + Eq + Zero>(x: &mut Natural, bits: T)
+fn shl_assign<T: PrimitiveUnsigned>(x: &mut Natural, bits: T)
 where
     u64: ExactFrom<T>,
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
@@ -200,91 +205,68 @@ where
 
 macro_rules! impl_natural_shl_unsigned {
     ($t:ident) => {
-        /// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by value.
-        ///
-        /// Time: worst case O(n)
-        ///
-        /// Additional memory: worst case O(m)
-        ///
-        /// where n = `self.significant_bits()` + `bits`, m = `bits`
-        ///
-        /// # Examples
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::basic::traits::Zero;
-        /// use malachite_nz::natural::Natural;
-        ///
-        /// assert_eq!((Natural::ZERO << 10u8).to_string(), "0");
-        /// assert_eq!((Natural::from(123u32) << 2u16).to_string(), "492");
-        /// assert_eq!((Natural::from(123u32) << 100u64).to_string(),
-        ///     "155921023828072216384094494261248");
-        /// ```
         impl Shl<$t> for Natural {
             type Output = Natural;
 
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2), taking it by value.
+            ///
+            /// $f(x, k) = x2^k$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
+            ///
+            /// # Examples
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(mut self, bits: $t) -> Natural {
                 self <<= bits;
                 self
             }
         }
-        /// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by
-        /// reference.
-        ///
-        /// Time: worst case O(n)
-        ///
-        /// Additional memory: worst case O(n)
-        ///
-        /// where n = `self.significant_bits()` + `bits`
-        ///
-        /// # Examples
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::basic::traits::Zero;
-        /// use malachite_nz::natural::Natural;
-        ///
-        /// assert_eq!((&Natural::ZERO << 10u8).to_string(), "0");
-        /// assert_eq!((&Natural::from(123u32) << 2u16).to_string(), "492");
-        /// assert_eq!((&Natural::from(123u32) << 100u64).to_string(),
-        ///     "155921023828072216384094494261248");
-        /// ```
+
         impl<'a> Shl<$t> for &'a Natural {
             type Output = Natural;
 
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2), taking it by reference.
+            ///
+            /// $f(x, k) = x2^k$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
+            ///
+            /// # Examples
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(self, bits: $t) -> Natural {
                 shl_ref_unsigned(self, bits)
             }
         }
 
-        /// Shifts a `Natural` left (multiplies it by a power of 2) in place.
-        ///
-        /// Time: worst case O(n)
-        ///
-        /// Additional memory: worst case O(m)
-        ///
-        /// where n = `self.significant_bits()` + `bits`, m = `bits`
-        ///
-        /// # Examples
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::basic::traits::One;
-        /// use malachite_nz::natural::Natural;
-        ///
-        /// let mut x = Natural::ONE;
-        /// x <<= 1u8;
-        /// x <<= 2u16;
-        /// x <<= 3u32;
-        /// x <<= 4u64;
-        /// assert_eq!(x.to_string(), "1024");
-        /// ```
         impl ShlAssign<$t> for Natural {
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2), in place.
+            ///
+            /// $x \gets x2^k$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.s
+            ///
+            /// # Examples
+            /// See [here](super::shl#shl_assign).
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
                 shl_assign(self, bits);
@@ -294,7 +276,7 @@ macro_rules! impl_natural_shl_unsigned {
 }
 apply_to_unsigneds!(impl_natural_shl_unsigned);
 
-fn shl_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shl_ref_signed<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
 ) -> Natural
@@ -308,7 +290,7 @@ where
     }
 }
 
-fn shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+fn shl_assign_signed<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(x: &mut Natural, bits: S)
 where
     Natural: ShlAssign<U> + ShrAssign<U>,
 {
@@ -324,29 +306,23 @@ macro_rules! impl_natural_shl_signed {
         impl Shl<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor), taking the `Natural` by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
+            /// of 2 and takes the floor), taking it by value.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \lfloor x2^k \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((Natural::ZERO << 10i8).to_string(), "0");
-            /// assert_eq!((Natural::from(123u32) << 2i16).to_string(), "492");
-            /// assert_eq!((Natural::from(123u32) << 100i32).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// assert_eq!((Natural::ZERO << -10i64).to_string(), "0");
-            /// assert_eq!((Natural::from(492u32) << -2i8).to_string(), "123");
-            /// assert_eq!((Natural::trillion() << -10i16).to_string(), "976562500");
-            /// ```
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(mut self, bits: $t) -> Natural {
                 self <<= bits;
@@ -357,29 +333,23 @@ macro_rules! impl_natural_shl_signed {
         impl<'a> Shl<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor), taking the `Natural` by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
+            /// of 2 and takes the floor), taking it by reference.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \lfloor x2^k \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::ZERO << 10i8).to_string(), "0");
-            /// assert_eq!((&Natural::from(123u32) << 2i16).to_string(), "492");
-            /// assert_eq!((&Natural::from(123u32) << 100i32).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// assert_eq!((&Natural::ZERO << -10i64).to_string(), "0");
-            /// assert_eq!((&Natural::from(492u32) << -2i8).to_string(), "123");
-            /// assert_eq!((&Natural::trillion() << -10i16).to_string(), "976562500");
-            /// ```
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(self, bits: $t) -> Natural {
                 shl_ref_signed(self, bits)
@@ -387,35 +357,22 @@ macro_rules! impl_natural_shl_signed {
         }
 
         impl ShlAssign<$t> for Natural {
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor) in place.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
+            /// of 2 and takes the floor), in place.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// x \gets \lfloor x2^k \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
             ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
+            /// $M(n, m) = O(n + m)$
             ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_nz::natural::Natural;
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
-            /// let mut x = Natural::ONE;
-            /// x <<= 1i8;
-            /// x <<= 2i16;
-            /// x <<= 3i32;
-            /// x <<= 4i64;
-            /// assert_eq!(x.to_string(), "1024");
-            ///
-            /// let mut x = Natural::from(1024u32);
-            /// x <<= -1i8;
-            /// x <<= -2i16;
-            /// x <<= -3i32;
-            /// x <<= -4i64;
-            /// assert_eq!(x.to_string(), "1");
-            /// ```
+            /// See [here](super::shl#shl_assign).
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
                 shl_assign_signed(self, bits);

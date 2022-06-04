@@ -11,7 +11,15 @@ use natural::comparison::cmp::limbs_cmp_same_length;
 use platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
 use std::cmp::Ordering;
 
-/// This is abs_sub_n from mpn/generic/matrix22_mul.c, GMP 6.2.1, where rp != ap.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
+// `rp != ap`.
 fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -24,7 +32,14 @@ fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     }
 }
 
-/// This is abs_sub_n from mpn/generic/matrix22_mul.c, GMP 6.2.1, where rp == ap.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
+// `rp == ap`.
 fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -37,7 +52,15 @@ fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
     }
 }
 
-/// This is abs_sub_n from mpn/generic/matrix22_mul.c, GMP 6.2.1, where rp == bp.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
+// `rp == bp`.
 fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -50,7 +73,15 @@ fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
     }
 }
 
-/// This is add_signed_n from mpn/generic/matrix22_mul.c, GMP 6.2.1, where rp != ap.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
+// `rp != ap`.
 fn limbs_add_signed_same_length_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -66,7 +97,15 @@ fn limbs_add_signed_same_length_to_out(
     }
 }
 
-/// This is add_signed_n from mpn/generic/matrix22_mul.c, GMP 6.2.1, where rp == ap.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
+// `rp == ap`.
 fn limbs_add_signed_same_length_in_place_left(
     xs: &mut [Limb],
     x_sign: bool,
@@ -81,7 +120,10 @@ fn limbs_add_signed_same_length_in_place_left(
     }
 }
 
-// This is mpn_matrix22_mul_itch from mpn/generic/matrix22_mul.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_matrix22_mul_itch` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1.
 pub_const_test! {limbs_matrix_mul_2_2_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     if xs_len < MATRIX22_STRASSEN_THRESHOLD || ys_len < MATRIX22_STRASSEN_THRESHOLD {
         3 * xs_len + 2 * ys_len
@@ -90,6 +132,12 @@ pub_const_test! {limbs_matrix_mul_2_2_scratch_len(xs_len: usize, ys_len: usize) 
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs_len, ys00.len())`.
 pub_test! {limbs_matrix_2_2_mul_small(
     xs00: &mut [Limb],
     xs01: &mut [Limb],
@@ -173,7 +221,14 @@ pub_test! {limbs_matrix_2_2_mul_small(
 //
 // Temporary storage: 3 * xs_len + 3 * ys_len + 5.
 //
-// This is mpn_matrix22_mul_strassen from mpn/generic/matrix22_mul.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs_len, ys00.len())`.
+//
+// This is equivalent to `mpn_matrix22_mul_strassen` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1.
 pub_test! {limbs_matrix_2_2_mul_strassen(
     xs00: &mut [Limb],
     xs01: &mut [Limb],
@@ -322,7 +377,14 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     assert!(xs10[sum_len] < 2);
 }}
 
-// This is mpn_matrix22_mul from mpn/generic/matrix22_mul.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs_len, ys00.len())`.
+//
+// This is equivalent to `mpn_matrix22_mul` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1.
 pub_crate_test! {limbs_matrix_2_2_mul(
     xs00: &mut [Limb],
     xs01: &mut [Limb],

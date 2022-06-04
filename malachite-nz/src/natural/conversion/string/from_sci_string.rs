@@ -147,9 +147,9 @@ where
 }
 
 impl FromSciString for Natural {
-    /// Converts a string, possibly in scientfic notation, to a `Natural`.
+    /// Converts a string, possibly in scientfic notation, to a [`Natural`].
     ///
-    /// Use `FromSciStringOptions` to specify the base (from 2 to 36, inclusive) and the rounding
+    /// Use [`FromSciStringOptions`] to specify the base (from 2 to 36, inclusive) and the rounding
     /// mode, in case rounding is necessary because the string represents a non-integer.
     ///
     /// If the base is greater than 10, the higher digits are represented by the letters `'a'`
@@ -157,9 +157,9 @@ impl FromSciString for Natural {
     /// consistent.
     ///
     /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the base is
-    /// 15 or greater, and ambiguity arises where it may not be clear whether `'e'` is a digit or
-    /// an exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after
-    /// the exponent indicator when the base is 15 or greater.
+    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or an
+    /// exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after the
+    /// exponent indicator when the base is 15 or greater.
     ///
     /// The exponent itself is always parsed using base 10.
     ///
@@ -171,7 +171,11 @@ impl FromSciString for Natural {
     /// mode in options is `Exact`, but rounding is necessary.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(m^n n \log m (\log n + \log\log m))$
+    ///
+    /// $M(n, m) = O(m^n n \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `options.base`.
     ///
     /// # Examples
     /// ```
@@ -196,6 +200,12 @@ impl FromSciString for Natural {
     /// options = FromSciStringOptions::default();
     /// options.set_base(16);
     /// assert_eq!(Natural::from_sci_string_with_options("ff", options).unwrap(), 255);
+    ///
+    /// options = FromSciStringOptions::default();
+    /// options.set_base(36);
+    /// assert_eq!(Natural::from_sci_string_with_options("1e5", options).unwrap(), 1805);
+    /// assert_eq!(Natural::from_sci_string_with_options("1e+5", options).unwrap(), 60466176);
+    /// assert_eq!(Natural::from_sci_string_with_options("1e-5", options).unwrap(), 0);
     /// ```
     #[inline]
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Natural> {

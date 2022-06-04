@@ -30,9 +30,15 @@ use platform::DoubleLimb;
 use platform::Limb;
 use std::mem::swap;
 
-/// This is GMP_NUMB_HALFMAX from mpz/n_pow_ui.c, GMP 6.1.2.
+/// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.
 const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
+// # Worst-case complexity
+// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(nm \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
 pub_crate_test! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = Vec::new();
     let out_len = limbs_pow_to_out(&mut out, xs, exp);
@@ -40,6 +46,12 @@ pub_crate_test! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     out
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `exp`.
 fn len_1_helper(x_0: &mut Limb, out_0: &mut Limb, trailing_zero_bits_out: &mut u64, exp: &mut u64) {
     // Power up as far as possible within `x_0`. We start here with `exp` != 0, but if `exp` is
     // small then we might reach `exp` == 0 and the whole `x` ^ `exp` in `out_0`.
@@ -67,8 +79,15 @@ fn len_1_helper(x_0: &mut Limb, out_0: &mut Limb, trailing_zero_bits_out: &mut u
     }
 }
 
-/// This is mpz_n_pow_ui from mpz/n_pow_ui.c, GMP 6.1.2 where e > 1 and bp.len() != 0. Returns
-/// rsize.
+// # Worst-case complexity
+// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(nm \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
+//
+// This is equivalent to `mpz_n_pow_ui` from `mpz/n_pow_ui.c`, GMP 6.2.1, where `e > 1` and
+// `bp.len() != 0`. Returns `rsize`.
 fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     assert!(exp > 1);
     let leading_zeros_in = slice_leading_zeros(xs);
@@ -234,6 +253,8 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     out_len + leading_zeros_out
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn exp_predecessor(exp: u64) -> u64 {
     if exp.even() {
@@ -243,6 +264,8 @@ fn exp_predecessor(exp: u64) -> u64 {
     }
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
     usize::exact_from(
@@ -250,6 +273,9 @@ fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
     )
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
+//
 // Never an underestimate.
 #[cfg(feature = "test_build")]
 fn limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
@@ -260,6 +286,9 @@ fn limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
     }
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
+//
 // Never an underestimate.
 #[cfg(feature = "test_build")]
 #[inline]
@@ -269,7 +298,15 @@ fn limb_pow_alt_estimated_scratch_len(x: Limb, exp: u64) -> usize {
 
 // TODO figure out how to find scratch len using mp_bases. x > 1.
 //
-// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1 and bn == 1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `exp`.
+//
+// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1` and
+// `bn == 1`.
 #[cfg(feature = "test_build")]
 fn limb_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
@@ -308,6 +345,12 @@ fn limb_pow_to_out_alt<'a>(
     out_len
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `exp`.
 #[cfg(feature = "test_build")]
 fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
     let mut out = vec![0; limb_pow_alt_estimated_out_len(x, exp)];
@@ -318,6 +361,8 @@ fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
     out
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
 #[cfg(feature = "test_build")]
 fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
     usize::exact_from(
@@ -325,6 +370,9 @@ fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
     )
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
+//
 // Never an underestimate.
 #[cfg(feature = "test_build")]
 fn limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
@@ -335,6 +383,9 @@ fn limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
     }
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
+//
 // Never an underestimate.
 #[cfg(feature = "test_build")]
 #[inline]
@@ -344,8 +395,15 @@ fn limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
 
 // TODO figure out how to find scratch len using mp_bases.
 //
-// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1, bn > 1, and the last
-// element of xs is nonzero.
+// # Worst-case complexity
+// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(nm \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
+//
+// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1`,
+// `bn > 1`, and the last element of `xs` is nonzero.
 #[cfg(feature = "test_build")]
 fn limbs_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
@@ -388,6 +446,12 @@ fn limbs_pow_to_out_alt<'a>(
     out_len
 }
 
+// # Worst-case complexity
+// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(nm \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
 #[cfg(feature = "test_build")]
 fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = vec![0; limbs_pow_alt_estimated_out_len(xs, exp)];
@@ -445,12 +509,21 @@ impl Natural {
 impl Pow<u64> for Natural {
     type Output = Natural;
 
-    /// TODO doc
+    /// Raises a [`Natural`] to a power, taking the [`Natural`] by value.
+    ///
+    /// $f(x, n) = x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
@@ -475,12 +548,21 @@ impl Pow<u64> for Natural {
 impl<'a> Pow<u64> for &'a Natural {
     type Output = Natural;
 
-    /// TODO doc
+    /// Raises a [`Natural`] to a power, taking the [`Natural`] by reference.
+    ///
+    /// $f(x, n) = x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
@@ -521,12 +603,21 @@ impl<'a> Pow<u64> for &'a Natural {
 }
 
 impl PowAssign<u64> for Natural {
-    /// TODO doc
+    /// Raises a [`Natural`] to a power in place.
+    ///
+    /// $x \gets x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::natural::Natural;

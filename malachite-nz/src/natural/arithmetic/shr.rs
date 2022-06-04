@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::vecs::vec_delete_left;
 use natural::InnerNatural::{Large, Small};
@@ -11,13 +13,15 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` right-shifted by a `Limb`, rounding down.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
-// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where the result is
+// returned.
 pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -38,17 +42,18 @@ pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // inclusive. The carry, or the bits that are shifted past the width of the input slice, is
 // returned. The input slice should not only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
 // equal to `Limb::WIDTH`.
 //
-// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
+// This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1.
 pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     assert_ne!(len, 0);
@@ -73,16 +78,17 @@ pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
 // be between 1 and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the
 // width of the input slice, is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 //
-// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
+// This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up`.
 pub_crate_test! {limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -104,14 +110,15 @@ pub_crate_test! {limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
-// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
-// sufficiently large, limbs are removed from rp.
+// This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up` and
+// if `cnt` is sufficiently large, limbs are removed from `rp`.
 pub_crate_test! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -141,7 +148,7 @@ where
     }
 }
 
-fn shr_assign_unsigned<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &mut Natural, bits: T)
+fn shr_assign_unsigned<T: PrimitiveUnsigned>(x: &mut Natural, bits: T)
 where
     u64: ExactFrom<T>,
     Limb: ShrAssign<T>,
@@ -167,27 +174,23 @@ macro_rules! impl_natural_shr_unsigned {
         impl Shr<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor), taking
-            /// the `Natural` by value.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor), taking
+            /// it by value.
             ///
-            /// Time: worst case O(n)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = max(1, `self.significant_bits()` - `bits`)
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((Natural::ZERO >> 10u8).to_string(), "0");
-            /// assert_eq!((Natural::from(492u32) >> 2u32).to_string(), "123");
-            /// assert_eq!((Natural::trillion() >> 10u64).to_string(), "976562500");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Natural {
                 self >>= bits;
@@ -198,27 +201,23 @@ macro_rules! impl_natural_shr_unsigned {
         impl<'a> Shr<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor), taking
-            /// the `Natural` by reference.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor), taking
+            /// it by reference.
             ///
-            /// Time: worst case O(n)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = max(1, `self.significant_bits()` - `bits`)
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::ZERO >> 10u8).to_string(), "0");
-            /// assert_eq!((&Natural::from(492u32) >> 2u32).to_string(), "123");
-            /// assert_eq!((&Natural::trillion() >> 10u64).to_string(), "976562500");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Natural {
                 shr_unsigned_ref(self, bits)
@@ -226,25 +225,23 @@ macro_rules! impl_natural_shr_unsigned {
         }
 
         impl ShrAssign<$t> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor) in place.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor), in
+            /// place.
             ///
-            /// Time: worst case O(n)
+            /// $$
+            /// x \gets \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = max(1, `self.significant_bits()` - `bits`)
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut x = Natural::from(1024u32);
-            /// x >>= 1u8;
-            /// x >>= 2u16;
-            /// x >>= 3u32;
-            /// x >>= 4u64;
-            /// assert_eq!(x.to_string(), "1");
-            /// ```
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign_unsigned(self, bits);
@@ -254,7 +251,7 @@ macro_rules! impl_natural_shr_unsigned {
 }
 apply_to_unsigneds!(impl_natural_shr_unsigned);
 
-fn shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_signed_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
 ) -> Natural
@@ -268,7 +265,7 @@ where
     }
 }
 
-fn shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+fn shr_assign_signed<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(x: &mut Natural, bits: S)
 where
     Natural: ShlAssign<U> + ShrAssign<U>,
 {
@@ -284,29 +281,23 @@ macro_rules! impl_natural_shr_signed {
         impl Shr<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2), taking the `Natural` by value.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), taking it by value.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((Natural::ZERO >> 10i8).to_string(), "0");
-            /// assert_eq!((Natural::from(492u32) >> 2i16).to_string(), "123");
-            /// assert_eq!((Natural::trillion() >> 10i32).to_string(), "976562500");
-            /// assert_eq!((Natural::ZERO >> -10i64).to_string(), "0");
-            /// assert_eq!((Natural::from(123u32) >> -2i8).to_string(), "492");
-            /// assert_eq!((Natural::from(123u32) >> -100i16).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Natural {
                 self >>= bits;
@@ -317,29 +308,23 @@ macro_rules! impl_natural_shr_signed {
         impl<'a> Shr<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2), taking the `Natural` by reference.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), taking it by reference.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::ZERO >> -10i8).to_string(), "0");
-            /// assert_eq!((&Natural::from(123u32) >> -2i16).to_string(), "492");
-            /// assert_eq!((&Natural::from(123u32) >> -100i32).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// assert_eq!((&Natural::ZERO >> 10i64).to_string(), "0");
-            /// assert_eq!((&Natural::from(492u32) >> 2i8).to_string(), "123");
-            /// assert_eq!((&Natural::trillion() >> 10i16).to_string(), "976562500");
-            /// ```
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Natural {
                 shr_signed_ref(self, bits)
@@ -347,35 +332,23 @@ macro_rules! impl_natural_shr_signed {
         }
 
         impl ShrAssign<$t> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2) in place.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2 and takes the floor or
+            /// multiplies it by a power of 2), in place.
             ///
-            /// Time: worst case O(`bits`)
+            /// $$
+            /// x \gets \left \lfloor \frac{x}{2^k} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is
+            /// `max(1, self.significant_bits() - bits)`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut x = Natural::ONE;
-            /// x >>= -1i8;
-            /// x >>= -2i16;
-            /// x >>= -3i32;
-            /// x >>= -4i64;
-            /// assert_eq!(x.to_string(), "1024");
-            ///
-            /// let mut x = Natural::from(1024u32);
-            /// x >>= 1i8;
-            /// x >>= 2i16;
-            /// x >>= 3i32;
-            /// x >>= 4i64;
-            /// assert_eq!(x.to_string(), "1");
-            /// ```
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign_signed(self, bits);

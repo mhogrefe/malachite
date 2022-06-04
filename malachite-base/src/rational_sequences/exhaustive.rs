@@ -3,10 +3,9 @@ use rational_sequences::{rational_sequence_is_reduced, RationalSequence};
 use tuples::exhaustive::{exhaustive_pairs_from_single, ExhaustivePairs1Input};
 use vecs::exhaustive::{exhaustive_vecs, ExhaustiveVecs};
 
-/// Generates all `RationalSequences` containing elements from an iterator.
+/// Generates all [`RationalSequence`]s containing elements from an iterator.
 ///
-/// This `struct` is created by the `exhaustive_rational_sequences` function. See its documentation
-/// for more.
+/// This `struct` is created by [`exhaustive_rational_sequences`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveRationalSequences<I: Clone + Iterator>(
     ExhaustivePairs1Input<ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>>,
@@ -33,7 +32,7 @@ where
     }
 }
 
-/// Generates all `RationalSequence`s containing elements from a given iterator.
+/// Generates all [`RationalSequence`]s containing elements from a given iterator.
 ///
 /// The input iterator should contain no repetitions, but this is not enforced.
 ///
@@ -50,7 +49,6 @@ where
 /// # Examples
 /// ```
 /// extern crate itertools;
-/// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;

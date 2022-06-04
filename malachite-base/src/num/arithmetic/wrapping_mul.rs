@@ -5,6 +5,8 @@ macro_rules! impl_wrapping_mul {
         impl WrappingMul<$t> for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `wrapping_mul` functions in the standard library, for
+            /// example [this one](u32::wrapping_mul).
             #[inline]
             fn wrapping_mul(self, other: $t) -> $t {
                 $t::wrapping_mul(self, other)
@@ -12,15 +14,16 @@ macro_rules! impl_wrapping_mul {
         }
 
         impl WrappingMulAssign<$t> for $t {
-            /// Replaces `self` with `self * other`, wrapping around at the boundary of the type.
+            /// Adds a number to another number in place, wrapping around at the boundary of the
+            /// type.
             ///
-            /// $x \gets z$, where $z \equiv xy \mod 2^W$ and $W$ is `$t::WIDTH`.
+            /// $x \gets z$, where $z \equiv xy \mod 2^W$ and $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::wrapping_mul` module.
+            /// See [here](super::wrapping_mul#wrapping_mul_assign).
             #[inline]
             fn wrapping_mul_assign(&mut self, other: $t) {
                 *self = self.wrapping_mul(other);

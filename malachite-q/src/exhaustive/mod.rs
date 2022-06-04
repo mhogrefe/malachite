@@ -4,10 +4,9 @@ use std::iter::{once, Chain, Once};
 use std::mem::swap;
 use Rational;
 
-/// Generates all positive `Rational`s.
+/// Generates all positive [`Rational`]s.
 ///
-/// This `struct` is created by the `exhaustive_positive_rationals` function. See its documentation
-/// for more.
+/// This `struct` is created by [`exhaustive_positive_rationals`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustivePositiveRationals {
     pred_pred: Natural,
@@ -31,66 +30,74 @@ impl Iterator for ExhaustivePositiveRationals {
     }
 }
 
-/// Generates all positive `Rational`s.
+/// Generates all positive [`Rational`]s.
 ///
-/// The `Rational`s are ordered as in the Calkin-Wilf sequence. Their numerators and denominators
-/// are given by the Stern-Brocot sequence. To generate the latter sequence, this iterator uses the
-/// formula
+/// The [`Rational`]s are ordered as in the
+/// [Calkin-Wilf sequence](https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree#Breadth_first_traversal).
+/// Their numerators and denominators are given by the
+/// [Stern-Brocot sequence](https://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Relation_to_Farey_sequences).
+/// To generate the latter sequence, this iterator uses the formula
 /// $$
 /// a_{n+1} = \left ( 2 \left \lfloor \frac{a_{n-1}}{a_n} \right \rfloor +1 \right ) a_n - a_{n-1},
 /// $$
 /// attributed to David S. Newman at <https://oeis.org/A002487>.
 ///
-/// The output length is infinite.
+/// The output length is infinite. The numerators and denominators of the $n$th element are
+/// $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// TODO
+/// $T(n) = O(\log n \log\log n \log\log\log n)$
+///
+/// $M(n) = O(\log n \log\log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-/// use malachite_base::strings::ToDebugString;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_positive_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_positive_rationals().take(20).collect_vec().to_debug_string(),
+///     prefix_to_string(exhaustive_positive_rationals(), 20),
 ///     "[1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, 7/3, \
-///     3/8]"
+///     3/8, ...]"
 /// )
 /// ```
-pub fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
+pub const fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
     ExhaustivePositiveRationals {
         pred_pred: Natural::ZERO,
         pred: Natural::ONE,
     }
 }
 
-/// Generates all non-positive `Rational`s.
+/// Generates all non-positive [`Rational`]s.
 ///
-/// Zero is generated first, followed by all the positive rationals. See
-/// `exhaustive_positive_rationals` for details.
+/// Zero is generated first, followed by all the positive [`Rational`]s. See
+/// [`exhaustive_positive_rationals`] for details.
 ///
-/// The output length is infinite.
+/// The output length is infinite. The numerators and denominators of the $n$th element are
+/// $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// TODO
+/// $T(n) = O(\log n \log\log n \log\log\log n)$
+///
+/// $M(n) = O(\log n \log\log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-/// use malachite_base::strings::ToDebugString;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_non_negative_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_non_negative_rationals().take(20).collect_vec().to_debug_string(),
+///     prefix_to_string(exhaustive_non_negative_rationals(), 20),
 ///     "[0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, \
-///     7/3]"
+///     7/3, ...]"
 /// )
 /// ```
 pub fn exhaustive_non_negative_rationals() -> Chain<Once<Rational>, ExhaustivePositiveRationals> {
@@ -99,8 +106,7 @@ pub fn exhaustive_non_negative_rationals() -> Chain<Once<Rational>, ExhaustivePo
 
 /// Generates all negative `Rational`s.
 ///
-/// This `struct` is created by the `exhaustive_negative_rationals` function. See its documentation
-/// for more.
+/// This `struct` is created by [`exhaustive_negative_rationals`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveNegativeRationals {
     xs: ExhaustivePositiveRationals,
@@ -117,41 +123,43 @@ impl Iterator for ExhaustiveNegativeRationals {
     }
 }
 
-/// Generates all negative `Rational`s.
+/// Generates all negative [`Rational`]s.
 ///
-/// The sequence is the same as the sequence of positive `Rational`s, but negated. See
-/// `exhaustive_positive_rationals` for details.
+/// The sequence is the same as the sequence of positive [`Rational`]s, but negated. See
+/// [`exhaustive_positive_rationals`] for details.
 ///
-/// The output length is infinite.
+/// The output length is infinite. The absolute values of the numerators and denominators of the
+/// $n$th element are $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// TODO
+/// $T(n) = O(\log n \log\log n \log\log\log n)$
+///
+/// $M(n) = O(\log n \log\log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-/// use malachite_base::strings::ToDebugString;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_negative_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_negative_rationals().take(20).collect_vec().to_debug_string(),
+///     prefix_to_string(exhaustive_negative_rationals(), 20),
 ///     "[-1, -1/2, -2, -1/3, -3/2, -2/3, -3, -1/4, -4/3, -3/5, -5/2, -2/5, -5/3, -3/4, -4, -1/5, \
-///     -5/4, -4/7, -7/3, -3/8]"
+///     -5/4, -4/7, -7/3, -3/8, ...]"
 /// )
 /// ```
-pub fn exhaustive_negative_rationals() -> ExhaustiveNegativeRationals {
+pub const fn exhaustive_negative_rationals() -> ExhaustiveNegativeRationals {
     ExhaustiveNegativeRationals {
         xs: exhaustive_positive_rationals(),
     }
 }
 
-/// Generates all nonzero `Rational`s.
+/// Generates all nonzero [`Rational`]s.
 ///
-/// This `struct` is created by the `exhaustive_nonzero_rationals` function. See its documentation
-/// for more.
+/// This `struct` is created by [`exhaustive_nonzero_rationals`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveNonzeroRationals {
     xs: ExhaustivePositiveRationals,
@@ -178,32 +186,35 @@ impl Iterator for ExhaustiveNonzeroRationals {
     }
 }
 
-/// Generates all nonzero `Rational`s.
+/// Generates all nonzero [`Rational`]s.
 ///
-/// The sequence is the same the sequence of positive `Rational`s, interleaved with its negative.
-/// See `exhaustive_positive_rationals` for details.
+/// The sequence is the same the sequence of positive [`Rational`]s, interleaved with its negative.
+/// See [`exhaustive_positive_rationals`] for details.
 ///
-/// The output length is infinite.
+/// The output length is infinite. The absolute values of the numerators and denominators of the
+/// $n$th element are $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// TODO
+/// $T(n) = O(\log n \log\log n \log\log\log n)$
+///
+/// $M(n) = O(\log n \log\log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-/// use malachite_base::strings::ToDebugString;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_nonzero_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_nonzero_rationals().take(20).collect_vec().to_debug_string(),
+///     prefix_to_string(exhaustive_nonzero_rationals(), 20),
 ///     "[1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3/2, -3/2, 2/3, -2/3, 3, -3, 1/4, -1/4, 4/3, -4/3, \
-///     3/5, -3/5]"
+///     3/5, -3/5, ...]"
 /// )
 /// ```
-pub fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
+pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
     ExhaustiveNonzeroRationals {
         xs: exhaustive_positive_rationals(),
         x: None,
@@ -211,29 +222,32 @@ pub fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
     }
 }
 
-/// Generates all `Rational`s.
+/// Generates all [`Rational`]s.
 ///
-/// The sequence begins with zero and is followed by the sequence of positive `Rational`s,
-/// interleaved with its negative. See `exhaustive_rationals` for details.
+/// The sequence begins with zero and is followed by the sequence of positive [`Rational`]s,
+/// interleaved with its negative. See [`exhaustive_positive_rationals`] for details.
 ///
-/// The output length is infinite.
+/// The output length is infinite. The absolute values of the numerators and denominators of the
+/// $n$th element are $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// TODO
+/// $T(n) = O(\log n \log\log n \log\log\log n)$
+///
+/// $M(n) = O(\log n \log\log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-/// use malachite_base::strings::ToDebugString;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_rationals().take(20).collect_vec().to_debug_string(),
+///     prefix_to_string(exhaustive_rationals(), 20),
 ///     "[0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3/2, -3/2, 2/3, -2/3, 3, -3, 1/4, -1/4, 4/3, \
-///     -4/3, 3/5]"
+///     -4/3, 3/5, ...]"
 /// )
 /// ```
 pub fn exhaustive_rationals() -> Chain<Once<Rational>, ExhaustiveNonzeroRationals> {

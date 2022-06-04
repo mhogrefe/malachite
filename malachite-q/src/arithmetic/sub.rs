@@ -8,15 +8,23 @@ use Rational;
 impl Sub<Rational> for Rational {
     type Output = Rational;
 
-    /// Subtracts a `Rational` from a `Rational`, taking both `Rational`s by value.
+    /// Subtracts a [`Rational`] by another [`Rational`], taking both by value.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
@@ -71,16 +79,24 @@ impl Sub<Rational> for Rational {
 impl<'a> Sub<&'a Rational> for Rational {
     type Output = Rational;
 
-    /// Subtracts a `Rational` from a `Rational`, taking the left `Rational` by value and the right
-    /// `Rational` by reference.
+    /// Subtracts a [`Rational`] by another [`Rational`], taking the first by value and the second
+    /// by reference.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
@@ -100,16 +116,24 @@ impl<'a> Sub<&'a Rational> for Rational {
 impl<'a> Sub<Rational> for &'a Rational {
     type Output = Rational;
 
-    /// Subtracts a `Rational` from a `Rational`, taking the left `Rational` by reference and the
-    /// right `Rational` by value.
+    /// Subtracts a [`Rational`] by another [`Rational`], taking the first by reference and the
+    /// second by value.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
@@ -165,15 +189,23 @@ impl<'a> Sub<Rational> for &'a Rational {
 impl<'a, 'b> Sub<&'a Rational> for &'b Rational {
     type Output = Rational;
 
-    /// Subtracts a `Rational` from a `Rational`, taking both `Rational`s by reference.
+    /// Subtracts a [`Rational`] by another [`Rational`], taking both by reference.
+    ///
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
@@ -227,16 +259,24 @@ impl<'a, 'b> Sub<&'a Rational> for &'b Rational {
 }
 
 impl SubAssign<Rational> for Rational {
-    /// Subtracts a `Rational` from a `Rational`, taking the `Rational` on the right-hand side by
-    /// value.
+    /// Subtracts a [`Rational`] by another [`Rational`] in place, taking the [`Rational`] on the
+    /// right-hand side by value.
+    ///
+    /// $$
+    /// x \gets x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
@@ -283,16 +323,24 @@ impl SubAssign<Rational> for Rational {
 }
 
 impl<'a> SubAssign<&'a Rational> for Rational {
-    /// Subtracts a `Rational` from a `Rational`, taking the `Rational` on the right-hand side by
-    /// reference.
+    /// Subtracts a [`Rational`] by another [`Rational`] in place, taking the [`Rational`] on the
+    /// right-hand side by reference.
+    ///
+    /// $$
+    /// x \gets x - y.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;

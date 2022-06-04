@@ -5,13 +5,19 @@ use malachite_base::num::arithmetic::traits::{
 use natural::Natural;
 use std::ops::Neg;
 
-impl FloorRootAssign<u64> for Integer {
-    /// Replaces an `Integer` with the floor of its $n$th root.
+impl FloorRoot<u64> for Integer {
+    type Output = Integer;
+
+    /// Returns the floor of the $n$th root of an [`Integer`], taking the [`Integer`] by value.
     ///
-    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
+    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -19,7 +25,83 @@ impl FloorRootAssign<u64> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorRoot;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(999).floor_root(3), 9);
+    /// assert_eq!(Integer::from(1000).floor_root(3), 10);
+    /// assert_eq!(Integer::from(1001).floor_root(3), 10);
+    /// assert_eq!(Integer::from(100000000000i64).floor_root(5), 158);
+    /// assert_eq!(Integer::from(-100000000000i64).floor_root(5), -159);
+    /// ```
+    #[inline]
+    fn floor_root(mut self, exp: u64) -> Integer {
+        self.floor_root_assign(exp);
+        self
+    }
+}
+
+impl<'a> FloorRoot<u64> for &'a Integer {
+    type Output = Integer;
+
+    /// Returns the floor of the $n$th root of an [`Integer`], taking the [`Integer`] by reference.
+    ///
+    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorRoot;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((&Integer::from(999)).floor_root(3), 9);
+    /// assert_eq!((&Integer::from(1000)).floor_root(3), 10);
+    /// assert_eq!((&Integer::from(1001)).floor_root(3), 10);
+    /// assert_eq!((&Integer::from(100000000000i64)).floor_root(5), 158);
+    /// assert_eq!((&Integer::from(-100000000000i64)).floor_root(5), -159);
+    /// ```
+    #[inline]
+    fn floor_root(self, exp: u64) -> Integer {
+        if *self >= 0 {
+            Integer::from(self.unsigned_abs_ref().floor_root(exp))
+        } else if exp.odd() {
+            -self.unsigned_abs_ref().ceiling_root(exp)
+        } else {
+            panic!("Cannot take even root of {}", self)
+        }
+    }
+}
+
+impl FloorRootAssign<u64> for Integer {
+    /// Replaces an [`Integer`] with the floor of its $n$th root.
+    ///
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorRootAssign;
     /// use malachite_nz::integer::Integer;
@@ -56,15 +138,19 @@ impl FloorRootAssign<u64> for Integer {
     }
 }
 
-impl FloorRoot<u64> for Integer {
+impl CeilingRoot<u64> for Integer {
     type Output = Integer;
 
-    /// Returns the floor of the $n$th root of an `Integer`, taking the `Integer` by value.
+    /// Returns the ceiling of the $n$th root of an [`Integer`], taking the [`Integer`] by value.
     ///
-    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
+    /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -72,33 +158,37 @@ impl FloorRoot<u64> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorRoot;
+    /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(999).floor_root(3), 9);
-    /// assert_eq!(Integer::from(1000).floor_root(3), 10);
-    /// assert_eq!(Integer::from(1001).floor_root(3), 10);
-    /// assert_eq!(Integer::from(100000000000i64).floor_root(5), 158);
-    /// assert_eq!(Integer::from(-100000000000i64).floor_root(5), -159);
+    /// assert_eq!(Integer::from(999).ceiling_root(3), 10);
+    /// assert_eq!(Integer::from(1000).ceiling_root(3), 10);
+    /// assert_eq!(Integer::from(1001).ceiling_root(3), 11);
+    /// assert_eq!(Integer::from(100000000000i64).ceiling_root(5), 159);
+    /// assert_eq!(Integer::from(-100000000000i64).ceiling_root(5), -158);
     /// ```
     #[inline]
-    fn floor_root(mut self, exp: u64) -> Integer {
-        self.floor_root_assign(exp);
+    fn ceiling_root(mut self, exp: u64) -> Integer {
+        self.ceiling_root_assign(exp);
         self
     }
 }
 
-impl<'a> FloorRoot<u64> for &'a Integer {
+impl<'a> CeilingRoot<u64> for &'a Integer {
     type Output = Integer;
 
-    /// Returns the floor of the $n$th root of an `Integer`, taking the `Integer` by reference.
+    /// Returns the ceiling of the $n$th root of an [`Integer`], taking the [`Integer`] by
+    /// reference.
     ///
-    /// $f(x, n) = \lfloor\root\[n\]{x}\rfloor$.
+    /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -106,36 +196,39 @@ impl<'a> FloorRoot<u64> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorRoot;
+    /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(999)).floor_root(3), 9);
-    /// assert_eq!((&Integer::from(1000)).floor_root(3), 10);
-    /// assert_eq!((&Integer::from(1001)).floor_root(3), 10);
-    /// assert_eq!((&Integer::from(100000000000i64)).floor_root(5), 158);
-    /// assert_eq!((&Integer::from(-100000000000i64)).floor_root(5), -159);
+    /// assert_eq!(Integer::from(999).ceiling_root(3), 10);
+    /// assert_eq!(Integer::from(1000).ceiling_root(3), 10);
+    /// assert_eq!(Integer::from(1001).ceiling_root(3), 11);
+    /// assert_eq!(Integer::from(100000000000i64).ceiling_root(5), 159);
+    /// assert_eq!(Integer::from(-100000000000i64).ceiling_root(5), -158);
     /// ```
     #[inline]
-    fn floor_root(self, exp: u64) -> Integer {
+    fn ceiling_root(self, exp: u64) -> Integer {
         if *self >= 0 {
-            Integer::from(self.unsigned_abs_ref().floor_root(exp))
+            Integer::from(self.unsigned_abs_ref().ceiling_root(exp))
         } else if exp.odd() {
-            -self.unsigned_abs_ref().ceiling_root(exp)
+            -self.unsigned_abs_ref().floor_root(exp)
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take even root of {}", self)
         }
     }
 }
 
 impl CeilingRootAssign<u64> for Integer {
-    /// Replaces an `Integer` with the ceiling of its $n$th root.
+    /// Replaces an [`Integer`] with the ceiling of its $n$th root.
     ///
-    /// $x \gets \lceil\root\[n\]{x}\rceil$.
+    /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -143,7 +236,6 @@ impl CeilingRootAssign<u64> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
     /// use malachite_nz::integer::Integer;
@@ -180,94 +272,25 @@ impl CeilingRootAssign<u64> for Integer {
     }
 }
 
-impl CeilingRoot<u64> for Integer {
-    type Output = Integer;
-
-    /// Returns the ceiling of the $n$th root of an `Integer`, taking the `Integer` by value.
-    ///
-    /// $f(x) = \lceil\sqrt\[n\]{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingRoot;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from(999).ceiling_root(3), 10);
-    /// assert_eq!(Integer::from(1000).ceiling_root(3), 10);
-    /// assert_eq!(Integer::from(1001).ceiling_root(3), 11);
-    /// assert_eq!(Integer::from(100000000000i64).ceiling_root(5), 159);
-    /// assert_eq!(Integer::from(-100000000000i64).ceiling_root(5), -158);
-    /// ```
-    #[inline]
-    fn ceiling_root(mut self, exp: u64) -> Integer {
-        self.ceiling_root_assign(exp);
-        self
-    }
-}
-
-impl<'a> CeilingRoot<u64> for &'a Integer {
-    type Output = Integer;
-
-    /// Returns the ceiling of the $n$th root of an `Integer`, taking the `Integer` by reference.
-    ///
-    /// $f(x) = \lceil\sqrt\[n\]{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingRoot;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from(999).ceiling_root(3), 10);
-    /// assert_eq!(Integer::from(1000).ceiling_root(3), 10);
-    /// assert_eq!(Integer::from(1001).ceiling_root(3), 11);
-    /// assert_eq!(Integer::from(100000000000i64).ceiling_root(5), 159);
-    /// assert_eq!(Integer::from(-100000000000i64).ceiling_root(5), -158);
-    /// ```
-    #[inline]
-    fn ceiling_root(self, exp: u64) -> Integer {
-        if *self >= 0 {
-            Integer::from(self.unsigned_abs_ref().ceiling_root(exp))
-        } else if exp.odd() {
-            -self.unsigned_abs_ref().floor_root(exp)
-        } else {
-            panic!("Cannot take square root of {}", self)
-        }
-    }
-}
-
 impl CheckedRoot<u64> for Integer {
     type Output = Integer;
 
-    /// Returns the the $n$th root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// $n$th power. The `Integer` is taken by value.
+    /// Returns the the $n$th root of an [`Integer`], or `None` if the [`Integer`] is not a perfect
+    /// $n$th power. The [`Integer`] is taken by value.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -275,7 +298,6 @@ impl CheckedRoot<u64> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -304,18 +326,22 @@ impl CheckedRoot<u64> for Integer {
 impl<'a> CheckedRoot<u64> for &'a Integer {
     type Output = Integer;
 
-    /// Returns the the $n$th root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// $n$th root. The `Integer` is taken by reference.
+    /// Returns the the $n$th root of an [`Integer`], or `None` if the [`Integer`] is not a perfect
+    /// $n$th power. The [`Integer`] is taken by reference.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \root{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero, or if `exp` is even and `self` is negative.
@@ -323,7 +349,6 @@ impl<'a> CheckedRoot<u64> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;

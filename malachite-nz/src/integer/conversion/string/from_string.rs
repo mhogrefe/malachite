@@ -7,14 +7,19 @@ use std::str::FromStr;
 impl FromStr for Integer {
     type Err = ();
 
-    /// Converts an `&str` to an `Integer`.
+    /// Converts an string to an [`Integer`].
     ///
-    /// If the `&str` does not represent a valid `Integer`, an `Err` is returned. To be valid, the
-    /// string must be nonempty and only contain the `char`s `'0'` through `'9'`, with an optional
-    /// leading `'-'`. Leading zeros are allowed, as is the string `"-0"`. The string `"-"` is not.
+    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid,
+    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, with an
+    /// optional leading `'-'`. Leading zeros are allowed, as is the string `"-0"`. The string
+    /// `"-"` is not.
     ///
     /// # Worst-case complexity
-    /// // TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Examples
     /// ```
@@ -38,16 +43,20 @@ impl FromStr for Integer {
 }
 
 impl FromStringBase for Integer {
-    /// Converts an `&str`, in a specified base, to an `Integer`.
+    /// Converts an string, in a specified base, to an [`Integer`].
     ///
-    /// If the `&str` does not represent a valid `Integer`, an `Err` is returned. To be valid, the
-    /// string must be nonempty and only contain the `char`s `'0'` through `'9'`, `'a'` through
-    /// `'z'`, and `'A'` through `'Z'`, with an optional leading `'-'`; and only characters that
-    /// represent digits smaller than the base are allowed. Leading zeros are allowed, as is the
-    /// string `"-0"`. The string `"-"` is not.
+    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid,
+    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'`
+    /// through `'z'`, and `'A'` through `'Z'`, with an optional leading `'-'`; and only characters
+    /// that represent digits smaller than the base are allowed. Leading zeros are allowed, as is
+    /// the string `"-0"`. The string `"-"` is not.
     ///
     /// # Worst-case complexity
-    /// // TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.

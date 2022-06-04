@@ -5,6 +5,8 @@ macro_rules! impl_wrapping_sub {
         impl WrappingSub<$t> for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `wrapping_sub` functions in the standard library, for
+            /// example [this one](u32::wrapping_sub).
             #[inline]
             fn wrapping_sub(self, other: $t) -> $t {
                 $t::wrapping_sub(self, other)
@@ -12,15 +14,16 @@ macro_rules! impl_wrapping_sub {
         }
 
         impl WrappingSubAssign<$t> for $t {
-            /// Replaces `self` with `self - other`, wrapping around at the boundary of the type.
+            /// Subtracts a number by another number in place, wrapping around at the boundary of
+            /// the type.
             ///
-            /// $x \gets z$, where $z \equiv x - y \mod 2^W$ and $W$ is `$t::WIDTH`.
+            /// $x \gets z$, where $z \equiv x - y \mod 2^W$ and $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::wrapping_sub` module.
+            /// See [here](super::wrapping_sub#wrapping_sub_assign).
             #[inline]
             fn wrapping_sub_assign(&mut self, other: $t) {
                 *self = self.wrapping_sub(other);

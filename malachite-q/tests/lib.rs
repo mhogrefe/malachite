@@ -1,3 +1,42 @@
+#![allow(
+    unstable_name_collisions,
+    clippy::bool_assert_comparison,
+    clippy::assertions_on_constants,
+    clippy::cognitive_complexity,
+    clippy::excessive_precision,
+    clippy::many_single_char_names,
+    clippy::range_plus_one,
+    clippy::suspicious_arithmetic_impl,
+    clippy::suspicious_op_assign_impl,
+    clippy::too_many_arguments,
+    clippy::float_cmp,
+    clippy::type_complexity
+)]
+#![warn(
+    clippy::cast_lossless,
+    clippy::explicit_into_iter_loop,
+    clippy::explicit_iter_loop,
+    clippy::filter_map_next,
+    clippy::large_digit_groups,
+    clippy::manual_filter_map,
+    clippy::manual_find_map,
+    clippy::map_flatten,
+    clippy::map_unwrap_or,
+    clippy::match_same_arms,
+    clippy::missing_const_for_fn,
+    clippy::mut_mut,
+    clippy::needless_borrow,
+    clippy::needless_continue,
+    clippy::needless_pass_by_value,
+    clippy::option_if_let_else,
+    clippy::print_stdout,
+    clippy::redundant_closure_for_method_calls,
+    clippy::single_match_else,
+    clippy::trait_duplication_in_bounds,
+    clippy::type_repetition_in_bounds,
+    clippy::unused_self
+)]
+
 extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
@@ -78,15 +117,15 @@ pub mod conversion {
         pub mod to_digits;
         pub mod to_power_of_2_digits;
     }
-    pub mod floating_point_from_rational;
     pub mod from_float_simplest;
-    pub mod from_floating_point;
     pub mod from_integer;
     pub mod from_natural;
+    pub mod from_primitive_float;
     pub mod from_primitive_int;
     pub mod integer_from_rational;
     pub mod is_integer;
     pub mod natural_from_rational;
+    pub mod primitive_float_from_rational;
     pub mod primitive_int_from_rational;
     pub mod sci_mantissa_and_exponent;
     pub mod serde;

@@ -14,5 +14,5 @@ rug = { version = "1.14.1", default-features = false, features = ["integer", "se
 criterion = "0.3"
 
 [[bench]]
-name = "natural_div"
+name = "natural_mul"
 harness = false

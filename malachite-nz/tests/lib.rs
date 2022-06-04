@@ -9,7 +9,8 @@
     clippy::suspicious_arithmetic_impl,
     clippy::suspicious_op_assign_impl,
     clippy::too_many_arguments,
-    clippy::float_cmp
+    clippy::float_cmp,
+    clippy::type_complexity
 )]
 #![warn(
     clippy::cast_lossless,

@@ -27,13 +27,15 @@ use platform::{
 };
 use std::mem::swap;
 
-/// Time: worst case O(k)
-///
-/// Additional memory: worst case O(1)
-///
-/// where k = `k`
-///
-/// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `k`.
+//
+// This is equivalent to `mpn_toom_interpolate_5pts` in `mpn/generic/toom_interpolate_5pts.c`,
+// GMP 6.2.1.
 pub(crate) fn limbs_mul_toom_interpolate_5_points(
     c: &mut [Limb],
     v_2: &mut [Limb],
@@ -190,35 +192,36 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
     assert!(!limbs_slice_add_limb_in_place(&mut v_inf[..two_r], v_inf_0));
 }
 
-/// Interpolation for Toom-3.5, using the evaluation points infinity, 1, -1, 2, -2. More precisely,
-/// we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 5, given the six
-/// values
-///
-/// w5 = f(0),
-/// w4 = f(-1),
-/// w3 = f(1)
-/// w2 = f(-2),
-/// w1 = f(2),
-/// w0 = limit at infinity of f(x) / x^5,
-///
-/// The result is stored in {out, 5 * n + n_high}. At entry, w5 is stored at {out, 2 * n}, w3 is
-/// stored at {out + 2 * n, 2 * n + 1}, and w0 is stored at {out + 5 * n, n_high}. The other values
-/// are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-2) may be negative;
-/// signs are passed in. All intermediate results are positive. Inputs are destroyed.
-///
-/// Interpolation sequence was taken from the paper: "Integer and Polynomial Multiplication: Towards
-/// Optimal Toom-Cook Matrices". Some slight variations were introduced: adaptation to "gmp
-/// instruction set", and a final saving of an operation by interlacing interpolation and
-/// recomposition phases.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_toom_interpolate_6pts from mpn/generic/toom_interpolate_6pts.c, but the argument
-/// w0n == `n_high` is moved to immediately after `n`, GMP 6.1.2.
+// Interpolation for Toom-3.5, using the evaluation points infinity, 1, -1, 2, -2. More precisely,
+// we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 5, given the six
+// values
+//
+// w5 = f(0),
+// w4 = f(-1),
+// w3 = f(1)
+// w2 = f(-2),
+// w1 = f(2),
+// w0 = limit at infinity of f(x) / x^5,
+//
+// The result is stored in {out, 5 * n + n_high}. At entry, w5 is stored at {out, 2 * n}, w3 is
+// stored at {out + 2 * n, 2 * n + 1}, and w0 is stored at {out + 5 * n, n_high}. The other values
+// are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-2) may be negative;
+// signs are passed in. All intermediate results are positive. Inputs are destroyed.
+//
+// Interpolation sequence was taken from the paper: "Integer and Polynomial Multiplication: Towards
+// Optimal Toom-Cook Matrices". Some slight variations were introduced: adaptation to "gmp
+// instruction set", and a final saving of an operation by interlacing interpolation and
+// recomposition phases.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpn_toom_interpolate_6pts` from `mpn/generic/toom_interpolate_6pts.c`,
+// GMP 6.2.1, but the argument `w0n == n_high` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_6_points(
     out: &mut [Limb],
     n: usize,
@@ -392,32 +395,33 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
 
 const WANT_ASSERT: bool = true;
 
-/// Interpolation for toom4, using the evaluation points 0, infinity, 1, -1, 2, -2, 1 / 2. More
-/// precisely, we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given
-/// the seven values
-/// w0 = f(0),
-/// w1 = f(-2),
-/// w2 = f(1),
-/// w3 = f(-1),
-/// w4 = f(2)
-/// w5 = 64 * f(1/2)
-/// w6 = limit at infinity of f(x) / x ^ 6,
-///
-/// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out, 2 * n}, w2 is stored
-/// at {out + 2 * n, 2 * n + 1}, and w6 is stored at {out + 6 * n, n_high}. The other
-/// values are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-1/2) may be
-/// negative, signs determined by the flag bits. Inputs are destroyed.
-///
-/// Needs 2 * n + 1 limbs of temporary storage.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_toom_interpolate_7pts from mpn/generic/toom_interpolate_7pts.c, GMP 6.1.2, but the
-/// argument w6n == `n_high` is moved to immediately after `n`.
+// Interpolation for toom4, using the evaluation points 0, infinity, 1, -1, 2, -2, 1 / 2. More
+// precisely, we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given
+// the seven values
+// w0 = f(0),
+// w1 = f(-2),
+// w2 = f(1),
+// w3 = f(-1),
+// w4 = f(2)
+// w5 = 64 * f(1/2)
+// w6 = limit at infinity of f(x) / x ^ 6,
+//
+// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out, 2 * n}, w2 is stored
+// at {out + 2 * n, 2 * n + 1}, and w6 is stored at {out + 6 * n, n_high}. The other
+// values are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-1/2) may be
+// negative, signs determined by the flag bits. Inputs are destroyed.
+//
+// Needs 2 * n + 1 limbs of temporary storage.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpn_toom_interpolate_7pts` from `mpn/generic/toom_interpolate_7pts.c`,
+// GMP 6.2.1, but the argument `w6n == n_high` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_7_points(
     out: &mut [Limb],
     n: usize,
@@ -572,13 +576,14 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     }
 }
 
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
-// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
+// This is equivalent to `DO_mpn_sublsh_n` from `mpn/generic/toom_interpolate_8pts.c`, GMP 6.2.1.
 pub_test! {limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -593,13 +598,14 @@ pub_test! {limbs_shl_and_sub_same_length(
     carry
 }}
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is DO_mpn_subrsh from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
+//
+// This is equivalent to `DO_mpn_subrsh` from `mpn/generic/toom_interpolate_8pts.c`, GMP 6.2.1.
 fn limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u64, scratch: &mut [Limb]) {
     let (ys_head, ys_tail) = ys.split_first().unwrap();
     assert!(!limbs_sub_limb_in_place(xs, *ys_head >> shift));
@@ -624,37 +630,38 @@ fn limbs_shl_and_sub_special(
     }
 }
 
-/// Interpolation for Toom-4.5 (or Toom-4), using the evaluation points: infinity(4.5 only), 4, -4,
-/// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial
-/// f of degree 7 (or 6), given the 8 (rsp. 7) values:
-///
-/// r1 = limit at infinity of f(x) / x ^ 7,
-/// r2 = f(4),
-/// r3 = f(-4),
-/// r4 = f(2),
-/// r5 = f(-2),
-/// r6 = f(1),
-/// r7 = f(-1),
-/// r8 = f(0).
-///
-/// All couples of the form f(n),f(-n) must be already mixed with
-/// `limbs_toom_couple_handling`(f(n),..., f(-n), ...)
-///
-/// The result is stored in {`out`, `s_plus_t` + 7 * n (or 6 * n)}. At entry, `r8` is stored at
-/// {`out`, 2 * `n`}, and r5 is stored at {`out` + 3 * `n`, 3 * `n` + 1}.
-///
-/// The other values are 2 * `n` + ... limbs each (with most significant limbs small).
-///
-/// All intermediate results are positive. Inputs are destroyed.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_toom_interpolate_8pts from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2, but the
-/// argument spt == `s_plus_t` is moved to immediately after `n`.
+// Interpolation for Toom-4.5 (or Toom-4), using the evaluation points: infinity(4.5 only), 4, -4,
+// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial
+// f of degree 7 (or 6), given the 8 (rsp. 7) values:
+//
+// r1 = limit at infinity of f(x) / x ^ 7,
+// r2 = f(4),
+// r3 = f(-4),
+// r4 = f(2),
+// r5 = f(-2),
+// r6 = f(1),
+// r7 = f(-1),
+// r8 = f(0).
+//
+// All couples of the form f(n),f(-n) must be already mixed with
+// `limbs_toom_couple_handling`(f(n),..., f(-n), ...)
+//
+// The result is stored in {`out`, `s_plus_t` + 7 * n (or 6 * n)}. At entry, `r8` is stored at
+// {`out`, 2 * `n`}, and r5 is stored at {`out` + 3 * `n`, 3 * `n` + 1}.
+//
+// The other values are 2 * `n` + ... limbs each (with most significant limbs small).
+//
+// All intermediate results are positive. Inputs are destroyed.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpn_toom_interpolate_8pts` from `mpn/generic/toom_interpolate_8pts.c`,
+// GMP 6.2.1, but the argument spt == `s_plus_t` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_8_points(
     out: &mut [Limb],
     n: usize,
@@ -757,11 +764,12 @@ pub(crate) fn limbs_mul_toom_interpolate_8_points(
     }
 }
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn limbs_div_255_in_place(xs: &mut [Limb]) {
     limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
 }
@@ -895,13 +903,15 @@ fn limbs_aors_mul_or_aors_and_sh_aors_helper(
 //
 // Negative intermediate results are stored two-complemented. Inputs are destroyed.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `n`
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom_interpolate_12pts` from `mpn/generic/toom_interpolate_12pts.c`,
+// GMP 6.2.1.
 pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     out: &mut [Limb],
     mut r1: &'a mut [Limb],
@@ -1099,13 +1109,15 @@ const CORRECTED_WIDTH: u64 = 42;
 //
 // Negative intermediate results are stored two-complemented. Inputs are destroyed.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `n`
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom_interpolate_16pts` from `mpn/generic/toom_interpolate_16pts.c`,
+// GMP 6.2.1.
 pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     out: &mut [Limb],
     r1: &mut [Limb],

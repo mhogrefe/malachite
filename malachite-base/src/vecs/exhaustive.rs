@@ -21,37 +21,131 @@ use tuples::exhaustive::{
 };
 use vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
 
-pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
+#[doc(hidden)]
+pub fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
     let oi_sorted_unique = xs.unique().sorted().collect_vec();
     assert_eq!(oi_sorted_unique.len(), max_input_index + 1);
     assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
     assert_eq!(*oi_sorted_unique.last().unwrap(), max_input_index);
 }
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-struct LexFixedLengthVecsOutput {
-    input_index: usize,
-    counter: usize,
+pub struct LexFixedLengthVecsOutput {
+    pub input_index: usize,
+    pub counter: usize,
 }
 
-macro_rules! lex_fixed_length_vecs {
+/// Defines lexicographic fixed-length [`Vec`] generators.
+///
+/// Malachite provides [`lex_vecs_length_2`] and [`lex_vecs_fixed_length_2_inputs`], but you can
+/// also define `lex_vecs_length_3`, `lex_vecs_length_4`, and so on, and
+/// `lex_vecs_fixed_length_3_inputs`, `lex_vecs_fixed_length_4_inputs`, and so on, in your program
+/// using the code below. The documentation for [`lex_vecs_length_2`] and
+/// [`lex_vecs_fixed_length_2_inputs`] describes these other functions as well.
+///
+/// See usage examples [here](self#lex_vecs_length_2) and
+/// [here](self#lex_vecs_fixed_length_2_inputs).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::vecs::exhaustive::{validate_oi_map, LexFixedLengthVecsOutput};
+///
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs3Inputs,
+///     lex_vecs_fixed_length_3_inputs,
+///     lex_vecs_length_3,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs]
+/// );
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs4Inputs,
+///     lex_vecs_fixed_length_4_inputs,
+///     lex_vecs_length_4,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs],
+///     [3, L, ws, ws_outputs]
+/// );
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs5Inputs,
+///     lex_vecs_fixed_length_5_inputs,
+///     lex_vecs_length_5,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs],
+///     [3, L, ws, ws_outputs],
+///     [4, M, vs, vs_outputs]
+/// );
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs6Inputs,
+///     lex_vecs_fixed_length_6_inputs,
+///     lex_vecs_length_6,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs],
+///     [3, L, ws, ws_outputs],
+///     [4, M, vs, vs_outputs],
+///     [5, N, us, us_outputs]
+/// );
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs7Inputs,
+///     lex_vecs_fixed_length_7_inputs,
+///     lex_vecs_length_7,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs],
+///     [3, L, ws, ws_outputs],
+///     [4, M, vs, vs_outputs],
+///     [5, N, us, us_outputs],
+///     [6, O, ts, ts_outputs]
+/// );
+/// lex_vecs_fixed_length!(
+///     (pub(crate)),
+///     LexFixedLengthVecs8Inputs,
+///     lex_vecs_fixed_length_8_inputs,
+///     lex_vecs_length_8,
+///     [0, I, xs, xs_outputs],
+///     [1, J, ys, ys_outputs],
+///     [2, K, zs, zs_outputs],
+///     [3, L, ws, ws_outputs],
+///     [4, M, vs, vs_outputs],
+///     [5, N, us, us_outputs],
+///     [6, O, ts, ts_outputs],
+///     [7, P, ss, ss_outputs]
+/// );
+/// # }
+/// ```
+#[macro_export]
+macro_rules! lex_vecs_fixed_length {
     (
+        ($($vis:tt)*),
         $exhaustive_struct: ident,
         $exhaustive_custom_fn: ident,
         $exhaustive_1_to_1_fn: ident,
         $([$i: expr, $it: ident, $xs: ident, $xs_outputs: ident]),*
     ) => {
-        /// Generates all `Vec`s of a given length with elements from $m$ iterators, in
+        /// This documentation applies not only to `LexFixedLengthVecs2Inputs`, but also to
+        /// `LexFixedLengthVecs3Inputs`, `LexFixedLengthVecs4Inputs`, and so on. See
+        /// [`lex_vecs_fixed_length`] for more information.
+        ///
+        /// Generates all [`Vec`]s of a given length with elements from $m$ iterators, in
         /// lexicographic order.
         ///
         /// The order is lexicographic with respect to the order of the element iterators.
         ///
-        /// The fixed length $n$ of the `Vec`s is greater than or equal to $m$.
-        ///
-        /// This struct is macro-generated. The value of $m$ is in the struct's name. Remember that
-        /// $m$ is the number of input iterators, not the length of the output `Vec`s!
+        /// The fixed length $n$ of the [`Vec`]s is greater than or equal to $m$.
         #[derive(Clone, Debug)]
-        pub struct $exhaustive_struct<T: Clone, $($it: Iterator<Item = T>,)*> {
+        $($vis)* struct $exhaustive_struct<T: Clone, $($it: Iterator<Item = T>,)*> {
             first: bool,
             done: bool,
             $(
@@ -124,56 +218,34 @@ macro_rules! lex_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s with elements from $m$ iterators, where $m \leq n$, in
+        /// This documentation applies not only to `lex_vecs_fixed_length_2_inputs`, but also to
+        /// `lex_vecs_fixed_length_3_inputs`, `lex_vecs_fixed_length_4_inputs`, and so on. See
+        /// [`lex_vecs_fixed_length`] for more information.
+        ///
+        /// Generates all length-$n$ [`Vec`]s with elements from $m$ iterators, where $m \leq n$, in
         /// lexicographic order.
         ///
         /// The order is lexicographic with respect to the order of the element iterators.
         ///
         /// The `output_to_input_map` parameter defines which iterators are mapped to which slot in
-        /// the output `Vec`s. The length of the output `Vec`s, $n$, is specified by the length of
-        /// `output_to_input_map`.
+        /// the output [`Vec`]s. The length of the output [`Vec`]s, $n$, is specified by the length
+        /// of `output_to_input_map`.
         ///
         /// The $i$th element of `output_to_input_map` is an index from 0 to $m-1$ which specifies
         /// which iterator the $i$th output slot is populated with. Together, the elements must
         /// include all indices from 0 to $m-1$, inclusive, possibly with repetitions.
         ///
-        /// This function is macro-generated. The value of $m$ is in the function's name. Remember
-        /// that $m$ is the number of input iterators, not the length of the output `Vec`s!
-        ///
-        /// Let `xs` be the input iterator mapped to the first slot of the output `Vec`s. All the
+        /// Let `xs` be the input iterator mapped to the first slot of the output [`Vec`]s. All the
         /// input iterators, except possibly `xs`, must be finite. If `xs` is finite, the output
         /// length is the product of the lengths of all the input iterators. If `xs` is infinite,
         /// the output is also infinite.
         ///
         /// If any of the input iterators is empty, the output is also empty.
         ///
-        /// # Complexity per iteration
-        /// If `xs` is finite:
-        ///
-        /// $T(i, n) = O(n)$
-        ///
-        /// $M(i, n) = O(n)$
-        ///
-        /// If `xs` is infinite: Let $j$ be the largest index of any output associated with `xs`,
-        /// $X$ the set of outputs with indices higher than $j$, $P$ the product of the lengths of
-        /// all the iterators associated with the outputs in $X$, including multiplicities, and
-        /// $T^\prime$ and $M^\prime$ the time and additional memory complexities of `xs`.
-        ///
-        /// Finally, we have
-        ///
-        /// $$
-        /// T(i, n) = O(n + T^\prime (i / P))
-        /// $$
-        ///
-        /// $$
-        /// M(i, n) = O(n + M^\prime (i / P))
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory and $n$ is the number of input iterators.
-        ///
         /// # Examples
-        /// See the documentation of the `vecs::exhaustive` module.
-        pub fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
+        /// See [here](self#lex_vecs_fixed_length_2_inputs).
+        #[allow(dead_code)]
+        $($vis)* fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
             $($xs: $it,)*
             output_to_input_map: &[usize],
         ) -> $exhaustive_struct<T, $($it,)*> {
@@ -205,12 +277,14 @@ macro_rules! lex_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s with elements from $n$ iterators, in lexicographic
+        /// This documentation applies not only to `lex_vecs_length_2`, but also to
+        /// `lex_vecs_length_3`, `lex_vecs_length_4`, and so on. See [`lex_vecs_fixed_length`] for
+        /// more information.
+        ///
+        /// Generates all length-$n$ [`Vec`]s with elements from $n$ iterators, in lexicographic
         /// order.
         ///
         /// The order is lexicographic with respect to the order of the element iterators.
-        ///
-        /// This function is macro-generated. The value of $n$ is in the function's name.
         ///
         /// All of `ys`, `zs`, ... (but not necessarily `xs`) must be finite. If `xs` is finite, the
         /// output length is the product of the lengths of all the input iterators. If `xs` is
@@ -218,31 +292,11 @@ macro_rules! lex_fixed_length_vecs {
         ///
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
-        /// # Complexity per iteration
-        /// If `xs` is finite:
-        ///
-        /// $T(i, n) = O(n)$
-        ///
-        /// $M(i, n) = O(n)$
-        ///
-        /// If `xs`, is infinite:
-        ///
-        /// $$
-        /// T(i, n) = O(n + T^\prime (i / P))
-        /// $$
-        ///
-        /// $$
-        /// M(i, n) = O(n + M^\prime (i / P))
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators,
-        /// $T^\prime$ and $M^\prime$ are the time and additional memory complexities of `xs`, and
-        /// $P$ is the product of the lengths of `ys`, `zs`, ... (excluding `xs`).
-        ///
         /// # Examples
-        /// See the documentation of the `vecs::exhaustive` module.
+        /// See [here](self#lex_vecs_length_2).
+        #[allow(dead_code)]
         #[inline]
-        pub fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
+        $($vis)* fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
             $($xs: $it,)*
         ) -> $exhaustive_struct<T, $($it,)*> {
             $exhaustive_custom_fn($($xs,)* &[$($i,)*])
@@ -250,75 +304,13 @@ macro_rules! lex_fixed_length_vecs {
     }
 }
 
-lex_fixed_length_vecs!(
+lex_vecs_fixed_length!(
+    (pub),
     LexFixedLengthVecs2Inputs,
     lex_vecs_fixed_length_2_inputs,
     lex_vecs_length_2,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs3Inputs,
-    lex_vecs_fixed_length_3_inputs,
-    lex_vecs_length_3,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs4Inputs,
-    lex_vecs_fixed_length_4_inputs,
-    lex_vecs_length_4,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs],
-    [3, L, ws, ws_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs5Inputs,
-    lex_vecs_fixed_length_5_inputs,
-    lex_vecs_length_5,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs],
-    [3, L, ws, ws_outputs],
-    [4, M, vs, vs_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs6Inputs,
-    lex_vecs_fixed_length_6_inputs,
-    lex_vecs_length_6,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs],
-    [3, L, ws, ws_outputs],
-    [4, M, vs, vs_outputs],
-    [5, N, us, us_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs7Inputs,
-    lex_vecs_fixed_length_7_inputs,
-    lex_vecs_length_7,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs],
-    [3, L, ws, ws_outputs],
-    [4, M, vs, vs_outputs],
-    [5, N, us, us_outputs],
-    [6, O, ts, ts_outputs]
-);
-lex_fixed_length_vecs!(
-    LexFixedLengthVecs8Inputs,
-    lex_vecs_fixed_length_8_inputs,
-    lex_vecs_length_8,
-    [0, I, xs, xs_outputs],
-    [1, J, ys, ys_outputs],
-    [2, K, zs, zs_outputs],
-    [3, L, ws, ws_outputs],
-    [4, M, vs, vs_outputs],
-    [5, N, us, us_outputs],
-    [6, O, ts, ts_outputs],
-    [7, P, ss, ss_outputs]
 );
 
 #[doc(hidden)]
@@ -401,13 +393,13 @@ where
     }
 }
 
-/// Generates all `Vec`s of a given length with elements from a single iterator, in lexicographic
+/// Generates all [`Vec`]s of a given length with elements from a single iterator, in lexicographic
 /// order.
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
 ///
-/// This `struct` is created by the `lex_vecs_fixed_length_from_single` function. See its
-/// documentation for more.
+/// This `struct` is created by the [`lex_vecs_fixed_length_from_single`]; see its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub enum LexFixedLengthVecsFromSingle<I: Iterator>
 where
@@ -433,37 +425,24 @@ where
     }
 }
 
-/// Generates all `Vec`s of a given length with elements from a single iterator, in lexicographic
+/// Generates all [`Vec`]s of a given length with elements from a single iterator, in lexicographic
 /// order.
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
 ///
 /// `xs` must be finite.
 ///
-/// The output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
+/// The output length is $k^n$, where $k$ is `xs.count()` and $n$ is `len`.
 ///
-/// If `len` is 0, the output consists of one empty `Vec`.
+/// If `len` is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, n) = O(n + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, n) = O(n + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_from_single;
 ///
 /// let xss = lex_vecs_fixed_length_from_single(2, 0..4).collect_vec();
@@ -505,21 +484,120 @@ where
     }
 }
 
-macro_rules! exhaustive_fixed_length_vecs {
+/// Defines exhaustive fixed-length [`Vec`] generators.
+///
+/// Malachite provides [`exhaustive_vecs_length_2`] and [`exhaustive_vecs_fixed_length_2_inputs`],
+/// but you can also define `exhaustive_vecs_length_3`, `exhaustive_vecs_length_4`, and so on, and
+/// `exhaustive_vecs_fixed_length_3_inputs`, `exhaustive_vecs_fixed_length_4_inputs`, and so on, in
+/// your program using the code below. The documentation for [`exhaustive_vecs_length_2`] and
+/// [`exhaustive_vecs_fixed_length_2_inputs`] describes these other functions as well.
+///
+/// See usage examples [here](self#exhaustive_vecs_length_2) and
+/// [here](self#exhaustive_vecs_fixed_length_2_inputs).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate itertools;
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use itertools::Itertools;
+/// use malachite_base::exhaustive_vecs_fixed_length;
+/// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+/// use malachite_base::num::logic::traits::SignificantBits;
+/// use malachite_base::vecs::exhaustive::validate_oi_map;
+/// use std::cmp::max;
+///
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs3Inputs,
+///     exhaustive_vecs_fixed_length_3_inputs,
+///     exhaustive_vecs_length_3,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs]
+/// );
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs4Inputs,
+///     exhaustive_vecs_fixed_length_4_inputs,
+///     exhaustive_vecs_length_4,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs],
+///     [3, L, ws, ws_done, ws_outputs]
+/// );
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs5Inputs,
+///     exhaustive_vecs_fixed_length_5_inputs,
+///     exhaustive_vecs_length_5,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs],
+///     [3, L, ws, ws_done, ws_outputs],
+///     [4, M, vs, vs_done, vs_outputs]
+/// );
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs6Inputs,
+///     exhaustive_vecs_fixed_length_6_inputs,
+///     exhaustive_vecs_length_6,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs],
+///     [3, L, ws, ws_done, ws_outputs],
+///     [4, M, vs, vs_done, vs_outputs],
+///     [5, N, us, us_done, us_outputs]
+/// );
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs7,
+///     exhaustive_vecs_fixed_length_7_inputs,
+///     exhaustive_vecs_length_7,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs],
+///     [3, L, ws, ws_done, ws_outputs],
+///     [4, M, vs, vs_done, vs_outputs],
+///     [5, N, us, us_done, us_outputs],
+///     [6, O, ts, ts_done, ts_outputs]
+/// );
+/// exhaustive_vecs_fixed_length!(
+///     (pub(crate)),
+///     ExhaustiveFixedLengthVecs8Inputs,
+///     exhaustive_vecs_fixed_length_8_inputs,
+///     exhaustive_vecs_length_8,
+///     [0, I, xs, xs_done, xs_outputs],
+///     [1, J, ys, ys_done, ys_outputs],
+///     [2, K, zs, zs_done, zs_outputs],
+///     [3, L, ws, ws_done, ws_outputs],
+///     [4, M, vs, vs_done, vs_outputs],
+///     [5, N, us, us_done, us_outputs],
+///     [6, O, ts, ts_done, ts_outputs],
+///     [7, P, ss, ss_done, ss_outputs]
+/// );
+/// # }
+/// ```
+#[macro_export]
+macro_rules! exhaustive_vecs_fixed_length {
     (
+        ($($vis:tt)*),
         $exhaustive_struct: ident,
         $exhaustive_custom_fn: ident,
         $exhaustive_1_to_1_fn: ident,
         $([$i: expr, $it: ident, $xs: ident, $xs_done: ident, $outputs: ident]),*
     ) => {
-        /// Generates all `Vec`s of a given length with elements from $m$ iterators.
+        /// This documentation applies not only to `ExhaustiveFixedLengthVecs2Inputs`, but also to
+        /// `ExhaustiveFixedLengthVecs3Inputs`, `ExhaustiveFixedLengthVecs4Inputs`, and so on. See
+        /// [`exhaustive_vecs_fixed_length`] for more information.
         ///
-        /// The fixed length $n$ of the `Vec`s is greater than or equal to $m$.
+        /// Generates all [`Vec`]s of a given length with elements from $m$ iterators.
         ///
-        /// This struct is macro-generated. The value of $m$ is in the struct's name. Remember that
-        /// $m$ is the number of input iterators, not the length of the output `Vec`s!
+        /// The fixed length $n$ of the [`Vec`]s is greater than or equal to $m$.
         #[derive(Clone, Debug)]
-        pub struct $exhaustive_struct<T: Clone, $($it: Iterator<Item=T>,)*> {
+        $($vis)* struct $exhaustive_struct<T: Clone, $($it: Iterator<Item=T>,)*> {
             i: u64,
             len: u64,
             limit: Option<u64>,
@@ -624,72 +702,31 @@ macro_rules! exhaustive_fixed_length_vecs {
             }
         }
 
-        /// Generates all `Vec`s of a given length with elements from $m$ iterators, where
+        /// This documentation applies not only to `exhaustive_vecs_fixed_length_2_inputs`, but
+        /// also to `exhaustive_vecs_fixed_length_3_inputs`,
+        /// `exhaustive_vecs_fixed_length_4_inputs`, and so on. See
+        /// [`exhaustive_vecs_fixed_length`] for more information.
+        ///
+        /// Generates all [`Vec`]s of a given length with elements from $m$ iterators, where
         /// $m \leq n$.
         ///
         /// The `output_types` parameter defines which iterators are mapped to which slot in the
-        /// output `Vec`s, and how quickly each output slot advances through its iterator. The
-        /// length of the output `Vec`s, $n$, is specified by the length of `output_types`.
+        /// output [`Vec`]s, and how quickly each output slot advances through its iterator. The
+        /// length of the output [`Vec`]s, $n$, is specified by the length of `output_types`.
         ///
-        /// The $i$th element of `output_types` is a pair of `BitDistributorOutputType` and `usize`.
-        /// The `BitDistributorOutputType` determines how quickly the $i$th output slot advances
-        /// through its iterator; see the `BitDistributor` documentation for a description of the
-        /// different types. The `usize` is an index from 0 to $m-1$ which specifies which iterator
-        /// the $i$th output slot is populated with. Together, the `usize`s must include all indices
-        /// from 0 to $m-1$, inclusive, possibly with repetitions.
-        ///
-        /// This function is macro-generated. The value of $m$ is in the function's name. Remember
-        /// that $m$ is the number of input iterators, not the length of the output `Vec`s!
+        /// The $i$th element of `output_types` is a pair of
+        /// [`BitDistributorOutputType`](BitDistributorOutputType) and `usize`. The
+        /// [`BitDistributorOutputType`](BitDistributorOutputType) determines how quickly the $i$th
+        /// output slot advances through its iterator; see the [`BitDistributor`](BitDistributor)
+        /// documentation for a description of the different types. The `usize` is an index from 0
+        /// to $m-1$ which specifies which iterator the $i$th output slot is populated with.
+        /// Together, the `usize`s must include all indices from 0 to $m-1$, inclusive, possibly
+        /// with repetitions.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, the output length is the product of their
         /// lengths. If any of `xs`, `ys`, `zs`, ... are infinite, the output is also infinite.
         ///
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
-        ///
-        /// # Complexity per iteration
-        /// If all of `xs`, `ys`, `zs`, ... are finite:
-        ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
-        ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
-        ///
-        /// If some of `xs`, `ys`, `zs`, ... are infinite, but all the infinite ones are associated
-        /// with tiny outputs: Let $k$ be the number of outputs associated with the infinite
-        /// iterators, and $T_0, T_1, \ldots T_{k-1}$ and $M_0, M_1, \ldots M_{k-1}$ be the time and
-        /// additional memory complexities of the outputs' input iterators.
-        ///
-        /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))
-        /// $$
-        ///
-        /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
-        ///
-        /// If some of `xs`, `ys`, `zs`, ... are infinite and associated with normal output types:
-        /// Let $k$ be the number of outputs associated with the infinite iterators, and
-        /// $T_0, T_1, \ldots T_{k-1}$ and $M_0, M_1, \ldots M_{k-1}$ be the time and additional
-        /// memory functions of the outputs' input iterators.
-        ///
-        /// Let $s$ be the sum of the weights of the normal output types associated with infinite
-        /// iterators, and let $t$ be the number of tiny outputs associated with infinite iterators.
-        /// Then define a weight function $W$ for each of the $k$ infinite outputs.
-        /// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
-        ///
-        /// Finally, we have
-        ///
-        /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(W_j(i)))
-        /// $$
-        ///
-        /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(W_j(i)))
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
         ///
         /// # Panics
         /// Panics if the `usize`s in `output_types` do not include all indices from 0 to $m-1$,
@@ -697,8 +734,9 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// be at least $m$.
         ///
         /// # Examples
-        /// See the documentation of the `vecs::exhaustive` module.
-        pub fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
+        /// See [here](self#exhaustive_vecs_fixed_length_2_inputs).
+        #[allow(dead_code)]
+        $($vis)* fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
             $($xs: $it,)*
             output_types: &[(BitDistributorOutputType, usize)],
         ) -> $exhaustive_struct<T, $($it,)*> {
@@ -722,40 +760,22 @@ macro_rules! exhaustive_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s with elements from $n$ iterators.
+        /// This documentation applies not only to `exhaustive_vecs_length_2`, but also to
+        /// `exhaustive_vecs_length_3`, `exhaustive_vecs_length_4`, and so on. See
+        /// [`exhaustive_vecs_fixed_length`] for more information.
         ///
-        /// This function is macro-generated. The value of $n$ is in the function's name.
+        /// Generates all length-$n$ [`Vec`]s with elements from $n$ iterators.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, the output length is the product of their
         /// lengths. If any of `xs`, `ys`, `zs`, ... are infinite, the output is also infinite.
         ///
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
-        /// # Complexity per iteration
-        /// If all of `xs`, `ys`, `zs`, ... are finite:
-        ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
-        ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))$
-        ///
-        /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
-        ///
-        /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))
-        /// $$
-        ///
-        /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_0, T_1, \ldots T_{n-1}$ and $M_0, M_1, \ldots M_{n-1}$ are the time and additional
-        /// memory functions of the infinite input iterators.
-        ///
         /// # Examples
-        /// See the documentation of the `vecs::exhaustive` module.
+        /// See [here](self#exhaustive_vecs_length_2).
+        #[allow(dead_code)]
         #[inline]
-        pub fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
+        $($vis)* fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
             $($xs: $it,)*
         ) -> $exhaustive_struct<T, $($it,)*> {
             $exhaustive_custom_fn(
@@ -766,75 +786,13 @@ macro_rules! exhaustive_fixed_length_vecs {
     }
 }
 
-exhaustive_fixed_length_vecs!(
+exhaustive_vecs_fixed_length!(
+    (pub),
     ExhaustiveFixedLengthVecs2Inputs,
     exhaustive_vecs_fixed_length_2_inputs,
     exhaustive_vecs_length_2,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs3Inputs,
-    exhaustive_vecs_fixed_length_3_inputs,
-    exhaustive_vecs_length_3,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs4Inputs,
-    exhaustive_vecs_fixed_length_4_inputs,
-    exhaustive_vecs_length_4,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs],
-    [3, L, ws, ws_done, ws_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs5Inputs,
-    exhaustive_vecs_fixed_length_5_inputs,
-    exhaustive_vecs_length_5,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs],
-    [3, L, ws, ws_done, ws_outputs],
-    [4, M, vs, vs_done, vs_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs6Inputs,
-    exhaustive_vecs_fixed_length_6_inputs,
-    exhaustive_vecs_length_6,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs],
-    [3, L, ws, ws_done, ws_outputs],
-    [4, M, vs, vs_done, vs_outputs],
-    [5, N, us, us_done, us_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs7,
-    exhaustive_vecs_fixed_length_7_inputs,
-    exhaustive_vecs_length_7,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs],
-    [3, L, ws, ws_done, ws_outputs],
-    [4, M, vs, vs_done, vs_outputs],
-    [5, N, us, us_done, us_outputs],
-    [6, O, ts, ts_done, ts_outputs]
-);
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs8Inputs,
-    exhaustive_vecs_fixed_length_8_inputs,
-    exhaustive_vecs_length_8,
-    [0, I, xs, xs_done, xs_outputs],
-    [1, J, ys, ys_done, ys_outputs],
-    [2, K, zs, zs_done, zs_outputs],
-    [3, L, ws, ws_done, ws_outputs],
-    [4, M, vs, vs_done, vs_outputs],
-    [5, N, us, us_done, us_outputs],
-    [6, O, ts, ts_done, ts_outputs],
-    [7, P, ss, ss_done, ss_outputs]
 );
 
 #[doc(hidden)]
@@ -919,10 +877,10 @@ where
     }
 }
 
-/// Generates all `Vec`s of a given length with elements from a single iterator.
+/// Generates all [`Vec`]s of a given length with elements from a single iterator.
 ///
-/// This `struct` is created by the `exhaustive_vecs_fixed_length_from_single` function. See its
-/// documentation for more.
+/// This `struct` is created by [`exhaustive_vecs_fixed_length_from_single`]; see its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveFixedLengthVecs1Input<I: Iterator>
 where
@@ -948,63 +906,38 @@ where
     }
 }
 
-/// Generates all length-$n$ `Vec`s with elements from a single iterator.
+/// Generates all length-$n$ [`Vec`]s with elements from a single iterator.
 ///
-/// This function differs from `exhaustive_vecs_fixed_length_from_single` in that different
-/// `BitDistributorOutputType`s may be specified for each output element.
+/// This function differs from [`exhaustive_vecs_fixed_length_from_single`] in that different
+/// [`BitDistributorOutputType`](crate::iterators::bit_distributor::BitDistributorOutputType)s may
+/// be specified for each output element.
 ///
-/// The $i$th element of `output_types` is a `BitDistributorOutputType` that determines how quickly
-/// the $i$th output slot advances through the iterator; see the `BitDistributor` documentation for
-/// a description of the different types. The length of the output `Vec`s, $n$, is specified by the
+/// The $i$th element of `output_types` is a
+/// [`BitDistributorOutputType`](crate::iterators::bit_distributor::BitDistributorOutputType) that
+/// determines how quickly the $i$th output slot advances through the iterator; see the
+/// [`BitDistributor`](crate::iterators::bit_distributor::BitDistributor) documentation for a
+/// description of the different types. The length of the output [`Vec`]s, $n$, is specified by the
 /// length of `output_types`.
 ///
-/// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
+/// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$ is `len`.
 /// If `xs` is infinite, the output is also infinite.
 ///
-/// If `len` is 0, the output consists of one empty `Vec`.
+/// If `len` is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
-///
-/// # Complexity per iteration
-/// If all of `xs` is finite:
-///
-/// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
-///
-/// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
-///
-/// If `xs` is infinite:
-///
-/// Let $s$ be the sum of the weights of the normal output types, and let $t$ be the number of tiny
-/// outputs. Then define a weight function $W$ for each of the $k$ infinite outputs.
-/// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-/// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
-///
-/// Finally, we have
-///
-/// $$
-/// T(i, n) = O(n + \sum_{j=0}^{n-1}T^\prime(W_j(i)))
-/// $$
-///
-/// $$
-/// M(i, n) = O(n + \sum_{j=0}^{n-1}M^\prime(W_j(i)))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_1_input;
 ///
-/// // We are generating length-3 `Vec`s of chars using one input iterator, which produces all ASCII
-/// // chars. The third element has a tiny output type, so it will grow more slowly than the other
-/// // two elements (though it doesn't look that way from the first few `Vec`s).
+/// // We are generating length-3 [`Vec`]s of chars using one input iterator, which produces all
+/// // ASCII chars. The third element has a tiny output type, so it will grow more slowly than the
+/// // other two elements (though it doesn't look that way from the first few [`Vec`]s).
 /// let xss = exhaustive_vecs_fixed_length_1_input(
 ///     exhaustive_ascii_chars(),
 ///     &[
@@ -1060,37 +993,20 @@ where
     }
 }
 
-/// Generates all `Vec`s of a given length with elements from a single iterator.
+/// Generates all [`Vec`]s of a given length with elements from a single iterator.
 ///
 /// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
 /// If `xs` is infinite, the output is also infinite.
 ///
-/// If `len` is 0, the output consists of one empty `Vec`.
+/// If `len` is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
-///
-/// # Complexity per iteration
-/// If `xs` is finite:
-///
-/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
-///
-/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
-///
-/// If `xs` is infinite:
-///
-/// $T(i, n) = O(n + T^\prime(\sqrt\[n\]{i}))$
-///
-/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_from_single;
 ///
 /// let xss = exhaustive_vecs_fixed_length_from_single(2, 0..4).collect_vec();
@@ -1146,7 +1062,7 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 }
 
 #[inline]
-fn shortlex_vecs_from_element_iterator_helper<
+const fn shortlex_vecs_from_element_iterator_helper<
     T: Clone,
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
@@ -1157,7 +1073,7 @@ fn shortlex_vecs_from_element_iterator_helper<
     lex_dependent_pairs_stop_after_empty_ys(xs, LexVecsGenerator { ys })
 }
 
-/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// Generates all [`Vec`]s with elements from a specified iterator and with lengths from another
 /// iterator.
 #[derive(Clone, Debug)]
 pub struct ShortlexVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
@@ -1175,14 +1091,15 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
     }
 }
 
-/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// Generates all [`Vec`]s with elements from a specified iterator and with lengths from another
 /// iterator.
 ///
 /// The length-generating iterator is `xs`, and the element-generating iterator is `ys`.
 ///
-/// If the provided lengths are $\ell_0, \ell_1, \ell_2, \ldots$, then first all `Vec`s with length
-/// $\ell_0$ will be generated, in lexicographic order; then all `Vec`s with length $\ell_2$, and so
-/// on. If the lengths iterator has repetitions, then the generated `Vec`s will be repeated too.
+/// If the provided lengths are $\ell_0, \ell_1, \ell_2, \ldots$, then first all [`Vec`]s with
+/// length $\ell_0$ will be generated, in lexicographic order; then all [`Vec`]s with length
+/// $\ell_2$, and so on. If the lengths iterator has repetitions, then the generated [`Vec`]s will
+/// be repeated too.
 ///
 /// `ys` must be finite; if it's infinite, the output will never get past the first nonzero $\ell$.
 ///
@@ -1203,7 +1120,6 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_from_length_iterator;
@@ -1235,7 +1151,7 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// );
 /// ```
 #[inline]
-pub fn shortlex_vecs_from_length_iterator<
+pub const fn shortlex_vecs_from_length_iterator<
     T: Clone,
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
@@ -1246,31 +1162,23 @@ pub fn shortlex_vecs_from_length_iterator<
     ShortlexVecs(shortlex_vecs_from_element_iterator_helper(xs, ys))
 }
 
-/// Generates `Vec`s with elements from a specified iterator, in shortlex order.
+/// Generates [`Vec`]s with elements from a specified iterator, in shortlex order.
 ///
-/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
-/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
-/// specified by the input iterator.
+/// Shortlex order means that the [`Vec`]s are output from shortest to longest, and [`Vec`]s of the
+/// same length are output in lexicographic order with respect to the ordering of the [`Vec`]
+/// elements specified by the input iterator.
 ///
-/// `xs` must be finite; if it's infinite, only `Vec`s of length 0 and 1 are ever produced.
+/// `xs` must be finite; if it's infinite, only [`Vec`]s of length 0 and 1 are ever produced.
 ///
 /// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs;
 ///
@@ -1311,34 +1219,26 @@ where
     shortlex_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
 }
 
-/// Generates all `Vec`s with a minimum length and with elements from a specified iterator, in
+/// Generates all [`Vec`]s with a minimum length and with elements from a specified iterator, in
 /// shortlex order.
 ///
-/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
-/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
-/// specified by the input iterator.
+/// Shortlex order means that the [`Vec`]s are output from shortest to longest, and [`Vec`]s of the
+/// same length are output in lexicographic order with respect to the ordering of the [`Vec`]
+/// elements specified by the input iterator.
 ///
-/// `xs` must be finite; if it's infinite, only `Vec`s of length `min_length` (or 0 and 1, if
+/// `xs` must be finite; if it's infinite, only [`Vec`]s of length `min_length` (or 0 and 1, if
 /// `min_length` is 0) are ever produced.
 ///
 /// If `xs` is empty and `min_length` is 0, the output length is 1; if `xs` is empty and
 /// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
 ///
@@ -1385,15 +1285,15 @@ where
     )
 }
 
-/// Generates all `Vec`s with lengths in $[a, b)$ and with elements from a specified iterator, in
+/// Generates all [`Vec`]s with lengths in $[a, b)$ and with elements from a specified iterator, in
 /// shortlex order.
 ///
-/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
-/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
-/// specified by the input iterator.
+/// Shortlex order means that the [`Vec`]s are output from shortest to longest, and [`Vec`]s of the
+/// same length are output in lexicographic order with respect to the ordering of the [`Vec`]
+/// elements specified by the input iterator.
 ///
-/// `xs` must be finite; if it's infinite and $a < b$, only `Vec`s of length `a` (or 0 and 1, if `a`
-/// is 0) are ever produced.
+/// `xs` must be finite; if it's infinite and $a < b$, only [`Vec`]s of length `a` (or 0 and 1, if
+/// `a` is 0) are ever produced.
 ///
 /// The output length is
 /// $$
@@ -1401,24 +1301,13 @@ where
 /// $$
 /// where $k$ is `xs.count()`.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
-///
-/// # Panics
-/// Panics if `a` > `b`.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_range;
 ///
@@ -1444,24 +1333,27 @@ where
 #[inline]
 pub fn shortlex_vecs_length_range<I: Clone + Iterator>(
     a: u64,
-    b: u64,
+    mut b: u64,
     xs: I,
 ) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
+    if a > b {
+        b = a;
+    }
     shortlex_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
 }
 
-/// Generates all `Vec`s with lengths in $[a, b]$ and with elements from a specified iterator, in
+/// Generates all [`Vec`]s with lengths in $[a, b]$ and with elements from a specified iterator, in
 /// shortlex order.
 ///
-/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
-/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
-/// specified by the input iterator.
+/// Shortlex order means that the [`Vec`]s are output from shortest to longest, and [`Vec`]s of the
+/// same length are output in lexicographic order with respect to the ordering of the [`Vec`]
+/// elements specified by the input iterator.
 ///
-/// `xs` must be finite; if it's infinite, only `Vec`s of length `a` (or 0 and 1, if `a` is 0) are
-/// ever produced.
+/// `xs` must be finite; if it's infinite, only [`Vec`]s of length `a` (or 0 and 1, if `a` is 0)
+/// are ever produced.
 ///
 /// The output length is
 /// $$
@@ -1469,24 +1361,13 @@ where
 /// $$
 /// where $k$ is `xs.count()`.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
-///
-/// # Panics
-/// Panics if `a` > `b`.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_inclusive_range;
 ///
@@ -1511,14 +1392,18 @@ where
 /// ```
 #[inline]
 pub fn shortlex_vecs_length_inclusive_range<I: Clone + Iterator>(
-    a: u64,
-    b: u64,
+    mut a: u64,
+    mut b: u64,
     xs: I,
 ) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
-    shortlex_vecs_from_length_iterator(primitive_int_increasing_inclusive_range(a, b), xs)
+    if a > b {
+        a = 1;
+        b = 0;
+    }
+    shortlex_vecs_from_length_iterator(primitive_int_increasing_range(a, b.saturating_add(1)), xs)
 }
 
 #[doc(hidden)]
@@ -1541,7 +1426,7 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 }
 
 #[inline]
-fn exhaustive_vecs_from_element_iterator_helper<
+const fn exhaustive_vecs_from_element_iterator_helper<
     T: Clone,
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
@@ -1563,7 +1448,7 @@ fn exhaustive_vecs_from_element_iterator_helper<
     )
 }
 
-/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// Generates all [`Vec`]s with elements from a specified iterator and with lengths from another
 /// iterator.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
@@ -1588,12 +1473,12 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
     }
 }
 
-/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// Generates all [`Vec`]s with elements from a specified iterator and with lengths from another
 /// iterator.
 ///
 /// The length-generating iterator is `xs`, and the element-generating iterator is `ys`.
 ///
-/// If the lengths iterator has repetitions, then the generated `Vec`s will be repeated too.
+/// If the lengths iterator has repetitions, then the generated [`Vec`]s will be repeated too.
 ///
 /// There's one quirk if `ys` is empty: then the iterator will stop at some point after it
 /// encounters a nonzero $\ell$, even if there are zeros later on. This prevents the iterator
@@ -1613,7 +1498,6 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
@@ -1645,7 +1529,7 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_vecs_from_length_iterator<
+pub const fn exhaustive_vecs_from_length_iterator<
     T: Clone,
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
@@ -1656,25 +1540,17 @@ pub fn exhaustive_vecs_from_length_iterator<
     ExhaustiveVecs(exhaustive_vecs_from_element_iterator_helper(lengths, xs))
 }
 
-/// Generates all `Vec`s with elements from a specified iterator.
+/// Generates all [`Vec`]s with elements from a specified iterator.
 ///
 /// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs;
 ///
@@ -1717,26 +1593,18 @@ where
     exhaustive_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
 }
 
-/// Generates all `Vec`s with a minimum length and with elements from a specified iterator.
+/// Generates all [`Vec`]s with a minimum length and with elements from a specified iterator.
 ///
 /// If `xs` is empty and `min_length` is 0, the output length is 1; if `xs` is empty and
 /// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
 ///
@@ -1783,9 +1651,9 @@ where
     )
 }
 
-/// Generates all `Vec`s with lengths in $[a, b)$ and with elements from a specified iterator.
+/// Generates all [`Vec`]s with lengths in $[a, b)$ and with elements from a specified iterator.
 ///
-/// - If $a = b$, the output length is 0.
+/// - If $a \geq b$, the output length is 0.
 /// - If $a = 0$ and $b = 1$, the output length is 1.
 /// - If $a < b$, $b > 1$, and `xs` is infinite, the output length is infinite.
 /// - If `xs` is finite, the output length is
@@ -1794,24 +1662,13 @@ where
 ///   $$
 ///   where $k$ is `xs.count()`.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
-///
-/// # Panics
-/// Panics if `a` > `b`.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
 ///
@@ -1847,17 +1704,21 @@ where
 #[inline]
 pub fn exhaustive_vecs_length_range<I: Clone + Iterator>(
     a: u64,
-    b: u64,
+    mut b: u64,
     xs: I,
 ) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
+    if a > b {
+        b = a;
+    }
     exhaustive_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
 }
 
-/// Generates all `Vec`s with lengths in $[a, b]$ and with elements from a specified iterator.
+/// Generates all [`Vec`]s with lengths in $[a, b]$ and with elements from a specified iterator.
 ///
+/// - If $a > b$, the output length is 0.
 /// - If $a = b = 0$, the output length is 1.
 /// - If $a < b$, $b > 0$, and `xs` is infinite, the output length is infinite.
 /// - If `xs` is finite, the output length is
@@ -1866,24 +1727,16 @@ where
 ///   $$
 ///   where $k$ is `xs.count()`.
 ///
-/// The lengths of the output `Vec`s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Panics
-/// Panics if `a` > `b`.
+/// Panics if $a > b$.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
 ///
@@ -1918,14 +1771,18 @@ where
 /// ```
 #[inline]
 pub fn exhaustive_vecs_length_inclusive_range<I: Clone + Iterator>(
-    a: u64,
-    b: u64,
+    mut a: u64,
+    mut b: u64,
     xs: I,
 ) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
-    exhaustive_vecs_from_length_iterator(primitive_int_increasing_inclusive_range(a, b), xs)
+    if a > b {
+        a = 1;
+        b = 0;
+    }
+    exhaustive_vecs_from_length_iterator(primitive_int_increasing_range(a, b.saturating_add(1)), xs)
 }
 
 /// Generates all collections of elements from an iterator, where the collections are of a fixed
@@ -1959,7 +1816,8 @@ where
     }
 }
 
-pub(crate) fn fixed_length_ordered_unique_indices_helper(
+#[doc(hidden)]
+pub fn fixed_length_ordered_unique_indices_helper(
     n: usize,
     k: usize,
     indices: &mut [usize],
@@ -2034,9 +1892,9 @@ where
     }
 }
 
-/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
-/// has no repeated elements, and the elements in each `Vec` are ordered the same way as they are
-/// in the source iterator.
+/// Generates [`Vec`]s of a given length with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the same way as
+/// they are in the source iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -2048,28 +1906,15 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `Vec`.
+/// If $k$ is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_fixed_length;
 ///
 /// let xss = lex_ordered_unique_vecs_fixed_length(4, 1..=6).collect_vec();
@@ -2170,42 +2015,29 @@ where
     }
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
-/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
+/// elements, and the elements in each [`Vec`] are ordered the same way as they are in the source
 /// iterator.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length 2 and above will never be
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length 2 and above will never be
 /// generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs;
 ///
 /// let xss = shortlex_ordered_unique_vecs(1..=4).collect_vec();
@@ -2241,17 +2073,17 @@ where
     shortlex_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the same way as
 /// they are in the source iterator.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, \ell + 1)` and above
-/// will never be generated.
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, \ell + 1)` and
+/// above will never be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
@@ -2260,24 +2092,11 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_min_length;
 ///
 /// let xss = shortlex_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
@@ -2309,21 +2128,21 @@ where
     shortlex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -2332,24 +2151,11 @@ where
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_range;
 ///
 /// let xss = shortlex_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
@@ -2387,21 +2193,21 @@ where
     shortlex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `Vec`.
+/// If $a = b = 0$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -2410,24 +2216,11 @@ where
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_inclusive_range;
 ///
 /// let xss = shortlex_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
@@ -2576,11 +2369,11 @@ where
     }
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
-/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
+/// elements, and the elements in each [`Vec`] are ordered the same way as they are in the source
 /// iterator.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -2591,26 +2384,13 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 ///
 /// let xss = lex_ordered_unique_vecs(1..=4).collect_vec();
@@ -2646,11 +2426,11 @@ where
     lex_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the same way as
 /// they are in the source iterator.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -2664,24 +2444,11 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_min_length;
 ///
 /// let xss = lex_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
@@ -2713,11 +2480,11 @@ where
     lex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -2726,7 +2493,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -2735,24 +2502,11 @@ where
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime(i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime(i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_range;
 ///
 /// let xss = lex_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
@@ -2790,11 +2544,11 @@ where
     lex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -2803,7 +2557,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `Vec`.
+/// If $a = b = 0$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -2812,24 +2566,11 @@ where
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_inclusive_range;
 ///
 /// let xss = lex_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
@@ -2883,7 +2624,7 @@ where
 /// # Panics
 /// Panics if `max_bits` is zero. (However, `min_bits` may be zero.)
 ///
-/// /// # Examples
+/// # Examples
 /// ```
 /// extern crate itertools;
 ///
@@ -3097,9 +2838,9 @@ where
     }
 }
 
-/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
-/// has no repeated elements, and the elements in each `Vec` are ordered the same way as they are
-/// in the source iterator.
+/// Generates [`Vec`]s of a given length with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the same way as
+/// they are in the source iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -3109,28 +2850,15 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `Vec`.
+/// If $k$ is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_fixed_length;
 ///
 /// let xss = exhaustive_ordered_unique_vecs_fixed_length(4, 1..=6).collect_vec();
@@ -3166,8 +2894,8 @@ where
     exhaustive_ordered_unique_vecs_length_inclusive_range(k, k, xs)
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
-/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
+/// elements, and the elements in each [`Vec`] are ordered the same way as they are in the source
 /// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
@@ -3179,26 +2907,13 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs;
 ///
 /// let xss = exhaustive_ordered_unique_vecs(1..=4).collect_vec();
@@ -3234,8 +2949,8 @@ where
     exhaustive_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the same way as
 /// they are in the source iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
@@ -3250,24 +2965,11 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_min_length;
 ///
 /// let xss = exhaustive_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
@@ -3299,9 +3001,9 @@ where
     exhaustive_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -3310,7 +3012,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -3319,24 +3021,11 @@ where
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_range;
 ///
 /// let xss = exhaustive_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
@@ -3372,11 +3061,11 @@ where
     }
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
-/// way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
+/// the same way as they are in the source iterator.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -3385,7 +3074,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `Vec`.
+/// If $a = b = 0$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -3394,24 +3083,11 @@ where
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_inclusive_range;
 ///
 /// let xss = exhaustive_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
@@ -3469,20 +3145,23 @@ fn fixed_length_unique_indices_helper(indices: &mut [usize], used: &mut [bool]) 
     true
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
-pub(crate) struct UniqueIndices {
-    pub(crate) done: bool,
+pub struct UniqueIndices {
+    pub done: bool,
     first: bool,
     indices: Vec<usize>,
-    pub(crate) used: Vec<bool>,
+    pub used: Vec<bool>,
 }
 
 impl UniqueIndices {
-    pub(crate) fn get_n(&self) -> usize {
+    #[doc(hidden)]
+    pub fn get_n(&self) -> usize {
         self.used.len()
     }
 
-    pub(crate) fn increment_n(&mut self) {
+    #[doc(hidden)]
+    pub fn increment_n(&mut self) {
         self.used.push(false);
     }
 }
@@ -3505,7 +3184,8 @@ impl Iterator for UniqueIndices {
     }
 }
 
-pub(crate) fn unique_indices(n: usize, k: usize) -> UniqueIndices {
+#[doc(hidden)]
+pub fn unique_indices(n: usize, k: usize) -> UniqueIndices {
     UniqueIndices {
         done: n == 0 && k != 0,
         first: true,
@@ -3516,8 +3196,8 @@ pub(crate) fn unique_indices(n: usize, k: usize) -> UniqueIndices {
     }
 }
 
-/// Generates all `Vec`s of elements from an iterator, where the `Vec`s are of a fixed length and
-/// have no repetitions.
+/// Generates all [`Vec`]s of elements from an iterator, where the [`Vec`]s are of a fixed length
+/// and have no repetitions.
 #[derive(Clone)]
 pub struct LexUniqueVecsFixedLength<I: Iterator>
 where
@@ -3553,8 +3233,8 @@ where
     }
 }
 
-/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
-/// has no repeated elements.
+/// Generates [`Vec`]s of a given length with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -3569,28 +3249,15 @@ where
 /// (n)_ k = \prod_ {i=0}^{k-1}(n - i) = frac{n!}{(n-k)!}.
 /// $$
 ///
-/// If $k$ is 0, the output consists of one empty `Vec`.
+/// If $k$ is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_fixed_length;
 ///
 /// let xss = lex_unique_vecs_fixed_length(4, 1..=6).take(20).collect_vec();
@@ -3634,8 +3301,8 @@ where
     }
 }
 
-/// Generates all `Vec`s of elements from an iterator in shortlex order, where the `Vec`s have no
-/// repetitions.
+/// Generates all [`Vec`]s of elements from an iterator in shortlex order, where the [`Vec`]s have
+/// no repetitions.
 #[derive(Clone)]
 pub struct ShortlexUniqueVecs<I: Clone + Iterator>
 where
@@ -3691,15 +3358,15 @@ where
     }
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
 /// elements.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length 2 and above will never be
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length 2 and above will never be
 /// generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
@@ -3710,34 +3377,21 @@ where
 /// $$
 /// $$
 /// = \\begin{cases}
-///     1 & n = 0 \\\\
-///     2 & n = 1 \\\\
+///     1 & \text{if} \\quad n = 0, \\\\
+///     2 & \text{if} \\quad n = 1, \\\\
 ///     \operatorname{round}(en!) & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// See <https://oeis.org/A000522>.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs;
 ///
 /// let xss = shortlex_unique_vecs(1..=4).take(20).collect_vec();
@@ -3775,16 +3429,16 @@ where
     shortlex_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements.
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, \ell + 1)` and above
-/// will never be generated.
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, \ell + 1)` and
+/// above will never be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
@@ -3793,24 +3447,11 @@ where
 /// \sum_ {k=\ell}^n \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_min_length;
 ///
 /// let xss = shortlex_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
@@ -3851,20 +3492,20 @@ where
     shortlex_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -3873,24 +3514,11 @@ where
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_range;
 ///
 /// let xss = shortlex_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
@@ -3938,20 +3566,20 @@ where
     shortlex_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
-/// lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are generated in order of increasing length, and within each length they are
+/// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `Vec`.
+/// If $a = b = 0$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -3960,24 +3588,11 @@ where
 /// \sum_{i=a}^b \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_inclusive_range;
 ///
 /// let xss = shortlex_unique_vecs_length_inclusive_range(2, 3, 1..=4).take(20).collect_vec();
@@ -4120,10 +3735,10 @@ where
     }
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
 /// elements.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4138,34 +3753,21 @@ where
 /// $$
 /// $$
 /// = \\begin{cases}
-///     1 & n = 0 \\\\
-///     2 & n = 1 \\\\
+///     1 & \text{if} \\quad n = 0, \\\\
+///     2 & \text{if} \\quad n = 1, \\\\
 ///     \operatorname{round}(en!) & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// See <https://oeis.org/A000522>.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs;
 ///
 /// let xss = lex_unique_vecs(1..=4).take(20).collect_vec();
@@ -4203,10 +3805,10 @@ where
     lex_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements.
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4220,24 +3822,11 @@ where
 /// \sum_{i=\ell}^n \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_min_length;
 ///
 /// let xss = lex_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
@@ -4275,10 +3864,10 @@ where
     lex_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such  that each [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4287,7 +3876,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -4296,24 +3885,11 @@ where
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime(i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime(i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_length_range;
 ///
 /// let xss = lex_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
@@ -4361,10 +3937,10 @@ where
     lex_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements.
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
-/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4378,24 +3954,11 @@ where
 /// \sum_{i=\ell}^n \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\min(i, n) + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\min(i, n) + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_min_length;
 ///
 /// let xss = lex_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
@@ -4500,8 +4063,9 @@ pub struct ExhaustiveUniqueVecsGenerator<T: Clone, I: Iterator<Item = T>> {
 }
 
 impl<T: Clone, I: Iterator<Item = T>> ExhaustiveUniqueVecsGenerator<T, I> {
+    #[doc(hidden)]
     #[inline]
-    pub(crate) fn new() -> ExhaustiveUniqueVecsGenerator<T, I> {
+    pub const fn new() -> ExhaustiveUniqueVecsGenerator<T, I> {
         ExhaustiveUniqueVecsGenerator {
             phantom_i: PhantomData,
             phantom_t: PhantomData,
@@ -4519,7 +4083,7 @@ impl<T: Clone, I: Iterator<Item = T>>
     }
 }
 
-/// Generates all fixed-length `Vec`s of elements from an iterator, where the `Vec`s have no
+/// Generates all fixed-length [`Vec`]s of elements from an iterator, where the [`Vec`]s have no
 /// repetitions and are ordered the same way as in the iterator.
 #[derive(Clone)]
 pub enum ExhaustiveUniqueVecsFixedLength<I: Iterator>
@@ -4564,8 +4128,8 @@ where
     }
 }
 
-/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
-/// has no repeated elements.
+/// Generates [`Vec`]s of a given length with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4578,28 +4142,15 @@ where
 /// (n)_ k = \prod_ {i=0}^{k-1}(n - i) = frac{n!}{(n-k)!}.
 /// $$
 ///
-/// If $k$ is 0, the output consists of one empty `Vec`.
+/// If $k$ is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_fixed_length;
 ///
 /// let xss = exhaustive_unique_vecs_fixed_length(4, 1..=6).take(20).collect_vec();
@@ -4648,8 +4199,8 @@ where
     }
 }
 
-/// Generates all `Vec`s of elements from an iterator, where the `Vec`s have no repetitions and are
-/// ordered the same way as in the iterator.
+/// Generates all [`Vec`]s of elements from an iterator, where the [`Vec`]s have no repetitions and
+/// are ordered the same way as in the iterator.
 #[derive(Clone)]
 pub struct ExhaustiveUniqueVecs<I: Iterator>
 where
@@ -4677,7 +4228,7 @@ where
     }
 }
 
-/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// Generates [`Vec`]s with elements from a single iterator, such that each [`Vec`] has no repeated
 /// elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
@@ -4690,34 +4241,21 @@ where
 /// $$
 /// $$
 /// = \\begin{cases}
-///     1 & n = 0 \\\\
-///     2 & n = 1 \\\\
+///     1 & \text{if} \\quad n = 0, \\\\
+///     2 & \text{if} \\quad n = 1, \\\\
 ///     \operatorname{round}(en!) & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// See <https://oeis.org/A000522>.
 ///
-/// If `xs` is empty, the output consists of a single empty `Vec`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs;
 ///
 /// let xss = exhaustive_unique_vecs(1..=4).take(20).collect_vec();
@@ -4761,8 +4299,8 @@ where
     }
 }
 
-/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
-/// `Vec` has no repeated elements.
+/// Generates [`Vec`]s with a mininum length, with elements from a single iterator, such that each
+/// [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4773,24 +4311,11 @@ where
 /// \sum_ {k=\ell}^n \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_min_length;
 ///
 /// let xss = exhaustive_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
@@ -4837,14 +4362,14 @@ where
     }
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -4853,24 +4378,11 @@ where
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_range;
 ///
 /// let xss = exhaustive_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
@@ -4918,14 +4430,14 @@ where
     }
 }
 
-/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
-/// that each `Vec` has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
+/// such that each [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `Vec`.
+/// If $a = b = 0$, the output consists of a single empty [`Vec`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -4934,24 +4446,11 @@ where
 /// \sum_{i=a}^b \frac{n!}{k!}.
 /// $$
 ///
-/// # Complexity per iteration
-/// $$
-/// T(i) = O(\log i + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i) = O(\log i + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_inclusive_range;
 ///
 /// let xss = exhaustive_unique_vecs_length_inclusive_range(2, 3, 1..=4).take(20).collect_vec();

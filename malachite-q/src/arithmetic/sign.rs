@@ -3,16 +3,17 @@ use std::cmp::Ordering;
 use Rational;
 
 impl Sign for Rational {
-    /// Returns the sign of an `Rational`. Interpret the result as the result of a comparison to
-    /// zero, so that `Equal` means zero, `Greater` means positive, and `Less` means negative.
+    /// Compares a [`Rational`] to zero.
+    ///
+    /// Returns `Greater`, `Equal`, or `Less`, depending on whether the [`Rational`] is positive,
+    /// zero, or negative, respectively.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::Zero;

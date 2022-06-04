@@ -3,7 +3,8 @@ use malachite_nz::natural::Natural;
 use Rational;
 
 impl From<Natural> for Rational {
-    /// Converts a `Natural` to a `Rational`, taking the `Natural` by value.
+    /// Converts a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`], taking the
+    /// [`Natural`](malachite_nz::natural::Natural) by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -11,7 +12,6 @@ impl From<Natural> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -28,7 +28,8 @@ impl From<Natural> for Rational {
 }
 
 impl<'a> From<&'a Natural> for Rational {
-    /// Converts a `Natural` to a `Rational`, taking the `Natural` by reference.
+    /// Converts a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`], taking the
+    /// [`Natural`](malachite_nz::natural::Natural) by reference.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -40,7 +41,6 @@ impl<'a> From<&'a Natural> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;

@@ -1,24 +1,13 @@
-use comparison::traits::{Max, Min};
-use num::arithmetic::traits::{
-    CheckedMul, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign,
-    SaturatingMul, UnsignedAbs, WrappingSub,
-};
-use num::basic::traits::Zero;
+use num::arithmetic::traits::{SaturatingAddMul, SaturatingAddMulAssign, UnsignedAbs};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
-fn saturating_add_mul_unsigned<T: SaturatingAdd<T, Output = T> + SaturatingMul<T, Output = T>>(
-    x: T,
-    y: T,
-    z: T,
-) -> T {
+fn saturating_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> T {
     x.saturating_add(y.saturating_mul(z))
 }
 
-fn saturating_add_mul_assign_unsigned<T: SaturatingAddAssign<T> + SaturatingMul<T, Output = T>>(
-    x: &mut T,
-    y: T,
-    z: T,
-) {
+fn saturating_add_mul_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, y: T, z: T) {
     x.saturating_add_assign(y.saturating_mul(z));
 }
 
@@ -27,22 +16,23 @@ macro_rules! impl_saturating_add_mul_unsigned {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes $x + yz$, saturating at the numeric bounds instead of overflowing.
+            /// Adds a number and the product of two other numbers, saturating at the numeric
+            /// bounds instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     x + yz & m \leq x + yz \leq M \\\\
-            ///     M & x + yz > M \\\\
-            ///     m & x + yz < m,
+            ///     x + yz & \text{if} \\quad m \leq x + yz \leq M, \\\\
+            ///     M & \text{if} \\quad x + yz > M, \\\\
+            ///     m & \text{if} \\quad x + yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
+            /// See [here](super::saturating_add_mul#saturating_add_mul).
             #[inline]
             fn saturating_add_mul(self, y: $t, z: $t) -> $t {
                 saturating_add_mul_unsigned(self, y, z)
@@ -50,23 +40,23 @@ macro_rules! impl_saturating_add_mul_unsigned {
         }
 
         impl SaturatingAddMulAssign<$t> for $t {
-            /// Replaces $x$ with $x + yz$, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Adds a number and the product of two other numbers in place, saturating at the
+            /// numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x + yz & m \leq x + yz \leq M \\\\
-            ///     M & x + yz > M \\\\
-            ///     m & x + yz < m,
+            ///     x + yz & \text{if} \\quad m \leq x + yz \leq M, \\\\
+            ///     M & \text{if} \\quad x + yz > M, \\\\
+            ///     m & \text{if} \\quad x + yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
+            /// See [here](super::saturating_add#saturating_add_mul_assign).
             #[inline]
             fn saturating_add_mul_assign(&mut self, y: $t, z: $t) {
                 saturating_add_mul_assign_unsigned(self, y, z);
@@ -77,16 +67,8 @@ macro_rules! impl_saturating_add_mul_unsigned {
 apply_to_unsigneds!(impl_saturating_add_mul_unsigned);
 
 fn saturating_add_mul_signed<
-    U: CheckedMul<U, Output = U> + Copy + Ord + WrappingSub<U, Output = U>,
-    S: Copy
-        + Max
-        + Min
-        + Ord
-        + SaturatingAdd<S, Output = S>
-        + SaturatingMul<S, Output = S>
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: S,
     y: S,
@@ -125,22 +107,23 @@ macro_rules! impl_saturating_add_mul_signed {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes $x + yz$, saturating at the numeric bounds instead of overflowing.
+            /// Adds a number and the product of two other numbers, saturating at the numeric
+            /// bounds instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     x + yz & m \leq x + yz \leq M \\\\
-            ///     M & x + yz > M \\\\
-            ///     m & x + yz < m,
+            ///     x + yz & \text{if} \\quad m \leq x + yz \leq M, \\\\
+            ///     M & \text{if} \\quad x + yz > M, \\\\
+            ///     m & \text{if} \\quad x + yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
+            /// See [here](super::saturating_add_mul#saturating_add_mul_assign).
             #[inline]
             fn saturating_add_mul(self, y: $t, z: $t) -> $t {
                 saturating_add_mul_signed(self, y, z)
@@ -148,23 +131,23 @@ macro_rules! impl_saturating_add_mul_signed {
         }
 
         impl SaturatingAddMulAssign<$t> for $t {
-            /// Replaces $x$ with $x + yz$, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Adds a number and the product of two other numbers in place, saturating at the
+            /// numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x + yz & m \leq x + yz \leq M \\\\
-            ///     M & x + yz > M \\\\
-            ///     m & x + yz < m,
+            ///     x + yz & \text{if} \\quad m \leq x + yz \leq M, \\\\
+            ///     M & \text{if} \\quad x + yz > M, \\\\
+            ///     m & \text{if} \\quad x + yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
+            /// See [here](super::saturating_add_mul#saturating_add_mul_assign).
             #[inline]
             fn saturating_add_mul_assign(&mut self, y: $t, z: $t) {
                 *self = self.saturating_add_mul(y, z);

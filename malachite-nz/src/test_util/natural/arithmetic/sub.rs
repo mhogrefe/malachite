@@ -12,8 +12,8 @@ pub fn limbs_sub_same_length_in_place_with_overlap_naive(
     borrow
 }
 
-/// Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
-/// `&xs[xs.len() - ys.len()..]` and `&ys`, and writes the limbs of the result to `&xs[..ys.len()]`.
+// Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
+// `&xs[xs.len() - ys.len()..]` and `&ys`, and writes the limbs of the result to `&xs[..ys.len()]`.
 pub fn limbs_sub_same_length_to_out_with_overlap_naive(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let y_len = ys.len();
     let mut x = xs[xs.len() - y_len..].to_vec();

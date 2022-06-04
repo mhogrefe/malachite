@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, UnsignedAbs,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use natural::Natural;
 use std::ops::{Shr, ShrAssign};
 
-fn mod_power_of_2_shr_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shr_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
     pow: u64,
@@ -20,7 +20,7 @@ where
     }
 }
 
-fn mod_power_of_2_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shr_assign<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &mut Natural,
     bits: S,
     pow: u64,
@@ -39,27 +39,21 @@ macro_rules! impl_mod_power_of_2_shr_signed {
         impl ModPowerOf2Shr<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod 2<sup>`pow`</sup>, taking
-            /// the `Natural` by value. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo $2^k$. Assumes the
+            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by value.
             ///
-            /// Time: worst case O(n)
+            /// $f(x, n, k) = y$, where $x, y < 2^k$ and
+            /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
             ///
-            /// Additional memory: worst case O(m)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()` + `bits`, m = `bits`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(-5i16, 8), 96);
-            /// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(-100i64, 80), 0);
-            /// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(2i8, 8), 30);
-            /// ```
+            /// See [here](super::mod_power_of_2_shr#mod_power_of_2_shr).
             #[inline]
             fn mod_power_of_2_shr(mut self, bits: $t, pow: u64) -> Natural {
                 self.mod_power_of_2_shr_assign(bits, pow);
@@ -70,28 +64,21 @@ macro_rules! impl_mod_power_of_2_shr_signed {
         impl<'a> ModPowerOf2Shr<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) mod 2<sup>`pow`</sup>, taking
-            /// the `Natural` by reference. Assumes the input is already reduced mod
-            /// 2<sup>`pow`</sup>.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo $2^k$. Assumes the
+            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by reference.
             ///
-            /// Time: worst case O(n)
+            /// $f(x, n, k) = y$, where $x, y < 2^k$ and
+            /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()` + `bits`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shr;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(-5i16, 8), 96);
-            /// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(-100i64, 80), 0);
-            /// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(2i8, 8), 30);
-            /// ```
+            /// See [here](super::mod_power_of_2_shr#mod_power_of_2_shr).
             #[inline]
             fn mod_power_of_2_shr(self, bits: $t, pow: u64) -> Natural {
                 mod_power_of_2_shr_ref(self, bits, pow)
@@ -99,35 +86,20 @@ macro_rules! impl_mod_power_of_2_shr_signed {
         }
 
         impl ModPowerOf2ShrAssign<$t> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2) mod 2<sup>`pow`</sup>, in
-            /// place. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+            /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo $2^k$, in place.
+            /// Assumes the input is already reduced modulo $2^k$.
             ///
-            /// Time: worst case O(n)
+            /// $x \gets y$, where $x, y < 2^k$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
             ///
-            /// Additional memory: worst case O(m)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()` + `bits`, m = `bits`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2ShrAssign;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut n = Natural::from(123u32);
-            /// n.mod_power_of_2_shr_assign(-5i16, 8);
-            /// assert_eq!(n, 96);
-            ///
-            /// let mut n = Natural::from(123u32);
-            /// n.mod_power_of_2_shr_assign(-100i64, 80);
-            /// assert_eq!(n, 0);
-            ///
-            /// let mut n = Natural::from(123u32);
-            /// n.mod_power_of_2_shr_assign(2i8, 8);
-            /// assert_eq!(n, 30);
-            /// ```
+            /// See [here](super::mod_power_of_2_shr#mod_power_of_2_shr_assign).
             #[inline]
             fn mod_power_of_2_shr_assign(&mut self, bits: $t, pow: u64) {
                 mod_power_of_2_shr_assign(self, bits, pow);

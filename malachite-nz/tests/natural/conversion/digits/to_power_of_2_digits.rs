@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2;
+use malachite_base::num::arithmetic::traits::{FloorLogBasePowerOf2, Pow};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -82,11 +82,11 @@ where
     Natural: PowerOf2Digits<T>,
 {
     assert_panic!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(
-        &Natural::trillion(),
+        &Natural::from(10u32).pow(12),
         0
     ));
     assert_panic!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(
-        &Natural::trillion(),
+        &Natural::from(10u32).pow(12),
         T::WIDTH + 1
     ));
 }
@@ -138,11 +138,11 @@ where
     Natural: PowerOf2Digits<T>,
 {
     assert_panic!(PowerOf2Digits::<T>::to_power_of_2_digits_desc(
-        &Natural::trillion(),
+        &Natural::from(10u32).pow(12),
         0
     ));
     assert_panic!(PowerOf2Digits::<T>::to_power_of_2_digits_desc(
-        &Natural::trillion(),
+        &Natural::from(10u32).pow(12),
         T::WIDTH + 1
     ));
 }
@@ -197,7 +197,7 @@ fn test_to_power_of_2_digits_asc_natural() {
 #[test]
 #[should_panic]
 fn to_power_of_2_digits_asc_natural_fail() {
-    PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::trillion(), 0);
+    PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::from(10u32).pow(12), 0);
 }
 
 #[test]
@@ -240,7 +240,7 @@ fn test_to_power_of_2_digits_desc_natural() {
 #[test]
 #[should_panic]
 fn to_power_of_2_digits_desc_natural_fail() {
-    PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::trillion(), 0);
+    PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::from(10u32).pow(12), 0);
 }
 
 fn to_power_of_2_digits_asc_properties_helper<

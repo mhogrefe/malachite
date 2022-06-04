@@ -1,34 +1,27 @@
-use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
-use std::ops::{BitOr, Shl, Shr};
 
 #[inline]
-fn join_halves<T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>, H: PrimitiveInt>(
-    upper: H,
-    lower: H,
-) -> T {
+fn join_halves<T: From<H> + PrimitiveUnsigned, H: PrimitiveUnsigned>(upper: H, lower: H) -> T {
     T::from(upper) << H::WIDTH | T::from(lower)
 }
 
 #[inline]
-fn upper_half<T: Copy + Shr<u64, Output = T>, H: PrimitiveInt + WrappingFrom<T>>(x: &T) -> H {
+fn upper_half<T: PrimitiveUnsigned, H: PrimitiveUnsigned + WrappingFrom<T>>(x: &T) -> H {
     H::wrapping_from(*x >> H::WIDTH)
 }
 
 macro_rules! impl_half_traits {
     ($t:ident, $ht: ident) => {
-        /// Implements `HasHalf` for unsigned primitive integers.
         impl HasHalf for $t {
-            /// The primitive integer type whose width is half of `Self`.
+            /// The primitive integer type whose width is half of `Self`'s.
             type Half = $ht;
         }
 
-        /// Implements `JoinHalves` for unsigned primitive integers.
         impl JoinHalves for $t {
             /// Joins two unsigned integers to form an unsigned integer with twice the width.
             ///
-            /// Let $W$ be `$t::WIDTH`.
+            /// Let $W$ be the width of `Self` (the output type).
             ///
             /// $f(x, y) = 2^{W/2} x + y$.
             ///
@@ -36,35 +29,33 @@ macro_rules! impl_half_traits {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::half` module.
+            /// See [here](super::half#join_halves).
             #[inline]
             fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
                 join_halves(upper, lower)
             }
         }
 
-        /// Implements `SplitInHalf` for unsigned primitive integers.
-        ///
-        /// # Examples
-        /// See the documentation of the `num::comparison::half` module.
         impl SplitInHalf for $t {
-            /// Extracts the lower, or least significant half, of and unsigned integer.
+            /// Extracts the lower, or least significant, half of an unsigned integer.
             ///
-            /// Let $W$ be `$t::WIDTH`.
+            /// Let $W$ be the width of `Self` (the input type).
             ///
-            /// $f(n) = m$, where $m < 2^{W/2}$ and $n + 2^{W/2} k = m$ for some $k \in Z$.
+            /// $f(n) = m$, where $m < 2^{W/2}$ and $n + 2^{W/2} k = m$ for some $k \in \Z$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::half` module.
+            /// See [here](super::half#lower_half).
             #[inline]
             fn lower_half(&self) -> Self::Half {
                 $ht::wrapping_from(*self)
             }
 
-            /// Extracts the upper, or most significant half, of an unsigned integer.
+            /// Extracts the upper, or most-significant, half of an unsigned integer.
+            ///
+            /// Let $W$ be the width of `Self` (the input type).
             ///
             /// $f(n) = \lfloor \frac{n}{2^{W/2}} \rfloor$.
             ///
@@ -72,7 +63,7 @@ macro_rules! impl_half_traits {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::half` module.
+            /// See [here](super::half#upper_half).
             #[inline]
             fn upper_half(&self) -> Self::Half {
                 upper_half(self)

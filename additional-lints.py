@@ -57,13 +57,73 @@ MAX_LINE_LENGTH = 100
 #        process_block(block)
 #    return i - 1
 
+line_length_exceptions = set((
+    # long Markdown table rows and/or links
+    ('./malachite-base/src/num/arithmetic/mod.rs', 267),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 268),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1017),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1257),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1258),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1259),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1260),
+    ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 102),
+    ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 156),
+    ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 158),
+    ('./malachite-base/src/num/exhaustive/mod.rs', 1031),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 23),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 24),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 25),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 53),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 54),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 65),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 66),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 67),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 97),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 99),
+    ('./malachite-nz/src/lib.rs', 28),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 30),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 31),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 32),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 117),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 118),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 141),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 142),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 143),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 521),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 523),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 540),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 542),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 854),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 856),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 331),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 486),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 516),
+    ('./malachite-nz/src/natural/conversion/mod.rs', 189),
+    ('./malachite-q/src/arithmetic/mod.rs', 70),
+    ('./malachite-q/src/arithmetic/mod.rs', 72),
+    ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 187),
+    ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 213),
+    ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 290),
+    ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 316),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 14),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 83),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 122),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 207),
+    ('./malachite-q/src/exhaustive/mod.rs', 36),
+    ('./malachite-q/src/exhaustive/mod.rs', 38),
+))
+
 def lint(filename):
     i = 1
     with open(filename) as f:
         for line in f.readlines():
             line = line.rstrip()
-            if len(line) > MAX_LINE_LENGTH:
-                raise ValueError('line too long: ' + filename + ': ' + str(i) + ' ' + line)
+            is_exception = (filename, i) in line_length_exceptions
+            if is_exception:
+                if len(line) <= MAX_LINE_LENGTH:
+                    raise ValueError(f'line not too long: {filename}: {i} {line}')
+            elif len(line) > MAX_LINE_LENGTH:
+                raise ValueError(f'line too long: {filename}: {i} {line}')
             i += 1
     return i - 1
 

@@ -3,7 +3,7 @@ use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, T
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
 use malachite_nz::test_util::bench::bucketers::{
     integer_bit_bucketer, pair_1_integer_bit_bucketer, triple_1_integer_bit_bucketer,
     triple_3_integer_bit_bucketer, triple_3_pair_1_integer_bit_bucketer,

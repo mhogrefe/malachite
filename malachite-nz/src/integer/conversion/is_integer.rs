@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::num::conversion::traits::IsInteger;
 
 impl<'a> IsInteger for &'a Integer {
-    /// Determines whether an `Integer` is an integer. It always returns `true`.
+    /// Determines whether an [`Integer`] is an integer. It always returns `true`.
     ///
     /// $f(x) = \textrm{true}$.
     ///
@@ -12,7 +12,6 @@ impl<'a> IsInteger for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
     /// use malachite_base::num::conversion::traits::IsInteger;

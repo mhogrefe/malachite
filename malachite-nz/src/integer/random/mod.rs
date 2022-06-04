@@ -21,9 +21,9 @@ use natural::random::{
 };
 use natural::Natural;
 
-/// Generates random `Integer`s, given an iterator of random signed bit lengths.
+/// Generates random [`Integer`]s, given an iterator of random signed bit lengths.
 ///
-/// The `Integer`'s sign is taken from the sign of the bit length.
+/// The [`Integer`]'s signs are taken from the signs of the bit lengths.
 #[derive(Clone, Debug)]
 pub struct RandomIntegers<I: Iterator<Item = i64>> {
     bits: I,
@@ -42,32 +42,32 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
     }
 }
 
-/// Generates random natural (non-negative) `Integer`s with a specified mean bit length.
+/// Generates random natural (non-negative) [`Integer`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 0. Then an `Integer` is
-/// chosen uniformly among all non-negative `Integer`s with that bit length. The resulting
+/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 0. Then an [`Integer`]
+/// is chosen uniformly among all non-negative [`Integer`]s with that bit length. The resulting
 /// distribution resembles a Pareto distribution. It has no mean or higher-order statistics (unless
 /// $m < 1$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
-///     0 & n < 0 \\\\
-///     \\frac{1}{m + 1} & n = 0 \\\\
+///     0 & \text{if} \\quad n < 0, \\\\
+///     \\frac{1}{m + 1} & \text{if} \\quad n = 0, \\\\
 ///     \\frac{2}{m+1} \\left ( \\frac{m}{2(m+1)} \\right ) ^ {\\lfloor \\log_2 n \\rfloor + 1} &
-///     \\text{otherwise}
+///     \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` /
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if after being reduced
@@ -75,32 +75,17 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_natural_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_natural_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "20431208470830262",
-///         "2777240",
-///         "114",
-///         "12184833305054",
-///         "1121025855008623490210",
-///         "13478874522577592",
-///         "115311695",
-///         "7",
-///         "18",
-///         "54522366353"
-///     ]
+///     prefix_to_string(random_natural_integers(EXAMPLE_SEED, 32, 1), 10),
+///     "[20431208470830262, 2777240, 114, 12184833305054, 1121025855008623490210, \
+///     13478874522577592, 115311695, 7, 18, 54522366353, ...]"
 /// )
 /// ```
 pub fn random_natural_integers(
@@ -118,32 +103,31 @@ pub fn random_natural_integers(
     }
 }
 
-/// Generates random positive `Integer`s with a specified mean bit length.
+/// Generates random positive [`Integer`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then an `Integer` is
-/// chosen uniformly among all positive `Integer`s with that bit length. The resulting distribution
-/// resembles a Pareto distribution. It has no mean or higher-order statistics (unless $m < 2$,
-/// which is not typical).
+/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then an [`Integer`]
+/// is chosen uniformly among all positive [`Integer`]s with that bit length. The resulting
+/// distribution resembles a Pareto distribution. It has no mean or higher-order statistics (unless
+/// $m < 2$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
-///     0 & n \leq 0 \\\\
-///     \frac{1}{m} \left ( \frac{m-1}{2m} \right ) ^ {\lfloor \log_2 n \rfloor} & \\text{otherwise}
+///     0 & \text{if} \\quad n \leq 0, \\\\
+///     \frac{1}{m} \left ( \frac{m-1}{2m} \right ) ^ {\lfloor \log_2 n \rfloor} &
+///         \\text{otherwise}.
 /// \\end{cases}
 /// $$
-///
-/// This would be a Pareto distribution, if it were not for the floor.
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` /
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -151,32 +135,17 @@ pub fn random_natural_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_positive_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_positive_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "22",
-///         "4",
-///         "178",
-///         "55845661150",
-///         "93254818",
-///         "7577967529619388",
-///         "8",
-///         "11316951483471",
-///         "11",
-///         "1005760138411689342464923704482"
-///     ]
+///     prefix_to_string(random_positive_integers(EXAMPLE_SEED, 32, 1), 10),
+///     "[22, 4, 178, 55845661150, 93254818, 7577967529619388, 8, 11316951483471, 11, \
+///     1005760138411689342464923704482, ...]"
 /// )
 /// ```
 pub fn random_positive_integers(
@@ -194,33 +163,31 @@ pub fn random_positive_integers(
     }
 }
 
-/// Generates random negative `Integer`s whose absolute values have a specified mean bit length.
+/// Generates random negative [`Integer`]s whose absolute values have a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then an `Integer` is
-/// chosen uniformly among all positive `Integer`s with that bit length, and negated. The resulting
-/// distribution resembles a negated Pareto distribution. It has no mean or higher-order statistics
-/// (unless $m < 2$, which is not typical).
+/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then an [`Integer`]
+/// is chosen uniformly among all positive [`Integer`]s with that bit length, and negated. The
+/// resulting distribution resembles a negated Pareto distribution. It has no mean or higher-order
+/// statistics (unless $m < 2$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
-///     0 & n \geq 0 \\\\
+///     0 & \text{if} \\quad n \geq 0 ,\\\\
 ///     \frac{1}{m} \left ( \frac{m-1}{2m} \right ) ^ {\lfloor \log_2 (-n) \rfloor}
-///     & \\text{otherwise}
+///     & \\text{otherwise}.
 /// \\end{cases}
 /// $$
-///
-/// This would be a negated Pareto distribution, if it were not for the floor.
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -228,32 +195,17 @@ pub fn random_positive_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_negative_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_negative_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "-22",
-///         "-4",
-///         "-178",
-///         "-55845661150",
-///         "-93254818",
-///         "-7577967529619388",
-///         "-8",
-///         "-11316951483471",
-///         "-11",
-///         "-1005760138411689342464923704482"
-///     ]
+///     prefix_to_string(random_negative_integers(EXAMPLE_SEED, 32, 1), 10),
+///     "[-22, -4, -178, -55845661150, -93254818, -7577967529619388, -8, -11316951483471, -11, \
+///     -1005760138411689342464923704482, ...]"
 /// )
 /// ```
 pub fn random_negative_integers(
@@ -271,32 +223,32 @@ pub fn random_negative_integers(
     }
 }
 
-/// Generates random nonzero `Integer`s whose absolute values have a specified mean bit length.
+/// Generates random nonzero [`Integer`]s whose absolute values have a specified mean bit length.
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// `geometric_random_nonzero_signeds`); $m$ must be greater than 1. Then an `Integer` is
-/// chosen uniformly among all positive `Integer`s with that bit length, and its sign is set to the
-/// sign of the signed bit length. The resulting distribution has no mean or higher-order statistics
-/// (unless $m < 2$, which is not typical).
+/// [`geometric_random_nonzero_signeds`](geometric_random_nonzero_signeds)); $m$ must be greater
+/// than 1. Then an [`Integer`] is chosen uniformly among all positive [`Integer`]s with that bit
+/// length, and its sign is set to the sign of the signed bit length. The resulting distribution
+/// has no mean or higher-order statistics (unless $m < 2$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
-///     0 & n = 0 \\\\
+///     0 & \text{if} \\quad n = 0, \\\\
 ///     \\frac{1}{2m} \\left ( \\frac{m-1}{2m} \\right ) ^ {\\lfloor \\log_2 |n| \\rfloor}
-///     & \\text{otherwise}
+///     & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -304,32 +256,17 @@ pub fn random_negative_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_nonzero_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_nonzero_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "6",
-///         "373973144",
-///         "46887963477285686350042496363292819122",
-///         "-93254818",
-///         "-126908",
-///         "-4471675267836600",
-///         "1860142159",
-///         "-118004986915853475",
-///         "-98",
-///         "346513"
-///     ]
+///     prefix_to_string(random_nonzero_integers(EXAMPLE_SEED, 32, 1), 10),
+///     "[6, 373973144, 46887963477285686350042496363292819122, -93254818, -126908, \
+///     -4471675267836600, 1860142159, -118004986915853475, -98, 346513, ...]"
 /// )
 /// ```
 pub fn random_nonzero_integers(
@@ -347,32 +284,32 @@ pub fn random_nonzero_integers(
     }
 }
 
-/// Generates random `Integer`s whose absolute values have a specified mean bit length.
+/// Generates random [`Integer`]s whose absolute values have a specified mean bit length.
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// `geometric_random_nonzero_signeds`); $m$ must be greater than 0. Then an `Integer` is
-/// chosen uniformly among all `Integer`s with that bit length, and its sign is set to the sign of
-/// the signed bit length. The resulting distribution has no mean or higher-order statistics (unless
-/// $m < 1$, which is not typical).
+/// [`geometric_random_signeds`](geometric_random_signeds)); $m$ must be greater than 0. Then an
+/// [`Integer`] is chosen uniformly among all [`Integer`]s with that bit length, and its sign is
+/// set to the sign of the signed bit length. The resulting distribution has no mean or
+/// higher-order statistics (unless $m < 1$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
-///     \\frac{1}{2m+1} & n = 0 \\\\
+///     \\frac{1}{2m+1} & \text{if} \\quad n = 0, \\\\
 ///     \\frac{2}{2m+1} \\left ( \\frac{m}{2(m+1)} \\right ) ^ {\\lfloor \\log_2 |n| \\rfloor + 1}
-///     & \\text{otherwise}
+///     & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if after being reduced
@@ -380,32 +317,17 @@ pub fn random_nonzero_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "89270",
-///         "69403499476962893258904",
-///         "62",
-///         "-1848070042786",
-///         "-64671510460",
-///         "-696",
-///         "0",
-///         "-79",
-///         "70819",
-///         "7330"
-///     ]
+///     prefix_to_string(random_integers(EXAMPLE_SEED, 32, 1), 10),
+///     "[89270, 69403499476962893258904, 62, -1848070042786, -64671510460, -696, 0, -79, 70819, \
+///     7330, ...]"
 /// )
 /// ```
 pub fn random_integers(
@@ -423,9 +345,9 @@ pub fn random_integers(
     }
 }
 
-/// Generates striped random `Integer`s, given an iterator of random signed bit lengths.
+/// Generates striped random [`Integer`]s, given an iterator of random signed bit lengths.
 ///
-/// The `Integer`s sign is taken from the sign of the bit length.
+/// The [`Integer`]s signs are taken from the signs of the bit lengths.
 #[derive(Clone, Debug)]
 pub struct StripedRandomIntegers<I: Iterator<Item = i64>> {
     bits: I,
@@ -444,23 +366,25 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
     }
 }
 
-/// Generates striped random natural (non-negative) `Integer`s with a specified mean bit length.
+/// Generates striped random natural (non-negative) [`Integer`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
 /// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 0. A striped bit
-/// sequence (see `StripedBitSource`) with the given stripe parameter is generated and truncated at
-/// the bit length. The highest bit is forced to be 1, and the `Integer` is generated from the
-/// sequence.
+/// sequence with the given stripe parameter is generated and truncated at the bit length. The
+/// highest bit is forced to be 1, and the [`Integer`] is generated from the sequence.
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -470,32 +394,17 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_natural_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_natural_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "18014656207519744",
-///         "2228160",
-///         "64",
-///         "17592184995840",
-///         "1179440951012584587264",
-///         "9007749010526207",
-///         "67108864",
-///         "5",
-///         "24",
-///         "34359738879"
-///     ]
+///     prefix_to_string(striped_random_natural_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     "[18014656207519744, 2228160, 64, 17592184995840, 1179440951012584587264, \
+///     9007749010526207, 67108864, 5, 24, 34359738879, ...]"
 /// )
 /// ```
 pub fn striped_random_natural_integers(
@@ -519,23 +428,25 @@ pub fn striped_random_natural_integers(
     }
 }
 
-/// Generates striped random positive `Integer`s with a specified mean bit length.
+/// Generates striped random positive [`Integer`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
 /// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. A striped bit
-/// sequence (see `StripedBitSource`) with the given stripe parameter is generated and truncated at
-/// the bit length. The highest bit is forced to be 1, and the `Integer` is generated from the
-/// sequence.
+/// sequence with the given stripe parameter is generated and truncated at the bit length. The
+/// highest bit is forced to be 1, and the [`Integer`] is generated from the sequence.
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -544,32 +455,17 @@ pub fn striped_random_natural_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_positive_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_positive_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "16",
-///         "4",
-///         "128",
-///         "34391195648",
-///         "75493376",
-///         "9007199120523391",
-///         "8",
-///         "8796094070783",
-///         "8",
-///         "950737950171027935941967741439"
-///     ]
+///     prefix_to_string(striped_random_positive_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     "[16, 4, 128, 34391195648, 75493376, 9007199120523391, 8, 8796094070783, 8, \
+///     950737950171027935941967741439, ...]"
 /// )
 /// ```
 pub fn striped_random_positive_integers(
@@ -593,24 +489,26 @@ pub fn striped_random_positive_integers(
     }
 }
 
-/// Generates striped random negative `Integer`s whose absolute values have a specified mean bit
+/// Generates striped random negative [`Integer`]s whose absolute values have a specified mean bit
 /// length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
 /// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. A striped bit
-/// sequence (see `StripedBitSource`) with the given stripe parameter is generated and truncated at
-/// the bit length. The highest bit is forced to be 1, and the `Integer` is generated from the
-/// sequence and negated.
+/// sequence with the given stripe parameter is generated and truncated at the bit length. The
+/// highest bit is forced to be 1, and the [`Integer`] is generated from the sequence and negated.
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -619,32 +517,17 @@ pub fn striped_random_positive_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_negative_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_negative_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "-16",
-///         "-4",
-///         "-128",
-///         "-34391195648",
-///         "-75493376",
-///         "-9007199120523391",
-///         "-8",
-///         "-8796094070783",
-///         "-8",
-///         "-950737950171027935941967741439"
-///     ]
+///     prefix_to_string(striped_random_negative_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     "[-16, -4, -128, -34391195648, -75493376, -9007199120523391, -8, -8796094070783, -8, \
+///     -950737950171027935941967741439, ...]"
 /// )
 /// ```
 pub fn striped_random_negative_integers(
@@ -668,26 +551,29 @@ pub fn striped_random_negative_integers(
     }
 }
 
-/// Generates striped random nonzero `Integer`s whose absolute values have a specified mean bit
+/// Generates striped random nonzero [`Integer`]s whose absolute values have a specified mean bit
 /// length.
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// `geometric_random_nonzero_signeds`); $m$ must be greater than 1. A striped bit sequence (see
-/// `StripedBitSource`) with the given stripe parameter is generated and truncated at the bit
-/// length. The highest bit is forced to be 1, an `Integer` is generated from the sequence, and its
-/// sign is set to the sign of the signed bit length. The resulting distribution has no mean or
-/// higher-order statistics (unless $m < 2$, which is not typical).
+/// [`geometric_random_nonzero_signeds`]); $m$ must be greater than 1. A striped bit sequence with
+/// the given stripe parameter is generated and truncated at the bit length. The highest bit is
+/// forced to be 1, an [`Integer`] is generated from the sequence, and its sign is set to the sign
+/// of the signed bit length. The resulting distribution has no mean or higher-order statistics
+/// (unless $m < 2$, which is not typical).
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -696,32 +582,17 @@ pub fn striped_random_negative_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_nonzero_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_nonzero_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "4",
-///         "268435456",
-///         "84405977732342160290572740160760316144",
-///         "-133169152",
-///         "-131064",
-///         "-2251834173421823",
-///         "1577058304",
-///         "-126100789566374399",
-///         "-76",
-///         "270335"
-///     ]
+///     prefix_to_string(striped_random_nonzero_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     "[4, 268435456, 84405977732342160290572740160760316144, -133169152, -131064, \
+///     -2251834173421823, 1577058304, -126100789566374399, -76, 270335, ...]"
 /// )
 /// ```
 pub fn striped_random_nonzero_integers(
@@ -745,25 +616,28 @@ pub fn striped_random_nonzero_integers(
     }
 }
 
-/// Generates striped random `Integer`s whose absolute values have a specified mean bit length.
+/// Generates striped random [`Integer`]s whose absolute values have a specified mean bit length.
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// `geometric_random_nonzero_signeds`); $m$ must be greater than 0. A striped bit sequence (see
-/// `StripedBitSource`) with the given stripe parameter is generated and truncated at the bit
-/// length. The highest bit is forced to be 1, an `Integer` is generated from the sequence, and its
-/// sign is set to the sign of the signed bit length. The resulting distribution has no mean or
+/// [`geometric_random_signeds`](geometric_random_signeds)); $m$ must be greater than 0. A striped
+/// bit sequence with the given stripe parameter is generated and truncated at the bit length. The
+/// highest bit is forced to be 1, an [`Integer`] is generated from the sequence, and its sign is
+/// set to the sign of the signed bit length. The resulting distribution has no mean or
 /// higher-order statistics (unless $m < 1$, which is not typical).
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -773,32 +647,17 @@ pub fn striped_random_nonzero_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integers;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "65536",
-///         "75521006248971741167616",
-///         "32",
-///         "-2199023255520",
-///         "-68719468544",
-///         "-527",
-///         "0",
-///         "-112",
-///         "131071",
-///         "4152"
-///     ]
+///     prefix_to_string(striped_random_integers(EXAMPLE_SEED, 16, 1, 32, 1), 10),
+///     "[65536, 75521006248971741167616, 32, -2199023255520, -68719468544, -527, 0, -112, \
+///     131071, 4152, ...]"
 /// )
 /// ```
 pub fn striped_random_integers(
@@ -822,7 +681,7 @@ pub fn striped_random_integers(
     }
 }
 
-/// Uniformly generates random `Integer`s in an interval.
+/// Uniformly generates random [`Integer`]s in an interval.
 #[derive(Clone, Debug)]
 pub struct UniformRandomIntegerRange {
     xs: RandomNaturalsLessThan,
@@ -837,46 +696,44 @@ impl Iterator for UniformRandomIntegerRange {
     }
 }
 
-/// Uniformly generates random `Integer`s in the half-open interval $[a, b)$.
+/// Uniformly generates random [`Integer`]s in the half-open interval $[a, b)$.
 ///
-/// `a` must be less than `b`.
+/// $a$ must be less than $b$.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a} & a \leq x < b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a} & \text{if} \\quad a \leq x < b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::uniform_random_integer_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     uniform_random_integer_range(EXAMPLE_SEED, Integer::from(-10), Integer::from(100))
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
+///     prefix_to_string(
+///         uniform_random_integer_range(EXAMPLE_SEED, Integer::from(-10), Integer::from(100)),
+///         10
+///     ),
+///     "[77, 83, -3, 95, 94, 97, 74, 17, 36, 83, ...]"
 /// )
 /// ```
 pub fn uniform_random_integer_range(
@@ -891,50 +748,48 @@ pub fn uniform_random_integer_range(
     }
 }
 
-/// Uniformly generates random `Integer`s in the closed interval $[a, b]$.
+/// Uniformly generates random [`Integer`]s in the closed interval $[a, b]$.
 ///
-/// `a` must be less than or equal to `b`.
+/// $a$ must be less than or equal to $b$.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a+1} & \text{if} \\quad a \leq x \leq b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(n)$
+/// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a > b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     uniform_random_integer_inclusive_range(
-///         EXAMPLE_SEED,
-///         Integer::from(-10),
-///         Integer::from(100)
-///     )
-///     .take(10)
-///     .map(|x| Integer::to_string(&x))
-///     .collect_vec(),
-///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
+///     prefix_to_string(
+///         uniform_random_integer_inclusive_range(
+///             EXAMPLE_SEED,
+///             Integer::from(-10),
+///             Integer::from(100)
+///         ),
+///         10
+///     ),
+///     "[77, 83, -3, 95, 94, 97, 74, 17, 36, 83, ...]"
 /// )
 /// ```
 #[inline]
@@ -986,8 +841,8 @@ fn signed_max_bit_range(
     }
 }
 
-/// Generates random `Integer`s greater than or equal to a lower bound, or less than or equal to an
-/// upper bound.
+/// Generates random [`Integer`]s greater than or equal to a lower bound, or less than or equal to
+/// an upper bound.
 #[derive(Clone, Debug)]
 pub struct RandomIntegerRangeToInfinity {
     boundary_bits: i64,
@@ -1012,7 +867,7 @@ impl Iterator for RandomIntegerRangeToInfinity {
     }
 }
 
-/// Generates random `Integer`s greater than or equal to a lower bound $a$.
+/// Generates random [`Integer`]s greater than or equal to a lower bound $a$.
 ///
 /// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
 /// length of the absolute values of the generated values; but the actual mean will always be lower
@@ -1022,35 +877,34 @@ impl Iterator for RandomIntegerRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and
+/// $m$ is `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
-/// is less than or equal to the bit length of `a`, or if they are too large and manipulating them
+/// is less than or equal to the bit length of $a$, or if they are too large and manipulating them
 /// leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range_to_infinity;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integer_range_to_infinity(EXAMPLE_SEED, Integer::from(-1000), 10, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &["15542", "2", "1714", "27863518", "-162", "956", "8", "14648399", "-419", "-98"]
+///     prefix_to_string(
+///         random_integer_range_to_infinity(EXAMPLE_SEED, Integer::from(-1000), 10, 1),
+///         10
+///     ),
+///     "[15542, 2, 1714, 27863518, -162, 956, 8, 14648399, -419, -98, ...]"
 /// )
 /// ```
 pub fn random_integer_range_to_infinity(
@@ -1074,7 +928,7 @@ pub fn random_integer_range_to_infinity(
     }
 }
 
-/// Generates random `Integer`s less than or equal to an upper bound $a$.
+/// Generates random [`Integer`]s less than or equal to an upper bound $a$.
 ///
 /// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
 /// length of the absolute values of the generated values; but the actual mean will always be lower
@@ -1084,46 +938,34 @@ pub fn random_integer_range_to_infinity(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a < 0$ and their ratio
-/// is less than or equal to the bit length of `a`, or if they are too large and manipulating them
+/// is less than or equal to the bit length of $a$, or if they are too large and manipulating them
 /// leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integer_range_to_negative_infinity(EXAMPLE_SEED, Integer::from(1000), 10, 1)
-///         .take(10)
-///         .map(|x| Integer::to_string(&x))
-///         .collect_vec(),
-///     &[
-///         "6",
-///         "2",
-///         "-1714",
-///         "-235958584061012446",
-///         "-455842",
-///         "514",
-///         "-12",
-///         "-14936760",
-///         "335",
-///         "99"
-///     ]
+///     prefix_to_string(
+///         random_integer_range_to_negative_infinity(EXAMPLE_SEED, Integer::from(1000), 10, 1),
+///         10
+///     ),
+///     "[6, 2, -1714, -235958584061012446, -455842, 514, -12, -14936760, 335, 99, ...]"
 /// )
 /// ```
 pub fn random_integer_range_to_negative_infinity(
@@ -1176,7 +1018,7 @@ impl Iterator for RandomIntegerRangeMultipleOrders {
     }
 }
 
-/// Generates random `Integer`s in an interval.
+/// Generates random [`Integer`]s in an interval.
 #[derive(Clone, Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum RandomIntegerRange {
@@ -1195,32 +1037,32 @@ impl Iterator for RandomIntegerRange {
     }
 }
 
-/// Generates random `Integer`s in the half-open interval $[a, b)$.
+/// Generates random [`Integer`]s in the half-open interval $[a, b)$.
 ///
-/// In general, the `Integer`s are not generated uniformly; for that, use
-/// `uniform_random_integer_range`. Instead, `Natural`s with smaller bit lengths are generated more
-/// frequently.
+/// In general, the [`Integer`]s are not generated uniformly; for that, use
+/// [`uniform_random_integer_range`]. Instead, [`Natural`]s with smaller bit lengths are generated
+/// more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator` / `mean_bits_denominator`. It is not actually the mean bit length, though
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
 /// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
 /// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
 /// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
 /// as bit length increases. The larger it is, the more closely the distribution approaches a
 /// uniform distribution over the bit lengths.
 ///
-/// Once a bit length is selected, the `Integer` is chosen uniformly from all `Integer`s with that
-/// bit length that are in $[a, b)$.
+/// Once a bit length is selected, the [`Integer` ]is chosen uniformly from all [`Integer`]s with
+/// that bit length that are in $[a, b)$.
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -1229,38 +1071,25 @@ impl Iterator for RandomIntegerRange {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integer_range(
-///         EXAMPLE_SEED,
-///         Integer::from(-1000),
-///         Integer::from(1000000000),
-///         20,
-///         1
-///     )
-///     .take(10)
-///     .map(|x| Integer::to_string(&x))
-///     .collect_vec(),
-///     &[
-///         "1",
-///         "1728664",
-///         "434",
-///         "-30",
-///         "5282",
-///         "515436476",
-///         "2353848",
-///         "-15",
-///         "19",
-///         "418"
-///     ]
+///     prefix_to_string(
+///         random_integer_range(
+///             EXAMPLE_SEED,
+///             Integer::from(-1000),
+///             Integer::from(1000000000),
+///             20,
+///             1
+///         ),
+///         10
+///     ),
+///     "[1, 1728664, 434, -30, 5282, 515436476, 2353848, -15, 19, 418, ...]"
 /// )
 /// ```
 #[inline]
@@ -1281,32 +1110,32 @@ pub fn random_integer_range(
     )
 }
 
-/// Generates random `Integer`s in the closed interval $[a, b]$.
+/// Generates random [`Integer`]s in the closed interval $[a, b]$.
 ///
-/// In general, the `Integer`s are not generated uniformly; for that, use
-/// `uniform_random_integer_range`. Instead, `Natural`s with smaller bit lengths are generated more
-/// frequently.
+/// In general, the [`Integer`]s are not generated uniformly; for that, use
+/// [`uniform_random_integer_inclusive_range`]. Instead, [`Integer`]s with smaller bit lengths are
+/// generated more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator` / `mean_bits_denominator`. It is not actually the mean bit length, though
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
 /// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
 /// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
 /// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
 /// as bit length increases. The larger it is, the more closely the distribution approaches a
 /// uniform distribution over the bit lengths.
 ///
-/// Once a bit length is selected, the `Integer` is chosen uniformly from all `Integer`s with that
-/// bit length that are in $[a, b]$.
+/// Once a bit length is selected, the [`Integer`] is chosen uniformly from all [`Integer`]s with
+/// that bit length that are in $[a, b]$.
 ///
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -1315,38 +1144,25 @@ pub fn random_integer_range(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_inclusive_range;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integer_inclusive_range(
-///         EXAMPLE_SEED,
-///         Integer::from(-1000),
-///         Integer::from(999999999),
-///         20,
-///         1
-///     )
-///     .take(10)
-///     .map(|x| Integer::to_string(&x))
-///     .collect_vec(),
-///     &[
-///         "1",
-///         "1728664",
-///         "434",
-///         "-30",
-///         "5282",
-///         "515436476",
-///         "2353848",
-///         "-15",
-///         "19",
-///         "418"
-///     ]
+///     prefix_to_string(
+///         random_integer_inclusive_range(
+///             EXAMPLE_SEED,
+///             Integer::from(-1000),
+///             Integer::from(999999999),
+///             20,
+///             1
+///         ),
+///         10
+///     ),
+///     "[1, 1728664, 434, -30, 5282, 515436476, 2353848, -15, 19, 418, ...]"
 /// )
 /// ```
 pub fn random_integer_inclusive_range(
@@ -1379,7 +1195,7 @@ pub fn random_integer_inclusive_range(
     }
 }
 
-/// Generates random striped `Integer`s from a range.
+/// Generates random striped [`Integer`]s from a range.
 #[derive(Clone, Debug)]
 pub enum StripedRandomIntegerInclusiveRange {
     NonNegative(StripedRandomNaturalInclusiveRange),
@@ -1411,14 +1227,16 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
     }
 }
 
-/// Generates random striped `Integer`s in the range $[a, b)$.
+/// Generates random striped [`Integer`]s in the range $[a, b)$.
 ///
-/// The `Integer`s are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
+/// run length.
 ///
-/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
-/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
-/// length.
+/// The output length is infinite.
+///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1430,29 +1248,31 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_integer_range;
 ///
-/// let xss = striped_random_integer_range(
-///     EXAMPLE_SEED,
-///     Integer::from(-4),
-///     Integer::from(7),
-///     4,
-///     1
-/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
-/// assert_eq!(xss, &["-100", "-100", "110", "11", "-100", "0", "110", "11", "0", "110"]);
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_range(
+///             EXAMPLE_SEED,
+///             Integer::from(-4),
+///             Integer::from(7),
+///             4,
+///             1
+///         ).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[-100, -100, 110, 11, -100, 0, 110, 11, 0, 110, ...]"
+/// );
 /// ```
 #[inline]
 pub fn striped_random_integer_range(
@@ -1472,14 +1292,16 @@ pub fn striped_random_integer_range(
     )
 }
 
-/// Generates random striped `Integer`s in the range $[a, b]$.
+/// Generates random striped [`Integer`]s in the range $[a, b]$.
 ///
-/// The `Integer`s are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+/// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
+/// run length.
 ///
-/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
-/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
-/// length.
+/// The output length is infinite.
+///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1491,29 +1313,31 @@ pub fn striped_random_integer_range(
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_integer_inclusive_range;
 ///
-/// let xss = striped_random_integer_inclusive_range(
-///     EXAMPLE_SEED,
-///     Integer::from(-4),
-///     Integer::from(6),
-///     4,
-///     1
-/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
-/// let xss = xss.iter().map(String::as_str).collect_vec();
-/// assert_eq!(xss, &["-100", "-100", "110", "11", "-100", "0", "110", "11", "0", "110"]);
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_inclusive_range(
+///             EXAMPLE_SEED,
+///             Integer::from(-4),
+///             Integer::from(6),
+///             4,
+///             1
+///         ).map(|x| x.to_binary_string()),
+///         10
+///     ),
+///     "[-100, -100, 110, 11, -100, 0, 110, 11, 0, 110, ...]"
+/// );
 /// ```
 pub fn striped_random_integer_inclusive_range(
     seed: Seed,
@@ -1613,7 +1437,7 @@ fn striped_signed_max_bit_range(
     }
 }
 
-/// Generates striped random `Integer`s greater than or equal to a lower bound, or less than or
+/// Generates striped random [`Integer`]s greater than or equal to a lower bound, or less than or
 /// equal to an upper bound.
 #[derive(Clone, Debug)]
 pub struct StripedRandomIntegerRangeToInfinity {
@@ -1639,60 +1463,61 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
     }
 }
 
-/// Generates striped random `Integer`s greater than or equal to a lower bound $a$.
+/// Generates striped random [`Integer`]s greater than or equal to a lower bound $a$.
 ///
-/// The mean bit length $m$ of the `Integer`s is specified; it must be greater than the bit length
-/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit
+/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
 /// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
 /// which is not typical).
 ///
-/// The `Integer`s are generated using a striped bit sequence with mean run length
-/// $\mu$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level
-/// documentation.
-///
-/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
-/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
-/// length.
+/// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher
+/// mean run length.
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
 /// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
 /// `mean_bits_denominator` are zero, if $a > 0$ and their ratio is less than or equal to the bit
-/// length of `a`, or if they are too large and manipulating them leads to arithmetic overflow.
+/// length of $a$, or if they are too large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integer_range_to_infinity;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_integer_range_to_infinity(
-///         EXAMPLE_SEED,
-///         Integer::from(-1000),
-///         20,
-///         1,
-///         10,
-///         1
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
-///     &["8192", "2", "1024", "33554400", "-128", "1023", "8", "14745599", "-256", "-67"]
+///     prefix_to_string(
+///         striped_random_integer_range_to_infinity(
+///             EXAMPLE_SEED,
+///             Integer::from(-1000),
+///             20,
+///             1,
+///             10,
+///             1
+///         ),
+///         10
+///     ),
+///     "[8192, 2, 1024, 33554400, -128, 1023, 8, 14745599, -256, -67, ...]"
 /// )
 /// ```
 pub fn striped_random_integer_range_to_infinity(
@@ -1728,63 +1553,61 @@ pub fn striped_random_integer_range_to_infinity(
     }
 }
 
-/// Generates striped random `Integer`s less than or equal to an upper bound $a$.
+/// Generates striped random [`Integer`]s less than or equal to an upper bound $a$.
 ///
-/// The mean bit length $m$ of the `Integer`s is specified; it must be greater than the bit length
-/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit
+/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
 /// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
 /// which is not typical).
 ///
-/// The `Integer`s are generated using a striped bit sequence with mean run length
-/// $\mu$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level
-/// documentation.
-///
-/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
-/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
-/// length.
+/// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
+/// length will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher
+/// mean run length.
 ///
 /// The output length is infinite.
 ///
+/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
+/// numbers.
+///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(m)$
+/// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
-/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is
+/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
 /// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
 /// `mean_bits_denominator` are zero, if $b < 0$ and their ratio is less than or equal to the bit
-/// length of `b`, or if they are too large and manipulating them leads to arithmetic overflow.
+/// length of $b$, or if they are too large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// extern crate malachite_base;
 ///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integer_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     striped_random_integer_range_to_negative_infinity(
-///         EXAMPLE_SEED,
-///         Integer::from(1000),
-///         20,
-///         1,
-///         10,
-///         1
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
-///     &[
-///         "4", "2", "-1024", "-144115188075919360", "-516096", "992", "-15", "-16776704", "511",
-///         "64"
-///     ]
+///     prefix_to_string(
+///         striped_random_integer_range_to_negative_infinity(
+///             EXAMPLE_SEED,
+///             Integer::from(1000),
+///             20,
+///             1,
+///             10,
+///             1
+///         ),
+///         10
+///     ),
+///     "[4, 2, -1024, -144115188075919360, -516096, 992, -15, -16776704, 511, 64, ...]"
 /// )
 /// ```
 pub fn striped_random_integer_range_to_negative_infinity(

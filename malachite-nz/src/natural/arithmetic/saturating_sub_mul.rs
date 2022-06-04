@@ -7,189 +7,250 @@ use natural::Natural;
 impl SaturatingSubMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), taking
-    /// `self`, y, and z by value. If y * z is greater than `self`, returns 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by value
+    /// and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y, z) = \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32)
-    ///     .saturating_sub_mul(Natural::from(3u32), Natural::from(4u32)).to_string(), "8");
-    /// assert_eq!(Natural::from(10u32).saturating_sub_mul(Natural::from(3u32),
-    ///     Natural::from(4u32)).to_string(), "0");
-    /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704");
+    /// assert_eq!(
+    ///     Natural::from(20u32).saturating_sub_mul(Natural::from(3u32), Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).saturating_sub_mul(Natural::from(3u32), Natural::from(4u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///             .saturating_sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     995705032704u64
+    /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, b: Natural, c: Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: Natural, z: Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
 impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), taking
-    /// `self` and y by value and z by reference. If y * z is greater than `self`, returns 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
+    /// value and the third by reference and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y, z) = \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32)
-    ///     .saturating_sub_mul(Natural::from(3u32), &Natural::from(4u32)).to_string(), "8");
-    /// assert_eq!(Natural::from(10u32).saturating_sub_mul(Natural::from(3u32),
-    ///     &Natural::from(4u32)).to_string(), "0");
-    /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704");
+    /// assert_eq!(
+    ///     Natural::from(20u32).saturating_sub_mul(Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).saturating_sub_mul(Natural::from(3u32), &Natural::from(4u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///             .saturating_sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
+    /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, b: Natural, c: &'a Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: Natural, z: &'a Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
 impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), taking
-    /// `self` and z by value and y by reference. If y * z is greater than `self`, returns 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and
+    /// third by value and the second by reference and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y, z) = \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32)
-    ///     .saturating_sub_mul(&Natural::from(3u32), Natural::from(4u32)).to_string(), "8");
-    /// assert_eq!(Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32),
-    ///     Natural::from(4u32)).to_string(), "0");
-    /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     &Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704");
+    /// assert_eq!(
+    ///     Natural::from(20u32).saturating_sub_mul(&Natural::from(3u32), Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32), Natural::from(4u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///             .saturating_sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     995705032704u64
+    /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, b: &'a Natural, c: Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: &'a Natural, z: Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
 impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), taking
-    /// `self` by value and y and z by reference. If y * z is greater than `self`, returns 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
+    /// and the second and third by reference and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y, z) = \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(20u32)
-    ///     .saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)).to_string(), "8");
-    /// assert_eq!(Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32),
-    ///     &Natural::from(4u32)).to_string(), "0");
-    /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704");
+    /// assert_eq!(
+    ///     Natural::from(20u32).saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///             .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
+    /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
 impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), taking
-    /// `self`, y, and z by reference. If y * z is greater than `self`, returns 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
+    /// reference and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y, z) = \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMul};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(20u32))
-    ///     .saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)).to_string(), "8");
-    /// assert_eq!((&Natural::from(10u32)).saturating_sub_mul(&Natural::from(3u32),
-    ///     &Natural::from(4u32)).to_string(), "0");
-    /// assert_eq!((&Natural::trillion()).saturating_sub_mul(
-    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704");
+    /// assert_eq!(
+    ///     (&Natural::from(20u32)).saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     8
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).saturating_sub_mul(&Natural::from(3u32), &Natural::from(4u32)),
+    ///     0
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(10u32).pow(12))
+    ///             .saturating_sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
+    /// );
     /// ```
     #[inline]
-    fn saturating_sub_mul(self, b: &'b Natural, c: &'c Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or(Natural::ZERO)
+    fn saturating_sub_mul(self, y: &'b Natural, z: &'c Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or(Natural::ZERO)
     }
 }
 
 impl SaturatingSubMulAssign<Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), in
-    /// place, taking y and z by value. If y * z is greater than `self`, sets `self` to 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
+    /// [`Natural`]s on the right-hand side by value and replacing the left-hand side [`Natural`]
+    /// with 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
@@ -200,35 +261,40 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     /// x.saturating_sub_mul_assign(Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 0);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.saturating_sub_mul_assign(Natural::from(0x10000u32), Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, b: Natural, c: Natural) {
-        if self.sub_mul_assign_no_panic(b, c) {
+    fn saturating_sub_mul_assign(&mut self, y: Natural, z: Natural) {
+        if self.sub_mul_assign_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }
 }
 
 impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), in
-    /// place, taking y by value and z by reference. If y * z is greater than `self`, sets `self` to
-    /// 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
+    /// [`Natural`] on the right-hand side by value and the second by reference and replacing the
+    /// left-hand side [`Natural`] with 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
@@ -239,35 +305,40 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     /// x.saturating_sub_mul_assign(Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 0);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.saturating_sub_mul_assign(Natural::from(0x10000u32), &Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, b: Natural, c: &'a Natural) {
-        if self.sub_mul_assign_val_ref_no_panic(b, c) {
+    fn saturating_sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
+        if self.sub_mul_assign_val_ref_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }
 }
 
 impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), in
-    /// place, taking y by reference and z by value. If y * z is greater than `self`, sets `self` to
-    /// 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
+    /// [`Natural`] on the right-hand side by reference and the second by value and replacing the
+    /// left-hand side [`Natural`](crate::natural::Natural) with 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
@@ -278,34 +349,40 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// x.saturating_sub_mul_assign(&Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 0);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.saturating_sub_mul_assign(&Natural::from(0x10000u32), Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: Natural) {
-        if self.sub_mul_assign_ref_val_no_panic(b, c) {
+    fn saturating_sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
+        if self.sub_mul_assign_ref_val_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }
 }
 
 impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (self), in
-    /// place, taking y and z by reference. If y * z is greater than `self`, sets `self` to 0.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
+    /// [`Natural`]s on the right-hand side by reference and replacing the left-hand side
+    /// [`Natural`] with 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - yz, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
@@ -316,13 +393,13 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// x.saturating_sub_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 0);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.saturating_sub_mul_assign(&Natural::from(0x10000u32), &Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     #[inline]
-    fn saturating_sub_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if self.sub_mul_assign_ref_ref_no_panic(b, c) {
+    fn saturating_sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+        if self.sub_mul_assign_ref_ref_no_panic(y, z) {
             *self = Natural::ZERO;
         }
     }

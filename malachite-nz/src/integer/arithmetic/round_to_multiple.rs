@@ -5,21 +5,48 @@ use malachite_base::rounding_modes::RoundingMode;
 impl RoundToMultiple<Integer> for Integer {
     type Output = Integer;
 
-    /// Rounds an `Integer` to a multiple of an `Integer` according to a specified rounding mode,
-    /// taking both `Integer`s by value.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
+    /// rounding mode. Both [`Integer`]s are taken by value.
+    ///
+    /// Let $q = \frac{x}{|y|}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) =  \operatorname{sgn}(q) |y| \lfloor |q| \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) |y| \lceil |q| \rceil.$
+    ///
+    /// $f(x, y, \mathrm{Floor}) = |y| \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Ceiling}) = |y| \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -28,7 +55,6 @@ impl RoundToMultiple<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -89,21 +115,48 @@ impl RoundToMultiple<Integer> for Integer {
 impl<'a> RoundToMultiple<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Rounds an `Integer` to a multiple of an `Integer` according to a specified rounding mode,
-    /// taking the first `Integer` by value and the second by reference.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
+    /// rounding mode. The first [`Integer`] is taken by value and the second by reference.
+    ///
+    /// Let $q = \frac{x}{|y|}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) =  \operatorname{sgn}(q) |y| \lfloor |q| \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) |y| \lceil |q| \rceil.$
+    ///
+    /// $f(x, y, \mathrm{Floor}) = |y| \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Ceiling}) = |y| \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -112,7 +165,6 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -176,21 +228,48 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
 impl<'a> RoundToMultiple<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Rounds an `Integer` to a multiple of an `Integer` according to a specified rounding mode,
-    /// taking the first `Integer` by reference and the second by value.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
+    /// rounding mode. The first [`Integer`] is taken by reference and the second by value.
+    ///
+    /// Let $q = \frac{x}{|y|}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) =  \operatorname{sgn}(q) |y| \lfloor |q| \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) |y| \lceil |q| \rceil.$
+    ///
+    /// $f(x, y, \mathrm{Floor}) = |y| \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Ceiling}) = |y| \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -199,7 +278,6 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -273,21 +351,48 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
 impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Rounds an `Integer` to a multiple of an `Integer` according to a specified rounding mode,
-    /// taking both `Integer`s by reference.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
+    /// rounding mode. Both [`Integer`]s are taken by reference.
+    ///
+    /// Let $q = \frac{x}{|y|}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) =  \operatorname{sgn}(q) |y| \lfloor |q| \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) |y| \lceil |q| \rceil.$
+    ///
+    /// $f(x, y, \mathrm{Floor}) = |y| \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Ceiling}) = |y| \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -296,7 +401,6 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -368,21 +472,24 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
 }
 
 impl RoundToMultipleAssign<Integer> for Integer {
-    /// Rounds an `Integer` to a multiple of another `Integer` in place according to a specified
-    /// rounding mode, taking the `Integer` on the right-hand side by value.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`] in place, according to a
+    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by value.
+    ///
+    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+    /// documentation for details.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
-    /// `assert!(x.divisible_by(other));`
+    /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+    /// - `assert!(x.divisible_by(other));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -391,7 +498,6 @@ impl RoundToMultipleAssign<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -469,21 +575,24 @@ impl RoundToMultipleAssign<Integer> for Integer {
 }
 
 impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
-    /// Rounds an `Integer` to a multiple of another `Integer` in place according to a specified
-    /// rounding mode, taking the `Integer` on the right-hand side by reference.
+    /// Rounds an [`Integer`] to a multiple of another [`Integer`] in place, according to a
+    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by reference.
+    ///
+    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+    /// documentation for details.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
-    /// `assert!(x.divisible_by(other));`
+    /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+    /// - `assert!(x.divisible_by(other));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -492,7 +601,6 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;

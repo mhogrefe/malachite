@@ -44,6 +44,16 @@ use std::marker::PhantomData;
 use std::vec::IntoIter;
 use strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use strings::{strings_from_char_vecs, StringsFromCharVecs};
+use test_util::extra_variadic::{
+    exhaustive_duodecuples_from_single, exhaustive_octuples_from_single,
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
+    exhaustive_quadruples_xxyx, exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
+    exhaustive_quadruples_xyyz_custom_output, exhaustive_quadruples_xyzz,
+    exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
+    exhaustive_triples_xyx_custom_output, lex_triples_from_single, lex_union3s,
+    ExhaustiveTriples1Input, ExhaustiveTriplesXXY, Union3,
+};
 use test_util::generators::common::{
     permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4,
     reshape_3_1_to_4, It,
@@ -57,21 +67,12 @@ use test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHAR
 use test_util::num::float::PRIMITIVE_FLOAT_CHARS;
 use test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_octuples_from_single, exhaustive_ordered_unique_pairs,
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
-    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
-    exhaustive_quadruples_xxyx, exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
-    exhaustive_quadruples_xyyz_custom_output, exhaustive_quadruples_xyzz,
-    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_custom_output,
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
-    exhaustive_triples_xyx, exhaustive_triples_xyx_custom_output, exhaustive_triples_xyy,
-    exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
-    lex_triples_from_single, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
-    ExhaustivePairs1Input, ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriples1Input,
-    ExhaustiveTriplesXXY, ExhaustiveTriplesXYY,
+    exhaustive_dependent_pairs, exhaustive_ordered_unique_pairs, exhaustive_pairs,
+    exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
+    exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
+    lex_pairs, lex_pairs_from_single, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
+    ExhaustivePairs1Input, ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriplesXYY,
 };
-use unions::exhaustive::lex_union3s;
-use unions::Union3;
 use vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
     exhaustive_vecs_length_inclusive_range, exhaustive_vecs_min_length,
@@ -773,7 +774,10 @@ impl<I: Iterator, P: Fn(&I::Item) -> bool> Iterator for TakeWhileExtra<I, P> {
 }
 
 #[inline]
-fn take_while_extra<I: Iterator, P: Fn(&I::Item) -> bool>(xs: I, p: P) -> TakeWhileExtra<I, P> {
+const fn take_while_extra<I: Iterator, P: Fn(&I::Item) -> bool>(
+    xs: I,
+    p: P,
+) -> TakeWhileExtra<I, P> {
     TakeWhileExtra {
         xs,
         p,
@@ -2801,10 +2805,7 @@ pub fn exhaustive_unsigned_nonuple_gen_var_1<T: PrimitiveUnsigned>(
 #[allow(clippy::type_complexity)]
 pub fn exhaustive_unsigned_duodecuple_gen_var_1<T: PrimitiveUnsigned>(
 ) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
-    Box::new(
-        exhaustive_triples_from_single(exhaustive_quadruples_from_single(exhaustive_unsigneds()))
-            .map(|((a, b, c, d), (e, f, g, h), (i, j, k, l))| (a, b, c, d, e, f, g, h, i, j, k, l)),
-    )
+    Box::new(exhaustive_duodecuples_from_single(exhaustive_unsigneds()))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

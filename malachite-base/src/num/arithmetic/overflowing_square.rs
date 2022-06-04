@@ -5,17 +5,16 @@ macro_rules! impl_overflowing_square {
         impl OverflowingSquare for $t {
             type Output = $t;
 
-            /// Calculates `self ^ 2`.
+            /// Squares a number.
             ///
-            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
-            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
-            /// returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an
+            /// arithmetic occurred. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_square` module.
+            /// See [here](super::overflowing_square#overflowing_square).
             #[inline]
             fn overflowing_square(self) -> ($t, bool) {
                 self.overflowing_mul(self)
@@ -23,16 +22,16 @@ macro_rules! impl_overflowing_square {
         }
 
         impl OverflowingSquareAssign for $t {
-            /// Replaces `self` with `self ^ 2`.
+            /// Squares a number in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_square` module.
+            /// See [here](super::overflowing_square#overflowing_square_assign).
             #[inline]
             fn overflowing_square_assign(&mut self) -> bool {
                 self.overflowing_mul_assign(*self)

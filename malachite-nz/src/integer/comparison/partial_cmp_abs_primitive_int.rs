@@ -5,15 +5,13 @@ use std::cmp::Ordering;
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Integer {
-            /// Compares the absolute value of an `Integer` to a value of unsigned primitive integer
-            /// type.
+            /// Compares the absolute values of an [`Integer`] and an unsigned primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(other)
@@ -21,15 +19,12 @@ macro_rules! impl_unsigned {
         }
 
         impl PartialOrdAbs<Integer> for $t {
-            /// Compares a value of unsigned primitive integer type to the absolute value of an
-            /// `Integer`.
+            /// Compares the absolute values of an unsigned primitive integer and an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
-            /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)
@@ -42,30 +37,25 @@ apply_to_unsigneds!(impl_unsigned);
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Integer {
-            /// Compares the absolute value of an `Integer` to the absolute value of a value of
-            /// signed primitive integer type.
+            /// Compares the absolute values of an [`Integer`] and a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(&other.unsigned_abs())
             }
         }
 
         impl PartialOrdAbs<Integer> for $t {
-            /// Compares the absolute value of a value of signed primitive integer type to the
-            /// absolute value of an `Integer`.
+            /// Compares the absolute values of a signed primitive integer and an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
-            /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

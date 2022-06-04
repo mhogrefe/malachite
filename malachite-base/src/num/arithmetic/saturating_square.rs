@@ -5,21 +5,21 @@ macro_rules! impl_saturating_square {
         impl SaturatingSquare for $t {
             type Output = $t;
 
-            /// Squares `self`, saturating at the numeric bounds instead of overflowing.
+            /// Squares a number, saturating at the numeric bounds instead of overflowing.
             ///
             /// $$
             /// f(x) = \\begin{cases}
-            ///     x^2 & x^2 \leq M \\\\
-            ///     M & x^2 > M,
+            ///     x^2 & \text{if} \\quad x^2 \leq M, \\\\
+            ///     M & \text{if} \\quad x^2 > M,
             /// \\end{cases}
             /// $$
-            /// where $M$ is `$t::MAX`.
+            /// where $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_square` module.
+            /// See [here](super::saturating_square#saturating_square).
             #[inline]
             fn saturating_square(self) -> $t {
                 self.saturating_mul(self)
@@ -27,22 +27,21 @@ macro_rules! impl_saturating_square {
         }
 
         impl SaturatingSquareAssign for $t {
-            /// Replaces `self` with `self ^ 2`, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Squares a number in place, saturating at the numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x^2 & x^2 \leq M \\\\
-            ///     M & x^2 > M,
+            ///     x^2 & \text{if} \\quad x^2 \leq M, \\\\
+            ///     M & \text{if} \\quad x^2 > M,
             /// \\end{cases}
             /// $$
-            /// where $M$ is `$t::MAX`.
+            /// where $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_square` module.
+            /// See [here](super::saturating_square#saturating_square_assign).
             #[inline]
             fn saturating_square_assign(&mut self) {
                 self.saturating_mul_assign(*self);

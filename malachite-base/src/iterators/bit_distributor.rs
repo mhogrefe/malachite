@@ -4,9 +4,9 @@ use std::fmt::Debug;
 
 const COUNTER_WIDTH: usize = u64::WIDTH as usize;
 
-/// This struct is used to configure `BitDistributor`s.
+/// This struct is used to configure [`BitDistributor`]s.
 ///
-/// See the `BitDistributor` documentation for more.
+/// See the [`BitDistributor`] documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct BitDistributorOutputType {
     weight: usize, // 0 means a tiny output_type
@@ -22,7 +22,7 @@ impl BitDistributorOutputType {
     /// # Panics
     /// Panics if `weight` is zero.
     ///
-    /// The corresponding element grows as a power of $i$. See the `BitDistributor` documentation
+    /// The corresponding element grows as a power of $i$. See the [`BitDistributor`] documentation
     /// for more.
     pub fn normal(weight: usize) -> BitDistributorOutputType {
         assert_ne!(weight, 0);
@@ -37,8 +37,8 @@ impl BitDistributorOutputType {
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
-    /// The corresponding element grows logarithmically. See the `BitDistributor` documentation for
-    /// more.
+    /// The corresponding element grows logarithmically. See the [`BitDistributor`] documentation
+    /// for more.
     pub const fn tiny() -> BitDistributorOutputType {
         BitDistributorOutputType {
             weight: 0,
@@ -47,7 +47,7 @@ impl BitDistributorOutputType {
     }
 }
 
-/// `BitDistributor` helps generate tuples exhaustively.
+/// Helps generate tuples exhaustively.
 ///
 /// Think of `counter` as the bits of an integer. It's initialized to zero (all `false`s), and as
 /// it's repeatedly incremented, it eventually takes on every 64-bit value.
@@ -62,8 +62,9 @@ impl BitDistributorOutputType {
 /// may be incremented to create the next pair. In this case, the pairs will be
 /// $(0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 0), (2, 1), \ldots$.
 ///
-/// If you think of these pairs as coordinates in the $xy$-plane, they are traversed along a Z-order
-/// curve. Every pair of unsigned integers will be generated exactly once.
+/// If you think of these pairs as coordinates in the $xy$-plane, they are traversed along a
+/// [Z-order curve](https://en.wikipedia.org/wiki/Z-order_curve). Every pair of unsigned integers
+/// will be generated exactly once.
 ///
 /// In general, setting `output_types` to `[BitDistributorOutputType::normal(1); n]` will generate
 /// $n$-tuples. The elements of the tuples will be very roughly the same size, in the sense that
@@ -86,7 +87,10 @@ impl BitDistributorOutputType {
 /// if `max_bits` wasn't specified, but will stop growing once it reaches $2^b-1$.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct BitDistributor {
+    #[cfg(feature = "test_build")]
     pub output_types: Vec<BitDistributorOutputType>,
+    #[cfg(not(feature = "test_build"))]
+    output_types: Vec<BitDistributorOutputType>,
     bit_map: [usize; COUNTER_WIDTH],
     counter: [bool; COUNTER_WIDTH],
 }
@@ -106,7 +110,7 @@ impl BitDistributor {
         }
     }
 
-    /// Creates a new `BitDistributor`.
+    /// Creates a new [`BitDistributor`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -310,7 +314,6 @@ impl BitDistributor {
     /// extern crate itertools;
     ///
     /// use itertools::Itertools;
-    ///
     /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
     ///
     /// let mut bd = BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]);

@@ -1,6 +1,4 @@
-/// Functions for getting and setting individual bits.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`BitAccess`](traits::BitAccess), a trait for getting and setting individual bits of a number.
 ///
 /// # get_bit
 /// ```
@@ -129,9 +127,8 @@
 /// assert_eq!(x, -1);
 /// ```
 pub mod bit_access;
-/// Functions for getting and setting adjacent blocks of bits.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`BitBlockAccess`](traits::BitBlockAccess), a trait for getting and setting adjacent blocks of
+/// bits in a number.
 ///
 /// # get_bits
 /// ```
@@ -178,9 +175,8 @@ pub mod bit_access;
 /// assert_eq!(x, -0x5433);
 /// ```
 pub mod bit_block_access;
-/// Traits for extracting all bits from numbers and constructing numbers from bits.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`BitConvertible`](traits::BitConvertible), a trait for extracting all bits from a number or
+/// constructing a number from bits.
 ///
 /// # to_bits_asc
 /// ```
@@ -268,16 +264,14 @@ pub mod bit_block_access;
 /// );
 /// ```
 pub mod bit_convertible;
-/// A double-ended iterator for iterating over a number's bits.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`BitIterable`](traits::BitIterable), a trait for producing a double-ended iterator over a
+/// number's bits.
 ///
 /// # bits
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::logic::traits::BitIterable;
 ///
 /// assert!(0u8.bits().next().is_none());
@@ -319,9 +313,8 @@ pub mod bit_convertible;
 /// );
 /// ```
 pub mod bit_iterable;
-/// Functions for finding the next `true` or `false` bit after a provided index.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`BitScan`](traits::BitScan), a trait for finding the next `true` or `false` bit in a number
+/// after a provided index.
 ///
 /// # index_of_next_false_bit
 /// ```
@@ -371,13 +364,15 @@ pub mod bit_iterable;
 /// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
 /// ```
 pub mod bit_scan;
-/// Wraps the `count_ones` function into an implementation of `CountOnes`.
+/// [`CountOnes`](traits::CountOnes), a trait for counting the number of ones in the binary
+/// representation of a number.
 pub mod count_ones;
-/// Wraps the `count_zeros` function into an implementation of `CountZeros`.
+/// [`CountZeros`](traits::CountZeros), a trait for counting the number of ones in the binary
+/// representation of a number.
 pub mod count_zeros;
-/// Functions for computing the Hamming distance between two numbers.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`HammingDistance`](traits::HammingDistance) and
+/// [`CheckedHammingDistance`](traits::CheckedHammingDistance), traits for computing the Hamming
+/// distance between two numbers.
 ///
 /// # hamming_distance
 /// ```
@@ -396,11 +391,11 @@ pub mod count_zeros;
 /// assert_eq!(0i8.checked_hamming_distance(-1), None);
 /// ```
 pub mod hamming_distance;
-/// Wraps the `leading_zeros` function into an implementation of `LeadingZeros`.
+/// [`LeadingZeros`](traits::LeadingZeros), a trait for determining the number of zeros that a
+/// number starts with, when written in binary using $W$ bits, $W$ being the type width.
 pub mod leading_zeros;
-/// Functions for generating bit masks.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`LowMask`](traits::LowMask), a trait for generating a low bit mask (a number in which only the
+/// $k$ least-significant bits are 1).
 ///
 /// # low_mask
 /// ```
@@ -417,9 +412,7 @@ pub mod leading_zeros;
 /// assert_eq!(i64::low_mask(40), 0xffffffffff);
 /// ```
 pub mod low_mask;
-/// Contains implementations of `NotAssign`.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`NotAssign`](traits::NotAssign), a trait for replacing a number with its bitwise negation.
 ///
 /// # not_assign
 /// ```
@@ -430,9 +423,8 @@ pub mod low_mask;
 /// assert_eq!(x, 65412);
 /// ```
 pub mod not;
-/// Functions to get the number of significant bits of a primitive integer.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SignificantBits`](traits::SignificantBits), a trait for determining how many significant bits
+/// a number has.
 ///
 /// # significant_bits
 /// ```
@@ -445,7 +437,8 @@ pub mod not;
 /// assert_eq!((-100i64).significant_bits(), 7);
 /// ```
 pub mod significant_bits;
-/// Wraps the `trailing_zeros` function into an implementation of `TrailingZeros`.
+/// [`TrailingZeros`](traits::TrailingZeros), a trait for determining the number of zeros that a
+/// number ends with when written in binary.
 pub mod trailing_zeros;
-/// Various traits for functions related to bit manipulation.
+/// Various traits for performing logic or bitwise operations on numbers.
 pub mod traits;

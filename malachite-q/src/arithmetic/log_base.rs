@@ -16,14 +16,18 @@ fn approx_log_helper(x: &Rational) -> f64 {
 impl Rational {
     /// Calculates the approximate natural logarithm of a positive `Rational`.
     ///
-    /// $f(x) = \log x \pm O(\log x)$.
+    /// $f(x) = (1+\epsilon)(\log x)$, where $|\epsilon| < 2^{-52}.$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
     /// use malachite_base::num::float::NiceFloat;
@@ -44,7 +48,7 @@ impl Rational {
     /// );
     /// ```
     ///
-    /// This is fmpz_dlog from fmpz/dlog.c, Flint 2.7.1.
+    /// This is equivalent to `fmpz_dlog` from `fmpz/dlog.c`, FLINT 2.7.1.
     #[inline]
     pub fn approx_log(&self) -> f64 {
         assert!(*self > 0u32);
@@ -52,6 +56,13 @@ impl Rational {
     }
 }
 
+// # Worst-case complexity
+// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(nm \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
+// $|\log_b x|$, where $b$ is `base` and $x$ is `x`.
 pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
     assert!(*base > 0u32);
     assert_ne!(*base, 1u32);
@@ -133,13 +144,19 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
 impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
     type Output = i64;
 
-    /// Returns the floor of the base-$b$ logarithm of a positive `Rational`.
+    /// Returns the floor of the base-$b$ logarithm of a positive [`Rational`].
     ///
     /// Note that this function may be slow if the base is very close to 1.
     ///
     /// $f(x, b) = \lfloor\log_b x\rfloor$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
+    /// $|\log_b x|$, where $b$ is `base` and $x$ is `x`.
     ///
     /// # Panics
     /// Panics if `self` less than or equal to zero or `base` is 1.
@@ -147,7 +164,6 @@ impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase;
     /// use malachite_q::Rational;
@@ -177,13 +193,19 @@ impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
 impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     type Output = i64;
 
-    /// Returns the ceiling of the base-$b$ logarithm of a positive `Rational`.
+    /// Returns the ceiling of the base-$b$ logarithm of a positive [`Rational`].
     ///
     /// Note that this function may be slow if the base is very close to 1.
     ///
     /// $f(x, b) = \lceil\log_b x\rceil$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
+    /// $|\log_b x|$, where $b$ is `base` and $x$ is `x`.
     ///
     /// # Panics
     /// Panics if `self` less than or equal to zero or `base` is 1.
@@ -191,7 +213,6 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_q::Rational;
@@ -206,7 +227,7 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     /// );
     /// assert_eq!(
     ///     Rational::from_signeds(5153632, 16807)
-    ///         .ceiling_log_base(&Rational::from_signeds(22, 7)),
+    ///             .ceiling_log_base(&Rational::from_signeds(22, 7)),
     ///     5
     /// );
     /// ```
@@ -227,19 +248,25 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
 impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
     type Output = i64;
 
-    /// Returns the base-$b$ logarithm of a positive `Rational`. If the integer is not a power of
-    /// $b$, `None` is returned.
+    /// Returns the base-$b$ logarithm of a positive [`Rational`]. If the [`Rational`] is not a
+    /// power of $b$, then `None` is returned.
     ///
     /// Note that this function may be slow if the base is very close to 1.
     ///
     /// $$
     /// f(x, b) = \\begin{cases}
-    ///     \operatorname{Some}(\log_b x) & \log_b x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(\log_b x) & \text{if} \\quad \log_b x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
+    /// $|\log_b x|$, where $b$ is `base` and $x$ is `x`.
     ///
     /// # Panics
     /// Panics if `self` less than or equal to zero or `base` is 1.
@@ -247,7 +274,6 @@ impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_q::Rational;
@@ -262,7 +288,7 @@ impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
     /// );
     /// assert_eq!(
     ///     Rational::from_signeds(5153632, 16807)
-    ///         .checked_log_base(&Rational::from_signeds(22, 7)),
+    ///             .checked_log_base(&Rational::from_signeds(22, 7)),
     ///     Some(5)
     /// );
     /// ```

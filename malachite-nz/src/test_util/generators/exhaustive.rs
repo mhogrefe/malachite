@@ -51,13 +51,9 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_ordered_unique_pairs, exhaustive_pairs,
-    exhaustive_pairs_from_single, exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
-    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_custom_output,
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
-    exhaustive_triples_xyx, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
-    lex_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_pairs_from_single, exhaustive_triples, exhaustive_triples_custom_output,
+    exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs,
+    ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_range,
@@ -119,6 +115,13 @@ use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 use test_util::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
+use test_util::extra_variadic::{
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
+    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
+    exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
 use test_util::generators::factors_of_limb_max;
 use test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};

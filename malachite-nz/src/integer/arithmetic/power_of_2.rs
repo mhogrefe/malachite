@@ -3,22 +3,26 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 
 impl PowerOf2<u64> for Integer {
-    /// Computes 2<sup>`pow`</sup>.
+    /// Raises 2 to an integer power.
     ///
-    /// Time: worst case O(`pow`)
+    /// $f(k) = 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::power_of_2(0).to_string(), "1");
-    /// assert_eq!(Integer::power_of_2(3).to_string(), "8");
+    /// assert_eq!(Integer::power_of_2(0), 1);
+    /// assert_eq!(Integer::power_of_2(3), 8);
     /// assert_eq!(Integer::power_of_2(100).to_string(), "1267650600228229401496703205376");
     /// ```
     #[inline]

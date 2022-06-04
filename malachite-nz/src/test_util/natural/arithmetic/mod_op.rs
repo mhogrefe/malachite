@@ -9,14 +9,15 @@ pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {
     -x.rem_ceil(y)
 }
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1, but not
-/// computing the quotient.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
+//
+// This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`
+// and `un > 1`, but not computing the quotient.
 pub fn limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();

@@ -14,7 +14,15 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 
-/// This is MPN_MOD_OR_MODEXACT_1_ODD from gmp-impl.h, GMP 6.2.1, where size > 1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
+//
+// This is equivalent to `MPN_MOD_OR_MODEXACT_1_ODD` from `gmp-impl.h`, GMP 6.2.1, where
+// `size > 1`.
 fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_mod_exact_odd_limb(ns, d, 0)
@@ -23,7 +31,14 @@ fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     }
 }
 
-// This is mpn_gcd_1 from mpn/generic/gcd_1.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_gcd_1` from `mpn/generic/gcd_1.c`, GMP 6.2.1.
 pub_test! {limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
     assert!(xs.len() > 1);
     assert_ne!(y, 0);
@@ -40,6 +55,12 @@ pub_test! {limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
     y << zeros
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
     let xs_zero_limbs = slice_leading_zeros(xs);
     let ys_zero_limbs = slice_leading_zeros(ys);
@@ -79,8 +100,7 @@ fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
 impl Gcd<Natural> for Natural {
     type Output = Natural;
 
-    /// Computes the GCD (greatest common divisor) of two `Natural`s, taking both `Natural`s by
-    /// value.
+    /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking both by value.
     ///
     /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which makes sense
     /// if we interpret "greatest" to mean "greatest by the divisibility order".
@@ -89,12 +109,17 @@ impl Gcd<Natural> for Natural {
     /// f(x, y) = \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
@@ -111,8 +136,8 @@ impl Gcd<Natural> for Natural {
 impl<'a> Gcd<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Computes the GCD (greatest common divisor) of two `Natural`s, taking the first `Natural` by
-    /// value and the second by reference.
+    /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking the first by value
+    /// and the second by reference.
     ///
     /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which makes sense
     /// if we interpret "greatest" to mean "greatest by the divisibility order".
@@ -121,12 +146,17 @@ impl<'a> Gcd<&'a Natural> for Natural {
     /// f(x, y) = \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
@@ -144,7 +174,7 @@ impl<'a> Gcd<&'a Natural> for Natural {
 impl<'a> Gcd<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Computes the GCD (greatest common divisor) of two `Natural`s, taking the first `Natural` by
+    /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking the first by
     /// reference and the second by value.
     ///
     /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which makes sense
@@ -154,12 +184,17 @@ impl<'a> Gcd<Natural> for &'a Natural {
     /// f(x, y) = \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
@@ -177,8 +212,7 @@ impl<'a> Gcd<Natural> for &'a Natural {
 impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Computes the GCD (greatest common divisor) of two `Natural`s, taking both `Natural`s by
-    /// reference.
+    /// Computes the GCD (greatest common divisor) of two [`Natural`]s, taking both by reference.
     ///
     /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which makes sense
     /// if we interpret "greatest" to mean "greatest by the divisibility order".
@@ -187,12 +221,17 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     /// f(x, y) = \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
@@ -228,19 +267,24 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
 }
 
 impl GcdAssign<Natural> for Natural {
-    /// Replaces a `Natural` by its GCD (greatest common divisor) with another `Natural`, taking
-    /// the `Natural` on the right-hand side by value.
+    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`],
+    /// taking the [`Natural`] on the right-hand side by value.
     ///
     /// $$
     /// x \gets \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::GcdAssign;
     /// use malachite_nz::natural::Natural;
@@ -282,19 +326,24 @@ impl GcdAssign<Natural> for Natural {
 }
 
 impl<'a> GcdAssign<&'a Natural> for Natural {
-    /// Replaces a `Natural` by its GCD (greatest common divisor) with another `Natural`, taking
-    /// the `Natural` on the right-hand side by reference.
+    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`],
+    /// taking the [`Natural`] on the right-hand side by reference.
     ///
     /// $$
     /// x \gets \gcd(x, y).
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::GcdAssign;
     /// use malachite_nz::natural::Natural;
@@ -336,5 +385,7 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     }
 }
 
+/// Code for the half-GCD algorithm, described [here](https://gmplib.org/manual/Subquadratic-GCD).
 pub mod half_gcd;
+/// Code for working with 2-by-2 matrices.
 pub mod matrix_2_2;

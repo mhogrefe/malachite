@@ -25,14 +25,16 @@ use std::cmp::Ordering;
 // limbs of the absolute value and the sign (true means non-negative). `xs` and `ys` should be
 // nonempty and have no trailing zeros, and `z` should be nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
+// `w_sign` is also returned.
 pub_crate_test! {limbs_overflowing_sub_mul_limb(
     xs: &[Limb],
     ys: &[Limb],
@@ -54,15 +56,16 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb(
 // negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
 // nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//       m = max(1, `ys.len()` - `xs.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, and w_sign is returned.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, and `w_sign` is returned.
 pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
@@ -136,16 +139,17 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 // negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
 // nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//       m = max(1, `xs.len()` - `ys.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, the limbs of the result are written to the second input rather than the first, and
-// w_sign is returned.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, the limbs of the result are written to the second input rather than
+// the first, and `w_sign` is returned.
 pub_test! {limbs_overflowing_sub_mul_limb_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -217,14 +221,16 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 // second `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be
 // nonempty and have no trailing zeros, and `z` should be nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, the result is written to the longer input, and w_sign is returned.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, the result is written to the longer input, and `w_sign` is
+// returned.
 pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -247,18 +253,20 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
 // the absolute value and the sign (true means non-negative). All of the input slices should be
 // non-empty and have no trailing zeros.
 //
-// Time: O(m + n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(m + n * log(n))
+// $M(n, m) = O(m + n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
-//       m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
 // Panics if `ys` or `zs` are empty.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
+// `w_sign` is also returned.
 pub_crate_test! {limbs_overflowing_sub_mul(
     xs: &[Limb],
     ys: &[Limb],
@@ -273,18 +281,19 @@ pub_crate_test! {limbs_overflowing_sub_mul(
 // absolute value to the first (left) slice and returning the sign (true means non-negative). All
 // of the input slices should be non-empty and have no trailing zeros.
 //
-// Time: O(m + n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n, m) = O(n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
-//       m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
 // Panics if `ys` or `zs` are empty.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-// negative, and w_sign is returned.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive, `sub` is negative, and `w_sign` is returned.
 pub_crate_test! {limbs_overflowing_sub_mul_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
@@ -329,27 +338,32 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
 impl<'a> SubMul<Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self`, y, and z by value.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking all three by
+    /// value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x10000),
-    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .sub_mul(Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn sub_mul(mut self, y: Integer, z: Integer) -> Integer {
@@ -361,27 +375,32 @@ impl<'a> SubMul<Integer, Integer> for Integer {
 impl<'a> SubMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` and y by value and z by reference.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first two by
+    /// value and the third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x10000),
-    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .sub_mul(Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn sub_mul(mut self, y: Integer, z: &'a Integer) -> Integer {
@@ -393,27 +412,32 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
 impl<'a> SubMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` and z by value and y by reference.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first and
+    /// third by value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x10000),
-    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .sub_mul(&Integer::from(-0x10000), -Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn sub_mul(mut self, y: &'a Integer, z: Integer) -> Integer {
@@ -425,27 +449,32 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` by value and y and z by reference.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first by
+    /// value and the second and third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x10000),
-    ///                     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn sub_mul(mut self, y: &'a Integer, z: &'b Integer) -> Integer {
@@ -457,27 +486,32 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
 impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (b) and an `Integer` (c) to an `Integer` (self), taking
-    /// `self`, b, and c by reference.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking all three by
+    /// reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x - yz$.
     ///
-    /// Additional memory: O(m + n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// $M(n, m) = O(m + n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!((&Integer::from(10u32)).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((&(-Integer::trillion())).sub_mul(&Integer::from(-0x10000),
-    ///                     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (&-Integer::from(10u32).pow(12))
+    ///             .sub_mul(&Integer::from(-0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     fn sub_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
         if self.sign == (y.sign != z.sign) {
@@ -496,31 +530,33 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
 }
 
 impl SubMulAssign<Integer, Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y and z by value.
+    /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking both
+    /// [`Integer`]s on the right-hand side by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.sub_mul_assign(Integer::from(3u32), Integer::from(-4));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(Integer::from(-0x10000), -Integer::trillion());
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.sub_mul_assign(Integer::from(-0x10000), -Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn sub_mul_assign(&mut self, y: Integer, z: Integer) {
         self.add_mul_assign(-y, z);
@@ -528,31 +564,33 @@ impl SubMulAssign<Integer, Integer> for Integer {
 }
 
 impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y by value and z by reference.
+    /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking the
+    /// first [`Integer`] on the right-hand side by value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.sub_mul_assign(Integer::from(3u32), &Integer::from(-4));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(Integer::from(-0x10000), &(-Integer::trillion()));
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.sub_mul_assign(Integer::from(-0x10000), &(-Integer::from(10u32).pow(12)));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn sub_mul_assign(&mut self, y: Integer, z: &'a Integer) {
         self.add_mul_assign(-y, z);
@@ -560,31 +598,33 @@ impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
 }
 
 impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y by reference and z by value.
+    /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking the
+    /// first [`Integer`] on the right-hand side by reference and the second by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.sub_mul_assign(&Integer::from(3u32), Integer::from(-4));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(&Integer::from(-0x10000), -Integer::trillion());
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.sub_mul_assign(&Integer::from(-0x10000), -Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Integer, z: Integer) {
         self.add_mul_assign(y, -z);
@@ -592,31 +632,33 @@ impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
 }
 
 impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y and z by reference.
+    /// Subtracts the product of two other [`Integer`]s from an [`Integer`] in place, taking both
+    /// [`Integer`]s on the right-hand side by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x - yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.sub_mul_assign(&Integer::from(3u32), &Integer::from(-4));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(&Integer::from(-0x10000), &(-Integer::trillion()));
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.sub_mul_assign(&Integer::from(-0x10000), &(-Integer::from(10u32).pow(12)));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Integer, z: &'b Integer) {
         self.neg_assign();

@@ -1,9 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::test_util::generators::{
-    signed_unsigned_pair_gen_var_14, unsigned_pair_gen_var_28,
-};
+use malachite_base::test_util::generators::{signed_unsigned_pair_gen, unsigned_pair_gen};
 
 #[test]
 fn test_saturating_pow() {
@@ -27,10 +25,20 @@ fn test_saturating_pow() {
     test::<i16>(-10, 9, i16::MIN);
     test::<i16>(10, 9, i16::MAX);
     test::<i64>(123, 456, i64::MAX);
+    test::<u64>(0, u64::MAX, 0);
+    test::<u64>(1, u64::MAX, 1);
+    test::<u64>(123, u64::MAX, u64::MAX);
+    test::<i64>(0, u64::MAX, 0);
+    test::<i64>(1, u64::MAX, 1);
+    test::<i64>(-1, u64::MAX, -1);
+    test::<i64>(-1, u64::MAX - 1, 1);
+    test::<i64>(123, u64::MAX, i64::MAX);
+    test::<i64>(-123, u64::MAX, i64::MIN);
+    test::<i64>(-123, u64::MAX - 1, i64::MAX);
 }
 
 fn saturating_pow_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen_var_28::<T, u64>().test_properties(|(x, y)| {
+    unsigned_pair_gen::<T, u64>().test_properties(|(x, y)| {
         let mut power = x;
         power.saturating_pow_assign(y);
         assert_eq!(power, x.saturating_pow(y));
@@ -44,7 +52,7 @@ fn saturating_pow_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 }
 
 fn saturating_pow_properties_helper_signed<T: PrimitiveSigned>() {
-    signed_unsigned_pair_gen_var_14::<T, u64>().test_properties(|(x, y)| {
+    signed_unsigned_pair_gen::<T, u64>().test_properties(|(x, y)| {
         let mut power = x;
         power.saturating_pow_assign(y);
         assert_eq!(power, x.saturating_pow(y));

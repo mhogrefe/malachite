@@ -4,12 +4,21 @@ use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign};
 impl Pow<u64> for Integer {
     type Output = Integer;
 
-    /// TODO doc
+    /// Raises an [`Integer`] to a power, taking the [`Integer`] by value.
+    ///
+    /// $f(x, n) = x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
@@ -34,12 +43,21 @@ impl Pow<u64> for Integer {
 impl<'a> Pow<u64> for &'a Integer {
     type Output = Integer;
 
-    /// TODO doc
+    /// Raises an [`Integer`] to a power, taking the [`Integer`] by reference.
+    ///
+    /// $f(x, n) = x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
@@ -64,12 +82,21 @@ impl<'a> Pow<u64> for &'a Integer {
 }
 
 impl PowAssign<u64> for Integer {
-    /// TODO doc
+    /// Raises an [`Integer`] to a power in place.
+    ///
+    /// $x \gets x^n$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::integer::Integer;

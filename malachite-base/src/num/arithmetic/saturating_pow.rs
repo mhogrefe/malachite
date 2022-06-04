@@ -1,35 +1,91 @@
-use num::arithmetic::traits::{SaturatingPow, SaturatingPowAssign};
-use num::conversion::traits::ExactFrom;
+use num::arithmetic::traits::{Parity, SaturatingPow, SaturatingPowAssign};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-macro_rules! impl_saturating_pow {
+fn saturating_pow_unsigned<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
+    if exp == 0 {
+        T::ONE
+    } else if x < T::TWO {
+        x
+    } else if let Some(p) = x.checked_pow(exp) {
+        p
+    } else {
+        T::MAX
+    }
+}
+
+fn saturating_pow_signed<T: PrimitiveSigned>(x: T, exp: u64) -> T {
+    if exp == 0 {
+        T::ONE
+    } else if x == T::ZERO || x == T::ONE {
+        x
+    } else if x == T::NEGATIVE_ONE {
+        if exp.even() {
+            T::ONE
+        } else {
+            T::NEGATIVE_ONE
+        }
+    } else if let Some(p) = x.checked_pow(exp) {
+        p
+    } else if x > T::ZERO || exp.even() {
+        T::MAX
+    } else {
+        T::MIN
+    }
+}
+
+macro_rules! impl_saturating_pow_unsigned {
     ($t:ident) => {
         impl SaturatingPow<u64> for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `saturating_pow` functions in the standard library, for
+            /// example [this one](u32::saturating_pow).
             #[inline]
             fn saturating_pow(self, exp: u64) -> $t {
-                $t::saturating_pow(self, u32::exact_from(exp))
+                saturating_pow_unsigned(self, exp)
             }
         }
+    };
+}
+apply_to_unsigneds!(impl_saturating_pow_unsigned);
 
+macro_rules! impl_saturating_pow_signed {
+    ($t:ident) => {
+        impl SaturatingPow<u64> for $t {
+            type Output = $t;
+
+            /// This is a wrapper over the `saturating_pow` functions in the standard library, for
+            /// example [this one](i32::saturating_pow).
+            #[inline]
+            fn saturating_pow(self, exp: u64) -> $t {
+                saturating_pow_signed(self, exp)
+            }
+        }
+    };
+}
+apply_to_signeds!(impl_saturating_pow_signed);
+
+macro_rules! impl_saturating_pow_primitive_int {
+    ($t:ident) => {
         impl SaturatingPowAssign<u64> for $t {
-            /// Replaces `self` with `self ^ exp`, saturating at the numeric bounds instead of
+            /// Raises a number to a power, in place, saturating at the numeric bounds instead of
             /// overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x^y & m \leq x^y \leq M \\\\
-            ///     M & x^y > M \\\\
-            ///     m & x^y < m,
+            ///     x^y & \text{if} \\quad m \leq x^y \leq M, \\\\
+            ///     M & \text{if} \\quad x^y > M, \\\\
+            ///     m & \text{if} \\quad x^y < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_pow` module.
+            /// See [here](super::saturating_pow#saturating_pow_assign).
             #[inline]
             fn saturating_pow_assign(&mut self, exp: u64) {
                 *self = SaturatingPow::saturating_pow(*self, exp);
@@ -37,4 +93,4 @@ macro_rules! impl_saturating_pow {
         }
     };
 }
-apply_to_primitive_ints!(impl_saturating_pow);
+apply_to_primitive_ints!(impl_saturating_pow_primitive_int);

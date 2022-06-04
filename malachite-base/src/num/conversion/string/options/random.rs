@@ -8,7 +8,9 @@ use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange}
 use random::Seed;
 use rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
 
-/// Generates random `SciSizeOptions`s.
+/// Generates random [`SciSizeOptions`](super::SciSizeOptions)s.
+///
+/// This struct is created by [`random_sci_size_options`]; see its documentation for more.
 pub struct RandomSciSizeOptions {
     bs: RandomBools,
     xs: GeometricRandomNaturalValues<u64>,
@@ -31,10 +33,14 @@ impl Iterator for RandomSciSizeOptions {
     }
 }
 
-/// Generates random `SciSizeOptions`s.
+/// Generates random [`SciSizeOptions`](super::SciSizeOptions)s.
 ///
 /// The scales and precisions are chosen from a geometric distribution whose mean is the
 /// ratio `m_size_numerator / m_size_denominator`.
+///
+/// # Panics
+/// Panics if `m_size_numerator` or `m_size_denominator` are zero, or, if after being reduced to
+/// lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// The output length is infinite.
 pub fn random_sci_size_options(
@@ -48,7 +54,9 @@ pub fn random_sci_size_options(
     }
 }
 
-/// Generates random `ToSciOptions`s.
+/// Generates random [`ToSciOptions`](super::ToSciOptions)s.
+///
+/// This struct is created by [`random_to_sci_options`]; see its documentation for more.
 pub struct RandomToSciOptions {
     us: RandomUnsignedInclusiveRange<u8>,
     rms: RandomRoundingModes,
@@ -74,31 +82,37 @@ impl Iterator for RandomToSciOptions {
     }
 }
 
-/// Generates random `ToSciOptions`s.
+/// Generates random [`ToSciOptions`](super::ToSciOptions)s.
 ///
 /// The scales, precisions, and the negative of the negative exponenet threshold are chosen from a
-/// geometric distribution whose mean is the ratio `m_small_numerator / m_small_denominator`.
+/// geometric distribution whose mean is the ratio `m_size_numerator / m_size_denominator`.
+///
+/// # Panics
+/// Panics if `m_size_numerator` or `m_size_denominator` are zero, or, if after being reduced to
+/// lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// The output length is infinite.
 pub fn random_to_sci_options(
     seed: Seed,
-    m_small_numerator: u64,
-    m_small_denominator: u64,
+    m_size_numerator: u64,
+    m_size_denominator: u64,
 ) -> RandomToSciOptions {
     RandomToSciOptions {
         us: random_unsigned_inclusive_range(seed.fork("us"), 2, 36),
         rms: random_rounding_modes(seed.fork("rms")),
-        sos: random_sci_size_options(seed.fork("sos"), m_small_numerator, m_small_denominator),
+        sos: random_sci_size_options(seed.fork("sos"), m_size_numerator, m_size_denominator),
         is: geometric_random_negative_signeds(
             seed.fork("is"),
-            m_small_numerator,
-            m_small_denominator,
+            m_size_numerator,
+            m_size_denominator,
         ),
         bs: random_bools(seed.fork("bs")),
     }
 }
 
-/// Generates random `FromSciStringOptions`s.
+/// Generates random [`FromSciStringOptions`](super::FromSciStringOptions)s.
+///
+/// This struct is created by [`random_from_sci_string_options`]; see its documentation for more.
 pub struct RandomFromSciStringOptions {
     us: RandomUnsignedInclusiveRange<u8>,
     rms: RandomRoundingModes,
@@ -115,7 +129,7 @@ impl Iterator for RandomFromSciStringOptions {
     }
 }
 
-/// Generates random `FromSciStringOptions`s.
+/// Generates random [`FromSciStringOptions`](super::FromSciStringOptions)s.
 ///
 /// The output length is infinite.
 pub fn random_from_sci_string_options(seed: Seed) -> RandomFromSciStringOptions {

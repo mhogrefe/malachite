@@ -53,10 +53,15 @@ macro_rules! impl_coprime_with {
             /// $f(x, y) = ((k,m,n \in \N \land x=km \land y=kn) \implies k=1)$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::compare_with` module.
+            /// See [here](super::coprime_with#coprime_with).
             #[inline]
             fn coprime_with(self, other: $t) -> bool {
                 coprime_with_check_2(self, other)

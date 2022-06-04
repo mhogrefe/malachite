@@ -15,7 +15,7 @@ const U8_SQUARES: [u8; 16] = [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144,
 impl FloorSqrt for u8 {
     type Output = u8;
 
-    /// Returns the floor of the square root of an integer.
+    /// Returns the floor of the square root of a [`u8`].
     ///
     /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
@@ -23,10 +23,10 @@ impl FloorSqrt for u8 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#floor_sqrt).
     ///
     /// # Notes
-    /// The `u8` implementation uses a lookup table.
+    /// The [`u8`] implementation uses a lookup table.
     fn floor_sqrt(self) -> u8 {
         u8::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) => i,
@@ -38,7 +38,7 @@ impl FloorSqrt for u8 {
 impl CeilingSqrt for u8 {
     type Output = u8;
 
-    /// Returns the ceiling of the square root of an integer.
+    /// Returns the ceiling of the square root of a [`u8`].
     ///
     /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
@@ -46,10 +46,10 @@ impl CeilingSqrt for u8 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#ceiling_sqrt).
     ///
     /// # Notes
-    /// The `u8` implementation uses a lookup table.
+    /// The [`u8`] implementation uses a lookup table.
     fn ceiling_sqrt(self) -> u8 {
         u8::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) | Err(i) => i,
@@ -60,13 +60,12 @@ impl CeilingSqrt for u8 {
 impl CheckedSqrt for u8 {
     type Output = u8;
 
-    /// Returns the the square root of an integer, or `None` if the integer is not a perfect
-    /// square.
+    /// Returns the the square root of a [`u8`], or `None` if the [`u8`] is not a perfect square.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -74,10 +73,10 @@ impl CheckedSqrt for u8 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#checked_sqrt).
     ///
     /// # Notes
-    /// The `u8` implementation uses a lookup table.
+    /// The [`u8`] implementation uses a lookup table.
     fn checked_sqrt(self) -> Option<u8> {
         U8_SQUARES.binary_search(&self).ok().map(u8::wrapping_from)
     }
@@ -87,8 +86,8 @@ impl SqrtRem for u8 {
     type SqrtOutput = u8;
     type RemOutput = u8;
 
-    /// Returns the floor of the square root of an integer, and the remainder (the difference
-    /// between the integer and the square of the floor).
+    /// Returns the floor of the square root of a [`u8`], and the remainder (the difference between
+    /// the [`u8`] and the square of the floor).
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///
@@ -96,10 +95,10 @@ impl SqrtRem for u8 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#sqrt_rem).
     ///
     /// # Notes
-    /// The `u8` implementation uses a lookup table.
+    /// The [`u8`] implementation uses a lookup table.
     fn sqrt_rem(self) -> (u8, u8) {
         match U8_SQUARES.binary_search(&self) {
             Ok(i) => (u8::wrapping_from(i), 0),
@@ -189,8 +188,8 @@ const INV_SQRT_TAB: [u16; 384] = [
     0x04, 0x04, 0x03, 0x03, 0x03, 0x03, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
 ];
 
-/// This is mpn_sqrtrem1 from mpn/generic/sqrtrem.c, GMP 6.2.1, where both the square root and the
-/// remainder are returned.
+// This is equivalent to `mpn_sqrtrem1` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where both the
+// square root and the remainder are returned.
 #[doc(hidden)]
 pub fn sqrt_rem_newton<
     U: PrimitiveUnsigned + WrappingFrom<S>,
@@ -246,7 +245,7 @@ pub fn sqrt_rem_newton<
     (sqrt, n - square)
 }
 
-/// This is n_sqrt from ulong_extras/sqrt.c, FLINT 2.7.1.
+// This is equivalent to `n_sqrt` from `ulong_extras/sqrt.c`, FLINT 2.7.1.
 fn floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
@@ -363,7 +362,7 @@ fn checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f
     }
 }
 
-/// This is n_sqrtrem from ulong_extras/sqrtrem.c, FLINT 2.7.1.
+// This is equivalent to `n_sqrtrem` from `ulong_extras/sqrtrem.c`, FLINT 2.7.1.
 fn sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
@@ -495,10 +494,10 @@ macro_rules! impl_sqrt_newton {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#floor_sqrt).
             ///
             /// # Notes
-            /// For `u32` and `u64`, the square root is computed using Newton's method.
+            /// For [`u32`] and [`u64`], the square root is computed using Newton's method.
             #[inline]
             fn floor_sqrt(self) -> $u {
                 floor_sqrt_newton_helper::<$u, $s>(self)
@@ -516,10 +515,10 @@ macro_rules! impl_sqrt_newton {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#ceiling_sqrt).
             ///
             /// # Notes
-            /// For `u32` and `u64`, the square root is computed using Newton's method.
+            /// For [`u32`] and [`u64`], the square root is computed using Newton's method.
             #[inline]
             fn ceiling_sqrt(self) -> $u {
                 ceiling_sqrt_newton_helper::<$u, $s>(self)
@@ -534,8 +533,8 @@ macro_rules! impl_sqrt_newton {
             ///
             /// $$
             /// f(x) = \\begin{cases}
-            ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -543,10 +542,10 @@ macro_rules! impl_sqrt_newton {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#checked_sqrt).
             ///
             /// # Notes
-            /// For `u32` and `u64`, the square root is computed using Newton's method.
+            /// For [`u32`] and [`u64`], the square root is computed using Newton's method.
             #[inline]
             fn checked_sqrt(self) -> Option<$u> {
                 checked_sqrt_newton_helper::<$u, $s>(self)
@@ -566,10 +565,10 @@ macro_rules! impl_sqrt_newton {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#sqrt_rem).
             ///
             /// # Notes
-            /// For `u32` and `u64`, the square root is computed using Newton's method.
+            /// For [`u32`] and [`u64`], the square root is computed using Newton's method.
             #[inline]
             fn sqrt_rem(self) -> ($u, $u) {
                 sqrt_rem_newton_helper::<$u, $s>(self)
@@ -583,7 +582,7 @@ impl_sqrt_newton!(u64, i64);
 impl FloorSqrt for u16 {
     type Output = u16;
 
-    /// Returns the floor of the square root of an integer.
+    /// Returns the floor of the square root of a [`u16`].
     ///
     /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
@@ -591,10 +590,10 @@ impl FloorSqrt for u16 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#floor_sqrt).
     ///
     /// # Notes
-    /// `u16`s are converted to `u32`s for this computation.
+    /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
     fn floor_sqrt(self) -> u16 {
         u16::wrapping_from(u32::from(self).floor_sqrt())
@@ -604,7 +603,7 @@ impl FloorSqrt for u16 {
 impl CeilingSqrt for u16 {
     type Output = u16;
 
-    /// Returns the ceiling of the square root of an integer.
+    /// Returns the ceiling of the square root of a [`u16`].
     ///
     /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
@@ -612,10 +611,10 @@ impl CeilingSqrt for u16 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#ceiling_sqrt).
     ///
     /// # Notes
-    /// `u16`s are converted to `u32`s for this computation.
+    /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
     fn ceiling_sqrt(self) -> u16 {
         u16::wrapping_from(u32::from(self).ceiling_sqrt())
@@ -625,13 +624,12 @@ impl CeilingSqrt for u16 {
 impl CheckedSqrt for u16 {
     type Output = u16;
 
-    /// Returns the the square root of an integer, or `None` if the integer is not a
-    /// perfect square.
+    /// Returns the the square root of a [`u16`], or `None` if the integer is not a perfect square.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -639,10 +637,10 @@ impl CheckedSqrt for u16 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#checked_sqrt).
     ///
     /// # Notes
-    /// `u16`s are converted to `u32`s for this computation.
+    /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
     fn checked_sqrt(self) -> Option<u16> {
         u32::from(self).checked_sqrt().map(u16::wrapping_from)
@@ -653,8 +651,8 @@ impl SqrtRem for u16 {
     type SqrtOutput = u16;
     type RemOutput = u16;
 
-    /// Returns the floor of the square root of an integer, and the remainder (the
-    /// difference between the integer and the square of the floor).
+    /// Returns the floor of the square root of a [`u16`], and the remainder (the difference
+    /// between the [`u16`] and the square of the floor).
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///
@@ -662,10 +660,10 @@ impl SqrtRem for u16 {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#sqrt_rem).
     ///
     /// # Notes
-    /// `u16`s are converted to `u32`s for this computation.
+    /// The [`u16`] implementation calls the implementation for [`u32`]s.
     #[inline]
     fn sqrt_rem(self) -> (u16, u16) {
         let (sqrt, rem) = u32::from(self).sqrt_rem();
@@ -676,7 +674,7 @@ impl SqrtRem for u16 {
 impl FloorSqrt for usize {
     type Output = usize;
 
-    /// Returns the floor of the square root of an integer.
+    /// Returns the floor of the square root of a [`usize`].
     ///
     /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
@@ -684,10 +682,10 @@ impl FloorSqrt for usize {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#floor_sqrt).
     ///
     /// # Notes
-    /// `usize`s are converted to `u32`s or `u64`s for this computation.
+    /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn floor_sqrt(self) -> usize {
         match usize::WIDTH {
@@ -701,7 +699,7 @@ impl FloorSqrt for usize {
 impl CeilingSqrt for usize {
     type Output = usize;
 
-    /// Returns the ceiling of the square root of an integer.
+    /// Returns the ceiling of the square root of a [`usize`].
     ///
     /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
@@ -709,10 +707,10 @@ impl CeilingSqrt for usize {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#ceiling_sqrt).
     ///
     /// # Notes
-    /// `usize`s are converted to `u32`s or `u64`s for this computation.
+    /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn ceiling_sqrt(self) -> usize {
         match usize::WIDTH {
@@ -726,13 +724,13 @@ impl CeilingSqrt for usize {
 impl CheckedSqrt for usize {
     type Output = usize;
 
-    /// Returns the the square root of an integer, or `None` if the integer is not a
-    /// perfect square.
+    /// Returns the the square root of a [`usize`], or `None` if the [`usize`] is not a perfect
+    /// square.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -740,10 +738,10 @@ impl CheckedSqrt for usize {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#checked_sqrt).
     ///
     /// # Notes
-    /// `usize`s are converted to `u32`s or `u64`s for this computation.
+    /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn checked_sqrt(self) -> Option<usize> {
         match usize::WIDTH {
@@ -762,8 +760,8 @@ impl SqrtRem for usize {
     type SqrtOutput = usize;
     type RemOutput = usize;
 
-    /// Returns the floor of the square root of an integer, and the remainder (the
-    /// difference between the integer and the square of the floor).
+    /// Returns the floor of the square root of a [`usize`], and the remainder (the difference
+    /// between the [`usize`] and the square of the floor).
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///
@@ -771,10 +769,10 @@ impl SqrtRem for usize {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#sqrt_rem).
     ///
     /// # Notes
-    /// `usize`s are converted to `u32`s or `u64`s for this computation.
+    /// The [`usize`] implementation calls the [`u32`] or [`u64`] implementations.
     #[inline]
     fn sqrt_rem(self) -> (usize, usize) {
         match usize::WIDTH {
@@ -798,25 +796,24 @@ const U128_MAX_SQUARE: u128 = 0xfffffffffffffffe0000000000000001;
 impl FloorSqrt for u128 {
     type Output = u128;
 
-    /// Returns the floor of the square root of an integer.
+    /// Returns the floor of the square root of a [`u128`].
     ///
     /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(\log n)$
+    /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
-    /// Constant-time addition, squaring, bit-shifting, and comparison are assumed.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#floor_sqrt).
     ///
     /// # Notes
-    /// For `u128`, using a floating-point approximation and refining the result works, but the
-    /// number of necessary adjustments becomes large for large `u128`s. To overcome this, large
-    /// `u128`s switch to a binary search algorithm. To get decent starting bounds, the following
+    /// For [`u128`], using a floating-point approximation and refining the result works, but the
+    /// number of necessary adjustments becomes large for large [`u128`]s. To overcome this, large
+    /// [`u128`]s switch to a binary search algorithm. To get decent starting bounds, the following
     /// fact is used:
     ///
     /// If $x$ is nonzero and has $b$ significant bits, then
@@ -849,25 +846,24 @@ impl FloorSqrt for u128 {
 impl CeilingSqrt for u128 {
     type Output = u128;
 
-    /// Returns the ceiling of the square root of an integer.
+    /// Returns the ceiling of the square root of a [`u128`].
     ///
     /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(\log n)$
+    /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
-    /// Constant-time addition, squaring, bit-shifting, and comparison is assumed.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#ceiling_sqrt).
     ///
     /// # Notes
-    /// For `u128`, using a floating-point approximation and refining the result works, but the
-    /// number of necessary adjustments becomes large for large `u128`s. To overcome this, large
-    /// `u128`s switch to a binary search algorithm. To get decent starting bounds, the following
+    /// For [`u128`], using a floating-point approximation and refining the result works, but the
+    /// number of necessary adjustments becomes large for large [`u128`]s. To overcome this, large
+    /// [`u128`]s switch to a binary search algorithm. To get decent starting bounds, the following
     /// fact is used:
     ///
     /// If $x$ is nonzero and has $b$ significant bits, then
@@ -900,31 +896,30 @@ impl CeilingSqrt for u128 {
 impl CheckedSqrt for u128 {
     type Output = u128;
 
-    /// Returns the the square root of an integer, or `None` if the integer is not a perfect
+    /// Returns the the square root of a [`u128`], or `None` if the [`u128`] is not a perfect
     /// square.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(\log n)$
+    /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
-    /// Constant-time addition, squaring, bit-shifting, and comparison is assumed.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#checked_sqrt).
     ///
     /// # Notes
-    /// For `u128`, using a floating-point approximation and refining the result works, but the
-    /// number of necessary adjustments becomes large for large `u128`s. To overcome this, large
-    /// `u128`s switch to a binary search algorithm. To get decent starting bounds, the following
+    /// For [`u128`], using a floating-point approximation and refining the result works, but the
+    /// number of necessary adjustments becomes large for large [`u128`]s. To overcome this, large
+    /// [`u128`]s switch to a binary search algorithm. To get decent starting bounds, the following
     /// fact is used:
     ///
     /// If $x$ is nonzero and has $b$ significant bits, then
@@ -958,26 +953,25 @@ impl SqrtRem for u128 {
     type SqrtOutput = u128;
     type RemOutput = u128;
 
-    /// Returns the floor of the square root of an integer, and the remainder (the difference
-    /// between the integer and the square of the floor).
+    /// Returns the floor of the square root of a [`u128`], and the remainder (the difference
+    /// between the [`u128`] and the square of the floor).
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(\log n)$
+    /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
-    /// Constant-time addition, squaring, bit-shifting, and comparison is assumed.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::sqrt` module.
+    /// See [here](super::sqrt#sqrt_rem).
     ///
     /// # Notes
-    /// For `u128`, using a floating-point approximation and refining the result works, but the
-    /// number of necessary adjustments becomes large for large `u128`s. To overcome this, large
-    /// `u128`s switch to a binary search algorithm. To get decent starting bounds, the following
+    /// For [`u128`], using a floating-point approximation and refining the result works, but the
+    /// number of necessary adjustments becomes large for large [`u128`]s. To overcome this, large
+    /// [`u128`]s switch to a binary search algorithm. To get decent starting bounds, the following
     /// fact is used:
     ///
     /// If $x$ is nonzero and has $b$ significant bits, then
@@ -1023,7 +1017,7 @@ macro_rules! impl_sqrt_signed {
             /// Panics if `self` is negative.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#floor_sqrt).
             #[inline]
             fn floor_sqrt(self) -> Self {
                 if self >= 0 {
@@ -1048,7 +1042,7 @@ macro_rules! impl_sqrt_signed {
             /// Panics if `self` is negative.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#ceiling_sqrt).
             #[inline]
             fn ceiling_sqrt(self) -> $s {
                 if self >= 0 {
@@ -1067,8 +1061,8 @@ macro_rules! impl_sqrt_signed {
             ///
             /// $$
             /// f(x) = \\begin{cases}
-            ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -1079,7 +1073,7 @@ macro_rules! impl_sqrt_signed {
             /// Panics if `self` is negative.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#checked_sqrt).
             #[inline]
             fn checked_sqrt(self) -> Option<$s> {
                 if self >= 0 {
@@ -1109,7 +1103,7 @@ macro_rules! impl_sqrt_assign_rem_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#sqrt_assign_rem).
             #[inline]
             fn sqrt_assign_rem(&mut self) -> $t {
                 let rem;
@@ -1135,7 +1129,7 @@ macro_rules! impl_sqrt_assign {
             /// Panics if `self` is negative.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#floor_sqrt_assign).
             #[inline]
             fn floor_sqrt_assign(&mut self) {
                 *self = self.floor_sqrt();
@@ -1154,7 +1148,7 @@ macro_rules! impl_sqrt_assign {
             /// Panics if `self` is negative.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#ceiling_sqrt_assign).
             #[inline]
             fn ceiling_sqrt_assign(&mut self) {
                 *self = self.ceiling_sqrt();
@@ -1176,7 +1170,7 @@ macro_rules! impl_sqrt_primitive_float {
         }
 
         impl SqrtAssign for $f {
-            /// Replaces `self` with its square root.
+            /// Replaces a number with its square root.
             ///
             /// $x \gets \sqrt x$.
             ///
@@ -1184,7 +1178,7 @@ macro_rules! impl_sqrt_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
+            /// See [here](super::sqrt#sqrt_assign).
             #[inline]
             fn sqrt_assign(&mut self) {
                 *self = self.sqrt();

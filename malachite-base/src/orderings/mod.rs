@@ -2,9 +2,9 @@ use std::cmp::Ordering;
 
 pub(crate) const ORDERINGS: [Ordering; 3] = [Ordering::Equal, Ordering::Less, Ordering::Greater];
 
-/// Converts a `&str` to a `Ordering`.
+/// Converts a string to an [`Ordering`].
 ///
-/// If the `&str` does not represent a valid `Ordering`, `None` is returned.
+/// If the string` does not represent a valid [`Ordering`], `None` is returned.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -29,7 +29,7 @@ pub fn ordering_from_str(src: &str) -> Option<Ordering> {
     }
 }
 
-/// Iterators that generate `Ordering`s without repetition.
+/// Iterators that generate [`Ordering`]s without repetition.
 pub mod exhaustive;
-/// Iterators that generate `Ordering`s randomly.
+/// Iterators that generate [`Ordering`]s randomly.
 pub mod random;

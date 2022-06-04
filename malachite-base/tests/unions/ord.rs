@@ -1,5 +1,5 @@
+use extra_variadic::Union3;
 use malachite_base::test_util::common::test_cmp_helper;
-use malachite_base::unions::Union3;
 
 #[test]
 fn test_cmp() {

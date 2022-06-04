@@ -32,25 +32,24 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_unsigned {
                 impl ArithmeticCheckedShl<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` left (multiplies it by a power of 2). If the result is too
-                    /// large to fit in a `$t`, `None` is returned.
+                    /// Left-shifts a number (multiplies it by a power of 2). If the result is too
+                    /// large to be represented, `None` is returned.
                     ///
                     /// Zero may be shifted by any amount.
                     ///
                     /// $$
                     /// f(x, b) = \\begin{cases}
-                    ///     \operatorname{Some}(2^b x) & 2^b x < 2^W \\\\
-                    ///     \operatorname{None} & 2^b x \geq 2^W,
+                    ///     \operatorname{Some}(2^b x) & \text{if} \\quad 2^b x < 2^W, \\\\
+                    ///     \operatorname{None} & \text{if} \\quad 2^b x \geq 2^W,
                     /// \\end{cases}
                     /// $$
-                    /// where $W$ is `$t::WIDTH`.
+                    /// where $W$ is `Self::WIDTH`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::arithmetic_checked_shl`
-                    /// module.
+                    /// See [here](super::arithmetic_checked_shl#arithmetic_checked_shl).
                     #[inline]
                     fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                         arithmetic_checked_shl_unsigned_unsigned(self, bits)
@@ -90,8 +89,8 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_signed {
                 impl ArithmeticCheckedShl<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` left (multiplies it by a power of 2). If the result is too
-                    /// large to fit in a `$t`, `None` is returned.
+                    /// Left-shifts a number (multiplies it by a power of 2). If the result is too
+                    /// large to be represented, `None` is returned.
                     ///
                     /// Zero may be shifted by any amount, and any number may be shifted by any
                     /// negative amount; shifting by a negative amount with a high absolute value
@@ -99,19 +98,21 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_signed {
                     ///
                     /// $$
                     /// f(x, b) = \\begin{cases}
-                    ///     \operatorname{Some}(2^b x) & b \geq 0 \\ \mathrm{and}\\ 2^b x < 2^W \\\\
-                    ///     \operatorname{None} & b \geq 0 \\ \mathrm{and} \\ 2^b x \geq 2^W \\\\
-                    ///     \operatorname{Some}(\lfloor x/2^{-b} \rfloor) & b < 0,
+                    ///     \operatorname{Some}(2^b x) &
+                    ///         \text{if} \\quad b \geq 0 \\ \mathrm{and}\\ 2^b x < 2^W, \\\\
+                    ///     \operatorname{None} &
+                    ///         \text{if} \\quad b \geq 0 \\ \mathrm{and} \\ 2^b x \geq 2^W, \\\\
+                    ///     \operatorname{Some}(\lfloor x/2^{-b} \rfloor) &
+                    ///         \text{if} \\quad b < 0,
                     /// \\end{cases}
                     /// $$
-                    /// where $W$ is `$t::WIDTH`.
+                    /// where $W$ is `Self::WIDTH`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::arithmetic_checked_shl`
-                    /// module.
+                    /// See [here](super::arithmetic_checked_shl#arithmetic_checked_shl).
                     #[inline]
                     fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                         arithmetic_checked_shl_unsigned_signed(self, bits)
@@ -153,26 +154,27 @@ macro_rules! impl_arithmetic_checked_shl_signed_unsigned {
                 impl ArithmeticCheckedShl<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` left (multiplies it by a power of 2). If the result is does
-                    /// not fit in a `$t`, `None` is returned.
+                    /// Left-shifts a number (multiplies it by a power of 2). If the result is too
+                    /// large to be represented, `None` is returned.
                     ///
                     /// Zero may be shifted by any amount.
                     ///
                     /// $$
                     /// f(x, b) = \\begin{cases}
-                    ///     \operatorname{Some}(2^b x) & -2^{W-1} \leq 2^b x < 2^{W-1} \\\\
+                    ///     \operatorname{Some}(2^b x) &
+                    ///         \text{if} \\quad -2^{W-1} \leq 2^b x < 2^{W-1}, \\\\
                     ///     \operatorname{None} &
-                    ///         2^b x < -2^{W-1} \\ \mathrm{or} \\ 2^b x \geq 2^{W-1}, \\\\
+                    ///         \text{if} \\quad 2^b x < -2^{W-1} \\ \mathrm{or}
+                    ///         \\ 2^b x \geq 2^{W-1}, \\\\
                     /// \\end{cases}
                     /// $$
-                    /// where $W$ is `$t::WIDTH`.
+                    /// where $W$ is `Self::WIDTH`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::arithmetic_checked_shl`
-                    /// module.
+                    /// See [here](super::arithmetic_checked_shl#arithmetic_checked_shl).
                     #[inline]
                     fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                         arithmetic_checked_shl_signed_unsigned(self, bits)
@@ -213,8 +215,8 @@ macro_rules! impl_arithmetic_checked_shl_signed_signed {
                 impl ArithmeticCheckedShl<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` left (multiplies it by a power of 2). If the result is too
-                    /// large to fit in a `$t`, `None` is returned.
+                    /// Left-shifts a number (multiplies it by a power of 2). If the result is too
+                    /// large to be represented, `None` is returned.
                     ///
                     /// Zero may be shifted by any amount, and any number may be shifted by any
                     /// negative amount; shifting by a negative amount with a high absolute value
@@ -224,21 +226,21 @@ macro_rules! impl_arithmetic_checked_shl_signed_signed {
                     /// $$
                     /// f(x, b) = \\begin{cases}
                     ///     \operatorname{Some}(2^b x) &
-                    ///         b \geq 0 \\ \mathrm{and}\\ -2^{W-1} \leq 2^b x < 2^{W-1} \\\\
+                    ///         \text{if} \\quad b \geq 0 \\ \mathrm{and}
+                    ///         \\ -2^{W-1} \leq 2^b x < 2^{W-1}, \\\\
                     ///     \operatorname{None} &
-                    ///         b \geq 0 \\ \mathrm{and} \\ (2^b x < -2^{W-1} \\ \mathrm{or}
-                    ///         \\ 2^b x \geq 2^{W-1}) \\\\
-                    ///     \operatorname{Some}(\lfloor x/2^{-b} \rfloor) & b < 0,
+                    ///         \text{if} \\quad b \geq 0 \\ \mathrm{and}
+                    ///         \\ (2^b x < -2^{W-1} \\ \mathrm{or} \\ 2^b x \geq 2^{W-1}), \\\\
+                    ///     \operatorname{Some}(\lfloor x/2^{-b} \rfloor) & \text{if} \\quad b < 0,
                     /// \\end{cases}
                     /// $$
-                    /// where $W$ is `$t::WIDTH`.
+                    /// where $W$ is `Self::WIDTH`.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::arithmetic_checked_shl`
-                    /// module.
+                    /// See [here](super::arithmetic_checked_shl#arithmetic_checked_shl).
                     fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                         arithmetic_checked_shl_signed_signed(self, bits)
                     }

@@ -43,14 +43,14 @@ use std::ops::{
 };
 use std::str::FromStr;
 
-/// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
+/// Defines functions on primitive integer types: uxx, ixx, usize, and isize.
 ///
 /// The different types are distinguished by whether they are signed or unsigned, and by their
-/// widths. The width, which we also call $W$, is the number of bits in the type. For example, the
-/// width of `u32` or `i32` is 32. Each type has $2^W$ distinct values.
+/// widths. The width $W$ is the number of bits in the type. For example, the width of [`u32`] or
+/// [`i32`] is 32. Each type has $2^W$ distinct values.
 ///
-/// Let $n$ be a value of type `T`. If `T` is unsigned, $0 \leq n < 2^W$. If `T` is signed,
-/// $2^{W-1} \leq n < 2^{W-1}$.
+/// Let $n$ be a value of type `Self`. If `Self` is unsigned, $0 \leq n < 2^W$. If `Self`
+/// is signed, $2^{W-1} \leq n < 2^{W-1}$.
 pub trait PrimitiveInt:
     'static
     + Add<Self, Output = Self>
@@ -462,28 +462,29 @@ pub trait PrimitiveInt:
     /// The number of bits of `Self`.
     const WIDTH: u64;
 
-    /// The base-2 logarithm of the number of bits of `Self`. Instead of `n / WIDTH`, use
-    /// `n >> LOG_WIDTH`.
+    /// The base-2 logarithm of the number of bits of `Self`.
     ///
-    /// This is $\log_2 W$, where $W$ is `Self::WIDTH`.
+    /// Whenever you need to use `n / WIDTH`, you can use `n >> LOG_WIDTH` instead.
+    ///
+    /// This is $\log_2 W$.
     ///
     /// Note that this value is correct for all of the built-in primitive integer types, but it will
-    /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
+    /// not be correct for custom types whose $W$ is not a power of 2. For such implementations,
     /// `LOG_WIDTH` should not be used.
     const LOG_WIDTH: u64 = Self::WIDTH.trailing_zeros() as u64;
 
-    /// A mask that consists of `LOG_WIDTH` bits. Instead of `n % WIDTH`, use `n & WIDTH_MASK`.
+    /// A mask that consists of `LOG_WIDTH` bits.
     ///
-    /// This is $W - 1$, where $W$ is `Self::WIDTH`.
+    /// Whenever you need to use `n % WIDTH`, you can use `n & WIDTH_MASK` instead.
+    ///
+    /// This is $W - 1$.
     ///
     /// Note that this value is correct for all of the built-in primitive integer types, but it will
-    /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
+    /// not be correct for custom types whose $W$ is not a power of 2. For such implementations,
     /// `WIDTH_MASK` should not be used.
     const WIDTH_MASK: u64 = Self::WIDTH - 1;
 
     /// Gets the most-significant bit of `Self`. For signed integers, this is the sign bit.
-    ///
-    /// Let $W$ be `Self::WIDTH`.
     ///
     /// If `Self` is unsigned, $f(n) = (n \geq 2^{W-1})$. If `Self` is unsigned, $f(n) = (n < 0)$.
     ///
@@ -505,11 +506,12 @@ pub trait PrimitiveInt:
     }
 }
 
-/// This macro defines basic trait implementations that are the same for unsigned and signed types.
+/// Defines basic trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_basic_traits_primitive_int {
     ($t:ident, $width:expr) => {
         /// # Examples
-        /// See the documentation of the `num::integers` module.
+        ///
+        /// See [here](self).
         impl PrimitiveInt for $t {
             const WIDTH: u64 = $width;
         }
@@ -518,48 +520,44 @@ macro_rules! impl_basic_traits_primitive_int {
 
         /// The constant 0.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl Zero for $t {
             const ZERO: $t = 0;
         }
 
         /// The constant 1.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl One for $t {
             const ONE: $t = 1;
         }
 
         /// The constant 2.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl Two for $t {
             const TWO: $t = 2;
         }
 
         /// The lowest value representable by this type.
         ///
-        /// Let $W$ be `Self::WIDTH`.
-        ///
         /// If `Self` is unsigned, `MIN` is 0. If `Self` is signed, `MIN` is $-2^{W-1}$.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl Min for $t {
             const MIN: $t = std::$t::MIN;
         }
 
         /// The highest value representable by this type.
         ///
-        /// Let $W$ be `Self::WIDTH`.
-        ///
         /// If `Self` is unsigned, `MAX` is $2^W-1$. If `Self` is signed, `MAX` is $2^{W-1}-1$.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl Max for $t {
             const MAX: $t = std::$t::MAX;
         }

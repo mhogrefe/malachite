@@ -10,14 +10,18 @@ use std::str::FromStr;
 impl FromStr for Natural {
     type Err = ();
 
-    /// Converts an `&str` to a `Natural`.
+    /// Converts an string to a [`Natural`].
     ///
-    /// If the `&str` does not represent a valid `Natural`, an `Err` is returned. To be valid, the
-    /// string must be nonempty and only contain the `char`s `'0'` through `'9'`. Leading zeros are
-    /// allowed.
+    /// If the string does not represent a valid [`Natural`], an `Err` is returned. To be valid,
+    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`. Leading
+    /// zeros are allowed.
     ///
     /// # Worst-case complexity
-    /// // TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Examples
     /// ```
@@ -54,7 +58,7 @@ fn from_binary_str(s: &str) -> Option<Natural> {
             if remaining == 0 {
                 i -= 1;
                 x = &mut xs[i];
-                remaining = Limb::WIDTH
+                remaining = Limb::WIDTH;
             }
             *x <<= 1;
             match b {
@@ -144,15 +148,19 @@ fn from_hex_str(s: &str) -> Option<Natural> {
 }
 
 impl FromStringBase for Natural {
-    /// Converts an `&str`, in a specified base, to a `Natural`.
+    /// Converts an string, in a specified base, to a [`Natural`].
     ///
-    /// If the `&str` does not represent a valid `Natural`, an `Err` is returned. To be valid, the
-    /// string must be nonempty and only contain the `char`s `'0'` through `'9'`, `'a'` through
-    /// `'z'`, and `'A'` through `'Z'`; and only characters that represent digits smaller than the
-    /// base are allowed. Leading zeros are always allowed.
+    /// If the string does not represent a valid [`Natural`], an `Err` is returned. To be valid,
+    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'`
+    /// through `'z'`, and `'A'` through `'Z'`; and only characters that represent digits smaller
+    /// than the base are allowed. Leading zeros are always allowed.
     ///
     /// # Worst-case complexity
-    /// // TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -167,14 +175,8 @@ impl FromStringBase for Natural {
     /// assert_eq!(Natural::from_string_base(10, "123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(10, "00123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(16, "0").unwrap(), 0);
-    /// assert_eq!(
-    ///     Natural::from_string_base(16, "deadbeef").unwrap(),
-    ///     3735928559u32
-    /// );
-    /// assert_eq!(
-    ///     Natural::from_string_base(16, "deAdBeEf").unwrap(),
-    ///     3735928559u32
-    /// );
+    /// assert_eq!(Natural::from_string_base(16, "deadbeef").unwrap(), 3735928559u32);
+    /// assert_eq!(Natural::from_string_base(16, "deAdBeEf").unwrap(), 3735928559u32);
     ///
     /// assert!(Natural::from_string_base(10, "").is_none());
     /// assert!(Natural::from_string_base(10, "a").is_none());

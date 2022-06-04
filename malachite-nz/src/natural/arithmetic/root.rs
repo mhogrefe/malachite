@@ -26,6 +26,12 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn limbs_shl_helper(xs: &mut [Limb], len: usize, out_start_index: usize, bits: u64) -> Limb {
     assert!(bits < Limb::WIDTH);
     if len == 0 {
@@ -40,6 +46,12 @@ fn limbs_shl_helper(xs: &mut [Limb], len: usize, out_start_index: usize, bits: u
     }
 }
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn shr_helper(out: &mut [Limb], xs: &[Limb], shift: u64) {
     if shift == 0 {
         out[..xs.len()].copy_from_slice(xs);
@@ -48,6 +60,12 @@ fn shr_helper(out: &mut [Limb], xs: &[Limb], shift: u64) {
     }
 }
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn div_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     assert!(*ns.last().unwrap() != 0);
     assert!(*ds.last().unwrap() != 0);
@@ -107,7 +125,10 @@ const LOGROOT_RETURNED_BITS: u64 = if LOGROOT_NEEDS_TWO_CORRECTIONS {
     LOGROOT_USED_BITS
 };
 
-// This is logbased_root from mpn/generic/rootrem.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `logbased_root` from `mpn/generic/rootrem.c`, GMP 6.2.1.
 fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 {
     const LOGROOT_USED_BITS_COMP: u64 = Limb::WIDTH - LOGROOT_USED_BITS;
     let len;
@@ -134,7 +155,14 @@ fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 
 
 // If approx is non-zero, does not compute the final remainder.
 //
-// This is mpn_rootrem_internal from mpn/generic/rootrem.c, GMP 6.2.1.
+/// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_rootrem_internal` from `mpn/generic/rootrem.c`, GMP 6.2.1.
 fn limbs_root_to_out_internal(
     out_root: &mut [Limb],
     out_rem: Option<&mut [Limb]>,
@@ -447,7 +475,15 @@ fn limbs_root_to_out_internal(
 
 // Returns the size (in limbs) of the remainder.
 //
-// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_rootrem` from `mpn/generic/rootrem.c`, GMP 6.2.1, where `k != 2` and
+// `remp` is not `NULL`.
 pub_test! {limbs_root_rem_to_out(
     out_root: &mut [Limb],
     out_rem: &mut [Limb],
@@ -464,7 +500,15 @@ pub_test! {limbs_root_rem_to_out(
 
 // Returns a non-zero value iff the remainder is non-zero.
 //
-// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_rootrem` from `mpn/generic/rootrem.c`, GMP 6.2.1, where `remp` is
+// `NULL`.
 pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
@@ -494,6 +538,12 @@ pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64)
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     let mut out = vec![
         0;
@@ -504,6 +554,12 @@ pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     (out, inexact)
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut root_out = vec![
         0;
@@ -516,56 +572,19 @@ pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     (root_out, rem_out)
 }}
 
-impl FloorRootAssign<u64> for Natural {
-    /// Replaces a `Natural` with the floor of its $n$th root.
-    ///
-    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// Panics if `exp` is zero.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::FloorRootAssign;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let mut x = Natural::from(999u16);
-    /// x.floor_root_assign(3);
-    /// assert_eq!(x, 9);
-    ///
-    /// let mut x = Natural::from(1000u16);
-    /// x.floor_root_assign(3);
-    /// assert_eq!(x, 10);
-    ///
-    /// let mut x = Natural::from(1001u16);
-    /// x.floor_root_assign(3);
-    /// assert_eq!(x, 10);
-    ///
-    /// let mut x = Natural::from(100000000000u64);
-    /// x.floor_root_assign(5);
-    /// assert_eq!(x, 158);
-    /// ```
-    #[inline]
-    fn floor_root_assign(&mut self, exp: u64) {
-        *self = (&*self).floor_root(exp);
-    }
-}
-
 impl FloorRoot<u64> for Natural {
     type Output = Natural;
 
-    /// Returns the floor of the $n$th root of a `Natural`, taking the `Natural` by value.
+    /// Returns the floor of the $n$th root of a [`Natural`], taking the [`Natural`] by value.
     ///
     /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -573,7 +592,6 @@ impl FloorRoot<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::natural::Natural;
@@ -601,12 +619,16 @@ impl FloorRoot<u64> for Natural {
 impl<'a> FloorRoot<u64> for &'a Natural {
     type Output = Natural;
 
-    /// Returns the floor of the $n$th root of a `Natural`, taking the `Natural` by reference.
+    /// Returns the floor of the $n$th root of a [`Natural`], taking the [`Natural`] by reference.
     ///
     /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -614,7 +636,6 @@ impl<'a> FloorRoot<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::natural::Natural;
@@ -639,13 +660,17 @@ impl<'a> FloorRoot<u64> for &'a Natural {
     }
 }
 
-impl CeilingRootAssign<u64> for Natural {
-    /// Replaces a `Natural` with the ceiling of its $n$th root.
+impl FloorRootAssign<u64> for Natural {
+    /// Replaces a [`Natural`] with the floor of its $n$th root.
     ///
-    /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -653,42 +678,45 @@ impl CeilingRootAssign<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
+    /// use malachite_base::num::arithmetic::traits::FloorRootAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(999u16);
-    /// x.ceiling_root_assign(3);
-    /// assert_eq!(x, 10);
+    /// x.floor_root_assign(3);
+    /// assert_eq!(x, 9);
     ///
     /// let mut x = Natural::from(1000u16);
-    /// x.ceiling_root_assign(3);
+    /// x.floor_root_assign(3);
     /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(1001u16);
-    /// x.ceiling_root_assign(3);
-    /// assert_eq!(x, 11);
+    /// x.floor_root_assign(3);
+    /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(100000000000u64);
-    /// x.ceiling_root_assign(5);
-    /// assert_eq!(x, 159);
+    /// x.floor_root_assign(5);
+    /// assert_eq!(x, 158);
     /// ```
     #[inline]
-    fn ceiling_root_assign(&mut self, exp: u64) {
-        *self = (&*self).ceiling_root(exp);
+    fn floor_root_assign(&mut self, exp: u64) {
+        *self = (&*self).floor_root(exp);
     }
 }
 
 impl CeilingRoot<u64> for Natural {
     type Output = Natural;
 
-    /// Returns the ceiling of the $n$th root of a `Natural`, taking the `Natural` by value.
+    /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by value.
     ///
     /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -696,7 +724,6 @@ impl CeilingRoot<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::natural::Natural;
@@ -730,12 +757,17 @@ impl CeilingRoot<u64> for Natural {
 impl<'a> CeilingRoot<u64> for &'a Natural {
     type Output = Natural;
 
-    /// Returns the ceiling of the $n$th root of a `Natural`, taking the `Natural` by reference.
+    /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by
+    /// reference.
     ///
     /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -743,7 +775,6 @@ impl<'a> CeilingRoot<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::natural::Natural;
@@ -774,21 +805,17 @@ impl<'a> CeilingRoot<u64> for &'a Natural {
     }
 }
 
-impl CheckedRoot<u64> for Natural {
-    type Output = Natural;
-
-    /// Returns the the $n$th root of a `Natural`, or `None` if the `Natural` is not a perfect
-    /// $n$th power. The `Natural` is taken by value.
+impl CeilingRootAssign<u64> for Natural {
+    /// Replaces a [`Natural`] with the ceiling of its $n$th root.
     ///
-    /// $$
-    /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
-    /// \\end{cases}
-    /// $$
+    /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -796,7 +823,58 @@ impl CheckedRoot<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(999u16);
+    /// x.ceiling_root_assign(3);
+    /// assert_eq!(x, 10);
+    ///
+    /// let mut x = Natural::from(1000u16);
+    /// x.ceiling_root_assign(3);
+    /// assert_eq!(x, 10);
+    ///
+    /// let mut x = Natural::from(1001u16);
+    /// x.ceiling_root_assign(3);
+    /// assert_eq!(x, 11);
+    ///
+    /// let mut x = Natural::from(100000000000u64);
+    /// x.ceiling_root_assign(5);
+    /// assert_eq!(x, 159);
+    /// ```
+    #[inline]
+    fn ceiling_root_assign(&mut self, exp: u64) {
+        *self = (&*self).ceiling_root(exp);
+    }
+}
+
+impl CheckedRoot<u64> for Natural {
+    type Output = Natural;
+
+    /// Returns the the $n$th root of a [`Natural`], or `None` if the [`Natural`] is not a perfect
+    /// $n$th power. The [`Natural`] is taken by value.
+    ///
+    /// $$
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
+    /// \\end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -832,18 +910,22 @@ impl CheckedRoot<u64> for Natural {
 impl<'a> CheckedRoot<u64> for &'a Natural {
     type Output = Natural;
 
-    /// Returns the the $n$th root of a `Natural`, or `None` if the `Natural` is not a perfect
-    /// $n$th power. The `Natural` is taken by reference.
+    /// Returns the the $n$th root of a [`Natural`], or `None` if the [`Natural`] is not a perfect
+    /// $n$th power. The [`Natural`] is taken by reference.
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -851,7 +933,6 @@ impl<'a> CheckedRoot<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
@@ -887,67 +968,26 @@ impl<'a> CheckedRoot<u64> for &'a Natural {
     }
 }
 
-impl RootAssignRem for Natural {
-    type RemOutput = Natural;
-
-    /// Replaces a `Natural` with the floor of its $n$th root, and returns the remainder (the
-    /// difference between the original `Natural` and the $n$th power of the floor).
-    ///
-    /// $f(x, n) = x - \lfloor\sqrt\[n\]{x}\rfloor^2$,
-    ///
-    /// $x \gets \lfloor\root{x}\rfloor$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::RootAssignRem;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let mut x = Natural::from(999u16);
-    /// assert_eq!(x.root_assign_rem(3), 270);
-    /// assert_eq!(x, 9);
-    ///
-    /// let mut x = Natural::from(1000u16);
-    /// assert_eq!(x.root_assign_rem(3), 0);
-    /// assert_eq!(x, 10);
-    ///
-    /// let mut x = Natural::from(1001u16);
-    /// assert_eq!(x.root_assign_rem(3), 1);
-    /// assert_eq!(x, 10);
-    ///
-    /// let mut x = Natural::from(100000000000u64);
-    /// assert_eq!(x.root_assign_rem(5), 1534195232);
-    /// assert_eq!(x, 158);
-    /// ```
-    #[inline]
-    fn root_assign_rem(&mut self, exp: u64) -> Natural {
-        let rem;
-        (*self, rem) = (&*self).root_rem(exp);
-        rem
-    }
-}
-
-impl RootRem for Natural {
+impl RootRem<u64> for Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 
-    /// Returns the floor of the $n$th root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the $n$th power of the floor). The `Natural` is taken by value.
+    /// Returns the floor of the $n$th root of a [`Natural`], and the remainder (the difference
+    /// between the [`Natural`] and the $n$th power of the floor). The [`Natural`] is taken by
+    /// value.
     ///
-    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^2)$.
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RootRem;
     /// use malachite_base::strings::ToDebugString;
@@ -983,23 +1023,26 @@ impl RootRem for Natural {
     }
 }
 
-impl<'a> RootRem for &'a Natural {
+impl<'a> RootRem<u64> for &'a Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 
-    /// Returns the floor of the $n$th root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the $n$th power of the floor). The `Natural` is taken by
-    /// reference.
+    /// Returns the floor of the $n$th root of a [`Natural`], and the
+    /// remainder (the difference between the [`Natural`] and the $n$th
+    /// power of the floor). The [`Natural`] is taken by reference.
     ///
-    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^2)$.
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RootRem;
     /// use malachite_base::strings::ToDebugString;
@@ -1032,5 +1075,53 @@ impl<'a> RootRem for &'a Natural {
                 }
             },
         }
+    }
+}
+
+impl RootAssignRem<u64> for Natural {
+    type RemOutput = Natural;
+
+    /// Replaces a [`Natural`] with the floor of its $n$th root, and returns the remainder (the
+    /// difference between the original [`Natural`] and the $n$th power of the floor).
+    ///
+    /// $f(x, n) = x - \lfloor\sqrt\[n\]{x}\rfloor^n$,
+    ///
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::RootAssignRem;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(999u16);
+    /// assert_eq!(x.root_assign_rem(3), 270);
+    /// assert_eq!(x, 9);
+    ///
+    /// let mut x = Natural::from(1000u16);
+    /// assert_eq!(x.root_assign_rem(3), 0);
+    /// assert_eq!(x, 10);
+    ///
+    /// let mut x = Natural::from(1001u16);
+    /// assert_eq!(x.root_assign_rem(3), 1);
+    /// assert_eq!(x, 10);
+    ///
+    /// let mut x = Natural::from(100000000000u64);
+    /// assert_eq!(x.root_assign_rem(5), 1534195232);
+    /// assert_eq!(x, 158);
+    /// ```
+    #[inline]
+    fn root_assign_rem(&mut self, exp: u64) -> Natural {
+        let rem;
+        (*self, rem) = (&*self).root_rem(exp);
+        rem
     }
 }

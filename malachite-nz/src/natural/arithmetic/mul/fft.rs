@@ -483,13 +483,13 @@ const SQR_FFT_TABLE3: [(usize, usize); SQR_FFT_TABLE3_SIZE] = [
     (0x800000, 24),
 ];
 
-/// Find the best k to use for a mod 2<sup>m * Limb::WIDTH</sup> + 1 FFT for m >= n.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_fft_best_k from mpn/generic/mul_fft.c, GMP 6.2.1, the mpn_fft_table3 variant.
+// Find the best `k` to use for $a \mod 2^{Wm}+1$ FFT for $m >= n$.
+//
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_fft_best_k` from `mpn/generic/mul_fft.c`, GMP 6.2.1, the
+// `mpn_fft_table3` variant.
 pub(crate) fn limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     let fft_table: &[(usize, usize)] = if square {
         &SQR_FFT_TABLE3
@@ -507,14 +507,15 @@ pub(crate) fn limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     last_k
 }
 
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_fft_mul from gmp-impl.h, GMP 6.2.1, and mpn_nussbaumer_mul from
-// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.2.1.
+// This is equivalent to `mpn_fft_mul` from `gmp-impl.h`, GMP 6.2.1, and `mpn_nussbaumer_mul` from
+// `mpn/generic/mpn_nussbaumer_mul.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -531,14 +532,17 @@ pub_crate_test! {limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys:
     }
 }}
 
-/// Initialize table[i][j] with bitrev(j).
-///
-/// Time: worst case O(2<sup>k</sup>)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_fft_initl from mpn/generic/mul_fft.c, GMP 6.2.1.
-fn limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<&[usize]> {
+// Initialize `table[i][j]` with `bitrev(j)`.
+//
+// # Worst-case complexity
+// $T(n) = O(2^n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `k`.
+//
+// This is equivalent to `mpn_fft_initl` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
+fn limbs_mul_fft_bit_reverse_table(mut scratch: &mut [Limb], k: usize) -> Vec<&[Limb]> {
     let mut table = Vec::with_capacity(k + 1);
     for i in 0..=k {
         // force scratch to move rather than be borrowed
@@ -558,30 +562,30 @@ fn limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<&
     table.into_iter().map(|row| &*row).collect()
 }
 
-/// Return the LCM of a and 2<sup>k</sup>.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c, GMP 6.2.1.
+// Return the LCM of $a$ and $2^k$.
+//
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_mul_fft_lcm` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 fn limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
     a << k.saturating_sub(usize::exact_from(a.trailing_zeros()))
 }
 
-/// Given xs with xs[n] <= 1, reduce it modulo 2<sup>n * Limb::WIDTH</sup> + 1, by subtracting that
-/// modulus if necessary.
-///
-/// If xs is exactly 2<sup>n * Limb::WIDTH</sup> then limbs_sub_limb_in_place produces a borrow and
-/// the limbs must be zeroed out again. This will occur very infrequently.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_normalize from mpn/generic/mul_fft.c, GMP 6.2.1.
+// Given `xs` with `xs[n] <= 1`, reduce it modulo $2^{Wn}+1$, by subtracting that modulus if
+// necessary.
+//
+// If `xs` is exactly $2^{Wn}$ then `limbs_sub_limb_in_place` produces a borrow and the limbs must
+// be zeroed out again. This will occur very infrequently.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_fft_normalize` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 fn limbs_mul_fft_normalize(xs: &mut [Limb]) {
     if *xs.last().unwrap() != 0 {
         assert!(!limbs_sub_limb_in_place(xs, 1));
@@ -595,13 +599,15 @@ fn limbs_mul_fft_normalize(xs: &mut [Limb]) {
     }
 }
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, GMP 6.2.1, where r == a.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_fft_add_modF` from `mpn/generic/mul_fft.c`, GMP 6.2.1, where
+// `r == a`.
 fn limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     let (ys_last, ys_init) = ys.split_last().unwrap();
@@ -621,15 +627,16 @@ fn limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     }
 }
 
-/// out <- xs - ys mod 2<sup>n * Limb::WIDTH</sup> + 1. Assumes xs and ys are semi-normalized.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
+// `out` becomes $X - Y \mod 2^{Wn} + 1$. Assumes `xs` and `ys` are semi-normalized.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_fft_sub_modF` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 fn limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len() - 1;
     let mut carry = xs[n].wrapping_sub(ys[n]);
@@ -645,16 +652,17 @@ fn limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     }
 }
 
-/// out <- xs * 2<sup>bits</sup> mod 2<sup>n * Limb::WIDTH</sup> + 1. Assumes xs is semi-normalized,
-/// i.e. xs[n] <= 1. out and xs must have n + 1 limbs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
+// `out` becomes $X 2^b \mod 2^{Wn} + 1$. Assumes `xs` is semi-normalized, _i.e._ `xs[n] <= 1`.
+// `out` and `xs` must have `n + 1` limbs.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_fft_mul_2exp_modF` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 fn limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
     let small_bits = u64::exact_from(bits) & Limb::WIDTH_MASK;
@@ -739,15 +747,16 @@ fn limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     }
 }
 
-/// out <- xs / 2<sup>bits</sup> mod 2<sup>n * Limb::WIDTH</sup> + 1
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
+// `out` becomes $X/2^b \mod 2^{Wn} + 1$.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_fft_div_2exp_modF` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 fn limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     limbs_mul_fft_shl_mod_f_to_out(out, xs, ((xs.len() - 1) << (Limb::LOG_WIDTH + 1)) - bits);
     // 1 / 2 ^ bits = 2 ^ (2 * n' * L - bits) mod 2 ^ (n' * Limb::WIDTH) + 1 where n' = xs.len() - 1
@@ -755,18 +764,19 @@ fn limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     limbs_mul_fft_normalize(out);
 }
 
-/// store in A[0..width - 1] the first m bits from xs[..len], in A[width..] the following m bits.
-/// Assumes m is a multiple of Limb::WIDTH (M = n * Limb::WIDTH). T must have space for at least
-/// `width` limbs. We must have xs.len() <= 2 * k * n.
-///
-/// Time: worst case O(a)
-///
-/// Additional memory: worst case O(a)
-///
-/// where a = `xs.len()`
-///
-/// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c, GMP 6.2.1. nl is omitted as it is just
-/// the length of n (here, xs). nprime is `width` - 1.
+// store in `a_s[0..width - 1]` the first `m` bits from `xs[..len]`, in `a_s[width..]` the
+// following `m` bits. Assumes m is a multiple of $W$ ($M = Wn$). `scratch` must have space for at
+// least `width` limbs. We must have `xs.len() <= 2 * k * n`.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_mul_fft_decompose from mpn/generic/mul_fft.c`, GMP 6.2.1. `nl` is
+// omitted as it is ust the length of `n` (here, `xs`). `nprime` is `width - 1`.
 fn limbs_mul_fft_decompose<'a>(
     a_s: &'a mut [Limb],
     k: usize,
@@ -825,22 +835,25 @@ fn limbs_mul_fft_decompose<'a>(
     a_table
 }
 
-// input: xss\[0\] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where
-// N = n * Limb::WIDTH, and 2 ^ omega is a primitive root mod 2 ^ N + 1.
-// output: xss[increment * bit_reverse_table[k]\[i\]] <-
-//      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
+// input: `xss\[0\] ... xss[increment * (k - 1)]` are residues mod $2N+1$ where $N=Wn$, and
+// $2^\omega$ is a primitive root mod $2^N+1$.
 //
-// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
+// output:
+// `xss[increment * bit_reverse_table[k]\[i\]]
+//          <- sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1`
 //
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
 //
-// where n = `xss[0].len()`
+// $M(n) = O(n \log n)$
 //
-// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xss[0].len()`.
+//
+// This is equivalent to `mpn_fft_fft` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 pub_test! {limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
     k: usize,
-    bit_reverse_table: &[&[usize]],
+    bit_reverse_table: &[&[Limb]],
     bit_reverse_table_offset: usize,
     omega: usize,
     increment: usize,
@@ -900,7 +913,7 @@ pub_test! {limbs_mul_fft_fft(
             limbs_mul_fft_shl_mod_f_to_out(
                 scratch,
                 xss_hi[0],
-                bit_reverse_row[i << 1].wrapping_mul(omega),
+                usize::exact_from(bit_reverse_row[i << 1]).wrapping_mul(omega),
             );
             limbs_mul_fft_sub_mod_f_to_out(xss_hi[0], xss_lo[xss_offset], scratch);
             limbs_mul_fft_add_mod_f_in_place_left(xss_lo[xss_offset], scratch);
@@ -909,19 +922,22 @@ pub_test! {limbs_mul_fft_fft(
     }
 }}
 
-// input: xs ^ bit_reverse_table\[k\]\[0\], xs ^ bit_reverse_table\[k\]\[1\], ...,
-//      xs ^ bit_reverse_table[k][K-1]
-// output: k * xss\[0\], k * xss[k - 1], ..., k * xss\[1\].
+// input: `xs ^ bit_reverse_table\[k\]\[0\], xs ^ bit_reverse_table\[k\]\[1\], ...,
+//          xs ^ bit_reverse_table[k][K-1]`
+//
+// output: `k * xss\[0\], k * xss[k - 1], ..., k * xss\[1\]`.
+//
 // Assumes the xss are pseudo-normalized, i.e. 0 <= xss[]\[n\] <= 1. This condition is also
 // fulfilled at exit.
 //
-// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xss[0].len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xss[0].len()`.
 //
-// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.2.1.
+// This is equivalent to `mpn_fft_fftinv` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 pub_test! {limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
     k: usize,
@@ -963,16 +979,18 @@ pub_test! {limbs_mul_fft_inverse(
     }
 }}
 
-// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
-// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
+// `out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n`.
+// Returns carry out, _i.e._ 1 iff `xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1`, then
+// `out[..n] = 0`.
 //
-// Time: O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: O(1)
+// $M(n) = O(1)$
 //
-// where n = `n`
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
+// This is equivalent to `mpn_fft_norm_modF` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 pub_test! {limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
@@ -994,14 +1012,15 @@ pub_test! {limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]
     }
 }}
 
-/// Time: TODO
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
-///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.2.1, where ap != bp. K is omitted
-/// because it is unused; it is just the length of `xss` and `yss`.
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xss[i].len()` (each slice in `xss`
+// should have the same length)
+//
+// This is equivalent to `mpn_fft_mul_modF_K` from `mpn/generic/mul_fft.c`, GMP 6.2.1, where
+// `ap != bp`. `K` is omitted because it is unused; it is just the length of `xss` and `yss`.
 fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= MUL_FFT_MODF_THRESHOLD {
@@ -1031,16 +1050,19 @@ fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
         let q_shifted = q >> k;
         let s = r + 1;
         // a.len() is n * log(n)
-        let mut a = vec![0; s << (k + 1)];
-        let (a, b) = a.split_at_mut(s << k);
-        let mut scratch = vec![0; s << 1];
-        let mut scratch2 = vec![0; 2 << k];
-        let bit_reverse_table = limbs_mul_fft_bit_reverse_table(&mut scratch2, k);
+        let a_len = s << k;
+        let scratch_len = s << 1;
+        let scratch_2_len = 2 << k;
+        let mut big_scratch = vec![0; (a_len << 1) + scratch_len + scratch_2_len];
+        let (a, remainder) = big_scratch.split_at_mut(a_len);
+        let (b, remainder) = remainder.split_at_mut(a_len);
+        let (scratch, scratch_2) = remainder.split_at_mut(scratch_len);
+        let bit_reverse_table = limbs_mul_fft_bit_reverse_table(scratch_2, k);
         for (xs, ys) in xss.iter_mut().zip(yss.iter_mut()) {
             limbs_mul_fft_normalize(xs);
             limbs_mul_fft_normalize(ys);
-            let residues = limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, &mut scratch);
-            limbs_mul_fft_decompose(b, two_pow_k, s, ys, p, q_shifted, &mut scratch);
+            let residues = limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, scratch);
+            limbs_mul_fft_decompose(b, two_pow_k, s, ys, p, q_shifted, scratch);
             xs[n] = Limb::iverson(limbs_mul_fft_internal(
                 xs,
                 n,
@@ -1050,7 +1072,7 @@ fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
                 p,
                 q_shifted,
                 &bit_reverse_table,
-                &mut scratch,
+                scratch,
                 false,
             ));
         }
@@ -1082,14 +1104,15 @@ fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
     }
 }
 
-/// Time: TODO
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
-///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.2.1, where ap == bp. K is omitted
-/// because it is unused; it is just the length of `xss`.
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xss[i].len()` (each slice in `xss`
+// should have the same length)
+//
+// This is equivalent to `mpn_fft_mul_modF_K` from `mpn/generic/mul_fft.c`, GMP 6.2.1, where
+// `ap == bp`. `K` is omitted because it is unused; it is just the length of `xss`.
 fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= SQR_FFT_MODF_THRESHOLD {
@@ -1119,25 +1142,27 @@ fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
         let q_shifted = q >> k;
         let s = r + 1;
         // a.len() is O(n * log(n))
-        let mut a = vec![0; s << (k + 1)];
-        let (a_lo, a_hi) = a.split_at_mut(s << k);
-        let mut scratch = vec![0; s << 1];
-        let mut scratch2 = vec![0; 2 << k];
-        let bit_reverse_table = limbs_mul_fft_bit_reverse_table(&mut scratch2, k);
+        let a_len = s << k;
+        let scratch_len = s << 1;
+        let scratch_2_len = 2 << k;
+        let mut big_scratch = vec![0; (a_len << 1) + scratch_len + scratch_2_len];
+        let (a, remainder) = big_scratch.split_at_mut(a_len);
+        let (b, remainder) = remainder.split_at_mut(a_len);
+        let (scratch, scratch_2) = remainder.split_at_mut(scratch_len);
+        let bit_reverse_table = limbs_mul_fft_bit_reverse_table(scratch_2, k);
         for xs in xss.iter_mut() {
             limbs_mul_fft_normalize(xs);
-            let residues =
-                limbs_mul_fft_decompose(a_lo, two_pow_k, s, xs, p, q_shifted, &mut scratch);
+            let residues = limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, scratch);
             xs[n] = Limb::iverson(limbs_mul_fft_internal(
                 xs,
                 n,
                 k,
                 residues,
-                a_hi,
+                b,
                 p,
                 q_shifted,
                 &bit_reverse_table,
-                &mut scratch,
+                scratch,
                 true,
             ));
         }
@@ -1166,14 +1191,15 @@ fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     }
 }
 
-// Time: TODO
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xss[i].len()` (each slice in `xss` should have the same length)
+// where $T$ is time, $M$ is additional memory, and $n$ is `xss[i].len()` (each slice in `xss`
+// should have the same length)
 //
-// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.2.1. A is excluded as it is
-// unused. nprime is `xss[0].len()` - 1.
+// This is equivalent to `mpn_mul_fft_internal` from `mpn/generic/mul_fft.c`, GMP 6.2.1. `A` is
+// excluded as it is unused. nprime is `xss[0].len() - 1`.
 pub_test! {limbs_mul_fft_internal(
     out: &mut [Limb],
     p: usize,
@@ -1182,7 +1208,7 @@ pub_test! {limbs_mul_fft_internal(
     ys: &mut [Limb],
     a: usize,
     omega: usize,
-    bit_reverse_table: &[&[usize]],
+    bit_reverse_table: &[&[Limb]],
     scratch: &mut [Limb],
     square: bool,
 ) -> bool {
@@ -1300,13 +1326,13 @@ pub_test! {limbs_mul_fft_internal(
     limbs_mul_fft_normalize_mod_f(out, p, ys)
 }}
 
-/// Time: TODO
-///
-/// Additional memory: O(p * log(p))
-///
-/// assuming k = O(log(p)), xs.len() = O(p).
-///
-// This is mpn_mul_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
+// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$, `xs.len()` is $O(n)$.
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `p`.
+//
+// This is equivalent to `mpn_mul_fft` from `mpn/generic/mul_fft.c`, GMP 6.2.1.
 pub(crate) fn limbs_mul_fft(
     out: &mut [Limb],
     p: usize,
@@ -1346,49 +1372,54 @@ pub(crate) fn limbs_mul_fft(
     // width = O(log(p))
     let width = width_minus_one + 1;
     assert!(width_minus_one < p); // otherwise we'll loop
-
+                                  // O(p * log(p)) memory
+    let residues_len = if square {
+        a * (two_pow_k - 1) + width
+    } else {
+        two_pow_k * width
+    };
     // O(log(p)) memory
-    let mut scratch = vec![0; width << 1];
-    let mp = big_width_minus_one >> k;
+    let scratch_len = width << 1;
     // O(p * log(p)) memory
-    let mut xss_scratch = vec![0; two_pow_k * width];
+    let xss_scratch_len = two_pow_k * width;
+    let table_scratch_len = two_pow_k << 1;
+    let mut big_scratch = vec![0; scratch_len + xss_scratch_len + table_scratch_len + residues_len];
+    let (scratch, remainder) = big_scratch.split_at_mut(scratch_len);
+    let (xss_scratch, remainder) = remainder.split_at_mut(xss_scratch_len);
+    let (table_scratch, ys_residues) = remainder.split_at_mut(table_scratch_len);
     // O(p) memory
-    let xss = limbs_mul_fft_decompose(&mut xss_scratch, two_pow_k, width, xs, a, mp, &mut scratch);
+    let mp = big_width_minus_one >> k;
+    let xss = limbs_mul_fft_decompose(xss_scratch, two_pow_k, width, xs, a, mp, scratch);
     // O(p) memory
-    let mut table_scratch = vec![0; 2 << k];
-    // O(p) memory
-    let bit_reverse_table = limbs_mul_fft_bit_reverse_table(&mut table_scratch, k);
+    let bit_reverse_table = limbs_mul_fft_bit_reverse_table(table_scratch, k);
     if square {
-        let q = a * (two_pow_k - 1) + width; // number of required limbs for p
-        let mut ys_residues = vec![0; q];
         // O(log(p) * log(log(p))) memory
         limbs_mul_fft_internal(
             out,
             p,
             k,
             xss,
-            &mut ys_residues,
+            ys_residues,
             a,
             mp,
             &bit_reverse_table,
-            &mut scratch,
+            scratch,
             square,
         )
     } else {
-        let mut ys_residues = vec![0; two_pow_k * width];
         // O(p) memory
-        limbs_mul_fft_decompose(&mut ys_residues, two_pow_k, width, ys, a, mp, &mut scratch);
+        limbs_mul_fft_decompose(ys_residues, two_pow_k, width, ys, a, mp, scratch);
         // O(log(p) * log(log(p))) memory
         limbs_mul_fft_internal(
             out,
             p,
             k,
             xss,
-            &mut ys_residues,
+            ys_residues,
             a,
             mp,
             &bit_reverse_table,
-            &mut scratch,
+            scratch,
             square,
         )
     }

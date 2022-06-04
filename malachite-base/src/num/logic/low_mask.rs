@@ -1,8 +1,8 @@
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::NegativeOne;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::LowMask;
 
-fn low_mask_unsigned<T: PrimitiveInt>(bits: u64) -> T {
+fn low_mask_unsigned<T: PrimitiveUnsigned>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);
     if bits == T::WIDTH {
         T::MAX
@@ -14,8 +14,8 @@ fn low_mask_unsigned<T: PrimitiveInt>(bits: u64) -> T {
 macro_rules! impl_low_mask_unsigned {
     ($t:ident) => {
         impl LowMask for $t {
-            /// Returns a value with the least significant `bits` bits on and the remaining bits
-            /// off.
+            /// Returns a number whose least significant $b$ bits are `true` and whose other bits
+            /// are `false`.
             ///
             /// $f(b) = 2^b - 1$.
             ///
@@ -23,10 +23,10 @@ macro_rules! impl_low_mask_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than the width of `$t`.
+            /// Panics if `bits` is greater than the width of of the type.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::low_mask` module.
+            /// See [here](super::low_mask#low_mask).
             #[inline]
             fn low_mask(bits: u64) -> $t {
                 low_mask_unsigned(bits)
@@ -36,7 +36,7 @@ macro_rules! impl_low_mask_unsigned {
 }
 apply_to_unsigneds!(impl_low_mask_unsigned);
 
-fn low_mask_signed<T: NegativeOne + PrimitiveInt>(bits: u64) -> T {
+fn low_mask_signed<T: PrimitiveSigned>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);
     if bits == T::WIDTH {
         T::NEGATIVE_ONE
@@ -50,25 +50,25 @@ fn low_mask_signed<T: NegativeOne + PrimitiveInt>(bits: u64) -> T {
 macro_rules! impl_low_mask_signed {
     ($t:ident) => {
         impl LowMask for $t {
-            /// Returns a value with the least significant `bits` bits on and the remaining bits
-            /// off.
+            /// Returns a number whose least significant $b$ bits are `true` and whose other bits
+            /// are `false`.
             ///
             /// $$
             /// f(b) = \\begin{cases}
-            ///     2^b - 1 & 0 \leq n < W \\\\
-            ///     -1 & n = W,
+            ///     2^b - 1 & \text{if} \\quad 0 \leq n < W, \\\\
+            ///     -1 & \text{if} \\quad n = W,
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is the width of the type.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than the width of `$t`.
+            /// Panics if `bits` is greater than the width of the type.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::low_mask` module.
+            /// See [here](super::low_mask#low_mask).
             #[inline]
             fn low_mask(bits: u64) -> $t {
                 low_mask_signed(bits)

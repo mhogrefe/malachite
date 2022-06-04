@@ -44,8 +44,8 @@ macro_rules! impl_div_mod_unsigned {
             type DivOutput = $t;
             type ModOutput = $t;
 
-            /// Divides a value by another value, returning the quotient and remainder. The quotient
-            /// is rounded towards negative infinity.
+            /// Divides a number by another number, returning the quotient and remainder. The
+            /// quotient is rounded towards negative infinity.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
             ///
@@ -61,7 +61,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_mod).
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
                 div_mod_unsigned(self, other)
@@ -71,8 +71,8 @@ macro_rules! impl_div_mod_unsigned {
         impl DivAssignMod<$t> for $t {
             type ModOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder. The quotient is
-            /// rounded towards negative infinity.
+            /// Divides a number by another number in place, returning the remainder. The quotient
+            /// is rounded towards negative infinity.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
             ///
@@ -90,7 +90,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_assign_mod).
             #[inline]
             fn div_assign_mod(&mut self, other: $t) -> $t {
                 div_assign_mod_unsigned(self, other)
@@ -101,8 +101,8 @@ macro_rules! impl_div_mod_unsigned {
             type DivOutput = $t;
             type RemOutput = $t;
 
-            /// Divides a value by another value, returning the quotient and remainder. The quotient
-            /// is rounded towards zero.
+            /// Divides a number by another number, returning the quotient and remainder. The
+            /// quotient is rounded towards zero.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
             ///
@@ -111,7 +111,7 @@ macro_rules! impl_div_mod_unsigned {
             /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
             /// $$
             ///
-            /// For unsigned integers, rem is equivalent to mod.
+            /// For unsigned integers, `div_rem` is equivalent to `div_mod`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -120,7 +120,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_rem).
             #[inline]
             fn div_rem(self, other: $t) -> ($t, $t) {
                 self.div_mod(other)
@@ -130,8 +130,8 @@ macro_rules! impl_div_mod_unsigned {
         impl DivAssignRem<$t> for $t {
             type RemOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder. The quotient is
-            /// rounded towards zero.
+            /// Divides a number by another number in place, returning the remainder. The quotient
+            /// is rounded towards zero.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
             ///
@@ -142,7 +142,7 @@ macro_rules! impl_div_mod_unsigned {
             /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
             /// $$
             ///
-            /// For unsigned integers, rem is equivalent to mod.
+            /// For unsigned integers, `div_assign_rem` is equivalent to `div_assign_mod`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -151,7 +151,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_assign_rem).
             #[inline]
             fn div_assign_rem(&mut self, other: $t) -> $t {
                 self.div_assign_mod(other)
@@ -162,8 +162,8 @@ macro_rules! impl_div_mod_unsigned {
             type DivOutput = $t;
             type ModOutput = $t;
 
-            /// Divides a value by another value, returning the ceiling of the quotient and the
-            /// remainder of the negative of the first value divided by the second.
+            /// Divides a number by another number, returning the ceiling of the quotient and the
+            /// remainder of the negative of the first number divided by the second.
             ///
             /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
             ///
@@ -179,7 +179,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#ceiling_div_neg_mod).
             #[inline]
             fn ceiling_div_neg_mod(self, other: $t) -> ($t, $t) {
                 ceiling_div_neg_mod_unsigned(self, other)
@@ -189,8 +189,8 @@ macro_rules! impl_div_mod_unsigned {
         impl CeilingDivAssignNegMod<$t> for $t {
             type ModOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder of the negative
-            /// of the first value divided by the second.
+            /// Divides a number by another number in place, returning the remainder of the negative
+            /// of the first number divided by the second.
             ///
             /// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
             ///
@@ -208,7 +208,7 @@ macro_rules! impl_div_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#ceiling_div_assign_neg_mod).
             #[inline]
             fn ceiling_div_assign_neg_mod(&mut self, other: $t) -> $t {
                 ceiling_div_assign_neg_mod_unsigned(self, other)
@@ -283,9 +283,9 @@ macro_rules! impl_div_mod_signed {
             type DivOutput = $t;
             type ModOutput = $t;
 
-            /// Divides a value by another value, returning the quotient and remainder. The quotient
-            /// is rounded towards negative infinity, and the remainder has the same sign as the
-            /// second value.
+            /// Divides a number by another number, returning the quotient and remainder. The
+            /// quotient is rounded towards negative infinity, and the remainder has the same sign
+            /// as the second number.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -301,7 +301,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_mod).
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
                 div_mod_signed(self, other)
@@ -311,9 +311,9 @@ macro_rules! impl_div_mod_signed {
         impl DivAssignMod<$t> for $t {
             type ModOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder. The quotient is
-            /// rounded towards negative infinity, and the remainder has the same sign as the
-            /// second value.
+            /// Divides a number by another number in place, returning the remainder. The quotient
+            /// is rounded towards negative infinity, and the remainder has the same sign as the
+            /// second number.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -331,7 +331,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_assign_mod).
             #[inline]
             fn div_assign_mod(&mut self, other: $t) -> $t {
                 let (q, r) = self.div_mod(other);
@@ -344,8 +344,9 @@ macro_rules! impl_div_mod_signed {
             type DivOutput = $t;
             type RemOutput = $t;
 
-            /// Divides a value by another value, returning the quotient and remainder. The quotient
-            /// is rounded towards zero and the remainder has the same sign as the dividend.
+            /// Divides a number by another number, returning the quotient and remainder. The
+            /// quotient is rounded towards zero and the remainder has the same sign as the
+            /// dividend.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -363,7 +364,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_rem).
             #[inline]
             fn div_rem(self, other: $t) -> ($t, $t) {
                 div_rem_signed(self, other)
@@ -373,8 +374,8 @@ macro_rules! impl_div_mod_signed {
         impl DivAssignRem<$t> for $t {
             type RemOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder. The quotient is
-            /// rounded towards zero and the remainder has the same sign as the dividend.
+            /// Divides a number by another number in place, returning the remainder. The quotient
+            /// is rounded towards zero and the remainder has the same sign as the dividend.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -394,7 +395,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#div_assign_rem).
             #[inline]
             fn div_assign_rem(&mut self, other: $t) -> $t {
                 div_assign_rem_signed(self, other)
@@ -405,9 +406,9 @@ macro_rules! impl_div_mod_signed {
             type DivOutput = $t;
             type ModOutput = $t;
 
-            /// Divides a value by another value, returning the quotient and remainder. The quotient
-            /// is rounded towards positive infinity and the remainder has the opposite sign of the
-            /// second value.
+            /// Divides a number by another number, returning the quotient and remainder. The
+            /// quotient is rounded towards positive infinity and the remainder has the opposite
+            /// sign as the second number.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -423,7 +424,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#ceiling_div_mod).
             #[inline]
             fn ceiling_div_mod(self, other: $t) -> ($t, $t) {
                 ceiling_div_mod_signed(self, other)
@@ -433,9 +434,9 @@ macro_rules! impl_div_mod_signed {
         impl CeilingDivAssignMod<$t> for $t {
             type ModOutput = $t;
 
-            /// Divides a value by another value in place, returning the remainder. The quotient
-            /// is rounded towards positive infinity and the remainder has the opposite sign of the
-            /// second value.
+            /// Divides a number by another number in place, returning the remainder. The quotient
+            /// is rounded towards positive infinity and the remainder has the opposite sign as the
+            /// second number.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -453,7 +454,7 @@ macro_rules! impl_div_mod_signed {
             /// Panics if `other` is 0, or if `self` is `$t::MIN` and `other` is -1.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::div_mod` module.
+            /// See [here](super::div_mod#ceiling_div_assign_mod).
             #[inline]
             fn ceiling_div_assign_mod(&mut self, other: $t) -> $t {
                 let (q, r) = self.ceiling_div_mod(other);

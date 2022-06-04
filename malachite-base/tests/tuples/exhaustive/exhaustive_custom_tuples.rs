@@ -1,14 +1,14 @@
+use extra_variadic::{
+    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_triples_xyx, exhaustive_triples_xyx_custom_output,
+};
 use get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
-use malachite_base::tuples::exhaustive::{
-    exhaustive_pairs, exhaustive_triples_from_single, exhaustive_triples_xxy,
-    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
-    exhaustive_triples_xyx_custom_output,
-};
+use malachite_base::tuples::exhaustive::exhaustive_pairs;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;

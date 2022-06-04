@@ -7,8 +7,10 @@ use Rational;
 impl NextPowerOf2 for Rational {
     type Output = Rational;
 
-    /// Returns the smallest integer power of 2 greater than or equal to a `Rational`, taking the
-    /// `Rational` by value.
+    /// Finds the smallest power of 2 greater than or equal to a [`Rational`]. The [`Rational`] is
+    /// taken by value.
+    ///
+    /// $f(x) = 2^{\lceil \log_2 x \rceil}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -23,7 +25,6 @@ impl NextPowerOf2 for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
     /// use malachite_q::Rational;
@@ -48,8 +49,10 @@ impl NextPowerOf2 for Rational {
 impl<'a> NextPowerOf2 for &'a Rational {
     type Output = Rational;
 
-    /// Returns the smallest integer power of 2 greater than or equal to a `Rational`, taking the
-    /// `Rational` by reference.
+    /// Finds the smallest power of 2 greater than or equal to a [`Rational`]. The [`Rational`] is
+    /// taken by reference.
+    ///
+    /// $f(x) = 2^{\lceil \log_2 x \rceil}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -64,7 +67,6 @@ impl<'a> NextPowerOf2 for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
     /// use malachite_q::Rational;
@@ -84,7 +86,10 @@ impl<'a> NextPowerOf2 for &'a Rational {
 }
 
 impl NextPowerOf2Assign for Rational {
-    /// Replaces a `Rational` with the smallest integer power of 2 greater than or equal to it.
+    /// Finds the smallest power of 2 greater than or equal to a [`Rational`]. The [`Rational`] is
+    /// taken by reference.
+    ///
+    /// $f(x) = 2^{\lceil \log_2 x \rceil}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -99,7 +104,6 @@ impl NextPowerOf2Assign for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
     /// use malachite_q::Rational;

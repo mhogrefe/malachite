@@ -2,7 +2,7 @@ use integer::Integer;
 use natural::Natural;
 
 impl PartialEq<Natural> for Integer {
-    /// Determines whether an `Integer` is equal to a `Natural`.
+    /// Determines whether an [`Integer`] is equal to a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -25,7 +25,7 @@ impl PartialEq<Natural> for Integer {
 }
 
 impl PartialEq<Integer> for Natural {
-    /// Determines whether a `Natural` is equal to an `Integer`.
+    /// Determines whether a [`Natural`] is equal to an [`Integer`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

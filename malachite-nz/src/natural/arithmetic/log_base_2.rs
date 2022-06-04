@@ -56,8 +56,8 @@ pub_test! {limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
 //
 // $$
 // f((d_i)_ {i=0}^k) = \\begin{cases}
-//     \operatorname{Some}(\log_2 x) & \log_2 x \in \Z \\\\
-//     \operatorname{None} & \textrm{otherwise},
+//     \operatorname{Some}(\log_2 x) & \text{if} \\quad \log_2 x \in \Z, \\\\
+//     \operatorname{None} & \textrm{otherwise}.
 // \\end{cases}
 // $$
 // where $x = \sum_{i=0}^kB^id_i$ and $B$ is one more than `Limb::MAX`.
@@ -85,7 +85,7 @@ pub_test! {limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
 impl<'a> FloorLogBase2 for &'a Natural {
     type Output = u64;
 
-    /// Returns the floor of the base-2 logarithm of a positive `Natural`.
+    /// Returns the floor of the base-2 logarithm of a positive [`Natural`].
     ///
     /// $f(x) = \lfloor\log_2 x\rfloor$.
     ///
@@ -98,7 +98,6 @@ impl<'a> FloorLogBase2 for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase2;
     /// use malachite_nz::natural::Natural;
@@ -117,7 +116,7 @@ impl<'a> FloorLogBase2 for &'a Natural {
 impl<'a> CeilingLogBase2 for &'a Natural {
     type Output = u64;
 
-    /// Returns the ceiling of the base-2 logarithm of a positive `Natural`.
+    /// Returns the ceiling of the base-2 logarithm of a positive [`Natural`].
     ///
     /// $f(x) = \lceil\log_2 x\rceil$.
     ///
@@ -134,7 +133,6 @@ impl<'a> CeilingLogBase2 for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase2;
     /// use malachite_nz::natural::Natural;
@@ -153,13 +151,13 @@ impl<'a> CeilingLogBase2 for &'a Natural {
 impl<'a> CheckedLogBase2 for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-2 logarithm of a positive `Natural`. If the `Natural` is not a power of 2,
-    /// then `None` is returned.
+    /// Returns the base-2 logarithm of a positive [`Natural`]. If the [`Natural`] is not a power
+    /// of 2, then `None` is returned.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\log_2 x) & \log_2 x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(\log_2 x) & \text{if} \\quad \log_2 x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -176,7 +174,6 @@ impl<'a> CheckedLogBase2 for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
     /// use malachite_nz::natural::Natural;

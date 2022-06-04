@@ -8,9 +8,9 @@ use malachite_nz::natural::Natural;
 use std::mem::swap;
 use Rational;
 
-/// An iterable that produces the convergents of a `Rational`.
+/// An iterator that produces the convergents of a [`Rational`].
 ///
-/// See `Rational::convergents` and `Rational::convergents_ref` for more information.
+/// See [`convergents`](Rational::convergents) for more information.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RationalConvergents {
     first: bool,
@@ -49,7 +49,7 @@ impl Iterator for RationalConvergents {
 impl Convergents for Rational {
     type C = RationalConvergents;
 
-    /// Returns the convergents of a `Rational`, taking the `Rational` by value.
+    /// Returns the convergents of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The convergents of a number are the sequence of rational numbers whose continued fractions
     /// are the prefixes of the number's continued fraction. The first convergent is the floor of
@@ -61,14 +61,19 @@ impl Convergents for Rational {
     /// $f(x) = ([a_0; a_1, a_2, \ldots, a_i])_{i=0}^{n}$, where $x = [a_0; a_1, a_2, \ldots, a_n]$
     /// and $a_n \neq 1$.
     ///
-    /// # Worst-case complexity
-    /// TODO
+    /// The output length is $O(n)$, where $n$ is `self.significant_bits()`.
+    ///
+    /// # Worst-case complexity per iteration
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate itertools;
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
@@ -100,7 +105,7 @@ impl Convergents for Rational {
 impl<'a> Convergents for &'a Rational {
     type C = RationalConvergents;
 
-    /// Returns the convergents of a `Rational`, taking the `Rational` by reference.
+    /// Returns the convergents of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The convergents of a number are the sequence of rational numbers whose continued fractions
     /// are the prefixes of the number's continued fraction. The first convergent is the floor of
@@ -112,14 +117,19 @@ impl<'a> Convergents for &'a Rational {
     /// $f(x) = ([a_0; a_1, a_2, \ldots, a_i])_{i=0}^{n}$, where $x = [a_0; a_1, a_2, \ldots, a_n]$
     /// and $a_n \neq 1$.
     ///
+    /// The output length is $O(n)$, where $n$ is `self.significant_bits()`.
+    ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate itertools;
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;

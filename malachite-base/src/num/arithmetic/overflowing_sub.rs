@@ -5,6 +5,8 @@ macro_rules! impl_overflowing_sub {
         impl OverflowingSub<$t> for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `overflowing_sub` functions in the standard library, for
+            /// example [this one](u32::overflowing_sub).
             #[inline]
             fn overflowing_sub(self, other: $t) -> ($t, bool) {
                 $t::overflowing_sub(self, other)
@@ -12,16 +14,16 @@ macro_rules! impl_overflowing_sub {
         }
 
         impl OverflowingSubAssign<$t> for $t {
-            /// Replaces `self` with `self - other`.
+            /// Subtracts a number by another number, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_sub` module.
+            /// See [here](super::overflowing_sub#overflowing_sub_assign).
             #[inline]
             fn overflowing_sub_assign(&mut self, other: $t) -> bool {
                 let overflow;

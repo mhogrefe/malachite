@@ -3,17 +3,16 @@ use num::conversion::string::to_sci::SciWrapper;
 use rounding_modes::RoundingMode;
 use std::fmt::{Formatter, Result};
 
-/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
-/// iterator of digits.
+/// Expresses a value as a [`Vec`] of digits, or reads a value from an iterator of digits.
 ///
 /// The trait is parameterized by `T`, which is both the digit type and the base type.
 pub trait Digits<T>: Sized {
-    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
-    /// significant.
+    /// Returns a [`Vec`] containing the digits of a value in ascending order: least- to
+    /// most-significant.
     fn to_digits_asc(&self, base: &T) -> Vec<T>;
 
-    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
-    /// significant.
+    /// Returns a [`Vec`] containing the digits of a value in descending order: most- to
+    /// least-significant.
     fn to_digits_desc(&self, base: &T) -> Vec<T>;
 
     /// Converts an iterator of digits into a value.
@@ -27,49 +26,49 @@ pub trait Digits<T>: Sized {
     fn from_digits_desc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
 }
 
-/// An iterator over a value's base-power-of-two digits.
+/// An iterator over a value's base-$2^k$ digits.
 pub trait PowerOf2DigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
     fn get(&self, index: u64) -> T;
 }
 
-/// This trait defines an iterator over a value's base-power-of-two digits.
+/// Creates an iterator over a value's base-$2^k$ digits.
 pub trait PowerOf2DigitIterable<T> {
     type PowerOf2DigitIterator: PowerOf2DigitIterator<T>;
 
-    /// Returns a double-ended iterator over a value's digits in base $2^\ell$, where $\ell$ is
+    /// Returns a double-ended iterator over a value's digits in base $2^l$, where $k$ is
     /// `log_base`.
     ///
     /// The iterator ends after the value's most-significant digit.
     fn power_of_2_digits(self, log_base: u64) -> Self::PowerOf2DigitIterator;
 }
 
-/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
-/// iterator of digits, where the base is a power of 2.
+/// Expresses a value as a [`Vec`] of base-$2^k$ digits, or reads a value from an iterator of
+/// base-$2^k$ digits.
 ///
-/// The base-2 logarithm of the base is specified, and the trait is parameterized by the digit type.
+/// The trait is parameterized by the digit type.
 pub trait PowerOf2Digits<T>: Sized {
-    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
-    /// significant.
+    /// Returns a [`Vec`] containing the digits of a value in ascending order: least- to
+    /// most-significant.
     ///
-    /// The base is $2^\ell$, where $\ell$ is `log_base`.
+    /// The base is $2^k$, where $k$ is `log_base`.
     fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<T>;
 
-    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
-    /// significant.
+    /// Returns a [`Vec`] containing the digits of a value in descending order: most- to
+    /// least-significant.
     ///
-    /// The base is $2^\ell$, where $\ell$ is `log_base`.
+    /// The base is $2^k$, where $k$ is `log_base`.
     fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<T>;
 
     /// Converts an iterator of digits into a value.
     ///
-    /// The input digits are in ascending order: least- to most-significant. The base is $2^\ell$,
-    /// where $\ell$ is `log_base`.
+    /// The input digits are in ascending order: least- to most-significant. The base is $2^k$,
+    /// where $k$ is `log_base`.
     fn from_power_of_2_digits_asc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Option<Self>;
 
     /// Converts an iterator of digits into a value.
     ///
-    /// The input digits are in descending order: most- to least-significant. The base is $2^\ell$,
-    /// where $b$ is `log_base`.
+    /// The input digits are in descending order: most- to least-significant. The base is $2^k$,
+    /// where $k$ is `log_base`.
     fn from_power_of_2_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I)
         -> Option<Self>;
 }
@@ -90,8 +89,10 @@ pub trait ToStringBase {
 
 /// Converts a number to a string, possibly in scientific notation.
 pub trait ToSci: Sized {
+    /// Formats a number, possibly in scientific notation.
     fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> Result;
 
+    /// Determines whether some formatting options can be applied to a number.
     fn fmt_sci_valid(&self, options: ToSciOptions) -> bool;
 
     /// Converts a number to a string, possibly in scientific notation.
@@ -100,7 +101,7 @@ pub trait ToSci: Sized {
     }
 
     /// Converts a number to a string, possibly in scientific notation, using the default
-    /// `ToSciOptions`.
+    /// [`ToSciOptions`](super::string::options::ToSciOptions).
     #[inline]
     fn to_sci(&self) -> SciWrapper<Self> {
         SciWrapper {
@@ -110,30 +111,31 @@ pub trait ToSci: Sized {
     }
 }
 
-/// Converts a `str`, possibly in scientific notation, to a number.
+/// Converts a `&str`, possibly in scientific notation, to a number.
 pub trait FromSciString: Sized {
-    /// Converts a `str`, possibly in scientific notation, to a number.
+    /// Converts a `&str`, possibly in scientific notation, to a number.
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self>;
 
-    /// Converts a `str`, possibly in scientific notation, to a number, using the default
-    /// `FromSciStringOptions`.
+    /// Converts a `&str`, possibly in scientific notation, to a number, using the default
+    /// [`FromSciStringOptions`](super::string::options::FromSciStringOptions).
     #[inline]
     fn from_sci_string(s: &str) -> Option<Self> {
         Self::from_sci_string_with_options(s, FromSciStringOptions::default())
     }
 }
 
-/// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
+/// Converts a value from one type to another. If the conversion fails, `None` is returned.
 ///
-/// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.
+/// If `CheckedFrom` is implemented, it usually makes sense to implement [`ConvertibleFrom`] as
+/// well.
 pub trait CheckedFrom<T>: Sized {
     fn checked_from(value: T) -> Option<Self>;
 }
 
-/// This trait defines a conversion to another type. If the conversion fails, `None` is returned.
+/// Converts a value from one type to another. If the conversion fails, `None` is returned.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `CheckedFrom` is implemented.
+/// when [`CheckedFrom`] is implemented.
 pub trait CheckedInto<T> {
     fn checked_into(self) -> Option<T>;
 }
@@ -145,18 +147,18 @@ impl<T, U: CheckedFrom<T>> CheckedInto<U> for T {
     }
 }
 
-/// This trait defines a conversion from another type. If the conversion fails, the function panics.
+/// Converts a value from one type to another. If the conversion fails, the function panics.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `CheckedFrom` is implemented.
+/// when [`CheckedFrom` ]is implemented.
 pub trait ExactFrom<T>: Sized {
     fn exact_from(value: T) -> Self;
 }
 
-/// This trait defines a conversion to another type. If the conversion fails, the function panics.
+/// Converts a value from one type to another. If the conversion fails, the function panics.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `ExactFrom` is implemented.
+/// when [`ExactFrom`] is implemented.
 pub trait ExactInto<T> {
     fn exact_into(self) -> T;
 }
@@ -175,19 +177,20 @@ impl<T, U: ExactFrom<T>> ExactInto<U> for T {
     }
 }
 
-/// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result will wrap around.
+/// Converts a value from one type to another. where if the conversion is not exact the result will
+/// wrap around.
 ///
-/// If `WrappingFrom` is implemented, it usually makes sense to implement `OverflowingFrom` as well.
+/// If `WrappingFrom` is implemented, it usually makes sense to implement [`OverflowingFrom`] as
+/// well.
 pub trait WrappingFrom<T>: Sized {
     fn wrapping_from(value: T) -> Self;
 }
 
-/// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// will wrap around.
+/// Converts a value from one type to another, where if the conversion is not exact the result will
+/// wrap around.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `WrappingFrom` is implemented.
+/// when [`WrappingFrom`] is implemented.
 pub trait WrappingInto<T>: Sized {
     fn wrapping_into(self) -> T;
 }
@@ -199,17 +202,17 @@ impl<T, U: WrappingFrom<T>> WrappingInto<U> for T {
     }
 }
 
-/// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result is set to the maximum or minimum value of the result type, whichever is closer.
+/// Converts a value from one type to another, where if the conversion is not exact the result is
+/// set to the maximum or minimum value of the result type, whichever is closer.
 pub trait SaturatingFrom<T>: Sized {
     fn saturating_from(value: T) -> Self;
 }
 
-/// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// is set to the maximum or minimum value of the result type, whichever is closer.
+/// Converts a value from one type to another, where if the conversion is not exact the result is
+/// set to the maximum or minimum value of the result type, whichever is closer.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `SaturatingFrom` is implemented.
+/// when [`SaturatingFrom`] is implemented.
 pub trait SaturatingInto<T>: Sized {
     fn saturating_into(self) -> T;
 }
@@ -221,21 +224,22 @@ impl<T, U: SaturatingFrom<T>> SaturatingInto<U> for T {
     }
 }
 
-/// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result will wrap around. The result is returned along with a `bool` that indicates whether
-/// wrapping has occurred.
+/// Converts a value from one type to another, where if the conversion is not exact the result will
+/// wrap around. The result is returned along with a [`bool`] that indicates whether wrapping has
+/// occurred.
 ///
-/// If `OverflowingFrom` is implemented, it usually makes sense to implement `WrappingFrom` as well.
+/// If `OverflowingFrom` is implemented, it usually makes sense to implement [`WrappingFrom`] as
+/// well.
 pub trait OverflowingFrom<T>: Sized {
     fn overflowing_from(value: T) -> (Self, bool);
 }
 
-/// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// can wrap around. The result is returned along with a `bool` that indicates whether wrapping has
+/// Converts a value from one type to another, where if the conversion is not exact the result will
+/// wrap around. The result is returned along with a [`bool`] that indicates whether wrapping has
 /// occurred.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `OverflowingFrom` is implemented.
+/// when [`OverflowingFrom`] is implemented.
 pub trait OverflowingInto<T>: Sized {
     fn overflowing_into(self) -> (T, bool);
 }
@@ -247,17 +251,17 @@ impl<T, U: OverflowingFrom<T>> OverflowingInto<U> for T {
     }
 }
 
-/// This trait defines a conversion from another type, where the conversion is made according to a
-/// specified `RoundingMode`.
+/// Converts a value from one type to another, where the conversion is made according to a
+/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode).
 pub trait RoundingFrom<T>: Sized {
     fn rounding_from(value: T, rm: RoundingMode) -> Self;
 }
 
-/// This trait defines a conversion to another type, where the conversion is made according to a
-/// specified `RoundingMode`.
+/// Converts a value from one type to another, where the conversion is made according to a
+/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode).
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `RoundingFrom` is implemented.
+/// when [`RoundingFrom`] is implemented.
 pub trait RoundingInto<T>: Sized {
     fn rounding_into(self, rm: RoundingMode) -> T;
 }
@@ -269,11 +273,10 @@ impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
     }
 }
 
-/// This trait provides a function that tests whether a value of type `T` is convertible into a
-/// value of type `Self`.
+/// Tests whether a value of one type is convertible into a value of another.
 ///
 /// If `ConvertibleFrom<T>` for `Self` is implemented, it usually makes sense to implement
-/// `CheckedFrom` for `T` as well.
+/// [`CheckedFrom`] for `T` as well.
 pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
 }
@@ -284,23 +287,23 @@ pub trait HasHalf {
     type Half;
 }
 
-/// Provides a function to join two pieces into a value. For example, two `u32`s may be joined to
-/// form a `u64`.
+/// Provides a function to join two pieces into a number. For example, two [`u32`]s may be joined
+/// to form a [`u64`].
 pub trait JoinHalves: HasHalf {
-    /// Joins two values into a single value; the upper, or most significant half, comes first.
+    /// Joins two values into a single value; the upper, or most-significant, half comes first.
     fn join_halves(upper: Self::Half, lower: Self::Half) -> Self;
 }
 
-/// Provides functions to split a value into two pieces. For example, a `u64` may be split into two
-/// `u32`s.
+/// Provides functions to split a number into two pieces. For example, a [`u64`] may be split into
+/// two [`u32`]s.
 pub trait SplitInHalf: HasHalf {
-    /// Extracts the lower, or least significant half, of `self`.
+    /// Extracts the lower, or least-significant, half of a number.
     fn lower_half(&self) -> Self::Half;
 
-    /// Extracts the upper, or most significant half, of `self`.
+    /// Extracts the upper, or most-significant half of a number.
     fn upper_half(&self) -> Self::Half;
 
-    /// Extracts both halves of `self`; the upper, or most significant half, comes first.
+    /// Extracts both halves of a number; the upper, or most-significant, half comes first.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(\max(T_U(n), T_L(n)))$
@@ -308,67 +311,87 @@ pub trait SplitInHalf: HasHalf {
     /// $M(n) = O(\max(M_U(n), M_L(n)))$
     ///
     /// where $T$ is time, $M$ is additional memory, $T_U$ and $T_L$ are the time complexities of
-    /// the `upper_half` and `lower_half` functions, respectively, and $M_U$ and $M_L$ are the
-    /// memory complexities of the `upper_half` and `lower_half` functions, respectively.
+    /// the [`upper_half`](Self::upper_half) and [`lower_half`](Self::lower_half) functions,
+    /// respectively, and $M_U$ and $M_L$ are the memory complexities of the
+    /// [`upper_half`](Self::upper_half) and [`lower_half`](Self::lower_half) functions,
+    /// respectively.
     #[inline]
     fn split_in_half(&self) -> (Self::Half, Self::Half) {
         (self.upper_half(), self.lower_half())
     }
 }
 
-/// Determines whether a value is an integer.
+/// Determines whether a number is an integer.
 pub trait IsInteger {
     #[allow(clippy::wrong_self_convention)]
     fn is_integer(self) -> bool;
 }
 
-/// Converts a number to and from a raw mantissa and exponent form.
+/// Converts a number to or from a raw mantissa and exponent.
+///
+/// See [here](crate::num::basic::floats::PrimitiveFloat) for a definition of raw mantissa and
+/// exponent.
 pub trait RawMantissaAndExponent<M, E, T = Self>: Sized {
+    /// Extracts the raw mantissa and exponent from a number.
     fn raw_mantissa_and_exponent(self) -> (M, E);
 
+    /// Extracts the raw mantissa from a number.
     fn raw_mantissa(self) -> M {
         self.raw_mantissa_and_exponent().0
     }
 
+    /// Extracts the raw exponent from a number.
     fn raw_exponent(self) -> E {
         self.raw_mantissa_and_exponent().1
     }
 
+    /// Constructs a number from its raw mantissa and exponent.
     fn from_raw_mantissa_and_exponent(raw_mantissa: M, raw_exponent: E) -> T;
 }
 
-/// Converts a number to and from an integer mantissa and exponent form.
+/// Converts a number to or from an integer mantissa and exponent.
+///
+/// See [here](crate::num::basic::floats::PrimitiveFloat) for a definition of integer mantissa and
+/// exponent.
 ///
 /// The mantissa is an odd integer, and the exponent is an integer, such that $x = 2^em$.
 pub trait IntegerMantissaAndExponent<M, E, T = Self>: Sized {
+    /// Extracts the integer mantissa and exponent from a number.
     fn integer_mantissa_and_exponent(self) -> (M, E);
 
+    /// Extracts the integer mantissa from a number.
     fn integer_mantissa(self) -> M {
         self.integer_mantissa_and_exponent().0
     }
 
+    /// Extracts the integer exponent from a number.
     fn integer_exponent(self) -> E {
         self.integer_mantissa_and_exponent().1
     }
 
+    /// Constructs a number from its integer mantissa and exponent.
     fn from_integer_mantissa_and_exponent(integer_mantissa: M, integer_exponent: E) -> Option<T>;
 }
 
-/// Converts a number to and from a scientific mantissa and exponent form.
+/// Converts a number to or from a scientific mantissa and exponent.
 ///
-/// The mantissa is a number greater than or equal to 1 and less than 2, and the exponent is an
-/// integer, such that $x = 2^em$.
+/// See [here](crate::num::basic::floats::PrimitiveFloat) for a definition of scientific mantissa
+/// and exponent.
 pub trait SciMantissaAndExponent<M, E, T = Self>: Sized {
+    /// Extracts the scientific mantissa and exponent from a number.
     fn sci_mantissa_and_exponent(self) -> (M, E);
 
+    /// Extracts the scientific mantissa from a number.
     fn sci_mantissa(self) -> M {
         self.sci_mantissa_and_exponent().0
     }
 
+    /// Extracts the scientific exponent from a number.
     fn sci_exponent(self) -> E {
         self.sci_mantissa_and_exponent().1
     }
 
+    /// Constructs a number from its scientific mantissa and exponent.
     fn from_sci_mantissa_and_exponent(sci_mantissa: M, sci_exponent: E) -> Option<T>;
 }
 
@@ -377,12 +400,12 @@ pub trait FromOtherTypeSlice<T: Sized> {
     fn from_other_type_slice(slice: &[T]) -> Self;
 }
 
-/// Converts a slice of one type of value to a `Vec` of another type.
+/// Converts a slice of one type of value to a [`Vec`] of another type.
 pub trait VecFromOtherTypeSlice<T: Sized>: Sized {
     fn vec_from_other_type_slice(slice: &[T]) -> Vec<Self>;
 }
 
-/// Converts a slice of one type of value to a `Vec` of another type.
+/// Converts a slice of one type of value to a [`Vec`] of another type.
 pub trait VecFromOtherType<T>: Sized {
     fn vec_from_other_type(value: T) -> Vec<Self>;
 }

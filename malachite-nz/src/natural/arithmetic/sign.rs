@@ -3,17 +3,17 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl Sign for Natural {
-    /// Returns the sign of an `Natural`. Interpret the result as the result of a comparison to
-    /// zero, so that `Equal` means zero and `Greater` means positive.
+    /// Compares a [`Natural`] to zero.
     ///
-    /// Time: worst case O(1)
+    /// Returns `Greater` or `Equal` depending on whether the [`Natural`] is positive or zero,
+    /// respectively.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::Zero;

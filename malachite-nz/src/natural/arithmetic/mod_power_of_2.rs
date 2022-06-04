@@ -16,12 +16,15 @@ use platform::Limb;
 // limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
 // `pow` bits.
 //
-// Time: worst case O(`pow`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(`pow`)
+// $M(n) = O(n)$
 //
-// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and the
-// result is returned.
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+//
+// This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where in is
+// non-negative and the result is returned.
 pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
@@ -43,12 +46,12 @@ pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 // the least-significant `pow` bits. If the upper limbs of the input slice are no longer needed,
 // they are set to zero.
 //
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative, res == in,
-// and instead of possibly being truncated, the high limbs of res are possibly filled with zeros.
+// This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
+// non-negative, `res == in`, and instead of possibly being truncated, the high limbs of `res` are
+// possibly filled with zeros.
 pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
     if pow == 0 {
         slice_set_zero(xs);
@@ -69,12 +72,11 @@ pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) 
 // limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
 // the least-significant `pow` bits.
 //
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and
-// res == in.
+// This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
+// non-negative and `res == in`.
 pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         xs.clear();
@@ -95,12 +97,15 @@ pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
 // limbs of the negative of the `Natural` mod two raised to `pow`. Equivalently, takes the two's
 // complement and retains only the least-significant `pow` bits.
 //
-// Time: worst case O(`pow`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(`pow`)
+// $M(n) = O(n)$
 //
-// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and the result
-// is returned. `xs` is the limbs of -in.
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+//
+// This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
+// negative and the result is returned. `xs` is the limbs of `-in`.
 pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_neg_mod_power_of_2_in_place(&mut result, pow);
@@ -111,12 +116,15 @@ pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 // limbs of the negative of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently,
 // takes the two's complement and retains only the least-significant `pow` bits.
 //
-// Time: worst case O(`pow`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(`pow`)
+// $M(n) = O(n)$
 //
-// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and res == in.
-// `xs` is the limbs of -in.
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+//
+// This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
+// negative and `res == in`. `xs` is the limbs of `-in`.
 pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     xs.resize(new_size, 0);
@@ -130,26 +138,31 @@ pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
 impl ModPowerOf2 for Natural {
     type Output = Natural;
 
-    /// Takes a `Natural` mod a power of 2, taking the `Natural` by value. In other words, returns
-    /// r, where `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
+    /// value.
     ///
-    /// Time: worst case O(1)
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!(Natural::from(260u32).mod_power_of_2(8).to_string(), "4");
+    /// assert_eq!(Natural::from(260u32).mod_power_of_2(8), 4);
     ///
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!(Natural::from(1611u32).mod_power_of_2(4).to_string(), "11");
+    /// assert_eq!(Natural::from(1611u32).mod_power_of_2(4), 11);
     /// ```
     #[inline]
     fn mod_power_of_2(mut self, pow: u64) -> Natural {
@@ -161,25 +174,30 @@ impl ModPowerOf2 for Natural {
 impl<'a> ModPowerOf2 for &'a Natural {
     type Output = Natural;
 
-    /// Takes a `Natural` mod a power of 2, taking the `Natural` by reference. In other words,
-    /// returns r, where `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
+    /// reference.
     ///
-    /// Time: worst case O(`pow`)
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!((&Natural::from(260u32)).mod_power_of_2(8).to_string(), "4");
+    /// assert_eq!((&Natural::from(260u32)).mod_power_of_2(8), 4);
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!((&Natural::from(1611u32)).mod_power_of_2(4).to_string(), "11");
+    /// assert_eq!((&Natural::from(1611u32)).mod_power_of_2(4), 11);
     /// ```
     fn mod_power_of_2(self, pow: u64) -> Natural {
         match *self {
@@ -192,17 +210,17 @@ impl<'a> ModPowerOf2 for &'a Natural {
 }
 
 impl ModPowerOf2Assign for Natural {
-    /// Reduces a `Natural` mod a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides a [`Natural`]by $2^k$, replacing the [`Natural`] by the remainder.
     ///
-    /// Time: worst case O(1)
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
@@ -210,12 +228,12 @@ impl ModPowerOf2Assign for Natural {
     /// // 1 * 2^8 + 4 = 260
     /// let mut x = Natural::from(260u32);
     /// x.mod_power_of_2_assign(8);
-    /// assert_eq!(x.to_string(), "4");
+    /// assert_eq!(x, 4);
     ///
     /// // 100 * 2^4 + 11 = 1611
     /// let mut x = Natural::from(1611u32);
     /// x.mod_power_of_2_assign(4);
-    /// assert_eq!(x.to_string(), "11");
+    /// assert_eq!(x, 11);
     /// ```
     fn mod_power_of_2_assign(&mut self, pow: u64) {
         match *self {
@@ -231,26 +249,34 @@ impl ModPowerOf2Assign for Natural {
 impl RemPowerOf2 for Natural {
     type Output = Natural;
 
-    /// Takes a `Natural` rem a power of 2, taking the `Natural` by value. For `Natural`s, rem is
-    /// equivalent to mod.
+    /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
+    /// value.
     ///
-    /// Time: worst case O(1)
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
+    /// $$
+    ///
+    /// For [`Natural`]s, `rem_power_of_2` is equivalent to
+    /// [`mod_power_of_2`](ModPowerOf2::mod_power_of_2).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!(Natural::from(260u32).rem_power_of_2(8).to_string(), "4");
+    /// assert_eq!(Natural::from(260u32).rem_power_of_2(8), 4);
     ///
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!(Natural::from(1611u32).rem_power_of_2(4).to_string(), "11");
+    /// assert_eq!(Natural::from(1611u32).rem_power_of_2(4), 11);
     /// ```
     #[inline]
     fn rem_power_of_2(self, pow: u64) -> Natural {
@@ -261,25 +287,37 @@ impl RemPowerOf2 for Natural {
 impl<'a> RemPowerOf2 for &'a Natural {
     type Output = Natural;
 
-    /// Takes a `Natural` rem a power of 2, taking the `Natural` by reference. For `Natural`s, rem
-    /// is equivalent to mod.
+    /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
+    /// reference.
     ///
-    /// Time: worst case O(`pow`)
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// $$
+    /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
+    /// $$
+    ///
+    /// For [`Natural`]s, `rem_power_of_2` is equivalent to
+    /// [`mod_power_of_2`](ModPowerOf2::mod_power_of_2).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 * 2^8 + 4 = 260
-    /// assert_eq!((&Natural::from(260u32)).rem_power_of_2(8).to_string(), "4");
+    /// assert_eq!((&Natural::from(260u32)).rem_power_of_2(8), 4);
     /// // 100 * 2^4 + 11 = 1611
-    /// assert_eq!((&Natural::from(1611u32)).rem_power_of_2(4).to_string(), "11");
+    /// assert_eq!((&Natural::from(1611u32)).rem_power_of_2(4), 11);
     /// ```
     #[inline]
     fn rem_power_of_2(self, pow: u64) -> Natural {
@@ -288,16 +326,24 @@ impl<'a> RemPowerOf2 for &'a Natural {
 }
 
 impl RemPowerOf2Assign for Natural {
-    /// Reduces a `Natural` rem a power of 2 in place. For `Natural`s, rem is equivalent to mod.
+    /// Divides a [`Natural`] by $2^k$, replacing the first [`Natural`] by the remainder.
     ///
-    /// Time: worst case O(1)
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
+    /// $$
+    ///
+    /// For [`Natural`]s, `rem_power_of_2_assign` is equivalent to
+    /// [`mod_power_of_2_assign`](ModPowerOf2Assign::mod_power_of_2_assign).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
@@ -305,12 +351,12 @@ impl RemPowerOf2Assign for Natural {
     /// // 1 * 2^8 + 4 = 260
     /// let mut x = Natural::from(260u32);
     /// x.rem_power_of_2_assign(8);
-    /// assert_eq!(x.to_string(), "4");
+    /// assert_eq!(x, 4);
     ///
     /// // 100 * 2^4 + 11 = 1611
     /// let mut x = Natural::from(1611u32);
     /// x.rem_power_of_2_assign(4);
-    /// assert_eq!(x.to_string(), "11");
+    /// assert_eq!(x, 11);
     /// ```
     #[inline]
     fn rem_power_of_2_assign(&mut self, pow: u64) {
@@ -321,27 +367,35 @@ impl RemPowerOf2Assign for Natural {
 impl NegModPowerOf2 for Natural {
     type Output = Natural;
 
-    /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by value. In other
-    /// words, returns r, where `self` = q * 2<sup>`pow`</sup> - r and
-    /// 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides the negative of a [`Natural`] by a $2^k$, returning just
+    /// the remainder. The [`Natural`] is taken by value.
     ///
-    /// Time: worst case O(`pow`)
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
+    /// $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// $$
+    /// f(x, k) = 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 2^8 - 252 = 260
-    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_2(8).to_string(), "252");
+    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_2(8), 252);
     ///
     /// // 101 * 2^4 - 5 = 1611
-    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_2(4).to_string(), "5");
+    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_2(4), 5);
     /// ```
     #[inline]
     fn neg_mod_power_of_2(mut self, pow: u64) -> Natural {
@@ -353,26 +407,34 @@ impl NegModPowerOf2 for Natural {
 impl<'a> NegModPowerOf2 for &'a Natural {
     type Output = Natural;
 
-    /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by reference. In
-    /// other words, returns r, where `self` = q * 2<sup>`pow`</sup> - r and
-    /// 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides the negative of a [`Natural`] by a $2^k$, returning just the remainder. The
+    /// [`Natural`] is taken by reference.
     ///
-    /// Time: worst case O(`pow`)
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
+    /// $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// $$
+    /// f(x, k) = 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 2^8 - 252 = 260
-    /// assert_eq!((&Natural::from(260u32)).neg_mod_power_of_2(8).to_string(), "252");
+    /// assert_eq!((&Natural::from(260u32)).neg_mod_power_of_2(8), 252);
     /// // 101 * 2^4 - 5 = 1611
-    /// assert_eq!((&Natural::from(1611u32)).neg_mod_power_of_2(4).to_string(), "5");
+    /// assert_eq!((&Natural::from(1611u32)).neg_mod_power_of_2(4), 5);
     /// ```
     fn neg_mod_power_of_2(self, pow: u64) -> Natural {
         match (self, pow) {
@@ -391,17 +453,25 @@ impl<'a> NegModPowerOf2 for &'a Natural {
 }
 
 impl NegModPowerOf2Assign for Natural {
-    /// Reduces the negative of a `Natural` mod a power of 2 in place. In other words, replaces
-    /// `self` with r, where `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
+    /// Divides the negative of a [`Natural`] by $2^k$, returning just the remainder.
     ///
-    /// Time: worst case O(`pow`)
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
+    /// $0 \leq r < 2^k$.
     ///
-    /// Additional memory: worst case O(`pow`)
+    /// $$
+    /// x \gets 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
@@ -409,12 +479,12 @@ impl NegModPowerOf2Assign for Natural {
     /// // 2 * 2^8 - 252 = 260
     /// let mut x = Natural::from(260u32);
     /// x.neg_mod_power_of_2_assign(8);
-    /// assert_eq!(x.to_string(), "252");
+    /// assert_eq!(x, 252);
     ///
     /// // 101 * 2^4 - 5 = 1611
     /// let mut x = Natural::from(1611u32);
     /// x.neg_mod_power_of_2_assign(4);
-    /// assert_eq!(x.to_string(), "5");
+    /// assert_eq!(x, 5);
     /// ```
     fn neg_mod_power_of_2_assign(&mut self, pow: u64) {
         if *self == 0 {

@@ -1,5 +1,4 @@
 use random::Seed;
-use sets::random::{random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength};
 use std::cmp::Ordering;
 use std::iter::{repeat, Repeat};
 
@@ -17,7 +16,6 @@ use std::iter::{repeat, Repeat};
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::tuples::random::random_units;
 ///
 /// assert_eq!(random_units().take(10).collect_vec(), &[(); 10]);
@@ -27,13 +25,134 @@ pub fn random_units() -> Repeat<()> {
 }
 
 // hack for macro
+#[doc(hidden)]
 #[inline]
-fn next_helper<I: Iterator>(x: &mut I, _i: usize) -> Option<I::Item> {
+pub fn next_helper<I: Iterator>(x: &mut I, _i: usize) -> Option<I::Item> {
     x.next()
 }
 
+/// Defines random tuple generators.
+///
+/// Malachite provides [`random_pairs`] and [`random_pairs_from_single`], but you can also define
+/// `random_triples`, `random_quadruples`, and so on, and `random_triples_from_single`,
+/// `random_quadruples_from_single`, and so on, in your program using the code below. The
+/// documentation for [`random_pairs`] and [`random_pairs_from_single`] describes these other
+/// functions as well.
+///
+/// See usage examples [here](self#random_pairs) and [here](self#random_pairs_from_single).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
+/// use malachite_base::random::Seed;
+/// use malachite_base::tuples::random::next_helper;
+///
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomTriples,
+///     RandomTriplesFromSingle,
+///     random_triples,
+///     random_triples_from_single,
+///     (I::Item, I::Item, I::Item),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen]
+/// );
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomQuadruples,
+///     RandomQuadruplesFromSingle,
+///     random_quadruples,
+///     random_quadruples_from_single,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen],
+///     [3, W, L, ws, ws_gen]
+/// );
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomQuintuples,
+///     RandomQuintuplesFromSingle,
+///     random_quintuples,
+///     random_quintuples_from_single,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen],
+///     [3, W, L, ws, ws_gen],
+///     [4, V, M, vs, vs_gen]
+/// );
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomSextuples,
+///     RandomSextuplesFromSingle,
+///     random_sextuples,
+///     random_sextuples_from_single,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen],
+///     [3, W, L, ws, ws_gen],
+///     [4, V, M, vs, vs_gen],
+///     [5, U, N, us, us_gen]
+/// );
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomSeptuples,
+///     RandomSeptuplesFromSingle,
+///     random_septuples,
+///     random_septuples_from_single,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen],
+///     [3, W, L, ws, ws_gen],
+///     [4, V, M, vs, vs_gen],
+///     [5, U, N, us, us_gen],
+///     [6, T, O, ts, ts_gen]
+/// );
+/// random_tuples!(
+///     (pub(crate)),
+///     RandomOctuples,
+///     RandomOctuplesFromSingle,
+///     random_octuples,
+///     random_octuples_from_single,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     [0, X, I, xs, xs_gen],
+///     [1, Y, J, ys, ys_gen],
+///     [2, Z, K, zs, zs_gen],
+///     [3, W, L, ws, ws_gen],
+///     [4, V, M, vs, vs_gen],
+///     [5, U, N, us, us_gen],
+///     [6, T, O, ts, ts_gen],
+///     [7, S, P, ss, ss_gen]
+/// );
+/// # }
+/// ```
+#[macro_export]
 macro_rules! random_tuples {
     (
+        ($($vis:tt)*),
         $random_struct: ident,
         $random_struct_from_single: ident,
         $random_fn: ident,
@@ -41,11 +160,13 @@ macro_rules! random_tuples {
         $single_out: tt,
         $([$i: expr, $t: ident, $it: ident, $xs: ident, $xs_gen:ident]),*
     ) => {
-        /// Generates random $n$-tuples using elements from $n$ iterators.
+        /// This documentation applies not only to `RandomPairs`, but also to `RandomTriples`,
+        /// `RandomQuadruples`, and so on. See [`random_tuples`] for more information.
         ///
-        /// This struct is macro-generated. The value of $n$ is in the struct's name.
+        /// Generates random $n$-tuples using elements from $n$ iterators.
         #[derive(Clone, Debug)]
-        pub struct $random_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
+        #[allow(dead_code)]
+        $($vis)* struct $random_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
             $($xs: $it,)*
         }
 
@@ -59,31 +180,20 @@ macro_rules! random_tuples {
             }
         }
 
-        /// Generates random $n$-tuples with elements from $n$ iterators.
+        /// This documentation applies not only to `random_pairs`, but also to `random_triples`,
+        /// `random_quadruples`, and so on. See [`random_tuples`] for more information.
         ///
-        /// This function is macro-generated. The value of $n$ is in the function's name.
+        /// Generates random $n$-tuples with elements from $n$ iterators.
         ///
         /// The probability of a particular $n$-tuple being generated is the product of the
         /// probabilities of each of its elements.
         ///
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
-        /// # Expected complexity per iteration
-        /// $$
-        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
-        /// $$
-        ///
-        /// $$
-        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_0, T_1, \ldots T_{n-1}$ and $M_0, M_1, \ldots M_{n-1}$ are the time and additional
-        /// memory of the input iterators.
-        ///
         /// # Examples
-        /// See the documentation of the `tuples::random` module.
-        pub fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
+        /// See [here](self#random_pairs).
+        #[allow(dead_code)]
+        $($vis)* fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             seed: Seed,
             $($xs_gen: &dyn Fn(Seed) -> $it,)*
         ) -> $random_struct<$($t, $it,)*> {
@@ -92,11 +202,14 @@ macro_rules! random_tuples {
             }
         }
 
-        /// Generates random $n$-tuples using elements from a single iterator.
+        /// This documentation applies not only to `RandomPairsFromSingle`, but also to
+        /// `RandomTriplesFromSingle`, `RandomQuadruplesFromSingle`, and so on. See
+        /// [`random_tuples`] for more information.
         ///
-        /// This struct is macro-generated. The value of $n$ is in the struct's name.
+        /// Generates random $n$-tuples using elements from a single iterator.
         #[derive(Clone, Debug)]
-        pub struct $random_struct_from_single<I: Iterator> {
+        #[allow(dead_code)]
+        $($vis)* struct $random_struct_from_single<I: Iterator> {
             xs: I
         }
 
@@ -109,33 +222,30 @@ macro_rules! random_tuples {
             }
         }
 
-        /// Generates random $n$-tuples using elements from a single iterator.
+        /// This documentation applies not only to `random_pairs_from_single`, but also to
+        /// `random_triples_from_single`, `random_quadruples_from_single`, and so on. See
+        /// [`random_tuples`] for more information.
         ///
-        /// This function is macro-generated. The value of $n$ is in the function's name.
+        /// Generates random $n$-tuples using elements from a single iterator.
         ///
         /// The probability of a particular $n$-tuple being generated is the product of the
         /// probabilities of each of its elements.
         ///
         /// `xs` must be infinite.
         ///
-        /// # Expected complexity per iteration
-        /// $T(n) = O(nT^\prime)$
-        ///
-        /// $M(n) = O(nM^\prime)$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$
-        /// and $M^\prime$ are the time and additional memory of `xs`.
-        ///
         /// # Examples
-        /// See the documentation of the `tuples::random` module.
+        /// See [here](self#random_pairs_from_single).
+        #[allow(dead_code)]
         #[inline]
-        pub fn $random_fn_from_single<I: Iterator>(xs: I) -> $random_struct_from_single<I> {
+        $($vis)* const fn $random_fn_from_single<I: Iterator>(xs: I)
+                -> $random_struct_from_single<I> {
             $random_struct_from_single { xs }
         }
     }
 }
 
 random_tuples!(
+    (pub),
     RandomPairs,
     RandomPairsFromSingle,
     random_pairs,
@@ -144,116 +254,132 @@ random_tuples!(
     [0, X, I, xs, xs_gen],
     [1, Y, J, ys, ys_gen]
 );
-random_tuples!(
-    RandomTriples,
-    RandomTriplesFromSingle,
-    random_triples,
-    random_triples_from_single,
-    (I::Item, I::Item, I::Item),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen]
-);
-random_tuples!(
-    RandomQuadruples,
-    RandomQuadruplesFromSingle,
-    random_quadruples,
-    random_quadruples_from_single,
-    (I::Item, I::Item, I::Item, I::Item),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen],
-    [3, W, L, ws, ws_gen]
-);
-random_tuples!(
-    RandomQuintuples,
-    RandomQuintuplesFromSingle,
-    random_quintuples,
-    random_quintuples_from_single,
-    (I::Item, I::Item, I::Item, I::Item, I::Item),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen],
-    [3, W, L, ws, ws_gen],
-    [4, V, M, vs, vs_gen]
-);
-random_tuples!(
-    RandomSextuples,
-    RandomSextuplesFromSingle,
-    random_sextuples,
-    random_sextuples_from_single,
-    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen],
-    [3, W, L, ws, ws_gen],
-    [4, V, M, vs, vs_gen],
-    [5, U, N, us, us_gen]
-);
-random_tuples!(
-    RandomSeptuples,
-    RandomSeptuplesFromSingle,
-    random_septuples,
-    random_septuples_from_single,
-    (
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item
-    ),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen],
-    [3, W, L, ws, ws_gen],
-    [4, V, M, vs, vs_gen],
-    [5, U, N, us, us_gen],
-    [6, T, O, ts, ts_gen]
-);
-random_tuples!(
-    RandomOctuples,
-    RandomOctuplesFromSingle,
-    random_octuples,
-    random_octuples_from_single,
-    (
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item
-    ),
-    [0, X, I, xs, xs_gen],
-    [1, Y, J, ys, ys_gen],
-    [2, Z, K, zs, zs_gen],
-    [3, W, L, ws, ws_gen],
-    [4, V, M, vs, vs_gen],
-    [5, U, N, us, us_gen],
-    [6, T, O, ts, ts_gen],
-    [7, S, P, ss, ss_gen]
-);
 
+/// Defines custom random tuple generators.
+///
+/// You can define custom tuple generators like `random_triples_xyx` in your program using the code
+/// below.
+///
+/// See usage examples [here](self#random_triples_xyx).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::random::Seed;
+///
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomTriplesXXY,
+///     (X, X, Y),
+///     random_triples_xxy,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+///     [Y, J, ys, ys_gen, [y_2, y_2]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomTriplesXYX,
+///     (X, Y, X),
+///     random_triples_xyx,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
+///     [Y, J, ys, ys_gen, [y_1, x_2]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomTriplesXYY,
+///     (X, Y, Y),
+///     random_triples_xyy,
+///     [X, I, xs, xs_gen, [x_0, x_0]],
+///     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXXXY,
+///     (X, X, X, Y),
+///     random_quadruples_xxxy,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_2, x_2]],
+///     [Y, J, ys, ys_gen, [y_3, y_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXXYX,
+///     (X, X, Y, X),
+///     random_quadruples_xxyx,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_3, y_2]],
+///     [Y, J, ys, ys_gen, [y_2, x_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXXYZ,
+///     (X, X, Y, Z),
+///     random_quadruples_xxyz,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+///     [Y, J, ys, ys_gen, [y_2, y_2]],
+///     [Z, K, zs, zs_gen, [z_3, z_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXYXZ,
+///     (X, Y, X, Z),
+///     random_quadruples_xyxz,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
+///     [Y, J, ys, ys_gen, [y_1, x_2]],
+///     [Z, K, zs, zs_gen, [z_3, z_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXYYX,
+///     (X, Y, Y, X),
+///     random_quadruples_xyyx,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_3, y_1]],
+///     [Y, J, ys, ys_gen, [y_1, y_2], [y_2, x_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXYYZ,
+///     (X, Y, Y, Z),
+///     random_quadruples_xyyz,
+///     [X, I, xs, xs_gen, [x_0, x_0]],
+///     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]],
+///     [Z, K, zs, zs_gen, [z_3, z_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuadruplesXYZZ,
+///     (X, Y, Z, Z),
+///     random_quadruples_xyzz,
+///     [X, I, xs, xs_gen, [x_0, x_0]],
+///     [Y, J, ys, ys_gen, [y_1, y_1]],
+///     [Z, K, zs, zs_gen, [z_2, z_2], [z_3, z_3]]
+/// );
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomQuintuplesXYYYZ,
+///     (X, Y, Y, Y, Z),
+///     random_quintuples_xyyyz,
+///     [X, I, xs, xs_gen, [x_0, x_0]],
+///     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2], [y_3, y_3]],
+///     [Z, K, zs, zs_gen, [z_4, z_4]]
+/// );
+/// # }
+/// ```
+#[macro_export]
 macro_rules! random_custom_tuples {
     (
+        ($($vis:tt)*),
         $random_struct: ident,
         $out_t: ty,
         $random_fn: ident,
         $([$t: ident, $it: ident, $xs: ident, $xs_gen: ident, $([$x: ident, $x_ord: ident]),*]),*
     ) => {
-        /// Generates random $n$-tuples with elements from $m$ iterators, where $m \leq n$.
-        ///
-        /// The mapping from iterators to tuple slots is indicated by the struct name; for example,
-        /// in `RandomTriplesXYX` there are two iterators, `X`, and `Y`; `X` generates the elements
-        /// in the first and third slots of the output triples, and `Y` generates the elements in
-        /// the second slots.
-        ///
-        /// This struct is macro-generated.
+        // Generates random $n$-tuples with elements from $m$ iterators, where $m \leq n$.
+        //
+        // The mapping from iterators to tuple slots is indicated by the struct name; for example,
+        // in `RandomTriplesXYX` there are two iterators, `X`, and `Y`; `X` generates the elements
+        // in the first and third slots of the output triples, and `Y` generates the elements in
+        // the second slots.
         #[derive(Clone, Debug)]
-        pub struct $random_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
+        $($vis)* struct $random_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
             $($xs: $it,)*
         }
 
@@ -271,39 +397,21 @@ macro_rules! random_custom_tuples {
             }
         }
 
-        /// Generates random $n$-tuples with elements from $m$ iterators, where $m \leq n$.
-        ///
-        /// The mapping from iterators to tuple slots is indicated by the function name; for
-        /// example, `random_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the
-        /// elements in the first and third slots of the output triples, and `ys` generates the
-        /// elements in the second slots.
-        ///
-        /// The probability of a particular $n$-tuple being generated is the product of the
-        /// probabilities of each of its elements.
-        ///
-        /// `xs`, `ys`, `zs`, ... must be infinite.
-        ///
-        /// # Expected complexity per iteration
-        /// Let $j$ be the largest index of any output associated with `xs`, and $T_j$ and
-        /// $M_j$ the time and additional memory complexities of `xs`.
-        ///
-        /// We have
-        ///
-        /// $$
-        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
-        /// $$
-        ///
-        /// $$
-        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_j$ and $M_j$ are the time and additional memory of the iterator corresponding to the
-        /// $j$th output.
-        ///
-        /// # Examples
-        /// See the documentation of the `tuples::random` module.
-        pub fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
+        // Generates random $n$-tuples with elements from $m$ iterators, where $m \leq n$.
+        //
+        // The mapping from iterators to tuple slots is indicated by the function name; for
+        // example, `random_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the
+        // elements in the first and third slots of the output triples, and `ys` generates the
+        // elements in the second slots.
+        //
+        // The probability of a particular $n$-tuple being generated is the product of the
+        // probabilities of each of its elements.
+        //
+        // `xs`, `ys`, `zs`, ... must be infinite.
+        //
+        // # Examples
+        // See [here](self#random_triples_xyx).
+        $($vis)* fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             seed: Seed,
             $($xs_gen: &dyn Fn(Seed) -> $it,)*
         ) -> $random_struct<$($t, $it,)*> {
@@ -313,89 +421,6 @@ macro_rules! random_custom_tuples {
         }
     }
 }
-
-random_custom_tuples!(
-    RandomTriplesXXY,
-    (X, X, Y),
-    random_triples_xxy,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
-    [Y, J, ys, ys_gen, [y_2, y_2]]
-);
-random_custom_tuples!(
-    RandomTriplesXYX,
-    (X, Y, X),
-    random_triples_xyx,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
-    [Y, J, ys, ys_gen, [y_1, x_2]]
-);
-random_custom_tuples!(
-    RandomTriplesXYY,
-    (X, Y, Y),
-    random_triples_xyy,
-    [X, I, xs, xs_gen, [x_0, x_0]],
-    [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXXXY,
-    (X, X, X, Y),
-    random_quadruples_xxxy,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_2, x_2]],
-    [Y, J, ys, ys_gen, [y_3, y_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXXYX,
-    (X, X, Y, X),
-    random_quadruples_xxyx,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_3, y_2]],
-    [Y, J, ys, ys_gen, [y_2, x_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXXYZ,
-    (X, X, Y, Z),
-    random_quadruples_xxyz,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
-    [Y, J, ys, ys_gen, [y_2, y_2]],
-    [Z, K, zs, zs_gen, [z_3, z_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXYXZ,
-    (X, Y, X, Z),
-    random_quadruples_xyxz,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
-    [Y, J, ys, ys_gen, [y_1, x_2]],
-    [Z, K, zs, zs_gen, [z_3, z_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXYYX,
-    (X, Y, Y, X),
-    random_quadruples_xyyx,
-    [X, I, xs, xs_gen, [x_0, x_0], [x_3, y_1]],
-    [Y, J, ys, ys_gen, [y_1, y_2], [y_2, x_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXYYZ,
-    (X, Y, Y, Z),
-    random_quadruples_xyyz,
-    [X, I, xs, xs_gen, [x_0, x_0]],
-    [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]],
-    [Z, K, zs, zs_gen, [z_3, z_3]]
-);
-random_custom_tuples!(
-    RandomQuadruplesXYZZ,
-    (X, Y, Z, Z),
-    random_quadruples_xyzz,
-    [X, I, xs, xs_gen, [x_0, x_0]],
-    [Y, J, ys, ys_gen, [y_1, y_1]],
-    [Z, K, zs, zs_gen, [z_2, z_2], [z_3, z_3]]
-);
-random_custom_tuples!(
-    RandomQuintuplesXYYYZ,
-    (X, Y, Y, Y, Z),
-    random_quintuples_xyyyz,
-    [X, I, xs, xs_gen, [x_0, x_0]],
-    [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2], [y_3, y_3]],
-    [Z, K, zs, zs_gen, [z_4, z_4]]
-);
 
 /// Generates random pairs using elements from a single iterator, where the first element is less
 /// than the second.
@@ -454,49 +479,116 @@ where
 /// its second. The probability of an invalid pair is zero.
 ///
 /// `xs` must be infinite.
-///
-/// # Expected complexity per iteration
-/// $T = O(T^\prime)$
-///
-/// $M = O(M^\prime)$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$ and
-/// $M^\prime$ are the time and additional memory of `xs`.
-///
-/// # Examples
-/// See the documentation of the `tuples::random` module.
 #[inline]
-pub fn random_ordered_unique_pairs<I: Iterator>(xs: I) -> RandomOrderedUniquePairs<I>
+pub const fn random_ordered_unique_pairs<I: Iterator>(xs: I) -> RandomOrderedUniquePairs<I>
 where
     I::Item: Ord,
 {
     RandomOrderedUniquePairs { xs }
 }
 
+/// Defines random ordered unique tuple generators.
+///
+/// Malachite provides [`random_ordered_unique_pairs`], but you can also define
+/// `random_ordered_unique_triples`, `random_ordered_unique_quadruples`, and so on, in your program
+/// using the code below.
+///
+/// See usage examples [here](self#random_ordered_unique_quadruples).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::sets::random::{
+///     random_b_tree_sets_fixed_length,
+///     RandomBTreeSetsFixedLength
+/// };
+///
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueTriples,
+///     3,
+///     (I::Item, I::Item, I::Item),
+///     random_ordered_unique_triples,
+///     [0, 1, 2]
+/// );
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     random_ordered_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuintuples,
+///     5,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item),
+///     random_ordered_unique_quintuples,
+///     [0, 1, 2, 3, 4]
+/// );
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueSextuples,
+///     6,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+///     random_ordered_unique_sextuples,
+///     [0, 1, 2, 3, 4, 5]
+/// );
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueSeptuples,
+///     7,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     random_ordered_unique_septuples,
+///     [0, 1, 2, 3, 4, 5, 6]
+/// );
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueOctuples,
+///     8,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     random_ordered_unique_octuples,
+///     [0, 1, 2, 3, 4, 5, 6, 7]
+/// );
+/// # }
+/// ```
+#[macro_export]
 macro_rules! random_ordered_unique_tuples {
     (
+        ($($vis:tt)*),
         $struct: ident,
         $k: expr,
         $out_t: ty,
         $fn: ident,
         [$($i: expr),*]
     ) => {
-        /// Generates random $n$-tuples using elements from a single iterator, where the tuples
-        /// have no repeated elements, and the elements are in ascending order.
-        ///
-        /// This struct is macro-generated. The value of $n$ is in the struct's name.
+        // Generates random $n$-tuples using elements from a single iterator, where the tuples
+        // have no repeated elements, and the elements are in ascending order.
         #[derive(Clone, Debug)]
-        pub struct $struct<I: Iterator>
-        where
-            I::Item: Ord,
-        {
+        $($vis)* struct $struct<I: Iterator> where I::Item: Ord {
             xs: RandomBTreeSetsFixedLength<I>,
         }
 
-        impl<I: Iterator> Iterator for $struct<I>
-        where
-            I::Item: Ord,
-        {
+        impl<I: Iterator> Iterator for $struct<I> where I::Item: Ord {
             type Item = $out_t;
 
             #[inline]
@@ -506,35 +598,25 @@ macro_rules! random_ordered_unique_tuples {
             }
         }
 
-        /// Generates random $n$-tuples using elements from a single iterator, where the tuples
-        /// have no repeated elements, and the elements are in ascending order.
-        ///
-        /// This function is macro-generated. The value of $n$ is in the function's name.
-        ///
-        /// The input iterator must generate at least `len` distinct elements; otherwise, this
-        /// iterator will hang.
-        ///
-        /// $$
-        /// P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
-        /// $$
-        ///
-        /// The above formula assumes that the tuple is valid, \emph{i.e.} its elements are
-        /// strictly increasing. The probability of an invalid tuple is zero.
-        ///
-        /// `xs` must be infinite.
-        ///
-        /// # Expected complexity per iteration
-        /// $T(n) = O(n\log n T^\prime)$
-        ///
-        /// $M(n) = O(nM^\prime)$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$
-        /// and $M^\prime$ are the time and additional memory of `xs`.
-        ///
-        /// # Examples
-        /// See the documentation of the `tuples::random` module.
+        // Generates random $n$-tuples using elements from a single iterator, where the tuples
+        // have no repeated elements, and the elements are in ascending order.
+        //
+        // The input iterator must generate at least `len` distinct elements; otherwise, this
+        // iterator will hang.
+        //
+        // $$
+        // P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
+        // $$
+        //
+        // The above formula assumes that the tuple is valid, \emph{i.e.} its elements are
+        // strictly increasing. The probability of an invalid tuple is zero.
+        //
+        // `xs` must be infinite.
+        //
+        // # Examples
+        // See [here](self#random_ordered_unique_quadruples).
         #[inline]
-        pub fn $fn<I: Iterator>(xs: I) -> $struct<I>
+        $($vis)* fn $fn<I: Iterator>(xs: I) -> $struct<I>
         where
             I::Item: Ord,
         {
@@ -544,62 +626,3 @@ macro_rules! random_ordered_unique_tuples {
         }
     }
 }
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueTriples,
-    3,
-    (I::Item, I::Item, I::Item),
-    random_ordered_unique_triples,
-    [0, 1, 2]
-);
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueQuadruples,
-    4,
-    (I::Item, I::Item, I::Item, I::Item),
-    random_ordered_unique_quadruples,
-    [0, 1, 2, 3]
-);
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueQuintuples,
-    5,
-    (I::Item, I::Item, I::Item, I::Item, I::Item),
-    random_ordered_unique_quintuples,
-    [0, 1, 2, 3, 4]
-);
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueSextuples,
-    6,
-    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
-    random_ordered_unique_sextuples,
-    [0, 1, 2, 3, 4, 5]
-);
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueSeptuples,
-    7,
-    (
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item
-    ),
-    random_ordered_unique_septuples,
-    [0, 1, 2, 3, 4, 5, 6]
-);
-random_ordered_unique_tuples!(
-    RandomOrderedUniqueOctuples,
-    8,
-    (
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item,
-        I::Item
-    ),
-    random_ordered_unique_octuples,
-    [0, 1, 2, 3, 4, 5, 6, 7]
-);

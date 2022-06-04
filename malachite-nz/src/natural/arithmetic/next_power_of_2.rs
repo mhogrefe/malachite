@@ -11,11 +11,12 @@ use platform::Limb;
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -48,11 +49,12 @@ pub_test! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -86,11 +88,12 @@ pub_test! {limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -103,27 +106,29 @@ pub_test! {limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
 impl NextPowerOf2 for Natural {
     type Output = Natural;
 
-    /// Returns the smallest integer power of 2 greater than or equal to a `Natural`, taking the
-    /// `Natural` by value.
+    /// Finds the smallest power of 2 greater than or equal to a [`Natural`]. The [`Natural`] is
+    /// taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $f(x) = 2^{\lceil \log_2 x \rceil}$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
+    /// use malachite_base::num::arithmetic::traits::{NextPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.next_power_of_2().to_string(), "1");
-    /// assert_eq!(Natural::from(123u32).next_power_of_2().to_string(), "128");
-    /// assert_eq!(Natural::trillion().next_power_of_2().to_string(), "1099511627776");
+    /// assert_eq!(Natural::ZERO.next_power_of_2(), 1);
+    /// assert_eq!(Natural::from(123u32).next_power_of_2(), 128);
+    /// assert_eq!(Natural::from(10u32).pow(12).next_power_of_2(), 1099511627776u64);
     /// ```
     #[inline]
     fn next_power_of_2(mut self) -> Natural {
@@ -135,27 +140,29 @@ impl NextPowerOf2 for Natural {
 impl<'a> NextPowerOf2 for &'a Natural {
     type Output = Natural;
 
-    /// Returns the smallest integer power of 2 greater than or equal to a `Natural`, taking the
-    /// `Natural` by reference.
+    /// Finds the smallest power of 2 greater than or equal to a [`Natural`]. The [`Natural`] is
+    /// taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $f(x) = 2^{\lceil \log_2 x \rceil}$.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
+    /// use malachite_base::num::arithmetic::traits::{NextPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).next_power_of_2().to_string(), "1");
-    /// assert_eq!((&Natural::from(123u32)).next_power_of_2().to_string(), "128");
-    /// assert_eq!((&Natural::trillion()).next_power_of_2().to_string(), "1099511627776");
+    /// assert_eq!((&Natural::ZERO).next_power_of_2(), 1);
+    /// assert_eq!((&Natural::from(123u32)).next_power_of_2(), 128);
+    /// assert_eq!((&Natural::from(10u32).pow(12)).next_power_of_2(), 1099511627776u64);
     /// ```
     fn next_power_of_2(self) -> Natural {
         Natural(match *self {
@@ -172,32 +179,36 @@ impl<'a> NextPowerOf2 for &'a Natural {
 }
 
 impl NextPowerOf2Assign for Natural {
-    /// Replaces a `Natural` with the smallest integer power of 2 greater than or equal to it.
+    /// Replaces a [`Natural`] with the smallest power of 2 greater than or equal to it.
     ///
-    /// Time: worst case O(1)
+    /// $x \gets 2^{\lceil \log_2 x \rceil}$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
+    /// use malachite_base::num::arithmetic::traits::{NextPowerOf2Assign, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
     /// x.next_power_of_2_assign();
-    /// assert_eq!(x.to_string(), "1");
+    /// assert_eq!(x, 1);
     ///
     /// let mut x = Natural::from(123u32);
     /// x.next_power_of_2_assign();
-    /// assert_eq!(x.to_string(), "128");
+    /// assert_eq!(x, 128);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.next_power_of_2_assign();
-    /// assert_eq!(x.to_string(), "1099511627776");
+    /// assert_eq!(x, 1099511627776u64);
     /// ```
     fn next_power_of_2_assign(&mut self) {
         match *self {

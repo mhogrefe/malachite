@@ -18,7 +18,7 @@ fn test_partial_eq() {
         assert_eq!(v == Integer::from_str(u).unwrap(), out);
         assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
 
-        let v = v as f64;
+        let v = f64::from(v);
         assert_eq!(Integer::from_str(u).unwrap() == v, out);
         assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
 

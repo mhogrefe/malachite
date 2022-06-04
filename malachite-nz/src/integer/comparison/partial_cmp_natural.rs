@@ -3,14 +3,14 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrd<Natural> for Integer {
-    /// Compares an `Integer` to a `Natural`.
+    /// Compares an [`Integer`] to a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits())`
+    /// where n = `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -34,13 +34,14 @@ impl PartialOrd<Natural> for Integer {
 }
 
 impl PartialOrd<Integer> for Natural {
-    /// Compares a `Natural` to an `Integer`.
+    /// Compares a [`Natural`] to an [`Integer`].
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where n = `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```

@@ -31,16 +31,17 @@ use std::ops::{Mul, MulAssign};
 // the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
 // cannot be empty.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys` or `ys` is empty.
 //
-// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
+// This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1, where `prodp` is returned.
 pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len() + ys.len()];
     limbs_mul_greater_to_out(&mut out, xs, ys);
@@ -52,17 +53,18 @@ pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // resulting slice is always the sum of the lengths of the input slices, so it may have trailing
 // zeros.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if either slice is empty.
 //
-// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn and prodp is
-// returned.
+// This is equivalent to `mpn_mul` from mpn/generic/mul.c, GMP 6.2.1, where `un` may be less than
+// `vn` and `prodp` is returned.
 pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mul_greater(xs, ys)
@@ -77,16 +79,17 @@ pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // as `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1`
 // (which may be zero).
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
 //
-// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
+// This is equivalent to `mpn_mul_n` from `mpn/generic/mul_n.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(ys.len(), len);
@@ -118,7 +121,7 @@ pub_crate_test! {limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
     }
 }}
 
-// This is TOOM44_OK from mpn/generic/mul.c, GMP 6.1.2.
+// This is equivalent to `TOOM44_OK` from `mpn/generic/mul.c`, GMP 6.2.1.
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }
@@ -129,16 +132,17 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 // long as `ys`, and `ys` cannot be empty. Returns the result limb at index
 // `xs.len() + ys.len() - 1` (which may be zero).
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 //
-// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
+// This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -279,16 +283,18 @@ pub_crate_test! {limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // slice. The output must be at least as long as `xs.len() + ys.len()`, and neither slice can be
 // empty. Returns the result limb at index `xs.len() + ys.len() - 1` (which may be zero).
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `out` is too short or either slice is empty.
 //
-// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.
+// This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1, where `un` may be less than
+// `vn`.
 pub_crate_test! {limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     if xs.len() >= ys.len() {
         limbs_mul_greater_to_out(out, xs, ys)
@@ -308,16 +314,17 @@ pub_crate_test! {limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) ->
 // immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
 // algorithm.
 //
-// Time: worst case O(n<sup>2</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` + `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 //
-// This is mpn_mul_basecase from mpn/generic/mul_basecase.c, GMP 6.1.2.
+// This is equivalent to `mpn_mul_basecase` from `mpn/generic/mul_basecase.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -337,28 +344,36 @@ pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb]
 impl Mul<Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by value.
+    /// Multiplies two [`Natural`]s, taking both by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((Natural::ONE * Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-    /// assert_eq!((Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-    /// assert_eq!((Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// assert_eq!(Natural::ONE * Natural::from(123u32), 123);
+    /// assert_eq!(Natural::from(123u32) * Natural::ZERO, 0);
+    /// assert_eq!(Natural::from(123u32) * Natural::from(456u32), 56088);
+    /// assert_eq!(
+    ///     (Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(),
+    ///     "121932631112635269000000"
+    /// );
     /// ```
     #[inline]
     fn mul(mut self, other: Natural) -> Natural {
@@ -370,29 +385,36 @@ impl Mul<Natural> for Natural {
 impl<'a> Mul<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by value and the right
-    /// `Natural` by reference.
+    /// Multiplies two [`Natural`]s, taking the first by value and the second by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-    /// assert_eq!((Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-    /// assert_eq!((Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// assert_eq!(Natural::ONE * &Natural::from(123u32), 123);
+    /// assert_eq!(Natural::from(123u32) * &Natural::ZERO, 0);
+    /// assert_eq!(Natural::from(123u32) * &Natural::from(456u32), 56088);
+    /// assert_eq!(
+    ///     (Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(),
+    ///     "121932631112635269000000"
+    /// );
     /// ```
     #[inline]
     fn mul(mut self, other: &'a Natural) -> Natural {
@@ -404,29 +426,36 @@ impl<'a> Mul<&'a Natural> for Natural {
 impl<'a> Mul<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by reference and the right
-    /// `Natural` by value.
+    /// Multiplies two [`Natural`]s, taking the first by reference and the second by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Natural::ONE * Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-    /// assert_eq!((&Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-    /// assert_eq!((&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// assert_eq!(&Natural::ONE * Natural::from(123u32), 123);
+    /// assert_eq!(&Natural::from(123u32) * Natural::ZERO, 0);
+    /// assert_eq!(&Natural::from(123u32) * Natural::from(456u32), 56088);
+    /// assert_eq!(
+    ///     (&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(),
+    ///     "121932631112635269000000"
+    /// );
     /// ```
     #[inline]
     fn mul(self, mut other: Natural) -> Natural {
@@ -438,28 +467,36 @@ impl<'a> Mul<Natural> for &'a Natural {
 impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by reference.
+    /// Multiplies two [`Natural`]s, taking both by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((&Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-    /// assert_eq!((&Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-    /// assert_eq!((&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// assert_eq!(&Natural::ONE * &Natural::from(123u32), 123);
+    /// assert_eq!(&Natural::from(123u32) * &Natural::ZERO, 0);
+    /// assert_eq!(&Natural::from(123u32) * &Natural::from(456u32), 56088);
+    /// assert_eq!(
+    ///     (&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(),
+    ///     "121932631112635269000000"
+    /// );
     /// ```
     fn mul(self, other: &'a Natural) -> Natural {
         match (self, other) {
@@ -473,19 +510,24 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 }
 
 impl MulAssign<Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the right-hand side
-    /// by value.
+    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
@@ -514,19 +556,24 @@ impl MulAssign<Natural> for Natural {
 }
 
 impl<'a> MulAssign<&'a Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the right-hand side
-    /// by reference.
+    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets = xy.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
@@ -551,11 +598,21 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     }
 }
 
+/// Code for the Schönhage-Strassen (FFT) multiplication algorithm.
 pub mod fft;
+/// Code for multiplying a many-limbed [`Natural`] by a single [limb](crate#limbs).
 pub mod limb;
+/// Code for computing only the lowest [limbs](crate#limbs) of the product of two [`Natural`]s.
 pub mod mul_low;
+/// Code for multiplying two [`Natural`]s modulo one less than a large power of 2; used by the
+/// Schönhage-Strassen algorithm.
 pub mod mul_mod;
+/// Code for evaluating polynomials at various points; used in Toom-Cook multiplication.
 pub mod poly_eval;
+/// Code for reconstructing polynomials from their values at various points; used in Toom-Cook
+/// multiplication.
 pub mod poly_interpolate;
+/// Code for computing only the lowest [limbs](crate#limbs) of the square of a [`Natural`].
 pub mod square_mod;
+/// Code for Toom-Cook multiplication.
 pub mod toom;

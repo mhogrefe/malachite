@@ -7,23 +7,25 @@ use std::ops::Neg;
 impl Neg for Integer {
     type Output = Integer;
 
-    /// Returns the negative of an `Integer`, taking the `Integer` by value.
+    /// Negates an [`Integer`], taking it by value.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((-Integer::ZERO).to_string(), "0");
-    /// assert_eq!((-Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((-Integer::from(-123)).to_string(), "123");
+    /// assert_eq!(-Integer::ZERO, 0);
+    /// assert_eq!(-Integer::from(123), -123);
+    /// assert_eq!(-Integer::from(-123), 123);
     /// ```
     fn neg(mut self) -> Integer {
         if self.abs != 0 {
@@ -36,25 +38,29 @@ impl Neg for Integer {
 impl<'a> Neg for &'a Integer {
     type Output = Integer;
 
-    /// Returns the negative of an `Integer`, taking the `Integer` by reference.
+    /// Negates an [`Integer`], taking it by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((-&Integer::ZERO).to_string(), "0");
-    /// assert_eq!((-&Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((-&Integer::from(-123)).to_string(), "123");
+    /// assert_eq!(-&Integer::ZERO, 0);
+    /// assert_eq!(-&Integer::from(123), -123);
+    /// assert_eq!(-&Integer::from(-123), 123);
     /// ```
     fn neg(self) -> Integer {
         if self.abs == 0 {
@@ -69,16 +75,18 @@ impl<'a> Neg for &'a Integer {
 }
 
 impl NegAssign for Integer {
-    /// Replaces an `Integer` with its negative.
+    /// Negates an [`Integer`] in place.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// x \gets -x.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::NegAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -86,15 +94,15 @@ impl NegAssign for Integer {
     ///
     /// let mut x = Integer::ZERO;
     /// x.neg_assign();
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     ///
     /// let mut x = Integer::from(123);
     /// x.neg_assign();
-    /// assert_eq!(x.to_string(), "-123");
+    /// assert_eq!(x, -123);
     ///
     /// let mut x = Integer::from(-123);
     /// x.neg_assign();
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(x, 123);
     /// ```
     fn neg_assign(&mut self) {
         if self.abs != 0 {

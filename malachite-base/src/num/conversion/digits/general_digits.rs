@@ -1,14 +1,12 @@
 use itertools::Itertools;
-use num::arithmetic::traits::{CheckedAdd, CheckedLogBase2, CheckedMul, DivAssignMod};
-use num::basic::traits::{One, Zero};
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
 };
-use std::cmp::Ord;
 
-pub fn unsigned_to_digits_asc_naive<
-    T: Copy + DivAssignMod<T, ModOutput = T> + Eq + ExactFrom<U> + Zero,
-    U: Copy + One + Ord + WrappingFrom<T>,
+pub_test! {unsigned_to_digits_asc_naive<
+    T: ExactFrom<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + WrappingFrom<T>,
 >(
     x: &T,
     base: U,
@@ -21,17 +19,11 @@ pub fn unsigned_to_digits_asc_naive<
         digits.push(U::wrapping_from(remainder.div_assign_mod(base)));
     }
     digits
-}
+}}
 
 fn to_digits_asc<
-    T: ConvertibleFrom<U>
-        + Copy
-        + DivAssignMod<T, ModOutput = T>
-        + Eq
-        + ExactFrom<U>
-        + PowerOf2Digits<U>
-        + Zero,
-    U: CheckedLogBase2<Output = u64> + Copy + One + Ord + WrappingFrom<T>,
+    T: ConvertibleFrom<U> + ExactFrom<U> + PrimitiveUnsigned + PowerOf2Digits<U>,
+    U: PrimitiveUnsigned + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -47,14 +39,8 @@ fn to_digits_asc<
 }
 
 fn to_digits_desc<
-    T: ConvertibleFrom<U>
-        + Copy
-        + DivAssignMod<T, ModOutput = T>
-        + Eq
-        + ExactFrom<U>
-        + PowerOf2Digits<U>
-        + Zero,
-    U: CheckedLogBase2<Output = u64> + Copy + One + Ord + WrappingFrom<T>,
+    T: ConvertibleFrom<U> + ExactFrom<U> + PrimitiveUnsigned + PowerOf2Digits<U>,
+    U: PrimitiveUnsigned + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -73,7 +59,7 @@ fn to_digits_desc<
 
 fn from_digits_asc<
     T: Digits<U> + PowerOf2Digits<U>,
-    U: CheckedLogBase2<Output = u64> + Copy,
+    U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
     base: &U,
@@ -89,15 +75,8 @@ fn from_digits_asc<
 }
 
 fn from_digits_desc<
-    T: CheckedAdd<T, Output = T>
-        + CheckedMul<T, Output = T>
-        + Copy
-        + Digits<U>
-        + CheckedFrom<U>
-        + Ord
-        + PowerOf2Digits<U>
-        + Zero,
-    U: CheckedLogBase2<Output = u64> + Copy + One + Ord,
+    T: Digits<U> + CheckedFrom<U> + PrimitiveUnsigned + PowerOf2Digits<U>,
+    U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
     base: &U,
@@ -125,11 +104,11 @@ macro_rules! impl_digits {
         macro_rules! impl_digits_inner {
             ($u:ident) => {
                 impl Digits<$u> for $t {
-                    /// Returns a `Vec` containing the digits of `self` in ascending order (least-
-                    /// to most-significant).
+                    /// Returns a [`Vec`] containing the digits of a number in ascending order
+                    /// (least- to most-significant).
                     ///
-                    /// The type of each digit is `$u`, and `base` must be convertible to $t$. If
-                    /// `self` is 0, the `Vec` is empty; otherwise, it ends with a nonzero digit.
+                    /// The base must be convertible to `Self`. If `self` is 0, the [`Vec`] is
+                    /// empty; otherwise, it ends with a nonzero digit.
                     ///
                     /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
                     /// $d_{k-1} \neq 0$, and
@@ -147,21 +126,20 @@ macro_rules! impl_digits {
                     /// `self.significant_bits()`.
                     ///
                     /// # Panics
-                    /// Panics if `base` is less than 2 or greater than `$t::MAX`.
+                    /// Panics if `base` is less than 2 or greater than `Self::MAX`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::general_digits`
-                    /// module.
+                    /// See [here](super::general_digits#to_digits_asc).
                     #[inline]
                     fn to_digits_asc(&self, base: &$u) -> Vec<$u> {
                         to_digits_asc(self, base)
                     }
 
-                    /// Returns a `Vec` containing the digits of `self` in descending order (most-
-                    /// to least-significant).
+                    /// Returns a [`Vec`] containing the digits of a number in descending order
+                    /// (most- to least-significant).
                     ///
-                    /// The type of each digit is `$u`, and `base` must be convertible to $t$. If
-                    /// `self` is 0, the `Vec` is empty; otherwise, it begins with a nonzero digit.
+                    /// The base must be convertible to `Self`. If `self` is 0, the [`Vec`] is
+                    /// empty; otherwise, it begins with a nonzero digit.
                     ///
                     /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
                     /// $d_{k-1} \neq 0$, and
@@ -182,8 +160,7 @@ macro_rules! impl_digits {
                     /// Panics if `base` is less than 2 or greater than `$t::MAX`.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::general_digits`
-                    /// module.
+                    /// See [here](super::general_digits#to_digits_desc).
                     #[inline]
                     fn to_digits_desc(&self, base: &$u) -> Vec<$u> {
                         to_digits_desc(self, base)
@@ -192,9 +169,10 @@ macro_rules! impl_digits {
                     /// Converts an iterator of digits into a value.
                     ///
                     /// The input digits are in ascending order (least- to most-significant). The
-                    /// type of each digit is `$u`, and `base` must be no larger than `$t::MAX`. The
-                    /// function returns `None` if the input represents a number that can't fit in
-                    /// `$t`, or if `base` is greater than `$t::MAX`.
+                    /// base must be no larger than `Self::MAX`. The function returns `None` if the
+                    /// input represents a number that can't fit in `Self`, if `base` is greater
+                    /// than `Self::MAX`, or if any of the digits are greater than or equal to the
+                    /// base.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^id_i.
@@ -211,8 +189,7 @@ macro_rules! impl_digits {
                     /// Panics if `base` is less than 2.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::general_digits`
-                    /// module.
+                    /// See [here](super::general_digits#from_digits_asc).
                     #[inline]
                     fn from_digits_asc<I: Iterator<Item = $u>>(base: &$u, digits: I) -> Option<$t> {
                         from_digits_asc(base, digits)
@@ -221,9 +198,10 @@ macro_rules! impl_digits {
                     /// Converts an iterator of digits into a value.
                     ///
                     /// The input digits are in descending order (most- to least-significant). The
-                    /// type of each digit is `$u`, and `base` must be no larger than `$t::MAX`. The
-                    /// function returns `None` if the input represents a number that can't fit in
-                    /// `$t`, or if `base` is greater than `$t::MAX`.
+                    /// base must be no larger than `Self::MAX`. The function returns `None` if the
+                    /// input represents a number that can't fit in `Self`, if `base` is greater
+                    /// than `Self::MAX`, or if any of the digits are greater than or equal to the
+                    /// base.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^{k-i-1}d_i.
@@ -240,8 +218,7 @@ macro_rules! impl_digits {
                     /// Panics if `base` is less than 2.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::general_digits`
-                    /// module.
+                    /// See [here](super::general_digits#from_digits_desc).
                     #[inline]
                     fn from_digits_desc<I: Iterator<Item = $u>>(
                         base: &$u,

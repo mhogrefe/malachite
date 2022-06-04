@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::XMulYIsZZ;
+use malachite_base::num::arithmetic::traits::XMulYToZZ;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use natural::InnerNatural::{Large, Small};
@@ -8,13 +8,15 @@ use platform::{DoubleLimb, Limb};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the product of the `Natural` and a `Limb`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
+// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the result is
+// returned.
 pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let y = DoubleLimb::from(y);
@@ -34,16 +36,17 @@ pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // limbs of the product of the `Natural` and a `Limb`, plus a carry, to an output slice. The output
 // slice must be at least as long as the input slice. Returns the carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`.
 //
-// This is mul_1c from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `mul_1c` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -63,16 +66,17 @@ pub_crate_test! {limbs_mul_limb_with_carry_to_out(
 // limbs of the product of the `Natural` and a `Limb` to an output slice. The output slice must be
 // at least as long as the input slice. Returns the carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`.
 //
-// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
+// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
     limbs_mul_limb_with_carry_to_out(out, xs, y, 0)
 }}
@@ -81,13 +85,15 @@ pub_crate_test! {limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -
 // limbs of the product of the `Natural` and a `Limb`, plus a carry, to the input slice. Returns
 // the carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mul_1c from gmp-impl.h, GMP 6.2.1, where the output is the same as the input.
+// This is equivalent to `mul_1c` from `gmp-impl.h`, GMP 6.2.1, where the output is the same as the
+// input.
 pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
     xs: &mut [Limb],
     y: Limb,
@@ -105,11 +111,14 @@ pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the product of the `Natural` and a `Limb` to the input slice. Returns the carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where `rp == up`.
 pub_crate_test! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
     limbs_slice_mul_limb_with_carry_in_place(xs, y, 0)
 }}
@@ -117,12 +126,15 @@ pub_crate_test! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the product of the `Natural` and a `Limb` to the input `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of
-// returning the carry, it is appended to rp.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the `rp == up`
+// and instead of returning the carry, it is appended to `rp`.
 pub_test! {limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     let carry = limbs_slice_mul_limb_in_place(xs, y);
     if carry != 0 {
@@ -137,7 +149,7 @@ impl Natural {
             (_, 1) | (&mut natural_zero!(), _) => {}
             (&mut natural_one!(), _) => *self = Natural::from(other),
             (&mut Natural(Small(ref mut small)), other) => {
-                let (upper, lower) = Limb::x_mul_y_is_zz(*small, other);
+                let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
                     *small = lower;
                 } else {
@@ -156,7 +168,7 @@ impl Natural {
             (_, 1) | (natural_zero!(), _) => self.clone(),
             (natural_one!(), _) => Natural::from(other),
             (Natural(Small(small)), other) => Natural({
-                let (upper, lower) = Limb::x_mul_y_is_zz(*small, other);
+                let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
                     Small(lower)
                 } else {

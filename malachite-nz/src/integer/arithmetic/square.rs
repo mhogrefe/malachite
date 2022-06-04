@@ -4,18 +4,22 @@ use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 impl Square for Integer {
     type Output = Integer;
 
-    /// Squares an `Integer`, taking it by value.
+    /// Squares an [`Integer`], taking it by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -35,18 +39,22 @@ impl Square for Integer {
 impl<'a> Square for &'a Integer {
     type Output = Integer;
 
-    /// Squares an `Integer`, taking it by reference.
+    /// Squares an [`Integer`], taking it by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -66,18 +74,22 @@ impl<'a> Square for &'a Integer {
 }
 
 impl SquareAssign for Integer {
-    /// Squares an `Integer` in place.
+    /// Squares an [`Integer`] in place.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;

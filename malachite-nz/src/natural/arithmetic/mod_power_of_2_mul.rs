@@ -20,11 +20,12 @@ use platform::{DoubleLimb, Limb};
 // are already reduced mod 2<sup>`pow`</sup>. The input `Vec`s may be mutated. Neither input may be
 // empty or have trailing zeros.
 //
-// Time: worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `pow`
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
@@ -64,11 +65,12 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
 // Assumes the inputs are already reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated.
 // Neither input may be empty or have trailing zeros.
 //
-// Time: worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `pow`
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
@@ -116,11 +118,12 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
 // `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
 // are already reduced mod 2<sup>`pow`</sup>. Neither input may be empty or have trailing zeros.
 //
-// Time: worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `pow`
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
@@ -205,31 +208,27 @@ impl Natural {
 impl ModPowerOf2Mul<Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup>, taking both `Natural`s by
-    /// value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
+    /// $2^k$. Both [`Natural`]s are taken by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::from(3u32).mod_power_of_2_mul(Natural::from(2u32), 5).to_string(),
-    ///     "6"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32).mod_power_of_2_mul(Natural::from(14u32), 4).to_string(),
-    ///     "12"
-    /// );
+    /// assert_eq!(Natural::from(3u32).mod_power_of_2_mul(Natural::from(2u32), 5), 6);
+    /// assert_eq!(Natural::from(10u32).mod_power_of_2_mul(Natural::from(14u32), 4), 12);
     /// ```
     #[inline]
     fn mod_power_of_2_mul(mut self, other: Natural, pow: u64) -> Natural {
@@ -241,32 +240,27 @@ impl ModPowerOf2Mul<Natural> for Natural {
 impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup>, taking the first `Natural` by
-    /// value and the second by reference. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
+    /// $2^k$. The first [`Natural`] is taken by value and the second by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::from(3u32).mod_power_of_2_mul(&Natural::from(2u32), 5).to_string(),
-    ///     "6"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32).mod_power_of_2_mul(&Natural::from(14u32), 4).to_string(),
-    ///     "12"
-    /// );
+    /// assert_eq!(Natural::from(3u32).mod_power_of_2_mul(&Natural::from(2u32), 5), 6);
+    /// assert_eq!(Natural::from(10u32).mod_power_of_2_mul(&Natural::from(14u32), 4), 12);
     /// ```
     #[inline]
     fn mod_power_of_2_mul(mut self, other: &'a Natural, pow: u64) -> Natural {
@@ -278,32 +272,27 @@ impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup>, taking the first `Natural` by
-    /// reference and the second by value. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
+    /// $2^k$. The first [`Natural`] is taken by reference and the second by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::from(3u32)).mod_power_of_2_mul(Natural::from(2u32), 5).to_string(),
-    ///     "6"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(10u32)).mod_power_of_2_mul(Natural::from(14u32), 4).to_string(),
-    ///     "12"
-    /// );
+    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_mul(Natural::from(2u32), 5), 6);
+    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_mul(Natural::from(14u32), 4), 12);
     /// ```
     #[inline]
     fn mod_power_of_2_mul(self, mut other: Natural, pow: u64) -> Natural {
@@ -315,31 +304,27 @@ impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup>, taking both `Natural`s by
-    /// reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
+    /// $2^k$. Both [`Natural`]s are taken by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::from(3u32)).mod_power_of_2_mul(&Natural::from(2u32), 5).to_string(),
-    ///     "6"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(10u32)).mod_power_of_2_mul(&Natural::from(14u32), 4).to_string(),
-    ///     "12"
-    /// );
+    /// assert_eq!((&Natural::from(3u32)).mod_power_of_2_mul(&Natural::from(2u32), 5), 6);
+    /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_mul(&Natural::from(14u32), 4), 12);
     /// ```
     fn mod_power_of_2_mul(self, other: &'b Natural, pow: u64) -> Natural {
         match (self, other) {
@@ -353,31 +338,32 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
 }
 
 impl ModPowerOf2MulAssign<Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the right-hand side by value. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced
+    /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(3u32);
     /// x.mod_power_of_2_mul_assign(Natural::from(2u32), 5);
-    /// assert_eq!(x.to_string(), "6");
+    /// assert_eq!(x, 6);
     ///
     /// let mut x = Natural::from(10u32);
     /// x.mod_power_of_2_mul_assign(Natural::from(14u32), 4);
-    /// assert_eq!(x.to_string(), "12");
+    /// assert_eq!(x, 12);
     /// ```
     fn mod_power_of_2_mul_assign(&mut self, mut other: Natural, pow: u64) {
         match (&mut *self, &mut other) {
@@ -395,31 +381,32 @@ impl ModPowerOf2MulAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2MulAssign<&'a Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the right-hand side by reference. Assumes the inputs are already reduced mod
-    /// 2<sup>`pow`</sup>.
+    /// Multiplies two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced
+    /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
-    /// Time: worst case O(n)
+    /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `pow`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(3u32);
     /// x.mod_power_of_2_mul_assign(&Natural::from(2u32), 5);
-    /// assert_eq!(x.to_string(), "6");
+    /// assert_eq!(x, 6);
     ///
     /// let mut x = Natural::from(10u32);
     /// x.mod_power_of_2_mul_assign(&Natural::from(14u32), 4);
-    /// assert_eq!(x.to_string(), "12");
+    /// assert_eq!(x, 12);
     /// ```
     fn mod_power_of_2_mul_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {

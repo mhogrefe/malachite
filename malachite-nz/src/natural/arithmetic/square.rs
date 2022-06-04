@@ -1,7 +1,7 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
-    WrappingSubAssign, XMulYIsZZ,
+    WrappingSubAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -43,7 +43,14 @@ use platform::{
 };
 use std::cmp::{max, Ordering};
 
-/// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `MPN_SQR_DIAGONAL` from `mpn/generic/sqr_basecase.c`, GMP 6.2.1.
 #[inline]
 pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
     for (i, &x) in xs.iter().enumerate() {
@@ -54,7 +61,14 @@ pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
 
 // scratch must have length 2 * xs.len() - 2 and out must have length 2 * xs.len().
 //
-// This is MPN_SQR_DIAG_ADDLSH1 from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `MPN_SQR_DIAG_ADDLSH1` from `mpn/generic/sqr_basecase.c`, GMP 6.2.1.
 pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     limbs_square_diagonal(out, xs);
     let (out_last, out_init) = out.split_last_mut().unwrap();
@@ -69,17 +83,18 @@ pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb
 // output must be at least twice as long as `xs.len()`, `xs.len()` must be less than
 // `SQR_TOOM2_THRESHOLD`, and `xs` cannot be empty.
 //
-// Time: worst case O(n<sup>2</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is less than twice the length of `xs`, `xs.len()` > SQR_TOOM2_THRESHOLD, or if
 // `xs` is empty.
 //
-// This is mpn_sqr_basecase from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+// This is equivalent to `mpn_sqr_basecase` from `mpn/generic/sqr_basecase.c`, GMP 6.2.1.
 pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
@@ -101,22 +116,32 @@ pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     }
 }}
 
-// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_toom2_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub_const_test! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
 }}
 
 //TODO tune
-/// This is MAYBE_sqr_toom2 from mpn/generic/toom2_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
 const TOOM2_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= 2 * SQR_TOOM2_THRESHOLD;
 
-/// This is TOOM2_SQR_REC from mpn/generic/toom2_sqr.c, GMP 6.1.2.
-fn limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [Limb]) {
-    if !TOOM2_MAYBE_SQR_TOOM2 || a.len() < SQR_TOOM2_THRESHOLD {
-        limbs_square_to_out_basecase(p, a);
+// # Worst-case complexity
+// $T(n) = O(n^{\log_2 3}) \approx O(n^{1.585})$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `TOOM2_SQR_REC` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
+fn limbs_square_to_out_toom_2_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    if !TOOM2_MAYBE_SQR_TOOM2 || xs.len() < SQR_TOOM2_THRESHOLD {
+        limbs_square_to_out_basecase(out, xs);
     } else {
-        limbs_square_to_out_toom_2(p, a, ws);
+        limbs_square_to_out_toom_2(out, xs, scratch);
     }
 }
 
@@ -140,16 +165,17 @@ fn limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [Li
 // v_neg_1 = (xs_0 - xs_1) ^ 2 # X(-1) ^ 2
 // v_inf   = xs_1 ^ 2          # X(inf) ^ 2
 //
-// Time: O(n<sup>log<sub>2</sub>3</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_2 3}) \approx O(n^{1.585})$
 //
-// Additional memory: O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if the input slice conditions are not met.
 //
-// This is mpn_toom2_sqr from mpn/generic/toom2_sqr.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom2_sqr` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len > 1);
@@ -209,14 +235,16 @@ pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &m
 // This function can be used to determine whether the size of the input slice to
 // `limbs_square_to_out_toom_3` is valid.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_const_test! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
     xs_len == 3 || xs_len > 4
 }}
 
-// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_toom3_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub_const_test! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }}
@@ -225,7 +253,7 @@ pub_const_test! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize 
 const SMALLER_RECURSION_TOOM_3: bool = true;
 
 //TODO tune
-// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 #[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
@@ -234,7 +262,7 @@ const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_basecase from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 #[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
@@ -242,7 +270,14 @@ pub const TOOM3_MAYBE_SQR_BASECASE: bool =
 const TOOM3_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
 
-/// This is TOOM3_SQR_REC from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n^{\log_3 5}) \approx O(n^{1.465})$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `TOOM3_SQR_REC` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     if TOOM3_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
@@ -276,16 +311,17 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2) ^ 2 # X(2)^2    xh  <= 6
 // v_inf   = xs_2 ^ 2                         # X(inf)^2
 //
-// Time: O(n<sup>log<sub>3</sub>5</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_3 5}) \approx O(n^{1.465})$
 //
-// Additional memory: O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if the input slice conditions are not met.
 //
-// This is mpn_toom3_sqr from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom3_sqr` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = xs_len.div_round(3, RoundingMode::Ceiling);
@@ -381,29 +417,38 @@ pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &m
 // This function can be used to determine whether the size of the input slice to
 // `limbs_square_to_out_toom_4` is valid.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_const_test! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
 }}
 
-// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_toom4_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub_const_test! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }}
 
 //TODO tune
-/// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom4 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+// This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= 4 * SQR_TOOM4_THRESHOLD;
 
-// This is TOOM4_SQR_REC from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n^{\log_4 7}) \approx O(n^{1.404})$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `TOOM4_SQR_REC` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     if n < SQR_TOOM2_THRESHOLD {
@@ -443,16 +488,17 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // vmh     = (8 * xs_0 - 4 * xs_1 + 2 * xs_2 - xs_3) ^ 2 # X(-1/2) ^ 2  -4 <= xh <= 9
 // v_inf   = xs_3 ^ 2                                    # X(inf) ^ 2
 //
-// Time: O(n<sup>log<sub>4</sub>7</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_4 7}) \approx O(n^{1.404})$
 //
-// Additional memory: O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if the input slice conditions are not met.
 //
-// This is mpn_toom4_sqr from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom4_sqr` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = (xs_len + 3) >> 2;
@@ -470,11 +516,11 @@ pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &m
     let apx = &mut apx[..m];
     let (v1, amx) = remainder.split_at_mut(m << 1);
     let amx = &mut amx[..m];
-    let (scratch_lo, tp) = scratch.split_at_mut((k << 2) + 1);
-    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(apx, amx, xs, n, &mut tp[..m]);
-    limbs_square_to_out_toom_4_recursive(scratch_lo, apx, tp);
+    let (scratch_lo, scratch_hi) = scratch.split_at_mut((k << 2) + 1);
+    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(apx, amx, xs, n, &mut scratch_hi[..m]);
+    limbs_square_to_out_toom_4_recursive(scratch_lo, apx, scratch_hi);
     let scratch_lo = &mut scratch_lo[k..];
-    limbs_square_to_out_toom_4_recursive(scratch_lo, amx, tp);
+    limbs_square_to_out_toom_4_recursive(scratch_lo, amx, scratch_hi);
     // Compute apx = 8 xs_0 + 4 xs_1 + 2 xs_2 + xs_3 = (((2 xs_0 + xs_1) * 2 + xs_2) * 2 + xs_3
     let (apx_last, apx_init) = apx.split_last_mut().unwrap();
     let mut carry = limbs_shl_to_out(apx_init, xs_0, 1);
@@ -494,31 +540,33 @@ pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &m
     *apx_last = carry;
     assert!(*apx_last < 15);
     let scratch_lo = &mut scratch_lo[k..];
-    limbs_square_to_out_toom_4_recursive(scratch_lo, apx, tp);
+    limbs_square_to_out_toom_4_recursive(scratch_lo, apx, scratch_hi);
     // Compute apx = xs_0 + xs_1 + xs_2 + xs_3 and amx = xs_0 - xs_1 + xs_2 - xs_3.
-    limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(apx, amx, xs, n, &mut tp[..m]);
-    limbs_square_to_out_toom_4_recursive(v1, apx, tp);
+    limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(apx, amx, xs, n, &mut scratch_hi[..m]);
+    limbs_square_to_out_toom_4_recursive(v1, apx, scratch_hi);
     let scratch_lo = &mut scratch_lo[k..];
-    limbs_square_to_out_toom_4_recursive(scratch_lo, amx, tp);
+    limbs_square_to_out_toom_4_recursive(scratch_lo, amx, scratch_hi);
     let (v0, vinf) = out.split_at_mut(n << 1);
     let vinf = &mut vinf[n << 2..];
-    limbs_square_to_out_toom_4_recursive(v0, xs_0, tp);
-    limbs_square_to_out_toom_4_recursive(vinf, xs_3, tp);
-    split_into_chunks_mut!(scratch, k, [v2, vm2, vh, vm1], tp);
-    limbs_mul_toom_interpolate_7_points(out, n, s << 1, false, vm2, false, vm1, v2, vh, tp);
+    limbs_square_to_out_toom_4_recursive(v0, xs_0, scratch_hi);
+    limbs_square_to_out_toom_4_recursive(vinf, xs_3, scratch_hi);
+    split_into_chunks_mut!(scratch, k, [v2, vm2, vh, vm1], scratch_hi);
+    limbs_mul_toom_interpolate_7_points(out, n, s << 1, false, vm2, false, vm1, v2, vh, scratch_hi);
 }}
 
 // This function can be used to determine whether the size of the input slice to
 // `limbs_square_to_out_toom_6` is valid.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_const_test! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
 }}
 
-// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_toom6_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     (n << 1)
         + max(
@@ -529,40 +577,47 @@ pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
 }}
 
 //TODO tune
-/// This is SQR_TOOM6_MAX from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `SQR_TOOM6_MAX` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
 
 //TODO tune
-/// This is MAYBE_sqr_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM2_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom2` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM4_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom3` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM4_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom4 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom4` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM6_THRESHOLD;
 
-// This is TOOM6_SQR_REC from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+// # Worst-case complexity
+// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.338})$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `TOOM6_SQR_REC` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     if TOOM6_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
@@ -588,16 +643,17 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 //
 // The smallest allowable `xs` length is 18.
 //
-// Time: O(n<sup>log<sub>6</sub>11</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.338})$
 //
-// Additional memory: O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if the input slice conditions are not met.
 //
-// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom6_sqr` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 18);
@@ -666,14 +722,16 @@ pub(crate) const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 // This function can be used to determine whether the size of the input slice to
 // `limbs_square_to_out_toom_8` is valid.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_const_test! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
 }}
 
-// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_toom8_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     ((n * 15) >> 3)
         + max(
@@ -684,7 +742,7 @@ pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
 }}
 
 //TODO tune
-/// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `SQR_TOOM8_MAX` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
     (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
 } else {
@@ -692,51 +750,59 @@ const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7
 };
 
 //TODO tune
-/// This is MAYBE_sqr_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_basecase` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM2_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom2` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM3_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom3` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM4_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom4` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM6_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_toom6 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+/// This is equivalent to `MAYBE_sqr_above_toom6` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
 
-// This is TOOM8_SQR_REC from mpn/generic/toom8_sqr.c, GMP 6.1.2, when f is false.
+// # Worst-case complexity
+// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.302})$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `TOOM8_SQR_REC` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1, when `f` is
+// `false`.
 fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     if TOOM8_MAYBE_SQR_BASECASE && (!TOOM8_MAYBE_SQR_ABOVE_BASECASE || n < SQR_TOOM2_THRESHOLD) {
@@ -764,16 +830,17 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 //
 // The smallest allowable `xs` length is 40.
 //
-// Time: O(n<sup>log<sub>8</sub>15</sup>)
+// # Worst-case complexity
+// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.302})$
 //
-// Additional memory: O(n)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if the input slice conditions are not met.
 //
-// This is mpn_toom8_sqr from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+// This is equivalent to `mpn_toom8_sqr` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
@@ -869,8 +936,17 @@ pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &m
 //TODO tune
 const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
 
-// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.
-pub_crate_test! {limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqr` from `mpn/generic/sqr.c`, GMP 6.2.1.
+pub_crate_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert!(n >= 1);
     if n < SQR_BASECASE_THRESHOLD {
@@ -912,18 +988,22 @@ pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
 impl Square for Natural {
     type Output = Natural;
 
-    /// Squares a `Natural`, taking it by value.
+    /// Squares a [`Natural`], taking it by value.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -942,18 +1022,22 @@ impl Square for Natural {
 impl<'a> Square for &'a Natural {
     type Output = Natural;
 
-    /// Squares a `Natural`, taking it by reference.
+    /// Squares a [`Natural`], taking it by reference.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -967,7 +1051,7 @@ impl<'a> Square for &'a Natural {
         match self {
             natural_zero!() | natural_one!() => self.clone(),
             Natural(Small(x)) => Natural({
-                let (upper, lower) = Limb::x_mul_y_is_zz(*x, *x);
+                let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {
                     Small(lower)
                 } else {
@@ -980,18 +1064,22 @@ impl<'a> Square for &'a Natural {
 }
 
 impl SquareAssign for Natural {
-    /// Squares a `Natural` in place.
+    /// Squares a [`Natural`] in place.
     ///
-    /// Time: worst case O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x^2.
+    /// $$
     ///
-    /// Additional memory: worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -1009,7 +1097,7 @@ impl SquareAssign for Natural {
         match self {
             natural_zero!() | natural_one!() => {}
             Natural(Small(x)) => {
-                let (upper, lower) = Limb::x_mul_y_is_zz(*x, *x);
+                let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {
                     *x = lower;
                 } else {

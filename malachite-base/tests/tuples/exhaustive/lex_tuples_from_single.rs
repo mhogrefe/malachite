@@ -1,12 +1,13 @@
+use extra_variadic::{
+    lex_octuples_from_single, lex_quadruples_from_single, lex_quintuples_from_single,
+    lex_triples_from_single,
+};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
-use malachite_base::tuples::exhaustive::{
-    exhaustive_units, lex_octuples_from_single, lex_pairs_from_single, lex_quadruples_from_single,
-    lex_quintuples_from_single, lex_triples_from_single,
-};
+use malachite_base::tuples::exhaustive::{exhaustive_units, lex_pairs_from_single};
 use std::fmt::Debug;
 
 macro_rules! helpers {

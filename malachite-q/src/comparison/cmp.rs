@@ -3,9 +3,9 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrd for Rational {
-    /// Compares a `Rational` to another `Rational`.
+    /// Compares two [`Rational`]s.
     ///
-    /// See the documentation for the `Ord` implementation.
+    /// See the documentation for the [`Ord`] implementation.
     #[inline]
     fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -13,18 +13,26 @@ impl PartialOrd for Rational {
 }
 
 impl Ord for Rational {
-    /// Compares a `Rational` to another `Rational`.
+    /// Compares two [`Rational`]s.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
-    /// assert!(Rational::from_str("2/3").unwrap() > Rational::from_str("1/2").unwrap());
-    /// assert!(Rational::from_str("-2/3").unwrap() < Rational::from_str("1/2").unwrap());
+    /// assert!(Rational::from_str("2/3").unwrap() > Rational::ONE_HALF);
+    /// assert!(Rational::from_str("-2/3").unwrap() < Rational::ONE_HALF);
     /// ```
     fn cmp(&self, other: &Rational) -> Ordering {
         if std::ptr::eq(self, other) {

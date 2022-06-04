@@ -7,15 +7,24 @@ use std::ops::{Rem, RemAssign};
 impl Mod<Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by value and returning the
-    /// remainder. The remainder has the same sign as the divisor. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
+    /// remainder. The remainder has the same sign as the second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -23,22 +32,21 @@ impl Mod<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Integer::from(23).mod_op(Integer::from(10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23).mod_op(Integer::from(10)), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!(Integer::from(23).mod_op(Integer::from(-10)).to_string(), "-7");
+    /// assert_eq!(Integer::from(23).mod_op(Integer::from(-10)), -7);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(10)).to_string(), "7");
+    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(10)), 7);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(-10)), -3);
     /// ```
     #[inline]
     fn mod_op(mut self, other: Integer) -> Integer {
@@ -50,15 +58,25 @@ impl Mod<Integer> for Integer {
 impl<'a> Mod<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by value and the second by
-    /// reference, and returning the remainder. The remainder has the same sign as the divisor. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
+    /// reference and returning just the remainder. The remainder has the same sign as the second
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -66,22 +84,21 @@ impl<'a> Mod<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(10)), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(-10)).to_string(), "-7");
+    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(-10)), -7);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(10)).to_string(), "7");
+    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(10)), 7);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(-10)), -3);
     /// ```
     #[inline]
     fn mod_op(mut self, other: &'a Integer) -> Integer {
@@ -93,15 +110,25 @@ impl<'a> Mod<&'a Integer> for Integer {
 impl<'a> Mod<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by reference and the second
-    /// by value, and returning the remainder. The remainder has the same sign as the divisor. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
+    /// by value and returning just the remainder. The remainder has the same sign as the second
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -109,22 +136,21 @@ impl<'a> Mod<Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(10)).to_string(), "3");
+    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(10)), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(-10)).to_string(), "-7");
+    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(-10)), -7);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(10)).to_string(), "7");
+    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(10)), 7);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)), -3);
     /// ```
     fn mod_op(self, other: Integer) -> Integer {
         Integer::from_sign_and_abs(
@@ -141,15 +167,24 @@ impl<'a> Mod<Integer> for &'a Integer {
 impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by reference and returning the
-    /// remainder. The remainder has the same sign as the divisor. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
+    /// the remainder. The remainder has the same sign as the second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -157,22 +192,21 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(10)).to_string(), "3");
+    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(10)), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(-10)).to_string(), "-7");
+    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(-10)), -7);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(10)).to_string(), "7");
+    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(10)), 7);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)), -3);
     /// ```
     fn mod_op(self, other: &'b Integer) -> Integer {
         Integer::from_sign_and_abs(
@@ -187,15 +221,23 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
 }
 
 impl ModAssign<Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value and
-    /// replacing `self` with the remainder. The remainder has the same sign as the divisor. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by value and
+    /// replacing the first by the remainder. The remainder has the same sign as the second
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+    /// and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -203,7 +245,6 @@ impl ModAssign<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
@@ -211,22 +252,22 @@ impl ModAssign<Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x.mod_assign(Integer::from(10));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x.mod_assign(Integer::from(-10));
-    /// assert_eq!(x.to_string(), "-7");
+    /// assert_eq!(x, -7);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x.mod_assign(Integer::from(10));
-    /// assert_eq!(x.to_string(), "7");
+    /// assert_eq!(x, 7);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x.mod_assign(Integer::from(-10));
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     /// ```
     fn mod_assign(&mut self, other: Integer) {
         if self.sign == other.sign {
@@ -239,15 +280,23 @@ impl ModAssign<Integer> for Integer {
 }
 
 impl<'a> ModAssign<&'a Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference and
-    /// replacing `self` with the remainder. The remainder has the same sign as the divisor. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by reference
+    /// and replacing the first by the remainder. The remainder has the same sign as the second
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+    /// and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -255,7 +304,6 @@ impl<'a> ModAssign<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
@@ -263,22 +311,22 @@ impl<'a> ModAssign<&'a Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x.mod_assign(&Integer::from(10));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x.mod_assign(&Integer::from(-10));
-    /// assert_eq!(x.to_string(), "-7");
+    /// assert_eq!(x, -7);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x.mod_assign(&Integer::from(10));
-    /// assert_eq!(x.to_string(), "7");
+    /// assert_eq!(x, 7);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x.mod_assign(&Integer::from(-10));
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     /// ```
     fn mod_assign(&mut self, other: &'a Integer) {
         if self.sign == other.sign {
@@ -293,15 +341,23 @@ impl<'a> ModAssign<&'a Integer> for Integer {
 impl Rem<Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by value and returning the
-    /// remainder. The remainder has the same sign as the dividend. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
+    /// remainder. The remainder has the same sign as the first [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -311,16 +367,16 @@ impl Rem<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((Integer::from(23) % Integer::from(10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23) % Integer::from(10), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((Integer::from(23) % Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23) % Integer::from(-10), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((Integer::from(-23) % Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23) % Integer::from(10), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) % Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23) % Integer::from(-10), -3);
     /// ```
     #[inline]
     fn rem(mut self, other: Integer) -> Integer {
@@ -332,15 +388,24 @@ impl Rem<Integer> for Integer {
 impl<'a> Rem<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by value and the second by
-    /// reference, and returning the remainder. The remainder has the same sign as the dividend. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
+    /// reference and returning just the remainder. The remainder has the same sign as the first
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -350,16 +415,16 @@ impl<'a> Rem<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((Integer::from(23) % &Integer::from(10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23) % &Integer::from(10), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((Integer::from(23) % &Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23) % &Integer::from(-10), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((Integer::from(-23) % &Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23) % &Integer::from(10), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((Integer::from(-23) % &Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23) % &Integer::from(-10), -3);
     /// ```
     #[inline]
     fn rem(mut self, other: &'a Integer) -> Integer {
@@ -371,15 +436,24 @@ impl<'a> Rem<&'a Integer> for Integer {
 impl<'a> Rem<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by reference and the second
-    /// by value, and returning the remainder. The remainder has the same sign as the dividend. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
+    /// by value and returning just the remainder. The remainder has the same sign as the first
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -389,16 +463,16 @@ impl<'a> Rem<Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) % Integer::from(10)).to_string(), "3");
+    /// assert_eq!(&Integer::from(23) % Integer::from(10), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23) % Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(&Integer::from(23) % Integer::from(-10), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23) % Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(&Integer::from(-23) % Integer::from(10), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) % Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(&Integer::from(-23) % Integer::from(-10), -3);
     /// ```
     #[inline]
     fn rem(self, other: Integer) -> Integer {
@@ -409,15 +483,23 @@ impl<'a> Rem<Integer> for &'a Integer {
 impl<'a, 'b> Rem<&'b Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by reference and returning the
-    /// remainder. The remainder has the same sign as the dividend. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
+    /// the remainder. The remainder has the same sign as the first [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) = x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -427,16 +509,16 @@ impl<'a, 'b> Rem<&'b Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23) % &Integer::from(10)).to_string(), "3");
+    /// assert_eq!(&Integer::from(23) % &Integer::from(10), 3);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23) % &Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(&Integer::from(23) % &Integer::from(-10), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23) % &Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(&Integer::from(-23) % &Integer::from(10), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23) % &Integer::from(-10)).to_string(), "-3");
+    /// assert_eq!(&Integer::from(-23) % &Integer::from(-10), -3);
     /// ```
     #[inline]
     fn rem(self, other: &'b Integer) -> Integer {
@@ -445,15 +527,24 @@ impl<'a, 'b> Rem<&'b Integer> for &'a Integer {
 }
 
 impl RemAssign<Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value and
-    /// replacing `self` with the remainder. The remainder has the same sign as the dividend. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by value and
+    /// replacing the first by the remainder. The remainder has the same sign as the first
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+    /// and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -465,22 +556,22 @@ impl RemAssign<Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x %= Integer::from(10);
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x %= Integer::from(-10);
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x %= Integer::from(10);
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x %= Integer::from(-10);
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     /// ```
     #[inline]
     fn rem_assign(&mut self, other: Integer) {
@@ -490,15 +581,24 @@ impl RemAssign<Integer> for Integer {
 }
 
 impl<'a> RemAssign<&'a Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference and
-    /// replacing `self` with the remainder. The remainder has the same sign as the dividend. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the second [`Integer`] by reference
+    /// and replacing the first by the remainder. The remainder has the same sign as the first
+    /// [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+    /// and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y \operatorname{sgn}(xy)
+    ///     \left \lfloor \left | \frac{x}{y} \right | \right \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -510,22 +610,22 @@ impl<'a> RemAssign<&'a Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x %= &Integer::from(10);
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x %= &Integer::from(-10);
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x %= &Integer::from(10);
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x %= &Integer::from(-10);
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     /// ```
     #[inline]
     fn rem_assign(&mut self, other: &'a Integer) {
@@ -537,15 +637,22 @@ impl<'a> RemAssign<&'a Integer> for Integer {
 impl CeilingMod<Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by value and returning the
-    /// remainder. The remainder has the opposite sign of the divisor. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
+    /// remainder. The remainder has the opposite sign as the second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -553,22 +660,21 @@ impl CeilingMod<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(10)).to_string(), "-7");
+    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(10)), -7);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(-10)), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(10)), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(-10)).to_string(), "7");
+    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(-10)), 7);
     /// ```
     #[inline]
     fn ceiling_mod(mut self, other: Integer) -> Integer {
@@ -580,15 +686,23 @@ impl CeilingMod<Integer> for Integer {
 impl<'a> CeilingMod<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by value and the second by
-    /// reference, and returning the remainder. The remainder has the opposite sign of the divisor.
-    /// The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
+    /// reference and returning just the remainder. The remainder has the opposite sign as the
+    /// second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -596,22 +710,21 @@ impl<'a> CeilingMod<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(10)).to_string(), "-7");
+    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(10)), -7);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(-10)).to_string(), "3");
+    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(-10)), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(10)).to_string(), "-3");
+    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(10)), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(-10)).to_string(), "7");
+    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(-10)), 7);
     /// ```
     #[inline]
     fn ceiling_mod(mut self, other: &'a Integer) -> Integer {
@@ -623,15 +736,23 @@ impl<'a> CeilingMod<&'a Integer> for Integer {
 impl<'a> CeilingMod<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking the first `Integer` by reference and the second
-    /// by value, and returning the remainder. The remainder has the opposite sign of the divisor.
-    /// The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
+    /// by value and returning just the remainder. The remainder has the opposite sign as the
+    /// second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -639,22 +760,21 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(10)).to_string(), "-7");
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(10)), -7);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(-10)).to_string(), "3");
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(-10)), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(10)).to_string(), "-3");
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(10)), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)).to_string(), "7");
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)), 7);
     /// ```
     fn ceiling_mod(self, other: Integer) -> Integer {
         Integer::from_sign_and_abs(
@@ -671,15 +791,22 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
 impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Divides an `Integer` by an `Integer`, taking both `Integer`s by reference and returning the
-    /// remainder. The remainder has the opposite sign of the divisor. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
+    /// the remainder. The remainder has the opposite sign as the second [`Integer`].
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -687,22 +814,21 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(10)).to_string(), "-7");
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(10)), -7);
     ///
     /// // -3 * -10 + -7 = 23
-    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(-10)).to_string(), "3");
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(-10)), 3);
     ///
     /// // -3 * 10 + 7 = -23
-    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(10)).to_string(), "-3");
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(10)), -3);
     ///
     /// // 2 * -10 + -3 = -23
-    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)).to_string(), "7");
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)), 7);
     /// ```
     fn ceiling_mod(self, other: &'b Integer) -> Integer {
         Integer::from_sign_and_abs(
@@ -717,16 +843,23 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
 }
 
 impl CeilingModAssign<Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value, taking
-    /// the quotient and replacing `self` with the remainder. The remainder has the opposite sign of
-    /// the divisor. The quotient and remainder satisfy `self` = q * `other` + r and
-    /// 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand
+    /// side by value and replacing the first number by the remainder. The remainder has the
+    /// opposite sign as the second number.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -734,7 +867,6 @@ impl CeilingModAssign<Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
@@ -742,22 +874,22 @@ impl CeilingModAssign<Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x.ceiling_mod_assign(Integer::from(10));
-    /// assert_eq!(x.to_string(), "-7");
+    /// assert_eq!(x, -7);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x.ceiling_mod_assign(Integer::from(-10));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x.ceiling_mod_assign(Integer::from(10));
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x.ceiling_mod_assign(Integer::from(-10));
-    /// assert_eq!(x.to_string(), "7");
+    /// assert_eq!(x, 7);
     /// ```
     fn ceiling_mod_assign(&mut self, other: Integer) {
         if self.sign == other.sign {
@@ -770,15 +902,23 @@ impl CeilingModAssign<Integer> for Integer {
 }
 
 impl<'a> CeilingModAssign<&'a Integer> for Integer {
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference,
-    /// replacing `self` with the remainder. The remainder has the opposite sign of the divisor. The
-    /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand
+    /// side by reference and replacing the first number by the remainder. The remainder has the
+    /// opposite sign as the second number.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If the quotient were computed, the quotient and remainder would satisfy
+    /// $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero.
@@ -786,7 +926,6 @@ impl<'a> CeilingModAssign<&'a Integer> for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
@@ -794,22 +933,22 @@ impl<'a> CeilingModAssign<&'a Integer> for Integer {
     /// // 2 * 10 + 3 = 23
     /// let mut x = Integer::from(23);
     /// x.ceiling_mod_assign(&Integer::from(10));
-    /// assert_eq!(x.to_string(), "-7");
+    /// assert_eq!(x, -7);
     ///
     /// // -3 * -10 + -7 = 23
     /// let mut x = Integer::from(23);
     /// x.ceiling_mod_assign(&Integer::from(-10));
-    /// assert_eq!(x.to_string(), "3");
+    /// assert_eq!(x, 3);
     ///
     /// // -3 * 10 + 7 = -23
     /// let mut x = Integer::from(-23);
     /// x.ceiling_mod_assign(&Integer::from(10));
-    /// assert_eq!(x.to_string(), "-3");
+    /// assert_eq!(x, -3);
     ///
     /// // 2 * -10 + -3 = -23
     /// let mut x = Integer::from(-23);
     /// x.ceiling_mod_assign(&Integer::from(-10));
-    /// assert_eq!(x.to_string(), "7");
+    /// assert_eq!(x, 7);
     /// ```
     fn ceiling_mod_assign(&mut self, other: &'a Integer) {
         if self.sign == other.sign {

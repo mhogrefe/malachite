@@ -5,6 +5,8 @@ macro_rules! impl_saturating_neg {
         impl SaturatingNeg for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `saturating_neg` functions in the standard library, for
+            /// example [this one](i32::saturating_neg).
             #[inline]
             fn saturating_neg(self) -> $t {
                 $t::saturating_neg(self)
@@ -12,22 +14,21 @@ macro_rules! impl_saturating_neg {
         }
 
         impl SaturatingNegAssign for $t {
-            /// Replaces `self` with its negative, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Negates a number in place, saturating at the numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     -x & x^2 > -2^{W-1} \\\\
-            ///     2^{W-1} - 1 & x = -2^{W-1},
+            ///     -x & \text{if} \\quad x^2 > -2^{W-1}, \\\\
+            ///     2^{W-1} - 1 & \text{if} \\quad x = -2^{W-1},
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_neg` module.
+            /// See [here](super::saturating_neg#saturating_neg_assign).
             #[inline]
             fn saturating_neg_assign(&mut self) {
                 *self = self.saturating_neg();

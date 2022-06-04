@@ -1,13 +1,12 @@
 use core::hash::Hash;
+use extra_variadic::random_vecs_length_3;
 use itertools::Itertools;
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::num::random::{random_primitive_ints, random_unsigned_range};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base::test_util::stats::median;
-use malachite_base::vecs::random::{
-    random_vecs_fixed_length_from_single, random_vecs_length_2, random_vecs_length_3,
-};
+use malachite_base::vecs::random::{random_vecs_fixed_length_from_single, random_vecs_length_2};
 use std::fmt::Debug;
 
 fn random_vecs_length_2_helper<

@@ -10,28 +10,34 @@ use std::ops::{Sub, SubAssign};
 impl Sub<Integer> for Integer {
     type Output = Integer;
 
-    /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
+    /// Subtracts an [`Integer`] by another [`Integer`], taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
-    /// assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(Integer::ZERO - Integer::from(123), -123);
+    /// assert_eq!(Integer::from(123) - Integer::ZERO, 123);
+    /// assert_eq!(Integer::from(456) - Integer::from(-123), 579);
     /// assert_eq!(
-    ///     (-Integer::trillion() - -Integer::trillion() * Integer::from(2u32)).to_string(),
-    ///     "1000000000000"
+    ///     -Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::from(2u32),
+    ///     1000000000000u64
     /// );
     /// ```
     #[inline]
@@ -44,29 +50,35 @@ impl Sub<Integer> for Integer {
 impl<'a> Sub<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by value and the right
-    /// `Integer` by reference.
+    /// Subtracts an [`Integer`] by another [`Integer`], taking the first by value and the second
+    /// by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
-    /// assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(Integer::ZERO - &Integer::from(123), -123);
+    /// assert_eq!(Integer::from(123) - &Integer::ZERO, 123);
+    /// assert_eq!(Integer::from(456) - &Integer::from(-123), 579);
     /// assert_eq!(
-    ///     (-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32))).to_string(),
-    ///     "1000000000000"
+    ///     -Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
+    ///     1000000000000u64
     /// );
     /// ```
     #[inline]
@@ -79,29 +91,35 @@ impl<'a> Sub<&'a Integer> for Integer {
 impl<'a> Sub<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by reference and the
-    /// right `Integer` by value.
+    /// Subtracts an [`Integer`] by another [`Integer`], taking the first by reference and the
+    /// second by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
-    /// assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(&Integer::ZERO - Integer::from(123), -123);
+    /// assert_eq!(&Integer::from(123) - Integer::ZERO, 123);
+    /// assert_eq!(&Integer::from(456) - Integer::from(-123), 579);
     /// assert_eq!(
-    ///     (&(-Integer::trillion()) - -Integer::trillion() * Integer::from(2u32)).to_string(),
-    ///     "1000000000000"
+    ///     &-Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::from(2u32),
+    ///     1000000000000u64
     /// );
     /// ```
     fn sub(self, mut other: Integer) -> Integer {
@@ -113,27 +131,36 @@ impl<'a> Sub<Integer> for &'a Integer {
 impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by reference.
+    /// Subtracts an [`Integer`] by another [`Integer`], taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x - y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO - &Integer::from(123)).to_string(), "-123");
-    /// assert_eq!((&Integer::from(123) - &Integer::ZERO).to_string(), "123");
-    /// assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-    /// let x: Integer = &-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32));
-    /// assert_eq!(x.to_string(), "1000000000000");
+    /// assert_eq!(&Integer::ZERO - &Integer::from(123), -123);
+    /// assert_eq!(&Integer::from(123) - &Integer::ZERO, 123);
+    /// assert_eq!(&Integer::from(456) - &Integer::from(-123), 579);
+    /// assert_eq!(
+    ///     &-Integer::from(10u32).pow(12) -
+    ///             &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
+    ///     1000000000000u64
+    /// );
     /// ```
     fn sub(self, other: &'a Integer) -> Integer {
         match (self, other) {
@@ -181,29 +208,32 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 }
 
 impl SubAssign<Integer> for Integer {
-    /// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the right-hand
-    /// side by value.
+    /// Subtracts an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x - y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;
-    /// x -= -Integer::trillion();
-    /// x -= Integer::trillion() * Integer::from(2u32);
-    /// x -= -Integer::trillion() * Integer::from(3u32);
-    /// x -= Integer::trillion() * Integer::from(4u32);
-    /// assert_eq!(x.to_string(), "-2000000000000");
+    /// x -= -Integer::from(10u32).pow(12);
+    /// x -= Integer::from(10u32).pow(12) * Integer::from(2u32);
+    /// x -= -Integer::from(10u32).pow(12) * Integer::from(3u32);
+    /// x -= Integer::from(10u32).pow(12) * Integer::from(4u32);
+    /// assert_eq!(x, -2000000000000i64);
     /// ```
     fn sub_assign(&mut self, mut other: Integer) {
         match (&mut *self, &other) {
@@ -241,31 +271,37 @@ impl SubAssign<Integer> for Integer {
     }
 }
 
-/// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the right-hand side
-/// by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::ZERO;
-/// x -= &(-Integer::trillion());
-/// x -= &(Integer::trillion() * Integer::from(2u32));
-/// x -= &(-Integer::trillion() * Integer::from(3u32));
-/// x -= &(Integer::trillion() * Integer::from(4u32));
-/// assert_eq!(x.to_string(), "-2000000000000");
-/// ```
 impl<'a> SubAssign<&'a Integer> for Integer {
+    /// Subtracts an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by reference.
+    ///
+    /// $$
+    /// x \gets x - y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::ZERO;
+    /// x -= &(-Integer::from(10u32).pow(12));
+    /// x -= &(Integer::from(10u32).pow(12) * Integer::from(2u32));
+    /// x -= &(-Integer::from(10u32).pow(12) * Integer::from(3u32));
+    /// x -= &(Integer::from(10u32).pow(12) * Integer::from(4u32));
+    /// assert_eq!(x, -2000000000000i64);
+    /// ```
     fn sub_assign(&mut self, other: &'a Integer) {
         match (&mut *self, other) {
             (_, &integer_zero!()) => {}

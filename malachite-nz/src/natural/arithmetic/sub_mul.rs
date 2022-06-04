@@ -14,17 +14,18 @@ use std::fmt::Display;
 // Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
 // y * z > x, `None` is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, and w is returned instead of overwriting the first input.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
 pub_crate_test! {limbs_sub_mul_limb_greater(
     xs: &[Limb],
     ys: &[Limb],
@@ -46,16 +47,17 @@ pub_crate_test! {limbs_sub_mul_limb_greater(
 // writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow
 // is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
+// This is equivalent to `mpn_submul_1` from `mpn/generic/submul_1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -84,17 +86,18 @@ pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_left(
 // Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
 // limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2, but where the first input may be
-// longer than the second.
+// This is equivalent to `mpn_submul_1` from `mpn/generic/submul_1.c`, GMP 6.2.1, but where the
+// first input may be longer than the second.
 pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -113,18 +116,19 @@ pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
 // writes the limbs of the result to the second (right) input slice. If y * z > x, a nonzero borrow
 // is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
-// same lengths, sub is negative, and the lowest limbs of the result are written to the second
-// input rather than the first.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive and have the same lengths, sub is negative, and the lowest limbs of the result are
+// written to the second input rather than the first.
 pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -153,19 +157,21 @@ pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
 // Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
 // limbs of the result to the second (right) input `Vec`. If y * z > x, a nonzero borrow is
 // returned.
+
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Time: worst case O(n)
+// $M(m) = O(m)$
 //
-// Additional memory: worst case O(m)
-//
-// where n = `xs.len()`
-//       m = `xs.len() - ys.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
+// `xs.len() - ys.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// negative, and the result is written to the second input rather than the first.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is negative, and the result is written to the second input rather than the
+// first.
 pub_test! {limbs_sub_mul_limb_greater_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -194,19 +200,21 @@ pub_test! {limbs_sub_mul_limb_greater_in_place_right(
 // false, the result would be `None` and there's no point in calling this function). None of the
 // slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n, m) = O(m + n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
 // Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
 // `zs.len()` - 1.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-// negative, negative results are converted to `None`, and w is returned instead of overwriting the
-// first input.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive, `sub` is negative, negative results are converted to `None`, and `w` is returned
+// instead of overwriting the first input.
 pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
     let mut xs = xs.to_vec();
     if limbs_sub_mul_in_place_left(&mut xs, ys, zs) {
@@ -224,18 +232,20 @@ pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<
 // this function). None of the slices should have any trailing zeros. The result, if it exists,
 // will have no trailing zeros.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
-// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
-// `zs.len()` - 1.
+// Panics if `ys` or `zs` have fewer than two elements each, or if
+// `xs.len() < ys.len() + zs.len() - 1`.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-// negative and negative results are discarded.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive, `sub` is negative and negative results are discarded.
 pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);
     assert!(zs.len() > 1);
@@ -258,14 +268,20 @@ fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
 impl SubMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
-    /// taking `self`, y, and z by value.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
+    /// value.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y, z) = x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -273,18 +289,15 @@ impl SubMul<Natural, Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(20u32).sub_mul(Natural::from(3u32), Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(20u32).sub_mul(Natural::from(3u32), Natural::from(4u32)).to_string(),
-    ///     "8"
-    /// );
-    /// assert_eq!(Natural::trillion().sub_mul(
-    ///     Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704"
+    ///     Natural::from(10u32).pow(12)
+    ///             .sub_mul(Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     995705032704u64
     /// );
     /// ```
     fn sub_mul(self, y: Natural, z: Natural) -> Natural {
@@ -296,14 +309,20 @@ impl SubMul<Natural, Natural> for Natural {
 impl<'a> SubMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
-    /// taking `self` and y by value and z by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first two by
+    /// value and the third by reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y, z) = x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -311,19 +330,15 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(20u32).sub_mul(Natural::from(3u32), &Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(20u32).sub_mul(Natural::from(3u32), &Natural::from(4u32)).to_string(),
-    ///     "8"
-    /// );
-    /// assert_eq!(
-    ///     Natural::trillion().sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///     .to_string(),
-    ///     "995705032704"
+    ///     Natural::from(10u32).pow(12)
+    ///             .sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
     /// );
     /// ```
     fn sub_mul(self, y: Natural, z: &'a Natural) -> Natural {
@@ -335,14 +350,20 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
 impl<'a> SubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
-    /// taking `self` and z value and y by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and
+    /// third by value and the second by reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y, z) = x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -350,18 +371,15 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(20u32).sub_mul(&Natural::from(3u32), Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(20u32).sub_mul(&Natural::from(3u32), Natural::from(4u32)).to_string(),
-    ///     "8"
-    /// );
-    /// assert_eq!(Natural::trillion().sub_mul(
-    ///     &Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
-    ///     "995705032704"
+    ///     Natural::from(10u32).pow(12)
+    ///             .sub_mul(&Natural::from(0x10000u32), Natural::from(0x10000u32)),
+    ///     995705032704u64
     /// );
     /// ```
     fn sub_mul(self, y: &'a Natural, z: Natural) -> Natural {
@@ -373,14 +391,20 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
 impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
-    /// taking `self` by value and y and z by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first by value
+    /// and the second and third by reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y, z) = x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -388,19 +412,15 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(20u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     Natural::from(20u32).sub_mul(&Natural::from(3u32), &Natural::from(4u32)).to_string(),
-    ///     "8"
-    /// );
-    /// assert_eq!(
-    ///     Natural::trillion().sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///     .to_string(),
-    ///     "995705032704"
+    ///     Natural::from(10u32).pow(12)
+    ///             .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
     /// );
     /// ```
     fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
@@ -412,14 +432,20 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
 impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
-    /// taking `self`, y, and z by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
+    /// reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// f(x, y, z) = x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n, m) = O(m + n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -427,19 +453,15 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMul;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!((&Natural::from(20u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)), 8);
     /// assert_eq!(
-    ///     (&Natural::from(20u32)).sub_mul(&Natural::from(3u32), &Natural::from(4u32)).to_string(),
-    ///     "8"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::trillion()).sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
-    ///         .to_string(),
-    ///     "995705032704"
+    ///     (&Natural::from(10u32).pow(12))
+    ///             .sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32)),
+    ///     995705032704u64
     /// );
     /// ```
     fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
@@ -450,14 +472,20 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
 }
 
 impl SubMulAssign<Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
-    /// place, taking y and z by value.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
+    /// [`Natural`]s on the right-hand side by value.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -465,18 +493,17 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
     /// x.sub_mul_assign(Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 8);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.sub_mul_assign(Natural::from(0x10000u32), Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: Natural) {
         if self.sub_mul_assign_no_panic(y, z) {
@@ -486,14 +513,20 @@ impl SubMulAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
-    /// place, taking y by value and z by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
+    /// [`Natural`] on the right-hand side by value and the second by reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -501,18 +534,17 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
     /// x.sub_mul_assign(Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 8);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.sub_mul_assign(Natural::from(0x10000u32), &Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
         if self.sub_mul_assign_val_ref_no_panic(y, z) {
@@ -522,14 +554,20 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
-    /// place, taking y by reference and z by value.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
+    /// [`Natural`] on the right-hand side by reference and the second by value.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -537,18 +575,17 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
     /// x.sub_mul_assign(&Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 8);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.sub_mul_assign(&Natural::from(0x10000u32), Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
         if self.sub_mul_assign_ref_val_no_panic(y, z) {
@@ -558,14 +595,20 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
-    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
-    /// place, taking y and z by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking both
+    /// [`Natural`]s on the right-hand side by reference.
     ///
-    /// Time: O(n * log(n) * log(log(n)))
+    /// $$
+    /// x \gets x - yz.
+    /// $$
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -573,18 +616,17 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SubMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(20u32);
     /// x.sub_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 8);
     ///
-    /// let mut x = Natural::trillion();
+    /// let mut x = Natural::from(10u32).pow(12);
     /// x.sub_mul_assign(&Natural::from(0x10000u32), &Natural::from(0x10000u32));
-    /// assert_eq!(x.to_string(), "995705032704");
+    /// assert_eq!(x, 995705032704u64);
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
         if self.sub_mul_assign_ref_ref_no_panic(y, z) {

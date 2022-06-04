@@ -26,7 +26,7 @@ macro_rules! impl_mod_unsigned {
         impl Mod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning just the remainder.
+            /// Divides a number by another number, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
             /// $x = qy + r$ and $0 \leq r < y$.
@@ -35,6 +35,8 @@ macro_rules! impl_mod_unsigned {
             /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
             /// $$
             ///
+            /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
+            ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
@@ -42,7 +44,7 @@ macro_rules! impl_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#mod_op).
             #[inline]
             fn mod_op(self, other: $t) -> $t {
                 self % other
@@ -50,7 +52,7 @@ macro_rules! impl_mod_unsigned {
         }
 
         impl ModAssign<$t> for $t {
-            /// Divides a value by another value, replacing the first value by the remainder.
+            /// Divides a number by another number, replacing the first number by the remainder.
             ///
             /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
             /// and $0 \leq r < y$.
@@ -66,7 +68,7 @@ macro_rules! impl_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#mod_assign).
             #[inline]
             fn mod_assign(&mut self, other: $t) {
                 *self %= other;
@@ -76,7 +78,7 @@ macro_rules! impl_mod_unsigned {
         impl NegMod<$t> for $t {
             type Output = $t;
 
-            /// Divides the negative of a value by another value, returning just the remainder.
+            /// Divides the negative of a number by another number, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
             /// $x = qy - r$ and $0 \leq r < y$.
@@ -92,7 +94,7 @@ macro_rules! impl_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#neg_mod).
             #[inline]
             fn neg_mod(self, other: $t) -> $t {
                 neg_mod_unsigned(self, other)
@@ -100,7 +102,7 @@ macro_rules! impl_mod_unsigned {
         }
 
         impl NegModAssign<$t> for $t {
-            /// Divides the negative of a value by another value, returning just the remainder.
+            /// Divides the negative of a number by another number, returning just the remainder.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
             /// $x = qy - r$ and $0 \leq r < y$.
@@ -116,7 +118,7 @@ macro_rules! impl_mod_unsigned {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#neg_mod_assign).
             #[inline]
             fn neg_mod_assign(&mut self, other: $t) {
                 neg_mod_assign_unsigned(self, other);
@@ -169,15 +171,17 @@ macro_rules! impl_mod_signed {
         impl Mod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning just the remainder. The remainder has
-            /// the same sign as the second value.
+            /// Divides a number by another number, returning just the remainder. The remainder has
+            /// the same sign as the second number.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy + r$ and $0 \leq |r| < y$.
+            /// $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
             /// $$
             /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
             /// $$
+            ///
+            /// This function is called `mod_op` rather than `mod` because `mod` is a Rust keyword.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -186,7 +190,7 @@ macro_rules! impl_mod_signed {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#mod_op).
             #[inline]
             fn mod_op(self, other: $t) -> $t {
                 mod_op_signed(self, other)
@@ -194,11 +198,11 @@ macro_rules! impl_mod_signed {
         }
 
         impl ModAssign<$t> for $t {
-            /// Divides a value by another value, replacing the first value by the remainder. The
-            /// remainder has the same sign as the second value.
+            /// Divides a number by another number, replacing the first number by the remainder.
+            /// The remainder has the same sign as the second number.
             ///
             /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-            /// and $0 \leq |r| < y$.
+            /// and $0 \leq |r| < |y|$.
             ///
             /// $$
             /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -211,7 +215,7 @@ macro_rules! impl_mod_signed {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#mod_assign).
             #[inline]
             fn mod_assign(&mut self, other: $t) {
                 *self = self.mod_op(other);
@@ -221,8 +225,8 @@ macro_rules! impl_mod_signed {
         impl CeilingMod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning just the remainder. The remainder has
-            /// the opposite sign of the second value.
+            /// Divides a number by another number, returning just the remainder. The remainder has
+            /// the opposite sign as the second number.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
             /// $x = qy + r$ and $0 \leq |r| < |y|$.
@@ -238,7 +242,7 @@ macro_rules! impl_mod_signed {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#ceiling_mod).
             #[inline]
             fn ceiling_mod(self, other: $t) -> $t {
                 ceiling_mod_signed(self, other)
@@ -246,8 +250,8 @@ macro_rules! impl_mod_signed {
         }
 
         impl CeilingModAssign<$t> for $t {
-            /// Divides a value by another value, replacing the first value by the remainder. The
-            /// remainder has the opposite sign of the second value.
+            /// Divides a number by another number, replacing the first number by the remainder.
+            /// The remainder has the opposite sign as the second number.
             ///
             /// If the quotient were computed, the quotient and remainder would satisfy
             /// $x = qy + r$ and $0 \leq |r| < |y|$.
@@ -263,7 +267,7 @@ macro_rules! impl_mod_signed {
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_op` module.
+            /// See [here](super::mod_op#ceiling_mod_assign).
             #[inline]
             fn ceiling_mod_assign(&mut self, other: $t) {
                 *self = self.ceiling_mod(other);

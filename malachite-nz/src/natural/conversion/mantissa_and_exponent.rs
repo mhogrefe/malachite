@@ -19,7 +19,7 @@ use platform::Limb;
 use std::cmp::Ordering;
 
 impl Natural {
-    /// Returns the scientific mantissa and exponent.
+    /// Returns a [`Natural`]'s scientific mantissa and exponent.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -40,7 +40,6 @@ impl Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
@@ -222,15 +221,16 @@ impl Natural {
         }
     }
 
-    /// Constructs a `Natural` from its scientific mantissa and exponent.
+    /// Constructs a [`Natural`] from its scientific mantissa and exponent.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is provided as a
     /// float. If the mantissa is outside the range $[1, 2)$, `None` is returned.
     ///
-    /// Some combinations of mantissas and exponents do not specify an integer, in which case the
-    /// resulting value is rounded to an integer using the specified rounding mode. If the rounding
-    /// mode is `Exact` but the input does not exactly specify an integer, `None` is returned.
+    /// Some combinations of mantissas and exponents do not specify a [`Natural`], in which case
+    /// the resulting value is rounded to a [`Natural`] using the specified rounding mode. If the
+    /// rounding mode is `Exact` but the input does not exactly specify a [`Natural`], `None` is
+    /// returned.
     ///
     /// $$
     /// f(x, r) \approx 2^{e_s}m_s.
@@ -249,7 +249,6 @@ impl Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -319,7 +318,7 @@ impl Natural {
 }
 
 impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
-    /// Returns the integer mantissa and exponent.
+    /// Returns a [`Natural`]'s integer mantissa and exponent.
     ///
     /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
     /// $m_i$ is an odd integer.
@@ -328,7 +327,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
-    /// The inverse operation is `from_integer_mantissa_and_exponent`.
+    /// The inverse operation is
+    /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -343,7 +343,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
@@ -363,7 +362,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
         (self >> trailing_zeros, trailing_zeros)
     }
 
-    /// Returns the integer mantissa.
+    /// Returns a [`Natural`]'s integer mantissa.
     ///
     /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
     /// $m_i$ is an odd integer.
@@ -385,7 +384,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
@@ -398,7 +396,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
         self >> self.trailing_zeros().unwrap()
     }
 
-    /// Returns the integer exponent.
+    /// Returns a [`Natural`]'s integer exponent.
     ///
     /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
     /// $m_i$ is an odd integer.
@@ -420,7 +418,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
@@ -433,7 +430,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
         self.trailing_zeros().unwrap()
     }
 
-    /// Constructs a `Natural` from its integer mantissa and exponent.
+    /// Constructs a [`Natural`] from its integer mantissa and exponent.
     ///
     /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
     /// an odd integer.
@@ -444,7 +441,7 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// The input does not have to be reduced; that is, the mantissa does not have to be odd.
     ///
-    /// The result is an `Option`, but for this trait implementation the result is always `Some`.
+    /// The result is an [`Option`], but for this trait implementation the result is always `Some`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -457,7 +454,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
@@ -481,13 +477,13 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
 macro_rules! impl_mantissa_and_exponent {
     ($t:ident) => {
         impl<'a> SciMantissaAndExponent<$t, u64, Natural> for &'a Natural {
-            /// Returns the scientific mantissa and exponent.
+            /// Returns a [`Natural`]'s scientific mantissa and exponent.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent_with_rounding`.
+            /// [`sci_mantissa_and_exponent_with_rounding`](Natural::sci_mantissa_and_exponent_with_rounding).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$
@@ -500,24 +496,24 @@ macro_rules! impl_mantissa_and_exponent {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `natural::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, u64) {
                 self.sci_mantissa_and_exponent_with_rounding(RoundingMode::Nearest)
                     .unwrap()
             }
 
-            /// Constructs a `Natural` from its scientific mantissa and exponent.
+            /// Constructs a [`Natural`] from its scientific mantissa and exponent.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is
             /// provided as a float. If the mantissa is outside the range $[1, 2)$, `None` is
             /// returned.
             ///
-            /// Some combinations of mantissas and exponents do not specify an integer, in which
-            /// case the resulting value is rounded to an integer using the `Nearest` rounding
+            /// Some combinations of mantissas and exponents do not specify a [`Natural`], in which
+            /// case the resulting value is rounded to a [`Natural`] using the `Nearest` rounding
             /// mode. To specify other rounding modes, use
-            /// `from_sci_mantissa_and_exponent_with_rounding`.
+            /// [`from_sci_mantissa_and_exponent_with_rounding`](Natural::from_sci_mantissa_and_exponent_with_rounding).
             ///
             /// $$
             /// f(x) \approx 2^{e_s}m_s.
@@ -531,7 +527,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `sci_exponent`.
             ///
             /// # Examples
-            /// See the documentation of the `natural::conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#from_sci_mantissa_and_exponent).
             #[inline]
             fn from_sci_mantissa_and_exponent(
                 sci_mantissa: $t,

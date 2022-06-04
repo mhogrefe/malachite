@@ -5,6 +5,8 @@ macro_rules! impl_ceiling {
         impl Ceiling for $f {
             type Output = $f;
 
+            /// This is a wrapper over the `ceil` functions in the standard library, for example
+            /// [this one](f32::ceil).
             #[inline]
             fn ceiling(self) -> $f {
                 $f::ceil(self)
@@ -12,7 +14,9 @@ macro_rules! impl_ceiling {
         }
 
         impl CeilingAssign for $f {
-            /// Replaces `self` with its ceiling.
+            /// Replaces a number with its ceiling.
+            ///
+            /// A number's ceiling is the smallest integer greater than or equal to the number.
             ///
             /// $x \gets \lceil x \rceil$.
             ///
@@ -20,7 +24,7 @@ macro_rules! impl_ceiling {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::ceiling` module.
+            /// See [here](super::ceiling#ceiling_assign).
             #[inline]
             fn ceiling_assign(&mut self) {
                 *self = self.ceiling();

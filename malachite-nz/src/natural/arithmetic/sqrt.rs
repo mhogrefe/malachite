@@ -35,7 +35,10 @@ use std::cmp::Ordering;
 
 // Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
 //
-// This is mpn_sqrtrem2 from mpn/generic/sqrtrem.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_sqrtrem2` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
 pub_test! {sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     assert!(n_hi.leading_zeros() < 2);
     let (mut sqrt, mut r_lo) = sqrt_rem_newton::<Limb, SignedLimb>(n_hi);
@@ -88,7 +91,14 @@ pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
 //
 // If approx = 0, then s = floor(sqrt(x)) and r = x - s ^ 2.
 //
-// This is mpn_dc_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_dc_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
 pub_test! {limbs_sqrt_rem_helper(
     out: &mut [Limb],
     xs: &mut [Limb],
@@ -164,7 +174,14 @@ pub_test! {limbs_sqrt_rem_helper(
     r_hi == 1
 }}
 
-/// This is mpn_divappr_q from mpn/generic/sqrtrem.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
+//
+// This is equivalent to `mpn_divappr_q` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
 fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -194,7 +211,14 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // Then s = floor(sqrt(x)).
 // The return value is true iff there is a remainder (that is, x is not a perfect square).
 //
-// This is mpn_dc_sqrt from mpn/generic/sqrtrem.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_dc_sqrt` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
 pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
@@ -316,9 +340,14 @@ pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: boo
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
 //
-// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is
+// `NULL`.
 pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
@@ -388,9 +417,14 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
 //
-// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is not
+// `NULL`.
 pub_test! {limbs_sqrt_rem_to_out(
     out_sqrt: &mut [Limb],
     out_rem: &mut [Limb],
@@ -508,7 +542,11 @@ pub_test! {limbs_sqrt_rem_to_out(
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
     limbs_sqrt_to_out(&mut out, xs);
@@ -551,7 +589,11 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
@@ -575,7 +617,11 @@ pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
@@ -585,18 +631,89 @@ pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     (out_sqrt, out_rem)
 }}
 
-impl FloorSqrtAssign for Natural {
-    /// Replaces a `Natural` with the floor of its square root.
+impl FloorSqrt for Natural {
+    type Output = Natural;
+
+    /// Returns the floor of the square root of a [`Natural`], taking it by value.
     ///
-    /// $x \gets \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(99u8).floor_sqrt(), 9);
+    /// assert_eq!(Natural::from(100u8).floor_sqrt(), 10);
+    /// assert_eq!(Natural::from(101u8).floor_sqrt(), 10);
+    /// assert_eq!(Natural::from(1000000000u32).floor_sqrt(), 31622);
+    /// assert_eq!(Natural::from(10000000000u64).floor_sqrt(), 100000);
+    /// ```
+    #[inline]
+    fn floor_sqrt(self) -> Natural {
+        (&self).floor_sqrt()
+    }
+}
+
+impl<'a> FloorSqrt for &'a Natural {
+    type Output = Natural;
+
+    /// Returns the floor of the square root of a [`Natural`], taking it by value.
+    ///
+    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(99u8)).floor_sqrt(), 9);
+    /// assert_eq!((&Natural::from(100u8)).floor_sqrt(), 10);
+    /// assert_eq!((&Natural::from(101u8)).floor_sqrt(), 10);
+    /// assert_eq!((&Natural::from(1000000000u32)).floor_sqrt(), 31622);
+    /// assert_eq!((&Natural::from(10000000000u64)).floor_sqrt(), 100000);
+    /// ```
+    fn floor_sqrt(self) -> Natural {
+        match self {
+            Natural(Small(small)) => Natural::from(small.floor_sqrt()),
+            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_floor_sqrt(limbs)),
+        }
+    }
+}
+
+impl FloorSqrtAssign for Natural {
+    /// Replaces a [`Natural`] with the floor of its square root.
+    ///
+    /// $x \gets \lfloor\sqrt{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrtAssign;
     /// use malachite_nz::natural::Natural;
@@ -627,80 +744,89 @@ impl FloorSqrtAssign for Natural {
     }
 }
 
-impl FloorSqrt for Natural {
+impl CeilingSqrt for Natural {
     type Output = Natural;
 
-    /// Returns the floor of the square root of a `Natural`, taking the `Natural` by value.
+    /// Returns the ceiling of the square root of a [`Natural`], taking it by value.
     ///
-    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(99u8).floor_sqrt(), 9);
-    /// assert_eq!(Natural::from(100u8).floor_sqrt(), 10);
-    /// assert_eq!(Natural::from(101u8).floor_sqrt(), 10);
-    /// assert_eq!(Natural::from(1000000000u32).floor_sqrt(), 31622);
-    /// assert_eq!(Natural::from(10000000000u64).floor_sqrt(), 100000);
+    /// assert_eq!(Natural::from(99u8).ceiling_sqrt(), 10);
+    /// assert_eq!(Natural::from(100u8).ceiling_sqrt(), 10);
+    /// assert_eq!(Natural::from(101u8).ceiling_sqrt(), 11);
+    /// assert_eq!(Natural::from(1000000000u32).ceiling_sqrt(), 31623);
+    /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
     #[inline]
-    fn floor_sqrt(self) -> Natural {
-        (&self).floor_sqrt()
+    fn ceiling_sqrt(self) -> Natural {
+        (&self).ceiling_sqrt()
     }
 }
 
-impl<'a> FloorSqrt for &'a Natural {
+impl<'a> CeilingSqrt for &'a Natural {
     type Output = Natural;
 
-    /// Returns the floor of the square root of a `Natural`, taking the `Natural` by reference.
+    /// Returns the ceiling of the square root of a [`Natural`], taking it by value.
     ///
-    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(99u8)).floor_sqrt(), 9);
-    /// assert_eq!((&Natural::from(100u8)).floor_sqrt(), 10);
-    /// assert_eq!((&Natural::from(101u8)).floor_sqrt(), 10);
-    /// assert_eq!((&Natural::from(1000000000u32)).floor_sqrt(), 31622);
-    /// assert_eq!((&Natural::from(10000000000u64)).floor_sqrt(), 100000);
+    /// assert_eq!(Natural::from(99u8).ceiling_sqrt(), 10);
+    /// assert_eq!(Natural::from(100u8).ceiling_sqrt(), 10);
+    /// assert_eq!(Natural::from(101u8).ceiling_sqrt(), 11);
+    /// assert_eq!(Natural::from(1000000000u32).ceiling_sqrt(), 31623);
+    /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
-    fn floor_sqrt(self) -> Natural {
+    fn ceiling_sqrt(self) -> Natural {
         match self {
-            Natural(Small(small)) => Natural::from(small.floor_sqrt()),
-            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_floor_sqrt(limbs)),
+            Natural(Small(small)) => Natural::from(small.ceiling_sqrt()),
+            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(limbs)),
         }
     }
 }
 
 impl CeilingSqrtAssign for Natural {
-    /// Replaces a `Natural` with the ceiling of its square root.
+    /// Replaces a [`Natural`] with the ceiling of its square root.
     ///
     /// $x \gets \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrtAssign;
     /// use malachite_nz::natural::Natural;
@@ -731,88 +857,29 @@ impl CeilingSqrtAssign for Natural {
     }
 }
 
-impl CeilingSqrt for Natural {
-    type Output = Natural;
-
-    /// Returns the ceiling of the square root of a `Natural`, taking the `Natural` by value.
-    ///
-    /// $f(x) = \lceil\sqrt{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(Natural::from(99u8).ceiling_sqrt(), 10);
-    /// assert_eq!(Natural::from(100u8).ceiling_sqrt(), 10);
-    /// assert_eq!(Natural::from(101u8).ceiling_sqrt(), 11);
-    /// assert_eq!(Natural::from(1000000000u32).ceiling_sqrt(), 31623);
-    /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
-    /// ```
-    #[inline]
-    fn ceiling_sqrt(self) -> Natural {
-        (&self).ceiling_sqrt()
-    }
-}
-
-impl<'a> CeilingSqrt for &'a Natural {
-    type Output = Natural;
-
-    /// Returns the ceiling of the square root of a `Natural`, taking the `Natural` by reference.
-    ///
-    /// $f(x) = \lceil\sqrt{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(Natural::from(99u8).ceiling_sqrt(), 10);
-    /// assert_eq!(Natural::from(100u8).ceiling_sqrt(), 10);
-    /// assert_eq!(Natural::from(101u8).ceiling_sqrt(), 11);
-    /// assert_eq!(Natural::from(1000000000u32).ceiling_sqrt(), 31623);
-    /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
-    /// ```
-    fn ceiling_sqrt(self) -> Natural {
-        match self {
-            Natural(Small(small)) => Natural::from(small.ceiling_sqrt()),
-            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(limbs)),
-        }
-    }
-}
-
 impl CheckedSqrt for Natural {
     type Output = Natural;
 
-    /// Returns the the square root of a `Natural`, or `None` if the `Natural` is not a perfect
-    /// square. The `Natural` is taken by value.
+    /// Returns the the square root of a [`Natural`], or `None` if it is not a perfect square. The
+    /// [`Natural`] is taken by value.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
@@ -833,23 +900,26 @@ impl CheckedSqrt for Natural {
 impl<'a> CheckedSqrt for &'a Natural {
     type Output = Natural;
 
-    /// Returns the the square root of a `Natural`, or `None` if the `Natural` is not a perfect
-    /// square. The `Natural` is taken by reference.
+    /// Returns the the square root of a [`Natural`], or `None` if it is not a perfect square. The
+    /// [`Natural`] is taken by value.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
@@ -874,23 +944,110 @@ impl<'a> CheckedSqrt for &'a Natural {
     }
 }
 
+impl SqrtRem for Natural {
+    type SqrtOutput = Natural;
+    type RemOutput = Natural;
+
+    /// Returns the floor of the square root of a [`Natural`] and the remainder (the difference
+    /// between the [`Natural`] and the square of the floor). The [`Natural`] is taken by value.
+    ///
+    /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::SqrtRem;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(99u8).sqrt_rem().to_debug_string(), "(9, 18)");
+    /// assert_eq!(Natural::from(100u8).sqrt_rem().to_debug_string(), "(10, 0)");
+    /// assert_eq!(Natural::from(101u8).sqrt_rem().to_debug_string(), "(10, 1)");
+    /// assert_eq!(Natural::from(1000000000u32).sqrt_rem().to_debug_string(), "(31622, 49116)");
+    /// assert_eq!(Natural::from(10000000000u64).sqrt_rem().to_debug_string(), "(100000, 0)");
+    /// ```
+    #[inline]
+    fn sqrt_rem(self) -> (Natural, Natural) {
+        (&self).sqrt_rem()
+    }
+}
+
+impl<'a> SqrtRem for &'a Natural {
+    type SqrtOutput = Natural;
+    type RemOutput = Natural;
+
+    /// Returns the floor of the square root of a [`Natural`] and the remainder (the difference
+    /// between the [`Natural`] and the square of the floor). The [`Natural`] is taken by
+    /// reference.
+    ///
+    /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::SqrtRem;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(99u8)).sqrt_rem().to_debug_string(), "(9, 18)");
+    /// assert_eq!((&Natural::from(100u8)).sqrt_rem().to_debug_string(), "(10, 0)");
+    /// assert_eq!((&Natural::from(101u8)).sqrt_rem().to_debug_string(), "(10, 1)");
+    /// assert_eq!((&Natural::from(1000000000u32)).sqrt_rem().to_debug_string(), "(31622, 49116)");
+    /// assert_eq!((&Natural::from(10000000000u64)).sqrt_rem().to_debug_string(), "(100000, 0)");
+    /// ```
+    fn sqrt_rem(self) -> (Natural, Natural) {
+        match self {
+            Natural(Small(small)) => {
+                let (sqrt, rem) = small.sqrt_rem();
+                (Natural::from(sqrt), Natural::from(rem))
+            }
+            Natural(Large(ref limbs)) => {
+                let (sqrt_limbs, rem_limbs) = limbs_sqrt_rem(limbs);
+                (
+                    Natural::from_owned_limbs_asc(sqrt_limbs),
+                    Natural::from_owned_limbs_asc(rem_limbs),
+                )
+            }
+        }
+    }
+}
+
 impl SqrtAssignRem for Natural {
     type RemOutput = Natural;
 
-    /// Replaces a `Natural` with the floor of its square root, and returns the remainder (the
-    /// difference between the original `Natural` and the square of the floor).
+    /// Replaces a [`Natural`] with the floor of its square root and returns the remainder (the
+    /// difference between the original [`Natural`] and the square of the floor).
     ///
     /// $f(x) = x - \lfloor\sqrt{x}\rfloor^2$,
     ///
     /// $x \gets \lfloor\sqrt{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::SqrtAssignRem;
     /// use malachite_nz::natural::Natural;
@@ -920,82 +1077,5 @@ impl SqrtAssignRem for Natural {
         let rem;
         (*self, rem) = (&*self).sqrt_rem();
         rem
-    }
-}
-
-impl SqrtRem for Natural {
-    type SqrtOutput = Natural;
-    type RemOutput = Natural;
-
-    /// Returns the floor of the square root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the square of the floor). The `Natural` is taken by value.
-    ///
-    /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::SqrtRem;
-    /// use malachite_base::strings::ToDebugString;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(Natural::from(99u8).sqrt_rem().to_debug_string(), "(9, 18)");
-    /// assert_eq!(Natural::from(100u8).sqrt_rem().to_debug_string(), "(10, 0)");
-    /// assert_eq!(Natural::from(101u8).sqrt_rem().to_debug_string(), "(10, 1)");
-    /// assert_eq!(Natural::from(1000000000u32).sqrt_rem().to_debug_string(), "(31622, 49116)");
-    /// assert_eq!(Natural::from(10000000000u64).sqrt_rem().to_debug_string(), "(100000, 0)");
-    /// ```
-    #[inline]
-    fn sqrt_rem(self) -> (Natural, Natural) {
-        (&self).sqrt_rem()
-    }
-}
-
-impl<'a> SqrtRem for &'a Natural {
-    type SqrtOutput = Natural;
-    type RemOutput = Natural;
-
-    /// Returns the floor of the square root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the square of the floor). The `Natural` is taken by reference.
-    ///
-    /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::SqrtRem;
-    /// use malachite_base::strings::ToDebugString;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!((&Natural::from(99u8)).sqrt_rem().to_debug_string(), "(9, 18)");
-    /// assert_eq!((&Natural::from(100u8)).sqrt_rem().to_debug_string(), "(10, 0)");
-    /// assert_eq!((&Natural::from(101u8)).sqrt_rem().to_debug_string(), "(10, 1)");
-    /// assert_eq!((&Natural::from(1000000000u32)).sqrt_rem().to_debug_string(), "(31622, 49116)");
-    /// assert_eq!((&Natural::from(10000000000u64)).sqrt_rem().to_debug_string(), "(100000, 0)");
-    /// ```
-    fn sqrt_rem(self) -> (Natural, Natural) {
-        match self {
-            Natural(Small(small)) => {
-                let (sqrt, rem) = small.sqrt_rem();
-                (Natural::from(sqrt), Natural::from(rem))
-            }
-            Natural(Large(ref limbs)) => {
-                let (sqrt_limbs, rem_limbs) = limbs_sqrt_rem(limbs);
-                (
-                    Natural::from_owned_limbs_asc(sqrt_limbs),
-                    Natural::from_owned_limbs_asc(rem_limbs),
-                )
-            }
-        }
     }
 }

@@ -4,13 +4,19 @@ use malachite_base::num::arithmetic::traits::{
 };
 use natural::Natural;
 
-impl FloorSqrtAssign for Integer {
-    /// Replaces an `Integer` with the floor of its square root.
+impl FloorSqrt for Integer {
+    type Output = Integer;
+
+    /// Returns the floor of the square root of an [`Integer`], taking it by value.
     ///
-    /// $x \gets \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -18,7 +24,81 @@ impl FloorSqrtAssign for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(99).floor_sqrt(), 9);
+    /// assert_eq!(Integer::from(100).floor_sqrt(), 10);
+    /// assert_eq!(Integer::from(101).floor_sqrt(), 10);
+    /// assert_eq!(Integer::from(1000000000).floor_sqrt(), 31622);
+    /// assert_eq!(Integer::from(10000000000u64).floor_sqrt(), 100000);
+    /// ```
+    #[inline]
+    fn floor_sqrt(mut self) -> Integer {
+        self.floor_sqrt_assign();
+        self
+    }
+}
+
+impl<'a> FloorSqrt for &'a Integer {
+    type Output = Integer;
+
+    /// Returns the floor of the square root of an [`Integer`], taking it by reference.
+    ///
+    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((&Integer::from(99)).floor_sqrt(), 9);
+    /// assert_eq!((&Integer::from(100)).floor_sqrt(), 10);
+    /// assert_eq!((&Integer::from(101)).floor_sqrt(), 10);
+    /// assert_eq!((&Integer::from(1000000000)).floor_sqrt(), 31622);
+    /// assert_eq!((&Integer::from(10000000000u64)).floor_sqrt(), 100000);
+    /// ```
+    #[inline]
+    fn floor_sqrt(self) -> Integer {
+        if *self >= 0 {
+            Integer::from(self.unsigned_abs_ref().floor_sqrt())
+        } else {
+            panic!("Cannot take square root of {}", self)
+        }
+    }
+}
+
+impl FloorSqrtAssign for Integer {
+    /// Replaces an [`Integer`] with the floor of its square root.
+    ///
+    /// $x \gets \lfloor\sqrt{x}\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrtAssign;
     /// use malachite_nz::integer::Integer;
@@ -53,15 +133,19 @@ impl FloorSqrtAssign for Integer {
     }
 }
 
-impl FloorSqrt for Integer {
+impl CeilingSqrt for Integer {
     type Output = Integer;
 
-    /// Returns the floor of the square root of an `Integer`, taking the `Integer` by value.
+    /// Returns the ceiling of the square root of an [`Integer`], taking it by value.
     ///
-    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -69,33 +153,36 @@ impl FloorSqrt for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(99).floor_sqrt(), 9);
-    /// assert_eq!(Integer::from(100).floor_sqrt(), 10);
-    /// assert_eq!(Integer::from(101).floor_sqrt(), 10);
-    /// assert_eq!(Integer::from(1000000000).floor_sqrt(), 31622);
-    /// assert_eq!(Integer::from(10000000000u64).floor_sqrt(), 100000);
+    /// assert_eq!(Integer::from(99).ceiling_sqrt(), 10);
+    /// assert_eq!(Integer::from(100).ceiling_sqrt(), 10);
+    /// assert_eq!(Integer::from(101).ceiling_sqrt(), 11);
+    /// assert_eq!(Integer::from(1000000000).ceiling_sqrt(), 31623);
+    /// assert_eq!(Integer::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
     #[inline]
-    fn floor_sqrt(mut self) -> Integer {
-        self.floor_sqrt_assign();
+    fn ceiling_sqrt(mut self) -> Integer {
+        self.ceiling_sqrt_assign();
         self
     }
 }
 
-impl<'a> FloorSqrt for &'a Integer {
+impl<'a> CeilingSqrt for &'a Integer {
     type Output = Integer;
 
-    /// Returns the floor of the square root of an `Integer`, taking the `Integer` by reference.
+    /// Returns the ceiling of the square root of an [`Integer`], taking it by reference.
     ///
-    /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+    /// $f(x) = \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -103,21 +190,20 @@ impl<'a> FloorSqrt for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::FloorSqrt;
+    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(99)).floor_sqrt(), 9);
-    /// assert_eq!((&Integer::from(100)).floor_sqrt(), 10);
-    /// assert_eq!((&Integer::from(101)).floor_sqrt(), 10);
-    /// assert_eq!((&Integer::from(1000000000)).floor_sqrt(), 31622);
-    /// assert_eq!((&Integer::from(10000000000u64)).floor_sqrt(), 100000);
+    /// assert_eq!(Integer::from(99).ceiling_sqrt(), 10);
+    /// assert_eq!(Integer::from(100).ceiling_sqrt(), 10);
+    /// assert_eq!(Integer::from(101).ceiling_sqrt(), 11);
+    /// assert_eq!(Integer::from(1000000000).ceiling_sqrt(), 31623);
+    /// assert_eq!(Integer::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
     #[inline]
-    fn floor_sqrt(self) -> Integer {
+    fn ceiling_sqrt(self) -> Integer {
         if *self >= 0 {
-            Integer::from(self.unsigned_abs_ref().floor_sqrt())
+            Integer::from(self.unsigned_abs_ref().ceiling_sqrt())
         } else {
             panic!("Cannot take square root of {}", self)
         }
@@ -125,12 +211,16 @@ impl<'a> FloorSqrt for &'a Integer {
 }
 
 impl CeilingSqrtAssign for Integer {
-    /// Replaces an `Integer` with the ceiling of its square root.
+    /// Replaces an [`Integer`] with the ceiling of its square root.
     ///
     /// $x \gets \lceil\sqrt{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -138,7 +228,6 @@ impl CeilingSqrtAssign for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrtAssign;
     /// use malachite_nz::integer::Integer;
@@ -173,92 +262,25 @@ impl CeilingSqrtAssign for Integer {
     }
 }
 
-impl CeilingSqrt for Integer {
-    type Output = Integer;
-
-    /// Returns the ceiling of the square root of an `Integer`, taking the `Integer` by value.
-    ///
-    /// $f(x) = \lceil\sqrt{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// Panics if `self` is negative.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from(99).ceiling_sqrt(), 10);
-    /// assert_eq!(Integer::from(100).ceiling_sqrt(), 10);
-    /// assert_eq!(Integer::from(101).ceiling_sqrt(), 11);
-    /// assert_eq!(Integer::from(1000000000).ceiling_sqrt(), 31623);
-    /// assert_eq!(Integer::from(10000000000u64).ceiling_sqrt(), 100000);
-    /// ```
-    #[inline]
-    fn ceiling_sqrt(mut self) -> Integer {
-        self.ceiling_sqrt_assign();
-        self
-    }
-}
-
-impl<'a> CeilingSqrt for &'a Integer {
-    type Output = Integer;
-
-    /// Returns the ceiling of the square root of an `Integer`, taking the `Integer` by reference.
-    ///
-    /// $f(x) = \lceil\sqrt{x}\rceil$.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// Panics if `self` is negative.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from(99).ceiling_sqrt(), 10);
-    /// assert_eq!(Integer::from(100).ceiling_sqrt(), 10);
-    /// assert_eq!(Integer::from(101).ceiling_sqrt(), 11);
-    /// assert_eq!(Integer::from(1000000000).ceiling_sqrt(), 31623);
-    /// assert_eq!(Integer::from(10000000000u64).ceiling_sqrt(), 100000);
-    /// ```
-    #[inline]
-    fn ceiling_sqrt(self) -> Integer {
-        if *self >= 0 {
-            Integer::from(self.unsigned_abs_ref().ceiling_sqrt())
-        } else {
-            panic!("Cannot take square root of {}", self)
-        }
-    }
-}
-
 impl CheckedSqrt for Integer {
     type Output = Integer;
 
-    /// Returns the the square root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// square. The `Integer` is taken by value.
+    /// Returns the the square root of an [`Integer`], or `None` if it is not a perfect square. The
+    /// [`Integer`] is taken by value.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -266,7 +288,6 @@ impl CheckedSqrt for Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
@@ -291,18 +312,22 @@ impl CheckedSqrt for Integer {
 impl<'a> CheckedSqrt for &'a Integer {
     type Output = Integer;
 
-    /// Returns the the square root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// square. The `Integer` is taken by reference.
+    /// Returns the the square root of an [`Integer`], or `None` if it is not a perfect square. The
+    /// [`Integer`] is taken by reference.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is negative.
@@ -310,7 +335,6 @@ impl<'a> CheckedSqrt for &'a Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;

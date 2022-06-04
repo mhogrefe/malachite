@@ -1,35 +1,8 @@
 use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::{IsInteger, WrappingFrom};
 use num::logic::traits::TrailingZeros;
 
-impl<T: PrimitiveInt> IsInteger for T {
-    /// Determines whether a value is an integer.
-    ///
-    /// For primitive integer types this always returns `true`.
-    ///
-    /// $f(x) = \textrm{true}$.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::conversion::traits::IsInteger;
-    ///
-    /// assert_eq!(0.is_integer(), true);
-    /// assert_eq!(1.is_integer(), true);
-    /// assert_eq!(100.is_integer(), true);
-    /// assert_eq!((-1).is_integer(), true);
-    /// assert_eq!((-100).is_integer(), true);
-    /// ```
-    #[inline]
-    fn is_integer(self) -> bool {
-        true
-    }
-}
-
-fn is_integer<T: PrimitiveFloat>(x: T) -> bool {
+fn is_integer_float<T: PrimitiveFloat>(x: T) -> bool {
     if x.is_nan() || x.is_infinite() {
         false
     } else if x == T::ZERO {
@@ -48,6 +21,29 @@ fn is_integer<T: PrimitiveFloat>(x: T) -> bool {
     }
 }
 
+macro_rules! impl_is_integer_primitive_int {
+    ($t:ident) => {
+        impl IsInteger for $t {
+            /// Determines whether a value is an integer.
+            ///
+            /// For primitive integer types this always returns `true`.
+            ///
+            /// $f(x) = \textrm{true}$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_integer#is_integer).
+            #[inline]
+            fn is_integer(self) -> bool {
+                true
+            }
+        }
+    };
+}
+apply_to_primitive_ints!(impl_is_integer_primitive_int);
+
 macro_rules! impl_is_integer_primitive_float {
     ($t:ident) => {
         impl IsInteger for $t {
@@ -59,10 +55,10 @@ macro_rules! impl_is_integer_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::is_integer` module.
+            /// See [here](super::is_integer#is_integer).
             #[inline]
             fn is_integer(self) -> bool {
-                is_integer(self)
+                is_integer_float(self)
             }
         }
     };

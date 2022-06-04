@@ -1,24 +1,105 @@
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 
-/// This is the error type for the unions' `FromStr` implementations.
-///
-/// The `Generic` variant is for when the union's variant can't be determined, and the `Specific`
-/// variant is for when the union's variant can be determined but the wrapped value can't be parsed.
+/// This is the error type for the unions' [`FromStr`] implementations.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum UnionFromStrError<E> {
+    /// For when the union's variant can't be determined.
     Generic(String),
+    /// For when the union's variant can be determined but the wrapped value can't be parsed.
     Specific(E),
 }
 
-macro_rules! union {
-    ($name: ident, $single: ty, $([$t: ident, $cons: ident, $c: expr, $x: ident]),*) => {
+/// Defines unions.
+///
+/// Malachite provides [`Union2`], but you can also define `Union3`, `Union4`, and so on, in your
+/// program using the code below. The documentation for [`Union2`] and describes these other
+/// `enum`s as well.
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::unions::UnionFromStrError;
+/// use std::fmt::{self, Display, Formatter};
+/// use std::str::FromStr;
+///
+/// union_struct!(
+///     (pub(crate)),
+///     Union3,
+///     Union3<T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union4,
+///     Union4<T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union5,
+///     Union5<T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union6,
+///     Union6<T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union7,
+///     Union7<T, T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f],
+///     [G, G, 'G', g]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union8,
+///     Union8<T, T, T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f],
+///     [G, G, 'G', g],
+///     [H, H, 'H', h]
+/// );
+/// }
+/// ```
+#[macro_export]
+macro_rules! union_struct {
+    (
+        ($($vis:tt)*),
+        $name: ident,
+        $single: ty,
+        $([$t: ident, $cons: ident, $c: expr, $x: ident]),*
+    ) => {
         #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
         /// This is a union, or sum type, of $n$ values. It is essentially a generic enum.
-        ///
-        /// This enum is macro-generated. The value of $n$, the union's arity, is in the enum's
-        /// name.
-        pub enum $name<$($t),*> {
+        $($vis)* enum $name<$($t),*> {
             $($cons($t)),*
         }
 
@@ -30,9 +111,9 @@ macro_rules! union {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `unions` module.
+            /// See [here](self#unwrap).
             #[allow(clippy::missing_const_for_fn)] // Can't be const because of destructor
-            pub fn unwrap(self) -> T {
+            $($vis)* fn unwrap(self) -> T {
                 match self {
                     $(
                         $name::$cons($x) => $x
@@ -42,14 +123,10 @@ macro_rules! union {
         }
 
         impl<$($t: Display),*> Display for $name<$($t),*> {
-            /// Converts a union to a `String`.
-            ///
-            /// # Worst-case complexity
-            /// The time and additional memory complexities are the maxima of the time and memory
-            /// complexities of the `Display::fmt` implementations of the variant types.
+            /// Converts a union to a [`String`].
             ///
             /// # Examples
-            /// See the documentation of the `unions` module.
+            /// See [here](self#fmt).
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> fmt::Result {
                 match self {
@@ -63,17 +140,12 @@ macro_rules! union {
         impl<$($t: FromStr),*> FromStr for $name<$($t),*> {
             type Err = UnionFromStrError<$name<$($t::Err),*>>;
 
-            /// Converts a `String` to a union.
+            /// Converts a string to a union.
             ///
-            /// If the `&str` does not represent a valid union, an error value is returned.
-            ///
-            /// # Worst-case complexity
-            /// The time and additional memory complexities are the maxima of the time and memory
-            /// complexities of the `FromStr::from_str` implementations of the variant types, or
-            /// $O(n)$, whichever is greater.
+            /// If the string does not represent a valid union, an error value is returned.
             ///
             /// # Examples
-            /// See the documentation of the `unions` module.
+            /// See [here](self#from_str).
             #[inline]
             fn from_str(src: &str) -> Result<$name<$($t),*>, Self::Err> {
                 if src.is_empty() {
@@ -103,62 +175,15 @@ macro_rules! union {
     }
 }
 
-union!(Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
-union!(Union3, Union3<T, T, T>, [A, A, 'A', a], [B, B, 'B', b], [C, C, 'C', c]);
-union!(Union4, Union4<T, T, T, T>, [A, A, 'A', a], [B, B, 'B', b], [C, C, 'C', c], [D, D, 'D', d]);
-union!(
-    Union5,
-    Union5<T, T, T, T, T>,
-    [A, A, 'A', a],
-    [B, B, 'B', b],
-    [C, C, 'C', c],
-    [D, D, 'D', d],
-    [E, E, 'E', e]
-);
-union!(
-    Union6,
-    Union6<T, T, T, T, T, T>,
-    [A, A, 'A', a],
-    [B, B, 'B', b],
-    [C, C, 'C', c],
-    [D, D, 'D', d],
-    [E, E, 'E', e],
-    [F, F, 'F', f]
-);
-union!(
-    Union7,
-    Union7<T, T, T, T, T, T, T>,
-    [A, A, 'A', a],
-    [B, B, 'B', b],
-    [C, C, 'C', c],
-    [D, D, 'D', d],
-    [E, E, 'E', e],
-    [F, F, 'F', f],
-    [G, G, 'G', g]
-);
-union!(
-    Union8,
-    Union8<T, T, T, T, T, T, T, T>,
-    [A, A, 'A', a],
-    [B, B, 'B', b],
-    [C, C, 'C', c],
-    [D, D, 'D', d],
-    [E, E, 'E', e],
-    [F, F, 'F', f],
-    [G, G, 'G', g],
-    [H, H, 'H', h]
-);
+union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 
 /// Iterators that generate unions without repetition.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # lex_union\[n\]s
+/// # lex_union2s
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::unions::exhaustive::lex_union2s;
 /// use malachite_base::unions::Union2;
@@ -177,12 +202,11 @@ union!(
 /// );
 /// ```
 ///
-/// # exhaustive_union\[n\]s
+/// # exhaustive_union2s
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::unions::exhaustive::exhaustive_union2s;
 /// use malachite_base::unions::Union2;
@@ -203,14 +227,11 @@ union!(
 pub mod exhaustive;
 /// Iterators that generate unions randomly.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # random_union\[n\]s
+/// # random_union2s
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;

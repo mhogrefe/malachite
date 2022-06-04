@@ -1,15 +1,14 @@
-use comparison::traits::Min;
 use num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
-use num::basic::traits::{One, Zero};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
-use std::fmt::Display;
-use std::ops::{Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_round_unsigned_unsigned<
-    T: PrimitiveInt + Shl<U, Output = T> + Shr<U, Output = T>,
-    U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
+    T: PrimitiveUnsigned + Shl<U, Output = T> + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
 >(
     x: T,
     bits: U,
@@ -65,8 +64,8 @@ fn shr_round_unsigned_unsigned<
 }
 
 fn shr_round_assign_unsigned_unsigned<
-    T: PrimitiveInt + Shl<U, Output = T> + ShrAssign<U>,
-    U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
+    T: PrimitiveUnsigned + Shl<U, Output = T> + ShrAssign<U>,
+    U: PrimitiveUnsigned,
 >(
     x: &mut T,
     bits: U,
@@ -128,33 +127,35 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                 impl ShrRound<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode.
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
                     /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
-                    /// Let $q = \frac{x}{2^p}$:
+                    /// Let $q = \frac{x}{2^k}$:
                     ///
-                    /// $f(x, p, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+                    /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
                     ///
-                    /// $f(x, p, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+                    /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
                     ///
                     /// $$
-                    /// f(x, p, \mathrm{Nearest}) = \begin{cases}
-                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
-                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
-                    ///     \lfloor q \rfloor &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is even} \\\\
+                    /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+                    ///     \lfloor q \rfloor & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+                    ///     \lceil q \rceil & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+                    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+                    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even}, \\\\
                     ///     \lceil q \rceil &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is odd.}
+                    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+                    ///         \\ \lfloor q \rfloor \\ \text{is odd}.
                     /// \end{cases}
                     /// $$
                     ///
-                    /// $f(x, p, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+                    /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -164,7 +165,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
+                    /// See [here](super::shr_round#shr_round).
                     #[inline]
                     fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
                         shr_round_unsigned_unsigned(self, bits, rm)
@@ -172,12 +173,14 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                 }
 
                 impl ShrRoundAssign<$u> for $t {
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode, in place.
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode, in place.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
+                    ///
+                    /// See the [`ShrRound`](super::traits::ShrRound) documentation for details.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -187,7 +190,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
+                    /// See [here](super::shr_round#shr_round_assign).
                     #[inline]
                     fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
                         shr_round_assign_unsigned_unsigned(self, bits, rm);
@@ -201,8 +204,8 @@ macro_rules! impl_shr_round_unsigned_unsigned {
 apply_to_unsigneds!(impl_shr_round_unsigned_unsigned);
 
 fn shr_round_signed_unsigned<
-    U: Copy + Eq + ShrRound<B, Output = U> + Zero,
-    S: Copy + Eq + Min + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + WrappingFrom<U> + Zero,
+    U: PrimitiveUnsigned + ShrRound<B, Output = U>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
     B,
 >(
     x: S,
@@ -231,8 +234,8 @@ macro_rules! impl_shr_round_signed_unsigned {
                 impl ShrRound<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode.
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
@@ -246,14 +249,16 @@ macro_rules! impl_shr_round_signed_unsigned {
                     ///
                     /// $$
                     /// f(x, p, \mathrm{Nearest}) = \begin{cases}
-                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
-                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
-                    ///     \lfloor q \rfloor &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is even} \\\\
+                    ///     \lfloor q \rfloor & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+                    ///     \lceil q \rceil & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+                    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+                    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even}, \\\\
                     ///     \lceil q \rceil &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is odd.}
+                    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+                    ///         \\ \lfloor q \rfloor \\ \text{is odd}.
                     /// \end{cases}
                     /// $$
                     ///
@@ -267,7 +272,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
+                    /// See [here](super::shr_round#shr_round).
                     #[inline]
                     fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
                         shr_round_signed_unsigned(self, bits, rm)
@@ -275,8 +280,8 @@ macro_rules! impl_shr_round_signed_unsigned {
                 }
 
                 impl ShrRoundAssign<$u> for $t {
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode, in place.
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode, in place.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
@@ -290,7 +295,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
+                    /// See [here](super::shr_round#shr_round_assign).
                     #[inline]
                     fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
                         *self = self.shr_round(bits, rm);
@@ -305,8 +310,8 @@ apply_to_signeds!(impl_shr_round_signed_unsigned);
 
 fn shr_round_primitive_signed<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
-    U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,
@@ -326,8 +331,8 @@ fn shr_round_primitive_signed<
 
 fn shr_round_assign_primitive_signed<
     T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
-    U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     bits: S,
@@ -352,32 +357,8 @@ macro_rules! impl_shr_round_primitive_signed {
                 impl ShrRound<$u> for $t {
                     type Output = $t;
 
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode.
-                    ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
-                    /// `bits` is non-negative.
-                    ///
-                    /// # Worst-case complexity
-                    /// Constant time and additional memory.
-                    ///
-                    /// # Panics
-                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by $2^b$.
-                    ///
-                    /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
-                    #[inline]
-                    fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        shr_round_primitive_signed(self, bits, rm)
-                    }
-                }
-
-                impl ShrRoundAssign<$u> for $t {
-                    /// Shifts `self` right (divides it by a power of 2) and rounds according to the
-                    /// specified rounding mode, in place.
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
@@ -396,14 +377,16 @@ macro_rules! impl_shr_round_primitive_signed {
                     ///
                     /// $$
                     /// f(x, p, \mathrm{Nearest}) = \begin{cases}
-                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
-                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
-                    ///     \lfloor q \rfloor &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is even} \\\\
+                    ///     \lfloor q \rfloor & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+                    ///     \lceil q \rceil & \text{if}
+                    ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+                    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+                    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even}, \\\\
                     ///     \lceil q \rceil &
-                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
-                    ///     \\ \text{is odd.}
+                    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+                    ///         \\ \lfloor q \rfloor \\ \text{is odd}.
                     /// \end{cases}
                     /// $$
                     ///
@@ -417,7 +400,33 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// not divisible by $2^b$.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::shr_round` module.
+                    /// See [here](super::shr_round#shr_round).
+                    #[inline]
+                    fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
+                        shr_round_primitive_signed(self, bits, rm)
+                    }
+                }
+
+                impl ShrRoundAssign<$u> for $t {
+                    /// Shifts a number right (divides it by a power of 2) and rounds according to
+                    /// the specified rounding mode, in place.
+                    ///
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
+                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
+                    /// `bits` is non-negative.
+                    ///
+                    /// See the [`ShrRound`](super::traits::ShrRound) documentation for details.
+                    ///
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
+                    ///
+                    /// # Panics
+                    /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
+                    /// not divisible by $2^b$.
+                    ///
+                    /// # Examples
+                    /// See [here](super::shr_round#shr_round_assign).
                     #[inline]
                     fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
                         shr_round_assign_primitive_signed(self, bits, rm)

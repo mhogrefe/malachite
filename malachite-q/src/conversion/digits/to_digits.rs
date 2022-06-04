@@ -36,22 +36,28 @@ fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSeque
 }
 
 impl Rational {
-    /// Returns the base-$b$ digits of a `Rational`, taking the `Rational` by value.
+    /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by value.
     ///
-    /// The output has two components. The first is a `Vec` of the digits of the integer portion of
-    /// the `Rational`, least- to most-significant. The second is a `RationalSequence` of the
-    /// digits of the fractional portion.
+    /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
+    /// of the [`Rational`], least- to most-significant. The second is a
+    /// [`RationalSequence`](malachite_base::rational_sequences::RationalSequence) of the digits of
+    /// the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.
     ///
     /// The fractional portion may be very large; the length of the repeating part may be almost as
-    /// large as the denominator. If the `Rational` has a large denominator, consider using
-    /// `digits` instead, which returns an iterator. This function computes the fractional digits
-    /// lazily and doesn't need to compute the entire repeating part.
+    /// large as the denominator. If the [`Rational`] has a large denominator, consider using
+    /// [`digits`](Rational::digits) instead, which returns an iterator. That function computes the
+    /// fractional digits lazily and doesn't need to compute the entire repeating part.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(m2^n)$
+    ///
+    /// $M(n, m) = O(m2^n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.
@@ -64,14 +70,13 @@ impl Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let (before_point, after_point) = Rational::from(3u32).into_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[]");
     ///
     /// let (before_point, after_point) =
-    ///     Rational::from_str("22/7").unwrap().into_digits(&Natural::from(10u32));
+    ///         Rational::from_signeds(22, 7).into_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```
@@ -81,22 +86,28 @@ impl Rational {
         to_digits_helper(self, base)
     }
 
-    /// Returns the base-$b$ digits of a `Rational`, taking the `Rational` by reference.
+    /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by reference.
     ///
-    /// The output has two components. The first is a `Vec` of the digits of the integer portion of
-    /// the `Rational`, least- to most-significant. The second is a `RationalSequence` of the
-    /// digits of the fractional portion.
+    /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
+    /// of the [`Rational`], least- to most-significant. The second is a
+    /// [`RationalSequence`](malachite_base::rational_sequences::RationalSequence) of the digits of
+    /// the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.
     ///
     /// The fractional portion may be very large; the length of the repeating part may be almost as
-    /// large as the denominator. If the `Rational` has a large denominator, consider using
-    /// `digits` instead, which returns an iterator. This function computes the fractional digits
-    /// lazily and doesn't need to compute the entire repeating part.
+    /// large as the denominator. If the [`Rational`] has a large denominator, consider using
+    /// [`digits`](Rational::digits) instead, which returns an iterator. That function computes the
+    /// fractional digits lazily and doesn't need to compute the entire repeating part.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(m2^n)$
+    ///
+    /// $M(n, m) = O(m2^n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.
@@ -109,14 +120,13 @@ impl Rational {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let (before_point, after_point) = Rational::from(3u32).to_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[]");
     ///
     /// let (before_point, after_point) =
-    ///     Rational::from_str("22/7").unwrap().to_digits(&Natural::from(10u32));
+    ///         Rational::from_signeds(22, 7).to_digits(&Natural::from(10u32));
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```

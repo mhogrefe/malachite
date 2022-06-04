@@ -3,6 +3,13 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
 // Returns the length of `xs`, excluding trailing zeros.
 fn limbs_significant_length(xs: &[Limb]) -> usize {
     xs.iter()
@@ -13,19 +20,22 @@ fn limbs_significant_length(xs: &[Limb]) -> usize {
 }
 
 impl Natural {
-    /// Converts a slice of limbs to a `Natural`, in ascending order, so that less significant limbs
-    /// have lower indices in the input slice.
+    /// Converts a slice of [limbs](crate#limbs) to a [`Natural`].
     ///
-    /// This function borrows `xs`. If taking ownership of `xs` is possible, `from_owned_limbs_asc`
-    /// is more efficient.
+    /// The limbs are in ascending order, so that less-significant limbs have lower indices in the
+    /// input slice.
     ///
-    /// Time: worst case O(n)
+    /// This function borrows the limbs. If taking ownership of limbs is possible,
+    /// [`from_owned_limbs_asc`](Self::from_owned_limbs_asc) is more efficient.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(n)$
     ///
-    /// This function is more efficient than `Natural::from_limbs_desc`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    ///
+    /// This function is more efficient than [`from_limbs_desc`](Self::from_limbs_desc).
     ///
     /// # Examples
     /// ```
@@ -36,8 +46,8 @@ impl Natural {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Natural::from_limbs_asc(&[]).to_string(), "0");
-    ///     assert_eq!(Natural::from_limbs_asc(&[123]).to_string(), "123");
+    ///     assert_eq!(Natural::from_limbs_asc(&[]), 0);
+    ///     assert_eq!(Natural::from_limbs_asc(&[123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_limbs_asc(&[3567587328, 232]), 1000000000000u64);
     /// }
@@ -51,19 +61,22 @@ impl Natural {
         }
     }
 
-    /// Converts a slice of limbs to a `Natural`, in descending order, so that less significant
-    /// limbs have higher indices in the input slice.
+    /// Converts a slice of [limbs](crate#limbs) to a [`Natural`].
     ///
-    /// This function borrows `xs`. If taking ownership of `xs` is possible, `from_owned_limbs_desc`
-    /// is more efficient.
+    /// The limbs in descending order, so that less-significant limbs have higher indices in the
+    /// input slice.
     ///
-    /// Time: worst case O(n)
+    /// This function borrows the limbs. If taking ownership of the limbs is possible,
+    /// [`from_owned_limbs_desc`](Self::from_owned_limbs_desc) is more efficient.
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(n)$
     ///
-    /// This function is less efficient than `Natural::from_limbs_asc`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    ///
+    /// This function is less efficient than [`from_limbs_asc`](Self::from_limbs_asc).
     ///
     /// # Examples
     /// ```
@@ -74,8 +87,8 @@ impl Natural {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Natural::from_limbs_desc(&[]).to_string(), "0");
-    ///     assert_eq!(Natural::from_limbs_desc(&[123]).to_string(), "123");
+    ///     assert_eq!(Natural::from_limbs_desc(&[]), 0);
+    ///     assert_eq!(Natural::from_limbs_desc(&[123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_limbs_desc(&[232, 3567587328]), 1000000000000u64);
     /// }
@@ -84,19 +97,22 @@ impl Natural {
         Natural::from_owned_limbs_asc(xs.iter().cloned().rev().collect())
     }
 
-    /// Converts a `Vec` of limbs to a `Natural`, in ascending order, so that less significant limbs
-    /// have lower indices in the input `Vec`.
+    /// Converts a [`Vec`] of [limbs](crate#limbs) to a [`Natural`].
     ///
-    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
-    /// `from_limbs_asc`.
+    /// The limbs are in ascending order, so that less-significant limbs have lower indices in the
+    /// input [`Vec`].
     ///
-    /// Time: worst case O(n)
+    /// This function takes ownership of the limbs. If it's necessary to borrow the limbs instead,
+    /// use [`from_limbs_asc`](Self::from_limbs_asc).
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(1)$
     ///
-    /// This function is more efficient than `Natural::from_limbs_desc`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    ///
+    /// This function is more efficient than [`from_limbs_desc`](Self::from_limbs_desc).
     ///
     /// # Examples
     /// ```
@@ -107,8 +123,8 @@ impl Natural {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Natural::from_owned_limbs_asc(vec![]).to_string(), "0");
-    ///     assert_eq!(Natural::from_owned_limbs_asc(vec![123]).to_string(), "123");
+    ///     assert_eq!(Natural::from_owned_limbs_asc(vec![]), 0);
+    ///     assert_eq!(Natural::from_owned_limbs_asc(vec![123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_owned_limbs_asc(vec![3567587328, 232]), 1000000000000u64);
     /// }
@@ -125,19 +141,22 @@ impl Natural {
         }
     }
 
-    /// Converts a `Vec` of limbs to a `Natural`, in descending order, so that less significant
-    /// limbs have higher indices in the input `Vec`.
+    /// Converts a [`Vec`] of [limbs](crate#limbs) to a [`Natural`].
     ///
-    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
-    /// `from_limbs_desc`.
+    /// The limbs are in descending order, so that less-significant limbs have higher indices in
+    /// the input [`Vec`].
     ///
-    /// Time: worst case O(n)
+    /// This function takes ownership of the limbs. If it's necessary to borrow the limbs instead,
+    /// use [`from_limbs_desc`](Self::from_limbs_desc).
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.len()`
+    /// $M(n) = O(1)$
     ///
-    /// This function is less efficient than `Natural::from_limbs_asc`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    ///
+    /// This function is less efficient than [`from_limbs_asc`](Self::from_limbs_asc).
     ///
     /// # Examples
     /// ```
@@ -148,8 +167,8 @@ impl Natural {
     /// use malachite_nz::platform::Limb;
     ///
     /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Natural::from_owned_limbs_desc(vec![]).to_string(), "0");
-    ///     assert_eq!(Natural::from_owned_limbs_desc(vec![123]).to_string(), "123");
+    ///     assert_eq!(Natural::from_owned_limbs_desc(vec![]), 0);
+    ///     assert_eq!(Natural::from_owned_limbs_desc(vec![123]), 123);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(Natural::from_owned_limbs_desc(vec![232, 3567587328]), 1000000000000u64);
     /// }

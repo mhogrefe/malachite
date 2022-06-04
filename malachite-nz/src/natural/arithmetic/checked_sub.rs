@@ -120,33 +120,44 @@ impl Natural {
 impl CheckedSub<Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second
-    /// `Natural` is greater than the first, returns `None`.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning `None`
+    /// if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \\begin{cases}
+    ///     \operatorname{Some}(x - y) & \text{if} \\quad x \geq y, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::arithmetic::traits::{CheckedSub, Pow};
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(Natural::from(123u32))), "None");
-    /// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(Natural::ZERO)), "Some(123)");
-    /// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(Natural::from(123u32))),
-    ///     "Some(333)");
+    /// assert_eq!(Natural::ZERO.checked_sub(Natural::from(123u32)).to_debug_string(), "None");
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (Natural::trillion() * Natural::from(3u32)).checked_sub(Natural::trillion())
-    ///     ),
+    ///     Natural::from(123u32).checked_sub(Natural::ZERO).to_debug_string(),
+    ///     "Some(123)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(456u32).checked_sub(Natural::from(123u32)).to_debug_string(),
+    ///     "Some(333)"
+    /// );
+    /// assert_eq!(
+    ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
+    ///             .checked_sub(Natural::from(10u32).pow(12)).to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -162,33 +173,42 @@ impl CheckedSub<Natural> for Natural {
 impl<'a> CheckedSub<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
-    /// `Natural` by reference. If the second `Natural` is greater than the first, returns `None`.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and returning `None` if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \\begin{cases}
+    ///     \operatorname{Some}(x - y) & \text{if} \\quad x \geq y, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::arithmetic::traits::{CheckedSub, Pow};
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(&Natural::from(123u32))), "None");
-    /// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(&Natural::ZERO)), "Some(123)");
-    /// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(&Natural::from(123u32))),
+    /// assert_eq!(Natural::ZERO.checked_sub(&Natural::from(123u32)).to_debug_string(), "None");
+    /// assert_eq!(
+    ///     Natural::from(123u32).checked_sub(&Natural::ZERO).to_debug_string(),
+    ///     "Some(123)"
+    /// );
+    /// assert_eq!(Natural::from(456u32).checked_sub(&Natural::from(123u32)).to_debug_string(),
     ///     "Some(333)");
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (Natural::trillion() * Natural::from(3u32)).checked_sub(&Natural::trillion())
-    ///     ),
+    ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
+    ///             .checked_sub(&Natural::from(10u32).pow(12)).to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -204,34 +224,40 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
 impl<'a> CheckedSub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-    /// `Natural` by value. If the second `Natural` is greater than the first, returns `None`.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
+    /// second by value and returning `None` if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \\begin{cases}
+    ///     \operatorname{Some}(x - y) & \text{if} \\quad x \geq y, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::arithmetic::traits::{CheckedSub, Pow};
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(Natural::from(123u32))), "None");
-    /// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(Natural::ZERO)),
+    /// assert_eq!((&Natural::ZERO).checked_sub(Natural::from(123u32)).to_debug_string(), "None");
+    /// assert_eq!((&Natural::from(123u32)).checked_sub(Natural::ZERO).to_debug_string(),
     ///     "Some(123)");
-    /// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(Natural::from(123u32))),
+    /// assert_eq!((&Natural::from(456u32)).checked_sub(Natural::from(123u32)).to_debug_string(),
     ///     "Some(333)");
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(Natural::trillion())
-    ///     ),
+    ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
+    ///             .checked_sub(Natural::from(10u32).pow(12)).to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```
@@ -247,34 +273,40 @@ impl<'a> CheckedSub<Natural> for &'a Natural {
 impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference. If the second
-    /// `Natural` is greater than the first, returns `None`.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference and returning
+    /// `None` if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \\begin{cases}
+    ///     \operatorname{Some}(x - y) & \text{if} \\quad x \geq y, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::arithmetic::traits::{CheckedSub, Pow};
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(&Natural::from(123u32))), "None");
-    /// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(&Natural::ZERO)),
+    /// assert_eq!((&Natural::ZERO).checked_sub(&Natural::from(123u32)).to_debug_string(), "None");
+    /// assert_eq!((&Natural::from(123u32)).checked_sub(&Natural::ZERO).to_debug_string(),
     ///     "Some(123)");
-    /// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(&Natural::from(123u32))),
+    /// assert_eq!((&Natural::from(456u32)).checked_sub(&Natural::from(123u32)).to_debug_string(),
     ///     "Some(333)");
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(&Natural::trillion())
-    ///     ),
+    ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
+    ///             .checked_sub(&Natural::from(10u32).pow(12)).to_debug_string(),
     ///     "Some(2000000000000)"
     /// );
     /// ```

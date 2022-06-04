@@ -19,6 +19,7 @@ use std::cmp::{min, Ordering};
 use std::marker::PhantomData;
 use std::slice::Chunks;
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct FitsInLimbIterator<'a, T>(FILIterator<'a, T>);
 
@@ -302,14 +303,14 @@ impl<'a, T: PrimitiveUnsigned> IIterator<'a, T> {
     }
 }
 
-/// A double-ended iterator over the digits of a `Natural`, where the base is a power of 2. The
-/// base-2 logarithm of the base is specified. The type of each digit is `T`, and `log_base` must be
-/// no larger than the width of `T`. The forward order is ascending (least-significant first). The
-/// iterator does not iterate over the implicit leading zero digits.
+/// A double-ended iterator over the base-$2^k$ $digits of a [`Natural`].
+///
+/// The base-2 logarithm of the base is specified. Each digit has primitive integer type, and
+/// `log_base` must be no larger than the width of that type. The forward order is ascending
+/// (least-significant first). The iterator does not iterate over the implicit leading zero digits.
 ///
 /// This struct also supports retrieving digits by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero digits is allowed.
-#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub enum NaturalPowerOf2DigitPrimitiveIterator<'a, T: PrimitiveUnsigned> {
     Small(PrimitivePowerOf2DigitIterator<Limb, T>),
@@ -322,37 +323,11 @@ pub enum NaturalPowerOf2DigitPrimitiveIterator<'a, T: PrimitiveUnsigned> {
 impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterator<'a, T> {
     type Item = T;
 
-    /// A function to iterate through the digits of a `Natural` in ascending order (least-
-    /// significant first), where the base is a power of 2.
+    /// Iterates through the base-$2^k$ digits of a [`Natural`] in ascending order
+    /// (least-significant first).
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(),
-    ///     None
-    /// );
-    ///
-    /// // 107 = 1223_4
-    /// let n = Natural::from(107u32);
-    /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2);
-    /// assert_eq!(digits.next(), Some(3));
-    /// assert_eq!(digits.next(), Some(2));
-    /// assert_eq!(digits.next(), Some(2));
-    /// assert_eq!(digits.next(), Some(1));
-    /// assert_eq!(digits.next(), None);
-    /// ```
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn next(&mut self) -> Option<T> {
         match *self {
             NaturalPowerOf2DigitPrimitiveIterator::Small(ref mut xs) => xs.next(),
@@ -363,36 +338,6 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterato
         }
     }
 
-    /// A function that returns the length of the digits iterator; that is, the `Natural`'s
-    /// significant base-2<sup>`log_base`</sup>-digit count. The format is
-    /// (lower bound, Option<upper bound>), but in this case it's trivial to always have an exact
-    /// bound.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).size_hint(),
-    ///     (0, Some(0))
-    /// );
-    ///
-    /// let n = Natural::from(105u32);
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2).size_hint(),
-    ///     (4, Some(4))
-    /// );
-    /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         match *self {
             NaturalPowerOf2DigitPrimitiveIterator::Small(ref xs) => xs.size_hint(),
@@ -407,37 +352,11 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterato
 impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator
     for NaturalPowerOf2DigitPrimitiveIterator<'a, T>
 {
-    /// A function to iterate through the digits of a `Natural` in descending order (most-
-    /// significant first), where the base is a power of 2.
+    /// Iterates through the base-$2^k$ digits of a [`Natural`] in descending order
+    /// (most-significant first).
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(),
-    ///     None
-    /// );
-    ///
-    /// // 107 = 1223_4
-    /// let n = Natural::from(107u32);
-    /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2);
-    /// assert_eq!(digits.next_back(), Some(1));
-    /// assert_eq!(digits.next_back(), Some(2));
-    /// assert_eq!(digits.next_back(), Some(2));
-    /// assert_eq!(digits.next_back(), Some(3));
-    /// assert_eq!(digits.next_back(), None);
-    /// ```
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn next_back(&mut self) -> Option<T> {
         match *self {
             NaturalPowerOf2DigitPrimitiveIterator::Small(ref mut xs) => xs.next_back(),
@@ -454,19 +373,19 @@ impl<'a, T: PrimitiveUnsigned> ExactSizeIterator for NaturalPowerOf2DigitPrimiti
 impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
     for NaturalPowerOf2DigitPrimitiveIterator<'a, T>
 {
-    /// A function to retrieve digits by index, where the base is a power of 2. The base-2
-    /// logarithm of the base is specified. The type of each digit is `T`, and `log_base` must be no
-    /// larger than the width of `T`. Indexing at or above the significant digit count returns
-    /// zeros.
+    /// Retrieves the base-$2^k$ digits of a [`Natural`] by index.
     ///
-    /// Time: worst case O(1)
+    /// $f(x, k, i) = d_i$, where $0 \leq d_i < 2^k$ for all $i$ and
+    /// $$
+    /// \sum_{i=0}^\infty2^{ki}d_i = x.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
@@ -520,7 +439,7 @@ fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
     })
 }
 
-fn size_of_limb_iterator<T: PrimitiveUnsigned>(xs: &[Limb]) -> SizeOfLimbIterator<'_, T> {
+const fn size_of_limb_iterator<T: PrimitiveUnsigned>(xs: &[Limb]) -> SizeOfLimbIterator<'_, T> {
     SizeOfLimbIterator(SOLIterator {
         limbs: xs,
         some_remaining: true,
@@ -610,56 +529,24 @@ macro_rules! iterables {
         impl<'a> PowerOf2DigitIterable<$t> for &'a Natural {
             type PowerOf2DigitIterator = NaturalPowerOf2DigitPrimitiveIterator<'a, $t>;
 
-            /// Returns a double-ended iterator over the digits of a `Natural`, where the base is a
-            /// power of 2. The base-2 logarithm of the base is specified. The type of each digit
-            /// is `T`, and `log_base` must be no larger than the width of `T`. The forward order is
-            /// ascending, so that less significant digits appear first. There are no trailing zero
-            /// digits going forward, or leading zero digits going backward.
+            /// Returns a double-ended iterator over the base-$2^k$ digits of a [`Natural`].
             ///
-            /// If it's necessary to get a `Vec` of all the digits, consider using
-            /// `to_power_of_2_digits_asc` or `to_power_of_2_digits_desc` instead.
+            /// The base-2 logarithm of the base is specified. Each digit has primitive integer
+            /// type, and `log_base` must be no larger than the width of that type. The forward
+            /// order is ascending, so that less significant digits appear first. There are no
+            /// trailing zero digits going forward, or leading zero digits going backward.
             ///
-            /// Time: worst case O(1)
+            /// If it's necessary to get a [`Vec`] of all the digits, consider using
+            /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
+            /// or
+            /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)
+            /// instead.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate itertools;
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use itertools::Itertools;
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let n = Natural::ZERO;
-            /// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
-            ///     .next()
-            ///     .is_none());
-            ///
-            /// // 107 = 1223_4
-            /// let n = Natural::from(107u32);
-            /// assert_eq!(
-            ///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2).collect_vec(),
-            ///     vec![3, 2, 2, 1]
-            /// );
-            ///
-            /// let n = Natural::ZERO;
-            /// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
-            ///     .next_back()
-            ///     .is_none());
-            ///
-            /// // 107 = 1223_4
-            /// let n = Natural::from(107u32);
-            /// assert_eq!(
-            ///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2)
-            ///         .rev()
-            ///         .collect_vec(),
-            ///     vec![1, 2, 2, 3]
-            /// );
-            /// ```
+            /// See [here](super::power_of_2_digit_iterable#power_of_2_digits).
             #[inline]
             fn power_of_2_digits(
                 self,
@@ -787,14 +674,14 @@ impl<'a> NIIterator<'a> {
     }
 }
 
-/// A double-ended iterator over the digits of a `Natural`, where the base is a power of 2. The
-/// base-2 logarithm of the base is specified. The type of each digit is `Natural`. The forward
-/// order is ascending (least-significant first). The iterator does not iterate over the implicit
-/// leading zero digits.
+/// A double-ended iterator over the base-$2^k$ digits of a [`Natural`].
+///
+/// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. The
+/// forward order is ascending (least-significant first). The iterator does not iterate over the
+/// implicit leading zero digits.
 ///
 /// This struct also supports retrieving digits by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero digits is allowed.
-#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub enum NaturalPowerOf2DigitIterator<'a> {
     Small(PrimitivePowerOf2DigitIterator<Limb, Limb>),
@@ -806,39 +693,15 @@ pub enum NaturalPowerOf2DigitIterator<'a> {
 impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
     type Item = Natural;
 
-    /// A function to iterate through the digits of a `Natural` in ascending order (least-
-    /// significant first), where the base is a power of 2.
+    /// Iterates through the base-$2^k$ digits of a [`Natural`] in ascending order
+    /// (least-significant first).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `log_base`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next(),
-    ///     None
-    /// );
-    ///
-    /// // 107 = 1223_4
-    /// let n = Natural::from(107u32);
-    /// let mut digits = PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2);
-    /// assert_eq!(digits.next(), Some(Natural::from(3u32)));
-    /// assert_eq!(digits.next(), Some(Natural::from(2u32)));
-    /// assert_eq!(digits.next(), Some(Natural::from(2u32)));
-    /// assert_eq!(digits.next(), Some(Natural::from(1u32)));
-    /// assert_eq!(digits.next(), None);
-    /// ```
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `log_base`.
     fn next(&mut self) -> Option<Natural> {
         match *self {
             NaturalPowerOf2DigitIterator::Small(ref mut xs) => xs.next().map(Natural::from),
@@ -850,36 +713,6 @@ impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
         }
     }
 
-    /// A function that returns the length of the digits iterator; that is, the `Natural`'s
-    /// significant base-2<sup>`log_base`</sup>-digit count. The format is
-    /// (lower bound, Option<upper bound>), but in this case it's trivial to always have an exact
-    /// bound.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).size_hint(),
-    ///     (0, Some(0))
-    /// );
-    ///
-    /// let n = Natural::from(105u32);
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).size_hint(),
-    ///     (4, Some(4))
-    /// );
-    /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         match *self {
             NaturalPowerOf2DigitIterator::Small(ref xs) => xs.size_hint(),
@@ -891,19 +724,19 @@ impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
 }
 
 impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
-    /// A function to iterate through the digits of a `Natural` in descending order (most-
-    /// significant first), where the base is a power of 2.
+    /// Iterate through the base-$2^k$ digits of a [`Natural`] in descending order
+    /// (most-significant first).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `log_base`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `log_base`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
@@ -939,40 +772,40 @@ impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
 impl<'a> ExactSizeIterator for NaturalPowerOf2DigitIterator<'a> {}
 
 impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
-    /// A function to retrieve digits by index, where the base is a power of 2. The base-2
-    /// logarithm of the base is specified. The type of each digit is `Natural`. Indexing at or
-    /// above the significant digit count returns zeros.
+    /// Retrieves the base-$2^k$ digits of a [`Natural`] by index.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, k, i) = d_i$, where $0 \leq d_i < 2^k$ for all $i$ and
+    /// $$
+    /// \sum_{i=0}^\infty2^{ki}d_i = x.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `log_base`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `log_base`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0),
-    ///     0
-    /// );
+    /// assert_eq!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0), 0);
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
     /// let digits = PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2);
-    /// assert_eq!(digits.get(0), Natural::from(3u32));
-    /// assert_eq!(digits.get(1), Natural::from(2u32));
-    /// assert_eq!(digits.get(2), Natural::from(2u32));
-    /// assert_eq!(digits.get(3), Natural::from(1u32));
-    /// assert_eq!(digits.get(4), Natural::from(0u32));
-    /// assert_eq!(digits.get(100), Natural::from(0u32));
+    /// assert_eq!(digits.get(0), 3);
+    /// assert_eq!(digits.get(1), 2);
+    /// assert_eq!(digits.get(2), 2);
+    /// assert_eq!(digits.get(3), 1);
+    /// assert_eq!(digits.get(4), 0);
+    /// assert_eq!(digits.get(100), 0);
     /// ```
     fn get(&self, index: u64) -> Natural {
         match *self {
@@ -1011,23 +844,25 @@ fn irregular_fn(xs: &[Limb], log_base: u64) -> NaturalIrregularIterator<'_> {
 impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     type PowerOf2DigitIterator = NaturalPowerOf2DigitIterator<'a>;
 
-    /// Returns a double-ended iterator over the digits of a `Natural`, where the base is a power of
-    /// two. The base-2 logarithm of the base is specified. The type of each digit is `Natural`. The
+    /// Returns a double-ended iterator over the base-$2^k$ digits of a [`Natural`].
+    ///
+    /// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. The
     /// forward order is ascending, so that less significant digits appear first. There are no
     /// trailing zero digits going forward, or leading zero digits going backward.
     ///
-    /// If it's necessary to get a `Vec` of all the digits, consider using
-    /// `to_power_of_2_digits_asc` or `to_power_of_2_digits_desc` instead.
+    /// If it's necessary to get a [`Vec`] of all the digits, consider using
+    /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
+    /// or
+    /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)
+    /// instead.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate itertools;
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
@@ -1035,9 +870,7 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
-    ///     .next()
-    ///     .is_none());
+    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next().is_none());
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);

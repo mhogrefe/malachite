@@ -7,15 +7,19 @@ macro_rules! impl_mod_power_of_2_square {
         impl ModPowerOf2Square for $t {
             type Output = $t;
 
-            /// Computes `self.square()` mod $2^p$. Assumes the input is already reduced mod $2^p$.
+            /// Squares a number modulo another number $2^k$. Assumes the input is already reduced
+            /// modulo $2^k$.
             ///
-            /// $f(x, p) = y$, where $x, y < 2^p$ and $x^2 \equiv y \mod 2^p$.
+            /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_square` module.
+            /// See [here](super::mod_power_of_2_square#mod_power_of_2_square).
             #[inline]
             fn mod_power_of_2_square(self, pow: u64) -> $t {
                 self.mod_power_of_2_mul(self, pow)
@@ -23,16 +27,19 @@ macro_rules! impl_mod_power_of_2_square {
         }
 
         impl ModPowerOf2SquareAssign for $t {
-            /// Replaces `self` with `self.square()` mod $2^p$. Assumes the input is already
-            /// reduced mod $2^p$.
+            /// Squares a number modulo another number $2^k$, in place. Assumes the input is
+            /// already reduced modulo $2^k$.
             ///
-            /// $x \gets y$, where $x, y < 2^p$ and $x^2 \equiv y \mod 2^p$.
+            /// $x \gets y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_square` module.
+            /// See [here](super::mod_power_of_2_square#mod_power_of_2_square_assign).
             #[inline]
             fn mod_power_of_2_square_assign(&mut self, pow: u64) {
                 self.mod_power_of_2_mul_assign(*self, pow);

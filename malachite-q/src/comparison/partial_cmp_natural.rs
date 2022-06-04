@@ -7,10 +7,15 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrd<Natural> for Rational {
-    /// Compares a `Rational` to a `Natural`.
+    /// Compares a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural).
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -18,10 +23,9 @@ impl PartialOrd<Natural> for Rational {
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert!(Rational::from_str("22/7").unwrap() > Natural::from(3u32));
-    /// assert!(Rational::from_str("22/7").unwrap() < Natural::from(4u32));
+    /// assert!(Rational::from_signeds(22, 7) > Natural::from(3u32));
+    /// assert!(Rational::from_signeds(22, 7) < Natural::from(4u32));
     /// ```
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         // First check signs
@@ -65,10 +69,15 @@ impl PartialOrd<Natural> for Rational {
 }
 
 impl PartialOrd<Rational> for Natural {
-    /// Compares a `Natural` to a `Rational`.
+    /// Compares a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -76,10 +85,9 @@ impl PartialOrd<Rational> for Natural {
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert!(Natural::from(3u32) < Rational::from_str("22/7").unwrap());
-    /// assert!(Natural::from(4u32) > Rational::from_str("22/7").unwrap());
+    /// assert!(Natural::from(3u32) < Rational::from_signeds(22, 7));
+    /// assert!(Natural::from(4u32) > Rational::from_signeds(22, 7));
     /// ```
     #[inline]
     fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {

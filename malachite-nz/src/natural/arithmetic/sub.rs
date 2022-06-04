@@ -8,13 +8,14 @@ use std::ops::{Sub, SubAssign};
 // `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
 // there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_sub_1 from gmp.h, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_sub_1` from `gmp.h`, GMP 6.2.1, where the result is returned.
 pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
@@ -37,16 +38,17 @@ pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 // Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
 // `Natural`. The output slice must be at least as long as the input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs`.
 //
-// This is mpn_sub_1 from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_sub_1` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
@@ -69,11 +71,15 @@ pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 // `Limb` from the `Natural` and writes the limbs of the result to the input slice. Returns whether
 // there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
+// input slice.
 pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
     for x in xs.iter_mut() {
         if x.overflowing_sub_assign(y) {
@@ -85,6 +91,8 @@ pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
     y != 0
 }}
 
+// # Worst-case complexity
+// Constant time and additional memory.
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let b = *borrow;
     let mut diff;
@@ -100,16 +108,17 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 // whether there was a borrow left over; that is, whether the second `Natural` was greater than the
 // first `Natural`. The first slice must be at least as long as the second.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is returned.
+// This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is returned.
 pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -134,16 +143,17 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 // `Natural` was greater than the first `Natural`. The output slice must be at least as long as
 // either input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -161,16 +171,17 @@ pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
 // greater than the first `Natural`. The output slice must be at least as long as the first input
 // slice and the first input slice must be at least as long as the second.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
 //
-// This is mpn_sub from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1.
 pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -192,16 +203,18 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // the first (left) slice. Returns whether there was a borrow left over; that is, whether the
 // second `Natural` was greater than the first `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// first input.
 pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
@@ -217,16 +230,18 @@ pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
 // `Natural` was greater than the first `Natural`. The first slice must be at least as long as the
 // second.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
+// This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// first input.
 pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -246,16 +261,18 @@ pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 // the second (right) slice. Returns whether there was a borrow left over; that is, whether the
 // second `Natural` was greater than the first `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// second input.
 pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
@@ -270,17 +287,19 @@ pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Lim
 // whether there was a borrow left over; that is, whether the second `Natural` was greater than the
 // first `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input (which
-// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// second input (which has `len` limbs) and the second input has enough space past `len` to
+// accomodate the output.
 pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -303,11 +322,13 @@ pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], le
 // that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
 // be at least as long as the second.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len()`, m = `xs.len()` - `ys.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
+// `xs.len()` - `ys.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
@@ -335,17 +356,18 @@ pub_crate_test! {limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -
 // the second `Natural` was greater than the first `Natural`. As implied by the name, the input
 // slices may overlap.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` - `right_start`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len() - right_start`.
 //
 // # Panics
 // Panics if `right_start` is greater than `xs.len()`.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input, and the
-// two inputs are possibly-overlapping subslices of a single slice.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
+// first input, and the two inputs are possibly-overlapping subslices of a single slice.
 pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
     xs: &mut [Limb],
     right_start: usize
@@ -364,17 +386,19 @@ pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
 // than the first `Natural`. As implied by the name, the input and output ranges may overlap. `xs`
 // must be at least as long as `ys`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
 // # Panics
 // Panics if `xs.len()` is shorter than `ys.len()`.
 //
-// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is a prefix of a slice and the left
-// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
+// This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is a prefix of a
+// slice and the left operand of the subtraction is a suffix of the same slice, and the prefix and
+// suffix may overlap.
 pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -392,16 +416,18 @@ pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: 
 // `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
 // there was a borrow left over. The output slice must be at least as long as either input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp, up, and vp are disjoint.
+// This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp`, `up`, and `vp` are
+// disjoint.
 pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -420,16 +446,17 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
 // `true` is 1), writing the `xs.len()` limbs of the result to the first (left) slice. Return
 // whether there was a borrow left over.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+// This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `up`.
 pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -447,16 +474,17 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
 // `true` is 1), writing the `xs.len()` limbs of the result to the second (right) slice. Returns
 // whether there was a borrow left over.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as vp.
+// This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `vp`.
 pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -492,27 +520,28 @@ impl Natural {
 impl Sub<Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-    /// assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(Natural::from(123u32) - Natural::ZERO, 123);
+    /// assert_eq!(Natural::from(456u32) - Natural::from(123u32), 333);
     /// assert_eq!(
-    ///     (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     Natural::from(10u32).pow(12) * Natural::from(3u32) - Natural::from(10u32).pow(12),
+    ///     2000000000000u64
     /// );
     /// ```
     fn sub(self, other: Natural) -> Natural {
@@ -524,28 +553,29 @@ impl Sub<Natural> for Natural {
 impl<'a> Sub<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
-    /// `Natural` by reference.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-    /// assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(Natural::from(123u32) - &Natural::ZERO, 123);
+    /// assert_eq!(Natural::from(456u32) - &Natural::from(123u32), 333);
     /// assert_eq!(
-    ///     (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     Natural::from(10u32).pow(12) * Natural::from(3u32) - &Natural::from(10u32).pow(12),
+    ///     2000000000000u64
     /// );
     /// ```
     fn sub(self, other: &'a Natural) -> Natural {
@@ -557,28 +587,29 @@ impl<'a> Sub<&'a Natural> for Natural {
 impl<'a> Sub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-    /// `Natural` by value.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
+    /// second by value.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(&Natural::from(123u32) - Natural::ZERO, 123);
+    /// assert_eq!(&Natural::from(456u32) - Natural::from(123u32), 333);
     /// assert_eq!(
-    ///     (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     &(Natural::from(10u32).pow(12) * Natural::from(3u32)) - Natural::from(10u32).pow(12),
+    ///     2000000000000u64
     /// );
     /// ```
     fn sub(self, other: Natural) -> Natural {
@@ -590,27 +621,28 @@ impl<'a> Sub<Natural> for &'a Natural {
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(&Natural::from(123u32) - &Natural::ZERO, 123);
+    /// assert_eq!(&Natural::from(456u32) - &Natural::from(123u32), 333);
     /// assert_eq!(
-    ///     (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     &(Natural::from(10u32).pow(12) * Natural::from(3u32)) - &Natural::from(10u32).pow(12),
+    ///     2000000000000u64
     /// );
     /// ```
     fn sub(self, other: &'a Natural) -> Natural {
@@ -621,28 +653,32 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 }
 
 impl SubAssign<Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the right-hand
-    /// side by value.
+    /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is greater than `self`.
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let mut x = Natural::trillion() * Natural::from(10u32);
-    /// x -= Natural::trillion();
-    /// x -= (Natural::trillion() * Natural::from(2u32));
-    /// x -= (Natural::trillion() * Natural::from(3u32));
-    /// x -= (Natural::trillion() * Natural::from(4u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// let mut x = Natural::from(10u32).pow(12) * Natural::from(10u32);
+    /// x -= Natural::from(10u32).pow(12);
+    /// x -= Natural::from(10u32).pow(12) * Natural::from(2u32);
+    /// x -= Natural::from(10u32).pow(12) * Natural::from(3u32);
+    /// x -= Natural::from(10u32).pow(12) * Natural::from(4u32);
+    /// assert_eq!(x, 0);
     /// ```
     fn sub_assign(&mut self, other: Natural) {
         if self.sub_assign_no_panic(other) {
@@ -652,28 +688,32 @@ impl SubAssign<Natural> for Natural {
 }
 
 impl<'a> SubAssign<&'a Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the right-hand
-    /// side by reference.
+    /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is greater than `self`.
     ///
     /// # Examples
     /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let mut x = Natural::trillion() * Natural::from(10u32);
-    /// x -= &Natural::trillion();
-    /// x -= &(Natural::trillion() * Natural::from(2u32));
-    /// x -= &(Natural::trillion() * Natural::from(3u32));
-    /// x -= &(Natural::trillion() * Natural::from(4u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// let mut x = Natural::from(10u32).pow(12) * Natural::from(10u32);
+    /// x -= &Natural::from(10u32).pow(12);
+    /// x -= &(Natural::from(10u32).pow(12) * Natural::from(2u32));
+    /// x -= &(Natural::from(10u32).pow(12) * Natural::from(3u32));
+    /// x -= &(Natural::from(10u32).pow(12) * Natural::from(4u32));
+    /// assert_eq!(x, 0);
     /// ```
     fn sub_assign(&mut self, other: &'a Natural) {
         if self.sub_assign_ref_no_panic(other) {

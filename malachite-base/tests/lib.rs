@@ -134,6 +134,7 @@ pub mod chars {
         pub mod random_chars;
     }
 }
+pub mod extra_variadic;
 pub mod iterators {
     pub mod bit_distributor {
         pub mod bit_map_as_slice;
@@ -179,6 +180,7 @@ pub mod num {
         pub mod checked_abs;
         pub mod checked_add_mul;
         pub mod checked_neg;
+        pub mod checked_pow;
         pub mod checked_square;
         pub mod checked_sub_mul;
         pub mod coprime_with;
@@ -259,21 +261,21 @@ pub mod num {
         pub mod wrapping_square;
         pub mod wrapping_sub;
         pub mod wrapping_sub_mul;
-        pub mod x_mul_y_is_zz;
-        pub mod xx_add_yy_is_zz;
-        pub mod xx_div_mod_y_is_qr;
-        pub mod xx_sub_yy_is_zz;
-        pub mod xxx_add_yyy_is_zzz;
-        pub mod xxx_sub_yyy_is_zzz;
-        pub mod xxxx_add_yyyy_is_zzzz;
+        pub mod x_mul_y_to_zz;
+        pub mod xx_add_yy_to_zz;
+        pub mod xx_div_mod_y_to_qr;
+        pub mod xx_sub_yy_to_zz;
+        pub mod xxx_add_yyy_to_zzz;
+        pub mod xxx_sub_yyy_to_zzz;
+        pub mod xxxx_add_yyyy_to_zzzz;
     }
     pub mod basic {
         pub mod constants;
         pub mod iverson;
     }
     pub mod comparison {
+        pub mod cmp_abs_partial_cmp_abs_and_comparators;
         pub mod eq_abs_partial_eq_abs_and_comparators;
-        pub mod ord_abs_partial_ord_abs_and_comparators;
     }
     pub mod conversion {
         pub mod digits {

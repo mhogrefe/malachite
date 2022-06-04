@@ -1,8 +1,8 @@
 use std::iter::{once, Chain, Once};
 
-/// Generates all `Options`, except `None`, with values from a given iterator.
+/// Generates all [`Option`]s except `None`, with values from a given iterator.
 ///
-/// This `struct` is created by the `exhaustive_somes` function. See its documentation for more.
+/// This `struct` is created by [`exhaustive_somes`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveSomes<I: Iterator> {
     xs: I,
@@ -16,21 +16,17 @@ impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
     }
 }
 
-/// Generates all `Options`, except `None`, with values from a given iterator.
+/// Generates all [`Option`]s except `None`, with values from a given iterator.
 ///
 /// The elements of the given iterator are wrapped in `Some` and generated in the original order.
 ///
 /// The output length is `xs.count()`.
-///
-/// # Complexity per iteration
-/// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::options::exhaustive::exhaustive_somes;
 ///
 /// assert_eq!(
@@ -39,25 +35,21 @@ impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
+pub const fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
     ExhaustiveSomes { xs }
 }
 
-/// Generates all `Options` with values from a given iterator.
+/// Generates all [`Option`]s with values from a given iterator.
 ///
 /// `None` comes first, followed by the elements of the given iterator wrapped in `Some`.
 ///
 /// The output length is `xs.count()`.
-///
-/// # Complexity per iteration
-/// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::options::exhaustive::exhaustive_options;
 ///
 /// assert_eq!(

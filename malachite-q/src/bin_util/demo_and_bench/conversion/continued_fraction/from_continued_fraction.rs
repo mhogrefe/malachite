@@ -28,7 +28,7 @@ fn demo_rational_from_continued_fraction(gm: GenMode, config: GenConfig, limit: 
             "from_continued_fraction({}, {:?}) = {}",
             floor.clone(),
             xs.clone(),
-            Rational::from_continued_fraction(floor, xs)
+            Rational::from_continued_fraction(floor, xs.into_iter())
         );
     }
 }
@@ -42,7 +42,7 @@ fn demo_rational_from_continued_fraction_ref(gm: GenMode, config: GenConfig, lim
             "from_continued_fraction_ref({}, {:?}) = {}",
             floor,
             xs,
-            Rational::from_continued_fraction_ref(&floor, &xs)
+            Rational::from_continued_fraction_ref(&floor, xs.iter())
         );
     }
 }
@@ -63,7 +63,7 @@ fn benchmark_rational_from_continued_fraction_algorithms(
         &pair_1_vec_natural_sum_bits_bucketer(),
         &mut [
             ("default", &mut |(xs, floor)| {
-                no_out!(Rational::from_continued_fraction(floor, xs))
+                no_out!(Rational::from_continued_fraction(floor, xs.into_iter()))
             }),
             ("alt", &mut |(xs, floor)| {
                 no_out!(from_continued_fraction_alt(floor, xs))
@@ -89,11 +89,15 @@ fn benchmark_rational_from_continued_fraction_evaluation_strategy(
         &mut [
             (
                 "Rational::from_continued_fraction(Integer, Vec<Natural>)",
-                &mut |(xs, floor)| no_out!(Rational::from_continued_fraction(floor, xs)),
+                &mut |(xs, floor)| {
+                    no_out!(Rational::from_continued_fraction(floor, xs.into_iter()))
+                },
             ),
             (
                 "Rational::from_continued_fraction_ref(&Integer, &[Natural])",
-                &mut |(xs, floor)| no_out!(Rational::from_continued_fraction_ref(&floor, &xs)),
+                &mut |(xs, floor)| {
+                    no_out!(Rational::from_continued_fraction_ref(&floor, xs.iter()))
+                },
             ),
         ],
     );

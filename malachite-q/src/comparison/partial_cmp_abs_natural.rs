@@ -8,29 +8,33 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrdAbs<Natural> for Rational {
-    /// Compares the absolute value of a `Rational` to the absolute value of a `Natural`.
+    /// Compares the absolute values of a [`Rational`] and a
+    /// [`Natural`](malachite_nz::natural::Natural).
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Rational::from_str("22/7").unwrap().partial_cmp_abs(&Natural::from(3u32)),
+    ///     Rational::from_signeds(22, 7).partial_cmp_abs(&Natural::from(3u32)),
     ///     Some(Ordering::Greater)
     /// );
     /// assert_eq!(
-    ///     Rational::from_str("-22/7").unwrap().partial_cmp_abs(&Natural::from(3u32)),
+    ///     Rational::from_signeds(-22, 7).partial_cmp_abs(&Natural::from(3u32)),
     ///     Some(Ordering::Greater)
     /// );
     /// ```
@@ -73,29 +77,33 @@ impl PartialOrdAbs<Natural> for Rational {
 }
 
 impl PartialOrdAbs<Rational> for Natural {
-    /// Compares the absolute value of a `Natural` to the absolute value of a `Rational`.
+    /// Compares the absolute values of a [`Natural`](malachite_nz::natural::Natural) and a
+    /// [`Rational`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_str("22/7").unwrap()),
+    ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_signeds(22, 7)),
     ///     Some(Ordering::Less)
     /// );
     /// assert_eq!(
-    ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_str("-22/7").unwrap()),
+    ///     Natural::from(3u32).partial_cmp_abs(&Rational::from_signeds(-22, 7)),
     ///     Some(Ordering::Less)
     /// );
     /// ```

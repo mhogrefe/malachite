@@ -298,19 +298,18 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 /// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
 /// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
 /// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
 /// more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but note
-/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
+/// that the iteration time increases linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[0, 2^W)$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[0, 2^W)$, where $W$ is the width of the type. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S,
 /// $$
-///
 /// and whenever $n, n + 1 \in S$,
 /// $$
 /// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
@@ -319,11 +318,11 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
@@ -331,18 +330,13 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
+///     prefix_to_string(geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1), 10),
+///     "[1, 0, 0, 3, 4, 4, 1, 0, 0, 1, ...]"
 /// )
 /// ```
 ///
@@ -353,15 +347,15 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{1-(1-p)^{2^W}} & 0 \\leq n < 2^W \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^np}{1-(1-p)^{2^W}} & \text{if} \\quad 0 \\leq n < 2^W, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(0) = p = \frac{1}{m_u + 1}.
+///     \lim_{W \to \infty} P(n) = (1-p)^np.
 /// $$
 pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
@@ -380,19 +374,18 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 /// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
 /// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
 /// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
 /// more quickly they drop. $m_u$ must be greater than one. It may be arbitrarily high, but note
-/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
+/// that the iteration time increases linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[1, 2^W)$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[1, 2^W)$, where $W$ is the width of the type. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
-///
 /// and whenever $n, n + 1 \in S$,
 /// $$
 /// \frac{P(n)}{P(n+1)} = \frac{m_u}{m_u - 1}.
@@ -401,29 +394,24 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
+/// Panics if `um_denominator` is zero or if `um_numerator <= um_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_positive_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_positive_unsigneds::<u64>(EXAMPLE_SEED, 2, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
+///     prefix_to_string(geometric_random_positive_unsigneds::<u64>(EXAMPLE_SEED, 2, 1), 10),
+///     "[2, 1, 1, 4, 5, 5, 2, 1, 1, 2, ...]"
 /// )
 /// ```
 ///
@@ -434,15 +422,15 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^W-1}} & 0 < n < 2^W \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^W-1}} & \text{if} \\quad 0 < n < 2^W, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(1) = p = \frac{1}{m_u}.
+///     \lim_{W \to \infty} P(n) = (1-p)^{n-1}p.
 /// $$
 pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
@@ -464,18 +452,18 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// the unadjusted mean. It is equal to `abs_um_numerator / abs_um_denominator`. The unadjusted
 /// mean is what the mean generated value would be if the distribution were not truncated, and were
 /// restricted to non-negative values. If $m_u$ is significantly lower than `T::MAX`, which is
 /// usually the case, then it is very close to the actual mean of the distribution restricted to
 /// positive values. The higher $m_u$ is, the more gently the probabilities drop; the lower it is,
 /// the more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but
-/// note that the iteration time increases linearly with `abs_um_numerator` + `abs_um_denominator`.
+/// note that the iteration time increases linearly with `abs_um_numerator + abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[-2^{W-1}, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[-2^{W-1}, 2^{W-1})$, where $W$ is the width of the type. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 /// Whenever $n \geq 0$ and $n, n + 1 \in S$,
 /// $$
@@ -491,12 +479,12 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ =
-/// `abs_um_numerator` + `abs_um_denominator`.
+/// `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
 /// Panics if `abs_um_numerator` or `abs_um_denominator` are zero, or, if after being reduced to
@@ -504,18 +492,13 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[-1, -1, -1, 1, -2, 1, 0, 0, 0, 0]
+///     prefix_to_string(geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1), 10),
+///     "[-1, -1, -1, 1, -2, 1, 0, 0, 0, 0, ...]"
 /// )
 /// ```
 ///
@@ -525,15 +508,16 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^{|n|}p}{((1-p)^{2^{W-1}}-1)(p-2)} & -2^{W-1} \leq n < 2^{W-1} \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^{|n|}p}{((1-p)^{2^{W-1}}-1)(p-2)} &
+///         \text{if} \\quad -2^{W-1} \leq n < 2^{W-1}, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(0) = \frac{p}{2-p} = \frac{1}{2 m_u + 1}.
+/// \lim_{W \to \infty} P(n) = \frac{(1-p)^{|n|}p}{2-p}.
 /// $$
 pub fn geometric_random_signeds<T: PrimitiveSigned>(
     seed: Seed,
@@ -552,19 +536,18 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 /// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
 /// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
 /// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
 /// more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but note
-/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
+/// that the iteration time increases linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[0, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[0, 2^{W-1})$, where $W$ is the width of the type. Then we have
 /// $$
 ///     P(n) \neq 0 \leftrightarrow n \in S
 /// $$
-///
 /// and whenever $n, n + 1 \in S$,
 /// $$
 /// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
@@ -573,11 +556,11 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
@@ -585,18 +568,13 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_natural_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
+///     prefix_to_string(geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1), 10),
+///     "[1, 0, 0, 3, 4, 4, 1, 0, 0, 1, ...]"
 /// )
 /// ```
 ///
@@ -607,15 +585,18 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{1-(1-p)^{2^{W-1}}} & 0 \\leq n < 2^{W-1} \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^np}{1-(1-p)^{2^{W-1}}} & \text{if} \\quad 0 \\leq n < 2^{W-1}, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(0) = p = \frac{1}{m_u + 1}.
+/// \lim_{W \to \infty} P(n) = \\begin{cases}
+///     (1-p)^np & \text{if} \\quad n \geq 0, \\\\
+///     0 & \\text{otherwise}.
+/// \\end{cases}
 /// $$
 pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
     seed: Seed,
@@ -634,15 +615,15 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 /// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
 /// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
 /// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
 /// more quickly they drop. $m_u$ must be greater than one. It may be arbitrarily high, but note
-/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
+/// that the iteration time increases linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[1, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[1, 2^{W-1})$, where $W$ is the width of the type. Then we have
 /// $$
 ///     P(n) \neq 0 \leftrightarrow n \in S
 /// $$
@@ -655,29 +636,24 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
+/// Panics if `um_denominator` is zero or if `um_numerator <= um_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_positive_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
+///     prefix_to_string(geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1), 10),
+///     "[2, 1, 1, 4, 5, 5, 2, 1, 1, 2, ...]"
 /// )
 /// ```
 ///
@@ -688,15 +664,18 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^{W-1}-1}} & 0 < n < 2^{W-1} \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^{W-1}-1}} & \text{if} \\quad 0 < n < 2^{W-1}, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(1) = p = \frac{1}{m_u}.
+/// \lim_{W \to \infty} P(n) = \\begin{cases}
+///     (1-p)^{n-1}p & \text{if} \\quad n > 0, \\\\
+///     0 & \\text{otherwise}.
+/// \\end{cases}
 /// $$
 pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     seed: Seed,
@@ -716,17 +695,17 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// sequence; that's where the "geometric" comes from. Values below `T::MIN` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// the unadjusted mean. It is equal to `abs_um_numerator / abs_um_denominator`. The unadjusted
 /// mean is what the mean of the absolute values of the generated values would be if the
 /// distribution were not truncated. If $m_u$ is significantly lower than `-T::MIN`, which is
 /// usually the case, then it is very close to the actual mean of the absolute values. The higher
 /// $m_u$ is, the more gently the probabilities drop; the lower it is, the more quickly they drop.
 /// $m_u$ must be greater than one. It may be arbitrarily high, but note that the iteration time
 /// increases linearly with
-/// `abs_um_numerator` + `abs_um_denominator`.
+/// `abs_um_numerator + abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[-2^{W-1}, 0)$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[-2^{W-1}, 0)$, where $W$ is the width of the type. Then we have
 /// $$
 ///     P(n) \neq 0 \leftrightarrow n \in S
 /// $$
@@ -739,30 +718,25 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and
-/// $n$ = `abs_um_numerator` + `abs_um_denominator`.
+/// $n$ = `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
-/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator` <= `abs_um_denominator`.
+/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator <= abs_um_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_negative_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2]
+///     prefix_to_string(geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1), 10),
+///     "[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2, ...]"
 /// )
 /// ```
 ///
@@ -773,15 +747,18 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^{-n-1}p}{1-(1-p)^{2^{W-1}}} & -2^{W-1} \leq n < 0 \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^{-n-1}p}{1-(1-p)^{2^{W-1}}} & \text{if} \\quad -2^{W-1} \leq n < 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(-1) = p = \frac{1}{m_u}.
+/// \lim_{W \to \infty} P(n) = \\begin{cases}
+///     (1-p)^{-n-1}p & \text{if} \\quad n < 0, \\\\
+///     0 & \\text{otherwise}.
+/// \\end{cases}
 /// $$
 pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
     seed: Seed,
@@ -809,21 +786,22 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// the unadjusted mean. It is equal to `abs_um_numerator / abs_um_denominator`. The unadjusted
 /// mean is what the mean of the absolute values of the generated values would be if the
 /// distribution were not truncated. If $m_u$ is significantly lower than `T::MAX`, which is usually
 /// the case, then it is very close to the actual mean of the absolute values. The higher $m_u$ is,
 /// the more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must
 /// be greater than one. It may be arbitrarily high, but note that the iteration time increases
-/// linearly with `abs_um_numerator` + `abs_um_denominator`.
+/// linearly with `abs_um_numerator + abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
-/// equal $[-2^{W-1}, 2^{W-1}) \setminus \\{0\\}$, where $W$ is `T::WIDTH`. Then we have
+/// equal $[-2^{W-1}, 2^{W-1}) \setminus \\{0\\}$, where $W$ is the width of the type`. Then we
+/// have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 /// $$
-///     P(1) = P(-1)
+/// P(1) = P(-1)
 /// $$
 /// Whenever $n > 0$ and $n, n + 1 \in S$,
 /// $$
@@ -839,30 +817,25 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and
-/// $n$ = `abs_um_numerator` + `abs_um_denominator`.
+/// $n$ = `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
-/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator` <= `abs_um_denominator`.
+/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator <= abs_um_denominator`.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_nonzero_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1]
+///     prefix_to_string(geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1), 10),
+///     "[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1, ...]"
 /// )
 /// ```
 ///
@@ -874,15 +847,18 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// $$
 /// P(n) = \\begin{cases}
 ///     \frac{(1-p)^{|n|}p}{(1-p)^{2^{W-1}}(p-2)-2p+2} &
-///         -2^{W-1} \leq n < 0 \\ \mathrm{or} \\ 0 < n < -2^{W-1} \\\\
-///     0 & \\text{otherwise}
+///         \text{if} \\quad -2^{W-1} \leq n < 0 \\ \mathrm{or} \\ 0 < n < -2^{W-1}, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// It's also useful to note that
 /// $$
-///     \lim_{W \to \infty} P(1) = \frac{p}{2} = \frac{1}{2 m_u}.
+/// \lim_{W \to \infty} P(n) = \\begin{cases}
+///     \frac{(1-p)^{|n|}p}{2-2p} & \text{if} \\quad n \neq 0, \\\\
+///     0 & \\text{otherwise}.
+/// \\end{cases}
 /// $$
 pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
     seed: Seed,
@@ -905,20 +881,20 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 /// With this distribution, the probability of a value being generated decreases as the value
 /// increases. The probabilities $P(a), P(a + 1), P(a + 2), \ldots$ decrease in a geometric
 /// sequence; that's where the "geometric" comes from. Unlike a true geometric distribution, this
-/// distribution is truncated, meaning that values above `b` are never generated.
+/// distribution is truncated, meaning that values above $b$ are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
-/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// significantly lower than $b$, then it is very close to the actual mean. The higher $m_u$ is, the
 /// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
-/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
-/// linearly with `um_numerator` + `um_denominator`.
+/// greater than $a$. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
 /// equal $[a, b)$. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 ///
 /// and whenever $n, n + 1 \in S$,
@@ -929,31 +905,26 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
-/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
 /// overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_unsigned_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_unsigned_range::<u16>(EXAMPLE_SEED, 1, 7, 3, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
+///     prefix_to_string(geometric_random_unsigned_range::<u16>(EXAMPLE_SEED, 1, 7, 3, 1), 10),
+///     "[2, 5, 2, 3, 4, 2, 5, 6, 1, 2, ...]"
 /// )
 /// ```
 ///
@@ -964,14 +935,9 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & a \\leq n < b \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & \text{if} \\quad a \\leq n < b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
-/// $$
-///
-/// It's also useful to note that
-/// $$
-///     \lim_{b \to \infty} P(a) = p = \frac{1}{m_u - a + 1}.
 /// $$
 #[inline]
 pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
@@ -993,20 +959,20 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 /// With this distribution, the probability of a value being generated decreases as the value
 /// increases. The probabilities $P(a), P(a + 1), P(a + 2), \ldots$ decrease in a geometric
 /// sequence; that's where the "geometric" comes from. Unlike a true geometric distribution, this
-/// distribution is truncated, meaning that values above `b` are never generated.
+/// distribution is truncated, meaning that values above $b$ are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// the unadjusted mean. It is equal to `um_numerator / um_denominator`. The unadjusted mean is
 /// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
-/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// significantly lower than $b$, then it is very close to the actual mean. The higher $m_u$ is, the
 /// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
-/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
-/// linearly with `um_numerator` + `um_denominator`.
+/// greater than $a$. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator + um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
 /// equal $[a, b]$. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 ///
 /// and whenever $n, n + 1 \in S$,
@@ -1017,31 +983,29 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
-/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
 /// overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_unsigned_inclusive_range::<u16>(EXAMPLE_SEED, 1, 6, 3, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
+///     prefix_to_string(
+///         geometric_random_unsigned_inclusive_range::<u16>(EXAMPLE_SEED, 1, 6, 3, 1),
+///         10
+///     ),
+///     "[2, 5, 2, 3, 4, 2, 5, 6, 1, 2, ...]"
 /// )
 /// ```
 ///
@@ -1052,14 +1016,9 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & a \\leq n \\leq b \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & \text{if} \\quad a \\leq n \\leq b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
-/// $$
-///
-/// It's also useful to note that
-/// $$
-///     \lim_{b \to \infty} P(a) = p = \frac{1}{m_u - a + 1}.
 /// $$
 #[inline]
 pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
@@ -1091,20 +1050,20 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// and $b$.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// the unadjusted mean. It is equal to `abs_um_numerator / abs_um_denominator`. The unadjusted
 /// mean is what the mean of the absolute values of the generated values would be if the
-/// distribution were not truncated. If $m_u$ is significantly lower than `b`, then it is very close
+/// distribution were not truncated. If $m_u$ is significantly lower than $b$, then it is very close
 /// to the actual mean of the absolute values. The higher $m_u$ is, the more gently the
-/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than `a`.
+/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than $a$.
 /// It may be arbitrarily high, but note that the iteration time increases linearly with
-/// `abs_um_numerator` + `abs_um_denominator`.
+/// `abs_um_numerator + abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support
 /// $S \subset \Z$ equal $[a, b)$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically
 /// parametrized by a parameter $p$. The relationship between $p$ and $m_u$ is
 /// $m_u = \frac{1}{p} + c - 1$, or $p = \frac{1}{m_u - c + 1}$. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 /// If $0, 1 \in S$, then
 /// $$
@@ -1124,31 +1083,26 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
-/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
 /// overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_signed_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 100, 30, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
+///     prefix_to_string(geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 100, 30, 1), 10),
+///     "[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46, ...]"
 /// )
 /// ```
 ///
@@ -1156,11 +1110,11 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & 0 \\leq a \\leq n < b \\\\
-///     \frac{(1-p)^{-n}p}{(1-p)^{1-b}-(1-p)^{1-a}} & a \\leq n < b \\leq 1 \\\\
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & \text{if} \\quad 0 \\leq a \\leq n < b, \\\\
+///     \frac{(1-p)^{-n}p}{(1-p)^{1-b}-(1-p)^{1-a}} & \text{if} \\quad a \\leq n < b \\leq 1, \\\\
 ///     \frac{(1-p)^{|n|}p}{2-p-(1-p)^{1-a}-(1-p)^b} &
-///         a < 0 < 1 < b \\ \mathrm{and} \\ a \\leq n < b \\\\
-///     0 & \\text{otherwise}
+///         \text{if} \\quad a < 0 < 1 < b \\ \mathrm{and} \\ a \\leq n < b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 #[inline]
@@ -1216,20 +1170,20 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// that case the distribution is doubled: it is highest at zero and is truncated at $a$ and $b$.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// the unadjusted mean. It is equal to `abs_um_numerator / abs_um_denominator`. The unadjusted
 /// mean is what the mean of the absolute values of the generated values would be if the
-/// distribution were not truncated. If $m_u$ is significantly lower than `b`, then it is very close
+/// distribution were not truncated. If $m_u$ is significantly lower than $b$, then it is very close
 /// to the actual mean of the absolute values. The higher $m_u$ is, the more gently the
-/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than `a`.
+/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than $a$.
 /// It may be arbitrarily high, but note that the iteration time increases linearly with
-/// `abs_um_numerator` + `abs_um_denominator`.
+/// `abs_um_numerator + abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support
 /// $S \subset \Z$ equal $[a, b]$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically
 /// parametrized by a parameter $p$. The relationship between $p$ and $m_u$ is
 /// $m_u = \frac{1}{p} + c - 1$, or $p = \frac{1}{m_u - c + 1}$. Then we have
 /// $$
-///     P(n) \neq 0 \leftrightarrow n \in S
+/// P(n) \neq 0 \leftrightarrow n \in S
 /// $$
 /// If $0, 1 \in S$, then
 /// $$
@@ -1249,31 +1203,26 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E\[T\] = O(n)$
+/// $T(n) = O(n)$
 ///
-/// $E\[M\] = O(1)$
+/// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
-/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
 /// overflow.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::geometric::geometric_random_signed_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1)
-///         .take(10)
-///         .collect_vec(),
-///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
+///     prefix_to_string(geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1), 10),
+///     "[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46, ...]"
 /// )
 /// ```
 ///
@@ -1281,11 +1230,12 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & 0 \\leq a \\leq n \\leq b \\\\
-///     \frac{(1-p)^{-n}p}{(1-p)^{-b}-(1-p)^{1-a}} & a \\leq n \\leq b \\leq 0 \\\\
-///     \frac{(1-p)^{|n|}p}{2-p-(1-p)^{1-a}-(1-p)^{b+1}} &
-///         a < 0 < b \\ \mathrm{and} \\ a \\leq n \\leq b \\\\
-///     0 & \\text{otherwise}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & \text{if} \\quad 0 \\leq a \\leq n \\leq b, \\\\
+///     \frac{(1-p)^{-n}p}{(1-p)^{-b}-(1-p)^{1-a}}
+///         & \text{if} \\quad a \\leq n \\leq b \\leq 0, \\\\
+///     \frac{(1-p)^{|n|}p}{2-p-(1-p)^{1-a}-(1-p)^{b+1}}
+///         & \text{if} \\quad a < 0 < b \\ \mathrm{and} \\ a \\leq n \\leq b, \\\\
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
 #[inline]

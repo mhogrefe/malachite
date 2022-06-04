@@ -8,10 +8,15 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrd<Integer> for Rational {
-    /// Compares a `Rational` to an `Integer`.
+    /// Compares a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer).
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -19,12 +24,11 @@ impl PartialOrd<Integer> for Rational {
     ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert!(Rational::from_str("22/7").unwrap() > Integer::from(3));
-    /// assert!(Rational::from_str("22/7").unwrap() < Integer::from(4));
-    /// assert!(Rational::from_str("-22/7").unwrap() < Integer::from(-3));
-    /// assert!(Rational::from_str("-22/7").unwrap() > Integer::from(-4));
+    /// assert!(Rational::from_signeds(22, 7) > Integer::from(3));
+    /// assert!(Rational::from_signeds(22, 7) < Integer::from(4));
+    /// assert!(Rational::from_signeds(-22, 7) < Integer::from(-3));
+    /// assert!(Rational::from_signeds(-22, 7) > Integer::from(-4));
     /// ```
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
         // First check signs
@@ -79,10 +83,15 @@ impl PartialOrd<Integer> for Rational {
 }
 
 impl PartialOrd<Rational> for Integer {
-    /// Compares an `Integer` to a `Rational`.
+    /// Compares an [`Integer`](malachite_nz::integer::Integer) to a [`Rational`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -90,12 +99,11 @@ impl PartialOrd<Rational> for Integer {
     ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert!(Integer::from(3) < Rational::from_str("22/7").unwrap());
-    /// assert!(Integer::from(4) > Rational::from_str("22/7").unwrap());
-    /// assert!(Integer::from(-3) > Rational::from_str("-22/7").unwrap());
-    /// assert!(Integer::from(-4) < Rational::from_str("-22/7").unwrap());
+    /// assert!(Integer::from(3) < Rational::from_signeds(22, 7));
+    /// assert!(Integer::from(4) > Rational::from_signeds(22, 7));
+    /// assert!(Integer::from(-3) > Rational::from_signeds(-22, 7));
+    /// assert!(Integer::from(-4) < Rational::from_signeds(-22, 7));
     /// ```
     #[inline]
     fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {

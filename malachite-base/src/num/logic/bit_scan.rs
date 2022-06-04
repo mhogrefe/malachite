@@ -1,7 +1,8 @@
-use num::basic::integers::PrimitiveInt;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{BitScan, TrailingZeros};
 
-fn index_of_next_false_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> u64 {
+fn index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(x: T, start: u64) -> u64 {
     if start >= T::WIDTH {
         start
     } else {
@@ -9,7 +10,7 @@ fn index_of_next_false_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> u64 {
     }
 }
 
-fn index_of_next_true_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_true_bit_unsigned<T: PrimitiveUnsigned>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH {
         None
     } else {
@@ -25,35 +26,35 @@ fn index_of_next_true_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> Option<
 macro_rules! impl_bit_scan_unsigned {
     ($t:ident) => {
         impl BitScan for $t {
-            /// Finds the smallest index of a `false` bit that is greater than or equal to
-            /// `starting_index`.
+            /// Given a number and a starting index, searches the number for the smallest index of
+            /// a `false` bit that is greater than or equal to the starting index.
             ///
-            /// Since `$t` is unsigned and therefore has an implicit prefix of infinitely-many
-            /// zeros, this function always returns a value.
+            /// Since the number is unsigned and therefore has an implicit prefix of
+            /// infinitely-many zeros, this function always returns a value.
             ///
-            /// Starting beyond the type's width is allowed; the result will be the starting index.
+            /// Starting beyond the type's width is allowed; the result is the starting index.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_scan` module.
+            /// See [here](super::bit_scan#index_of_next_false_bit).
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
                 Some(index_of_next_false_bit_unsigned(self, start))
             }
 
-            /// Finds the smallest index of a `true` bit that is greater than or equal to
-            /// `starting_index`.
+            /// Given a number and a starting index, searches the number for the smallest index of
+            /// a `true` bit that is greater than or equal to the starting index.
             ///
-            /// If the starting index is greater than or equal to the type's width, the result will
-            /// be `None` since there are no `true` bits past that point.
+            /// If the starting index is greater than or equal to the type's width, the result is
+            /// `None` since there are no `true` bits past that point.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_scan` module.
+            /// See [here](super::bit_scan#index_of_next_true_bit).
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
                 index_of_next_true_bit_unsigned(self, start)
@@ -63,7 +64,7 @@ macro_rules! impl_bit_scan_unsigned {
 }
 apply_to_unsigneds!(impl_bit_scan_unsigned);
 
-fn index_of_next_false_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_false_bit_signed<T: PrimitiveSigned>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             Some(start)
@@ -80,7 +81,7 @@ fn index_of_next_false_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u
     }
 }
 
-fn index_of_next_true_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_true_bit_signed<T: PrimitiveSigned>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             None
@@ -100,35 +101,37 @@ fn index_of_next_true_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u6
 macro_rules! impl_bit_scan_signed {
     ($t:ident) => {
         impl BitScan for $t {
-            /// Finds the smallest index of a `false` bit that is greater than or equal to
-            /// `starting_index`.
+            /// Given a number and a starting index, searches the number for the smallest index of
+            /// a `false` bit that is greater than or equal to the starting index.
             ///
-            /// If the input is negative and starting index is greater than or equal to the type's
-            /// width, the result will be `None` since there are no `false` bits past that point. If
-            /// the input is non-negative, the result will be the starting index.
+            /// If the starting index is greater than or equal to the type's width, then the result
+            /// depends on whether the number is negative. If it is, then the result is `None`
+            /// since there are no `false` bits past that point. If the number is non-negative,
+            /// then the result is the starting index.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_scan` module.
+            /// See [here](super::bit_scan#index_of_next_false_bit).
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
                 index_of_next_false_bit_signed(self, start)
             }
 
-            /// Finds the smallest index of a `true` bit that is greater than or equal to
-            /// `starting_index`.
+            /// Given a number and a starting index, searches the number for the smallest index of
+            /// a `true` bit that is greater than or equal to the starting index.
             ///
-            /// If the input is non-negative and starting index is greater than or equal to the
-            /// type's width, the result will be `None` since there are no `true` bits past that
-            /// point. If the input is negative, the result will be the starting index.
+            /// If the starting index is greater than or equal to the type's width, then the result
+            /// depends on whether the number is non-negative. If it is, then the result is `None`
+            /// since there are no `true` bits past that point. If the number is negative, then the
+            /// result is the starting index.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_scan` module.
+            /// See [here](super::bit_scan#index_of_next_true_bit).
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
                 index_of_next_true_bit_signed(self, start)

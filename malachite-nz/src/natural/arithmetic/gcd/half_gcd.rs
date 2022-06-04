@@ -1,6 +1,6 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivMod, Gcd, Parity, XMulYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
+    DivMod, Gcd, Parity, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -43,11 +43,11 @@ trait GcdSubdivideStepContext {
     }
 }
 
-/// This is gcd_ctx from mpn/gcd.c, GMP 6.2.1.
+/// This is equivalent to `gcd_ctx` from `mpn/gcd.c`, GMP 6.2.1.
 struct GcdContext<'a>(&'a mut [Limb]);
 
 impl<'a> GcdSubdivideStepContext for GcdContext<'a> {
-    /// This is gcd_hook from mpn/gcd.c, GMP 6.2.1.
+    /// This is equivalent to `gcd_hook` from `mpn/gcd.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
         g: Option<&[Limb]>,
@@ -80,6 +80,8 @@ struct HalfGcdMatrix<'a> {
 }
 
 impl<'a> HalfGcdMatrix<'a> {
+    // # Worst-case complexity
+    // Constant time and additional memory.
     pub_test! {get(&self, row: u8, column: u8) -> &[Limb] {
         match (row, column) {
             (0, 0) => &self.data[..self.s],
@@ -90,6 +92,8 @@ impl<'a> HalfGcdMatrix<'a> {
         }
     }}
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     pub_test! {get_mut(&mut self, row: u8, column: u8) -> &mut [Limb] {
         match (row, column) {
             (0, 0) => &mut self.data[..self.s],
@@ -100,6 +104,8 @@ impl<'a> HalfGcdMatrix<'a> {
         }
     }}
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     #[inline]
     fn get_two_mut(
         &mut self,
@@ -123,12 +129,16 @@ impl<'a> HalfGcdMatrix<'a> {
         }
     }
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     #[inline]
     fn get_four_mut(&mut self) -> (&mut [Limb], &mut [Limb], &mut [Limb], &mut [Limb]) {
         split_into_chunks_mut!(self.data, self.s, [x00, x01, x10], x11);
         (x00, x01, x10, x11)
     }
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     pub_const_test! {min_init_scratch(n: usize) -> usize {
         (((n + 1) >> 1) + 1) << 2
     }}
@@ -136,8 +146,15 @@ impl<'a> HalfGcdMatrix<'a> {
     // For input of size n, matrix elements are of size at most ceil(n / 2) - 1, but we need two
     // limbs extra.
     //
-    // This is mpn_hgcd_matrix_init from mpn/generic/hgcd_matrix.c, GMP 6.2.1, where the matrix is
-    // returned.
+    // # Worst-case complexity
+    // $T(n) = O(n)$
+    //
+    // $M(n) = O(1)$
+    //
+    // where $T$ is time, $M$ is additional memory, and $n$ is `p.len()`.
+    //
+    // This is equivalent to `mpn_hgcd_matrix_init` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1,
+    // where the matrix is returned.
     pub_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix {
         let s = (n + 1) / 2 + 1;
         let two_s = s << 1;
@@ -155,10 +172,14 @@ impl<'a> HalfGcdMatrix<'a> {
         m
     }}
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     pub_const_test! {update_q_scratch_len(&self, qs_len: usize) -> usize {
         self.n + qs_len
     }}
 
+    // # Worst-case complexity
+    // Constant time and additional memory.
     fn all_elements_zero_at_index(&self, i: usize) -> bool {
         self.get(0, 0)[i] == 0
             && self.get(0, 1)[i] == 0
@@ -170,11 +191,18 @@ impl<'a> HalfGcdMatrix<'a> {
 // Multiply M by M1 from the right. Needs 3*(M->n + M1->n) + 5 limbs
 // of temporary storage (see mpn_matrix22_mul_itch).
 //
-// This is mpn_hgcd_matrix_mul from mpn/generic/hgcd_matrix.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.n, b.n)`.
+//
+// This is equivalent to `mpn_hgcd_matrix_mul` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
 pub_test! {limbs_half_gcd_matrix_mul_matrix(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix,
-    tp: &mut [Limb]
+    scratch: &mut [Limb]
 ) {
     // About the new size of M:s elements. Since M1's diagonal elements
     // are > 0, no element can decrease. The new elements are of size
@@ -203,7 +231,7 @@ pub_test! {limbs_half_gcd_matrix_mul_matrix(
         &b.get(0, 1)[..b_n],
         &b.get(1, 0)[..b_n],
         &b.get(1, 1)[..b_n],
-        tp,
+        scratch,
     );
     // Index of last potentially non-zero limb, size is one greater.
     let mut n = a.n + b_n;
@@ -220,7 +248,14 @@ pub_test! {limbs_half_gcd_matrix_mul_matrix(
 // GMP_NUMB_BITS - 1 bits, M grows by at most one limb. Needs
 // temporary space M->n
 //
-// This is mpn_hgcd_matrix_mul_1 from mpn/generic/hgcd_matrix.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `a.n`.
+//
+// This is equivalent to `mpn_hgcd_matrix_mul_1` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
 pub_test! {limbs_half_gcd_matrix_mul_matrix_1(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix1,
@@ -241,7 +276,14 @@ pub_test! {limbs_half_gcd_matrix_mul_matrix_1(
 // Update column `column`, adding in Q * column (1-`col`). Temporary storage:
 // qn + n <= `self.s`, where n is the size of the largest element in column 1 - `column`.
 //
-// This is mpn_hgcd_matrix_update_q from mpn/generic/hgcd_matrix.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
+//
+// This is equivalent to `mpn_hgcd_matrix_update_q` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
 pub_test! {limbs_half_gcd_matrix_update_q(
     m: &mut HalfGcdMatrix,
     qs: &[Limb],
@@ -306,7 +348,14 @@ pub_test! {limbs_half_gcd_matrix_update_q(
 // Multiplies the least significant p limbs of (X;Y) by M^-1.
 // Temporary space needed: 2 * (p + m.n)
 //
-// This is mpn_hgcd_matrix_adjust from mpn/generic/hgcd_matrix.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpn_hgcd_matrix_adjust` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
 fn limbs_half_gcd_matrix_adjust(
     m: &HalfGcdMatrix,
     mut n: usize,
@@ -358,9 +407,16 @@ fn limbs_half_gcd_matrix_adjust(
     n
 }
 
-/// Computes (x, y) <- M^(-1) (x; y)
-///
-/// This is mpn_hgcd_matrix_apply from mpn/generic/hgcd_reduce.c, GMP 6.2.1.
+// Computes (x, y) <- M^(-1) (x; y)
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `m.len()`.
+//
+// This is equivalent to `mpn_hgcd_matrix_apply` from `mpn/generic/hgcd_reduce.c`, GMP 6.2.1.
 fn limbs_half_gcd_matrix_apply(m: &HalfGcdMatrix, xs: &mut [Limb], ys: &mut [Limb]) -> usize {
     let mut n = xs.len();
     assert_eq!(ys.len(), n);
@@ -481,7 +537,7 @@ fn limbs_half_gcd_matrix_apply(m: &HalfGcdMatrix, xs: &mut [Limb], ys: &mut [Lim
     }
 }
 
-/// This is mpn_hgcd_reduce from mpn/generic/hgcd_reduce.c, GMP 6.2.1.
+/// This is equivalent to `mpn_hgcd_reduce` from `mpn/generic/hgcd_reduce.c`, GMP 6.2.1.
 fn limbs_half_gcd_matrix_reduce(
     m: &mut HalfGcdMatrix,
     xs: &mut [Limb],
@@ -512,10 +568,17 @@ fn limbs_half_gcd_matrix_reduce(
     }
 }
 
-/// Computes R -= X * Y. Result must be non-negative. Normalized down to size xs_len, and resulting
-/// size is returned.
-///
-/// This is submul from mpn/generic/hgcd_reduce.c, GMP 6.2.1.
+// Computes R -= X * Y. Result must be non-negative. Normalized down to size xs_len, and resulting
+// size is returned.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `submul` from `mpn/generic/hgcd_reduce.c`, GMP 6.2.1.
 fn limbs_gcd_sub_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> usize {
     let mut out_len = out.len();
     let xs_len = xs.len();
@@ -557,7 +620,14 @@ struct HalfGcdMatrix1 {
 // Sets (r;b) = (a;b) M, with M = (u00, u01; u10, u11). Vector must
 // have space for n + 1 limbs. Uses three buffers to avoid a copy
 //
-// This is mpn_hgcd_mul_matrix1_vector from mpn/generic/hgcd2.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
+//
+// This is equivalent to `mpn_hgcd_mul_matrix1_vector` from `mpn/generic/hgcd2.c`, GMP 6.2.1.
 pub_test! {limbs_half_gcd_matrix_1_mul_vector(
     m: &HalfGcdMatrix1,
     out: &mut [Limb],
@@ -582,14 +652,21 @@ pub_test! {limbs_half_gcd_matrix_1_mul_vector(
     }
 }}
 
-/// Compute (r;y) <- (u11 x - u01 y; -u10 x + u00 y) xs
-/// r  = u11 * x
-/// r -= u01 * y
-/// y *= u00
-/// y -= u10 * x
-///
-/// This is mpn_matrix22_mul1_inverse_vector from mpn/generic/matrix22_mul1_inverse_vector.c,
-/// GMP 6.2.1.
+// Compute (r;y) <- (u11 x - u01 y; -u10 x + u00 y) xs
+// r  = u11 * x
+// r -= u01 * y
+// y *= u00
+// y -= u10 * x
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `m.len()`.
+//
+// This is equivalent to `mpn_matrix22_mul1_inverse_vector` from
+// `mpn/generic/matrix22_mul1_inverse_vector.c`, GMP 6.2.1.
 fn limbs_half_gcd_matrix_1_mul_inverse_vector(
     m: &HalfGcdMatrix1,
     out: &mut [Limb],
@@ -612,7 +689,14 @@ fn limbs_half_gcd_matrix_1_mul_inverse_vector(
     }
 }
 
-/// This is mpn_gcd_subdiv_step from mpn/generic/gcd_subdiv_step.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_gcd_subdiv_step` from `mpn/generic/gcd_subdiv_step.c`, GMP 6.2.1.
 fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     mut xs: &'a mut [Limb],
     mut ys: &'a mut [Limb],
@@ -744,7 +828,14 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
 }
 
 impl<'a> GcdSubdivideStepContext for HalfGcdMatrix<'a> {
-    /// This is hgcd_hook from mpn/generic/hgcd_step.c, GMP 6.2.1.
+    // # Worst-case complexity
+    // $T(n) = O(n)$
+    //
+    // $M(n) = O(1)$
+    //
+    // where $T$ is time, $M$ is additional memory, and $n$ is `q_len`.
+    //
+    // This is equivalent to `hgcd_hook` from `mpn/generic/hgcd_step.c`, GMP 6.2.1.
     fn gcd_subdiv_step_hook(
         &mut self,
         g: Option<&[Limb]>,
@@ -762,12 +853,19 @@ impl<'a> GcdSubdivideStepContext for HalfGcdMatrix<'a> {
     }
 }
 
-/// This is MPN_EXTRACT_NUMB from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `MPN_EXTRACT_NUMB` from `gmp-impl.h`, GMP 6.2.1.
 const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
     (x1 << count) | (x0 >> (Limb::WIDTH - count))
 }
 
-// This is div2 from mpn/generic/hgcd2.c, GMP 6.2.1, where HGCD2_DIV2_METHOD == 1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where
+// `HGCD2_DIV2_METHOD == 1`.
 pub_test! {limbs_gcd_div(
     mut n1: Limb,
     mut n0: Limb,
@@ -785,25 +883,25 @@ pub_test! {limbs_gcd_div(
         n0 <<= c;
         d1 = (d1 << c) | (d0 >> width_comp);
         d0 <<= c;
-        (q, n1) = Limb::xx_div_mod_y_is_qr(n2, n1, d1);
-        let (mut t1, mut t0) = Limb::x_mul_y_is_zz(q, d0);
+        (q, n1) = Limb::xx_div_mod_y_to_qr(n2, n1, d1);
+        let (mut t1, mut t0) = Limb::x_mul_y_to_zz(q, d0);
         if t1 > n1 || t1 == n1 && t0 > n0 {
             assert_ne!(q, 0);
             q -= 1;
-            (t1, t0) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
+            (t1, t0) = Limb::xx_sub_yy_to_zz(t1, t0, d1, d0);
         }
-        (n1, n0) = Limb::xx_sub_yy_is_zz(n1, n0, t1, t0);
+        (n1, n0) = Limb::xx_sub_yy_to_zz(n1, n0, t1, t0);
         // Undo normalization
         (q, n1 >> c, (n0 >> c) | (n1 << width_comp))
     } else {
         n1 = r;
-        let (mut t1, mut t0) = Limb::x_mul_y_is_zz(q, d0);
+        let (mut t1, mut t0) = Limb::x_mul_y_to_zz(q, d0);
         if t1 >= n1 && (t1 > n1 || t0 > n0) {
             assert_ne!(q, 0);
             q -= 1;
-            (t1, t0) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
+            (t1, t0) = Limb::xx_sub_yy_to_zz(t1, t0, d1, d0);
         }
-        let (r1, r0) = Limb::xx_sub_yy_is_zz(n1, n0, t1, t0);
+        let (r1, r0) = Limb::xx_sub_yy_to_zz(n1, n0, t1, t0);
         (q, r1, r0)
     }
 }}
@@ -811,7 +909,7 @@ pub_test! {limbs_gcd_div(
 // Reduces a, b until |a - b| (almost) fits in one limb + 1 bit. Constructs matrix M. Returns 1 if
 // we make progress, i.e. can perform at least one subtraction. Otherwise returns zero.
 //
-// This is mpn_hgcd2 from mpn/generic/hgcd2.c, GMP 6.2.1.
+// This is equivalent to `mpn_hgcd2` from `mpn/generic/hgcd2.c`, GMP 6.2.1.
 fn limbs_half_gcd_2(
     mut x_high: Limb,
     mut a_low: Limb,
@@ -825,14 +923,14 @@ fn limbs_half_gcd_2(
     let mut m01;
     let mut m10;
     if x_high > y_high || x_high == y_high && a_low > b_low {
-        (x_high, a_low) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
+        (x_high, a_low) = Limb::xx_sub_yy_to_zz(x_high, a_low, y_high, b_low);
         if x_high < 2 {
             return false;
         }
         m01 = 1;
         m10 = 0;
     } else {
-        (y_high, b_low) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
+        (y_high, b_low) = Limb::xx_sub_yy_to_zz(y_high, b_low, x_high, a_low);
         if y_high < 2 {
             return false;
         }
@@ -863,7 +961,7 @@ fn limbs_half_gcd_2(
             // Subtract a -= q * b, and multiply M from the right by (1 q ; 0 1), affecting the
             // second column of M.
             assert!(x_high > y_high);
-            (x_high, a_low) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
+            (x_high, a_low) = Limb::xx_sub_yy_to_zz(x_high, a_low, y_high, b_low);
             if x_high < 2 {
                 done = true;
                 break;
@@ -900,7 +998,7 @@ fn limbs_half_gcd_2(
         }
         // Subtract b -= q * a, and multiply M from the right by (1 0 ; q 1), affecting the first
         // column of M.
-        (y_high, b_low) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
+        (y_high, b_low) = Limb::xx_sub_yy_to_zz(y_high, b_low, x_high, a_low);
         if y_high < 2 {
             done = true;
             break;
@@ -986,7 +1084,7 @@ fn limbs_half_gcd_2(
     true
 }
 
-/// This is mpn_hgcd_step from mpn/generic/hgcd_step.c, GMP 6.2.1.
+/// This is equivalent to `mpn_hgcd_step` from `mpn/generic/hgcd_step.c`, GMP 6.2.1.
 fn limbs_half_gcd_step(
     xs: &mut [Limb],
     ys: &mut [Limb],
@@ -1031,17 +1129,26 @@ fn limbs_half_gcd_step(
     }
 }
 
-/// This is MPN_GCD_SUBDIV_STEP_ITCH from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `MPN_GCD_SUBDIV_STEP_ITCH` from `gmp-impl.h`, GMP 6.2.1.
 const fn limbs_gcd_subdivide_step_scratch_len(n: usize) -> usize {
     n
 }
 
-/// This is CHOOSE_P from mpn/generic/gcd.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `CHOOSE_P` from `mpn/generic/gcd.c`, GMP 6.2.1.
 const fn limbs_gcd_choose_p(n: usize) -> usize {
     (n << 1) / 3
 }
 
-/// This is MPN_HGCD_MATRIX_INIT_ITCH from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `MPN_HGCD_MATRIX_INIT_ITCH` from `gmp-impl.h`, GMP 6.2.1.
 const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
     (((n + 1) >> 1) + 1) << 2
 }
@@ -1049,7 +1156,10 @@ const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
 //TODO tune
 const HGCD_THRESHOLD: usize = 101;
 
-/// This is mpn_hgcd_itch from mpn/generic/hgcd.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_hgcd_itch` from `mpn/generic/hgcd.c`, GMP 6.2.1.
 fn limbs_half_gcd_scratch_len(n: usize) -> usize {
     if n < HGCD_THRESHOLD {
         n
@@ -1063,7 +1173,10 @@ fn limbs_half_gcd_scratch_len(n: usize) -> usize {
 //TODO tune
 const HGCD_REDUCE_THRESHOLD: usize = 1679;
 
-// This is mpn_hgcd_reduce_itch from mpn/generic/hgcd_reduce.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_hgcd_reduce_itch` from `mpn/generic/hgcd_reduce.c`, GMP 6.2.1.
 pub_test! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
     assert!(n >= p);
     let diff = n - p;
@@ -1087,7 +1200,7 @@ const HGCD_APPR_THRESHOLD: usize = 104;
 
 /// Destroys inputs.
 ///
-/// This is mpn_hgcd_appr from mpn/generic/hgcd_appr.c, GMP 6.2.1.
+/// This is equivalent to `mpn_hgcd_appr` from `mpn/generic/hgcd_appr.c`, GMP 6.2.1.
 fn limbs_half_gcd_approx(
     mut xs: &mut [Limb],
     mut ys: &mut [Limb],
@@ -1252,10 +1365,17 @@ fn limbs_half_gcd_approx(
     }
 }
 
-/// Reduces x, y until |x - y| fits in n / 2 + 1 limbs. Constructs matrix A with elements of size
-/// at most (n + 1) / 2 - 1. Returns new size of a, b, or zero if no reduction is possible.
-///
-/// This is mpn_hgcd from mpn/generic/hgcd.c, GMP 6.2.1.
+// Reduces x, y until |x - y| fits in n / 2 + 1 limbs. Constructs matrix A with elements of size
+// at most (n + 1) / 2 - 1. Returns new size of a, b, or zero if no reduction is possible.
+//
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_hgcd` from `mpn/generic/hgcd.c`, GMP 6.2.1.
 fn limbs_half_gcd(
     xs: &mut [Limb],
     ys: &mut [Limb],
@@ -1331,7 +1451,14 @@ const GCD_DC_THRESHOLD: usize = 330;
 
 // X >= Y, X and Y not both even.
 //
-// This is mpn_gcd from mpn/generic/gcd.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_gcd` from `mpn/generic/gcd.c`, GMP 6.2.1.
 pub_crate_test! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [Limb]) -> usize {
     let mut xs = &mut *xs;
     let mut ys = &mut *ys;

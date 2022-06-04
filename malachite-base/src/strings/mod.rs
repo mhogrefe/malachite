@@ -3,7 +3,7 @@ use named::Named;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
 
-/// Sorts the characters of a string and returns them in a new `String`.
+/// Sorts the characters of a string slice and returns them in a new [`String`].
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n \log n)$
@@ -25,7 +25,7 @@ pub fn string_sort(s: &str) -> String {
     chars.iter().collect()
 }
 
-/// Removes duplicate characters from a string and returns the result in a new `String`.
+/// Takes a string slice's unique characters and returns them in a new [`String`].
 ///
 /// The unique characters are output in order of appearance.
 ///
@@ -54,7 +54,8 @@ pub fn string_unique(s: &str) -> String {
     nub
 }
 
-/// Returns whether all of the first `&str`'s characters are present in the second `&str`.
+/// Returns whether all of the first string slice's characters are present in the second string
+/// slice.
 ///
 /// Does not take multiplicities into account.
 ///
@@ -81,18 +82,14 @@ pub fn string_is_subset(s: &str, t: &str) -> bool {
 
 impl_named!(String);
 
-/// A trait that provides an ergonomic way to create the string specified by a `Debug`
+/// A trait that provides an ergonomic way to create the string specified by a [`Debug`]
 /// implementation.
 pub trait ToDebugString: Debug {
     fn to_debug_string(&self) -> String;
 }
 
 impl<T: Debug> ToDebugString for T {
-    /// Returns the `String` produced by `T`s `Debug` implementation.
-    ///
-    /// Time: depends on `Debug` implementation
-    ///
-    /// Additional memory: depends on `Debug` implementation
+    /// Returns the [`String`] produced by `T`s [`Debug`] implementation.
     ///
     /// # Examples
     /// ```
@@ -111,18 +108,14 @@ impl<T: Debug> ToDebugString for T {
     }
 }
 
-/// A trait that provides an ergonomic way to create the string specified by a `Binary`
+/// A trait that provides an ergonomic way to create the string specified by a [`Binary`]
 /// implementation.
 pub trait ToBinaryString: Binary {
     fn to_binary_string(&self) -> String;
 }
 
 impl<T: Binary> ToBinaryString for T {
-    /// Returns the `String` produced by `T`s `Binary` implementation.
-    ///
-    /// Time: depends on `Binary` implementation
-    ///
-    /// Additional memory: depends on `Binary` implementation
+    /// Returns the [`String`] produced by `T`s [`Binary`] implementation.
     ///
     /// # Examples
     /// ```
@@ -137,18 +130,14 @@ impl<T: Binary> ToBinaryString for T {
     }
 }
 
-/// A trait that provides an ergonomic way to create the string specified by an `Octal`
+/// A trait that provides an ergonomic way to create the string specified by an [`Octal`]
 /// implementation.
 pub trait ToOctalString: Octal {
     fn to_octal_string(&self) -> String;
 }
 
 impl<T: Octal> ToOctalString for T {
-    /// Returns the `String` produced by `T`s `Octal` implementation.
-    ///
-    /// Time: depends on `Octal` implementation
-    ///
-    /// Additional memory: depends on `Octal` implementation
+    /// Returns the [`String`] produced by `T`s [`Octal`] implementation.
     ///
     /// # Examples
     /// ```
@@ -163,18 +152,14 @@ impl<T: Octal> ToOctalString for T {
     }
 }
 
-/// A trait that provides an ergonomic way to create the string specified by a `LowerHex`
+/// A trait that provides an ergonomic way to create the string specified by a [`LowerHex`]
 /// implementation.
 pub trait ToLowerHexString: LowerHex {
     fn to_lower_hex_string(&self) -> String;
 }
 
 impl<T: LowerHex> ToLowerHexString for T {
-    /// Returns the `String` produced by `T`s `LowerHex` implementation.
-    ///
-    /// Time: depends on `LowerHex` implementation
-    ///
-    /// Additional memory: depends on `LowerHex` implementation
+    /// Returns the [`String`] produced by `T`s [`LowerHex`] implementation.
     ///
     /// # Examples
     /// ```
@@ -189,18 +174,14 @@ impl<T: LowerHex> ToLowerHexString for T {
     }
 }
 
-/// A trait that provides an ergonomic way to create the string specified by an `UpperHex`
+/// A trait that provides an ergonomic way to create the string specified by an [`UpperHex`]
 /// implementation.
 pub trait ToUpperHexString: UpperHex {
     fn to_upper_hex_string(&self) -> String;
 }
 
 impl<T: UpperHex> ToUpperHexString for T {
-    /// Returns the `String` produced by `T`s `UpperHex` implementation.
-    ///
-    /// Time: depends on `UpperHex` implementation
-    ///
-    /// Additional memory: depends on `UpperHex` implementation
+    /// Returns the [`String`] produced by `T`s [`UpperHex`] implementation.
     ///
     /// # Examples
     /// ```
@@ -215,10 +196,9 @@ impl<T: UpperHex> ToUpperHexString for T {
     }
 }
 
-/// Generates `String`s, given an iterator that generates `Vec<char>`s.
+/// Generates [`String`]s, given an iterator that generates `Vec<char>`s.
 ///
-/// This `struct` is created by the `strings_from_char_vecs` function. See its documentation for
-/// more.
+/// This `struct` is created by [`strings_from_char_vecs`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct StringsFromCharVecs<I: Iterator<Item = Vec<char>>> {
     css: I,
@@ -233,21 +213,17 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
     }
 }
 
-/// Generates `String`s, given an iterator that generates `Vec<char>`s.
+/// Generates [`String`]s, given an iterator that generates `Vec<char>`s.
 ///
-/// The elements appear in the same order as they do in the given iterator, but as `String`s.
+/// The elements appear in the same order as they do in the given iterator, but as [`String`]s.
 ///
 /// The output length is `css.count()`.
-///
-/// # Complexity per iteration
-/// Same as the time and additional memory complexity of iterating `css`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::strings::strings_from_char_vecs;
 ///
 /// let ss =
@@ -258,11 +234,13 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 /// );
 /// ```
 #[inline]
-pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsFromCharVecs<I> {
+pub const fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(
+    css: I,
+) -> StringsFromCharVecs<I> {
     StringsFromCharVecs { css }
 }
 
-/// Iterators that generate `String`s without repetition.
+/// Iterators that generate [`String`]s without repetition.
 pub mod exhaustive;
-/// Iterators that generate `String`s randomly.
+/// Iterators that generate [`String`]s randomly.
 pub mod random;

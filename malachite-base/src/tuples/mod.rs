@@ -1,6 +1,6 @@
 /// Generates all singletons (1-element tuples) with values from a given iterator.
 ///
-/// This `struct` is created by the `singletons` function. See its documentation for more.
+/// This `struct` is created by [`singletons`]; see its documentation for more.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Singletons<I: Iterator> {
     xs: I,
@@ -21,15 +21,11 @@ impl<I: Iterator> Iterator for Singletons<I> {
 ///
 /// The output length is `xs.count()`.
 ///
-/// # Complexity per iteration
-/// Same as the time and additional memory complexity of iterating `xs`.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::tuples::singletons;
 ///
 /// assert_eq!(
@@ -38,20 +34,21 @@ impl<I: Iterator> Iterator for Singletons<I> {
 /// );
 /// ```
 #[inline]
-pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
+pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
     Singletons { xs }
 }
 
 /// Iterators that generate tuples without repetition.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// To reduce binary size and lower compilation time, many of the functions described here are not
+/// actually defined in Malachite, but may be created in your program using macros exported from
+/// Malachite. To do this, see the documentation for [`lex_tuples`], [`lex_custom_tuples`].
 ///
-/// # lex_\[n\]_tuples
+/// # lex_pairs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::tuples::exhaustive::lex_pairs;
 ///
 /// assert_eq!(
@@ -76,12 +73,11 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # lex_\[n\]_tuples_from_single
+/// # lex_pairs_from_single
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::tuples::exhaustive::lex_pairs_from_single;
 ///
 /// assert_eq!(
@@ -90,91 +86,54 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # lex_custom_tuples
+/// # lex_triples_xyx
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
-/// use malachite_base::tuples::exhaustive::lex_triples_xyx;
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::lex_custom_tuples;
+///
+/// fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
+///     (a.unwrap(), b.unwrap(), c.unwrap())
+/// }
+///
+/// lex_custom_tuples!(
+///     (pub(crate)),
+///     LexTriplesXYX,
+///     (X, Y, X),
+///     (None, None, None),
+///     unwrap_triple,
+///     lex_triples_xyx,
+///     [X, I, xs, [0, x_0], [2, x_2]],
+///     [Y, J, ys, [1, y_1]]
+/// );
 ///
 /// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
-/// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
+/// // iterator, `xs`, the chars 'a' through 'c', and the second, `ys`, produces the three numbers
 /// // 0, 1, and 2. The function we're using is `lex_triples_xyx`, meaning that the first element of
 /// // the output triples will be taken from `xs`, the second element from `ys`, and the third also
 /// // from `xs`.
-/// let ts = lex_triples_xyx(exhaustive_ascii_chars(), 0..3);
+/// let ts = lex_triples_xyx('a'..='c', 0..3);
 /// assert_eq!(
-///     ts.take(20).collect_vec(),
+///     ts.collect_vec(),
 ///     &[
-///         ('a', 0, 'a'),
-///         ('a', 0, 'b'),
-///         ('a', 0, 'c'),
-///         ('a', 0, 'd'),
-///         ('a', 0, 'e'),
-///         ('a', 0, 'f'),
-///         ('a', 0, 'g'),
-///         ('a', 0, 'h'),
-///         ('a', 0, 'i'),
-///         ('a', 0, 'j'),
-///         ('a', 0, 'k'),
-///         ('a', 0, 'l'),
-///         ('a', 0, 'm'),
-///         ('a', 0, 'n'),
-///         ('a', 0, 'o'),
-///         ('a', 0, 'p'),
-///         ('a', 0, 'q'),
-///         ('a', 0, 'r'),
-///         ('a', 0, 's'),
-///         ('a', 0, 't')
+///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 1, 'a'), ('a', 1, 'b'),
+///         ('a', 1, 'c'), ('a', 2, 'a'), ('a', 2, 'b'), ('a', 2, 'c'), ('b', 0, 'a'),
+///         ('b', 0, 'b'), ('b', 0, 'c'), ('b', 1, 'a'), ('b', 1, 'b'), ('b', 1, 'c'),
+///         ('b', 2, 'a'), ('b', 2, 'b'), ('b', 2, 'c'), ('c', 0, 'a'), ('c', 0, 'b'),
+///         ('c', 0, 'c'), ('c', 1, 'a'), ('c', 1, 'b'), ('c', 1, 'c'), ('c', 2, 'a'),
+///         ('c', 2, 'b'), ('c', 2, 'c')
 ///     ]
 /// );
 /// ```
 ///
-/// # exhaustive_[n-tuples]
+/// # exhaustive_pairs_from_single
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
-/// use malachite_base::tuples::exhaustive::exhaustive_pairs;
-///
-/// let xss = exhaustive_pairs(['a', 'b', 'c'].iter().cloned(), 0..3).collect_vec();
-/// assert_eq!(
-///     xss,
-///     &[('a', 0), ('a', 1), ('b', 0), ('b', 1), ('a', 2), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
-/// );
-/// ```
-///
-/// # exhaustive_[n-tuples]_custom_output
-/// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
-/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::tuples::exhaustive::exhaustive_pairs_custom_output;
-///
-/// let xss = exhaustive_pairs_custom_output(
-///     ['a', 'b', 'c'].iter().cloned(),
-///     0..3,
-///     BitDistributorOutputType::normal(1),
-///     BitDistributorOutputType::tiny(),
-/// )
-/// .collect_vec();
-/// assert_eq!(
-///     xss,
-///     &[('a', 0), ('a', 1), ('a', 2), ('b', 0), ('b', 1), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
-/// );
-/// ```
-///
-/// # exhaustive_[n-tuples]_from_single
-/// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs_from_single;
 ///
 /// assert_eq!(
@@ -200,15 +159,31 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # exhaustive_[n-tuples]_1_input
+/// # exhaustive_pairs_1_input
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
-/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::tuples::exhaustive::exhaustive_triples_1_input;
+/// use malachite_base::exhaustive_tuples_1_input;
+/// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::num::arithmetic::traits::CheckedPow;
+/// use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+/// use malachite_base::num::logic::traits::SignificantBits;
+/// use std::cmp::max;
+/// use std::marker::PhantomData;
+///
+/// exhaustive_tuples_1_input!(
+///     (pub(crate)),
+///     ExhaustiveTriples1Input,
+///     exhaustive_triples_1_input,
+///     exhaustive_triples_from_single,
+///     (I::Item, I::Item, I::Item),
+///     [0, output_type_x],
+///     [1, output_type_y],
+///     [2, output_type_z]
+/// );
 ///
 /// // We are generating triples of `char`s using one input iterator, which produces all ASCII
 /// // `char`s. The third element has a tiny output type, so it will grow more slowly than the other
@@ -246,14 +221,70 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # exhaustive_custom_tuples
+/// # exhaustive_pairs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
+/// use malachite_base::tuples::exhaustive::exhaustive_pairs;
 ///
+/// let xss = exhaustive_pairs(['a', 'b', 'c'].iter().cloned(), 0..3).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[('a', 0), ('a', 1), ('b', 0), ('b', 1), ('a', 2), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
+/// );
+/// ```
+///
+/// # exhaustive_pairs_custom_output
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::tuples::exhaustive::exhaustive_pairs_custom_output;
+///
+/// let xss = exhaustive_pairs_custom_output(
+///     ['a', 'b', 'c'].iter().cloned(),
+///     0..3,
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::tiny(),
+/// )
+/// .collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[('a', 0), ('a', 1), ('a', 2), ('b', 0), ('b', 1), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
+/// );
+/// ```
+///
+/// # exhaustive_triples_xyx
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
-/// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx;
+/// use malachite_base::custom_tuples;
+/// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+/// use malachite_base::num::logic::traits::SignificantBits;
+/// use std::cmp::max;
+///
+/// #[allow(clippy::missing_const_for_fn)]
+/// fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
+///     (a.unwrap(), b.unwrap(), c.unwrap())
+/// }
+///
+/// custom_tuples!(
+///     (pub(crate)),
+///     ExhaustiveTriplesXYX,
+///     (X, Y, X),
+///     (None, None, None),
+///     unwrap_triple,
+///     exhaustive_triples_xyx,
+///     exhaustive_triples_xyx_custom_output,
+///     [X, I, xs, xs_done, [0, output_type_xs_0], [2, output_type_ys_1]],
+///     [Y, J, ys, ys_done, [1, output_type_xs_2]]
+/// );
 ///
 /// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
 /// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
@@ -288,15 +319,35 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # exhaustive_custom_tuples_custom_output
+/// # exhaustive_triples_xyx_custom_output
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
-/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx_custom_output;
+/// use malachite_base::custom_tuples;
+/// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+/// use malachite_base::num::logic::traits::SignificantBits;
+/// use std::cmp::max;
+///
+/// #[allow(clippy::missing_const_for_fn)]
+/// fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
+///     (a.unwrap(), b.unwrap(), c.unwrap())
+/// }
+///
+/// custom_tuples!(
+///     (pub(crate)),
+///     ExhaustiveTriplesXYX,
+///     (X, Y, X),
+///     (None, None, None),
+///     unwrap_triple,
+///     exhaustive_triples_xyx,
+///     exhaustive_triples_xyx_custom_output,
+///     [X, I, xs, xs_done, [0, output_type_xs_0], [2, output_type_ys_1]],
+///     [Y, J, ys, ys_done, [1, output_type_xs_2]]
+/// );
 ///
 /// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
 /// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
@@ -340,13 +391,24 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # lex_ordered_unique_tuples
+/// # lex_ordered_unique_quadruples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::lex_ordered_unique_tuples;
+/// use malachite_base::vecs::exhaustive::fixed_length_ordered_unique_indices_helper;
+/// use std::marker::PhantomData;
 ///
-/// use malachite_base::tuples::exhaustive::lex_ordered_unique_quadruples;
+/// lex_ordered_unique_tuples!(
+///     (pub(crate)),
+///     LexOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     lex_ordered_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
 ///
 /// let xss = lex_ordered_unique_quadruples(1..=6).collect_vec();
 /// assert_eq!(
@@ -371,13 +433,23 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # exhaustive_ordered_unique_tuples
+/// # exhaustive_ordered_unique_quadruples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
+/// use malachite_base::exhaustive_ordered_unique_tuples;
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::vecs::exhaustive::next_bit_pattern;
 ///
-/// use malachite_base::tuples::exhaustive::exhaustive_ordered_unique_quadruples;
+/// exhaustive_ordered_unique_tuples!(
+///     (pub(crate)),
+///     ExhaustiveOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     exhaustive_ordered_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
 ///
 /// let xss = exhaustive_ordered_unique_quadruples(1..=6).collect_vec();
 /// assert_eq!(
@@ -402,13 +474,23 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # lex_unique_tuples
+/// # lex_unique_quadruples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
+/// use malachite_base::iterators::iterator_cache::IteratorCache;
+/// use malachite_base::lex_unique_tuples;
+/// use malachite_base::vecs::exhaustive::{UniqueIndices, unique_indices};
 ///
-/// use malachite_base::tuples::exhaustive::lex_unique_quadruples;
+/// lex_unique_tuples!(
+///     (pub(crate)),
+///     LexUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     lex_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
 ///
 /// let xss = lex_unique_quadruples(1..=6).take(20).collect_vec();
 /// assert_eq!(
@@ -438,13 +520,29 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # exhaustive_unique_tuples
+/// # exhaustive_unique_quadruples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
+/// use malachite_base::exhaustive_unique_tuples;
+/// use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
+/// use malachite_base::tuples::exhaustive::{ExhaustiveDependentPairs, exhaustive_dependent_pairs};
+/// use malachite_base::vecs::ExhaustiveVecPermutations;
+/// use malachite_base::vecs::exhaustive::{
+///     ExhaustiveOrderedUniqueCollections,
+///     ExhaustiveUniqueVecsGenerator,
+///     exhaustive_ordered_unique_vecs_fixed_length
+/// };
 ///
-/// use malachite_base::tuples::exhaustive::exhaustive_unique_quadruples;
+/// exhaustive_unique_tuples!(
+///     (pub(crate)),
+///     ExhaustiveUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     exhaustive_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
 ///
 /// let xss = exhaustive_unique_quadruples(1..=6).take(20).collect_vec();
 /// assert_eq!(
@@ -476,14 +574,11 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 pub mod exhaustive;
 /// Iterators that generate tuples randomly.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # random_[n-tuples]
+/// # random_pairs
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -521,12 +616,11 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_[n-tuples]_from_single
+/// # random_pairs_from_single
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -560,16 +654,24 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_custom_tuples
+/// # random_triples_xyx
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::tuples::random::random_triples_xyx;
+/// use malachite_base::random::{EXAMPLE_SEED, Seed};
+/// use malachite_base::random_custom_tuples;
+///
+/// random_custom_tuples!(
+///     (pub(crate)),
+///     RandomTriplesXYX,
+///     (X, Y, X),
+///     random_triples_xyx,
+///     [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
+///     [Y, J, ys, ys_gen, [y_1, x_2]]
+/// );
 ///
 /// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
 /// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
@@ -608,43 +710,38 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_ordered_unique_[n-tuples]
+/// # random_ordered_unique_quadruples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
-/// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::tuples::random::random_ordered_unique_pairs;
+/// use malachite_base::random_ordered_unique_tuples;
+/// use malachite_base::sets::random::{
+///     random_b_tree_sets_fixed_length,
+///     RandomBTreeSetsFixedLength
+/// };
 ///
-/// let ps = random_ordered_unique_pairs(
-///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 3)
+/// random_ordered_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     random_ordered_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
+///
+/// let qs = random_ordered_unique_quadruples(
+///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 10)
 /// );
 /// assert_eq!(
-///     ps.take(20).collect_vec().as_slice(),
+///     qs.take(20).collect_vec().as_slice(),
 ///     &[
-///         (0, 1),
-///         (1, 3),
-///         (2, 3),
-///         (1, 3),
-///         (0, 1),
-///         (0, 1),
-///         (2, 3),
-///         (0, 1),
-///         (1, 2),
-///         (2, 3),
-///         (0, 1),
-///         (0, 3),
-///         (1, 2),
-///         (0, 2),
-///         (2, 3),
-///         (0, 1),
-///         (0, 2),
-///         (0, 2),
-///         (2, 3),
-///         (1, 3)
+///         (2, 5, 6, 8), (3, 5, 7, 9), (1, 2, 6, 8), (3, 4, 6, 7), (3, 6, 9, 10), (4, 6, 8, 10),
+///         (3, 6, 8, 10), (2, 5, 9, 10), (2, 3, 8, 10), (1, 3, 7, 8), (1, 2, 6, 10), (2, 5, 8, 9),
+///         (1, 8, 9, 10), (1, 3, 7, 8), (2, 3, 4, 5), (1, 3, 4, 8), (3, 6, 7, 9), (5, 6, 7, 8),
+///         (3, 4, 5, 9), (4, 6, 9, 10)
 ///     ]
 /// );
 /// ```

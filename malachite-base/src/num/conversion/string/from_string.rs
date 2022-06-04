@@ -1,7 +1,7 @@
 use num::conversion::traits::FromStringBase;
 
 /// Produces a digit from a byte corresponding to a numeric or alphabetic (lower- or uppercase)
-/// `char` that represents the digit.
+/// [`char`] that represents the digit.
 ///
 /// Bytes corresponding to `char`s from '0' to '9' become digits 0 to 9. Bytes corresponding to
 /// `char`s from 'a' to 'z' become digits 10 to 35. Bytes corresponding to `char`s from 'A' to 'Z'
@@ -36,6 +36,8 @@ pub const fn digit_from_display_byte(b: u8) -> Option<u8> {
 macro_rules! impl_from_string_base {
     ($t:ident) => {
         impl FromStringBase for $t {
+            /// This is a wrapper over the `from_str_radix` functions in the standard library, for
+            /// example [this one](u32::from_str_radix).
             #[inline]
             fn from_string_base(base: u8, s: &str) -> Option<Self> {
                 $t::from_str_radix(s, u32::from(base)).ok()

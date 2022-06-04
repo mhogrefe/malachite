@@ -23,14 +23,15 @@ use platform::Limb;
 // of the input limbs, the function interprets them as pointing to `true` bits. `x` must be
 // positive.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `end * Limb::WIDTH`
+// where $T$ is time, $M$ is additional memory and $n$ is `end`.
 //
 // # Panics
-// Panics if `start` > `end`.
+// Panics if `start > end`.
 pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = TrailingZeros::trailing_zeros(x);
@@ -64,14 +65,15 @@ pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 // of the input limbs, the function interprets them as pointing to `true` bits. The input slice
 // cannot only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `end * Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), end * Limb::WIDTH)`.
 //
 // # Panics
-// Panics if `start` > `end`.
+// Panics if `start > end`.
 pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(xs);
@@ -118,14 +120,15 @@ pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Li
 // of the input limbs, the function interprets them as pointing to `true` bits. The input slice
 // cannot only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `end * Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), end * Limb::WIDTH)`.
 //
 // # Panics
-// Panics if `start` > `end`.
+// Panics if `start > end`.
 pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(&xs);
@@ -168,14 +171,16 @@ pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Ve
 // extended to accommodate the new bits. `start` must be smaller than `end`, and `xs` cannot only
 // contain zeros.
 //
-// Time: worst case O(max(n / 2 ^ `Limb::WIDTH`, m))
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(m) = O(m)$
 //
-// where n = `end` and m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(n / 2 ^ Limb::WIDTH, m)`, and $m$ is
+// `end`.
 //
 // # Panics
-// Panics if `start` >= `end` or `xs` only contains zeros.
+// Panics if `start >= end` or `xs` only contains zeros.
 pub_test! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     assert!(!limbs_sub_limb_in_place(xs, 1));
@@ -231,24 +236,40 @@ impl Natural {
 impl BitBlockAccess for Integer {
     type Bits = Natural;
 
-    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
-    /// is taken by reference, and the resulting bits are returned as a `Natural`. If `end` is
-    /// greater than the type's width, the high bits of the result are all 0 if `self` is
-    /// non-negative and 1 if `self` is negative.
+    /// Extracts a block of adjacent two's complement bits from an [`Integer`], taking the
+    /// [`Integer`] by reference.
     ///
-    /// Time: worst case O(n)
+    /// The first index is `start` and last index is `end - 1`.
     ///
-    /// Additional memory: worst case O(n)
+    /// Let $n$ be `self`, and let $p$ and $q$ be `start` and `end`, respectively.
     ///
-    /// where n = max(`self.significant_bits()`, end)
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
+    /// Then
+    /// $$
+    /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), end)`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitBlockAccess;
@@ -278,24 +299,40 @@ impl BitBlockAccess for Integer {
         }
     }
 
-    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
-    /// is taken by value, and the resulting bits are returned as a `Natural`. If `end` is greater
-    /// than the type's width, the high bits of the result are all 0 if `self` is non-negative and 1
-    /// if `self` is negative.
+    /// Extracts a block of adjacent two's complement bits from an [`Integer`], taking the
+    /// [`Integer`] by value.
     ///
-    /// Time: worst case O(n)
+    /// The first index is `start` and last index is `end - 1`.
     ///
-    /// Additional memory: worst case O(n)
+    /// Let $n$ be `self`, and let $p$ and $q$ be `start` and `end`, respectively.
     ///
-    /// where n = max(`self.significant_bits()`, end)
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
+    /// Then
+    /// $$
+    /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), end)`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitBlockAccess;
@@ -325,26 +362,53 @@ impl BitBlockAccess for Integer {
         }
     }
 
-    /// Writes the bits of `bits` to `self`. The first index that the bits are written to in `self`
-    /// is `start` and last index is `end - 1`. The bit indices do not need to be aligned with any
-    /// limb boundaries. If `bits` has more than `end` - `start` bits, only the first
-    /// `end` - `start` bits are written. If `bits` has fewer than `end` - `start` bits, the
-    /// remaining written bits are zero or one, depending on the sign of `self`. `self` may be
-    /// extended to accommodate the new bits. `start` must be less than or equal to `end`.
+    /// Replaces a block of adjacent two's complement bits in an [`Integer`] with other bits.
     ///
-    /// Time: worst case O(max(n, m))
+    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through
+    /// `end - 1`, inclusive, of `self`.
     ///
-    /// Additional memory: worst case O(n)
+    /// Let $n$ be `self` and let $m$ be `bits`, and let $p$ and $q$ be `start` and `end`,
+    /// respectively.
     ///
-    /// where n = `end`, m = `self.significant_bits()`
+    /// Let
+    /// $$
+    /// m = \sum_{i=0}^k 2^{d_i},
+    /// $$
+    /// where for all $i$, $d_i\in \\{0, 1\\}$.
+    ///
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
+    /// Then
+    /// $$
+    /// n \gets \sum_{i=0}^\infty 2^{c_i},
+    /// $$
+    /// where
+    /// $$
+    /// \\{c_0, c_1, c_2, \ldots \\} =
+    /// \\{b_0, b_1, b_2, \ldots, b_{p-1}, d_0, d_1, \ldots, d_{p-q-1}, b_q, b_{q+1}, \ldots \\}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), end)`,
+    /// and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;

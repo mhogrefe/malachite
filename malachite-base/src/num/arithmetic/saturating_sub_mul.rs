@@ -1,24 +1,13 @@
-use comparison::traits::{Max, Min};
-use num::arithmetic::traits::{
-    CheckedMul, SaturatingMul, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
-    SaturatingSubMulAssign, UnsignedAbs, WrappingSub,
-};
-use num::basic::traits::Zero;
+use num::arithmetic::traits::{SaturatingSubMul, SaturatingSubMulAssign, UnsignedAbs};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
-fn saturating_sub_mul_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSub<T, Output = T>>(
-    x: T,
-    y: T,
-    z: T,
-) -> T {
+fn saturating_sub_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> T {
     x.saturating_sub(y.saturating_mul(z))
 }
 
-fn saturating_sub_mul_assign_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSubAssign<T>>(
-    x: &mut T,
-    y: T,
-    z: T,
-) {
+fn saturating_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, y: T, z: T) {
     x.saturating_sub_assign(y.saturating_mul(z));
 }
 
@@ -27,22 +16,23 @@ macro_rules! impl_saturating_sub_mul_unsigned {
         impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes $x - yz$, saturating at the numeric bounds instead of overflowing.
+            /// Subtracts a number by the product of two other numbers, saturating at the numeric
+            /// bounds instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     x - yz & m \leq x - yz \leq M \\\\
-            ///     M & x - yz > M \\\\
-            ///     m & x - yz < m,
+            ///     x - yz & \text{if} \\quad m \leq x - yz \leq M, \\\\
+            ///     M & \text{if} \\quad x - yz > M, \\\\
+            ///     m & \text{if} \\quad x - yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
+            /// See [here](super::saturating_sub_mul#saturating_sub_mul_assign).
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
                 saturating_sub_mul_unsigned(self, y, z)
@@ -50,23 +40,23 @@ macro_rules! impl_saturating_sub_mul_unsigned {
         }
 
         impl SaturatingSubMulAssign<$t> for $t {
-            /// Replaces $x$ with $x - yz$, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Subtracts a number by the product of two other numbers in place, saturating at the
+            /// numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x - yz & m \leq x - yz \leq M \\\\
-            ///     M & x - yz > M \\\\
-            ///     m & x - yz < m,
+            ///     x - yz & \text{if} \\quad m \leq x - yz \leq M, \\\\
+            ///     M & \text{if} \\quad x - yz > M, \\\\
+            ///     m & \text{if} \\quad x - yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
+            /// See [here](super::saturating_sub_mul#saturating_sub_mul_assign).
             #[inline]
             fn saturating_sub_mul_assign(&mut self, y: $t, z: $t) {
                 saturating_sub_mul_assign_unsigned(self, y, z);
@@ -77,17 +67,8 @@ macro_rules! impl_saturating_sub_mul_unsigned {
 apply_to_unsigneds!(impl_saturating_sub_mul_unsigned);
 
 fn saturating_sub_mul_signed<
-    U: CheckedMul<U, Output = U> + Copy + Ord + WrappingSub<U, Output = U>,
-    S: Copy
-        + Eq
-        + Max
-        + Min
-        + Ord
-        + SaturatingMul<S, Output = S>
-        + SaturatingSub<S, Output = S>
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: S,
     y: S,
@@ -126,22 +107,23 @@ macro_rules! impl_saturating_sub_mul_signed {
         impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes $x - yz$, saturating at the numeric bounds instead of overflowing.
+            /// Subtracts a number by the product of two other numbers, saturating at the numeric
+            /// bounds instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
-            ///     x - yz & m \leq x - yz \leq M \\\\
-            ///     M & x - yz > M \\\\
-            ///     m & x - yz < m,
+            ///     x - yz & \text{if} \\quad m \leq x - yz \leq M, \\\\
+            ///     M & \text{if} \\quad x - yz > M, \\\\
+            ///     m & \text{if} \\quad x - yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
+            /// See [here](super::saturating_sub_mul#saturating_sub_mul).
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
                 saturating_sub_mul_signed(self, y, z)
@@ -149,23 +131,23 @@ macro_rules! impl_saturating_sub_mul_signed {
         }
 
         impl SaturatingSubMulAssign<$t> for $t {
-            /// Replaces $x$ with $x - yz$, saturating at the numeric bounds instead of
-            /// overflowing.
+            /// Subtracts a number by the product of two other numbers in place, saturating at the
+            /// numeric bounds instead of overflowing.
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     x - yz & m \leq x - yz \leq M \\\\
-            ///     M & x - yz > M \\\\
-            ///     m & x - yz < m,
+            ///     x - yz & \text{if} \\quad m \leq x - yz \leq M, \\\\
+            ///     M & \text{if} \\quad x - yz > M, \\\\
+            ///     m & \text{if} \\quad x - yz < m,
             /// \\end{cases}
             /// $$
-            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
+            /// where $m$ is `Self::MIN` and $M$ is `Self::MAX`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
+            /// See [here](super::saturating_sub_mul#saturating_sub_mul_assign).
             #[inline]
             fn saturating_sub_mul_assign(&mut self, y: $t, z: $t) {
                 *self = self.saturating_sub_mul(y, z);

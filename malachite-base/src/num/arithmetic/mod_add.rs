@@ -24,7 +24,8 @@ macro_rules! impl_mod_add {
         impl ModAdd<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Adds two numbers modulo a third number $m$. Assumes the inputs are already reduced
+            /// modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
@@ -32,9 +33,9 @@ macro_rules! impl_mod_add {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_add` module.
+            /// See [here](super::mod_add#mod_add).
             ///
-            /// This is nmod_add from nmod_vec.h, FLINT 2.7.1.
+            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1.
             #[inline]
             fn mod_add(self, other: $t, m: $t) -> $t {
                 mod_add(self, other, m)
@@ -42,8 +43,8 @@ macro_rules! impl_mod_add {
         }
 
         impl ModAddAssign<$t> for $t {
-            /// Replaces `self` with `self + other` mod `m`. Assumes the inputs are already reduced
-            /// mod `m`.
+            /// Adds two numbers modulo a third number $m$, in place. Assumes the inputs are
+            /// already reduced modulo $m$.
             ///
             /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
@@ -51,9 +52,10 @@ macro_rules! impl_mod_add {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_add` module.
+            /// See [here](super::mod_add#mod_add_assign).
             ///
-            /// This is nmod_add from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
+            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1, where the result
+            /// is assigned to `a`.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {
                 mod_add_assign(self, other, m);

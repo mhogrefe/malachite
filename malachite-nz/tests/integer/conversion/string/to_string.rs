@@ -1,7 +1,7 @@
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
+use malachite_base::num::conversion::string::to_string::BaseFmtWrapper as BaseBaseFmtWrapper;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString,
@@ -12,7 +12,7 @@ use malachite_base::test_util::generators::{
     signed_unsigned_unsigned_triple_gen_var_3, unsigned_gen_var_8, unsigned_pair_gen_var_9,
 };
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{

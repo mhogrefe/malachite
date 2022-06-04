@@ -27,7 +27,8 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use vecs::{random_values_from_vec, RandomValuesFromVec};
 
-/// Uniformly generates random primitive integers.
+// Uniformly generates random primitive integers.
+#[doc(hidden)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ThriftyRandomState {
     x: u32,
@@ -102,8 +103,7 @@ impl_thrifty_random_primitive_ints!(i16);
 
 /// Uniformly generates random primitive integers.
 ///
-/// This `struct` is created by the `random_primitive_ints` function. See its documentation for
-/// more.
+/// This `struct` is created by [`random_primitive_ints`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveInts<T: HasRandomPrimitiveInts> {
     pub(crate) rng: ChaCha20Rng,
@@ -121,8 +121,7 @@ impl<T: HasRandomPrimitiveInts> Iterator for RandomPrimitiveInts<T> {
 
 /// Uniformly generates random unsigned integers less than a positive limit.
 ///
-/// This `enum` is created by the `random_unsigneds_less_than` function. See its documentation for
-/// more.
+/// This `enum` is created by [`random_unsigneds_less_than`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
     One,
@@ -148,8 +147,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
 
 /// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
 ///
-/// This `struct` is created by the `random_unsigned_range` function. See its documentation for
-/// more.
+/// This `struct` is created by [`random_unsigned_range`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedRange<T: PrimitiveUnsigned> {
     pub(crate) xs: RandomUnsignedsLessThan<T>,
@@ -167,8 +165,8 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedRange<T> {
 
 /// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by the `random_unsigned_inclusive_range` function. See its
-/// documentation for more.
+/// This `struct` is created by [`random_unsigned_inclusive_range`]; see its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
     NotAll(RandomUnsignedsLessThan<T>, T),
@@ -235,7 +233,7 @@ apply_to_unsigned_signed_pairs!(impl_has_random_signed_range);
 
 /// Uniformly generates random signed integers in the half-open interval $[a, b)$.
 ///
-/// This `struct` is created by the `random_signed_range` function. See its documentation for more.
+/// This `struct` is created by [`random_signed_range`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedRange<T: HasRandomSignedRange> {
     pub(crate) xs: RandomUnsignedRange<T::UnsignedValue>,
@@ -251,8 +249,7 @@ impl<T: HasRandomSignedRange> Iterator for RandomSignedRange<T> {
 
 /// Uniformly generates random signed integers in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by the `random_signed_inclusive_range` function. See its documentation
-/// for more.
+/// This `struct` is created by [`random_signed_inclusive_range`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedInclusiveRange<T: HasRandomSignedRange> {
     pub(crate) xs: RandomUnsignedInclusiveRange<T::UnsignedValue>,
@@ -266,10 +263,9 @@ impl<T: HasRandomSignedRange> Iterator for RandomSignedInclusiveRange<T> {
     }
 }
 
-/// Uniformly generates unsigned integers of up to `chunk_size` bits.
+/// Uniformly generates unsigned integers with up to some number of bits.
 ///
-/// This `struct` is created by the `random_unsigned_bit_chunks` function. See its documentation for
-/// more.
+/// This `struct` is created by [`random_unsigned_bit_chunks`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
     xs: IteratorToBitChunks<RandomPrimitiveInts<T>, T, T>,
@@ -309,10 +305,9 @@ macro_rules! impl_random_signed_chunkable {
 }
 apply_to_unsigned_signed_pairs!(impl_random_signed_chunkable);
 
-/// Uniformly generates signed integers of up to `chunk_size` bits.
+/// Uniformly generates signed integers with up to some number of bits.
 ///
-/// This `struct` is created by the `random_signed_bit_chunks` function. See its documentation for
-/// more.
+/// This `struct` is created by [`random_signed_bit_chunks`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedBitChunks<T: RandomSignedChunkable> {
     pub(crate) xs: T::AbsoluteChunks,
@@ -326,7 +321,7 @@ impl<T: RandomSignedChunkable> Iterator for RandomSignedBitChunks<T> {
     }
 }
 
-/// Generates an iterator's values, but with the highest bit set.
+/// Modifies the output values of an iterator by setting their highest bit.
 #[derive(Clone, Debug)]
 pub struct RandomHighestBitSetValues<I: Iterator>
 where
@@ -350,7 +345,7 @@ where
 
 /// Uniformly generates random primitive integers.
 ///
-/// $P(x) = 2^{-W}$, where $W$ is `T::WIDTH`.
+/// $P(x) = 2^{-W}$, where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -359,18 +354,13 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_ints::<u8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
+///     prefix_to_string(random_primitive_ints::<u8>(EXAMPLE_SEED), 10),
+///     "[113, 239, 69, 108, 228, 210, 168, 161, 87, 32, ...]"
 /// )
 /// ```
 #[inline]
@@ -385,11 +375,11 @@ pub fn random_primitive_ints<T: PrimitiveInt>(seed: Seed) -> RandomPrimitiveInts
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \\frac{1}{2^W-1} & x > 0 \\\\
-///     0 & \\text{otherwise}
+///     \\frac{1}{2^W-1} & \text{if} \\quad x > 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -398,18 +388,13 @@ pub fn random_primitive_ints<T: PrimitiveInt>(seed: Seed) -> RandomPrimitiveInts
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_positive_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_unsigneds::<u8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
+///     prefix_to_string(random_positive_unsigneds::<u8>(EXAMPLE_SEED), 10),
+///     "[113, 239, 69, 108, 228, 210, 168, 161, 87, 32, ...]"
 /// )
 /// ```
 #[inline]
@@ -423,11 +408,11 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \\frac{1}{2^{W-1}-1} & x > 0 \\\\
-///     0 & \\text{otherwise}
+///     \\frac{1}{2^{W-1}-1} & \text{if} \\quad x > 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -436,18 +421,13 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_positive_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_signeds::<i8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[113, 94, 23, 98, 70, 92, 52, 84, 33, 47]
+///     prefix_to_string(random_positive_signeds::<i8>(EXAMPLE_SEED), 10),
+///     "[113, 94, 23, 98, 70, 92, 52, 84, 33, 47, ...]"
 /// )
 /// ```
 #[inline]
@@ -461,11 +441,11 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     2^{1-W} & x < 0\\\\
-///     0 & \\text{otherwise}
+///     2^{1-W} & \text{if} \\quad x < 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -474,18 +454,13 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_negative_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_negative_signeds::<i8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[-15, -34, -105, -30, -58, -36, -76, -44, -95, -81]
+///     prefix_to_string(random_negative_signeds::<i8>(EXAMPLE_SEED), 10),
+///     "[-15, -34, -105, -30, -58, -36, -76, -44, -95, -81, ...]"
 /// )
 /// ```
 #[inline]
@@ -502,11 +477,11 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     2^{1-W} & x \geq 0 \\\\
-///     0 & \\text{otherwise}
+///     2^{1-W} & \text{if} \\quad x \geq 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -515,18 +490,13 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_natural_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_natural_signeds::<i8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[113, 94, 23, 98, 70, 92, 52, 84, 33, 47]
+///     prefix_to_string(random_natural_signeds::<i8>(EXAMPLE_SEED), 10),
+///     "[113, 94, 23, 98, 70, 92, 52, 84, 33, 47, ...]"
 /// )
 /// ```
 #[inline]
@@ -538,11 +508,11 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \\frac{1}{2^W-1} & x \\neq 0 \\\\
-///     0 & \\text{otherwise}
+///     \\frac{1}{2^W-1} & \text{if} \\quad x \\neq 0, \\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -551,18 +521,13 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_nonzero_signeds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_nonzero_signeds::<i8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[113, -17, 69, 108, -28, -46, -88, -95, 87, 32]
+///     prefix_to_string(random_nonzero_signeds::<i8>(EXAMPLE_SEED), 10),
+///     "[113, -17, 69, 108, -28, -46, -88, -95, 87, 32, ...]"
 /// )
 /// ```
 #[inline]
@@ -572,12 +537,12 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
     nonzero_values(random_primitive_ints(seed))
 }
 
-/// Uniformly generates random unsigned integers less than a positive `limit`.
+/// Uniformly generates random unsigned integers less than a positive limit.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{\\ell} & x < \\ell \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{\\ell} & \text{if} \\quad x < \\ell, \\\\
+///     0 & \\text{otherwise,}
 /// \\end{cases}
 /// $$
 /// where $\ell$ is `limit`.
@@ -592,18 +557,13 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_unsigneds_less_than;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigneds_less_than::<u8>(EXAMPLE_SEED, 10)
-///         .take(10)
-///         .collect_vec(),
-///     &[1, 7, 5, 4, 6, 4, 2, 8, 1, 7]
+///     prefix_to_string(random_unsigneds_less_than::<u8>(EXAMPLE_SEED, 10), 10),
+///     "[1, 7, 5, 4, 6, 4, 2, 8, 1, 7, ...]"
 /// )
 /// ```
 pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
@@ -624,13 +584,13 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 
 /// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
 ///
-/// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
-/// use `random_unsigned_inclusive_range`.
+/// $a$ must be less than $b$. This function cannot create a range that includes `T::MAX`; for that,
+/// use [`random_unsigned_inclusive_range`].
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a} & a \leq x < b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a} & \text{if} \\quad a \leq x < b, \\\\
+///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
@@ -644,18 +604,13 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_unsigned_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_range::<u8>(EXAMPLE_SEED, 10, 20)
-///         .take(10)
-///         .collect_vec(),
-///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
+///     prefix_to_string(random_unsigned_range::<u8>(EXAMPLE_SEED, 10, 20), 10),
+///     "[11, 17, 15, 14, 16, 14, 12, 18, 11, 17, ...]"
 /// )
 /// ```
 pub fn random_unsigned_range<T: PrimitiveUnsigned>(
@@ -674,12 +629,12 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 
 /// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
 ///
-/// `a` must be less than or equal to `b`.
+/// $a$ must be less than or equal to $b$.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a+1} & \text{if} \\quad a \leq x \leq b, \\\\
+///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
@@ -693,18 +648,13 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 10, 19)
-///         .take(10)
-///         .collect_vec(),
-///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
+///     prefix_to_string(random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 10, 19), 10),
+///     "[11, 17, 15, 14, 16, 14, 12, 18, 11, 17, ...]"
 /// )
 /// ```
 pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
@@ -724,13 +674,13 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 
 /// Uniformly generates random signed integers in the half-open interval $[a, b)$.
 ///
-/// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
-/// use `random_signed_inclusive_range`.
+/// $a$ must be less than $b$. This function cannot create a range that includes `T::MAX`; for that,
+/// use [`random_signed_inclusive_range`].
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a} & a \leq x < b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a} & \text{if} \\quad a \leq x < b, \\\\
+///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
@@ -744,18 +694,13 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_signed_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_range::<i8>(EXAMPLE_SEED, -100, 100)
-///         .take(10)
-///         .collect_vec(),
-///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
+///     prefix_to_string(random_signed_range::<i8>(EXAMPLE_SEED, -100, 100), 10),
+///     "[13, -31, 8, 68, 61, -13, -68, 10, -17, 88, ...]"
 /// )
 /// ```
 #[inline]
@@ -770,12 +715,12 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 
 /// Uniformly generates random signed integers in the closed interval $[a, b]$.
 ///
-/// `a` must be less than or equal to `b`.
+/// $a$ must be less than or equal to $b$.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
-///     0 & \\text{otherwise}
+///     \frac{1}{b-a+1} & \text{if} \\quad a \leq x \leq b, \\\\
+///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
@@ -789,18 +734,13 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_signed_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99)
-///         .take(10)
-///         .collect_vec(),
-///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
+///     prefix_to_string(random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99), 10),
+///     "[13, -31, 8, 68, 61, -13, -68, 10, -17, 88, ...]"
 /// )
 /// ```
 #[inline]
@@ -817,12 +757,12 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
     }
 }
 
-/// Uniformly generates unsigned integers of up to `chunk_size` bits.
+/// Uniformly generates unsigned integers containing some maximum number of bits.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     2^{-c} & 0 \\leq x < 2^c \\\\
-///     0 & \\text{otherwise}
+///     2^{-c} & \text{if} \\quad 0 \\leq x < 2^c, \\\\
+///     0 & \\text{otherwise,}
 /// \\end{cases}
 /// $$
 /// where $c$ is `chunk_size`.
@@ -833,22 +773,17 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
+/// Panics if `chunk_size` is zero or greater than the width of the type.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_unsigned_bit_chunks;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3)
-///         .take(10)
-///         .collect_vec(),
-///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
+///     prefix_to_string(random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3), 10),
+///     "[1, 6, 5, 7, 6, 3, 1, 2, 4, 5, ...]"
 /// )
 /// ```
 pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
@@ -860,18 +795,19 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     }
 }
 
-/// Uniformly generates signed integers of up to `chunk_size` bits.
+/// Uniformly generates signed integers containing some maximum number of bits.
 ///
-/// The generated values will all be
-/// non-negative unless `chunk_size` is equal to `T::WIDTH`.
+/// The generated values will all be non-negative unless `chunk_size` is equal to the width of the
+/// type.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     2^{-c} & c = W \\ \\text{or} \\ (c < W \\ \\text{and} \\ 0 \\leq x < 2^c) \\\\
-///     0 & \\text{otherwise}
+///     2^{-c} & \text{if} \\quad c = W \\ \\text{or}
+///         \\ (c < W \\ \\text{and} \\ 0 \\leq x < 2^c), \\\\
+///     0 & \\text{otherwise,}
 /// \\end{cases}
 /// $$
-/// where $c$ is `chunk_size` and $W$ is `T::WIDTH`.
+/// where $c$ is `chunk_size` and $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -879,22 +815,17 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
+/// Panics if `chunk_size` is zero or greater than the width of the type.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_signed_bit_chunks;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3)
-///         .take(10)
-///         .collect_vec(),
-///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
+///     prefix_to_string(random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3), 10),
+///     "[1, 6, 5, 7, 6, 3, 1, 2, 4, 5, ...]"
 /// )
 /// ```
 pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
@@ -911,11 +842,11 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     2^{1-W} & 2^{W-1} \\leq x < 2^W \\\\
-///     0 & \\text{otherwise}
+///     2^{1-W} & \text{if} \\quad 2^{W-1} \\leq x < 2^W ,\\\\
+///     0 & \\text{otherwise},
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
+/// where $W$ is the width of the type.
 ///
 /// The output length is infinite.
 ///
@@ -924,18 +855,13 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::random::random_highest_bit_set_unsigneds;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED)
-///         .take(10)
-///         .collect_vec(),
-///     &[241, 222, 151, 226, 198, 220, 180, 212, 161, 175],
+///     prefix_to_string(random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED), 10),
+///     "[241, 222, 151, 226, 198, 220, 180, 212, 161, 175, ...]"
 /// )
 /// ```
 #[inline]
@@ -950,8 +876,7 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
 
 /// Generates random primitive floats in the half-open interval $[a, b)$.
 ///
-/// This `struct` is created by the `random_primitive_float_range` function. See its documentation
-/// for more.
+/// This `struct` is created by [`random_primitive_float_range`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloatRange<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -968,8 +893,8 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
 
 /// Generates random primitive floats in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by the `random_primitive_float_inclusive_range` function. See its
-/// documentation for more.
+/// This `struct` is created by [`random_primitive_float_inclusive_range`]; see its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -996,8 +921,8 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
 ///
 /// `NaN` is never generated.
 ///
-/// `a` must be less than `b`. This function cannot create a range that includes
-/// `T::POSITIVE_INFINITY`; for that,  use `random_primitive_float_inclusive_range`.
+/// $a$ must be less than $b$. This function cannot create a range that includes
+/// `T::POSITIVE_INFINITY`; for that, use [`random_primitive_float_inclusive_range`].
 ///
 /// The output length is infinite.
 ///
@@ -1009,35 +934,18 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_float_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_float_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         5.664681e-11,
-///         1.2492925e-35,
-///         2.3242339e-29,
-///         4.699183e-7,
-///         -2.8244436e-36,
-///         -2.264039e-37,
-///         -0.0000017299129,
-///         1.40616e-23,
-///         2.7418007e-27,
-///         1.5418819e-16
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         random_primitive_float_range::<f32>(EXAMPLE_SEED, -0.1, 0.1).map(NiceFloat),
+///         10
+///     ),
+///     "[5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37, \
+///     -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16, ...]"
 /// );
 /// ```
 #[inline]
@@ -1075,7 +983,7 @@ pub fn random_primitive_float_range<T: PrimitiveFloat>(
 /// Positive and negative zero are treated as two distinct values, with negative zero being smaller
 /// than zero.
 ///
-/// `a` must be less than or equal to `b`.
+/// $a$ must be less than or equal to $b$.
 ///
 /// `NaN` is never generated.
 ///
@@ -1089,35 +997,18 @@ pub fn random_primitive_float_range<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_float_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_float_inclusive_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         5.664681e-11,
-///         1.2492925e-35,
-///         2.3242339e-29,
-///         4.699183e-7,
-///         -2.8244436e-36,
-///         -2.264039e-37,
-///         -0.0000017299129,
-///         1.40616e-23,
-///         2.7418007e-27,
-///         1.5418819e-16
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         random_primitive_float_inclusive_range::<f32>(EXAMPLE_SEED, -0.1, 0.1).map(NiceFloat),
+///         10
+///     ),
+///     "[5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37, \
+///     -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16, ...]"
 /// );
 /// ```
 #[inline]
@@ -1161,35 +1052,18 @@ pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_positive_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         9.5715654e26,
-///         209.6476,
-///         386935780.0,
-///         7.965817e30,
-///         0.00021030706,
-///         0.0027270128,
-///         3.4398167e-34,
-///         2.3397111e14,
-///         44567765000.0,
-///         2.3479653e21
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat),
+///         10
+///     ),
+///     "[9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128, \
+///     3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21, ...]"
 /// );
 /// ```
 #[inline]
@@ -1215,35 +1089,18 @@ pub fn random_positive_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_negative_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484663e-27,
-///         -0.010641626,
-///         -5.8060583e-9,
-///         -2.8182442e-31,
-///         -10462.532,
-///         -821.12994,
-///         -6.303163e33,
-///         -9.50376e-15,
-///         -4.9561126e-11,
-///         -8.565163e-22
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat),
+///         10
+///     ),
+///     "[-2.3484663e-27, -0.010641626, -5.8060583e-9, -2.8182442e-31, -10462.532, -821.12994, \
+///     -6.303163e33, -9.50376e-15, -4.9561126e-11, -8.565163e-22, ...]"
 /// );
 /// ```
 #[inline]
@@ -1269,35 +1126,18 @@ pub fn random_negative_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_nonzero_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484663e-27,
-///         2.287989e-18,
-///         -2.0729893e-12,
-///         3.360012e28,
-///         -9.021723e-32,
-///         3564911.2,
-///         -0.0000133769445,
-///         -1.8855448e18,
-///         8.2494555e-29,
-///         2.2178014e-38
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat),
+///         10
+///     ),
+///     "[-2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2, \
+///     -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38, ...]"
 /// );
 /// ```
 #[inline]
@@ -1323,35 +1163,15 @@ pub fn random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484663e-27,
-///         2.287989e-18,
-///         -2.0729893e-12,
-///         3.360012e28,
-///         -9.021723e-32,
-///         3564911.2,
-///         -0.0000133769445,
-///         -1.8855448e18,
-///         8.2494555e-29,
-///         2.2178014e-38
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(random_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat), 10),
+///     "[-2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2, \
+///     -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38, ...]"
 /// );
 /// ```
 #[inline]
@@ -1377,35 +1197,15 @@ pub fn random_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_positive_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         9.5715654e26,
-///         209.6476,
-///         386935780.0,
-///         7.965817e30,
-///         0.00021030706,
-///         0.0027270128,
-///         3.4398167e-34,
-///         2.3397111e14,
-///         44567765000.0,
-///         2.3479653e21
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(random_positive_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat), 10),
+///     "[9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128, \
+///     3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21, ...]"
 /// );
 /// ```
 #[inline]
@@ -1431,35 +1231,15 @@ pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_negative_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_negative_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484665e-27,
-///         -0.010641627,
-///         -5.8060587e-9,
-///         -2.8182444e-31,
-///         -10462.533,
-///         -821.13,
-///         -6.3031636e33,
-///         -9.5037605e-15,
-///         -4.956113e-11,
-///         -8.565164e-22
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(random_negative_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat), 10),
+///     "[-2.3484665e-27, -0.010641627, -5.8060587e-9, -2.8182444e-31, -10462.533, -821.13, \
+///     -6.3031636e33, -9.5037605e-15, -4.956113e-11, -8.565164e-22, ...]"
 /// );
 /// ```
 #[inline]
@@ -1485,35 +1265,15 @@ pub fn random_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_nonzero_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484665e-27,
-///         2.2879888e-18,
-///         -2.0729896e-12,
-///         3.3600117e28,
-///         -9.0217234e-32,
-///         3564911.0,
-///         -0.000013376945,
-///         -1.885545e18,
-///         8.249455e-29,
-///         2.2178013e-38
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat), 10),
+///     "[-2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0, \
+///     -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38, ...]",
 /// );
 /// ```
 #[inline]
@@ -1525,8 +1285,7 @@ pub fn random_nonzero_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates random primitive floats.
 ///
-/// This `struct` is created by the `random_primitive_floats` function. See its documentation for
-/// more.
+/// This `struct` is created by [`random_primitive_floats`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloats<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -1564,35 +1323,15 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat)
-///         .take(10)
-///         .collect_vec(),
-///     [
-///         -2.3484665e-27,
-///         2.2879888e-18,
-///         -2.0729896e-12,
-///         3.3600117e28,
-///         -9.0217234e-32,
-///         3564911.0,
-///         -0.000013376945,
-///         -1.885545e18,
-///         8.249455e-29,
-///         2.2178013e-38
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(random_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat), 10),
+///     "[-2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0, \
+///     -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38, ...]"
 /// );
 /// ```
 #[inline]
@@ -1607,8 +1346,8 @@ pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitive
 
 /// Generates positive finite primitive floats.
 ///
-/// This `struct` is created by the `special_random_positive_finite_primitive_floats` function. See
-/// its documentation for more.
+/// This `struct` is created by [`special_random_positive_finite_primitive_floats`]; see its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloats<T: PrimitiveFloat> {
     seed: Seed,
@@ -1661,11 +1400,11 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 /// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
 /// and denominators of their means.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -1679,45 +1418,20 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_positive_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         0.80126953,
-///         0.0000013709068,
-///         0.015609741,
-///         0.98552704,
-///         65536.0,
-///         0.008257866,
-///         0.017333984,
-///         2.25,
-///         7.7089844,
-///         0.00004425831,
-///         0.40625,
-///         24576.0,
-///         37249.0,
-///         1.1991882,
-///         32.085938,
-///         0.4375,
-///         0.0012359619,
-///         1536.0,
-///         0.22912993,
-///         0.0015716553
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[0.80126953, 0.0000013709068, 0.015609741, 0.98552704, 65536.0, 0.008257866, \
+///     0.017333984, 2.25, 7.7089844, 0.00004425831, 0.40625, 24576.0, 37249.0, 1.1991882, \
+///     32.085938, 0.4375, 0.0012359619, 1536.0, 0.22912993, 0.0015716553, ...]"
 /// );
 /// ```
 pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
@@ -1748,8 +1462,8 @@ pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates negative finite primitive floats.
 ///
-/// This `struct` is created by the `special_random_negative_finite_primitive_floats` function. See
-/// its documentation for more.
+/// This `struct` is created by [`special_random_negative_finite_primitive_floats`]; see its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub struct SpecialRandomNegativeFiniteFloats<T: PrimitiveFloat>(
     SpecialRandomPositiveFiniteFloats<T>,
@@ -1770,11 +1484,11 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 /// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
 /// and denominators of their means.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -1788,45 +1502,20 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_negative_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         -0.80126953,
-///         -0.0000013709068,
-///         -0.015609741,
-///         -0.98552704,
-///         -65536.0,
-///         -0.008257866,
-///         -0.017333984,
-///         -2.25,
-///         -7.7089844,
-///         -0.00004425831,
-///         -0.40625,
-///         -24576.0,
-///         -37249.0,
-///         -1.1991882,
-///         -32.085938,
-///         -0.4375,
-///         -0.0012359619,
-///         -1536.0,
-///         -0.22912993,
-///         -0.0015716553
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[-0.80126953, -0.0000013709068, -0.015609741, -0.98552704, -65536.0, -0.008257866, \
+///     -0.017333984, -2.25, -7.7089844, -0.00004425831, -0.40625, -24576.0, -37249.0, \
+///     -1.1991882, -32.085938, -0.4375, -0.0012359619, -1536.0, -0.22912993, -0.0015716553, ...]"
 /// );
 /// ```
 #[inline]
@@ -1848,8 +1537,8 @@ pub fn special_random_negative_finite_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates nonzero finite primitive floats.
 ///
-/// This `struct` is created by the `special_random_nonzero_finite_primitive_floats` function. See
-/// its documentation for more.
+/// This `struct` is created by [`special_random_nonzero_finite_primitive_floats`]; see its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub struct SpecialRandomNonzeroFiniteFloats<T: PrimitiveFloat> {
     bs: RandomBools,
@@ -1872,11 +1561,11 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 /// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
 /// and denominators of their means.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -1890,45 +1579,20 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_nonzero_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         -0.6328125,
-///         -9.536743e-7,
-///         -0.013671875,
-///         0.6875,
-///         -70208.0,
-///         0.01550293,
-///         -0.028625488,
-///         -3.3095703,
-///         -5.775879,
-///         0.000034958124,
-///         0.4375,
-///         31678.0,
-///         -49152.0,
-///         -1.0,
-///         49.885254,
-///         -0.40625,
-///         -0.0015869141,
-///         -1889.5625,
-///         -0.14140439,
-///         -0.001449585
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[-0.6328125, -9.536743e-7, -0.013671875, 0.6875, -70208.0, 0.01550293, -0.028625488, \
+///     -3.3095703, -5.775879, 0.000034958124, 0.4375, 31678.0, -49152.0, -1.0, 49.885254, \
+///     -0.40625, -0.0015869141, -1889.5625, -0.14140439, -0.001449585, ...]"
 /// );
 /// ```
 #[inline]
@@ -1958,11 +1622,11 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 /// generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the nonzero floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -1976,46 +1640,21 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_finite_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         0.65625,
-///         0.0000014255784,
-///         0.013183594,
-///         0.0,
-///         -0.8125,
-///         -74240.0,
-///         -0.0078125,
-///         -0.03060913,
-///         3.331552,
-///         4.75,
-///         -0.000038146973,
-///         -0.3125,
-///         -27136.0,
-///         -0.0,
-///         -59392.0,
-///         -1.75,
-///         -41.1875,
-///         0.0,
-///         0.30940247,
-///         -0.0009765625
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[0.65625, 0.0000014255784, 0.013183594, 0.0, -0.8125, -74240.0, -0.0078125, -0.03060913, \
+///     3.331552, 4.75, -0.000038146973, -0.3125, -27136.0, -0.0, -59392.0, -1.75, -41.1875, 0.0, \
+///     0.30940247, -0.0009765625, ...]"
 /// );
 /// ```
 #[inline]
@@ -2052,11 +1691,11 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 /// will be generated. You can also specify the mean absolute sci-exponent and precision by passing
 /// the numerators and denominators of their means of the finite floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -2070,46 +1709,21 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_positive_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_positive_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         0.6328125,
-///         9.536743e-7,
-///         0.013671875,
-///         f32::POSITIVE_INFINITY,
-///         0.6875,
-///         70208.0,
-///         0.01550293,
-///         0.028625488,
-///         3.3095703,
-///         5.775879,
-///         0.000034958124,
-///         0.4375,
-///         31678.0,
-///         f32::POSITIVE_INFINITY,
-///         49152.0,
-///         1.0,
-///         49.885254,
-///         f32::POSITIVE_INFINITY,
-///         0.40625,
-///         0.0015869141
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_positive_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[0.6328125, 9.536743e-7, 0.013671875, Infinity, 0.6875, 70208.0, 0.01550293, \
+///     0.028625488, 3.3095703, 5.775879, 0.000034958124, 0.4375, 31678.0, Infinity, 49152.0, \
+///     1.0, 49.885254, Infinity, 0.40625, 0.0015869141, ...]"
 /// );
 /// ```
 #[inline]
@@ -2146,11 +1760,11 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 /// will be generated. You can also specify the mean absolute sci-exponent and precision by passing
 /// the numerators and denominators of their means of the finite floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -2164,46 +1778,21 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_negative_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_negative_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         -0.6328125,
-///         -9.536743e-7,
-///         -0.013671875,
-///         f32::NEGATIVE_INFINITY,
-///         -0.6875,
-///         -70208.0,
-///         -0.01550293,
-///         -0.028625488,
-///         -3.3095703,
-///         -5.775879,
-///         -0.000034958124,
-///         -0.4375,
-///         -31678.0,
-///         f32::NEGATIVE_INFINITY,
-///         -49152.0,
-///         -1.0,
-///         -49.885254,
-///         f32::NEGATIVE_INFINITY,
-///         -0.40625,
-///         -0.0015869141
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_negative_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[-0.6328125, -9.536743e-7, -0.013671875, -Infinity, -0.6875, -70208.0, -0.01550293, \
+///     -0.028625488, -3.3095703, -5.775879, -0.000034958124, -0.4375, -31678.0, -Infinity, \
+///     -49152.0, -1.0, -49.885254, -Infinity, -0.40625, -0.0015869141, ...]"
 /// );
 /// ```
 #[inline]
@@ -2240,11 +1829,11 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 /// be generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the finite floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -2258,46 +1847,21 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_nonzero_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         0.65625,
-///         0.0000014255784,
-///         0.013183594,
-///         f32::POSITIVE_INFINITY,
-///         -0.8125,
-///         -74240.0,
-///         -0.0078125,
-///         -0.03060913,
-///         3.331552,
-///         4.75,
-///         -0.000038146973,
-///         -0.3125,
-///         -27136.0,
-///         f32::NEGATIVE_INFINITY,
-///         -59392.0,
-///         -1.75,
-///         -41.1875,
-///         f32::POSITIVE_INFINITY,
-///         0.30940247,
-///         -0.0009765625
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[0.65625, 0.0000014255784, 0.013183594, Infinity, -0.8125, -74240.0, -0.0078125, \
+///     -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0, -Infinity, -59392.0, \
+///     -1.75, -41.1875, Infinity, 0.30940247, -0.0009765625, ...]"
 /// );
 /// ```
 #[inline]
@@ -2334,11 +1898,11 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// or NaN will be generated. You can also specify the mean absolute sci-exponent and precision by
 /// passing the numerators and denominators of their means of the finite floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
@@ -2350,46 +1914,21 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_floats;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat)
-///         .take(20)
-///         .collect_vec(),
-///     [
-///         0.65625,
-///         0.0000014255784,
-///         0.013183594,
-///         f32::POSITIVE_INFINITY,
-///         -0.8125,
-///         -74240.0,
-///         -0.0078125,
-///         -0.03060913,
-///         3.331552,
-///         4.75,
-///         -0.000038146973,
-///         -0.3125,
-///         -27136.0,
-///         f32::POSITIVE_INFINITY,
-///         -59392.0,
-///         -1.75,
-///         -41.1875,
-///         f32::POSITIVE_INFINITY,
-///         0.30940247,
-///         -0.0009765625
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///                 .map(NiceFloat),
+///         20
+///     ),
+///     "[0.65625, 0.0000014255784, 0.013183594, Infinity, -0.8125, -74240.0, -0.0078125, \
+///     -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0, Infinity, -59392.0, \
+///     -1.75, -41.1875, Infinity, 0.30940247, -0.0009765625, ...]"
 /// );
 /// ```
 #[inline]
@@ -2458,6 +1997,7 @@ fn mantissas_inclusive<T: PrimitiveFloat>(
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloatInclusiveRange<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -2660,6 +2200,9 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
 }
 
 /// Generates random primitive floats in a range.
+///
+/// This `enum` is created by [`special_random_primitive_float_range`]; see its documentation for
+/// more.
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum SpecialRandomFloatInclusiveRange<T: PrimitiveFloat> {
@@ -2698,6 +2241,16 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 ///   a float in the range, and the precision mean greater than 2, but they may be as high as you
 /// like.
 ///
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater the smallest absolute value of any
+///   sci-exponent of a float in the range, and the precision mean greater than 2, but they may be
+///   as high as you like.
+///
 /// `NaN` is never generated.
 ///
 /// The output length is infinite.
@@ -2706,45 +2259,36 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `a` or `b` are `NaN`, if `a` is greater than or equal to `b` in the `NiceFloat`
+/// Panics if $a$ or $b$ are `NaN`, if $a$ is greater than or equal to $b$ in the `NiceFloat`
 /// ordering, if any of the denominators are zero, if the special probability is greater than 1, if
 /// the mean precision is less than 2, or if the mean sci-exponent is less than or equal to the
 /// minimum absolute value of any sci-exponent in the range.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_float_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_primitive_float_range::<f32>(
-///         EXAMPLE_SEED,
-///         core::f32::consts::E,
-///         core::f32::consts::PI,
-///         10,
-///         1,
-///         10,
-///         1,
-///         1,
-///         100
-///     )
-///     .map(NiceFloat)
-///     .take(20)
-///     .collect_vec(),
-///     [
-///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
-///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_primitive_float_range::<f32>(
+///             EXAMPLE_SEED,
+///             core::f32::consts::E,
+///             core::f32::consts::PI,
+///             10,
+///             1,
+///             10,
+///             1,
+///             1,
+///             100
+///         ).map(NiceFloat),
+///         20
+///     ),
+///     "[2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625, \
+///     2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75, ...]"
 /// );
 /// ```
 pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
@@ -2782,15 +2326,15 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 /// range. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the finite floats.
 ///
-/// But note that the means are only approximate, since the distributions we are sampling are
-/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
-/// implications are that
-/// - The actual mean is lower than the specified means.
-/// - However, increasing the approximate mean increases the actual means, so this still works as a
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
+/// practical implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
-/// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of
-///   a float in the range, and the precision mean greater than 2, but they may be as high as you
-///   like.
+/// - The specified sci-exponent mean must be greater the smallest absolute value of any
+///   sci-exponent of a float in the range, and the precision mean greater than 2, but they may be
+///   as high as you like.
 ///
 /// `NaN` is never generated.
 ///
@@ -2800,45 +2344,36 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `a` or `b` are `NaN`, if `a` is greater than `b` in the `NiceFloat` ordering, if any
+/// Panics if $a$ or $b$ are `NaN`, if $a$ is greater than $b$ in the `NiceFloat` ordering, if any
 /// of the denominators are zero, if the special probability is greater than 1, if the mean
 /// precision is less than 2, or if the mean sci-exponent is less than or equal to the minimum
 /// absolute value of any sci-exponent in the range.
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_float_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     special_random_primitive_float_inclusive_range::<f32>(
-///         EXAMPLE_SEED,
-///         core::f32::consts::E,
-///         core::f32::consts::PI,
-///         10,
-///         1,
-///         10,
-///         1,
-///         1,
-///         100
-///     )
-///     .map(NiceFloat)
-///     .take(20)
-///     .collect_vec(),
-///     [
-///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
-///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
-///     ]
-///     .iter()
-///     .cloned()
-///     .map(NiceFloat)
-///     .collect_vec()
+///     prefix_to_string(
+///         special_random_primitive_float_inclusive_range::<f32>(
+///             EXAMPLE_SEED,
+///             core::f32::consts::E,
+///             core::f32::consts::PI,
+///             10,
+///             1,
+///             10,
+///             1,
+///             1,
+///             100
+///         ).map(NiceFloat),
+///         20
+///     ),
+///     "[2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625, \
+///     2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75, ...]"
 /// );
 /// ```
 pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
@@ -2917,7 +2452,10 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
     }
 }
 
-/// Generates ranges of unsigneds. A single generator can generate many different ranges.
+/// Generates unsigneds sampled from ranges. A single generator can sample from different ranges of
+/// different types.
+///
+/// This `struct` is created by [`variable_range_generator`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct VariableRangeGenerator {
     xs: RandomPrimitiveInts<u32>,
@@ -2927,12 +2465,12 @@ pub struct VariableRangeGenerator {
 }
 
 impl VariableRangeGenerator {
-    /// Uniformly generates an unsigned integer of up to `chunk_size` bits.
+    /// Uniformly generates an unsigned integer with up to some number of bits.
     ///
     /// $$
     /// P(x) = \\begin{cases}
-    ///     2^{-c} & 0 \\leq x < 2^c \\\\
-    ///     0 & \\text{otherwise}
+    ///     2^{-c} & \text{if} \\quad 0 \\leq x < 2^c, \\\\
+    ///     0 & \text{if} \\quad \\text{otherwise,}
     /// \\end{cases}
     /// $$
     /// where $c$ is `chunk_size`.
@@ -2943,7 +2481,7 @@ impl VariableRangeGenerator {
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
+    /// Panics if `chunk_size` is zero or greater than the width of the type.
     ///
     /// # Examples
     /// ```
@@ -2988,11 +2526,11 @@ impl VariableRangeGenerator {
         }
     }
 
-    /// Uniformly generates a random unsigned integers less than a positive `limit`.
+    /// Uniformly generates a random unsigned integer less than a positive limit.
     ///
     /// $$
     /// P(x) = \\begin{cases}
-    ///     \frac{1}{\\ell} & x < \\ell \\\\
+    ///     \frac{1}{\\ell} & \text{if} \\quad x < \\ell \\\\
     ///     0 & \\text{otherwise}
     /// \\end{cases}
     /// $$
@@ -3033,13 +2571,13 @@ impl VariableRangeGenerator {
 
     /// Uniformly generates a random unsigned integer in the half-open interval $[a, b)$.
     ///
-    /// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for
-    /// that, use `next_in_inclusive_range`.
+    /// $a$ must be less than $b$. This function cannot create a range that includes `T::MAX`; for
+    /// that, use [`next_in_inclusive_range`](Self::next_in_inclusive_range).
     ///
     /// $$
     /// P(x) = \\begin{cases}
-    ///     \frac{1}{b-a} & a \leq x < b \\\\
-    ///     0 & \\text{otherwise}
+    ///     \frac{1}{b-a} & \text{if} \\quad a \leq x < b, \\\\
+    ///     0 & \\text{otherwise.}
     /// \\end{cases}
     /// $$
     ///
@@ -3067,12 +2605,12 @@ impl VariableRangeGenerator {
 
     /// Uniformly generates a random unsigned integer in the closed interval $[a, b]$.
     ///
-    /// `a` must be less than or equal to `b`.
+    /// $a$ must be less than or equal to $b$.
     ///
     /// $$
     /// P(x) = \\begin{cases}
-    ///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
-    ///     0 & \\text{otherwise}
+    ///     \frac{1}{b-a+1} & \text{if} \\quad a \leq x \leq b, \\\\
+    ///     0 & \\text{otherwise.}
     /// \\end{cases}
     /// $$
     ///
@@ -3103,11 +2641,12 @@ impl VariableRangeGenerator {
     }
 }
 
-/// Generates ranges of unsigneds. A single generator can generate many different ranges.
+/// Generates unsigneds sampled from ranges. A single generator can sample from different ranges of
+/// different types.
 ///
 /// If you only need to generate values from a single range, it is slightly more efficient to use
-/// `random_unsigned_bit_chunks`, `unsigneds_less_than`, `random_unsigned_range`, or
-/// `random_unsigned_inclusive_range`.
+/// [`random_unsigned_bit_chunks`], [`random_unsigneds_less_than`], [`random_unsigned_range`], or
+/// [`random_unsigned_inclusive_range`].
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -3139,16 +2678,17 @@ pub mod geometric;
 ///
 /// Integers with long runs of 0s and 1s are good for testing; they're more likely to result in
 /// carries and borrows than uniformly random integers. This idea was inspired by GMP's
-/// `mpz_rrandomb` function, although striped integers are more general: they can also have runs
-/// that are shorter than average, so that they tend to contain alternating blocks like $1010101$.
+/// `mpz_rrandomb` function, although striped integer generators are more general: they can also
+/// produce integers with runs that are shorter than average, so that they tend to contain
+/// alternating bits like $1010101$.
 ///
 /// Let the average length of a run of 0s and 1s be $m$. The functions in this module allow the user
 /// to specify a rational $m$ through the parameters `m_numerator` and `m_denominator`. Since any
 /// binary sequence has an average run length of at least 1, $m$ must be at least 1; but if it is
-/// exactly 1 then the sequence is strictly alternating and no longer random, so 1 is excluded. if
-/// $m$ is between 1 and 2, the sequence is less likely to have two equal adjacent bits than a
-/// uniformly random sequence. If $m$ is 2, the sequence is uniformly random. If $m$ is greater than
-/// 2 (the most useful case), the sequence tends to have long runs of 0s and 1s.
+/// exactly 1 then the sequence is strictly alternating and no longer random, so 1 is not allowed
+/// either. if $m$ is between 1 and 2, the sequence is less likely to have two equal adjacent bits
+/// than a uniformly random sequence. If $m$ is 2, the sequence is uniformly random. If $m$ is
+/// greater than 2 (the most useful case), the sequence tends to have long runs of 0s and 1s.
 ///
 /// # Details
 ///
@@ -3173,10 +2713,9 @@ pub mod geometric;
 /// and then determine the length of each block of equal bits using a geometric distribution with
 /// mean $m$. In practice, this isn't any more efficient than the naive algorithm.
 ///
-/// We can generate a random striped unsigned integer of type `T` by taking the first `T::WIDTH`
-/// bits of a striped sequence. Fixing the parameter $m$ defines a distribution over `T`s. A few
-/// things can be said about the probability $P_m(n)$ of an unsigned integer $n$ of width $W$ being
-/// generated :
+/// We can generate a random striped unsigned integer of type `T` by taking the first $W$ bits of a
+/// striped sequence. Fixing the parameter $m$ defines a distribution over `T`s. A few things can
+/// be said about the probability $P_m(n)$ of an unsigned integer $n$ of width $W$ being generated:
 /// * $P_m(n) = P_m(\lnot n)$
 /// * $P_m(0) = P_m(2^W-1) = \frac{1}{2} \left ( 1-\frac{1}{m} \right )^{W-1}$. If $m>2$, this is
 ///   the maximum probability achieved; if $m<2$, the minimum.
@@ -3186,10 +2725,11 @@ pub mod geometric;
 ///   It's hard to say anything about their standard deviations or excess kurtoses, although these
 ///   can be computed quickly for specific values of $m$ when $W$ is 8 or 16.
 ///
-/// We can similarly generate random striped signed integers of width `T`. The sign bit is chosen
-/// uniformly, and the remaining `T::WIDTH - 1` are taken from a striped sequence.
+/// We can similarly generate random striped signed integers of width $W$. The sign bit is chosen
+/// uniformly, and the remaining $W-1$ are taken from a striped sequence.
 ///
-/// Generating striped random values from an interval seems difficult. We can't shift the interval
-/// by adding, since addition destroys the the values' stripiness. For this reason, iterators that
-/// generate striped random values from an interval are not provided.
+/// To generate striped integers from a range, the integers are constructed one bit at a time.
+/// Some bits are forced; they must be 0 or 1 in order for the final integer to be within the
+/// specified range. If a bit is _not_ forced, it is different from the preceding bit with
+/// probability $1/m$.
 pub mod striped;

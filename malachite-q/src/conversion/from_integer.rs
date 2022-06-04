@@ -5,7 +5,8 @@ use malachite_nz::natural::Natural;
 use Rational;
 
 impl From<Integer> for Rational {
-    /// Converts an `Integer` to a `Rational`, taking the `Integer` by value.
+    /// Converts an [`Integer`](malachite_nz::integer::Integer) to a [`Rational`], taking the
+    /// [`Integer`](malachite_nz::integer::Integer) by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -13,7 +14,6 @@ impl From<Integer> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
@@ -31,7 +31,8 @@ impl From<Integer> for Rational {
 }
 
 impl<'a> From<&'a Integer> for Rational {
-    /// Converts an `Integer` to a `Rational`, taking the `Integer` by reference.
+    /// Converts an [`Integer`](malachite_nz::integer::Integer) to a [`Rational`], taking the
+    /// [`Integer`](malachite_nz::integer::Integer) by reference.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -43,7 +44,6 @@ impl<'a> From<&'a Integer> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;

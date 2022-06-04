@@ -1,9 +1,10 @@
+use extra_variadic::exhaustive_triples_1_input;
 use get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::{exhaustive_positive_primitive_ints, exhaustive_unsigneds};
-use malachite_base::tuples::exhaustive::{exhaustive_pairs_1_input, exhaustive_triples_1_input};
+use malachite_base::tuples::exhaustive::exhaustive_pairs_1_input;
 use std::fmt::Debug;
 
 fn exhaustive_pairs_1_input_helper<T, I: Clone + Iterator<Item = T>>(

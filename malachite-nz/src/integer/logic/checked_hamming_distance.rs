@@ -16,11 +16,12 @@ use std::cmp::Ordering;
 // `Limb`. Both have infinitely many implicit leading ones. `xs` cannot be empty or only contain
 // zeros; `y` cannot be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -89,17 +90,18 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 // returns the Hamming distance between their negatives (two's complement). Both have infinitely
 // many implicit leading ones. Neither slice may be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if `xs` or `ys` only contain zeros.
 //
-// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
-// the same length.
+// This is equivalent to `mpz_hamdist` from `mpz/hamdist.c`, GMP 6.2.1, where both arguments are
+// negative and have the same length.
 pub_test! {limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = slice_leading_zeros(xs);
     let ys_i = slice_leading_zeros(ys);
@@ -135,21 +137,24 @@ impl Natural {
 }
 
 impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
-    /// Determines the Hamming distance between two `Integer`s. The two `Integer`s have infinitely
-    /// many leading zeros or infinitely many leading ones, depending on their signs. If they are
-    /// both non-negative or both negative, the Hamming distance is finite. If one is non-negative
-    /// and the other is negative, the Hamming distance is infinite, so `None` is returned.
+    /// Determines the Hamming distance between two [`Integer`]s.
     ///
-    /// Time: worst case O(n)
+    /// The two [`Integer`]s have infinitely many leading zeros or infinitely many leading ones,
+    /// depending on their signs. If they are both non-negative or both negative, the Hamming
+    /// distance is finite. If one is non-negative and the other is negative, the Hamming distance
+    /// is infinite, so `None` is returned.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;

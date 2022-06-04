@@ -1,12 +1,11 @@
+use extra_variadic::{lex_triples, lex_triples_from_single};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
-use malachite_base::tuples::exhaustive::{
-    lex_pairs, lex_pairs_from_single, lex_triples, lex_triples_from_single,
-};
+use malachite_base::tuples::exhaustive::{lex_pairs, lex_pairs_from_single};
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;

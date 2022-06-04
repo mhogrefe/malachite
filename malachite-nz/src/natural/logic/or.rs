@@ -7,11 +7,12 @@ use std::ops::{BitOr, BitOrAssign};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the bitwise or of the `Natural` and a `Limb`. `xs` cannot be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -25,11 +26,12 @@ pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // limbs of the bitwise or of the `Natural` and a `Limb` to an output slice. The output slice must
 // be at least as long as the input slice. `xs` cannot be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` is empty.
@@ -41,9 +43,8 @@ pub_test! {limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the bitwise or of the `Natural` and a `Limb` to the input slice. `xs` cannot be empty.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -55,16 +56,17 @@ pub_test! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
 // `Natural`s, returns a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the
 // result is the length of one of the input slices.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpn_ior_n from gmp-impl.h, GMP 6.2.1, where rp is returned.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
+//
+// This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1, where `rp` is returned.
 pub_test! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x | y).collect()
@@ -74,14 +76,15 @@ pub_test! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the result is the length
 // of the longer input slice.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res is returned and both inputs are non-
-// negative.
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Time: worst case O(n)
+// $M(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res` is returned and both
+// inputs are non-negative.
 pub_test! {limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -100,16 +103,17 @@ pub_test! {limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // `Natural`s, writes the limbs of the bitwise or of the `Natural`s to an output slice. The output
 // must be at least as long as one of the input slices.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpn_ior_n from gmp-impl.h, GMP 6.2.1.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
+//
+// This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1.
 pub_test! {limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -123,16 +127,17 @@ pub_test! {limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb
 // the limbs of the bitwise or of the `Natural`s to an output slice. The output must be at least as
 // long as the longer input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//
-// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are non-negative.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `out` is too short.
+//
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are non-negative.
 pub_test! {limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -150,16 +155,17 @@ pub_test! {limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, writes the limbs of the bitwise or of the `Natural`s to the first (left) slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpn_ior_n from gmp-impl.h, GMP 6.2.1, where rp == up.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
+//
+// This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1, where `rp == up`.
 pub_test! {limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
@@ -171,13 +177,15 @@ pub_test! {limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 // `Natural`s, writes the limbs of the bitwise or of the `Natural`s to the `Vec`. If `ys` is longer
 // than `xs`, `xs` will be extended.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are non-negative.
 pub_test! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -194,15 +202,16 @@ pub_test! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 // equally long). Returns a `bool` which is `false` when the output is to the first slice and
 // `true` when it's to the second slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = min(`xs.len`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are non-negative and the result is
-// written to the longer input slice.
-pub_test! {limbs_or_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are non-negative
+// and the result is written to the longer input slice.
+pub_test! {limbs_or_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let right = xs_len < ys_len;
@@ -239,25 +248,33 @@ impl Natural {
 impl BitOr<Natural> for Natural {
     type Output = Natural;
 
-    /// Takes the bitwise or of two `Natural`s, taking both by value.
+    /// Takes the bitwise or of two [`Natural`]s, taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-    /// assert_eq!((Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-    ///     "1000000004095");
+    /// assert_eq!(Natural::from(123u32) | Natural::from(456u32), 507);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12) | (Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     1000000004095u64
+    /// );
     /// ```
     #[inline]
     fn bitor(mut self, other: Natural) -> Natural {
@@ -269,26 +286,33 @@ impl BitOr<Natural> for Natural {
 impl<'a> BitOr<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Takes the bitwise or of two `Natural`s, taking the left `Natural` by value and the right
-    /// `Natural` by reference.
+    /// Takes the bitwise or of two [`Natural`]s, taking the first by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-    /// assert_eq!((Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-    ///     "1000000004095");
+    /// assert_eq!(Natural::from(123u32) | &Natural::from(456u32), 507);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12) | &(Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     1000000004095u64
+    /// );
     /// ```
     #[inline]
     fn bitor(mut self, other: &'a Natural) -> Natural {
@@ -300,26 +324,33 @@ impl<'a> BitOr<&'a Natural> for Natural {
 impl<'a> BitOr<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Takes the bitwise or of two `Natural`s, taking the left `Natural` by reference and the right
-    /// `Natural` by value.
+    /// Takes the bitwise or of two [`Natural`]s, taking the first by reference and the second by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-    /// assert_eq!((&Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-    ///     "1000000004095");
+    /// assert_eq!(&Natural::from(123u32) | Natural::from(456u32), 507);
+    /// assert_eq!(
+    ///     &Natural::from(10u32).pow(12) | (Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     1000000004095u64
+    /// );
     /// ```
     #[inline]
     fn bitor(self, mut other: Natural) -> Natural {
@@ -331,25 +362,33 @@ impl<'a> BitOr<Natural> for &'a Natural {
 impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Takes the bitwise or of two `Natural`s, taking both `Natural`s by reference.
+    /// Takes the bitwise or of two [`Natural`]s, taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-    /// assert_eq!((&Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-    ///     "1000000004095");
+    /// assert_eq!(&Natural::from(123u32) | &Natural::from(456u32), 507);
+    /// assert_eq!(
+    ///     &Natural::from(10u32).pow(12) | &(Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     1000000004095u64
+    /// );
     /// ```
     fn bitor(self, other: &'a Natural) -> Natural {
         match (self, other) {
@@ -361,19 +400,20 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 }
 
 impl BitOrAssign<Natural> for Natural {
-    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the
+    /// Bitwise-ors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by value.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -399,19 +439,19 @@ impl BitOrAssign<Natural> for Natural {
 }
 
 impl<'a> BitOrAssign<&'a Natural> for Natural {
-    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the
+    /// Bitwise-ors a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
     /// right-hand side by reference.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;

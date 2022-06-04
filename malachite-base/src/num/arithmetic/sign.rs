@@ -4,14 +4,16 @@ use std::cmp::Ordering;
 macro_rules! impl_sign_primitive_int {
     ($t:ident) => {
         impl Sign for $t {
-            /// Returns `Greater`, `Equal`, or `Less`, depending on whether `self` is positive,
+            /// Compares a number to zero.
+            ///
+            /// Returns `Greater`, `Equal`, or `Less`, depending on whether the number is positive,
             /// zero, or negative, respectively.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sign` module.
+            /// See [here](super::sign#sign).
             #[inline]
             fn sign(&self) -> Ordering {
                 self.cmp(&0)
@@ -24,7 +26,7 @@ apply_to_primitive_ints!(impl_sign_primitive_int);
 macro_rules! impl_sign_primitive_float {
     ($t:ident) => {
         impl Sign for $t {
-            /// Returns the sign of `self`.
+            /// Compares a number to zero.
             ///
             /// - Positive finite numbers, positive zero, and positive infinity have sign
             /// `Greater`.
@@ -35,7 +37,7 @@ macro_rules! impl_sign_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sign` module.
+            /// See [here](super::sign#sign).
             #[inline]
             fn sign(&self) -> Ordering {
                 if self.is_nan() {

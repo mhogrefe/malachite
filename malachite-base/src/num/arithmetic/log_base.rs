@@ -99,7 +99,7 @@ macro_rules! impl_log_base_unsigned {
             /// Panics if `self` is 0 or `base` is less than 2.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base` module.
+            /// See [here](super::log_base#floor_log_base).
             #[inline]
             fn floor_log_base(self, base: $t) -> u64 {
                 floor_log_base(self, base)
@@ -125,7 +125,7 @@ macro_rules! impl_log_base_unsigned {
             /// Panics if `self` is 0 or `base` is less than 2.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base` module.
+            /// See [here](super::log_base#ceiling_log_base).
             #[inline]
             fn ceiling_log_base(self, base: $t) -> u64 {
                 ceiling_log_base(self, base)
@@ -140,8 +140,8 @@ macro_rules! impl_log_base_unsigned {
             ///
             /// $$
             /// f(x, b) = \\begin{cases}
-            ///     \operatorname{Some}(\log_b x) & \log_b x \in \Z \\\\
-            ///     \operatorname{None} & \textrm{otherwise},
+            ///     \operatorname{Some}(\log_b x) & \text{if} \\quad \log_b x \in \Z, \\\\
+            ///     \operatorname{None} & \textrm{otherwise}.
             /// \\end{cases}
             /// $$
             ///
@@ -157,7 +157,7 @@ macro_rules! impl_log_base_unsigned {
             /// Panics if `self` is 0 or `base` is less than 2.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::log_base` module.
+            /// See [here](super::log_base#checked_log_base).
             #[inline]
             fn checked_log_base(self, base: $t) -> Option<u64> {
                 checked_log_base(self, base)

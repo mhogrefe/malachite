@@ -10,16 +10,20 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl Natural {
-    /// Calculates the approximate natural logarithm of a nonzero `Natural`.
+    /// Calculates the approximate natural logarithm of a nonzero [`Natural`].
     ///
-    /// $f(x) = \log x \pm O(\log x)$.
+    /// $f(x) = (1+\epsilon)(\log x)$, where $|\epsilon| < 2^{-52}.$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::float::NiceFloat;
@@ -27,12 +31,12 @@ impl Natural {
     ///
     /// assert_eq!(NiceFloat(Natural::from(10u32).approx_log()), NiceFloat(2.3025850929940455));
     /// assert_eq!(
-    ///     NiceFloat(Natural::from(10u32).pow(100).approx_log()),
-    ///     NiceFloat(230.25850929940455)
+    ///     NiceFloat(Natural::from(10u32).pow(10000).approx_log()),
+    ///     NiceFloat(23025.850929940454)
     /// );
     /// ```
     ///
-    /// This is fmpz_dlog from fmpz/dlog.c, Flint 2.7.1.
+    /// This is equivalent to `fmpz_dlog` from `fmpz/dlog.c`, FLINT 2.7.1.
     pub fn approx_log(&self) -> f64 {
         assert_ne!(*self, 0);
         let (mantissa, exponent): (f64, u64) = self.sci_mantissa_and_exponent();
@@ -40,6 +44,12 @@ impl Natural {
     }
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
 fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     assert_ne!(*x, 0);
     assert!(*base > 1);
@@ -83,6 +93,13 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     }
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+//
 // Also returns base^p and p, where b^p is close to x.
 pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, bool, Natural, u64) {
     assert_ne!(*x, 0);
@@ -133,11 +150,16 @@ pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, boo
 impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     type Output = u64;
 
-    /// Returns the floor of the base-$b$ logarithm of a positive `Natural`.
+    /// Returns the floor of the base-$b$ logarithm of a positive [`Natural`].
     ///
     /// $f(x, b) = \lfloor\log_b x\rfloor$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or `base` is less than 2.
@@ -145,7 +167,6 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase;
     /// use malachite_nz::natural::Natural;
@@ -156,7 +177,7 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     /// assert_eq!(Natural::from(4294967296u64).floor_log_base(&Natural::from(10u32)), 9);
     /// ```
     ///
-    /// This is fmpz_flog from fmpz/flog.c, FLINT 2.7.1.
+    /// This is equivalent to `fmpz_flog` from `fmpz/flog.c`, FLINT 2.7.1.
     fn floor_log_base(self, base: &Natural) -> u64 {
         if let Some(log_base) = base.checked_log_base_2() {
             return self.floor_log_base_power_of_2(log_base);
@@ -168,11 +189,16 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
 impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     type Output = u64;
 
-    /// Returns the ceiling of the base-$b$ logarithm of a positive `Natural`.
+    /// Returns the ceiling of the base-$b$ logarithm of a positive [`Natural`].
     ///
     /// $f(x, b) = \lceil\log_b x\rceil$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or `base` is less than 2.
@@ -180,7 +206,6 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_nz::natural::Natural;
@@ -191,7 +216,7 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     /// assert_eq!(Natural::from(4294967296u64).ceiling_log_base(&Natural::from(10u32)), 10);
     /// ```
     ///
-    /// This is fmpz_clog from fmpz/clog.c, FLINT 2.7.1.
+    /// This is equivalent to `fmpz_clog` from `fmpz/clog.c`, FLINT 2.7.1.
     fn ceiling_log_base(self, base: &Natural) -> u64 {
         if let Some(log_base) = base.checked_log_base_2() {
             return self.ceiling_log_base_power_of_2(log_base);
@@ -208,17 +233,22 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
 impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-$b$ logarithm of a positive `Natural`. If the integer is not a power of
-    /// $b$, `None` is returned.
+    /// Returns the base-$b$ logarithm of a positive [`Natural`]. If the [`Natural`] is not a power
+    /// of $b$, then `None` is returned.
     ///
     /// $$
     /// f(x, b) = \\begin{cases}
-    ///     \operatorname{Some}(\log_b x) & \log_b x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(\log_b x) & \text{if} \\quad \log_b x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or `base` is less than 2.
@@ -226,7 +256,6 @@ impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_nz::natural::Natural;

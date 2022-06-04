@@ -2,6 +2,7 @@ use num::arithmetic::traits::{Gcd, GcdAssign};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use std::cmp::min;
 
+#[cfg(feature = "test_build")]
 pub fn gcd_euclidean<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     if y == T::ZERO {
         x
@@ -10,6 +11,7 @@ pub fn gcd_euclidean<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     }
 }
 
+#[cfg(feature = "test_build")]
 pub fn gcd_binary<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     if x == y {
         x
@@ -32,8 +34,8 @@ pub fn gcd_binary<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     }
 }
 
-// This is the first version of n_gcd from ulong_extras/gcd.c, FLINT 2.7.1.
-pub fn gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
+// This is equivalent to the first version of `n_gcd` from `ulong_extras/gcd.c`, FLINT 2.7.1.
+pub_test! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
     if x == T::ZERO {
         return y;
     }
@@ -55,9 +57,10 @@ pub fn gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
         }
     }
     x << f
-}
+}}
 
-// This is the second version of n_gcd from ulong_extras/gcd.c, FLINT 2.7.1.
+#[cfg(feature = "test_build")]
+// This is equivalent to the second version of `n_gcd` from `ulong_extras/gcd.c`, FLINT 2.7.1.
 pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
     let mut v;
     if x >= y {
@@ -123,10 +126,15 @@ macro_rules! impl_gcd {
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::gcd` module.
+            /// See [here](super::gcd#gcd).
             #[inline]
             fn gcd(self, other: $t) -> $t {
                 gcd_fast_a(self, other)
@@ -134,8 +142,7 @@ macro_rules! impl_gcd {
         }
 
         impl GcdAssign<$t> for $t {
-            /// Replaces `self` with the GCD (greatest common divisor) of `self` and another
-            /// number.
+            /// Replaces another with the GCD (greatest common divisor) of it and another number.
             ///
             /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which
             /// makes sense if we interpret "greatest" to mean "greatest by the divisibility
@@ -146,10 +153,15 @@ macro_rules! impl_gcd {
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::gcd` module.
+            /// See [here](super::gcd#gcd_assign).
             #[inline]
             fn gcd_assign(&mut self, other: $t) {
                 *self = gcd_fast_a(*self, other);

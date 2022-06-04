@@ -2,9 +2,9 @@ use rational_sequences::RationalSequence;
 use std::cmp::Ordering;
 
 impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {
-    /// Compares a `RationalSequence` to another `RationalSequence`.
+    /// Compares a [`RationalSequence`] to another [`RationalSequence`].
     ///
-    /// See the documentation for the `Ord` implementation.
+    /// See [here](RationalSequence::cmp) for more information.
     #[inline]
     fn partial_cmp(&self, other: &RationalSequence<T>) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -12,7 +12,7 @@ impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {
 }
 
 impl<T: Eq + Ord> Ord for RationalSequence<T> {
-    /// Compares a `RationalSequence` to another `RationalSequence`.
+    /// Compares a [`RationalSequence`] to another [`RationalSequence`].
     ///
     /// The comparison is made lexicographically with respect to the element type's ordering.
     ///

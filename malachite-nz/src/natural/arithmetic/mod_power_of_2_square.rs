@@ -27,7 +27,14 @@ use platform::{
     SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 
-/// This is MPN_SQRLO_DIAGONAL from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `MPN_SQRLO_DIAGONAL` from `mpn/generic/sqrlo_basecase.c`, GMP 6.2.1.
 fn limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let half_n = n >> 1;
@@ -37,7 +44,14 @@ fn limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
-// This is MPN_SQRLO_DIAG_ADDLSH1 from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `MPN_SQRLO_DIAG_ADDLSH1` from `mpn/generic/sqrlo_basecase.c`, GMP 6.2.1.
 pub_test! {limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert_eq!(scratch.len(), n - 1);
@@ -48,7 +62,11 @@ pub_test! {limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb],
 }}
 
 //TODO tune
+#[cfg(feature = "test_build")]
 pub const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
+
+#[cfg(not(feature = "test_build"))]
+const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
 
 //TODO tune
 const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
@@ -57,9 +75,14 @@ const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
     SQRLO_DC_THRESHOLD_LIMIT - 1
 };
 
-// TODO complexity
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// This is mpn_sqrlo_basecase from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqrlo_basecase` from `mpn/generic/sqrlo_basecase.c`, GMP 6.2.1.
 pub_test! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let out = &mut out[..n];
@@ -98,8 +121,8 @@ pub_test! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
 const SQRLO_BASECASE_THRESHOLD: usize = 8;
 
 //TODO tune
-/// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from
-/// 6.1.2?
+/// This is equivalent to `MAYBE_range_basecase` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
+/// changes from 6.1.2?
 const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
@@ -109,7 +132,8 @@ const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
 
 //TODO tune
-/// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
+/// This is equivalent to `MAYBE_range_toom22` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
+/// changes from 6.1.2?
 const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
@@ -118,17 +142,29 @@ const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
         SQRLO_DC_THRESHOLD
     }) < SQR_TOOM3_THRESHOLD * 36 / (36 - 11);
 
-// This is mpn_sqrlo_itch from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_sqrlo_itch` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
+// changes from 6.1.2?
 pub_const_test! {limbs_square_low_scratch_len(len: usize) -> usize {
     len << 1
 }}
 
 // Requires a scratch space of 2 * `xs.len()` limbs at `scratch`.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// This is mpn_dc_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
-pub_test! {limbs_square_low_divide_and_conquer(
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_dc_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
+// from 6.1.2?
+pub_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_square_low_divide_and_conquer(
     out: &mut [Limb],
     xs: &[Limb],
     scratch: &mut [Limb]
@@ -186,9 +222,15 @@ const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
 
 // Square an n-limb number and return the lowest n limbs of the result.
 //
-// //TODO complexity
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// This is mpn_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// This is equivalent to `mpn_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
+// from 6.1.2?
 pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     assert!(SQRLO_BASECASE_THRESHOLD_LIMIT >= SQRLO_BASECASE_THRESHOLD);
     let len = xs.len();
@@ -223,7 +265,12 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 // reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated. The input may not be empty or
 // have trailing zeros.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 //
 // # Panics
 // Panics if the input is empty. May panic if the input has trailing zeros.
@@ -254,7 +301,12 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 // of the limbs of the square of the `Natural` mod 2<sup>`pow`</sup>. Assumes the input is already
 // reduced mod 2<sup>`pow`</sup>. The input may not be empty or have trailing zeros.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 //
 // # Panics
 // Panics if the input is empty. May panic if the input has trailing zeros.
@@ -289,15 +341,21 @@ pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<L
 impl ModPowerOf2Square for Natural {
     type Output = Natural;
 
-    /// Computes `self.square()` mod 2<sup>`pow`</sup>, taking `self` by value. Assumes the input is
-    /// already reduced mod 2<sup>`pow`</sup>.
+    /// Squares a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// [`Natural`] is taken by value.
     ///
-    /// TODO complexity
+    /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -321,15 +379,21 @@ impl ModPowerOf2Square for Natural {
 impl<'a> ModPowerOf2Square for &'a Natural {
     type Output = Natural;
 
-    /// Computes `self.square()` mod 2<sup>`pow`</sup>, taking `self` by reference. Assumes the
-    /// input is already reduced mod 2<sup>`pow`</sup>.
+    /// Squares a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// [`Natural`] is taken by reference.
     ///
-    /// TODO complexity
+    /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -365,15 +429,21 @@ impl<'a> ModPowerOf2Square for &'a Natural {
 }
 
 impl ModPowerOf2SquareAssign for Natural {
-    /// Replaces `self` with `self.square()` mod 2<sup>`pow`</sup>. Assumes the input is already
-    /// reduced mod 2<sup>`pow`</sup>.
+    /// Squares a [`Natural`] modulo $2^k$, in place. Assumes the input is already reduced modulo
+    /// $2^k$.
     ///
-    /// TODO complexity
+    /// $x \gets y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;

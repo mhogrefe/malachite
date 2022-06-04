@@ -645,7 +645,11 @@ pub fn rational_from_digits_bucketer<'a>(
 pub fn pair_1_vec_natural_sum_bits_bucketer<'a, T>() -> Bucketer<'a, (Vec<Natural>, T)> {
     Bucketer {
         bucketing_function: &|(xs, _)| {
-            usize::exact_from(xs.iter().map(|x| x.significant_bits()).sum::<u64>())
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
         },
         bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
     }

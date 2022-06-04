@@ -19,7 +19,7 @@ fn test_partial_cmp_primitive_float() {
         assert_eq!(v.partial_cmp(&Integer::from_str(u).unwrap()), out_rev);
         assert_eq!(v.partial_cmp(&rug::Integer::from_str(u).unwrap()), out_rev);
 
-        let v = v as f64;
+        let v = f64::from(v);
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
         assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
 

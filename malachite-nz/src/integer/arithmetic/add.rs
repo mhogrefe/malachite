@@ -7,27 +7,35 @@ use std::ops::{Add, AddAssign};
 impl Add<Integer> for Integer {
     type Output = Integer;
 
-    /// Adds an `Integer` to an `Integer`, taking both `Integer`s by value.
+    /// Adds two [`Integer`]s, taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::ZERO + Integer::from(123)).to_string(), "123");
-    /// assert_eq!((Integer::from(-123) + Integer::ZERO).to_string(), "-123");
-    /// assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
-    /// assert_eq!((-Integer::trillion() + Integer::trillion() * Integer::from(2u32)).to_string(),
-    ///     "1000000000000");
+    /// assert_eq!(Integer::ZERO + Integer::from(123), 123);
+    /// assert_eq!(Integer::from(-123) + Integer::ZERO, -123);
+    /// assert_eq!(Integer::from(-123) + Integer::from(456), 333);
+    /// assert_eq!(
+    ///     -Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1),
+    ///     1000000000000u64
+    /// );
     /// ```
     fn add(mut self, mut other: Integer) -> Integer {
         if self.abs.limb_count() >= other.abs.limb_count() {
@@ -43,29 +51,34 @@ impl Add<Integer> for Integer {
 impl<'a> Add<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Adds an `Integer` to an `Integer`, taking the left `Integer` by value and the right
-    /// `Integer` by reference.
+    /// Adds two [`Integer`]s, taking the first by reference and the second by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::ZERO + &Integer::from(123)).to_string(), "123");
-    /// assert_eq!((Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
-    /// assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+    /// assert_eq!(Integer::ZERO + &Integer::from(123), 123);
+    /// assert_eq!(Integer::from(-123) + &Integer::ZERO, -123);
+    /// assert_eq!(Integer::from(-123) + &Integer::from(456), 333);
     /// assert_eq!(
-    ///     (-Integer::trillion() + &(Integer::trillion() * Integer::from(2u32))).to_string(),
-    ///     "1000000000000"
+    ///     -Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1),
+    ///     1000000000000u64
     /// );
     /// ```
     #[inline]
@@ -78,29 +91,34 @@ impl<'a> Add<&'a Integer> for Integer {
 impl<'a> Add<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Adds an `Integer` to an `Integer`, taking the left `Integer` by reference and the right
-    /// `Integer` by value.
+    /// Adds two [`Integer`]s, taking the first by value and the second by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO + Integer::from(123)).to_string(), "123");
-    /// assert_eq!((&Integer::from(-123) + Integer::ZERO).to_string(), "-123");
-    /// assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
+    /// assert_eq!(&Integer::ZERO + Integer::from(123), 123);
+    /// assert_eq!(&Integer::from(-123) + Integer::ZERO, -123);
+    /// assert_eq!(&Integer::from(-123) + Integer::from(456), 333);
     /// assert_eq!(
-    ///     (&(-Integer::trillion()) + Integer::trillion() * Integer::from(2u32)).to_string(),
-    ///     "1000000000000"
+    ///     &-Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1),
+    ///     1000000000000u64
     /// );
     /// ```
     #[inline]
@@ -113,28 +131,34 @@ impl<'a> Add<Integer> for &'a Integer {
 impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    /// Adds an `Integer` to an `Integer`, taking both `Integer`s by reference.
+    /// Adds two [`Integer`]s, taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO + &Integer::from(123)).to_string(), "123");
-    /// assert_eq!((&Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
-    /// assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+    /// assert_eq!(&Integer::ZERO + &Integer::from(123), 123);
+    /// assert_eq!(&Integer::from(-123) + &Integer::ZERO, -123);
+    /// assert_eq!(&Integer::from(-123) + &Integer::from(456), 333);
     /// assert_eq!(
-    ///     (&(-Integer::trillion()) + &(Integer::trillion() * Integer::from(2u32))).to_string(),
-    ///     "1000000000000"
+    ///     &-Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1),
+    ///     1000000000000u64
     /// );
     /// ```
     fn add(self, other: &'a Integer) -> Integer {
@@ -183,29 +207,35 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 }
 
 impl AddAssign<Integer> for Integer {
-    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the right-hand side by
-    /// value.
+    /// Adds an [`Integer`] to an [`Integer`] in place, taking the [`Integer`] on the right-hand
+    /// side by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;
-    /// x += -Integer::trillion();
-    /// x += Integer::trillion() * Integer::from(2u32);
-    /// x += -Integer::trillion() * Integer::from(3u32);
-    /// x += Integer::trillion() * Integer::from(4u32);
-    /// assert_eq!(x.to_string(), "2000000000000");
+    /// x += -Integer::from(10u32).pow(12);
+    /// x += Integer::from(10u32).pow(12) * Integer::from(2u32);
+    /// x += -Integer::from(10u32).pow(12) * Integer::from(3u32);
+    /// x += Integer::from(10u32).pow(12) * Integer::from(4u32);
+    /// assert_eq!(x, 2000000000000u64);
     /// ```
     fn add_assign(&mut self, mut other: Integer) {
         match (&mut *self, &other) {
@@ -213,7 +243,7 @@ impl AddAssign<Integer> for Integer {
             (&mut integer_zero!(), _) => {
                 *self = other;
             }
-            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
+            // e.g. 10 += 5 or -10 += -5; sign of self is unchanged
             (
                 &mut Integer {
                     sign: sx,
@@ -224,7 +254,7 @@ impl AddAssign<Integer> for Integer {
                     abs: ref ay,
                 },
             ) if sx == (sy && *ay != 0) => *ax += ay,
-            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
+            // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
                 &mut Integer {
                     sign: sx,
@@ -232,7 +262,7 @@ impl AddAssign<Integer> for Integer {
                 },
                 &Integer { abs: ref ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
-            // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
+            // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             _ => {
                 swap(self, &mut other);
                 self.abs -= other.abs;
@@ -242,29 +272,35 @@ impl AddAssign<Integer> for Integer {
 }
 
 impl<'a> AddAssign<&'a Integer> for Integer {
-    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the right-hand side by
-    /// reference.
+    /// Adds an [`Integer`] to an [`Integer`] in place, taking the [`Integer`] on the right-hand
+    /// side by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x + y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `other.significant_bits`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;
-    /// x += &(-Integer::trillion());
-    /// x += &(Integer::trillion() * Integer::from(2u32));
-    /// x += &(-Integer::trillion() * Integer::from(3u32));
-    /// x += &(Integer::trillion() * Integer::from(4u32));
-    /// assert_eq!(x.to_string(), "2000000000000");
+    /// x += &(-Integer::from(10u32).pow(12));
+    /// x += &(Integer::from(10u32).pow(12) * Integer::from(2u32));
+    /// x += &(-Integer::from(10u32).pow(12) * Integer::from(3u32));
+    /// x += &(Integer::from(10u32).pow(12) * Integer::from(4u32));
+    /// assert_eq!(x, 2000000000000u64);
     /// ```
     fn add_assign(&mut self, other: &'a Integer) {
         match (&mut *self, other) {
@@ -272,7 +308,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
             (&mut integer_zero!(), _) => {
                 *self = other.clone();
             }
-            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
+            // e.g. 10 += 5 or -10 += -5; sign of self is unchanged
             (
                 &mut Integer {
                     sign: sx,
@@ -283,7 +319,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     abs: ref ay,
                 },
             ) if sx == (sy && *ay != 0) => *ax += ay,
-            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
+            // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
                 &mut Integer {
                     sign: sx,
@@ -291,7 +327,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                 },
                 &Integer { abs: ref ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
-            // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
+            // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             (
                 &mut Integer {
                     sign: ref mut sx,

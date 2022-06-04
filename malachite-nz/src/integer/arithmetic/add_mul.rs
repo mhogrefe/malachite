@@ -180,27 +180,31 @@ impl Natural {
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self`, y, and z by value.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking all three by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)), 22);
-    /// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x10000),
-    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .add_mul(Integer::from(0x10000), -Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: Integer, z: Integer) -> Integer {
@@ -212,27 +216,32 @@ impl<'a> AddMul<Integer, Integer> for Integer {
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` and y by value and z by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first two by
+    /// value and the third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)), 22);
-    /// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x10000),
-    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .add_mul(Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: Integer, z: &'a Integer) -> Integer {
@@ -244,27 +253,32 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` and z by value and y by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first and third
+    /// by value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)), 22);
-    /// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x10000),
-    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .add_mul(&Integer::from(0x10000), -Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: &'a Integer, z: Integer) -> Integer {
@@ -276,27 +290,32 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self` by value and y and z by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first by value
+    /// and the second and third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-    /// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x10000),
-    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (-Integer::from(10u32).pow(12))
+    ///             .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: &'a Integer, z: &'b Integer) -> Integer {
@@ -308,27 +327,35 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
 impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
-    /// `self`, y, and z by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking all three by
+    /// reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(m + n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n, m) = O(m + n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-    /// assert_eq!((&(-Integer::trillion())).add_mul(&Integer::from(0x10000),
-    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// assert_eq!(
+    ///     (&Integer::from(10u32)).add_mul(&Integer::from(3u32), &Integer::from(4u32)),
+    ///     22
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::from(10u32).pow(12))
+    ///             .add_mul(&Integer::from(0x10000), &-Integer::from(10u32).pow(12)),
+    ///     -65537000000000000i64
+    /// );
     /// ```
     fn add_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
         if self.sign == (y.sign == z.sign) {
@@ -347,31 +374,33 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
 }
 
 impl AddMulAssign<Integer, Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y and z by value.
+    /// Adds the product of two other [`Integer`]s to an [`Integer`] in place, taking both
+    /// [`Integer`]s on the right-hand side by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.add_mul_assign(Integer::from(3u32), Integer::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.add_mul_assign(Integer::from(0x10000), -Integer::trillion());
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.add_mul_assign(Integer::from(0x10000), -Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn add_mul_assign(&mut self, y: Integer, z: Integer) {
         if self.sign == (y.sign == z.sign) {
@@ -384,31 +413,33 @@ impl AddMulAssign<Integer, Integer> for Integer {
 }
 
 impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y by value and z by reference.
+    /// Adds the product of two other [`Integer`]s to an [`Integer`] in place, taking the first
+    /// [`Integer`] on the right-hand side by value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.add_mul_assign(Integer::from(3u32), &Integer::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.add_mul_assign(Integer::from(0x10000), &(-Integer::trillion()));
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.add_mul_assign(Integer::from(0x10000), &-Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn add_mul_assign(&mut self, y: Integer, z: &'a Integer) {
         if self.sign == (y.sign == z.sign) {
@@ -421,31 +452,33 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
 }
 
 impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y by reference and z by value.
+    /// Adds the product of two other [`Integer`]s to an [`Integer`] in place, taking the first
+    /// [`Integer`] on the right-hand side by reference and the second by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.add_mul_assign(&Integer::from(3u32), Integer::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.add_mul_assign(&Integer::from(0x10000), -Integer::trillion());
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.add_mul_assign(&Integer::from(0x10000), -Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn add_mul_assign(&mut self, y: &'a Integer, z: Integer) {
         if self.sign == (y.sign == z.sign) {
@@ -458,31 +491,33 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
 }
 
 impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
-    /// taking y and z by reference.
+    /// Adds the product of two other [`Integer`]s to an [`Integer`] in place, taking both
+    /// [`Integer`]s on the right-hand side by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(10u32);
     /// x.add_mul_assign(&Integer::from(3u32), &Integer::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = -Integer::trillion();
-    /// x.add_mul_assign(&Integer::from(0x10000), &(-Integer::trillion()));
-    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// let mut x = -Integer::from(10u32).pow(12);
+    /// x.add_mul_assign(&Integer::from(0x10000), &-Integer::from(10u32).pow(12));
+    /// assert_eq!(x, -65537000000000000i64);
     /// ```
     fn add_mul_assign(&mut self, y: &'a Integer, z: &'b Integer) {
         if self.sign == (y.sign == z.sign) {

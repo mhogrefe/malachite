@@ -112,7 +112,7 @@ fn power_of_2_digits_properties() {
         let (before_point_alt, after_point_alt) = x.power_of_2_digits(log_base);
         assert_eq!(before_point, before_point_alt);
         assert!(Iterator::eq(
-            after_point.iter().cloned().take(10),
+            after_point.iter().take(10).cloned(),
             after_point_alt.take(10)
         ));
     });

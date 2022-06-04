@@ -2,17 +2,15 @@ use rounding_modes::RoundingMode;
 
 /// A `struct` determining how much "detail" should be used when creating a scientific-notation
 /// string.
-///
-/// - The `Complete` variant indicates that the number should be rendered in its full precision.
-/// - The `Precision` variant indicates how many significant figures should be shown. The precision
-///   cannot be zero.
-/// - The `Scale` variant indicates how many digits after the decimal (or other-base) point should
-///   be shown. For example, if the base is 10 and the scale is 2, then up to two digits after the
-///   decimal point should be shown.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SciSizeOptions {
+    /// Indicates that the number should be rendered in its full precision.
     Complete,
+    /// Indicates how many significant figures should be shown. The precision cannot be zero.
     Precision(u64),
+    /// Indicates how many digits after the decimal (or other-base) point should be shown. For
+    /// example, if the base is 10 and the scale is 2, then up to two digits after the decimal
+    /// point should be shown.
     Scale(u64),
 }
 
@@ -22,8 +20,8 @@ impl Default for SciSizeOptions {
     }
 }
 
+#[cfg(feature = "test_build")]
 impl SciSizeOptions {
-    #[cfg(feature = "test_build")]
     pub const fn is_valid(&self) -> bool {
         if let SciSizeOptions::Precision(p) = *self {
             p != 0
@@ -294,5 +292,9 @@ impl FromSciStringOptions {
     }
 }
 
+/// Iterators that generate [`SciSizeOptions`], [`ToSciOptions`], and [`FromSciStringOptions`]
+/// without repetition.
 pub mod exhaustive;
+/// Iterators that generate [`SciSizeOptions`], [`ToSciOptions`], and [`FromSciStringOptions`]
+/// randomly.
 pub mod random;

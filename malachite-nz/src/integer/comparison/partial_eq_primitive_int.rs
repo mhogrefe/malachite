@@ -6,15 +6,13 @@ use natural::Natural;
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialEq<$t> for Integer {
-            /// Determines whether an `Integer` is equal to a value of unsigned primitive integer
-            /// type.
+            /// Determines whether an [`Integer`] is equal to an unsigned primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &$t) -> bool {
                 self.sign && self.abs == *other
@@ -22,15 +20,13 @@ macro_rules! impl_unsigned {
         }
 
         impl PartialEq<Integer> for $t {
-            /// Determines whether a value of unsigned primitive integer type is equal to an
-            /// `Integer`.
+            /// Determines whether an unsigned primitive integer is equal to an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &Integer) -> bool {
                 other == self
@@ -50,30 +46,26 @@ where
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialEq<$t> for Integer {
-            /// Determines whether an `Integer` is equal to a value of signed primitive integer
-            /// type.
+            /// Determines whether an [`Integer`] is equal to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             fn eq(&self, other: &$t) -> bool {
                 eq_signed(self, other)
             }
         }
 
         impl PartialEq<Integer> for $t {
-            /// Determines whether a value of signed primitive integer type is equal to an
-            /// `Integer`.
+            /// Determines whether a signed primitive integer is equal to an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &Integer) -> bool {
                 other == self

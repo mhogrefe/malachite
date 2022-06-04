@@ -6,17 +6,23 @@ use malachite_nz::natural::Natural;
 use Rational;
 
 impl Rational {
-    /// Converts base-$b$ digits to a `Rational`. The inputs are taken by value.
+    /// Converts base-$b$ digits to a [`Rational`]. The inputs are taken by value.
     ///
-    /// The input consists of the digits of the integer portion of the `Rational` and the digits of
-    /// the fractional portion. The integer-portion digits are ordered from least- to
+    /// The input consists of the digits of the integer portion of the [`Rational`] and the digits
+    /// of the fractional portion. The integer-portion digits are ordered from least- to
     /// most-significant, and the fractional-portion digits from most- to least.
     ///
     /// The fractional-portion digits may end in infinitely many zeros or $(b-1)$s; these are
     /// handled correctly.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm)^2 \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(before_point.len(), after_point.component_len())`, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.
@@ -41,6 +47,7 @@ impl Rational {
     ///     "22/7"
     /// );
     ///
+    /// // 21.34565656...
     /// let before_point = vec_from_str("[1, 2]").unwrap();
     /// let after_point = RationalSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),
@@ -75,17 +82,23 @@ impl Rational {
             }
     }
 
-    /// Converts base-$b$ digits to a `Rational`. The inputs are taken by reference.
+    /// Converts base-$b$ digits to a [`Rational`]. The inputs are taken by reference.
     ///
-    /// The input consists of the digits of the integer portion of the `Rational` and the digits of
-    /// the fractional portion. The integer-portion digits are ordered from least- to
+    /// The input consists of the digits of the integer portion of the [`Rational`] and the digits
+    /// of the fractional portion. The integer-portion digits are ordered from least- to
     /// most-significant, and the fractional-portion digits from most- to least.
     ///
     /// The fractional-portion digits may end in infinitely many zeros or $(b-1)$s; these are
     /// handled correctly.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm)^2 \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(before_point.len(), after_point.component_len())`, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.
@@ -111,6 +124,7 @@ impl Rational {
     ///     "22/7"
     /// );
     ///
+    /// // 21.34565656...
     /// let before_point = vec_from_str("[1, 2]").unwrap();
     /// let after_point = RationalSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),

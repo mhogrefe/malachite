@@ -6,14 +6,18 @@ use Rational;
 impl FromStr for Rational {
     type Err = ();
 
-    /// Converts an `&str` to a `Rational`.
+    /// Converts an string to a [`Rational`].
     ///
-    /// If the `&str` does not represent a valid `Integer`, a `Rational` is returned. The numerator
+    /// If the string does not represent a valid [`Rational`], an `Err` is returned. The numerator
     /// and denominator do not need to be in lowest terms, but the denominator must be nonzero. A
     /// negative sign is only allowed at the 0th position of the string.
     ///
     /// # Worst-case complexity
-    /// // TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Examples
     /// ```
@@ -37,6 +41,9 @@ impl FromStr for Rational {
     /// assert!(Rational::from_str("a").is_err());
     /// assert!(Rational::from_str("1/0").is_err());
     /// assert!(Rational::from_str("/1").is_err());
+    /// assert!(Rational::from_str("1/").is_err());
+    /// assert!(Rational::from_str("--1").is_err());
+    /// assert!(Rational::from_str("1/-2").is_err());
     /// ```
     #[inline]
     fn from_str(s: &str) -> Result<Rational, ()> {

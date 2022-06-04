@@ -3,6 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
 use platform::Limb;
@@ -19,9 +20,8 @@ use std::cmp::Ordering;
 // Note that this function may only return `None`, `Some(0)`, or `Some(1)` because of the
 // restrictions placed on the input slice.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
     if n == 0 {
         Some(0)
@@ -38,8 +38,15 @@ pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) ->
     }
 }}
 
-fn div_round_nearest(q: Natural, r: Natural, d: &Natural) -> Natural {
-    let compare = (r << 1u64).cmp(d);
+// Compares 2x and y
+fn double_cmp(x: &Natural, y: &Natural) -> Ordering {
+    (x.significant_bits() + 1)
+        .cmp(&y.significant_bits())
+        .then_with(|| x.cmp_normalized(y))
+}
+
+fn div_round_nearest(q: Natural, r: &Natural, d: &Natural) -> Natural {
+    let compare = double_cmp(r, d);
     if compare == Ordering::Greater || compare == Ordering::Equal && q.odd() {
         q.add_limb(1)
     } else {
@@ -47,8 +54,8 @@ fn div_round_nearest(q: Natural, r: Natural, d: &Natural) -> Natural {
     }
 }
 
-fn div_round_assign_nearest(q: &mut Natural, r: Natural, d: &Natural) {
-    let compare = (r << 1u64).cmp(d);
+fn div_round_assign_nearest(q: &mut Natural, r: &Natural, d: &Natural) {
+    let compare = double_cmp(r, d);
     if compare == Ordering::Greater || compare == Ordering::Equal && q.odd() {
         *q += Natural::ONE;
     }
@@ -57,14 +64,40 @@ fn div_round_assign_nearest(q: &mut Natural, r: Natural, d: &Natural) {
 impl DivRound<Natural> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural` and rounds according to a specified rounding mode, taking
-    /// both `Natural`s by value. See the `RoundingMode` documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and rounding according
+    /// to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Let $q = \frac{x}{y}$:
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// $$
+    /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+    /// $$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+    ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+    ///     \lfloor q \rfloor &
+    ///     \text{if} \\quad  q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is even}, \\\\
+    ///     \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -72,53 +105,25 @@ impl DivRound<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Down), 2);
     /// assert_eq!(
-    ///     Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Down).to_string(),
-    ///     "2"
+    ///     Natural::from(10u32).pow(12).div_round(Natural::from(3u32), RoundingMode::Floor),
+    ///     333333333333u64
     /// );
+    /// assert_eq!(Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Up), 3);
     /// assert_eq!(
-    ///     Natural::trillion().div_round(Natural::from(3u32), RoundingMode::Floor).to_string(),
-    ///     "333333333333"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Up).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::trillion()
-    ///         .div_round(Natural::from(3u32), RoundingMode::Ceiling).to_string(),
-    ///     "333333333334");
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(Natural::from(5u32), RoundingMode::Exact).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(20u32)
-    ///         .div_round(Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "7"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(14u32)
-    ///         .div_round(Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "4"
-    /// );
+    ///     Natural::from(10u32).pow(12).div_round(Natural::from(3u32), RoundingMode::Ceiling),
+    ///     333333333334u64);
+    /// assert_eq!(Natural::from(10u32).div_round(Natural::from(5u32), RoundingMode::Exact), 2);
+    /// assert_eq!(Natural::from(10u32).div_round(Natural::from(3u32), RoundingMode::Nearest), 3);
+    /// assert_eq!(Natural::from(20u32).div_round(Natural::from(3u32), RoundingMode::Nearest), 7);
+    /// assert_eq!(Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Nearest), 2);
+    /// assert_eq!(Natural::from(14u32).div_round(Natural::from(4u32), RoundingMode::Nearest), 4);
     /// ```
     #[inline]
     fn div_round(mut self, other: Natural, rm: RoundingMode) -> Natural {
@@ -130,15 +135,40 @@ impl DivRound<Natural> for Natural {
 impl<'a> DivRound<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural` and rounds according to a specified rounding mode, taking
-    /// the first `Natural` by value and the second by reference. See the `RoundingMode`
-    /// documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and rounding according to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Let $q = \frac{x}{y}$:
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// $$
+    /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+    /// $$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+    ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+    ///     \lfloor q \rfloor &
+    ///     \text{if} \\quad  q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is even}, \\\\
+    ///     \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -146,55 +176,25 @@ impl<'a> DivRound<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(Natural::from(10u32).div_round(&Natural::from(4u32), RoundingMode::Down), 2);
     /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Down).to_string(),
-    ///     "2"
+    ///     Natural::from(10u32).pow(12).div_round(&Natural::from(3u32), RoundingMode::Floor),
+    ///     333333333333u64
     /// );
+    /// assert_eq!(Natural::from(10u32).div_round(&Natural::from(4u32), RoundingMode::Up), 3);
     /// assert_eq!(
-    ///     Natural::trillion()
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Floor).to_string(),
-    ///     "333333333333"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32).div_round(&Natural::from(4u32), RoundingMode::Up).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::trillion()
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Ceiling).to_string(),
-    ///     "333333333334");
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(&Natural::from(5u32), RoundingMode::Exact).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(20u32)
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "7"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(10u32)
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(14u32)
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "4"
-    /// );
+    ///     Natural::from(10u32).pow(12).div_round(&Natural::from(3u32), RoundingMode::Ceiling),
+    ///     333333333334u64);
+    /// assert_eq!(Natural::from(10u32).div_round(&Natural::from(5u32), RoundingMode::Exact), 2);
+    /// assert_eq!(Natural::from(10u32).div_round(&Natural::from(3u32), RoundingMode::Nearest), 3);
+    /// assert_eq!(Natural::from(20u32).div_round(&Natural::from(3u32), RoundingMode::Nearest), 7);
+    /// assert_eq!(Natural::from(10u32).div_round(&Natural::from(4u32), RoundingMode::Nearest), 2);
+    /// assert_eq!(Natural::from(14u32).div_round(&Natural::from(4u32), RoundingMode::Nearest), 4);
     /// ```
     #[inline]
     fn div_round(mut self, other: &'a Natural, rm: RoundingMode) -> Natural {
@@ -206,15 +206,40 @@ impl<'a> DivRound<&'a Natural> for Natural {
 impl<'a> DivRound<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural` and rounds according to a specified rounding mode, taking
-    /// the first `Natural` by reference and the second by value. See the `RoundingMode`
-    /// documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and rounding according to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Let $q = \frac{x}{y}$:
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// $$
+    /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+    /// $$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+    ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+    ///     \lfloor q \rfloor &
+    ///     \text{if} \\quad  q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is even}, \\\\
+    ///     \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -222,55 +247,36 @@ impl<'a> DivRound<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!((&Natural::from(10u32)).div_round(Natural::from(4u32), RoundingMode::Down), 2);
     /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(Natural::from(4u32), RoundingMode::Down).to_string(),
-    ///     "2"
+    ///     (&Natural::from(10u32).pow(12)).div_round(Natural::from(3u32), RoundingMode::Floor),
+    ///     333333333333u64
+    /// );
+    /// assert_eq!((&Natural::from(10u32)).div_round(Natural::from(4u32), RoundingMode::Up), 3);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32).pow(12)).div_round(Natural::from(3u32), RoundingMode::Ceiling),
+    ///     333333333334u64);
+    /// assert_eq!((&Natural::from(10u32)).div_round(Natural::from(5u32), RoundingMode::Exact), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).div_round(Natural::from(3u32), RoundingMode::Nearest),
+    ///     3
     /// );
     /// assert_eq!(
-    ///     (&Natural::trillion())
-    ///         .div_round(Natural::from(3u32), RoundingMode::Floor).to_string(),
-    ///     "333333333333"
+    ///     (&Natural::from(20u32)).div_round(Natural::from(3u32), RoundingMode::Nearest),
+    ///     7
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(Natural::from(4u32), RoundingMode::Up).to_string(),
-    ///     "3"
+    ///     (&Natural::from(10u32)).div_round(Natural::from(4u32), RoundingMode::Nearest),
+    ///     2
     /// );
     /// assert_eq!(
-    ///     (&Natural::trillion())
-    ///         .div_round(Natural::from(3u32), RoundingMode::Ceiling).to_string(),
-    ///     "333333333334");
-    /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(Natural::from(5u32), RoundingMode::Exact).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(20u32))
-    ///         .div_round(Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "7"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(14u32))
-    ///         .div_round(Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "4"
+    ///     (&Natural::from(14u32)).div_round(Natural::from(4u32), RoundingMode::Nearest),
+    ///     4
     /// );
     /// ```
     fn div_round(self, other: Natural, rm: RoundingMode) -> Natural {
@@ -284,7 +290,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => q.add_limb(1),
                     RoundingMode::Exact => panic!("Division is not exact"),
-                    RoundingMode::Nearest => div_round_nearest(q, r, &other),
+                    RoundingMode::Nearest => div_round_nearest(q, &r, &other),
                     _ => unreachable!(),
                 }
             }
@@ -295,14 +301,40 @@ impl<'a> DivRound<Natural> for &'a Natural {
 impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural` and rounds according to a specified rounding mode, taking
-    /// both `Natural`s by reference. See the `RoundingMode` documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and rounding
+    /// according to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Let $q = \frac{x}{y}$:
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $$
+    /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+    /// $$
     ///
-    /// where n = `self.significant_bits()`
+    /// $$
+    /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+    /// $$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+    ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+    ///     \lfloor q \rfloor &
+    ///     \text{if} \\quad  q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is even}, \\\\
+    ///     \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///     \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -310,55 +342,39 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRound;
+    /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!((&Natural::from(10u32)).div_round(&Natural::from(4u32), RoundingMode::Down), 2);
     /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Down).to_string(),
-    ///     "2"
+    ///     (&Natural::from(10u32).pow(12)).div_round(&Natural::from(3u32), RoundingMode::Floor),
+    ///     333333333333u64
+    /// );
+    /// assert_eq!((&Natural::from(10u32)).div_round(&Natural::from(4u32), RoundingMode::Up), 3);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32).pow(12)).div_round(&Natural::from(3u32), RoundingMode::Ceiling),
+    ///     333333333334u64);
+    /// assert_eq!(
+    ///     (&Natural::from(10u32)).div_round(&Natural::from(5u32), RoundingMode::Exact),
+    ///     2
     /// );
     /// assert_eq!(
-    ///     (&Natural::trillion())
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Floor).to_string(),
-    ///     "333333333333"
+    ///     (&Natural::from(10u32)).div_round(&Natural::from(3u32), RoundingMode::Nearest),
+    ///     3
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Up).to_string(),
-    ///     "3"
+    ///     (&Natural::from(20u32)).div_round(&Natural::from(3u32), RoundingMode::Nearest),
+    ///     7
     /// );
     /// assert_eq!(
-    ///     (&Natural::trillion())
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Ceiling).to_string(),
-    ///     "333333333334");
-    /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(&Natural::from(5u32), RoundingMode::Exact).to_string(),
-    ///     "2"
+    ///     (&Natural::from(10u32)).div_round(&Natural::from(4u32), RoundingMode::Nearest),
+    ///     2
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "3"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(20u32))
-    ///         .div_round(&Natural::from(3u32), RoundingMode::Nearest).to_string(),
-    ///     "7"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(10u32))
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "2"
-    /// );
-    /// assert_eq!(
-    ///     (&Natural::from(14u32))
-    ///         .div_round(&Natural::from(4u32), RoundingMode::Nearest).to_string(),
-    ///     "4"
+    ///     (&Natural::from(14u32)).div_round(&Natural::from(4u32), RoundingMode::Nearest),
+    ///     4
     /// );
     /// ```
     fn div_round(self, other: &'b Natural, rm: RoundingMode) -> Natural {
@@ -372,7 +388,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => q.add_limb(1),
                     RoundingMode::Exact => panic!("Division is not exact: {} / {}", self, other),
-                    RoundingMode::Nearest => div_round_nearest(q, r, other),
+                    RoundingMode::Nearest => div_round_nearest(q, &r, other),
                     _ => unreachable!(),
                 }
             }
@@ -381,15 +397,18 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
 }
 
 impl DivRoundAssign<Natural> for Natural {
-    /// Divides a `Natural` by a `Natural` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the right-hand side by value. See the `RoundingMode`
-    /// documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and rounding according to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// See the [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) documentation for
+    /// details.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -397,47 +416,46 @@ impl DivRoundAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
+    /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(Natural::from(4u32), RoundingMode::Down);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
-    /// let mut n = Natural::trillion();
+    /// let mut n = Natural::from(10u32).pow(12);
     /// n.div_round_assign(Natural::from(3u32), RoundingMode::Floor);
-    /// assert_eq!(n.to_string(), "333333333333");
+    /// assert_eq!(n, 333333333333u64);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(Natural::from(4u32), RoundingMode::Up);
-    /// assert_eq!(n.to_string(), "3");
+    /// assert_eq!(n, 3);
     ///
-    /// let mut n = Natural::trillion();
+    /// let mut n = Natural::from(10u32).pow(12);
     /// n.div_round_assign(Natural::from(3u32), RoundingMode::Ceiling);
-    /// assert_eq!(n.to_string(), "333333333334");
+    /// assert_eq!(n, 333333333334u64);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(Natural::from(5u32), RoundingMode::Exact);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(Natural::from(3u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "3");
+    /// assert_eq!(n, 3);
     ///
     /// let mut n = Natural::from(20u32);
     /// n.div_round_assign(Natural::from(3u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "7");
+    /// assert_eq!(n, 7);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(Natural::from(4u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
     /// let mut n = Natural::from(14u32);
     /// n.div_round_assign(Natural::from(4u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "4");
+    /// assert_eq!(n, 4);
     /// ```
     fn div_round_assign(&mut self, other: Natural, rm: RoundingMode) {
         if rm == RoundingMode::Floor || rm == RoundingMode::Down {
@@ -450,7 +468,7 @@ impl DivRoundAssign<Natural> for Natural {
                         *self += Natural::ONE;
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
-                    RoundingMode::Nearest => div_round_assign_nearest(self, r, &other),
+                    RoundingMode::Nearest => div_round_assign_nearest(self, &r, &other),
                     _ => unreachable!(),
                 }
             }
@@ -459,15 +477,18 @@ impl DivRoundAssign<Natural> for Natural {
 }
 
 impl<'a> DivRoundAssign<&'a Natural> for Natural {
-    /// Divides a `Natural` by a `Natural` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the right-hand side by reference. See the `RoundingMode`
-    /// documentation for details.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference and rounding according to a specified rounding mode.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// See the [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) documentation for
+    /// details.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
@@ -475,47 +496,46 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
+    /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(&Natural::from(4u32), RoundingMode::Down);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
-    /// let mut n = Natural::trillion();
+    /// let mut n = Natural::from(10u32).pow(12);
     /// n.div_round_assign(&Natural::from(3u32), RoundingMode::Floor);
-    /// assert_eq!(n.to_string(), "333333333333");
+    /// assert_eq!(n, 333333333333u64);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(&Natural::from(4u32), RoundingMode::Up);
-    /// assert_eq!(n.to_string(), "3");
+    /// assert_eq!(n, 3);
     ///
-    /// let mut n = Natural::trillion();
+    /// let mut n = Natural::from(10u32).pow(12);
     /// n.div_round_assign(&Natural::from(3u32), RoundingMode::Ceiling);
-    /// assert_eq!(n.to_string(), "333333333334");
+    /// assert_eq!(n, 333333333334u64);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(&Natural::from(5u32), RoundingMode::Exact);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(&Natural::from(3u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "3");
+    /// assert_eq!(n, 3);
     ///
     /// let mut n = Natural::from(20u32);
     /// n.div_round_assign(&Natural::from(3u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "7");
+    /// assert_eq!(n, 7);
     ///
     /// let mut n = Natural::from(10u32);
     /// n.div_round_assign(&Natural::from(4u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "2");
+    /// assert_eq!(n, 2);
     ///
     /// let mut n = Natural::from(14u32);
     /// n.div_round_assign(&Natural::from(4u32), RoundingMode::Nearest);
-    /// assert_eq!(n.to_string(), "4");
+    /// assert_eq!(n, 4);
     /// ```
     fn div_round_assign(&mut self, other: &'a Natural, rm: RoundingMode) {
         if rm == RoundingMode::Floor || rm == RoundingMode::Down {
@@ -528,7 +548,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
                         *self += Natural::ONE;
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
-                    RoundingMode::Nearest => div_round_assign_nearest(self, r, other),
+                    RoundingMode::Nearest => div_round_assign_nearest(self, &r, other),
                     _ => unreachable!(),
                 }
             }

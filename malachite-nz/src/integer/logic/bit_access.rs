@@ -16,13 +16,14 @@ use std::cmp::Ordering;
 // specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
 // contain only zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
+// This is equivalent to `mpz_tstbit` from `mpz/tstbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
@@ -44,14 +45,17 @@ pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 // the slice will result in no action being taken, since negative numbers in two's complement have
 // infinitely many leading 1s. The slice cannot be empty or contain only zeros.
 //
-// Time: worst case O(`index`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
 //
 // # Panics
 // If the slice contains only zeros a panic may occur.
 //
-// This is mpz_setbit from mpz/setbit.c, GMP 6.2.1, where d is negative.
+// This is equivalent to `mpz_setbit` from `mpz/setbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
@@ -104,16 +108,19 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 // index to `false`, and taking the two's complement again. Inputs that would result in new `true`
 // bits outside of the slice will cause a panic. The slice cannot be empty or contain only zeros.
 //
-// Time: worst case O(`index`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
 //
 // # Panics
 // Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
 // only zeros a panic may occur.
 //
-// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative and bit_idx small enough
-// that no additional memory needs to be given to d.
+// This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is negative and
+// `bit_idx` small enough that no additional memory needs to be given to `d`.
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
@@ -127,14 +134,17 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 // index to `false`, and taking the two's complement again. Sufficiently high indices will increase
 // the length of the limbs vector. The slice cannot be empty or contain only zeros.
 //
-// Time: worst case O(`index`)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(`index`)
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
 //
 // # Panics
 // If the slice contains only zeros a panic may occur.
 //
-// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative.
+// This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is negative.
 pub_test! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
@@ -197,15 +207,12 @@ impl Natural {
     }
 }
 
-/// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
-/// coefficient of 2^<sup>`index`</sup> in its binary expansion.
-///
-/// Negative integers are treated as though they are represented in two's complement.
+/// Provides functions for accessing and modifying the $i$th bit of a [`Integer`], or the
+/// coefficient of $2^i$ in its two's complement binary expansion.
 ///
 /// # Examples
 /// ```
 /// extern crate malachite_base;
-/// extern crate malachite_nz;
 ///
 /// use malachite_base::num::logic::traits::BitAccess;
 /// use malachite_base::num::basic::traits::{NegativeOne, Zero};
@@ -215,51 +222,65 @@ impl Natural {
 /// x.assign_bit(2, true);
 /// x.assign_bit(5, true);
 /// x.assign_bit(6, true);
-/// assert_eq!(x.to_string(), "100");
+/// assert_eq!(x, 100);
 /// x.assign_bit(2, false);
 /// x.assign_bit(5, false);
 /// x.assign_bit(6, false);
-/// assert_eq!(x.to_string(), "0");
+/// assert_eq!(x, 0);
 ///
 /// let mut x = Integer::from(-0x100);
 /// x.assign_bit(2, true);
 /// x.assign_bit(5, true);
 /// x.assign_bit(6, true);
-/// assert_eq!(x.to_string(), "-156");
+/// assert_eq!(x, -156);
 /// x.assign_bit(2, false);
 /// x.assign_bit(5, false);
 /// x.assign_bit(6, false);
-/// assert_eq!(x.to_string(), "-256");
+/// assert_eq!(x, -256);
 ///
 /// let mut x = Integer::ZERO;
 /// x.flip_bit(10);
-/// assert_eq!(x.to_string(), "1024");
+/// assert_eq!(x, 1024);
 /// x.flip_bit(10);
-/// assert_eq!(x.to_string(), "0");
+/// assert_eq!(x, 0);
 ///
 /// let mut x = Integer::NEGATIVE_ONE;
 /// x.flip_bit(10);
-/// assert_eq!(x.to_string(), "-1025");
+/// assert_eq!(x, -1025);
 /// x.flip_bit(10);
-/// assert_eq!(x.to_string(), "-1");
+/// assert_eq!(x, -1);
 /// ```
 impl BitAccess for Integer {
-    /// Determines whether the `index`th bit of an `Integer`, or the coefficient of
-    /// 2<sup>`index`</sup> in its binary expansion, is 0 or 1. `false` means 0, `true` means 1.
+    /// Determines whether the $i$th bit of an [`Integer`], or the coefficient of $2^i$ in its
+    /// two's complement binary expansion, is 0 or 1.
     ///
-    /// Negative integers are treated as though they are represented in two's complement.
+    /// `false` means 0 and `true` means 1. Getting bits beyond the [`Integer`]'s width is allowed;
+    /// those bits are `false` if the [`Integer`] is non-negative and `true` if it is negative.
     ///
-    /// Time: worst case O(n)
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $f(n, i) = (b_i = 1)$.
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
@@ -269,10 +290,10 @@ impl BitAccess for Integer {
     /// assert_eq!(Integer::from(-123).get_bit(0), true);
     /// assert_eq!(Integer::from(-123).get_bit(1), false);
     /// assert_eq!(Integer::from(-123).get_bit(100), true);
-    /// assert_eq!(Integer::trillion().get_bit(12), true);
-    /// assert_eq!(Integer::trillion().get_bit(100), false);
-    /// assert_eq!((-Integer::trillion()).get_bit(12), true);
-    /// assert_eq!((-Integer::trillion()).get_bit(100), true);
+    /// assert_eq!(Integer::from(10u32).pow(12).get_bit(12), true);
+    /// assert_eq!(Integer::from(10u32).pow(12).get_bit(100), false);
+    /// assert_eq!((-Integer::from(10u32).pow(12)).get_bit(12), true);
+    /// assert_eq!((-Integer::from(10u32).pow(12)).get_bit(100), true);
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match *self {
@@ -287,19 +308,35 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of an `Integer`, or the coefficient of 2<sup>`index`</sup> in its
+    /// Sets the $i$th bit of an [`Integer`], or the coefficient of $2^i$ in its two's complement
     /// binary expansion, to 1.
     ///
-    /// Negative integers are treated as though they are represented in two's complement.
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
+    /// $$
+    /// n \gets \\begin{cases}
+    ///     n + 2^j & \text{if} \\quad b_j = 0, \\\\
+    ///     n & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Time: worst case O(`index`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(`index`)
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_base::num::basic::traits::Zero;
@@ -309,13 +346,13 @@ impl BitAccess for Integer {
     /// x.set_bit(2);
     /// x.set_bit(5);
     /// x.set_bit(6);
-    /// assert_eq!(x.to_string(), "100");
+    /// assert_eq!(x, 100);
     ///
     /// let mut x = Integer::from(-0x100);
     /// x.set_bit(2);
     /// x.set_bit(5);
     /// x.set_bit(6);
-    /// assert_eq!(x.to_string(), "-156");
+    /// assert_eq!(x, -156);
     /// ```
     fn set_bit(&mut self, index: u64) {
         match *self {
@@ -330,19 +367,35 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of an `Integer`, or the coefficient of 2<sup>`index`</sup> in its
-    /// binary expansion, to 0.
+    /// Sets the $i$th bit of an [`Integer`], or the coefficient of $2^i$ in its binary expansion,
+    /// to 0.
     ///
-    /// Negative integers are treated as though they are represented in two's complement.
+    /// If $n \geq 0$, let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i};
+    /// $$
+    /// but if $n < 0$, let
+    /// $$
+    /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$.
+    /// $$
+    /// n \gets \\begin{cases}
+    ///     n - 2^j & \text{if} \\quad b_j = 1, \\\\
+    ///     n & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Time: worst case O(`index`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(`index`)
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
@@ -352,13 +405,13 @@ impl BitAccess for Integer {
     /// x.clear_bit(1);
     /// x.clear_bit(3);
     /// x.clear_bit(4);
-    /// assert_eq!(x.to_string(), "100");
+    /// assert_eq!(x, 100);
     ///
     /// let mut x = Integer::from(-156);
     /// x.clear_bit(2);
     /// x.clear_bit(5);
     /// x.clear_bit(6);
-    /// assert_eq!(x.to_string(), "-256");
+    /// assert_eq!(x, -256);
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match *self {

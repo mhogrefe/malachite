@@ -50,18 +50,22 @@ macro_rules! impl_shl_unsigned {
         impl Shl<$t> for Rational {
             type Output = Rational;
 
-            /// Shifts an `Rational` left (multiplies it by a power of 2), taking the `Rational` by
-            /// value.
+            /// Left-shifts a [`Rational`] (multiplies it by a power of 2), taking it by value.
+            ///
+            /// $$
+            /// f(x, k) = x2^k.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
             ///
             /// # Examples
-            /// See the documentation of the `arithmetic::shl` module.
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(mut self, bits: $t) -> Rational {
                 self <<= bits;
@@ -72,18 +76,22 @@ macro_rules! impl_shl_unsigned {
         impl<'a> Shl<$t> for &'a Rational {
             type Output = Rational;
 
-            /// Shifts an `Rational` left (multiplies it by a power of 2), taking the `Rational` by
-            /// reference.
+            /// Left-shifts a [`Rational`] (multiplies it by a power of 2), taking it by value.
+            ///
+            /// $$
+            /// f(x, k) = x2^k.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
             ///
             /// # Examples
-            /// See the documentation of the `arithmetic::shl` module.
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(self, bits: $t) -> Rational {
                 shl_unsigned_ref(self, bits)
@@ -91,17 +99,22 @@ macro_rules! impl_shl_unsigned {
         }
 
         impl ShlAssign<$t> for Rational {
-            /// Shifts an `Rational` left (multiplies it by a power of 2), in place.
+            /// Left-shifts a [`Rational`] (multiplies it by a power of 2), in place.
+            ///
+            /// $$
+            /// x \gets x2^k.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
             ///
             /// # Examples
-            /// See the documentation of the `arithmetic::shl` module.
+            /// See [here](super::shl#shl_assign).
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
                 shl_unsigned_assign(self, bits);
@@ -141,6 +154,22 @@ macro_rules! impl_shl_signed {
         impl Shl<$t> for Rational {
             type Output = Rational;
 
+            /// Left-shifts a [`Rational`] (multiplies it or divides it by a power of 2), taking it
+            /// by value.
+            ///
+            /// $$
+            /// f(x, k) = x2^k.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
+            ///
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(mut self, bits: $t) -> Rational {
                 self <<= bits;
@@ -151,6 +180,22 @@ macro_rules! impl_shl_signed {
         impl<'a> Shl<$t> for &'a Rational {
             type Output = Rational;
 
+            /// Left-shifts a [`Rational`] (multiplies or divides it by a power of 2), taking it by
+            /// reference.
+            ///
+            /// $$
+            /// f(x, k) = x2^k.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
+            ///
+            /// See [here](super::shl#shl).
             #[inline]
             fn shl(self, bits: $t) -> Rational {
                 shl_signed_ref(self, bits)
@@ -158,6 +203,21 @@ macro_rules! impl_shl_signed {
         }
 
         impl ShlAssign<$t> for Rational {
+            /// Left-shifts a [`Rational`] (multiplies or divides it by a power of 2), in place.
+            ///
+            /// $$
+            /// x \gets x2^k.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `bits`.
+            ///
+            /// See [here](super::shl#shl_assign).
             fn shl_assign(&mut self, bits: $t) {
                 shl_assign_signed(self, bits);
             }

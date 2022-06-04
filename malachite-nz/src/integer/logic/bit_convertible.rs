@@ -13,9 +13,8 @@ use platform::{Limb, SignedLimb};
 // significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
 // non-negativity is preserved in its bits.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
     if !bits.is_empty() && *bits.last().unwrap() {
         // Sign-extend with an extra false bit to indicate a positive Integer
@@ -27,11 +26,12 @@ pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
 // bits to two's complement. Returns whether there is a carry left over from the two's complement
 // conversion process.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `bits.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `bits.len()`.
 pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
     for bit in bits.iter_mut() {
@@ -49,11 +49,12 @@ pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> boo
 // appends an extra `true` bit. This way the `Integer`'s negativity is preserved in its bits. The
 // bits cannot be empty or contain only `false`s.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `bits.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `bits.len()`.
 //
 // # Panics
 // Panics if `bits` contains only `false`s.
@@ -76,25 +77,26 @@ fn from_bits_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: u64) -> In
 }
 
 impl BitConvertible for Integer {
-    /// Returns the bits of an `Integer` in ascending order, so that less significant bits have
-    /// lower indices in the output vector. The bits are in two's complement, and the most
-    /// significant bit indicates the sign; if the bit is `false`, the `Integer` is positive, and if
-    /// the bit is `true` it is negative. There are no trailing `false` bits if the `Integer` is
-    /// positive or trailing `true` bits if the `Integer` is negative, except as necessary to
-    /// include the correct sign bit. Zero is a special case: it contains no bits.
+    /// Returns a [`Vec`] containing the twos-complement bits of an [`Integer`] in ascending order:
+    /// least- to most-significant.
     ///
-    /// This function is more efficient than `to_bits_desc`.
+    /// The most significant bit indicates the sign; if the bit is `false`, the [`Integer`] is
+    /// positive, and if the bit is `true` it is negative. There are no trailing `false` bits if
+    /// the [`Integer`] is positive or trailing `true` bits if the [`Integer`] is negative, except
+    /// as necessary to include the correct sign bit. Zero is a special case: it contains no bits.
     ///
-    /// Time: worst case O(n)
+    /// This function is more efficient than [`to_bits_desc`](`Self::to_bits_desc`).
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
@@ -104,12 +106,12 @@ impl BitConvertible for Integer {
     /// // 105 = 01101001b, with a leading false bit to indicate sign
     /// assert_eq!(
     ///     Integer::from(105).to_bits_asc(),
-    ///     vec![true, false, false, true, false, true, true, false]
+    ///     &[true, false, false, true, false, true, true, false]
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
     ///     Integer::from(-105).to_bits_asc(),
-    ///     vec![true, true, true, false, true, false, false, true]
+    ///     &[true, true, true, false, true, false, false, true]
     /// );
     /// ```
     fn to_bits_asc(&self) -> Vec<bool> {
@@ -122,27 +124,28 @@ impl BitConvertible for Integer {
         bits
     }
 
-    /// Returns the bits of an `Integer` in descending order, so that less significant bits have
-    /// higher indices in the output vector. The bits are in two's complement, and the most
-    /// significant bit indicates the sign; if the bit is `false`, the `Integer` is positive, and if
-    /// the bit is `true` it is negative. There are no leading `false` bits if the `Integer` is
-    /// non-negative or `true` bits if `Integer` is negative, except as necessary to include the
-    /// correct sign bit. Zero is a special case: it contains no bits.
+    /// Returns a [`Vec`] containing the twos-complement bits of an [`Integer`] in descending
+    /// order: most- to least-significant.
     ///
-    /// This is similar to how BigIntegers in Java are represented.
+    /// The most significant bit indicates the sign; if the bit is `false`, the [`Integer`] is
+    /// positive, and if the bit is `true` it is negative. There are no leading `false` bits if the
+    /// [`Integer`] is positive or leading `true` bits if the [`Integer`] is negative, except as
+    /// necessary to include the correct sign bit. Zero is a special case: it contains no bits.
     ///
-    /// This function is less efficient than `to_bits_asc`.
+    /// This is similar to how `BigInteger`s in Java are represented.
     ///
-    /// Time: worst case O(n)
+    /// This function is less efficient than [`to_bits_asc`](`Self::to_bits_asc`).
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
@@ -152,12 +155,12 @@ impl BitConvertible for Integer {
     /// // 105 = 01101001b, with a leading false bit to indicate sign
     /// assert_eq!(
     ///     Integer::from(105).to_bits_desc(),
-    ///     vec![false, true, true, false, true, false, false, true]
+    ///     &[false, true, true, false, true, false, false, true]
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
     ///     Integer::from(-105).to_bits_desc(),
-    ///     vec![true, false, false, true, false, true, true, true]
+    ///     &[true, false, false, true, false, true, true, true]
     /// );
     /// ```
     fn to_bits_desc(&self) -> Vec<bool> {
@@ -166,12 +169,30 @@ impl BitConvertible for Integer {
         bits
     }
 
-    /// TODO doc
+    /// Converts an iterator of twos-complement bits into an [`Integer`]. The bits should be in
+    /// ascending order (least- to most-significant).
+    ///
+    /// Let $k$ be `bits.count()`. If $k = 0$ or $b_{k-1}$ is `false`, then
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^i \[b_i\],
+    /// $$
+    /// where braces denote the Iverson bracket, which converts a bit to 0 or 1.
+    ///
+    /// If $b_{k-1}$ is `true`, then
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \left ( \sum_{i=0}^{k-1}2^i \[b_i\] \right ) - 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
@@ -215,12 +236,30 @@ impl BitConvertible for Integer {
         from_bits_helper(limbs, last_bit, last_width)
     }
 
-    /// TODO doc
+    /// Converts an iterator of twos-complement bits into an [`Integer`]. The bits should be in
+    /// descending order (most- to least-significant).
+    ///
+    /// If `bits` is empty or $b_0$ is `false`, then
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\],
+    /// $$
+    /// where braces denote the Iverson bracket, which converts a bit to 0 or 1.
+    ///
+    /// If $b_0$ is `true`, then
+    /// $$
+    /// f((b_i)_ {i=0}^{k-1}) = \left ( \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\] \right ) - 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;

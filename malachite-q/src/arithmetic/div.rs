@@ -6,18 +6,26 @@ use Rational;
 impl Div<Rational> for Rational {
     type Output = Rational;
 
-    /// Divides a `Rational` by a `Rational`, taking both `Rational`s by value.
+    /// Divides a [`Rational`] by another [`Rational`], taking both by value.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
@@ -51,19 +59,27 @@ impl Div<Rational> for Rational {
 impl<'a> Div<&'a Rational> for Rational {
     type Output = Rational;
 
-    /// Divides a `Rational` by a `Rational`, taking the first `Rational` by value and the second
-    /// by reference.
+    /// Divides a [`Rational`] by another [`Rational`], taking the first by value and the second by
+    /// reference.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
@@ -87,19 +103,27 @@ impl<'a> Div<&'a Rational> for Rational {
 impl<'a> Div<Rational> for &'a Rational {
     type Output = Rational;
 
-    /// Divides a `Rational` by a `Rational`, taking the first `Rational` by reference and the
-    /// second by value.
+    /// Divides a [`Rational`] by another [`Rational`], taking the first by reference and the second
+    /// by value.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
@@ -133,18 +157,26 @@ impl<'a> Div<Rational> for &'a Rational {
 impl<'a, 'b> Div<&'a Rational> for &'b Rational {
     type Output = Rational;
 
-    /// Divides a `Rational` by a `Rational`, taking both `Rational`s by reference.
+    /// Divides a [`Rational`] by another [`Rational`], taking both by reference.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
@@ -176,19 +208,27 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
 }
 
 impl DivAssign<Rational> for Rational {
-    /// Divides a `Rational` by a `Rational` in place, taking the `Rational` on the right-hand side
-    /// by value.
+    /// Divides a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the right-hand
+    /// side by value.
+    ///
+    /// $$
+    /// x \gets \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
@@ -221,19 +261,27 @@ impl DivAssign<Rational> for Rational {
 }
 
 impl<'a> DivAssign<&'a Rational> for Rational {
-    /// Divides a `Rational` by a `Rational` in place, taking the `Rational` on the right-hand side
-    /// by reference.
+    /// Divides a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the right-hand
+    /// side by reference.
+    ///
+    /// $$
+    /// x \gets \frac{x}{y}.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if the second `Rational` is zero.
+    /// Panics if the second [`Rational`] is zero.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;

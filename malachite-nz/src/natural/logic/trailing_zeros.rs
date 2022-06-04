@@ -10,11 +10,12 @@ use platform::Limb;
 // number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity
 // of 2 in its prime factorization). The limbs cannot be empty or all zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` only contains zeros.
@@ -25,20 +26,22 @@ pub_crate_test! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
 }}
 
 impl Natural {
-    /// Returns the number of trailing zeros in the binary expansion of a `Natural` (equivalently,
-    /// the multiplicity of 2 in its prime factorization) or `None` is the `Natural` is 0.
+    /// Returns the number of trailing zeros in the binary expansion of a [`Natural`]
+    /// (equivalently, the multiplicity of 2 in its prime factorization), or `None` is the
+    /// [`Natural`] is 0.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
@@ -46,7 +49,7 @@ impl Natural {
     /// assert_eq!(Natural::from(3u32).trailing_zeros(), Some(0));
     /// assert_eq!(Natural::from(72u32).trailing_zeros(), Some(3));
     /// assert_eq!(Natural::from(100u32).trailing_zeros(), Some(2));
-    /// assert_eq!(Natural::trillion().trailing_zeros(), Some(12));
+    /// assert_eq!(Natural::from(10u32).pow(12).trailing_zeros(), Some(12));
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {

@@ -1,66 +1,14 @@
 use std::ops::Index;
 
-/// Returns the number of ones in the binary representation of `self`.
-pub trait CountOnes {
-    fn count_ones(self) -> u64;
-}
-
-/// Returns the number of zeros in the binary representation of `self`.
-pub trait CountZeros {
-    fn count_zeros(self) -> u64;
-}
-
-/// Returns the number of leading zeros in the binary representation of `self`.
-pub trait LeadingZeros {
-    fn leading_zeros(self) -> u64;
-}
-
-/// Returns the number of trailing zeros in the binary representation of `self`.
-pub trait TrailingZeros {
-    fn trailing_zeros(self) -> u64;
-}
-
-/// Replaces a number with its bitwise negation.
-pub trait NotAssign {
-    fn not_assign(&mut self);
-}
-
-/// Provides a function to get the number of significant bits of `self`.
-pub trait SignificantBits {
-    /// The number of bits it takes to represent `self`.
-    fn significant_bits(self) -> u64;
-}
-
-/// Returns the Hamming distance between `self` and `other`, or the number of bit flips needed to
-/// turn `self` into `other`.
-pub trait HammingDistance<RHS = Self> {
-    fn hamming_distance(self, other: RHS) -> u64;
-}
-
-/// Returns the Hamming distance between `self` and `other`, or the number of bit flips needed to
-/// turn `self` into `other`.
-///
-/// This trait allows for the possibility of the distance being undefined for some pairs of `self`
-/// and `other`, in which case the `checked_hamming_distance` function should return `None`.
-pub trait CheckedHammingDistance<RHS = Self> {
-    fn checked_hamming_distance(self, other: RHS) -> Option<u64>;
-}
-
-/// Returns a value with the least significant `bits` bits on and the remaining bits off.
-pub trait LowMask {
-    fn low_mask(bits: u64) -> Self;
-}
-
-/// This trait defines functions that access or modify individual bits in a value, indexed by a
-/// `u64`.
+/// Defines functions that access or modify individual bits in a number.
 pub trait BitAccess {
-    /// Determines whether the bit at `index` is true or false.
+    /// Determines whether a number has a `true` or `false` bit at `index`.
     fn get_bit(&self, index: u64) -> bool;
 
-    /// Sets the bit at `index` to true.
+    /// Sets the bit at `index` to `true`.
     fn set_bit(&mut self, index: u64);
 
-    /// Sets the bit at `index` to false.
+    /// Sets the bit at `index` to `false`.
     fn clear_bit(&mut self, index: u64);
 
     /// Sets the bit at `index` to whichever value `bit` is.
@@ -71,10 +19,11 @@ pub trait BitAccess {
     /// $M(n) = O(\max(M_S(n), M_C(n)))$
     ///
     /// where $T$ is time, $M$ is additional memory, $T_S$ and $M_S$ are the complexities of
-    /// `Self::set_bit`, and $T_C$ and $M_C$ are the complexities of `Self::clear_bit`.
+    /// [`set_bit`](Self::set_bit), and $T_C$ and $M_C$ are the complexities of
+    /// [`clear_bit`](Self::clear_bit).
     ///
     /// # Panics
-    /// See panics for `set_bit` and `assign_bit`.
+    /// See panics for [`set_bit`](Self::set_bit) and [`clear_bit`](Self::clear_bit).
     #[inline]
     fn assign_bit(&mut self, index: u64, bit: bool) {
         if bit {
@@ -92,11 +41,13 @@ pub trait BitAccess {
     /// $M(n) = O(M_G(n) + \max(M_S(n), M_C(n)))$
     ///
     /// where $T$ is time, $M$ is additional memory, $T_G$ and $M_G$ are the complexities of
-    /// `Self::get_bit`, $T_S$ and $M_S$ are the complexities of `Self::set_bit`, and $T_C$ and
-    /// $M_C$ are the complexities of `Self::clear_bit`.
+    /// [`get_bit`](Self::get_bit), $T_S$ and $M_S$ are the complexities of
+    /// [`set_bit`](Self::set_bit), and $T_C$ and $M_C$ are the complexities of
+    /// [`clear_bit`](Self::clear_bit).
     ///
     /// # Panics
-    /// See panics for `get_bit`, `set_bit` and `assign_bit`.
+    /// See panics for [`get_bit`](Self::get_bit), [`set_bit`](Self::set_bit) and
+    /// [`clear_bit`](Self::clear_bit).
     #[inline]
     fn flip_bit(&mut self, index: u64) {
         if self.get_bit(index) {
@@ -107,18 +58,7 @@ pub trait BitAccess {
     }
 }
 
-/// This trait defines functions search for the next true or false bit, starting at a specified
-/// index and searching in the more-significant direction.
-pub trait BitScan {
-    /// Finds the smallest index of a `false` bit that is greater than or equal to `start`.
-    fn index_of_next_false_bit(self, start: u64) -> Option<u64>;
-
-    /// Finds the smallest index of a `true` bit that is greater than or equal to `start`.
-    fn index_of_next_true_bit(self, start: u64) -> Option<u64>;
-}
-
-/// This trait defines functions that access or modify blocks of adjacent bits in a value, where the
-/// start (inclusive) and end (exclusive) indices of the block are specified.
+/// Defines functions that access or modify blocks of adjacent bits in a number.
 pub trait BitBlockAccess: Sized {
     type Bits;
 
@@ -129,10 +69,10 @@ pub trait BitBlockAccess: Sized {
     /// ownership of `self`.
     ///
     /// # Worst-case complexity
-    /// For the default implementation, same as `Self::get_bits`.
+    /// For the default implementation, same as [`get_bits`](Self::get_bits).
     ///
     /// # Panics
-    /// See panics for `Self::get_bits`.
+    /// For the default implementation, ee panics for [`get_bits`](Self::get_bits).
     ///
     /// # Examples
     /// ```
@@ -148,36 +88,100 @@ pub trait BitBlockAccess: Sized {
         self.get_bits(start, end)
     }
 
-    /// Assigns the least-significant `end - start` bits of `bits` to bits `start` (inclusive)
-    /// through `end` (exclusive) of `self`.
+    /// Assigns the least-significant `end - start` bits of `bits` to bits `start` through
+    /// `end - 1` (inclusive) of `self`.
     fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }
 
-/// This trait defines functions that express a value as a `Vec` of bits and read a value from a
-/// slice of bits.
+/// Defines functions that express a number as a [`Vec`] of bits or construct a number from an
+/// iterator of bits.
 pub trait BitConvertible {
-    /// Returns a `Vec` containing the bits of a value in ascending order: least- to most-
-    /// significant.
+    /// Returns a [`Vec`] containing the bits of a number in ascending order: least- to
+    /// most-significant.
     fn to_bits_asc(&self) -> Vec<bool>;
 
-    /// Returns a `Vec` containing the bits of a value in descending order: most- to least-
-    /// significant.
+    /// Returns a [`Vec`] containing the bits of a number in descending order: most- to
+    /// least-significant.
     fn to_bits_desc(&self) -> Vec<bool>;
 
-    /// Converts an iterator of bits into a value. The input bits are in ascending order: least- to
-    /// most-significant.
+    /// Converts an iterator of bits into a number. The input bits are in ascending order: least-
+    /// to most-significant.
     fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> Self;
 
-    /// Converts an iterator of bits into a value. The input bits are in descending order: most- to
-    /// least-significant.
+    /// Converts an iterator of bits into a value. The input bits are in descending order: most-
+    /// to least-significant.
     fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> Self;
 }
 
-/// This trait defines an iterator over a value's bits.
+/// Defines an iterator over a value's bits.
 pub trait BitIterable {
-    type BitIterator: Iterator<Item = bool> + DoubleEndedIterator<Item = bool> + Index<u64>;
+    type BitIterator: DoubleEndedIterator<Item = bool> + Index<u64>;
 
-    /// Returns a double-ended iterator over a value's bits. The iterator ends after the value's
-    /// most-significant bit.
+    /// Returns a double-ended iterator over a number's bits. When iterating in the forward
+    /// direction, the iterator ends after the producing the number's most-significant bit.
     fn bits(self) -> Self::BitIterator;
+}
+
+/// Defines functions that search for the next `true` or `false` bit in a number, starting at a
+/// specified index and searching in the more-significant direction.
+pub trait BitScan {
+    /// Given a number and a starting index, searches the number for the smallest index of a
+    /// `false` bit that is greater than or equal to the starting index.
+    fn index_of_next_false_bit(self, start: u64) -> Option<u64>;
+
+    /// Given a number and a starting index, searches the number for the smallest index of a `true`
+    /// bit that is greater than or equal to the starting index.
+    fn index_of_next_true_bit(self, start: u64) -> Option<u64>;
+}
+
+/// Returns the number of ones in the binary representation of a number.
+pub trait CountOnes {
+    fn count_ones(self) -> u64;
+}
+
+/// Returns the number of zeros in the binary representation of a number.
+pub trait CountZeros {
+    fn count_zeros(self) -> u64;
+}
+
+/// Returns the Hamming distance between two numbers, or the number of bit flips needed to turn one
+/// into the other.
+pub trait HammingDistance<RHS = Self> {
+    fn hamming_distance(self, other: RHS) -> u64;
+}
+
+/// Returns the Hamming distance between two numbers, or the number of bit flips needed to turn one
+/// into the other.
+///
+/// This trait allows for the possibility of the distance being undefined for some pairs of
+/// numbers, in which case [`checked_hamming_distance`](Self::checked_hamming_distance) should
+/// return `None`.
+pub trait CheckedHammingDistance<RHS = Self> {
+    fn checked_hamming_distance(self, other: RHS) -> Option<u64>;
+}
+
+/// Returns the number of leading zeros in the binary representation of a number.
+pub trait LeadingZeros {
+    fn leading_zeros(self) -> u64;
+}
+
+/// Returns a number whose least significant $b$ bits are `true` and whose other bits are `false`.
+pub trait LowMask {
+    fn low_mask(bits: u64) -> Self;
+}
+
+/// Replaces a number with its bitwise negation.
+pub trait NotAssign {
+    fn not_assign(&mut self);
+}
+
+// Returns the number of significant bits of a number.
+pub trait SignificantBits {
+    /// The number of bits it takes to represent `self`.
+    fn significant_bits(self) -> u64;
+}
+
+/// Returns the number of trailing zeros in the binary representation of a number.
+pub trait TrailingZeros {
+    fn trailing_zeros(self) -> u64;
 }

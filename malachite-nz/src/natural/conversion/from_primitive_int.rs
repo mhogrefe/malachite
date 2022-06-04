@@ -9,17 +9,13 @@ use platform::Limb;
 macro_rules! impl_from_limb {
     ($t: ident) => {
         impl From<$t> for Natural {
-            /// Converts a `Limb` to a `Natural`.
+            /// Converts a [`Limb`](crate#limbs) to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(123u32).to_string(), "123");
-            /// ```
+            /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Natural {
                 Natural(Small(u))
@@ -31,18 +27,14 @@ macro_rules! impl_from_limb {
 macro_rules! impl_from_smaller_than_limb {
     ($t: ident) => {
         impl From<$t> for Natural {
-            /// Converts a value to a `Natural`, where the value is of a primitive unsigned integer
-            /// type that's smaller than a `Limb`.
+            /// Converts an unsigned primitive integer to a [`Natural`], where the integer's width
+            /// is smaller than a [`Limb`](crate#limbs)'s.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(123u8).to_string(), "123");
-            /// ```
+            /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Natural {
                 Natural(Small(Limb::from(u)))
@@ -54,19 +46,17 @@ macro_rules! impl_from_smaller_than_limb {
 macro_rules! impl_from_larger_than_limb_or_usize {
     ($t: ident) => {
         impl From<$t> for Natural {
-            /// Converts a value to a `Natural`, where the value is of a primitive unsigned integer
-            /// type that's larger than a `Limb`. This implementation is general enough to also work
-            /// for `usize`, regardless of whether it is equal in width to `Limb`.
+            /// Converts an unsigned primitive integer to a [`Natural`], where the integer's width
+            /// is larger than a [`Limb`](crate#limbs)'s.
+            ///
+            /// This implementation is general enough to also work for [`usize`], regardless of
+            /// whether it is equal in width to [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(123u64).to_string(), "123");
-            /// ```
+            /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Natural {
                 Natural::from_owned_limbs_asc(Limb::vec_from_other_type(u))
@@ -78,22 +68,14 @@ macro_rules! impl_from_larger_than_limb_or_usize {
 macro_rules! impl_signed {
     ($t: ident) => {
         impl CheckedFrom<$t> for Natural {
-            /// Converts a value of signed primitive integer type to a `Natural`. If the value is
-            /// negative, `None` is returned.
+            /// Converts a signed primitive integer to a [`Natural`]. If the integer is negative,
+            /// `None` is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(format!("{:?}", Natural::checked_from(123i32)), "Some(123)");
-            /// assert_eq!(format!("{:?}", Natural::checked_from(-123i32)), "None");
-            /// ```
+            /// See [here](super::from_primitive_int#checked_from).
             #[inline]
             fn checked_from(i: $t) -> Option<Natural> {
                 if i >= 0 {
@@ -105,22 +87,13 @@ macro_rules! impl_signed {
         }
 
         impl ConvertibleFrom<$t> for Natural {
-            /// Determines whether a value of signed primitive integer type can be converted to a
-            /// `Natural`.
+            /// Determines whether a signed primitive integer can be converted to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::convertible_from(123i32), true);
-            /// assert_eq!(Natural::convertible_from(-123i32), false);
-            /// ```
+            /// See [here](super::from_primitive_int#convertible_from).
             #[inline]
             fn convertible_from(i: $t) -> bool {
                 i >= 0
@@ -128,22 +101,14 @@ macro_rules! impl_signed {
         }
 
         impl SaturatingFrom<$t> for Natural {
-            /// Converts a value of signed primitive integer type to a `Natural`. If the value is
+            /// Converts a signed primitive primitive integer to a [`Natural`]. If the integer is
             /// negative, 0 is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::saturating_from(123i32).to_string(), "123");
-            /// assert_eq!(Natural::saturating_from(-123i32).to_string(), "0");
-            /// ```
+            /// See [here](super::from_primitive_int#saturating_from).
             #[inline]
             fn saturating_from(i: $t) -> Natural {
                 if i >= 0 {

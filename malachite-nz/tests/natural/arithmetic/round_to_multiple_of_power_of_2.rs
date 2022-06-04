@@ -817,16 +817,19 @@ fn limbs_round_to_multiple_of_power_of_2_properties() {
         &config,
         |(xs, pow, rm)| {
             let n = Natural::from_limbs_asc(&xs);
-            if let Some(result_limbs) = limbs_round_to_multiple_of_power_of_2(&xs, pow, rm) {
-                let m = (&n).round_to_multiple_of_power_of_2(pow, rm);
-                assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
-                if rm == RoundingMode::Exact {
-                    assert_eq!(m, n);
-                }
-            } else {
-                assert_eq!(rm, RoundingMode::Exact);
-                assert!(!n.divisible_by_power_of_2(pow));
-            }
+            limbs_round_to_multiple_of_power_of_2(&xs, pow, rm).map_or_else(
+                || {
+                    assert_eq!(rm, RoundingMode::Exact);
+                    assert!(!n.divisible_by_power_of_2(pow));
+                },
+                |result_limbs| {
+                    let m = (&n).round_to_multiple_of_power_of_2(pow, rm);
+                    assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
+                    if rm == RoundingMode::Exact {
+                        assert_eq!(m, n);
+                    }
+                },
+            );
         },
     );
 }

@@ -6,15 +6,23 @@ use Rational;
 impl Mul<Rational> for Rational {
     type Output = Rational;
 
-    /// Multiplies a `Rational` by a `Rational`, taking both `Rational`s by value.
+    /// Multiplies two [`Rational`]s, taking both by value.
+    ///
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
@@ -46,16 +54,23 @@ impl Mul<Rational> for Rational {
 impl<'a> Mul<&'a Rational> for Rational {
     type Output = Rational;
 
-    /// Multiplies a `Rational` by a `Rational`, taking the first `Rational`s by value and the
-    /// second by reference.
+    /// Multiplies two [`Rational`]s, taking the first by value and the second by reference.
+    ///
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
@@ -75,16 +90,23 @@ impl<'a> Mul<&'a Rational> for Rational {
 impl<'a> Mul<Rational> for &'a Rational {
     type Output = Rational;
 
-    /// Multiplies a `Rational` by a `Rational`, taking the first `Rational` by value and the
-    /// second by reference.
+    /// Multiplies two [`Rational`]s, taking the first by reference and the second by value.
+    ///
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
@@ -116,15 +138,23 @@ impl<'a> Mul<Rational> for &'a Rational {
 impl<'a, 'b> Mul<&'a Rational> for &'b Rational {
     type Output = Rational;
 
-    /// Multiplies a `Rational` by a `Rational`, taking both `Rational`s by reference.
+    /// Multiplies two [`Rational`]s, taking both by reference.
+    ///
+    /// $$
+    /// f(x, y) = xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
@@ -154,16 +184,24 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Rational {
 }
 
 impl MulAssign<Rational> for Rational {
-    /// Multiplies a `Rational` by a `Rational` in place, taking the `Rational` on the right-hand
-    /// side by value.
+    /// Multiplies a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the
+    /// right-hand side by value.
+    ///
+    /// $$
+    /// x \gets xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
@@ -197,16 +235,24 @@ impl MulAssign<Rational> for Rational {
 }
 
 impl<'a> MulAssign<&'a Rational> for Rational {
-    /// Multiplies a `Rational` by a `Rational` in place, taking the `Rational` on the right-hand
-    /// side by reference.
+    /// Multiplies a [`Rational`] by a [`Rational`] in place, taking the [`Rational`] on the
+    /// right-hand side by reference.
+    ///
+    /// $$
+    /// x \gets xy.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;

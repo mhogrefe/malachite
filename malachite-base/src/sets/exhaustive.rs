@@ -5,9 +5,10 @@ use vecs::exhaustive::{
     LexOrderedUniqueCollections, ShortlexOrderedUniqueCollections,
 };
 
-/// Generates `HashSet`s of a given size with elements from a single iterator.
+/// Generates [`HashSet`]s of a given size with elements from a single iterator.
 ///
-/// The `HashSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`HashSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -17,21 +18,9 @@ use vecs::exhaustive::{
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `HashSet`.
+/// If $k$ is 0, the output consists of one empty [`HashSet`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -77,33 +66,21 @@ where
     LexFixedLengthOrderedUniqueCollections::new(k, xs)
 }
 
-/// Generates `HashSet`s with elements from a single iterator.
+/// Generates [`HashSet`]s with elements from a single iterator.
 ///
-/// The `HashSet`s are generated in order of increasing length, and within each length they are
+/// The [`HashSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `HashSet`s of length 2 and above will never
+/// The iterator should be finite; if it is infinite, [`HashSet`]s of length 2 and above will never
 /// be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `HashSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`HashSet`].
 ///
 /// # Examples
 /// ```
@@ -149,15 +126,15 @@ where
     shortlex_hash_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`HashSet`]s with a mininum length, with elements from a single iterator.
 ///
-/// The `HashSet`s are generated in order of increasing length, and within each length they are
+/// The [`HashSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `HashSet`s of length `\max(2, \ell + 1)` and
-/// above will never be generated.
+/// The iterator should be finite; if it is infinite, [`HashSet`]s of length `\max(2, \ell + 1)`
+/// and above will never be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
@@ -165,18 +142,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -218,19 +183,19 @@ where
     shortlex_hash_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
-/// The `HashSet`s are generated in order of increasing length, and within each length they are
+/// The [`HashSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `HashSet`s of length `\max(2, a + 1)` and
+/// The iterator should be finite; if it is infinite, [`HashSet`]s of length `\max(2, a + 1)` and
 /// above will never be generated.
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `HashSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -238,18 +203,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -297,19 +250,19 @@ where
     shortlex_hash_sets_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
-/// The `HashSet`s are generated in order of increasing length, and within each length they are
+/// The [`HashSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `HashSet`s of length `\max(2, a + 1)` and
+/// The iterator should be finite; if it is infinite, [`HashSet`]s of length `\max(2, a + 1)` and
 /// above will never be generated.
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `HashSet`.
+/// If $a = b = 0$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -317,18 +270,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -370,9 +311,10 @@ where
     ShortlexOrderedUniqueCollections::new(a, b, xs)
 }
 
-/// Generates `HashSet`s with elements from a single iterator.
+/// Generates [`HashSet`]s with elements from a single iterator.
 ///
-/// The `HashSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`HashSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -383,19 +325,7 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `HashSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`HashSet`].
 ///
 /// # Examples
 /// ```
@@ -439,9 +369,10 @@ where
     lex_hash_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`HashSet`]s with a mininum length, with elements from a single iterator.
 ///
-/// The `HashSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`HashSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -454,18 +385,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -507,9 +426,10 @@ where
     lex_hash_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
-/// The `HashSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`HashSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -518,7 +438,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `HashSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -526,18 +446,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -585,9 +493,10 @@ where
     lex_hash_sets_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
-/// The `HashSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`HashSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -596,7 +505,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `HashSet`.
+/// If $a = b = 0$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -604,18 +513,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -657,7 +554,7 @@ where
     LexOrderedUniqueCollections::new(a, b, xs)
 }
 
-/// Generates `HashSet`s of a given size with elements from a single iterator.
+/// Generates [`HashSet`]s of a given size with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -667,21 +564,9 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `HashSet`.
+/// If $k$ is 0, the output consists of one empty [`HashSet`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -727,7 +612,7 @@ where
     exhaustive_hash_sets_length_inclusive_range(k, k, xs)
 }
 
-/// Generates `HashSet`s with elements from a single iterator.
+/// Generates [`HashSet`]s with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -738,19 +623,7 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `HashSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`HashSet`].
 ///
 /// # Examples
 /// ```
@@ -796,7 +669,7 @@ where
     exhaustive_hash_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`HashSet`]s with a mininum length, with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -809,18 +682,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -862,7 +723,7 @@ where
     exhaustive_hash_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -871,7 +732,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `HashSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -879,18 +740,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -936,7 +785,7 @@ where
     }
 }
 
-/// Generates `HashSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`HashSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -945,7 +794,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `HashSet`.
+/// If $a = b = 0$, the output consists of a single empty [`HashSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -953,18 +802,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1006,9 +843,9 @@ where
     ExhaustiveOrderedUniqueCollections::new(a, b, xs)
 }
 
-/// Generates `BTreeSet`s of a given size with elements from a single iterator.
+/// Generates [`BTreeSet`]s of a given size with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
 /// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
@@ -1019,21 +856,9 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `BTreeSet`.
+/// If $k$ is 0, the output consists of one empty [`BTreeSet`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1079,33 +904,21 @@ where
     LexFixedLengthOrderedUniqueCollections::new(k, xs)
 }
 
-/// Generates `BTreeSet`s with elements from a single iterator.
+/// Generates [`BTreeSet`]s with elements from a single iterator.
 ///
-/// The `BTreeSet`s are generated in order of increasing length, and within each length they are
+/// The [`BTreeSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `BTreeSet`s of length 2 and above will never
+/// The iterator should be finite; if it is infinite, [`BTreeSet`]s of length 2 and above will never
 /// be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `HashSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`HashSet`].
 ///
 /// # Examples
 /// ```
@@ -1151,15 +964,15 @@ where
     shortlex_b_tree_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`BTreeSet`]s with a mininum length, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are generated in order of increasing length, and within each length they are
+/// The [`BTreeSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `BTreeSet`s of length `\max(2, \ell + 1)` and
-/// above will never be generated.
+/// The iterator should be finite; if it is infinite, [`BTreeSet`]s of length `\max(2, \ell + 1)`
+/// and above will never be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///
@@ -1167,18 +980,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1220,19 +1021,19 @@ where
     shortlex_b_tree_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are generated in order of increasing length, and within each length they are
+/// The [`BTreeSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `BTreeSet`s of length `\max(2, a + 1)` and
+/// The iterator should be finite; if it is infinite, [`BTreeSet`]s of length `\max(2, a + 1)` and
 /// above will never be generated.
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `BTreeSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -1240,18 +1041,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1299,19 +1088,19 @@ where
     shortlex_b_tree_sets_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are generated in order of increasing length, and within each length they are
+/// The [`BTreeSet`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, `BTreeSet`s of length `\max(2, a + 1)` and
+/// The iterator should be finite; if it is infinite, [`BTreeSet`]s of length `\max(2, a + 1)` and
 /// above will never be generated.
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `BTreeSet`.
+/// If $a = b = 0$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -1319,18 +1108,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1372,9 +1149,10 @@ where
     ShortlexOrderedUniqueCollections::new(a, b, xs)
 }
 
-/// Generates `BTreeSet`s with elements from a single iterator.
+/// Generates [`BTreeSet`]s with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1385,19 +1163,7 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `BTreeSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`BTreeSet`].
 ///
 /// # Examples
 /// ```
@@ -1443,9 +1209,10 @@ where
     lex_b_tree_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`BTreeSet`]s with a mininum length, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1458,18 +1225,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1511,9 +1266,10 @@ where
     lex_b_tree_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1522,7 +1278,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `BTreeSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -1530,18 +1286,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1589,9 +1333,10 @@ where
     lex_b_tree_sets_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1600,7 +1345,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `BTreeSet`.
+/// If $a = b = 0$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -1608,18 +1353,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1661,7 +1394,7 @@ where
     LexOrderedUniqueCollections::new(a, b, xs)
 }
 
-/// Generates `BTreeSet`s of a given size with elements from a single iterator.
+/// Generates [`BTreeSet`]s of a given size with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1671,21 +1404,9 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
 ///
-/// If $k$ is 0, the output consists of one empty `BTreeSet`.
+/// If $k$ is 0, the output consists of one empty [`BTreeSet`].
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1731,7 +1452,7 @@ where
     exhaustive_b_tree_sets_length_inclusive_range(k, k, xs)
 }
 
-/// Generates `BTreeSet`s with elements from a single iterator.
+/// Generates [`BTreeSet`]s with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1742,19 +1463,7 @@ where
 ///
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
-/// If `xs` is empty, the output consists of a single empty `BTreeSet`.
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
+/// If `xs` is empty, the output consists of a single empty [`BTreeSet`].
 ///
 /// # Examples
 /// ```
@@ -1800,9 +1509,10 @@ where
     exhaustive_b_tree_sets_length_inclusive_range(0, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s with a mininum length, with elements from a single iterator.
+/// Generates [`BTreeSet`]s with a mininum length, with elements from a single iterator.
 ///
-/// The `BTreeSet`s are ordered lexicographically with respect to the order of the element iterator.
+/// The [`BTreeSet`]s are ordered lexicographically with respect to the order of the element
+/// iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1815,18 +1525,6 @@ where
 /// $$
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1868,7 +1566,7 @@ where
     exhaustive_b_tree_sets_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b)$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b)$, with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1877,7 +1575,7 @@ where
 ///
 /// If $a \leq b$, the output is empty.
 ///
-/// If $a = 0$ and $b = 1$, the output consists of a single empty `BTreeSet`.
+/// If $a = 0$ and $b = 1$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
 ///
@@ -1885,18 +1583,6 @@ where
 /// $$
 /// \sum_{i=a}^b - 1 \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```
@@ -1942,7 +1628,7 @@ where
     }
 }
 
-/// Generates `BTreeSet`s, with lengths in a range $[a, b]$, with elements from a single iterator.
+/// Generates [`BTreeSet`]s, with lengths in a range $[a, b]$, with elements from a single iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -1951,7 +1637,7 @@ where
 ///
 /// If $a < b$, the output is empty.
 ///
-/// If $a = b = 0$, the output consists of a single empty `BTreeSet`.
+/// If $a = b = 0$, the output consists of a single empty [`BTreeSet`].
 ///
 /// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
 ///
@@ -1959,18 +1645,6 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
-///
-/// # Complexity per iteration
-/// $$
-/// T(i, k) = O(k + T^\prime (i))
-/// $$
-///
-/// $$
-/// M(i, k) = O(k + M^\prime (i))
-/// $$
-///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// additional memory functions of `xs`.
 ///
 /// # Examples
 /// ```

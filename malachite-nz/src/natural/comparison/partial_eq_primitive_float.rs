@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialEq<$t> for Natural {
-            /// Determines whether a `Natural` is equal to a value of primitive float type.
+            /// Determines whether a [`Natural`] is equal to a primitive float.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -16,8 +16,7 @@ macro_rules! impl_float {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_float`
-            /// module.
+            /// See [here](super::partial_eq_primitive_float#partial_eq).
             fn eq(&self, other: &$t) -> bool {
                 if !other.is_finite() {
                     false
@@ -38,7 +37,7 @@ macro_rules! impl_float {
         }
 
         impl PartialEq<Natural> for $t {
-            /// Determines whether a value of primitive float type is equal to a `Natural`.
+            /// Determines whether a primitive float is equal to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -48,8 +47,7 @@ macro_rules! impl_float {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_float`
-            /// module.
+            /// See [here](super::partial_eq_primitive_float#partial_eq).
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
                 other == self

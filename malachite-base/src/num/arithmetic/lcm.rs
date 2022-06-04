@@ -26,13 +26,18 @@ macro_rules! impl_lcm {
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Panics
-            /// Panics if the result is too large to fit in the type.
+            /// Panics if the result is too large to be represented.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::lcm` module.
+            /// See [here](super::lcm#lcm).
             #[inline]
             fn lcm(self, other: $t) -> $t {
                 lcm(self, other)
@@ -40,20 +45,25 @@ macro_rules! impl_lcm {
         }
 
         impl LcmAssign<$t> for $t {
-            /// Replaces `self` with the LCM (least common multiple) of `self` and another number.
+            /// Replaces a number with the LCM (least common multiple) of it and another number.
             ///
             /// $$
             /// x \gets \operatorname{lcm}(x, y).
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Panics
-            /// Panics if the result is too large to fit in the type.
+            /// Panics if the result is too large to be represented.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::lcm` module.
+            /// See [here](super::lcm#lcm_assign).
             #[inline]
             fn lcm_assign(&mut self, other: $t) {
                 *self = lcm(*self, other);
@@ -69,20 +79,22 @@ macro_rules! impl_lcm {
             /// $$
             /// f(x, y) = \\begin{cases}
             ///     \operatorname{Some}(\operatorname{lcm}(x, y)) &
-            ///         \operatorname{lcm}(x, y) < 2^W \\\\
-            ///     \operatorname{None} & \operatorname{lcm}(x, y) \geq 2^W,
+            ///         \text{if} \\quad \operatorname{lcm}(x, y) < 2^W, \\\\
+            ///     \operatorname{None} & \text{if} \\quad \operatorname{lcm}(x, y) \geq 2^W,
             /// \\end{cases}
             /// $$
-            /// where $W$ is `$t::WIDTH`.
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
             ///
-            /// # Panics
-            /// Panics if the result is too large to fit in the type.
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.significant_bits())`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::lcm` module.
+            /// See [here](super::lcm#checked_lcm).
             #[inline]
             fn checked_lcm(self, other: $t) -> Option<$t> {
                 checked_lcm(self, other)

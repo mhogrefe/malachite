@@ -3,16 +3,18 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 
 impl Natural {
-    /// Returns the number of limbs of a `Natural`. Zero has 0 limbs.
+    /// Returns the number of limbs of a [`Natural`].
     ///
-    /// Time: worst case O(1)
+    /// Zero has 0 limbs.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -21,7 +23,7 @@ impl Natural {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert_eq!(Natural::ZERO.limb_count(), 0);
     ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
-    ///     assert_eq!(Natural::trillion().limb_count(), 2);
+    ///     assert_eq!(Natural::from(10u32).pow(12).limb_count(), 2);
     /// }
     /// ```
     pub fn limb_count(&self) -> u64 {

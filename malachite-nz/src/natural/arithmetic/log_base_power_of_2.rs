@@ -58,8 +58,8 @@ pub_test! {limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 //
 // $$
 // f((d_i)_ {i=0}^k, p) = \\begin{cases}
-//     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
-//     \operatorname{None} & \textrm{otherwise},
+//     \operatorname{Some}(\log_{2^p} x) & \text{if} \\quad \log_{2^p} x \in \Z, \\\\
+//     \operatorname{None} & \textrm{otherwise}.
 // \\end{cases}
 // $$
 // where $x = \sum_{i=0}^kB^id_i$ and $B$ is one more than `Limb::MAX`.
@@ -87,9 +87,9 @@ pub_test! {limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u6
 impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
-    /// Returns the floor of the base-$2^p$ logarithm of a positive `Natural`.
+    /// Returns the floor of the base-$2^k$ logarithm of a positive [`Natural`].
     ///
-    /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
+    /// $f(x, k) = \lfloor\log_{2^k} x\rfloor$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -100,7 +100,6 @@ impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
@@ -119,9 +118,9 @@ impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
 impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
-    /// Returns the ceiling of the base-$2^p$ logarithm of a positive `Natural`.
+    /// Returns the ceiling of the base-$2^k$ logarithm of a positive [`Natural`].
     ///
-    /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
+    /// $f(x, k) = \lceil\log_{2^k} x\rceil$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -136,7 +135,6 @@ impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
@@ -155,13 +153,13 @@ impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
 impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-$2^p$ logarithm of a positive `Natural`. If the `Natural` is not a power
-    /// of $2^p$, `None` is returned.
+    /// Returns the base-$2^k$ logarithm of a positive [`Natural`]. If the [`Natural`] is not a
+    /// power of $2^k$, then `None` is returned.
     ///
     /// $$
-    /// f(x, p) = \\begin{cases}
-    ///     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    /// f(x, k) = \\begin{cases}
+    ///     \operatorname{Some}(\log_{2^k} x) & \text{if} \\quad \log_{2^k} x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -178,7 +176,6 @@ impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;

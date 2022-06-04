@@ -59,17 +59,20 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                 impl ModPowerOf2Shr<$u> for $t {
                     type Output = $t;
 
-                    /// Computes `self >> other` mod $2^p$. Assumes the input is already reduced
-                    /// mod $2^p$.
+                    /// Right-shifts a number (divides it by a power of 2) modulo $2^k$. Assumes
+                    /// the input is already reduced modulo $2^k$.
                     ///
-                    /// $f(x, n, p) = y$, where $x, y < 2^p$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^p$.
+                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and
+                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shr` module.
+                    /// See [here](super::mod_power_of_2_shr#mod_power_of_2_shr).
                     #[inline]
                     fn mod_power_of_2_shr(self, other: $u, pow: u64) -> $t {
                         mod_power_of_2_shr_signed(self, other, pow)
@@ -77,17 +80,20 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                 }
 
                 impl ModPowerOf2ShrAssign<$u> for $t {
-                    /// Replaces `self` with `self >> other` mod $2^p$. Assumes the input is
-                    /// already reduced mod $2^p$.
+                    /// Right-shifts a number (divides it by a power of 2) modulo $2^k$, in place.
+                    /// Assumes the input is already reduced modulo $2^k$.
                     ///
-                    /// $x \gets y$, where $x, y < 2^p$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^p$.
+                    /// $x \gets y$, where $x, y < 2^k$ and
+                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
                     ///
+                    /// # Panics
+                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    ///
                     /// # Examples
-                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shr` module.
+                    /// See [here](super::mod_power_of_2_shr#mod_power_of_2_shr_assign).
                     #[inline]
                     fn mod_power_of_2_shr_assign(&mut self, other: $u, pow: u64) {
                         mod_power_of_2_shr_assign_signed(self, other, pow)

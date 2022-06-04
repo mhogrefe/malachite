@@ -24,7 +24,20 @@ fn bench_mul(c: &mut Criterion) {
     let mut group = c.benchmark_group("Natural * Natural");
     let plot_config = PlotConfiguration::default().summary_scale(AxisScale::Logarithmic);
     group.plot_config(plot_config);
-    let sizes = [1u64, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000];
+    let sizes = [
+        1u64,
+        10,
+        100,
+        1000,
+        10000,
+        100000,
+        1000000,
+        10000000,
+        100000000,
+        1000000000,
+        10000000000,
+        100000000000,
+    ];
     for &i in sizes.iter() {
         let x = get_random_natural_with_bits(&mut random_primitive_ints(EXAMPLE_SEED.fork("a")), i);
         let y = get_random_natural_with_bits(&mut random_primitive_ints(EXAMPLE_SEED.fork("b")), i);
@@ -44,3 +57,9 @@ fn bench_mul(c: &mut Criterion) {
     }
     group.finish();
 }
+criterion_group! {
+    name = benches;
+    config = Criterion::default().significance_level(0.1).sample_size(10);
+    targets = bench_mul
+}
+criterion_main!(benches);

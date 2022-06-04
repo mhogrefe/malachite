@@ -46,21 +46,26 @@ pub_test! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
 }}
 
 impl CoprimeWith<Natural> for Natural {
-    /// Returns whether two `Natural`s are coprime; that is, whether they have no common factor
-    /// other than 1. Both `Natural`s are taken by value.
+    /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
+    /// other than 1. Both [`Natural`]s are taken by value.
     ///
-    /// Every number is coprime with 1. No number is coprime with 0, except 1.
+    /// Every [`Natural`] is coprime with 1. No [`Natural`] is coprime with 0, except 1.
     ///
     /// $f(x, y) = (\gcd(x, y) = 1)$.
     ///
     /// $f(x, y) = ((k,m,n \in \N \land x=km \land y=kn) \implies k=1)$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
@@ -75,21 +80,26 @@ impl CoprimeWith<Natural> for Natural {
 }
 
 impl<'a> CoprimeWith<&'a Natural> for Natural {
-    /// Returns whether two `Natural`s are coprime; that is, whether they have no common factor
-    /// other than 1. The first `Natural` is taken by value and the second by reference.
+    /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
+    /// other than 1. The first [`Natural`] is taken by value and the second by reference.
     ///
-    /// Every number is coprime with 1. No number is coprime with 0, except 1.
+    /// Every [`Natural`] is coprime with 1. No [`Natural`] is coprime with 0, except 1.
     ///
     /// $f(x, y) = (\gcd(x, y) = 1)$.
     ///
     /// $f(x, y) = ((k,m,n \in \N \land x=km \land y=kn) \implies k=1)$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
@@ -104,21 +114,26 @@ impl<'a> CoprimeWith<&'a Natural> for Natural {
 }
 
 impl<'a> CoprimeWith<Natural> for &'a Natural {
-    /// Returns whether two `Natural`s are coprime; that is, whether they have no common factor
-    /// other than 1. The first `Natural` is taken by reference and the second by value.
+    /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
+    /// other than 1. The first [`Natural`] is taken by reference and the second by value.
     ///
-    /// Every number is coprime with 1. No number is coprime with 0, except 1.
+    /// Every [`Natural`] is coprime with 1. No [`Natural`] is coprime with 0, except 1.
     ///
     /// $f(x, y) = (\gcd(x, y) = 1)$.
     ///
     /// $f(x, y) = ((k,m,n \in \N \land x=km \land y=kn) \implies k=1)$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
@@ -133,21 +148,26 @@ impl<'a> CoprimeWith<Natural> for &'a Natural {
 }
 
 impl<'a, 'b> CoprimeWith<&'b Natural> for &'a Natural {
-    /// Returns whether two `Natural`s are coprime; that is, whether they have no common factor
-    /// other than 1. Both `Natural`s are taken by reference.
+    /// Returns whether two [`Natural`]s are coprime; that is, whether they have no common factor
+    /// other than 1. Both [`Natural`]s are taken by reference.
     ///
-    /// Every number is coprime with 1. No number is coprime with 0, except 1.
+    /// Every [`Natural`] is coprime with 1. No [`Natural`] is coprime with 0, except 1.
     ///
     /// $f(x, y) = (\gcd(x, y) = 1)$.
     ///
     /// $f(x, y) = ((k,m,n \in \N \land x=km \land y=kn) \implies k=1)$.
     ///
-    /// TODO complexity
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;

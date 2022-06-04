@@ -8,7 +8,8 @@ macro_rules! impl_mod_square {
         impl ModSquare for $t {
             type Output = $t;
 
-            /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Squares a number modulo another number $m$. Assumes the input is already reduced
+            /// modulo $m$.
             ///
             /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
             ///
@@ -16,7 +17,7 @@ macro_rules! impl_mod_square {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_square` module.
+            /// See [here](super::mod_square#mod_square).
             #[inline]
             fn mod_square(self, m: $t) -> $t {
                 self.mod_pow(2, m)
@@ -24,8 +25,8 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquareAssign for $t {
-            /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced
-            /// mod `m`.
+            /// Squares a number modulo another number $m$, in place. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
             ///
@@ -33,7 +34,7 @@ macro_rules! impl_mod_square {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_square` module.
+            /// See [here](super::mod_square#mod_square_assign).
             #[inline]
             fn mod_square_assign(&mut self, m: $t) {
                 self.mod_pow_assign(2, m);
@@ -41,17 +42,18 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquarePrecomputed<u64, $t> for $t {
-            /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Squares a number modulo another number $m$. Assumes the input is already reduced
+            /// modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular squarings with the same modulus. The precomputed data should be obtained
-            /// using `precompute_mod_pow_data`.
+            /// using [`precompute_mod_pow_data`](super::traits::ModPowPrecomputed).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_square` module.
+            /// See [here](super::mod_square#mod_square_precomputed).
             #[inline]
             fn mod_square_precomputed(self, m: $t, data: &Self::Data) -> Self::Output {
                 self.mod_pow_precomputed(2, m, data)
@@ -59,18 +61,18 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquarePrecomputedAssign<u64, $t> for $t {
-            /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced
-            /// mod `m`.
+            /// Squares a number modulo another number $m$, in place. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular squarings with the same modulus. The precomputed data should be obtained
-            /// using `precompute_mod_pow_data`.
+            /// using [`precompute_mod_pow_data`](super::traits::ModPowPrecomputed).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_square` module.
+            /// See [here](super::mod_square#mod_square_precomputed_assign).
             #[inline]
             fn mod_square_precomputed_assign(&mut self, m: $t, data: &Self::Data) {
                 self.mod_pow_precomputed_assign(2, m, data);

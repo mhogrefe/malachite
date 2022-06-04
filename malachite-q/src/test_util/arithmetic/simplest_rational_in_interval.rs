@@ -51,24 +51,27 @@ fn simplest_rational_helper(
         if x != y {
             let mut cf = cf_x[..i].to_vec();
             cf.push(min(x, y) + Natural::ONE);
-            return Rational::from_continued_fraction(floor.clone(), cf);
+            return Rational::from_continued_fraction_ref(floor, cf.iter());
         }
     }
     let x_len = cf_x.len();
     let y_len = cf_y.len();
-    match x_len.cmp(&y_len) {
-        Ordering::Equal => panic!(),
-        Ordering::Greater => {
-            let mut cf = cf_y.to_vec();
-            cf.push(cf_x[y_len].clone() + Natural::ONE);
-            return Rational::from_continued_fraction(floor.clone(), cf);
-        }
-        Ordering::Less => {
-            let mut cf = cf_x.to_vec();
-            cf.push(cf_y[x_len].clone() + Natural::ONE);
-            return Rational::from_continued_fraction(floor.clone(), cf);
-        }
-    }
+    Rational::from_continued_fraction(
+        floor.clone(),
+        match x_len.cmp(&y_len) {
+            Ordering::Equal => panic!(),
+            Ordering::Greater => {
+                let mut cf = cf_y.to_vec();
+                cf.push(cf_x[y_len].clone() + Natural::ONE);
+                cf.into_iter()
+            }
+            Ordering::Less => {
+                let mut cf = cf_x.to_vec();
+                cf.push(cf_y[x_len].clone() + Natural::ONE);
+                cf.into_iter()
+            }
+        },
+    )
 }
 
 fn cf_variants(x: &Rational) -> (Integer, Integer, Vec<Natural>, Vec<Natural>) {

@@ -2,9 +2,9 @@ use integer::Integer;
 use std::cmp::Ordering;
 
 impl PartialOrd for Integer {
-    /// Compares an `Integer` to another `Integer`.
+    /// Compares two [`Integer`]s.
     ///
-    /// See the documentation for the `Ord` implementation.
+    /// See the documentation for the [`Ord`] implementation.
     #[inline]
     fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -12,13 +12,15 @@ impl PartialOrd for Integer {
 }
 
 impl Ord for Integer {
-    /// Compares an `Integer` to another `Integer`.
+    /// Compares two [`Integer`]s.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```

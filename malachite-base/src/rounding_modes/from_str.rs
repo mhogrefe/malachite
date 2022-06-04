@@ -4,9 +4,9 @@ use std::str::FromStr;
 impl FromStr for RoundingMode {
     type Err = String;
 
-    /// Converts a `&str` to a `RoundingMode`.
+    /// Converts a string to a [`RoundingMode`].
     ///
-    /// If the `&str` does not represent a valid `RoundingMode`, an `Err` is returned with the
+    /// If the string does not represent a valid [`RoundingMode`], an `Err` is returned with the
     /// unparseable string.
     ///
     /// # Worst-case complexity
@@ -16,7 +16,7 @@ impl FromStr for RoundingMode {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
     ///
-    /// The worst case occurs when the input `&str` is invalid and must be copied into an `Err`.
+    /// The worst case occurs when the input string is invalid and must be copied into an `Err`.
     ///
     /// # Examples
     /// ```

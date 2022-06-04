@@ -1,11 +1,12 @@
-use num::basic::integers::PrimitiveInt;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::BitAccess;
 
-fn get_bit_unsigned<T: PrimitiveInt>(x: &T, index: u64) -> bool {
+fn get_bit_unsigned<T: PrimitiveUnsigned>(x: &T, index: u64) -> bool {
     index < T::WIDTH && *x & T::power_of_2(index) != T::ZERO
 }
 
-fn set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn set_bit_unsigned<T: PrimitiveUnsigned>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::power_of_2(index);
     } else {
@@ -17,7 +18,7 @@ fn set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     }
 }
 
-fn clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn clear_bit_unsigned<T: PrimitiveUnsigned>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !T::power_of_2(index);
     }
@@ -25,10 +26,8 @@ fn clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
 
 macro_rules! impl_bit_access_unsigned {
     ($t:ident) => {
-        /// Provides functions for accessing and modifying individual bits of a primitive unsigned
-        /// integer.
         impl BitAccess for $t {
-            /// Determines whether the `index`th bit of a primitive unsigned integer, or the
+            /// Determines whether the $i$th bit of an unsigned primitive integer, or the
             /// coefficient of $2^i$ in its binary expansion, is 0 or 1.
             ///
             /// `false` means 0 and `true` means 1. Getting bits beyond the type's width is allowed;
@@ -45,14 +44,14 @@ macro_rules! impl_bit_access_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#get_bit).
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
                 get_bit_unsigned(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of $2^i$
-            /// in its binary expansion, to 1.
+            /// Sets the $i$th bit of an unsigned primitive integer, or the coefficient of $2^i$ in
+            /// its binary expansion, to 1.
             ///
             /// Setting bits beyond the type's width is disallowed.
             ///
@@ -60,15 +59,14 @@ macro_rules! impl_bit_access_unsigned {
             /// $$
             /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// where for all $i$, $b_i\in \\{0, 1\\}$, and $W$ is the width of the type. Then
             /// $$
-            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// n \gets \\begin{cases}
+            ///     n + 2^j & \text{if} \\quad b_j = 0, \\\\
+            ///     n & \text{otherwise},
+            /// \\end{cases}
             /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\}.
-            /// $$
+            /// where $j < W$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -77,38 +75,35 @@ macro_rules! impl_bit_access_unsigned {
             /// Panics if $i \geq W$, where $i$ is `index` and $W$ is `$t::WIDTH`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#set_bit).
             #[inline]
             fn set_bit(&mut self, index: u64) {
                 set_bit_unsigned(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of $2^i$
-            /// in its binary expansion, to 0.
+            /// Sets the $i$th bit of an unsigned primitive integer, or the coefficient of $2^i$ in
+            /// its binary expansion, to 0.
             ///
             /// Clearing bits beyond the type's width is allowed; since those bits are already
-            /// false, clearing them does nothing.
+            /// `false`, clearing them does nothing.
             ///
             /// Let
             /// $$
-            /// n = \sum_{i=0}^\infty 2^{b_i},
+            /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
-            /// rest are 0. Then
+            /// where for all $i$, $b_i\in \\{0, 1\\}$, and $W$ is the width of the type. Then
             /// $$
-            /// f(n, j) = \sum_{i=0}^\infty 2^{c_i},
-            /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots \\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots \\}.
+            /// n \gets \\begin{cases}
+            ///     n - 2^j & \text{if} \\quad b_j = 1, \\\\
+            ///     n & \text{otherwise}.
+            /// \\end{cases}
             /// $$
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#clear_bit).
             #[inline]
             fn clear_bit(&mut self, index: u64) {
                 clear_bit_unsigned(self, index)
@@ -118,7 +113,7 @@ macro_rules! impl_bit_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_access_unsigned);
 
-fn get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
+fn get_bit_signed<T: PrimitiveSigned>(x: &T, index: u64) -> bool {
     if index < T::WIDTH {
         *x & (T::ONE << index) != T::ZERO
     } else {
@@ -126,7 +121,7 @@ fn get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     }
 }
 
-fn set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn set_bit_signed<T: PrimitiveSigned>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::ONE << index;
     } else if *x >= T::ZERO {
@@ -138,7 +133,7 @@ fn set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     }
 }
 
-fn clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn clear_bit_signed<T: PrimitiveSigned>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !(T::ONE << index);
     } else if *x < T::ZERO {
@@ -152,13 +147,11 @@ fn clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
 
 macro_rules! impl_bit_access_signed {
     ($t:ident) => {
-        /// Provides functions for accessing and modifying the individual bits of a primitive signed
-        /// integer.
         impl BitAccess for $t {
-            /// Determines whether the `index`th bit of a primitive signed integer is 0 or 1.
+            /// Determines whether the $i$th bit of a signed primitive integer is 0 or 1.
             ///
             /// `false` means 0 and `true` means 1. Getting bits beyond the type's width is allowed;
-            /// those bits are true if the value is negative, and false otherwise.
+            /// those bits are `true` if the value is negative, and `false` otherwise.
             ///
             /// If $n \geq 0$, let
             /// $$
@@ -181,100 +174,77 @@ macro_rules! impl_bit_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#get_bit).
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
                 get_bit_signed(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive signed integer to 1.
+            /// Sets the $i$th bit of a signed primitive integer to 1.
             ///
-            /// Setting bits beyond the type's width is disallowed, if `self` is non-negative.
+            /// Setting bits beyond the type's width is disallowed if the number is non-negative.
             ///
             /// If $n \geq 0$ and $j \neq W - 1$, let
             /// $$
-            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// n = \sum_{i=0}^{W-1} 2^{b_i};
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
-            /// $$
-            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
-            /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\},
-            /// $$
-            ///
-            /// If $n < 0$ or $j = W - 1$, let
+            /// but if $n < 0$ or $j = W - 1$, let
             /// $$
             /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// where for all $i$, $b_i\in \\{0, 1\\}$, and $W$ is the width of the type. Then
             /// $$
-            /// f(n, j) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// n \gets \\begin{cases}
+            ///     n + 2^j & \text{if} \\quad b_j = 0, \\\\
+            ///     n & \text{otherwise},
+            /// \\end{cases}
             /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\}.
-            /// $$
+            /// where $n < 0$ or $j < W$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if $n \geq 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is
-            /// `$t::WIDTH`.
+            /// the width of the type.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#set_bit).
             #[inline]
             fn set_bit(&mut self, index: u64) {
                 set_bit_signed(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive signed integer to 0.
+            /// Sets the $i$th bit of a signed primitive integer to 0.
             ///
-            /// Clearing bits beyond the type's width is disallowed, if `self` is negative.
+            /// Clearing bits beyond the type's width is disallowed if the number is negative.
             ///
             /// If $n \geq 0$ or $j = W - 1$, let
             /// $$
-            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// n = \sum_{i=0}^{W-1} 2^{b_i};
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
-            /// $$
-            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
-            /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots, b_ {W-1}\\}.
-            /// $$
-            ///
-            /// If $n < 0$ and $j \neq W - 1$, let
+            /// but if $n < 0$ or $j = W - 1$, let
             /// $$
             /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is the width of the type. Then
             /// $$
-            /// f(n, j) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// n \gets \\begin{cases}
+            ///     n - 2^j & \text{if} \\quad b_j = 1, \\\\
+            ///     n & \text{otherwise},
+            /// \\end{cases}
             /// $$
-            /// where
-            /// $$
-            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots, b_ {W-1}\\},
-            /// $$
-            /// and $i < W$.
+            /// where $n \geq 0$ or $j < W$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if $n < 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is
-            /// `$t::WIDTH`.
+            /// the width of the type.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See [here](super::bit_access#clear_bit).
             #[inline]
             fn clear_bit(&mut self, index: u64) {
                 clear_bit_signed(self, index)

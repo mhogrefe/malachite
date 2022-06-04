@@ -3,9 +3,9 @@ use num::arithmetic::traits::NegAssign;
 macro_rules! impl_neg_signed {
     ($t:ident) => {
         impl NegAssign for $t {
-            /// Replaces `self` with its negative.
+            /// Negates a number in place.
             ///
-            /// Assumes that `self` can be negated.
+            /// Assumes that the negative can be represented.
             ///
             /// $x \gets -x$.
             ///
@@ -13,7 +13,7 @@ macro_rules! impl_neg_signed {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::neg` module.
+            /// See [here](super::neg#neg_assign).
             #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;
@@ -26,9 +26,9 @@ apply_to_signeds!(impl_neg_signed);
 macro_rules! impl_neg_float {
     ($t:ident) => {
         impl NegAssign for $t {
-            /// Replaces `self` with its negative.
+            /// Negates a number in place.
             ///
-            /// Assumes that `self` can be negated.
+            /// Assumes that the negative can be represented.
             ///
             /// $x \gets -x$.
             ///
@@ -36,7 +36,7 @@ macro_rules! impl_neg_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::neg` module.
+            /// See [here](super::neg#neg_assign).
             #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;

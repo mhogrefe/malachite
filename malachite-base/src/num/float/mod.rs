@@ -4,33 +4,33 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
 use std::str::FromStr;
 
-/// `NiceFloat` is a wrapper around primitive float types that provides nicer `Eq`, `Ord`, `Hash`,
-/// `Display`, and `FromStr` instances.
+/// `NiceFloat` is a wrapper around primitive float types that provides nicer [`Eq`], [`Ord`],
+/// [`Hash`], [`Display`], and [`FromStr`] instances.
 ///
-/// It's well-known that in most languages, floats behave weirdly due to the IEEE 754 standard. The
-/// `NiceFloat` type ignores the standard in favor of more intuitive behavior.
+/// In most languages, floats behave weirdly due to the IEEE 754 standard. The `NiceFloat` type
+/// ignores the standard in favor of more intuitive behavior.
 /// - Using `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
 ///   concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal to
 ///   each other.
 /// - The `NiceFloat` hash respects this equality.
-/// - Using `NiceFloat`, there is a somewhat-arbitrary total order on floats. These are the classes
-///   of floats, in ascending order:
+/// - `NiceFloat` has a total order. These are the classes of floats, in ascending order:
 ///   - Negative infinity
 ///   - Negative nonzero finite floats
 ///   - Negative zero
 ///   - NaN
 ///   - Positive zero
 ///   - Positive nonzero finite floats
-///   - Positive floats
-/// - `NiceFloat` uses a different `Display` implementation than floats do by default in Rust. For
-///   example, Rust will convert `f32::MIN_POSITIVE_SUBNORMAL` to something with many zeros, but
-///   `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just converts to `1.0e-45`. The conversion function
-///   uses David Tolnay's `ryu` crate, with a few modifications:
+///   - Positive infinity
+/// - `NiceFloat` uses a different [`Display`] implementation than floats do by default in Rust. For
+///   example, Rust will format `f32::MIN_POSITIVE_SUBNORMAL` as something with many zeros, but
+///   `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just formats it as `"1.0e-45"`. The conversion
+///   function uses David Tolnay's [`ryu`](https://docs.rs/ryu/latest/ryu/) crate, with a few
+///   modifications:
 ///   - All finite floats have a decimal point. For example, Ryu by itself would convert
-///     `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
+///     `f32::MIN_POSITIVE_SUBNORMAL` to `"1e-45"`.
 ///   - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
 ///     `"-Infinity"`, and "`NaN`", respectively.
-/// - `FromStr` accepts these strings.
+/// - [`FromStr`] accepts these strings.
 #[derive(Clone, Copy, Default)]
 pub struct NiceFloat<T: PrimitiveFloat>(pub T);
 
@@ -72,16 +72,15 @@ impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
     /// Compares two `NiceFloat`s for equality.
     ///
     /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
-    /// respects the expected properties of antisymmetry, reflexivity, and transitivity. Using
-    /// `NiceFloat`, there is a somewhat-arbitrary total order on floats. These are the classes
-    ///   of floats, in ascending order:
+    /// respects the expected properties of antisymmetry, reflexivity, and transitivity.
+    /// `NiceFloat` has a total order. These are the classes of floats, in ascending order:
     ///   - Negative infinity
     ///   - Negative nonzero finite floats
     ///   - Negative zero
     ///   - NaN
     ///   - Positive zero
     ///   - Positive nonzero finite floats
-    ///   - Positive floats
+    ///   - Positive infinity
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -162,7 +161,7 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
 impl<T: PrimitiveFloat> PartialOrd<NiceFloat<T>> for NiceFloat<T> {
     /// Compares a `NiceFloat` to another `NiceFloat`.
     ///
-    /// See the documentation for the `Ord` implementation.
+    /// See the documentation for the [`Ord`] implementation.
     #[inline]
     fn partial_cmp(&self, other: &NiceFloat<T>) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -222,14 +221,15 @@ impl_fmt_ryu_string!(f32);
 impl_fmt_ryu_string!(f64);
 
 impl<T: PrimitiveFloat> Display for NiceFloat<T> {
-    /// Converts a `NiceFloat` to a `String`.
+    /// Formats a `NiceFloat` as a string.
     ///
-    /// `NiceFloat` uses a different `Display` implementation than floats do by default in Rust. For
-    /// example, Rust will convert `f32::MIN_POSITIVE_SUBNORMAL` to something with many zeros, but
-    /// `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just converts to `1.0e-45`. The conversion function
-    /// uses David Tolnay's `ryu` crate, with a few modifications:
+    /// `NiceFloat` uses a different [`Display`] implementation than floats do by default in Rust.
+    /// For example, Rust will convert `f32::MIN_POSITIVE_SUBNORMAL` to something with many zeros,
+    /// but `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just converts to `"1.0e-45"`. The conversion
+    /// function uses David Tolnay's [`ryu`](https://docs.rs/ryu/latest/ryu/) crate, with a few
+    /// modifications:
     /// - All finite floats have a decimal point. For example, Ryu by itself would convert
-    ///   `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
+    ///   `f32::MIN_POSITIVE_SUBNORMAL` to `"1e-45"`.
     /// - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
     ///   `"-Infinity"`, and "`NaN`", respectively.
     ///
@@ -278,9 +278,9 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> Debug for NiceFloat<T> {
-    /// Converts a `NiceFloat` to a `String`.
+    /// Formats a `NiceFloat` as a string.
     ///
-    /// This is identical to the `Display::fmt` implementation.
+    /// This is identical to the [`Display::fmt`] implementation.
     #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(self, f)
@@ -316,6 +316,7 @@ impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
             "NaN" => Ok(T::NAN),
             "Infinity" => Ok(T::POSITIVE_INFINITY),
             "-Infinity" => Ok(T::NEGATIVE_INFINITY),
+            "inf" | "-inf" => T::from_str("invalid"),
             src => T::from_str(src),
         }
         .map(NiceFloat)

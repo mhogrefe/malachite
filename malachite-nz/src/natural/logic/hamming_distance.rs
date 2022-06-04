@@ -9,11 +9,12 @@ use std::cmp::Ordering;
 // Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading
 // zeros. `xs` cannot be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -24,17 +25,18 @@ pub_test! {limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
 // Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
 // returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative and
-// have the same length.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
+//
+// This is equivalent to `mpz_hamdist` from `mpz/hamdist.c`, GMP 6.2.1, where both arguments are
+// non-negative and have the same length.
 pub_crate_test! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
     assert_eq!(xs.len(), ys.len());
     xs.iter()
@@ -46,13 +48,15 @@ pub_crate_test! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) ->
 // Interpreting two slices of `Limb`s as the limbs of `Natural`s in ascending order, returns the
 // Hamming distance between them. Both have infinitely many implicit leading zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
+// This is equivalent to `mpz_hamdist` from `mpz/hamdist.c`, GMP 6.2.1, where both arguments are
+// non-negative.
 pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -77,19 +81,21 @@ impl Natural {
 }
 
 impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
-    /// Determines the Hamming distance between two `Natural`s. Both have infinitely many implicit
-    /// leading zeros.
+    /// Determines the Hamming distance between two [`Natural]`s.
     ///
-    /// Time: worst case O(n)
+    /// Both [`Natural`]s have infinitely many implicit leading zeros.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::num::logic::traits::HammingDistance;

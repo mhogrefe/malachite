@@ -7,7 +7,11 @@ use Rational;
 impl Neg for Rational {
     type Output = Rational;
 
-    /// Finds the negative of a `Rational`, taking the `Rational` by value.
+    /// Negates a [`Rational`], taking it by value.
+    ///
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -15,12 +19,11 @@ impl Neg for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((-Rational::ZERO).to_string(), "0");
+    /// assert_eq!(-Rational::ZERO, 0);
     /// assert_eq!((-Rational::from_signeds(22, 7)).to_string(), "-22/7");
     /// assert_eq!((-Rational::from_signeds(-22, 7)).to_string(), "22/7");
     /// ```
@@ -35,7 +38,11 @@ impl Neg for Rational {
 impl<'a> Neg for &'a Rational {
     type Output = Rational;
 
-    /// Returns the negative of a `Rational`, taking the `Rational` by reference.
+    /// Negates a [`Rational`], taking it by reference.
+    ///
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -47,15 +54,13 @@ impl<'a> Neg for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert_eq!((-&Rational::ZERO).to_string(), "0");
-    /// assert_eq!((-&Rational::from_str("22/7").unwrap()).to_string(), "-22/7");
-    /// assert_eq!((-&Rational::from_str("-22/7").unwrap()).to_string(), "22/7");
+    /// assert_eq!(-&Rational::ZERO, 0);
+    /// assert_eq!((-&Rational::from_signeds(22, 7)).to_string(), "-22/7");
+    /// assert_eq!((-&Rational::from_signeds(-22, 7)).to_string(), "22/7");
     /// ```
     fn neg(self) -> Rational {
         if self.numerator == 0 {
@@ -71,7 +76,11 @@ impl<'a> Neg for &'a Rational {
 }
 
 impl NegAssign for Rational {
-    /// Replaces a `Rational` with its negative.
+    /// Negates a [`Rational`] in place.
+    ///
+    /// $$
+    /// x \gets -x.
+    /// $$
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -79,22 +88,20 @@ impl NegAssign for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::NegAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let mut x = Rational::ZERO;
     /// x.neg_assign();
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     ///
-    /// let mut x = Rational::from_str("22/7").unwrap();
+    /// let mut x = Rational::from_signeds(22, 7);
     /// x.neg_assign();
     /// assert_eq!(x.to_string(), "-22/7");
     ///
-    /// let mut x = Rational::from_str("-22/7").unwrap();
+    /// let mut x = Rational::from_signeds(-22, 7);
     /// x.neg_assign();
     /// assert_eq!(x.to_string(), "22/7");
     /// ```

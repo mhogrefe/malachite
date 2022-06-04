@@ -7,9 +7,9 @@ use std::cmp::Ordering;
 use std::marker::PhantomData;
 use std::ops::Index;
 
-/// A double-ended iterator over the bits of a primitive unsigned integer.
+/// A double-ended iterator over the bits of an unsigned primitive integer.
 ///
-/// This `struct` is created by the `BitIterable::bits` function. See its documentation for more.
+/// This `struct` is created by [`BitIterable::bits`]; see its documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {
     pub(crate) value: T,
@@ -25,29 +25,6 @@ pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {
 impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     type Item = bool;
 
-    /// A function to iterate through the bits of a primitive unsigned integer in ascending order
-    /// (least-significant first).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::logic::traits::BitIterable;
-    ///
-    /// assert_eq!(0u8.bits().next(), None);
-    ///
-    /// // 105 = 1101001b
-    /// let mut bits = 105u32.bits();
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), None);
-    /// ```
     fn next(&mut self) -> Option<bool> {
         if self.some_remaining {
             let bit = self.value & self.i_mask != T::ZERO;
@@ -61,22 +38,6 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
         }
     }
 
-    /// A function that returns the length of the bits iterator; that is, the value's significant
-    /// bit count.
-    ///
-    /// The format is (lower bound, Option<upper bound>), but in this case it's trivial to always
-    /// have an exact bound.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::logic::traits::BitIterable;
-    ///
-    /// assert_eq!(0u8.bits().size_hint(), (0, Some(0)));
-    /// assert_eq!(105u32.bits().size_hint(), (7, Some(7)));
-    /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         let significant_bits = usize::exact_from(self.value.significant_bits());
         (significant_bits, Some(significant_bits))
@@ -84,29 +45,6 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
 }
 
 impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<T> {
-    /// A function to iterate through the bits of a primitive unsigned integer in descending order
-    /// (most-significant first).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::logic::traits::BitIterable;
-    ///
-    /// assert_eq!(0u8.bits().next_back(), None);
-    ///
-    /// // 105 = 1101001b
-    /// let mut bits = 105u32.bits();
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), None);
-    /// ```
     fn next_back(&mut self) -> Option<bool> {
         if self.some_remaining {
             if self.i_mask == self.j_mask {
@@ -121,7 +59,6 @@ impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<
     }
 }
 
-/// This allows for some optimizations, _e.g._ when collecting into a `Vec`.
 impl<T: PrimitiveUnsigned> ExactSizeIterator for PrimitiveUnsignedBitIterator<T> {}
 
 impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
@@ -132,7 +69,7 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     /// The index is the power of 2 of which the bit is a coefficient. Indexing at or above the
     /// significant bit count returns false bits.
     ///
-    /// This is equivalent to the `get_bit` function.
+    /// This is equivalent to [`get_bit`](super::traits::BitAccess::get_bit).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -179,19 +116,20 @@ macro_rules! impl_bit_iterable_unsigned {
         impl BitIterable for $t {
             type BitIterator = PrimitiveUnsignedBitIterator<$t>;
 
-            /// Returns a double-ended iterator over the bits of a primitive unsigned integer.
+            /// Returns a double-ended iterator over the bits of an unsigned primitive integer.
             ///
             /// The forward order is ascending, so that less significant bits appear first. There
             /// are no trailing false bits going forward, or leading falses going backward.
             ///
-            /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
-            /// `to_bits_desc` instead.
+            /// If it's necessary to get a [`Vec`] of all the bits, consider using
+            /// [`to_bits_asc`](super::traits::BitConvertible::to_bits_asc) or
+            /// [`to_bits_desc`](super::traits::BitConvertible::to_bits_desc) instead.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_iterable` module.
+            /// See [here](super::bit_iterable#bits).
             #[inline]
             fn bits(self) -> PrimitiveUnsignedBitIterator<$t> {
                 bits_unsigned(self)
@@ -201,9 +139,9 @@ macro_rules! impl_bit_iterable_unsigned {
 }
 apply_to_unsigneds!(impl_bit_iterable_unsigned);
 
-/// A double-ended iterator over the bits of a primitive signed integer.
+/// A double-ended iterator over the bits of a signed primitive integer.
 ///
-/// This `struct` is created by the `BitIterable::bits` function. See its documentation for more.
+/// This `struct` is created by [`BitIterable::bits`]; see its documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveSignedBitIterator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
     phantom: PhantomData<*const S>,
@@ -213,30 +151,6 @@ pub struct PrimitiveSignedBitIterator<U: PrimitiveUnsigned, S: PrimitiveSigned> 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<U, S> {
     type Item = bool;
 
-    /// A function to iterate through the bits of a primitive signed integer in ascending order
-    /// (least-significant first).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::logic::traits::BitIterable;
-    ///
-    /// assert_eq!(0i8.bits().next(), None);
-    ///
-    /// // -105 = 10010111 in two's complement
-    /// let mut bits = (-105i32).bits();
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(false));
-    /// assert_eq!(bits.next(), Some(true));
-    /// assert_eq!(bits.next(), None);
-    /// ```
     fn next(&mut self) -> Option<bool> {
         self.xs.next()
     }
@@ -245,30 +159,6 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIt
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
     for PrimitiveSignedBitIterator<U, S>
 {
-    /// A function to iterate through the bits of a primitive signed integer in descending order
-    /// (most-significant first).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::logic::traits::BitIterable;
-    ///
-    /// assert_eq!(0i8.bits().next_back(), None);
-    ///
-    /// // -105 = 10010111 in two's complement
-    /// let mut bits = (-105i32).bits();
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(false));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), Some(true));
-    /// assert_eq!(bits.next_back(), None);
-    /// ```
     fn next_back(&mut self) -> Option<bool> {
         self.xs.next_back()
     }
@@ -283,7 +173,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     /// Indexing at or above the significant bit count returns false or true bits, depending on the
     /// value's sign.
     ///
-    /// This is equivalent to the `get_bit` function.
+    /// This is equivalent to [`get_bit`](super::traits::BitAccess::get_bit).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -340,19 +230,20 @@ macro_rules! impl_bit_iterable_signed {
         impl BitIterable for $s {
             type BitIterator = PrimitiveSignedBitIterator<$u, $s>;
 
-            /// Returns a double-ended iterator over the bits of a primitive signed integer.
+            /// Returns a double-ended iterator over the bits of a signed primitive integer.
             ///
             /// The forward order is ascending, so that less significant bits appear first. There
             /// are no trailing sign bits going forward, or leading sign bits going backward.
             ///
-            /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
-            /// `to_bits_desc` instead.
+            /// If it's necessary to get a [`Vec`] of all the bits, consider using
+            /// [`to_bits_asc`](super::traits::BitConvertible::to_bits_asc) or
+            /// [`to_bits_desc`](super::traits::BitConvertible::to_bits_desc) instead.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_iterable` module.
+            /// See [here](super::bit_iterable#bits).
             #[inline]
             fn bits(self) -> PrimitiveSignedBitIterator<$u, $s> {
                 bits_signed::<$u, $s>(self)

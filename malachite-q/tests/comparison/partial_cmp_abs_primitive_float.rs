@@ -17,7 +17,7 @@ fn test_partial_cmp_abs_primitive_float() {
         assert_eq!(Rational::from_str(u).unwrap().partial_cmp_abs(&v), out);
         assert_eq!(v.partial_cmp_abs(&Rational::from_str(u).unwrap()), out_rev);
 
-        let v = v as f64;
+        let v = f64::from(v);
         assert_eq!(Rational::from_str(u).unwrap().partial_cmp_abs(&v), out);
         assert_eq!(v.partial_cmp_abs(&Rational::from_str(u).unwrap()), out_rev);
     };

@@ -29,13 +29,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_to_sci_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
-        println!("{}.to_sci() = {}", x, x.to_sci().to_string());
+        println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 
 fn demo_to_sci_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for x in signed_gen::<T>().get(gm, &config).take(limit) {
-        println!("{}.to_sci() = {}", x, x.to_sci().to_string());
+        println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 

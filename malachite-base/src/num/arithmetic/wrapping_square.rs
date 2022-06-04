@@ -5,15 +5,15 @@ macro_rules! impl_wrapping_square {
         impl WrappingSquare for $t {
             type Output = $t;
 
-            /// Squares `self`, wrapping around at the boundary of the type.
+            /// Squares a number, wrapping around at the boundary of the type.
             ///
-            /// $f(x) = y$, where $y \equiv x^2 \mod 2^W$ and $W$ is `$t::WIDTH`.
+            /// $f(x) = y$, where $y \equiv x^2 \mod 2^W$ and $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::wrapping_square` module.
+            /// See [here](super::wrapping_square#wrapping_square).
             #[inline]
             fn wrapping_square(self) -> $t {
                 self.wrapping_mul(self)
@@ -21,15 +21,15 @@ macro_rules! impl_wrapping_square {
         }
 
         impl WrappingSquareAssign for $t {
-            /// Replaces `self` with `self` squared, wrapping around at the boundary of the type.
+            /// Squares a number in place, wrapping around at the boundary of the type.
             ///
-            /// $x \gets y$, where $y \equiv x^2 \mod 2^W$ and $W$ is `$t::WIDTH`.
+            /// $x \gets y$, where $y \equiv x^2 \mod 2^W$ and $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::wrapping_square` module.
+            /// See [here](super::wrapping_square#wrapping_square_assign).
             #[inline]
             fn wrapping_square_assign(&mut self) {
                 self.wrapping_mul_assign(*self);

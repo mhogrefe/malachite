@@ -1,9 +1,9 @@
 use num::logic::traits::NotAssign;
 
 impl NotAssign for bool {
-    /// Replaces a `bool` by its opposite.
+    /// Replaces a [`bool`] by its opposite.
     ///
-    /// $b_\mathrm{after}=\lnot b_\mathrm{before}$
+    /// $b \gets \lnot b$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

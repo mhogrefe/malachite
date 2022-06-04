@@ -21,7 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_to_sci(gm: GenMode, config: GenConfig, limit: usize) {
     for x in natural_gen().get(gm, &config).take(limit) {
-        println!("{}.to_sci() = {}", x, x.to_sci().to_string());
+        println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 

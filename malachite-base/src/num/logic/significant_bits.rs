@@ -1,22 +1,23 @@
 use num::arithmetic::traits::UnsignedAbs;
-use num::basic::integers::PrimitiveInt;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{LeadingZeros, SignificantBits};
 
-fn significant_bits_unsigned<T: PrimitiveInt>(x: T) -> u64 {
+fn significant_bits_unsigned<T: PrimitiveUnsigned>(x: T) -> u64 {
     T::WIDTH - LeadingZeros::leading_zeros(x)
 }
 
 macro_rules! impl_significant_bits_unsigned {
     ($t:ident) => {
         impl SignificantBits for $t {
-            /// Returns the number of significant bits of a primitive unsigned integer.
+            /// Returns the number of significant bits of an unsigned primitive integer.
             ///
             /// This is the integer's width minus the number of leading zeros.
             ///
             /// $$
             /// f(n) = \\begin{cases}
-            ///     0 & n = 0 \\\\
-            ///     \lfloor \log_2 n \rfloor + 1 & n > 0
+            ///     0 & \text{if} \\quad n = 0, \\\\
+            ///     \lfloor \log_2 n \rfloor + 1 & \text{if} \\quad n > 0.
             /// \\end{cases}
             /// $$
             ///
@@ -24,7 +25,7 @@ macro_rules! impl_significant_bits_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::significant_bits` module.
+            /// See [here](super::significant_bits#significant_bits).
             #[inline]
             fn significant_bits(self) -> u64 {
                 significant_bits_unsigned(self)
@@ -34,20 +35,22 @@ macro_rules! impl_significant_bits_unsigned {
 }
 apply_to_unsigneds!(impl_significant_bits_unsigned);
 
-fn significant_bits_signed<U: SignificantBits, S: UnsignedAbs<Output = U>>(x: S) -> u64 {
+fn significant_bits_signed<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
+    x: S,
+) -> u64 {
     x.unsigned_abs().significant_bits()
 }
 
 macro_rules! impl_significant_bits_signed {
     ($u:ident, $s:ident) => {
-        /// Returns the number of significant bits of a primitive signed integer.
+        /// Returns the number of significant bits of a signed primitive integer.
         ///
         /// This is the integer's width minus the number of leading zeros of its absolute value.
         ///
         /// $$
         /// f(n) = \\begin{cases}
-        ///     0 & n = 0 \\\\
-        ///     \lfloor \log_2 |n| \rfloor + 1 & n \neq 0
+        ///     0 & \text{if} \\quad n = 0, \\\\
+        ///     \lfloor \log_2 |n| \rfloor + 1 & \text{if} \\quad n \neq 0.
         /// \\end{cases}
         /// $$
         ///
@@ -55,7 +58,7 @@ macro_rules! impl_significant_bits_signed {
         /// Constant time and additional memory.
         ///
         /// # Examples
-        /// See the documentation of the `num::logic::significant_bits` module.
+        /// See [here](super::significant_bits#significant_bits).
         impl SignificantBits for $s {
             #[inline]
             fn significant_bits(self) -> u64 {

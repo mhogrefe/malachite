@@ -5,15 +5,21 @@ use natural::Natural;
 impl ModSquare<Natural> for Natural {
     type Output = Natural;
 
-    /// Squares a `Natural` mod a `Natural`, taking both `Natural`s by value. Assumes the base is
-    /// already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// modulo $m$. Both [`Natural`]s are taken by value.
     ///
-    /// //TODO complexity
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
@@ -29,15 +35,21 @@ impl ModSquare<Natural> for Natural {
 impl<'a> ModSquare<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Squares a `Natural` mod a `Natural`, taking the first `Natural`s by value and the second by
-    /// reference. Assumes the base is already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
@@ -53,15 +65,21 @@ impl<'a> ModSquare<&'a Natural> for Natural {
 impl<'a> ModSquare<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Squares a `Natural` mod a `Natural`, taking the first `Natural` by reference and the second
-    /// by value. Assumes the base is already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// modulo $m$. The first [`Natural`] is taken by reference and the second by value.
     ///
-    /// //TODO complexity
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
@@ -77,15 +95,21 @@ impl<'a> ModSquare<Natural> for &'a Natural {
 impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Squares a `Natural` mod a `Natural`, taking both `Natural`s by reference. Assumes the base
-    /// is already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// modulo $m$. Both [`Natural`]s are taken by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
@@ -99,15 +123,21 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
 }
 
 impl ModSquareAssign<Natural> for Natural {
-    /// Squares a `Natural` mod a `Natural` in place, taking the second `Natural` by value. Assumes
-    /// the base is already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. Assumes the input is
+    /// already reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
     /// use malachite_nz::natural::Natural;
@@ -127,15 +157,21 @@ impl ModSquareAssign<Natural> for Natural {
 }
 
 impl<'a> ModSquareAssign<&'a Natural> for Natural {
-    /// Squares a `Natural` mod a `Natural` in place, taking the second `Natural` by reference.
-    /// Assumes the base is already reduced mod `m`.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. Assumes the input is
+    /// already reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
     /// use malachite_nz::natural::Natural;

@@ -1,6 +1,5 @@
-/// Functions for getting the absolute value of a number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Abs`](traits::Abs), [`AbsAssign`](traits::AbsAssign), and
+/// [`UnsignedAbs`](traits::UnsignedAbs), traits for getting the absolute value of a number.
 ///
 /// # abs_assign
 /// ```
@@ -37,9 +36,8 @@
 /// assert_eq!(NiceFloat(x), NiceFloat(100.0));
 /// ```
 pub mod abs;
-/// Functions for adding a number and the product of two other numbers.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`AddMul`](traits::AddMul) and [`AddMulAssign`](traits::AddMulAssign), traits for adding a
+/// number and the product of two other numbers.
 ///
 /// # add_mul
 /// ```
@@ -67,9 +65,8 @@ pub mod abs;
 /// assert_eq!(x, 7.0);
 /// ```
 pub mod add_mul;
-/// Functions for left-shifting a number and checking whether the result is representable.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ArithmeticCheckedShl`](traits::ArithmeticCheckedShl), a trait for left-shifting a number and
+/// checking whether the result is representable.
 ///
 /// # arithmetic_checked_shl
 /// ```
@@ -108,9 +105,8 @@ pub mod add_mul;
 /// assert_eq!((-100i8).arithmetic_checked_shl(-100), Some(-1i8));
 /// ```
 pub mod arithmetic_checked_shl;
-/// Functions for right-shifting a number and checking whether the result is representable.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ArithmeticCheckedShr`](traits::ArithmeticCheckedShr), a trait for right-shifting a number and
+/// checking whether the result is representable.
 ///
 /// # arithmetic_checked_shr
 /// ```
@@ -136,9 +132,8 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
-/// Functions for computing the ceiling of a number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Ceiling`](traits::Ceiling) and [`CeilingAssign`](traits::CeilingAssign), traits for computing
+/// the ceiling of a number.
 ///
 /// # ceiling
 /// ```
@@ -153,14 +148,14 @@ pub mod arithmetic_checked_shr;
 /// assert_eq!(x, -1.0);
 /// ```
 pub mod ceiling;
-/// Wraps the `checked_abs` function into an implementation of `CheckedAbs`.
+/// [`CheckedAbs`](traits::CheckedAbs), a trait for computing the absolute value of number and
+/// checking whether the result is representable.
 pub mod checked_abs;
-/// Wraps the `checked_add` function into an implementation of `CheckedAdd`.
-pub mod checked_add;
-/// Functions for adding a number and the product of two other numbers, and checking whether the
+/// [`CheckedAdd`](traits::CheckedAdd), a trait for adding two numbers and checking whether the
 /// result is representable.
-///
-/// Here are usage examples of the macro-generated functions:
+pub mod checked_add;
+/// [`CheckedAddMul`](traits::CheckedAddMul), a trait for adding a number and the product of two
+/// other numbers, and checking whether the result is representable.
 ///
 /// # checked_add_mul
 /// ```
@@ -173,19 +168,23 @@ pub mod checked_add;
 /// assert_eq!((-127i8).checked_add_mul(-2, 100), None);
 /// ```
 pub mod checked_add_mul;
-/// Wraps the `checked_div` function into an implementation of `CheckedDiv`.
+/// [`CheckedDiv`](traits::CheckedDiv), a trait for dividing two numbers and checking whether the
+/// result is representable.
 pub mod checked_div;
-/// Wraps the `checked_mul` function into an implementation of `CheckedMul`.
+/// [`CheckedMul`](traits::CheckedMul), a trait for multiplying two numbers and checking whether
+/// the result is representable.
 pub mod checked_mul;
-/// Wraps the `checked_neg` function into an implementation of `CheckedNeg`.
+/// [`CheckedNeg`](traits::CheckedNeg), a trait for negating a number and checking whether the
+/// result is representable.
 pub mod checked_neg;
-/// Wraps the `checked_next_power_of_2` function into an implementation of `CheckedNextPowerOf2`.
+/// [`CheckedNextPowerOf2`](traits::CheckedNextPowerOf2), a trait for getting the next-highest
+/// power of 2, if it's representable.
 pub mod checked_next_power_of_2;
-/// Wraps the `checked_pow` function into an implementation of `CheckedPow`.
+/// [`CheckedPow`](traits::CheckedPow), a trait for raising a number to the power of a [`u64`] and
+/// checking whether the result is representable.
 pub mod checked_pow;
-/// Functions for squaring a number and checking whether the result is representable.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`CheckedSquare`](traits::CheckedSquare), a trait for squaring a number and checking whether
+/// the result is representable.
 ///
 /// # checked_square
 /// ```
@@ -196,12 +195,11 @@ pub mod checked_pow;
 /// assert_eq!((1000u16).checked_square(), None);
 /// ```
 pub mod checked_square;
-/// Wraps the `checked_sub` function into an implementation of `CheckedSub`.
-pub mod checked_sub;
-/// Functions for subtracting the product of two numbers from another number, and checking whether
+/// [`CheckedSub`](traits::CheckedSub), a trait for subtracting two numbers and checking whether
 /// the result is representable.
-///
-/// Here are usage examples of the macro-generated functions:
+pub mod checked_sub;
+/// [`CheckedSubMul`](traits::CheckedSubMul), a trait for subtracting the product of two numbers
+/// from another number, and checking whether the result is representable.
 ///
 /// # checked_sub_mul
 /// ```
@@ -214,9 +212,7 @@ pub mod checked_sub;
 /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
 /// ```
 pub mod checked_sub_mul;
-/// Functions determining whether two numbers are coprime.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`CoprimeWith`](traits::CoprimeWith), a trait for determining whether two numbers are coprime.
 ///
 /// # coprime_with
 /// ```
@@ -230,9 +226,8 @@ pub mod checked_sub_mul;
 /// assert_eq!(6u8.coprime_with(35), true);
 /// ```
 pub mod coprime_with;
-/// Functions for unchecked exact division.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`DivExact`](traits::DivExact) and [`DivExactAssign`](traits::DivExactAssign), traits for
+/// dividing two numbers when it's known that the division is exact.
 ///
 /// # div_exact
 /// ```
@@ -260,10 +255,24 @@ pub mod coprime_with;
 /// assert_eq!(x, -123);
 /// ```
 pub mod div_exact;
-/// Functions for simultaneously finding the quotient and remainder of two numbers, subject to
-/// various rounding rules.
+/// Traits for simultaneously finding the quotient and remainder of two numbers, subject to various
+/// rounding rules.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// These are the traits:
+///
+/// | rounding     | by value or reference           | by mutable reference (assignment)      |
+/// |--------------|---------------------------------|----------------------------------------|
+/// | towards $-\infty$ | [`DivMod`](traits::DivMod) | [`DivAssignMod`](traits::DivAssignMod) |
+/// | towards 0         | [`DivRem`](traits::DivRem) | [`DivAssignRem`](traits::DivAssignRem) |
+/// | towards $\infty$  | [`CeilingDivMod`](traits::CeilingDivMod) | [`CeilingDivAssignMod`](traits::CeilingDivAssignMod) |
+/// | towards $\infty$  | [`CeilingDivNegMod`](traits::CeilingDivNegMod) | [`CeilingDivAssignNegMod`](traits::CeilingDivAssignNegMod) |
+///
+/// [`CeilingDivMod`](traits::CeilingDivMod) and [`CeilingDivNegMod`](traits::CeilingDivNegMod)
+/// are similar. The difference is that [`CeilingDivMod`](traits::CeilingDivMod) returns a
+/// remainder less than or equal to 0, so that the usual relation $x = qy + r$ is satisfied, while
+/// [`CeilingDivNegMod`](traits::CeilingDivNegMod) returns a remainder greater than or equal to
+/// zero. This allows the remainder to have an unsigned type, but modifies the relation to
+/// $x = qy - r$.
 ///
 /// # div_mod
 /// ```
@@ -449,9 +458,9 @@ pub mod div_exact;
 /// assert_eq!(x, 3);
 /// ```
 pub mod div_mod;
-/// Functions dividing two numbers according to a specified `RoundingMode`.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`DivRound`](traits::DivRound) and [`DivExactAssign`](traits::DivRoundAssign), traits for
+/// dividing two numbers according to a specified
+/// [`RoundingMode`](crate::rounding_modes::RoundingMode).
 ///
 /// # div_round
 /// ```
@@ -573,9 +582,8 @@ pub mod div_mod;
 /// assert_eq!(x, 4);
 /// ```
 pub mod div_round;
-/// Functions determining whether one number is divisible by another.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`DivisibleBy`](traits::DivisibleBy), a trait for determining whether one number is divisible
+/// by another.
 ///
 /// # divisible_by
 /// ```
@@ -590,9 +598,8 @@ pub mod div_round;
 /// assert_eq!(102i32.divisible_by(-3), true);
 /// ```
 pub mod divisible_by;
-/// Functions determining whether one number is divisible by a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`DivisibleByPowerOf2`](traits::DivisibleByPowerOf2), a trait for determining whether a number
+/// is divisible by $2^k$.
 ///
 /// # divisible_by_power_of_2
 /// ```
@@ -607,9 +614,8 @@ pub mod divisible_by;
 /// assert_eq!(96i32.divisible_by_power_of_2(6), false);
 /// ```
 pub mod divisible_by_power_of_2;
-/// Functions determining whether one number is equal by another, mod a third.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`EqMod`](traits::EqMod), a trait for determining whether one number is equal by another
+/// modulo a third.
 ///
 /// # eq_mod
 /// ```
@@ -620,9 +626,8 @@ pub mod divisible_by_power_of_2;
 /// assert_eq!((-123i64).eq_mod(278, 100), false);
 /// ```
 pub mod eq_mod;
-/// Functions determining whether one number is equal by another, mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`EqModPowerOf2`](traits::EqModPowerOf2), a trait for determining whether one number is equal
+/// to another modulo $2^k$.
 ///
 /// # eq_mod_power_of_2
 /// ```
@@ -633,11 +638,10 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
-/// Functions for computing the floor of a number.
+/// [`Floor`](traits::Floor) and [`FloorAssign`](traits::FloorAssign), traits for computing the
+/// floor of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # floor
+/// # floor_assign
 /// ```
 /// use malachite_base::num::arithmetic::traits::FloorAssign;
 ///
@@ -650,9 +654,8 @@ pub mod eq_mod_power_of_2;
 /// assert_eq!(x, -2.0);
 /// ```
 pub mod floor;
-/// Functions for computing the GCD (greatest common divisor) of two numbers.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Gcd`](traits::Gcd) and [`GcdAssign`](traits::GcdAssign), traits for computing the GCD
+/// (greatest common divisor) of two numbers.
 ///
 /// # gcd
 /// ```
@@ -675,9 +678,8 @@ pub mod floor;
 /// assert_eq!(x, 6);
 /// ```
 pub mod gcd;
-/// Functions for determining whether a number is an integer power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`IsPowerOf2`](traits::IsPowerOf2), a trait for determining whether a number is an integer
+/// power of 2.
 ///
 /// # is_power_of_2
 /// ```
@@ -689,9 +691,8 @@ pub mod gcd;
 /// assert_eq!((-4.0).is_power_of_2(), false);
 /// ```
 pub mod is_power_of_2;
-/// Functions for computing the LCM (least common multiple) of two numbers.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Lcm`](traits::Lcm), [`LcmAssign`](traits::LcmAssign), and [`CheckedLcm`](traits::CheckedLcm),
+/// traits for computing the LCM (least common multiple) of two numbers.
 ///
 /// # lcm
 /// ```
@@ -714,7 +715,7 @@ pub mod is_power_of_2;
 /// assert_eq!(x, 180);
 /// ```
 ///
-/// # lcm
+/// # checked_lcm
 /// ```
 /// use malachite_base::num::arithmetic::traits::CheckedLcm;
 ///
@@ -723,9 +724,10 @@ pub mod is_power_of_2;
 /// assert_eq!(120u8.checked_lcm(90), None);
 /// ```
 pub mod lcm;
-/// Functions for taking the base-$b$ logarithm of a number.
+/// Traits for taking the base-$b$ logarithm of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`FloorLogBase`](traits::FloorLogBase),
+/// [`CeilingLogBase`](traits::CeilingLogBase), and [`CheckedLogBase`](traits::CheckedLogBase).
 ///
 /// # floor_log_base
 /// ```
@@ -760,9 +762,10 @@ pub mod lcm;
 /// assert_eq!(101u64.checked_log_base(10), None);
 /// ```
 pub mod log_base;
-/// Functions for taking the base-2 logarithm of a number.
+/// Traits for taking the base-2 logarithm of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`FloorLogBase2`](traits::FloorLogBase2),
+/// [`CeilingLogBase2`](traits::CeilingLogBase2), and [`CheckedLogBase2`](traits::CheckedLogBase2).
 ///
 /// # floor_log_base_2
 /// ```
@@ -803,9 +806,11 @@ pub mod log_base;
 /// assert_eq!(0.0625f32.checked_log_base_2(), Some(-4));
 /// ```
 pub mod log_base_2;
-/// Functions for taking the base-$b$ logarithm of a number, where $b$ is a power of 2.
+/// Traits for taking the base-$2^k$ logarithm of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`FloorLogBasePowerOf2`](traits::FloorLogBasePowerOf2),
+/// [`CeilingLogBasePowerOf2`](traits::CeilingLogBasePowerOf2), and
+/// [`CheckedLogBasePowerOf2`](traits::CheckedLogBasePowerOf2).
 ///
 /// # floor_log_base_power_of_2
 /// ```
@@ -839,9 +844,8 @@ pub mod log_base_2;
 /// assert_eq!(0.0625f32.checked_log_base_power_of_2(2), Some(-2));
 /// ```
 pub mod log_base_power_of_2;
-/// Functions for adding two numbers mod another number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModAdd`](traits::ModAdd) and [`ModAddAssign`](traits::ModAddAssign), traits for adding two
+/// numbers modulo another number.
 ///
 /// # mod_add
 /// ```
@@ -864,9 +868,8 @@ pub mod log_base_power_of_2;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_add;
-/// Functions for checking whether a number is reduced mod another number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModIsReduced`](traits::ModIsReduced), a trait for checking whether a number is reduced modulo
+/// another number.
 ///
 /// # mod_is_reduced
 /// ```
@@ -877,9 +880,14 @@ pub mod mod_add;
 /// assert_eq!(100u16.mod_is_reduced(&101), true);
 /// ```
 pub mod mod_is_reduced;
-/// Functions for multiplying two numbers mod another number.
+/// Traits for multiplying two numbers modulo another number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`ModMul`](traits::ModMul), [`ModMulAssign`](traits::ModMulAssign),
+/// [`ModMulPrecomputed`](traits::ModMulPrecomputed), and
+/// [`ModMulPrecomputedAssign`](traits::ModMulPrecomputedAssign).
+/// [`ModMulPrecomputed`](traits::ModMulPrecomputed) and
+/// [`ModMulPrecomputedAssign`](traits::ModMulPrecomputedAssign) are useful when having to make
+/// several multiplications modulo the same modulus.
 ///
 /// # mod_mul
 /// ```
@@ -970,9 +978,8 @@ pub mod mod_is_reduced;
 /// assert_eq!(x, 0);
 /// ```
 pub mod mod_mul;
-/// Functions for negating a number mod another number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModNeg`](traits::ModNeg) and [`ModNegAssign`](traits::ModNegAssign), traits for negating a
+/// number modulo another number.
 ///
 /// # mod_neg
 /// ```
@@ -1000,9 +1007,23 @@ pub mod mod_mul;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_neg;
-/// Functions for finding the remainder of two numbers, subject to various rounding rules.
+/// Traits for finding the remainder of two numbers, subject to various rounding rules.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// These are the traits:
+///
+/// | rounding          | by value or reference      | by mutable reference (assignment)      |
+/// |-------------------|----------------------------|----------------------------------------|
+/// | towards $-\infty$ | [`Mod`](traits::Mod)       | [`ModAssign`](traits::ModAssign)       |
+/// | towards $\infty$  | [`CeilingMod`](traits::CeilingMod) | [`CeilingModAssign`](traits::CeilingModAssign) |
+/// | towards $\infty$  | [`NegMod`](traits::NegMod) | [`NegModAssign`](traits::NegModAssign) |
+///
+/// [`CeilingMod`](traits::CeilingMod) and [`NegMod`](traits::NegMod) are similar. The difference
+/// is that [`CeilingMod`](traits::CeilingMod) returns a remainder less than or equal to 0, so that
+/// the usual relation $x = qy + r$ is satisfied, while [`NegMod`](traits::NegMod) returns a
+/// remainder greater than or equal to zero. This allows the remainder to have an unsigned type,
+/// but modifies the relation to $x = qy - r$.
+///
+/// The [`Rem`](std::ops::Rem) trait in the standard library rounds towards 0.
 ///
 /// # mod_op
 /// ```
@@ -1130,9 +1151,12 @@ pub mod mod_neg;
 /// assert_eq!(x, 7);
 /// ```
 pub mod mod_op;
-/// Functions for raising a number to a power mod another number.
+/// Traits for raising a number to a power modulo another number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`ModPow`](traits::ModPow), [`ModPowAssign`](traits::ModPowAssign), and
+/// [`ModPowPrecomputed`](traits::ModPowPrecomputed).
+/// [`ModPowPrecomputed`](traits::ModPowPrecomputed) is useful when having to make several
+/// exponentiations modulo the same modulus.
 ///
 /// # mod_pow
 /// ```
@@ -1223,10 +1247,25 @@ pub mod mod_op;
 /// assert_eq!(x, 25);
 /// ```
 pub mod mod_pow;
-/// Functions for finding the remainder of a number divided by a power of 2, subject to various
-/// rounding rules.
+/// Traits for finding the remainder of a number divided by $2^k$, subject to various rounding
+/// rules.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// These are the traits:
+///
+/// | rounding | by value or reference | by mutable reference (assignment) |
+/// |----------|-----------------------|-----------------------------------|
+/// | towards $-\infty$ | [`ModPowerOf2`](traits::ModPowerOf2) | [`ModPowerOf2Assign`](traits::ModPowerOf2Assign)       |
+/// | towards 0 | [`RemPowerOf2`](traits::RemPowerOf2) | [`RemPowerOf2Assign`](traits::RemPowerOf2Assign)       |
+/// | towards $\infty$  | [`CeilingModPowerOf2`](traits::CeilingModPowerOf2) | [`CeilingModPowerOf2Assign`](traits::CeilingModPowerOf2Assign) |
+/// | towards $\infty$  | [`NegModPowerOf2`](traits::NegModPowerOf2) | [`NegModPowerOf2Assign`](traits::NegModPowerOf2Assign) |
+///
+/// [`CeilingModPowerOf2`](traits::CeilingModPowerOf2) and
+/// [`NegModPowerOf2`](traits::NegModPowerOf2) are similar. The difference is that
+/// [`CeilingModPowerOf2`](traits::CeilingModPowerOf2) returns a remainder less than or equal to 0,
+/// so that the usual relation $x = q2^k + r$ is satisfied, while
+/// [`NegModPowerOf2`](traits::NegModPowerOf2) returns a remainder greater than or equal to zero.
+/// This allows the remainder to have an unsigned type, but modifies the relation to
+/// $x = q2^k - r$.
 ///
 /// # mod_power_of_2
 /// ```
@@ -1364,9 +1403,9 @@ pub mod mod_pow;
 /// assert_eq!(x, -11);
 /// ```
 pub mod mod_power_of_2;
-/// Functions for adding two numbers mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Add`](traits::ModPowerOf2Add) and
+/// [`ModPowerOf2AddAssign`](traits::ModPowerOf2AddAssign), traits for adding two numbers modulo
+/// $2^k$.
 ///
 /// # mod_power_of_2_add
 /// ```
@@ -1389,9 +1428,8 @@ pub mod mod_power_of_2;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_power_of_2_add;
-/// Functions for checking whether a number is reduced mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2IsReduced`](traits::ModPowerOf2IsReduced), a trait for checking whether a number
+/// is reduced modulo $2^k$.
 ///
 /// # mod_power_of_2_is_reduced
 /// ```
@@ -1402,9 +1440,9 @@ pub mod mod_power_of_2_add;
 /// assert_eq!(100u16.mod_power_of_2_is_reduced(8), true);
 /// ```
 pub mod mod_power_of_2_is_reduced;
-/// Functions for multiplying two numbers mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Mul`](traits::ModPowerOf2Mul) and
+/// [`ModPowerOf2MulAssign`](traits::ModPowerOf2MulAssign), traits for multiplying two numbers
+/// modulo $2^k$.
 ///
 /// # mod_power_of_2_mul
 /// ```
@@ -1427,9 +1465,9 @@ pub mod mod_power_of_2_is_reduced;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_mul;
-/// Functions for negating a number mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Neg`](traits::ModPowerOf2Neg) and
+/// [`ModPowerOf2NegAssign`](traits::ModPowerOf2NegAssign), traits for negating a number modulo
+/// $2^k$.
 ///
 /// # mod_power_of_2_neg
 /// ```
@@ -1457,9 +1495,9 @@ pub mod mod_power_of_2_mul;
 /// assert_eq!(n, 156);
 /// ```
 pub mod mod_power_of_2_neg;
-/// Functions for raising a number to a power mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Pow`](traits::ModPowerOf2Pow) and
+/// [`ModPowerOf2PowAssign`](traits::ModPowerOf2PowAssign), traits for raising a number to a power
+/// modulo $2^k$.
 ///
 /// # mod_power_of_2_pow
 /// ```
@@ -1482,9 +1520,9 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_power_of_2_pow;
-/// Functions for left-shifting a number mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Shl`](traits::ModPowerOf2Shl) and
+/// [`ModPowerOf2ShlAssign`](traits::ModPowerOf2ShlAssign), traits for left-shifting a number
+/// modulo $2^k$.
 ///
 /// # mod_power_of_2_shl
 /// ```
@@ -1518,9 +1556,9 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_power_of_2_shl;
-/// Functions for right-shifting a number mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Shr`](traits::ModPowerOf2Shr) and
+/// [`ModPowerOf2ShrAssign`](traits::ModPowerOf2ShrAssign), traits for right-shifting a number
+/// modulo $2^k$.
 ///
 /// # mod_power_of_2_shr
 /// ```
@@ -1543,9 +1581,9 @@ pub mod mod_power_of_2_shl;
 /// assert_eq!(n, 16);
 /// ```
 pub mod mod_power_of_2_shr;
-/// Functions for squaring a number mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Square`](traits::ModPowerOf2Square) and
+/// [`ModPowerOf2SquareAssign`](traits::ModPowerOf2SquareAssign), traits for squaring a number
+/// modulo $2^k$.
 ///
 /// # mod_power_of_2_square
 /// ```
@@ -1568,9 +1606,9 @@ pub mod mod_power_of_2_shr;
 /// assert_eq!(n, 16);
 /// ```
 pub mod mod_power_of_2_square;
-/// Functions for subtracting one number by another, mod a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModPowerOf2Sub`](traits::ModPowerOf2Sub) and
+/// [`ModPowerOf2SubAssign`](traits::ModPowerOf2SubAssign), traits for subtracting one number by
+/// another modulo $2^k$.
 ///
 /// # mod_power_of_2_sub
 /// ```
@@ -1593,9 +1631,8 @@ pub mod mod_power_of_2_square;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_sub;
-/// Functions for left-shifting a number mod another number
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModShl`](traits::ModShl) and [`ModShlAssign`](traits::ModShlAssign), traits for left-shifting
+/// a number modulo another number.
 ///
 /// # mod_shl
 /// ```
@@ -1629,9 +1666,8 @@ pub mod mod_power_of_2_sub;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shl;
-/// Functions for right-shifting a number mod another number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModShr`](traits::ModShr) and [`ModShrAssign`](traits::ModShrAssign), traits for
+/// right-shifting a number modulo another number.
 ///
 /// # mod_shr
 /// ```
@@ -1654,9 +1690,12 @@ pub mod mod_shl;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shr;
-/// Functions for squaring a number mod another number.
+/// Traits for squaring a number modulo another number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`ModSquare`](traits::ModSquare), [`ModSquareAssign`](traits::ModSquareAssign),
+/// and [`ModSquarePrecomputed`](traits::ModSquarePrecomputed).
+/// [`ModSquarePrecomputed`](traits::ModSquarePrecomputed) is useful when having to make several
+/// squarings modulo the same modulus.
 ///
 /// # mod_square
 /// ```
@@ -1708,9 +1747,8 @@ pub mod mod_shr;
 /// assert_eq!(x, 43);
 /// ```
 pub mod mod_square;
-/// Functions for subtracting one number by another, mod a third number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`ModSub`](traits::ModSub) and [`ModSubAssign`](traits::ModSubAssign), traits for subtracting
+/// two numbers modulo another number.
 ///
 /// # mod_sub
 /// ```
@@ -1733,9 +1771,7 @@ pub mod mod_square;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_sub;
-/// Functions for negating a number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`NegAssign`](traits::NegAssign), a trait for negating a number in place.
 ///
 /// # neg_assign
 /// ```
@@ -1758,9 +1794,8 @@ pub mod mod_sub;
 /// assert_eq!(x, -1.2f32);
 /// ```
 pub mod neg;
-/// Functions for getting the next-highest power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`NextPowerOf2`](traits::NextPowerOf2) and [`NextPowerOf2Assign`](traits::NextPowerOf2Assign),
+/// traits for getting the next-highest power of 2.
 ///
 /// # next_power_of_2
 /// ```
@@ -1799,10 +1834,9 @@ pub mod neg;
 /// assert_eq!(x, 0.015625);
 /// ```
 pub mod next_power_of_2;
-/// Functions for taking the absolute value of a number and returning a boolean indicating whether
-/// an overflow occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingAbs`](traits::OverflowingAbs) and
+/// [`OverflowingAbsAssign`](traits::OverflowingAbsAssign), traits for taking the absolute value
+/// of a number and returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_abs_assign
 /// ```
@@ -1825,10 +1859,9 @@ pub mod next_power_of_2;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_abs;
-/// Functions for adding two numbers and returning a boolean indicating whether an overflow
-/// occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingAdd`](traits::OverflowingAdd) and
+/// [`OverflowingAddAssign`](traits::OverflowingAddAssign), traits for adding two numbers and
+/// returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_add_assign
 /// ```
@@ -1843,10 +1876,9 @@ pub mod overflowing_abs;
 /// assert_eq!(x, 67);
 /// ```
 pub mod overflowing_add;
-/// Functions for adding a number and the product of two other numbers, and returning a boolean
-/// indicating whether an overflow occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingAddMul`](traits::OverflowingAddMul) and
+/// [`OverflowingAddMulAssign`](traits::OverflowingAddMulAssign), traits for adding the product of
+/// two other numbers to a number and returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_add_mul
 /// ```
@@ -1880,10 +1912,9 @@ pub mod overflowing_add;
 /// assert_eq!(x, -71);
 /// ```
 pub mod overflowing_add_mul;
-/// Functions for dividing a number by another number and returning a boolean indicating whether an
-/// overflow occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingDiv`](traits::OverflowingDiv) and
+/// [`OverflowingDivAssign`](traits::OverflowingDivAssign), traits for dividing two numbers and
+/// returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_div_assign
 /// ```
@@ -1898,10 +1929,9 @@ pub mod overflowing_add_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_div;
-/// Functions for multiplying two numbers and returning a boolean indicating whether an overflow
-/// occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingMul`](traits::OverflowingMul) and
+/// [`OverflowingMulAssign`](traits::OverflowingMulAssign), traits for multiplying two numbers and
+/// returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_mul_assign
 /// ```
@@ -1916,10 +1946,9 @@ pub mod overflowing_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod overflowing_mul;
-/// Functions for negating a number and returning a boolean indicating whether an overflow
-/// occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingNeg`](traits::OverflowingNeg) and
+/// [`OverflowingNegAssign`](traits::OverflowingNegAssign), traits for negating a number and
+/// returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_neg_assign
 /// ```
@@ -1942,10 +1971,9 @@ pub mod overflowing_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_neg;
-/// Functions for raising a number to a power and returning a boolean indicating whether an
-/// overflow occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingPow`](traits::OverflowingPow) and
+/// [`OverflowingPowAssign`](traits::OverflowingPowAssign), traits for raising a number to a power
+/// and returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_pow_assign
 /// ```
@@ -1964,10 +1992,9 @@ pub mod overflowing_neg;
 /// assert_eq!(x, 13824);
 /// ```
 pub mod overflowing_pow;
-/// Functions for squaring a number and returning a boolean indicating whether an overflow
-/// occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingSquare`](traits::OverflowingSquare) and
+/// [`OverflowingSquareAssign`](traits::OverflowingSquareAssign), traits for squaring a number and
+/// returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_square_assign
 /// ```
@@ -1986,12 +2013,11 @@ pub mod overflowing_pow;
 /// assert_eq!(x, 16960);
 /// ```
 pub mod overflowing_square;
-/// Functions for subtracting a number by another number and returning a boolean indicating whether
-/// an overflow occurred.
+/// [`OverflowingSub`](traits::OverflowingSub) and
+/// [`OverflowingSubAssign`](traits::OverflowingSubAssign), traits for subtracting two numbers and
+/// returning a boolean indicating whether an overflow occurred.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # overflowing_square
+/// # overflowing_sub
 /// ```
 /// use malachite_base::num::arithmetic::traits::OverflowingSquare;
 ///
@@ -2013,10 +2039,10 @@ pub mod overflowing_square;
 /// assert_eq!(x, 65203);
 /// ```
 pub mod overflowing_sub;
-/// Functions for subtracting a number by the product of two other numbers, and returning a boolean
-/// indicating whether an overflow occurred.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`OverflowingSubMul`](traits::OverflowingSubMul) and
+/// [`OverflowingSubMulAssign`](traits::OverflowingSubMulAssign), traits for subtracting the
+/// product of two other numbers from a number and returning a boolean indicating whether an
+/// overflow occurred.
 ///
 /// # overflowing_sub_mul
 /// ```
@@ -2050,9 +2076,7 @@ pub mod overflowing_sub;
 /// assert_eq!(x, -71);
 /// ```
 pub mod overflowing_sub_mul;
-/// Functions for determining whether a number is even or odd.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Parity`](traits::Parity), a trait for determining whether a number is even or odd.
 ///
 /// # even
 /// ```
@@ -2072,9 +2096,8 @@ pub mod overflowing_sub_mul;
 /// assert_eq!(4u32.odd(), false);
 /// ```
 pub mod parity;
-/// Functions for raising a number to a power.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Pow`](traits::Pow) and [`PowAssign`](traits::PowAssign), traits for raising a number to a
+/// power.
 ///
 /// # pow_assign
 /// ```
@@ -2097,9 +2120,7 @@ pub mod parity;
 /// assert_eq!(x, 32.0);
 /// ```
 pub mod pow;
-/// Functions for computing a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`PowerOf2`](traits::PowerOf2), a trait for computing a power of 2.
 ///
 /// # power_of_2
 /// ```
@@ -2118,9 +2139,12 @@ pub mod pow;
 /// assert_eq!(f32::power_of_2(-3), 0.125);
 /// ```
 pub mod power_of_2;
-/// Functions for taking the $n$th root of a number.
+/// Traits for taking the $n$th root of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`FloorRoot`](traits::FloorRoot), [`FloorRootAssign`](traits::FloorRootAssign),
+/// [`CeilingRoot`](traits::CeilingRoot), [`CeilingRootAssign`](traits::CeilingRootAssign),
+/// [`CheckedRoot`](traits::CheckedRoot), [`RootRem`](traits::RootRem), and
+/// [`RootAssignRem`](traits::RootAssignRem).
 ///
 /// # floor_root
 /// ```
@@ -2238,9 +2262,9 @@ pub mod power_of_2;
 /// assert_eq!(x, 158);
 /// ```
 pub mod root;
-/// Functions for rounding a number to a multiple of another number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`RoundToMultiple`](traits::RoundToMultiple) and
+/// [`RoundToMultipleAssign`](traits::RoundToMultipleAssign), traits for rounding a number to a
+/// multiple of another number.
 ///
 /// # round_to_multiple
 /// ```
@@ -2374,9 +2398,9 @@ pub mod root;
 /// assert_eq!(x, -16);
 /// ```
 pub mod round_to_multiple;
-/// Functions for rounding a number to a multiple of a power of 2.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`RoundToMultipleOfPowerOf2`](traits::RoundToMultipleOfPowerOf2) and
+/// [`RoundToMultipleOfPowerOf2Assign`](traits::RoundToMultipleOfPowerOf2Assign), traits for
+/// rounding a number to a multiple of a power of 2.
 ///
 /// # round_to_multiple_of_power_of_2
 /// ```
@@ -2487,10 +2511,9 @@ pub mod round_to_multiple;
 /// assert_eq!(x, -12);
 /// ```
 pub mod round_to_multiple_of_power_of_2;
-/// Functions for taking the absolute value of a number, saturating at numeric bounds instead of
-/// overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingAbs`](traits::SaturatingAbs) and
+/// [`SaturatingAbsAssign`](traits::SaturatingAbsAssign), traits for taking the absolute value of a
+/// number and saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_abs_assign
 /// ```
@@ -2513,10 +2536,9 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(x, 127);
 /// ```
 pub mod saturating_abs;
-/// Functions for adding two numbers, saturating at numeric bounds instead of
-/// overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingAdd`](traits::SaturatingAdd) and
+/// [`SaturatingAddAssign`](traits::SaturatingAddAssign), traits for adding two numbers and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_add_assign
 /// ```
@@ -2531,10 +2553,9 @@ pub mod saturating_abs;
 /// assert_eq!(x, 255);
 /// ```
 pub mod saturating_add;
-/// Functions for adding the product of two numbers to a number, saturating at numeric bounds
-/// instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingAddMul`](traits::SaturatingAddMul) and
+/// [`SaturatingAddMulAssign`](traits::SaturatingAddMulAssign), traits for adding the product of
+/// two numbers to a number and saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_add_mul
 /// ```
@@ -2568,9 +2589,9 @@ pub mod saturating_add;
 /// assert_eq!(x, -128);
 /// ```
 pub mod saturating_add_mul;
-/// Functions for multiplying two numbers, saturating at numeric bounds instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingMul`](traits::SaturatingMul) and
+/// [`SaturatingMulAssign`](traits::SaturatingMulAssign), traits for multiplying two numbers and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_mul_assign
 /// ```
@@ -2585,9 +2606,9 @@ pub mod saturating_add_mul;
 /// assert_eq!(x, 255);
 /// ```
 pub mod saturating_mul;
-/// Functions for negating a number, saturating at numeric bounds instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingNeg`](traits::SaturatingNeg) and
+/// [`SaturatingNegAssign`](traits::SaturatingNegAssign), traits for negating a number and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_neg_assign
 /// ```
@@ -2610,9 +2631,9 @@ pub mod saturating_mul;
 /// assert_eq!(x, 127);
 /// ```
 pub mod saturating_neg;
-/// Functions for raising a number to a power, saturating at numeric bounds instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingPow`](traits::SaturatingPow) and
+/// [`SaturatingPowAssign`](traits::SaturatingPowAssign), traits for raising a number to a power
+/// and saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_pow_assign
 /// ```
@@ -2631,9 +2652,9 @@ pub mod saturating_neg;
 /// assert_eq!(x, -32768);
 /// ```
 pub mod saturating_pow;
-/// Functions for squaring a number, saturating at numeric bounds instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingSquare`](traits::SaturatingSquare) and
+/// [`SaturatingSquareAssign`](traits::SaturatingSquareAssign), traits for squaring a number and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_square
 /// ```
@@ -2661,9 +2682,9 @@ pub mod saturating_pow;
 /// assert_eq!(x, u16::MAX);
 /// ```
 pub mod saturating_square;
-/// Functions for subtracting two numbers, saturating at numeric bounds instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingSub`](traits::SaturatingSub) and
+/// [`SaturatingSubAssign`](traits::SaturatingSubAssign), traits for subtracting two numbers and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_sub_assign
 /// ```
@@ -2678,10 +2699,9 @@ pub mod saturating_square;
 /// assert_eq!(x, 0);
 /// ```
 pub mod saturating_sub;
-/// Functions for subtracting a number by the product of two numbers, saturating at numeric bounds
-/// instead of overflowing.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SaturatingSubMul`](traits::SaturatingSubMul) and
+/// [`SaturatingSubMulAssign`](traits::SaturatingSubMulAssign), traits for subtracting a number by
+/// the product of two numbers and saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_sub_mul
 /// ```
@@ -2715,8 +2735,9 @@ pub mod saturating_sub;
 /// assert_eq!(x, -128);
 /// ```
 pub mod saturating_sub_mul;
-/// Functions for multiplying a number by a power of 2 and rounding according to a specified
-/// rounding mode.
+/// [`ShlRound`](traits::ShlRound) and [`ShlRoundAssign`](traits::ShlRoundAssign), traits for
+/// multiplying a number by a power of 2 and rounding according to a specified
+/// [`RoundingMode`](crate::rounding_modes::RoundingMode).
 ///
 /// # shl_round
 /// ```
@@ -2773,8 +2794,9 @@ pub mod saturating_sub_mul;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shl_round;
-/// Functions for multiplying a number by a power of 2 and rounding according to a specified
-/// rounding mode.
+/// [`ShrRound`](traits::ShrRound) and [`ShrRoundAssign`](traits::ShrRoundAssign), traits for
+/// dividing a number by a power of 2 and rounding according to a specified
+/// [`RoundingMode`](crate::rounding_modes::RoundingMode).
 ///
 /// # shr_round
 /// ```
@@ -2917,9 +2939,7 @@ pub mod shl_round;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shr_round;
-/// Functions for determining the sign of a number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`Sign`](traits::Sign), a trait for determining the sign of a number.
 ///
 /// # sign
 /// ```
@@ -2942,9 +2962,12 @@ pub mod shr_round;
 /// assert_eq!(f64::NAN.sign(), Ordering::Equal);
 /// ```
 pub mod sign;
-/// Functions for taking the square root of a number.
+/// Traits for taking the square root of a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// The traits are [`FloorSqrt`](traits::FloorSqrt), [`FloorSqrtAssign`](traits::FloorSqrtAssign),
+/// [`CeilingSqrt`](traits::CeilingSqrt), [`CeilingSqrtAssign`](traits::CeilingSqrtAssign),
+/// [`CheckedSqrt`](traits::CheckedSqrt), [`SqrtRem`](traits::SqrtRem),
+/// [`SqrtAssignRem`](traits::SqrtAssignRem), and [`SqrtAssign`](traits::SqrtAssign).
 ///
 /// # floor_sqrt
 /// ```
@@ -3064,10 +3087,23 @@ pub mod sign;
 /// assert_eq!(x.sqrt_assign_rem(), 0);
 /// assert_eq!(x, 100000);
 /// ```
-pub mod sqrt;
-/// Functions for squaring a number.
 ///
-/// Here are usage examples of the macro-generated functions:
+/// # sqrt_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::SqrtAssign;
+/// use malachite_base::num::float::NiceFloat;
+///
+/// let mut x = 4.0f64;
+/// x.sqrt_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(2.0));
+///
+/// let mut x = 2.0f64;
+/// x.sqrt_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(1.4142135623730951));
+/// ```
+pub mod sqrt;
+/// [`Square`](traits::Square) and [`SquareAssign`](traits::SquareAssign), traits for squaring a
+/// number.
 ///
 /// # square
 /// ```
@@ -3095,9 +3131,8 @@ pub mod sqrt;
 /// assert_eq!(x, 2.25);
 /// ```
 pub mod square;
-/// Functions for subtracting the product of two numbers from a number.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`SubMul`](traits::SubMul) and [`SubMulAssign`](traits::SubMulAssign), traits for subtracting
+/// the product of two numbers from a number.
 ///
 /// # sub_mul
 /// ```
@@ -3127,9 +3162,8 @@ pub mod square;
 pub mod sub_mul;
 /// Various traits for performing arithmetic operations on numbers.
 pub mod traits;
-/// Functions for computing the absolute value of a number, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingAbs`](traits::WrappingAbs) and [`WrappingAbsAssign`](traits::WrappingAbsAssign),
+/// traits for computing the absolute value of a number and wrapping at the boundary of the type.
 ///
 /// # wrapping_abs_assign
 /// ```
@@ -3152,9 +3186,8 @@ pub mod traits;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_abs;
-/// Functions for adding two numbers, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingAdd`](traits::WrappingAdd) and [`WrappingAddAssign`](traits::WrappingAddAssign),
+/// traits for adding two numbers and wrapping at the boundary of the type.
 ///
 /// # wrapping_add_assign
 /// ```
@@ -3169,10 +3202,9 @@ pub mod wrapping_abs;
 /// assert_eq!(x, 67);
 /// ```
 pub mod wrapping_add;
-/// Functions for adding the product of two numbers to a third, wrapping at the boundary of the
-/// type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingAddMul`](traits::WrappingAddMul) and
+/// [`WrappingAddMulAssign`](traits::WrappingAddMulAssign), traits for adding the product of two
+/// numbers to a third and wrapping at the boundary of the type.
 ///
 /// # wrapping_add_mul
 /// ```
@@ -3195,9 +3227,8 @@ pub mod wrapping_add;
 /// assert_eq!(x, -71);
 /// ```
 pub mod wrapping_add_mul;
-/// Functions for dividing two numbers, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingDiv`](traits::WrappingDiv) and [`WrappingDivAssign`](traits::WrappingDivAssign),
+/// traits for dividing two numbers and wrapping at the boundary of the type.
 ///
 /// # wrapping_div_assign
 /// ```
@@ -3212,9 +3243,8 @@ pub mod wrapping_add_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_div;
-/// Functions for multiplying two numbers, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingMul`](traits::WrappingMul) and [`WrappingMulAssign`](traits::WrappingMulAssign),
+/// traits for multiplying two numbers and wrapping at the boundary of the type.
 ///
 /// # wrapping_mul_assign
 /// ```
@@ -3229,9 +3259,8 @@ pub mod wrapping_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod wrapping_mul;
-/// Functions for negating a number, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingNeg`](traits::WrappingNeg) and [`WrappingNegAssign`](traits::WrappingNegAssign) for
+/// negating a number and wrapping at the boundary of the type.
 ///
 /// # wrapping_neg_assign
 /// ```
@@ -3254,9 +3283,8 @@ pub mod wrapping_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_neg;
-/// Functions for raising a number to a power, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingPow`](traits::WrappingPow) and [`WrappingPowAssign`](traits::WrappingPowAssign),
+/// traits for raising a number to a power and wrapping at the boundary of the type.
 ///
 /// # wrapping_pow_assign
 /// ```
@@ -3275,9 +3303,9 @@ pub mod wrapping_neg;
 /// assert_eq!(x, 13824);
 /// ```
 pub mod wrapping_pow;
-/// Functions for squaring a number, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingSquare`](traits::WrappingSquare) and
+/// [`WrappingSquareAssign`](traits::WrappingAbsAssign), traits for squaring a number and wrapping
+/// at the boundary of the type.
 ///
 /// # wrapping_square
 /// ```
@@ -3305,9 +3333,8 @@ pub mod wrapping_pow;
 /// assert_eq!(x, 16960);
 /// ```
 pub mod wrapping_square;
-/// Functions for subtracting two numbers, wrapping at the boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingSub`](traits::WrappingSub) and [`WrappingSubAssign`](traits::WrappingSubAssign),
+/// traits for subtracting two numbers and wrapping at the boundary of the type.
 ///
 /// # wrapping_sub_assign
 /// ```
@@ -3322,10 +3349,9 @@ pub mod wrapping_square;
 /// assert_eq!(x, 65203);
 /// ```
 pub mod wrapping_sub;
-/// Functions for subtracting a number by the product of two other numbers, wrapping at the
-/// boundary of the type.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`WrappingSubMul`](traits::WrappingSubMul) and
+/// [`WrappingSubMulAssign`](traits::WrappingSubMulAssign), traits for subtracting a number by the
+/// product of two other numbers and wrapping at the boundary of the type.
 ///
 /// # wrapping_sub_mul
 /// ```
@@ -3348,114 +3374,101 @@ pub mod wrapping_sub;
 /// assert_eq!(x, -71);
 /// ```
 pub mod wrapping_sub_mul;
-/// Functions for multiplying two numbers and returning the result as a double-width number.
+/// [`XMulYToZZ`](traits::XMulYToZZ), a trait for multiplying two numbers and returning the result
+/// as a double-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # x_mul_y_is_zz
+/// # x_mul_y_to_zz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XMulYIsZZ;
+/// use malachite_base::num::arithmetic::traits::XMulYToZZ;
 ///
-/// assert_eq!(u64::x_mul_y_is_zz(15, 3), (0, 45));
-/// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
+/// assert_eq!(u64::x_mul_y_to_zz(15, 3), (0, 45));
+/// assert_eq!(u8::x_mul_y_to_zz(0x78, 0x9a), (0x48, 0x30));
 /// ```
-pub mod x_mul_y_is_zz;
-/// Functions for adding two double-width numbers and returning the result as a double-width
-/// number.
+pub mod x_mul_y_to_zz;
+/// [`XXAddYYToZZ`](traits::XXAddYYToZZ), a trait for adding two double-width numbers and returning
+/// the result as a double-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xx_add_yy_is_zz
+/// # xx_add_yy_to_zz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXAddYYIsZZ;
+/// use malachite_base::num::arithmetic::traits::XXAddYYToZZ;
 ///
-/// assert_eq!(u64::xx_add_yy_is_zz(0x12, 0x34, 0x33, 0x33), (0x45, 0x67));
-/// assert_eq!(u8::xx_add_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0x35, 0x78));
+/// assert_eq!(u64::xx_add_yy_to_zz(0x12, 0x34, 0x33, 0x33), (0x45, 0x67));
+/// assert_eq!(u8::xx_add_yy_to_zz(0x78, 0x9a, 0xbc, 0xde), (0x35, 0x78));
 /// ```
-pub mod xx_add_yy_is_zz;
-/// Functions for dividing a double-width number by a single-width number and returning the
-/// quotient and remainder.
+pub mod xx_add_yy_to_zz;
+/// [`XXDivModYToQR`](traits::XXDivModYToQR), a trait for dividing a double-width number by a
+/// single-width number and returning the quotient and remainder.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xx_div_mod_y_is_qr
+/// # xx_div_mod_y_to_qr
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
+/// use malachite_base::num::arithmetic::traits::XXDivModYToQR;
 ///
 /// assert_eq!(
-///     u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33),
+///     u64::xx_div_mod_y_to_qr(0x12, 0x34, 0x33),
 ///     (0x5a5a5a5a5a5a5a5b, 0x13)
 /// );
-/// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
+/// assert_eq!(u8::xx_div_mod_y_to_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
 /// ```
-pub mod xx_div_mod_y_is_qr;
-/// Functions for subtracting two double-width numbers and returning the result as a double-width
-/// number.
+pub mod xx_div_mod_y_to_qr;
+/// [`XXSubYYToZZ`](traits::XXSubYYToZZ), a trait for subtracting two double-width numbers and
+/// returning the result as a double-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xx_sub_yy_is_zz
+/// # xx_sub_yy_to_zz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXSubYYIsZZ;
+/// use malachite_base::num::arithmetic::traits::XXSubYYToZZ;
 ///
-/// assert_eq!(u64::xx_sub_yy_is_zz(0x67, 0x89, 0x33, 0x33), (0x34, 0x56));
-/// assert_eq!(u8::xx_sub_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
+/// assert_eq!(u64::xx_sub_yy_to_zz(0x67, 0x89, 0x33, 0x33), (0x34, 0x56));
+/// assert_eq!(u8::xx_sub_yy_to_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
 /// ```
-pub mod xx_sub_yy_is_zz;
-/// Functions for adding two triple-width numbers and returning the result as a triple-width
-/// number.
+pub mod xx_sub_yy_to_zz;
+/// [`XXXAddYYYToZZZ`](traits::XXXAddYYYToZZZ), a trait for adding two triple-width numbers and
+/// returning the result as a triple-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xxx_add_yyy_is_zzz
+/// # xxx_add_yyy_to_zzz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXXAddYYYIsZZZ;
+/// use malachite_base::num::arithmetic::traits::XXXAddYYYToZZZ;
 ///
 /// assert_eq!(
-///     u64::xxx_add_yyy_is_zzz(0x12, 0x34, 0x56, 0x33, 0x33, 0x33),
+///     u64::xxx_add_yyy_to_zzz(0x12, 0x34, 0x56, 0x33, 0x33, 0x33),
 ///     (0x45, 0x67, 0x89)
 /// );
 /// assert_eq!(
-///     u8::xxx_add_yyy_is_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
+///     u8::xxx_add_yyy_to_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
 ///     (0x57, 0x99, 0x98)
 /// );
 /// ```
-pub mod xxx_add_yyy_is_zzz;
-/// Functions for subtracting two triple-width numbers and returning the result as a triple-width
-/// number.
+pub mod xxx_add_yyy_to_zzz;
+/// [`XXXSubYYYToZZZ`](traits::XXXSubYYYToZZZ), a trait for subtracting two triple-width numbers
+/// and returning the result as a triple-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xxx_sub_yyy_is_zzz
+/// # xxx_sub_yyy_to_zzz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXXSubYYYIsZZZ;
+/// use malachite_base::num::arithmetic::traits::XXXSubYYYToZZZ;
 ///
 /// assert_eq!(
-///     u64::xxx_sub_yyy_is_zzz(0x67, 0x89, 0xab, 0x33, 0x33, 0x33),
+///     u64::xxx_sub_yyy_to_zzz(0x67, 0x89, 0xab, 0x33, 0x33, 0x33),
 ///     (0x34, 0x56, 0x78)
 /// );
 /// assert_eq!(
-///     u8::xxx_sub_yyy_is_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
+///     u8::xxx_sub_yyy_to_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
 ///     (0x99, 0x9b, 0xe0)
 /// );
 /// ```
-pub mod xxx_sub_yyy_is_zzz;
-/// Functions for adding two quadruple-width numbers and returning the result as a quadruple-width
-/// number.
+pub mod xxx_sub_yyy_to_zzz;
+/// [`XXXXAddYYYYToZZZZ`](traits::XXXXAddYYYYToZZZZ), a trait for adding two quadruple-width
+/// numbers and returning the result as a quadruple-width number.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # xxxx_add_yyyy_is_zzzz
+/// # xxxx_add_yyyy_to_zzzz
 /// ```
-/// use malachite_base::num::arithmetic::traits::XXXXAddYYYYIsZZZZ;
+/// use malachite_base::num::arithmetic::traits::XXXXAddYYYYToZZZZ;
 ///
 /// assert_eq!(
-///     u64::xxxx_add_yyyy_is_zzzz(0x12, 0x34, 0x56, 0x78, 0x33, 0x33, 0x33, 0x33),
+///     u64::xxxx_add_yyyy_to_zzzz(0x12, 0x34, 0x56, 0x78, 0x33, 0x33, 0x33, 0x33),
 ///     (0x45, 0x67, 0x89, 0xab)
 /// );
 /// assert_eq!(
-///     u8::xxxx_add_yyyy_is_zzzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc, 0xba, 0x98),
+///     u8::xxxx_add_yyyy_to_zzzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc, 0xba, 0x98),
 ///     (0x77, 0x77, 0x77, 0x76)
 /// );
 /// ```
-pub mod xxxx_add_yyyy_is_zzzz;
+pub mod xxxx_add_yyyy_to_zzzz;

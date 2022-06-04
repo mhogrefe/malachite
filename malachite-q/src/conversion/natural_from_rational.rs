@@ -6,8 +6,9 @@ use malachite_nz::natural::Natural;
 use Rational;
 
 impl CheckedFrom<Rational> for Natural {
-    /// Converts a `Rational` to a `Natural`, taking the `Rational` by value. If the `Rational` is
-    /// negative or not an integer, `None` is returned.
+    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
+    /// [`Rational`] by value. If the [`Rational`] is negative or not an integer, `None` is
+    /// returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -16,16 +17,14 @@ impl CheckedFrom<Rational> for Natural {
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::checked_from(Rational::from(123)).unwrap(), 123);
     /// assert_eq!(Natural::checked_from(Rational::from(-123)), None);
-    /// assert_eq!(Natural::checked_from(Rational::from_str("22/7").unwrap()), None);
+    /// assert_eq!(Natural::checked_from(Rational::from_signeds(22, 7)), None);
     /// ```
     fn checked_from(x: Rational) -> Option<Natural> {
         if x.sign && x.denominator == 1u32 {
@@ -37,26 +36,29 @@ impl CheckedFrom<Rational> for Natural {
 }
 
 impl<'a> CheckedFrom<&'a Rational> for Natural {
-    /// Converts a `Rational` to a `Natural`, taking the `Rational` by reference. If the `Rational`
-    /// is negative or not an integer, `None` is returned.
+    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
+    /// [`Rational`] by reference. If the [`Rational`] is negative or not an integer, `None` is
+    /// returned.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::checked_from(&Rational::from(123)).unwrap(), 123);
     /// assert_eq!(Natural::checked_from(&Rational::from(-123)), None);
-    /// assert_eq!(Natural::checked_from(&Rational::from_str("22/7").unwrap()), None);
+    /// assert_eq!(Natural::checked_from(&Rational::from_signeds(22, 7)), None);
     /// ```
     fn checked_from(x: &Rational) -> Option<Natural> {
         if x.sign && x.denominator == 1u32 {
@@ -68,8 +70,9 @@ impl<'a> CheckedFrom<&'a Rational> for Natural {
 }
 
 impl<'a> ConvertibleFrom<&'a Rational> for Natural {
-    /// Determines whether a `Rational` can be converted to a `Natural` (when the `Rational` is
-    /// non-negative and an integer). Takes the `Rational` by reference.
+    /// Determines whether a [`Rational`] can be converted to a
+    /// [`Natural`](malachite_nz::natural::Natural) (when the [`Rational`] is non-negative and an
+    /// integer), taking the [`Rational`] by reference.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -78,16 +81,14 @@ impl<'a> ConvertibleFrom<&'a Rational> for Natural {
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::convertible_from(&Rational::from(123)), true);
     /// assert_eq!(Natural::convertible_from(&Rational::from(-123)), false);
-    /// assert_eq!(Natural::convertible_from(&Rational::from_str("22/7").unwrap()), false);
+    /// assert_eq!(Natural::convertible_from(&Rational::from_signeds(22, 7)), false);
     /// ```
     #[inline]
     fn convertible_from(x: &Rational) -> bool {
@@ -96,51 +97,46 @@ impl<'a> ConvertibleFrom<&'a Rational> for Natural {
 }
 
 impl RoundingFrom<Rational> for Natural {
-    /// Converts a `Rational` to a `Natural`, using a specified `RoundingMode` and taking the
-    /// `Rational` by value.
+    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), using a
+    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
+    /// [`Rational`] by value.
     ///
-    /// If the `Rational` is negative, then it will be rounded to zero when the `RoundingMode` is
-    /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
+    /// If the [`Rational`] is negative, then it will be rounded to zero when the
+    /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) is `Ceiling`, `Down`, or
+    /// `Nearest`. Otherwise, this function will panic.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, or if the
-    /// `Rational` is less than zero and `RoundingMode` is not `Down`, `Ceiling`, or `Nearest`.
+    /// Panics if the [`Rational`] is not an integer and `rm` is `Exact`, or if the [`Rational`] is
+    /// less than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::rounding_from(Rational::from(123), RoundingMode::Exact), 123);
     ///
+    /// assert_eq!(Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
+    /// assert_eq!(Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Down), 3);
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Floor),
-    ///     3
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Down),
-    ///     3
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Ceiling),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Ceiling),
     ///     4
     /// );
+    /// assert_eq!(Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Up), 4);
     /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Up),
-    ///     4
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(Rational::from_str("22/7").unwrap(), RoundingMode::Nearest),
+    ///     Natural::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Nearest),
     ///     3
     /// );
     ///
@@ -166,51 +162,46 @@ impl RoundingFrom<Rational> for Natural {
 }
 
 impl<'a> RoundingFrom<&'a Rational> for Natural {
-    /// Converts a `Rational` to a `Natural`, using a specified `RoundingMode` and taking the
-    /// `Rational` by reference.
+    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), using a
+    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
+    /// [`Rational`] by reference.
     ///
-    /// If the `Rational` is negative, then it will be rounded to zero when the `RoundingMode` is
-    /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
+    /// If the [`Rational`] is negative, then it will be rounded to zero when the
+    /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) is `Ceiling`, `Down`, or
+    /// `Nearest`. Otherwise, this function will panic.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, or if the
-    /// `Rational` is less than zero and `RoundingMode` is not `Down`, `Ceiling`, or `Nearest`.
+    /// Panics if the [`Rational`] is not an integer and `rm` is `Exact`, or if the [`Rational`] is
+    /// less than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::rounding_from(&Rational::from(123), RoundingMode::Exact), 123);
     ///
+    /// assert_eq!(Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
+    /// assert_eq!(Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down), 3);
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Floor),
-    ///     3
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Down),
-    ///     3
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Ceiling),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling),
     ///     4
     /// );
+    /// assert_eq!(Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up), 4);
     /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Up),
-    ///     4
-    /// );
-    /// assert_eq!(
-    ///     Natural::rounding_from(&Rational::from_str("22/7").unwrap(), RoundingMode::Nearest),
+    ///     Natural::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest),
     ///     3
     /// );
     ///

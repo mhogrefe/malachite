@@ -6,10 +6,10 @@ use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange}
 use random::Seed;
 use vecs::{random_values_from_vec, RandomValuesFromVec};
 
-/// Uniformly generates random `char`s in a closed interval.
+/// Uniformly generates random [`char`]s in a closed interval.
 ///
-/// This `struct` is created by the `random_char_range` and `random_char_inclusive_range` functions.
-/// See their documentation for more.
+/// This `struct` is created by [`random_char_range`] and [`random_char_inclusive_range`]; see
+/// their documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomCharRange {
     chunks: RandomUnsignedInclusiveRange<u32>,
@@ -24,11 +24,11 @@ impl Iterator for RandomCharRange {
     }
 }
 
-/// Uniformly generates random `char`s in a closed interval, weighting graphic and non-graphic
-/// `char`s separately.
+/// Uniformly generates random [`char`]s in a closed interval, weighting graphic and non-graphic
+/// [`char`]s separately.
 ///
-/// This `struct` is created by the `graphic_weighted_random_char_range` and
-/// `graphic_weighted_random_char_inclusive_range` functions. See their documentation for more.
+/// This `struct` is created by [`graphic_weighted_random_char_range`] and
+/// [`graphic_weighted_random_char_inclusive_range`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct WeightedGraphicRandomCharRange {
     xs: WeightedRandomBools,
@@ -48,13 +48,13 @@ impl Iterator for WeightedGraphicRandomCharRange {
     }
 }
 
-/// Uniformly generates random `char`s.
+/// Uniformly generates random [`char`]s.
 ///
 /// $P(c) = \frac{1}{2^{20}+2^{16}-2^{11}}$.
 ///
 /// The output length is infinite.
 ///
-/// # Complexity per iteration
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -75,18 +75,18 @@ pub fn random_chars(seed: Seed) -> RandomCharRange {
     random_char_inclusive_range(seed, char::MIN, char::MAX)
 }
 
-/// Uniformly generates random ASCII `char`s.
+/// Uniformly generates random ASCII [`char`]s.
 ///
 /// $$
 /// P(c) = \\begin{cases}
-///     2^{-7} & c < \\backslash\\text{u\\{0x80\\}} \\\\
+///     2^{-7} & \text{if} \\quad c < \\backslash\\text{u\\{0x80\\}} \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
 ///
 /// The output length is infinite.
 ///
-/// # Complexity per iteration
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -107,16 +107,16 @@ pub fn random_ascii_chars(seed: Seed) -> RandomCharRange {
     random_char_inclusive_range(seed, char::MIN, '\u{7f}')
 }
 
-/// Uniformly generates random `char`s in the half-open interval $[a, b)$.
+/// Uniformly generates random [`char`]s in the half-open interval $[a, b)$.
 ///
-/// `a` must be less than `b`. This function cannot create a range that includes `char::MAX`; for
-/// that, use `random_char_inclusive_range`.
+/// $a$ must be less than $b$. This function cannot create a range that includes `char::MAX`; for
+/// that, use [`random_char_inclusive_range`].
 ///
 /// $$
 /// P(x) = \\begin{cases}
 ///     \frac{1}
 ///     {\mathrm{char\\_to\\_contiguous\\_range(b)}-\mathrm{char\\_to\\_contiguous\\_range(a)}} &
-///         a \leq x < b \\\\
+///         \text{if} \\quad a \leq x < b \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
@@ -151,16 +151,16 @@ pub fn random_char_range(seed: Seed, a: char, mut b: char) -> RandomCharRange {
     random_char_inclusive_range(seed, a, b)
 }
 
-/// Uniformly generates random `char`s in the closed interval $[a, b]$.
+/// Uniformly generates random [`char`]s in the closed interval $[a, b]$.
 ///
-/// `a` must be less than or equal to `b`.
+/// $a$ must be less than or equal to $b$.
 ///
 /// $$
 /// P(x) = \\begin{cases}
 ///     \frac{1}
 ///         {\mathrm{char\\_to\\_contiguous\\_range(b)}-\mathrm{char\\_to\\_contiguous\\_range(a)}
 ///         +1} &
-///         a \leq x < b \\\\
+///         \text{if} \\quad a \leq x < b \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
@@ -200,23 +200,25 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
     }
 }
 
-/// Generates random `char`s, weighting graphic and non-graphic `char`s separately.
+/// Generates random [`char`]s, weighting graphic and non-graphic [`char`]s separately.
 ///
-/// See `char_is_graphic` for the definition of a graphic `char`.
+/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
+/// [`char`].
 ///
-/// The set of graphic `char`s in the specified range is selected with probability $p$, or
-/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` with probability $1-p$.
-/// Then, a `char` is selected uniformly from the appropriate set. There are 141,798 graphic `char`s
-/// out of 1,112,064, so we have
+/// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
+///
+/// The set of graphic [`char`]s is selected with probability $p$, and the set of non-graphic
+/// [`char`]s with probability $1-p$. Then, a [`char`] is selected uniformly from the appropriate
+/// set. There are 142,523 graphic [`char`]s out of 1,112,064, so we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{p}{141798} & x \\ \\text{is} \\ \\text{graphic} \\\\
-///     \frac{1-p}{970266} & \\text{otherwise.}
+///     \frac{p}{142523} & \text{if} \\quad x \\ \\text{is} \\ \\text{graphic} \\\\
+///     \frac{1-p}{969541} & \\text{otherwise}
 /// \\end{cases}
 /// $$
 ///
-/// To recover the uniform distribution, use $p = 23633/185344$, which is roughly $1/8$.
+/// To recover the uniform distribution, use $p = 142523/1112064$, which is roughly $1/8$.
 ///
 /// The output length is infinite.
 ///
@@ -224,7 +226,7 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`.
+/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`.
 ///
 /// # Examples
 /// ```
@@ -254,22 +256,24 @@ pub fn graphic_weighted_random_chars(
     )
 }
 
-/// Generates random ASCII `char`s, weighting graphic and non-graphic `char`s separately.
+/// Generates random ASCII [`char`]s, weighting graphic and non-graphic [`char`]s separately.
 ///
-/// See `char_is_graphic` for the definition of a graphic `char`.
+/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
+/// [`char`].
 ///
-/// The set of graphic `char`s in the specified range is selected with probability $p$, or
-/// `p_numerator` / `p_denominator`, and the set of non-graphic ASCII `chars` with probability
-/// $1-p$. Then, a `char` is selected uniformly from the appropriate set. There are 95 graphic ASCII
-/// `char`s out of 128, so we have
+/// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
+///
+/// The set of graphic ASCII [`char`]s is selected with probability $p$, and the set of non-graphic
+/// ASCII [`char`]s with probability $1-p$. Then, a [`char`] is selected uniformly from the
+/// appropriate set. There are 95 graphic ASCII [`char`]s out of 128, so we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{p}{95} &
+///     \frac{p}{95} & \text{if} \\quad
 ///     x < \\backslash\\text{u\\{0x80\\}} \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
-///     \frac{1-p}{33} &
+///     \frac{1-p}{33} & \text{if} \\quad
 ///     x < \\backslash\\text{u\\{0x80\\}} \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
-///     0 & \\text{otherwise.}
+///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
 ///
@@ -281,7 +285,7 @@ pub fn graphic_weighted_random_chars(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`.
+/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`.
 ///
 /// # Examples
 /// ```
@@ -311,26 +315,29 @@ pub fn graphic_weighted_random_ascii_chars(
     )
 }
 
-/// Generates random `char`s in the half-open interval $[a, b)$, weighting graphic and non-graphic
-/// `char`s separately.
+/// Generates random [`char`]s in the half-open interval $[a, b)$, weighting graphic and
+/// non-graphic [`char`]s separately.
 ///
-/// See `char_is_graphic` for the definition of a graphic `char`.
+/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
+/// [`char`].
 ///
-/// `a` must be less than `b`. Furthermore, $[a, b)$ must contain both graphic and non-graphic
-/// `char`s. This function cannot create a range that includes `char::MAX`; for that, use
-/// `graphic_weighted_random_char_inclusive_range`.
+/// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///
-/// The set of graphic `char`s in the specified range is selected with probability $p$, or
-/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` in the range with
-/// probability $1-p$. Then, a `char` is selected uniformly from the appropriate set.
+/// The set of graphic [`char`]s in the specified range is selected with probability $p$, and the
+/// set of non-graphic [`char`]s in the range with probability $1-p$. Then, a [`char`] is selected
+/// uniformly from the appropriate set.
 ///
-/// Let $g$ be the number of graphic `char`s in $[a, b)$. Then we have
+/// $a$ must be less than $b$. Furthermore, $[a, b)$ must contain both graphic and non-graphic
+/// [`char`]s. This function cannot create a range that includes `char::MAX`; for that, use
+/// [`graphic_weighted_random_char_inclusive_range`].
+///
+/// Let $g$ be the number of graphic [`char`]s in $[a, b)$. Then we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
 ///     \frac{p}{g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
 ///     \frac{1-p}{b-a-g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
-///     0 & \\text{otherwise.}
+///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
 ///
@@ -342,8 +349,8 @@ pub fn graphic_weighted_random_ascii_chars(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`, if $a \geq b$, if
-/// $[a, b)$ contains no graphic `char`s, or if $[a, b)$ contains only graphic `char`s.
+/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`, if $a \geq b$, if
+/// $[a, b)$ contains no graphic [`char`]s, or if $[a, b)$ contains only graphic [`char`]s.
 ///
 /// # Examples
 /// ```
@@ -373,25 +380,29 @@ pub fn graphic_weighted_random_char_range(
     graphic_weighted_random_char_inclusive_range(seed, a, b, p_numerator, p_denominator)
 }
 
-/// Generates random `char`s in the closed interval $[a, b]$, weighting graphic and non-graphic
-/// `char`s separately.
+/// Generates random [`char`]s in the closed interval $[a, b]$, weighting graphic and
+/// non-graphic [`char`]s separately.
 ///
-/// See `char_is_graphic` for the definition of a graphic `char`.
+/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
+/// [`char`].
 ///
-/// `a` must be less than or equal to `b`. Furthermore, $[a, b]$ must contain both graphic and non-
-/// graphic `char`s.
+/// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///
-/// The set of graphic `char`s in the specified range is selected with probability $p$, or
-/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` in the range with
-/// probability $1-p$. Then, a `char` is selected uniformly from the appropriate set.
+/// The set of graphic [`char`]s in the specified range is selected with probability $p$, and the
+/// set of non-graphic [`char`]s in the range with probability $1-p$. Then, a [`char`] is selected
+/// uniformly from the appropriate set.
 ///
-/// Let $g$ be the number of graphic `char`s in $[a, b]$. Then we have
+/// $a$ must be less than $b$. Furthermore, $[a, b]$ must contain both graphic and non-graphic
+/// [`char`]s. This function cannot create a range that includes `char::MAX`; for that, use
+/// [`graphic_weighted_random_char_inclusive_range`].
+///
+/// Let $g$ be the number of graphic [`char`]s in $[a, b]$. Then we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
 ///     \frac{p}{g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
 ///     \frac{1-p}{b-a-g+1} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
-///     0 & \\text{otherwise.}
+///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
 ///
@@ -403,8 +414,8 @@ pub fn graphic_weighted_random_char_range(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`, if $a > b$, if $[a, b]$
-/// contains no graphic `char`s, or if $[a, b]$ contains only graphic `char`s.
+/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`, if $a > b$, if $[a, b]$
+/// contains no graphic [`char`]s, or if $[a, b]$ contains only graphic [`char`]s.
 ///
 /// # Examples
 /// ```

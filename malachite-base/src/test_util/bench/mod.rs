@@ -185,7 +185,7 @@ pub fn run_benchmark<'a, I: Iterator>(
         bucketing_function: bucketer.bucketing_function,
         x_axis_label: &bucketer.bucketing_label,
         y_axis_label: "time (ns)",
-        file_name: format!("{}", file_name),
+        file_name: file_name.to_string(),
         series_options,
     };
     run_benchmark_internal(options);

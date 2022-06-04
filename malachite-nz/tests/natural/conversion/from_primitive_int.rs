@@ -170,14 +170,17 @@ where
         assert_eq!(Natural::convertible_from(i), i >= T::ZERO);
         let n = Natural::saturating_from(i);
         assert!(n.is_valid());
-        if let Some(x) = on.as_ref() {
-            assert_eq!(*x, n);
-            assert_eq!(T::exact_from(x), i);
-            let n_alt: Natural = ExactFrom::exact_from(i128::exact_from(i));
-            assert_eq!(n_alt, n);
-        } else {
-            assert_eq!(n, 0);
-        }
+        on.as_ref().map_or_else(
+            || {
+                assert_eq!(n, 0);
+            },
+            |x| {
+                assert_eq!(*x, n);
+                assert_eq!(T::exact_from(x), i);
+                let n_alt: Natural = ExactFrom::exact_from(i128::exact_from(i));
+                assert_eq!(n_alt, n);
+            },
+        );
     });
 }
 

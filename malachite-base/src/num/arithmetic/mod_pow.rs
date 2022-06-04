@@ -23,7 +23,7 @@ pub_test! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> 
 
 // m.get_highest_bit(), x < m, y < m
 //
-// This is n_mulmod_preinv from ulong_extras/mulmod_preinv.c, FLINT 2.7.1.
+// This is equivalent to `n_mulmod_preinv` from `ulong_extras/mulmod_preinv.c`, FLINT 2.7.1.
 fn mul_mod_helper<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -53,7 +53,7 @@ fn mul_mod_helper<
 
 // m.get_highest_bit(), x < m
 //
-// This is n_powmod_ui_preinv from ulong_extras/powmod_ui_preinv.c, FLINT 2.7.1.
+// This is equivalent to `n_powmod_ui_preinv` from ulong_extras/powmod_ui_preinv.c, FLINT 2.7.1.
 fn fast_pow_mod<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -98,7 +98,8 @@ macro_rules! impl_mod_pow_precomputed_fast {
 
             /// Precomputes data for modular exponentiation.
             ///
-            /// See `mod_pow_precomputed` and `mod_pow_precomputed_assign`.
+            /// See `mod_pow_precomputed` and
+            /// [`mod_pow_precomputed_assign`](super::traits::ModPowPrecomputedAssign).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -107,11 +108,13 @@ macro_rules! impl_mod_pow_precomputed_fast {
                 ($invert_limb(m << leading_zeros), leading_zeros)
             }
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Raises a number to a power modulo another number $m$. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular exponentiations with the same modulus. The precomputed data should be
-            /// obtained using `precompute_mod_pow_data`.
+            /// obtained using
+            /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -121,7 +124,7 @@ macro_rules! impl_mod_pow_precomputed_fast {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_pow` module.
+            /// See [here](super::mod_pow#mod_pow_precomputed).
             fn mod_pow_precomputed(self, exp: u64, m: $t, data: &($t, u64)) -> $t {
                 let (inverse, shift) = *data;
                 fast_pow_mod::<$t, $dt>(self << shift, exp, m << shift, inverse, shift) >> shift
@@ -138,8 +141,10 @@ macro_rules! impl_mod_pow_precomputed_promoted {
             type Output = $t;
             type Data = (u32, u64);
 
-            /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
-            /// `mod_pow_precomputed_assign`.
+            /// Precomputes data for modular exponentiation.
+            ///
+            /// See `mod_pow_precomputed` and
+            /// [`mod_pow_precomputed_assign`](super::traits::ModPowPrecomputedAssign).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -147,11 +152,13 @@ macro_rules! impl_mod_pow_precomputed_promoted {
                 u32::precompute_mod_pow_data(&u32::from(m))
             }
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Raises a number to a power modulo another number $m$. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular exponentiations with the same modulus. The precomputed data should be
-            /// obtained using `precompute_mod_pow_data`.
+            /// obtained using
+            /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -161,7 +168,7 @@ macro_rules! impl_mod_pow_precomputed_promoted {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_pow` module.
+            /// See [here](super::mod_pow#mod_pow_precomputed).
             fn mod_pow_precomputed(self, exp: u64, m: $t, data: &(u32, u64)) -> $t {
                 $t::wrapping_from(u32::from(self).mod_pow_precomputed(exp, u32::from(m), data))
             }
@@ -175,18 +182,21 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     type Output = u128;
     type Data = ();
 
-    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
-    /// `mod_pow_precomputed_assign`.
+    /// Precomputes data for modular exponentiation.
+    ///
+    /// See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](super::traits::ModPowPrecomputedAssign).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     fn precompute_mod_pow_data(_m: &u128) {}
 
-    /// Computes `self.pow(exp) mod `m`. Assumes the input is already reduced mod `m`.
+    /// Raises a number to a power modulo another number $m$. Assumes the input is already
+    /// reduced modulo $m$.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// exponentiations with the same modulus. The precomputed data should be obtained using
-    /// `precompute_mod_pow_data`.
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -196,7 +206,7 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
     ///
     /// # Examples
-    /// See the documentation of the `num::arithmetic::mod_pow` module.
+    /// See [here](super::mod_pow#mod_pow_precomputed).
     #[inline]
     fn mod_pow_precomputed(self, exp: u64, m: u128, _data: &()) -> u128 {
         simple_binary_mod_pow(self, exp, m)
@@ -207,8 +217,10 @@ impl ModPowPrecomputed<u64, usize> for usize {
     type Output = usize;
     type Data = (usize, u64);
 
-    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
-    /// `mod_pow_precomputed_assign`.
+    /// Precomputes data for modular exponentiation.
+    ///
+    /// See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](super::traits::ModPowPrecomputedAssign).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -222,11 +234,12 @@ impl ModPowPrecomputed<u64, usize> for usize {
         }
     }
 
-    /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
+    /// Raises a number to a power modulo another number $m$. Assumes the input is already
+    /// reduced modulo $m$.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// exponentiations with the same modulus. The precomputed data should be obtained using
-    /// `precompute_mod_pow_data`.
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -234,6 +247,9 @@ impl ModPowPrecomputed<u64, usize> for usize {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+    ///
+    /// # Examples
+    /// See [here](super::mod_pow#mod_pow_precomputed).
     fn mod_pow_precomputed(self, exp: u64, m: usize, data: &(usize, u64)) -> usize {
         let (inverse, shift) = *data;
         if usize::WIDTH == u32::WIDTH {
@@ -255,11 +271,13 @@ impl ModPowPrecomputed<u64, usize> for usize {
 macro_rules! impl_mod_pow {
     ($t:ident) => {
         impl ModPowPrecomputedAssign<u64, $t> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod `m`.
+            /// Raises a number to a power modulo another number $m$, in place. Assumes the input
+            /// is already reduced modulo $m$.
             ///
-            /// Assumes the input is already reduced mod `m`. Some precomputed data is provided;
+            /// Assumes the input is already reduced modulo `m`. Some precomputed data is provided;
             /// this speeds up computations involving several modular exponentiations with the same
-            /// modulus. The precomputed data should be obtained using `precompute_mod_pow_data`.
+            /// modulus. The precomputed data should be obtained using
+            /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -269,7 +287,7 @@ macro_rules! impl_mod_pow {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_pow` module.
+            /// See [here](super::mod_pow#mod_pow_precomputed_assign).
             #[inline]
             fn mod_pow_precomputed_assign(&mut self, exp: u64, m: $t, data: &Self::Data) {
                 *self = self.mod_pow_precomputed(exp, m, data);
@@ -279,7 +297,8 @@ macro_rules! impl_mod_pow {
         impl ModPow<u64> for $t {
             type Output = $t;
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
+            /// Raises a number to a power modulo another number $m$. Assumes the input is already
+            /// reduced modulo $m$.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
             ///
@@ -291,7 +310,7 @@ macro_rules! impl_mod_pow {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_pow` module.
+            /// See [here](super::mod_pow#mod_pow).
             #[inline]
             fn mod_pow(self, exp: u64, m: $t) -> $t {
                 simple_binary_mod_pow(self, exp, m)
@@ -299,8 +318,8 @@ macro_rules! impl_mod_pow {
         }
 
         impl ModPowAssign<u64> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the input is already reduced
-            /// mod `m`.
+            /// Raises a number to a power modulo another number $m$, in place. Assumes the input
+            /// is already reduced modulo $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
             ///
@@ -312,7 +331,7 @@ macro_rules! impl_mod_pow {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_pow` module.
+            /// See [here](super::mod_pow#mod_pow_assign).
             #[inline]
             fn mod_pow_assign(&mut self, exp: u64, m: $t) {
                 *self = simple_binary_mod_pow(*self, exp, m);

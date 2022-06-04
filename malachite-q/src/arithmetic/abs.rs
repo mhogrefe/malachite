@@ -4,7 +4,11 @@ use Rational;
 impl Abs for Rational {
     type Output = Rational;
 
-    /// Finds the absolute value of a `Rational`, taking the `Rational` by value.
+    /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by value.
+    ///
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -12,13 +16,12 @@ impl Abs for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::ZERO.abs().to_string(), "0");
+    /// assert_eq!(Rational::ZERO.abs(), 0);
     /// assert_eq!(Rational::from_signeds(22, 7).abs().to_string(), "22/7");
     /// assert_eq!(Rational::from_signeds(-22, 7).abs().to_string(), "22/7");
     /// ```
@@ -31,7 +34,11 @@ impl Abs for Rational {
 impl<'a> Abs for &'a Rational {
     type Output = Rational;
 
-    /// Finds the absolute value of a `Rational`, taking the `Rational` by reference.
+    /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by value.
+    ///
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -43,16 +50,14 @@ impl<'a> Abs for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Rational::ZERO).abs().to_string(), "0");
-    /// assert_eq!((&Rational::from_str("22/7").unwrap()).abs().to_string(), "22/7");
-    /// assert_eq!((&Rational::from_str("-22/7").unwrap()).abs().to_string(), "22/7");
+    /// assert_eq!((&Rational::ZERO).abs(), 0);
+    /// assert_eq!((&Rational::from_signeds(22, 7)).abs().to_string(), "22/7");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).abs().to_string(), "22/7");
     /// ```
     fn abs(self) -> Rational {
         Rational {
@@ -64,30 +69,29 @@ impl<'a> Abs for &'a Rational {
 }
 
 impl AbsAssign for Rational {
-    /// Replaces a `Rational` with its absolute value.
+    /// Replaces a [`Rational`] with its absolute value.
     ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $$
+    /// x \gets |x|.
+    /// $$
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::AbsAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
-    /// use std::str::FromStr;
     ///
     /// let mut x = Rational::ZERO;
     /// x.abs_assign();
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     ///
-    /// let mut x = Rational::from_str("22/7").unwrap();
+    /// let mut x = Rational::from_signeds(22, 7);
     /// x.abs_assign();
     /// assert_eq!(x.to_string(), "22/7");
     ///
-    /// let mut x = Rational::from_str("-22/7").unwrap();
+    /// let mut x = Rational::from_signeds(-22, 7);
     /// x.abs_assign();
     /// assert_eq!(x.to_string(), "22/7");
     /// ```

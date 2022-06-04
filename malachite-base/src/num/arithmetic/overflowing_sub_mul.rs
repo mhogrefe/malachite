@@ -1,17 +1,10 @@
 use num::arithmetic::traits::{
-    OverflowingMul, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
-    OverflowingSubMulAssign, UnsignedAbs, WrappingMul, WrappingSub,
+    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn overflowing_sub_mul_unsigned<
-    T: OverflowingMul<T, Output = T> + OverflowingSub<T, Output = T>,
->(
-    x: T,
-    y: T,
-    z: T,
-) -> (T, bool) {
+fn overflowing_sub_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, bool) {
     let (product, overflow_1) = y.overflowing_mul(z);
     let (result, overflow_2) = x.overflowing_sub(product);
     (result, overflow_1 | overflow_2)
@@ -22,17 +15,17 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
         impl OverflowingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Calculates $x - yz$.
+            /// Subtracts a number by the product of two other numbers.
             ///
-            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
-            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
-            /// returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an
+            /// arithmetic overflow would occur. If an overflow would have occurred, then the
+            /// wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_sub_mul` module.
+            /// See [here](super::overflowing_sub_mul#overflowing_sub_mul).
             #[inline]
             fn overflowing_sub_mul(self, y: $t, z: $t) -> ($t, bool) {
                 overflowing_sub_mul_unsigned(self, y, z)
@@ -40,7 +33,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
         }
 
         impl OverflowingSubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`.
+            /// Subtracts a number by the product of two other numbers, in place.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred, then the wrapped value is assigned.
@@ -49,7 +42,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_sub_mul` module.
+            /// See [here](super::overflowing_sub_mul#overflowing_sub_mul_assign).
             #[inline]
             fn overflowing_sub_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let (product, overflow) = y.overflowing_mul(z);
@@ -60,17 +53,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_sub_mul_unsigned);
 
-fn overflowing_sub_mul<
-    U: PrimitiveInt,
-    S: Copy
-        + Ord
-        + OverflowingMul<S, Output = S>
-        + OverflowingSub<S, Output = S>
-        + UnsignedAbs<Output = U>
-        + WrappingMul<S, Output = S>
-        + WrappingSub<S, Output = S>
-        + Zero,
->(
+fn overflowing_sub_mul<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: S,
     y: S,
     z: S,
@@ -108,17 +91,17 @@ macro_rules! impl_overflowing_sub_mul_signed {
         impl OverflowingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Calculates $x - yz$.
+            /// Subtracts a number by the product of two other numbers.
             ///
-            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
-            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// Returns a tuple containing the result and a boolean indicating whether an
+            /// arithmetic overflow occurred. If an overflow occurred, then the wrapped value is
             /// returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_sub_mul` module.
+            /// See [here](super::overflowing_sub_mul#overflowing_sub_mul).
             #[inline]
             fn overflowing_sub_mul(self, y: $t, z: $t) -> ($t, bool) {
                 overflowing_sub_mul(self, y, z)
@@ -126,7 +109,7 @@ macro_rules! impl_overflowing_sub_mul_signed {
         }
 
         impl OverflowingSubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`.
+            /// Subtracts a number by the product of two other numbers, in place.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred, then the wrapped value is assigned.
@@ -135,7 +118,7 @@ macro_rules! impl_overflowing_sub_mul_signed {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_sub_mul` module.
+            /// See [here](super::overflowing_sub_mul#overflowing_sub_mul_assign).
             #[inline]
             fn overflowing_sub_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let overflow;

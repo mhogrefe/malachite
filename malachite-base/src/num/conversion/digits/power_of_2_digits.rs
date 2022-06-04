@@ -1,14 +1,7 @@
-use num::arithmetic::traits::ArithmeticCheckedShl;
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{CheckedFrom, PowerOf2Digits, WrappingFrom};
-use num::logic::traits::SignificantBits;
-use std::ops::{BitOr, BitOrAssign, ShrAssign};
 
-fn to_power_of_2_digits_asc<
-    T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInt + WrappingFrom<T>,
->(
+fn to_power_of_2_digits_asc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     x: &T,
     log_base: u64,
 ) -> Vec<U> {
@@ -35,10 +28,7 @@ fn to_power_of_2_digits_asc<
     digits
 }
 
-fn to_power_of_2_digits_desc<
-    T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInt + WrappingFrom<T>,
->(
+fn to_power_of_2_digits_desc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     x: &T,
     log_base: u64,
 ) -> Vec<U> {
@@ -48,12 +38,8 @@ fn to_power_of_2_digits_desc<
 }
 
 fn from_power_of_2_digits_asc<
-    T: ArithmeticCheckedShl<u64, Output = T>
-        + BitOrAssign<T>
-        + CheckedFrom<U>
-        + WrappingFrom<U>
-        + Zero,
-    U: PrimitiveInt,
+    T: CheckedFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
+    U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
     log_base: u64,
@@ -80,8 +66,8 @@ fn from_power_of_2_digits_asc<
 }
 
 fn from_power_of_2_digits_desc<
-    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
-    U: PrimitiveInt,
+    T: PrimitiveUnsigned + WrappingFrom<U>,
+    U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
     log_base: u64,
@@ -111,18 +97,18 @@ macro_rules! impl_power_of_2_digits {
         macro_rules! impl_power_of_2_digits_inner {
             ($u:ident) => {
                 impl PowerOf2Digits<$u> for $t {
-                    /// Returns a `Vec` containing the digits of `self` in ascending order (least-
-                    /// to most-significant) where the base is a power of 2.
+                    /// Returns a [`Vec`] containing the base-$2^k$ digits of a number in ascending
+                    /// order (least- to most-significant).
                     ///
-                    /// The base-2 logarithm of the base is specified. The type of each digit is
-                    /// `$u`, and `log_base` must be no larger than the width of `$u`. If `self` is
-                    /// 0, the `Vec` is empty; otherwise, it ends with a nonzero digit.
+                    /// The base-2 logarithm of the base is specified. `log_base` must be no larger
+                    /// than the width of the digit type. If `self` is 0, the [`Vec`] is empty;
+                    /// otherwise, it ends with a nonzero digit.
                     ///
-                    /// $f(x, \ell) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < 2^\ell$ for all $i$,
-                    /// $k=0$ or $d_{k-1} \neq 0$, and
+                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$,
+                    /// $n=0$ or $d_{n-1} \neq 0$, and
                     ///
                     /// $$
-                    /// \sum_{i=0}^{k-1}2^{\ell i}d_i = x.
+                    /// \sum_{i=0}^{n-1}2^{ki}d_i = x.
                     /// $$
                     ///
                     /// # Worst-case complexity
@@ -134,29 +120,28 @@ macro_rules! impl_power_of_2_digits {
                     /// `self.significant_bits()`.
                     ///
                     /// # Panics
-                    /// Panics if `log_base` is greater than the width of `$u`, or if `log_base` is
-                    /// zero.
+                    /// Panics if `log_base` is greater than the width of the output type, or if
+                    /// `log_base` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::power_of_2_digits`
-                    /// module.
+                    /// See [here](super::power_of_2_digits#to_power_of_2_digits_asc).
                     #[inline]
                     fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<$u> {
                         to_power_of_2_digits_asc(self, log_base)
                     }
 
-                    /// Returns a `Vec` containing the digits of `self` in descending order (most-
-                    /// to least-significant) where the base is a power of 2.
+                    /// Returns a [`Vec`] containing the base-$2^k$ digits of a number in
+                    /// descending order (most- to least-significant).
                     ///
-                    /// The base-2 logarithm of the base is specified. The type of each digit is
-                    /// `$u`, and `log_base` must be no larger than the width of `$u`. If `self` is
-                    /// 0, the `Vec` is empty; otherwise, it begins with a nonzero digit.
+                    /// The base-2 logarithm of the base is specified. `log_base` must be no larger
+                    /// than the width of the digit type. If `self` is 0, the [`Vec`] is empty;
+                    /// otherwise, it begins with a nonzero digit.
                     ///
-                    /// $f(x, \ell) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < 2^\ell$ for all $i$,
-                    /// $k=0$ or $d_0 \neq 0$, and
+                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$,
+                    /// $n=0$ or $d_0 \neq 0$, and
                     ///
                     /// $$
-                    /// \sum_{i=0}^{k-1}2^{\ell (k-i-1)}d_i = x.
+                    /// \sum_{i=0}^{n-1}2^{k (n-i-1)}d_i = x.
                     /// $$
                     ///
                     /// # Worst-case complexity
@@ -168,27 +153,25 @@ macro_rules! impl_power_of_2_digits {
                     /// `self.significant_bits()`.
                     ///
                     /// # Panics
-                    /// Panics if `log_base` is greater than the width of `$u`, or if `log_base` is
-                    /// zero.
+                    /// Panics if `log_base` is greater than the width of the output type, or if
+                    /// `log_base` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::power_of_2_digits`
-                    /// module.
+                    /// See [here](super::power_of_2_digits#to_power_of_2_digits_desc).
                     #[inline]
                     fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<$u> {
                         to_power_of_2_digits_desc(self, log_base)
                     }
 
-                    /// Converts an iterator of digits into a value, where the base is a power of
-                    /// two.
+                    /// Converts an iterator of base-$2^k$ digits into a value.
                     ///
                     /// The base-2 logarithm of the base is specified. The input digits are in
-                    /// ascending order (least- to most-significant). The type of each digit is
-                    /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
-                    /// returns `None` if the input represents a number that can't fit in `$t`.
+                    /// ascending order (least- to most-significant). `log_base` must be no larger
+                    /// than the width of the digit type. The function returns `None` if the input
+                    /// represents a number that can't fit in the output type.
                     ///
                     /// $$
-                    /// f((d_i)_ {i=0}^{k-1}, \ell) = \sum_{i=0}^{k-1}2^{\ell i}d_i.
+                    /// f((d_i)_ {i=0}^{n-1}, k) = \sum_{i=0}^{n-1}2^{ki}d_i.
                     /// $$
                     ///
                     /// # Worst-case complexity
@@ -199,12 +182,11 @@ macro_rules! impl_power_of_2_digits {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is `digits.count()`.
                     ///
                     /// # Panics
-                    /// Panics if `log_base` is greater than the width of `$u`, or if `log_base` is
-                    /// zero.
+                    /// Panics if `log_base` is greater than the width of the digit type, or if
+                    /// `log_base` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::power_of_2_digits`
-                    /// module.
+                    /// See [here](super::power_of_2_digits#from_power_of_2_digits_asc).
                     #[inline]
                     fn from_power_of_2_digits_asc<I: Iterator<Item = $u>>(
                         log_base: u64,
@@ -213,16 +195,15 @@ macro_rules! impl_power_of_2_digits {
                         from_power_of_2_digits_asc(log_base, digits)
                     }
 
-                    /// Converts an iterator of digits into a value, where the base is a power of
-                    /// two.
+                    /// Converts an iterator of base-$2^k$ digits into a value.
                     ///
                     /// The base-2 logarithm of the base is specified. The input digits are in
-                    /// descending order (most- to least-significant). The type of each digit is
-                    /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
-                    /// returns `None` if the input represents a number that can't fit in `$t`.
+                    /// descending order (most- to least-significant). `log_base` must be no larger
+                    /// than the width of the digit type. The function returns `None` if the input
+                    /// represents a number that can't fit in the output type.
                     ///
                     /// $$
-                    /// f((d_i)_ {i=0}^{k-1}, \ell) = \sum_{i=0}^{k-1}2^{\ell (k-i-1)}d_i.
+                    /// f((d_i)_ {i=0}^{n-1}, k) = \sum_{i=0}^{n-1}2^{k (n-i-1)}d_i.
                     /// $$
                     ///
                     /// # Worst-case complexity
@@ -233,12 +214,11 @@ macro_rules! impl_power_of_2_digits {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is `digits.count()`.
                     ///
                     /// # Panics
-                    /// Panics if `log_base` is greater than the width of `$u` or if `log_base` is
-                    /// zero.
+                    /// Panics if `log_base` is greater than the width of the digit type, or if
+                    /// `log_base` is zero.
                     ///
                     /// # Examples
-                    /// See the documentation of the `num::conversion::digits::power_of_2_digits`
-                    /// module.
+                    /// See [here](super::power_of_2_digits#from_power_of_2_digits_desc).
                     fn from_power_of_2_digits_desc<I: Iterator<Item = $u>>(
                         log_base: u64,
                         digits: I,

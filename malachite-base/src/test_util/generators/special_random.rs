@@ -61,6 +61,13 @@ use std::cmp::{max, min, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use strings::random::random_strings_using_chars;
+use test_util::extra_variadic::{
+    random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
+    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_quadruples_xyzz, random_sextuples_from_single, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
+    random_union3s, Union3,
+};
 use test_util::generators::common::{
     reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
 };
@@ -72,15 +79,9 @@ use test_util::generators::{
     shift_integer_mantissa_and_exponent, signed_assign_bits_valid, unsigned_assign_bits_valid,
 };
 use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
-use tuples::random::{
-    random_octuples_from_single, random_ordered_unique_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples_from_single, random_quadruples_xxxy,
-    random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
-    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyx, random_triples_xyy,
-};
-use unions::random::{random_union2s, random_union3s};
-use unions::{Union2, Union3};
+use tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
+use unions::random::random_union2s;
+use unions::Union2;
 
 // -- char --
 
@@ -1407,6 +1408,28 @@ pub fn special_random_signed_signed_rounding_mode_triple_gen_var_4<
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn special_random_signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_unsigned_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_large_unsigned_stripe_n", U::WIDTH >> 1),
+                config.get_or("mean_large_unsigned_stripe_d", 1),
+            )
+        },
+    ))
+}
 
 pub fn special_random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     config: &GenConfig,
@@ -2916,12 +2939,26 @@ pub fn special_random_unsigned_signed_rounding_mode_triple_gen_var_2<
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
-pub fn special_random_unsigned_pair_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
-    Box::new(random_pairs_from_single(striped_random_unsigneds(
+pub fn special_random_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
         EXAMPLE_SEED,
-        config.get_or("mean_stripe_n", T::WIDTH >> 1),
-        config.get_or("mean_stripe_d", 1),
-    )))
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", U::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn special_random_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
@@ -3702,6 +3739,16 @@ pub fn special_random_unsigned_pair_gen_var_34<T: PrimitiveUnsigned, U: Primitiv
             )
         },
     ))
+}
+
+pub fn special_random_unsigned_pair_gen_var_35<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(random_pairs_from_single(striped_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        config.get_or("mean_stripe_d", 1),
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
@@ -4784,14 +4831,11 @@ pub fn special_random_unsigned_nonuple_gen_var_1<T: PrimitiveUnsigned>(
 pub fn special_random_unsigned_duodecuple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
-    Box::new(
-        random_triples_from_single(random_quadruples_from_single(striped_random_unsigneds(
-            EXAMPLE_SEED,
-            config.get_or("mean_stripe_n", T::WIDTH >> 1),
-            config.get_or("mean_stripe_d", 1),
-        )))
-        .map(|((a, b, c, d), (e, f, g, h), (i, j, k, l))| (a, b, c, d, e, f, g, h, i, j, k, l)),
-    )
+    Box::new(random_duodecuples_from_single(striped_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        config.get_or("mean_stripe_d", 1),
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

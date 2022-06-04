@@ -3,9 +3,10 @@ use chars::CharType;
 use comparison::traits::Min;
 use std::ops::RangeInclusive;
 
-/// Generates all ASCII `char`s, in ascending order.
+/// Generates all ASCII [`char`]s, in ascending order.
 ///
-/// For a friendlier order (_e.g._ nonprintable `char`s coming last), try `exhaustive_ascii_char`s.
+/// For a friendlier order (_e.g_. nonprintable [`char`]s coming last), try
+/// [`exhaustive_ascii_chars`].
 ///
 /// The output length is 128.
 ///
@@ -27,9 +28,9 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
     char::MIN..='\u{7f}'
 }
 
-/// Generates all `char`s, in ascending order.
+/// Generates all [`char`]s, in ascending order.
 ///
-/// For a friendlier order (_e.g_. nonprintable `char`s coming last), use `exhaustive_char`s.
+/// For a friendlier order (_e.g_. nonprintable [`char`]s coming last), try [`exhaustive_chars`].
 ///
 /// The output length is 1,112,064.
 ///
@@ -54,20 +55,20 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
     char::MIN..=char::MAX
 }
 
-/// Generates all `char`s, in a friendly order, so that more familiar characters come first.
+/// Generates all [`char`]s, in a friendly order, so that more familiar [`char`] come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters
-/// 2. Uppercase ASCII letters
-/// 3. ASCII digits
-/// 4. "Printable" ASCII characters (not alphanumeric and not control), including ' ' but no other
-///     whitespace
-/// 5. (only if `ascii_only` is false) "Printable" Non-ASCII characters; all non-ASCII characters
-///     whose `Debug` representations don't start with '\\'
-/// 6. All remaining characters.
+/// 1. Lowercase ASCII letters,
+/// 2. Uppercase ASCII letters,
+/// 3. ASCII digits,
+/// 4. Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
+///    whitespace,
+/// 5. (only if `ascii_only` is false) Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose
+///    [`Debug`](std::fmt::Debug) representations don't start with `'\'`,
+/// 6. All remaining [`char`]s.
 ///
-/// This `struct` is created by the `exhaustive_chars` and `exhaustive_ascii_chars` functions. See
-/// their documentation for more.
+/// This `struct` is created by [`exhaustive_chars`] and [`exhaustive_ascii_chars`]; see their
+/// documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveChars {
     ascii_only: bool,
@@ -155,17 +156,19 @@ impl Iterator for ExhaustiveChars {
     }
 }
 
-/// Generates all ASCII `char`s, in a friendly order, so that more familiar characters come first.
+/// Generates all ASCII [`char`]s, in a friendly order, so that more familiar [`char`]s come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters
-/// 2. Uppercase ASCII letters
-/// 3. ASCII digits
-/// 4. "Printable" ASCII characters (not alphanumeric and not control), including ' ' but no other
-///     whitespace
-/// 5. All remaining ASCII characters.
+/// 1. Lowercase ASCII letters,
+/// 2. Uppercase ASCII letters,
+/// 3. ASCII digits,
+/// 4. Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
+///    whitespace,
+/// 5. All remaining ASCII [`char`]s.
 ///
-/// Within each group, the characters are ordered according to their usual order.
+/// Within each group, the [`char`]s are ordered according to their usual order.
+///
+/// If you want to generate ASCII [`char`]s in their usual order, try [`ascii_chars_increasing`].
 ///
 /// The output length is 128.
 ///
@@ -192,19 +195,21 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
     }
 }
 
-/// Generates all `char`s, in a friendly order, so that more familiar characters come first.
+/// Generates all [`char`]s, in a friendly order, so that more familiar [`char`]s come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters
-/// 2. Uppercase ASCII letters
-/// 3. ASCII digits
-/// 4. "Printable" ASCII characters (not alphanumeric and not control), including ' ' but no other
-///     whitespace
-/// 5. "Printable" Non-ASCII characters; all non-ASCII characters whose `Debug` representations
-///     don't start with '\\'
-/// 6. All remaining characters.
+/// 1. Lowercase ASCII letters,
+/// 2. Uppercase ASCII letters,
+/// 3. ASCII digits,
+/// 4. Graphic ASCII [`char`] (not alphanumeric and not control), including `' '` but no other
+///    whitespace,
+/// 5. Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose
+///    [`Debug`](std::fmt::Debug) representations don't start with `'\'`,
+/// 6. All remaining [`char`]s.
 ///
-/// Within each group, the characters are ordered according to their usual order.
+/// Within each group, the [`char`]s are ordered according to their usual order.
+///
+/// If you want to generate [`char`]s in their usual order, try [`chars_increasing`].
 ///
 /// The output length is 1,112,064.
 ///

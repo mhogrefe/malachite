@@ -819,7 +819,7 @@ pub fn signed_signed_signed_unsigned_quadruple_gen_var_1<
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
 
-// All triples `(T, T, u64)` (x, y, p) where `T` is signed and x is equal to y mod $2^p$.
+// All triples `(T, T, u64)` (x, y, k) where `T` is signed and x is equal to y mod $2^k$.
 pub fn signed_signed_unsigned_triple_gen_var_1<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -841,7 +841,7 @@ pub fn signed_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveU
     )
 }
 
-// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is not equal to y mod $2^p$.
+// All triples `(T, T, u64)` (x, y, k) where `T` is unsigned and x is not equal to y mod $2^k$.
 pub fn signed_signed_unsigned_triple_gen_var_3<T: PrimitiveSigned>() -> Generator<(T, T, u64)> {
     Generator::new(
         &exhaustive_signed_signed_unsigned_triple_gen_var_5,
@@ -899,6 +899,14 @@ pub fn signed_signed_rounding_mode_triple_gen_var_4<T: PrimitiveSigned, U: Primi
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen,
+        &random_primitive_int_pair_gen,
+        &special_random_signed_unsigned_pair_gen,
+    )
+}
 
 // All `(T, U)`s where `T` is signed, `U` is unsigned, and the `U` is small.
 pub fn signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
@@ -1585,6 +1593,14 @@ pub fn unsigned_signed_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned, U: P
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
+pub fn unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen,
+        &random_primitive_int_pair_gen,
+        &special_random_unsigned_pair_gen,
+    )
+}
+
 // All `(u32, u32)`s where each `u32` is smaller than `NUMBER_OF_CHARS`.
 pub fn unsigned_pair_gen_var_1() -> Generator<(u32, u32)> {
     Generator::new(
@@ -1849,7 +1865,7 @@ pub fn unsigned_pair_gen_var_27<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(
         &exhaustive_unsigned_pair_gen_var_20,
         &random_primitive_int_pair_gen_var_1,
-        &special_random_unsigned_pair_gen,
+        &special_random_unsigned_pair_gen_var_35,
     )
 }
 
@@ -2051,7 +2067,7 @@ pub fn unsigned_triple_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(T, T, T)>
     )
 }
 
-// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is equal to y mod $2^p$.
+// All triples `(T, T, u64)` (x, y, k) where `T` is unsigned and x is equal to y mod $2^k$.
 pub fn unsigned_triple_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(T, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_triple_gen_var_8,
@@ -2060,7 +2076,7 @@ pub fn unsigned_triple_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(T, T, u64
     )
 }
 
-// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is not equal to y mod $2^p$.
+// All triples `(T, T, u64)` (x, y, k) where `T` is unsigned and x is not equal to y mod $2^k$.
 pub fn unsigned_triple_gen_var_10<T: PrimitiveUnsigned>() -> Generator<(T, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_triple_gen_var_9,

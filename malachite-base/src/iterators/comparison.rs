@@ -1,8 +1,9 @@
 use std::cmp::Ordering;
 
-/// Returns an iterator that generates the `Ordering`s of adjacent elements of a given iterator.
+/// An iterator that generates the [`Ordering`](std::cmp::Ordering)s of adjacent elements of a
+/// given iterator.
 ///
-/// This `struct` is created by the `delta_directions` function. See its documentation for more.
+/// This `struct` is created by [`delta_directions`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct DeltaDirections<I: Iterator>
 where
@@ -34,26 +35,22 @@ where
     }
 }
 
-/// Returns an iterator that generates the `Ordering`s of adjacent pairs of elements of a given
-/// iterator.
+/// Returns an iterator that generates the [`Ordering`](std::cmp::Ordering)s of adjacent pairs of
+/// elements of a given iterator.
 ///
-/// To put it another way, the returned iterator produces the signs of the finite differences of the
-/// input iterator.
+/// To put it another way (at least for types where subtraction is defined), the returned iterator
+/// produces the signs of the finite differences of the input iterator.
 ///
 /// $f((x_k)_{k=0}^N) = (\\operatorname{cmp}(x_k, x\_{k-1}))\_{k=1}^N$, where $N$ may be $\infty$.
 ///
 /// The output length is infinite if `xs` is infinite, or $\max(n - 1, 0)$ otherwise, where $n$ is
 /// `xs.count()`.
 ///
-/// # Complexity per iteration
-/// Constant time and additional memory.
-///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::iterators::comparison::delta_directions;
 /// use std::cmp::Ordering;
 ///
@@ -63,7 +60,7 @@ where
 /// )
 /// ```
 #[inline]
-pub fn delta_directions<I: Iterator>(xs: I) -> DeltaDirections<I>
+pub const fn delta_directions<I: Iterator>(xs: I) -> DeltaDirections<I>
 where
     I::Item: Ord,
 {
@@ -75,16 +72,9 @@ where
 /// This function will hang if given an infinite strictly ascending iterator.
 ///
 /// $$
-/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k > x\_{k-1}}
+/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k > x\_{k-1}},
 /// $$
 /// where $N$ may be $\infty$.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -106,16 +96,9 @@ where
 /// This function will hang if given an infinite strictly descending iterator.
 ///
 /// $$
-/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k < x\_{k-1}}
+/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k < x\_{k-1}},
 /// $$
 /// where $N$ may be $\infty$.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -137,16 +120,9 @@ where
 /// This function will hang if given an infinite weakly ascending iterator.
 ///
 /// $$
-/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k \geq x\_{k-1}}
+/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k \geq x\_{k-1}},
 /// $$
 /// where $N$ may be $\infty$.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -169,16 +145,9 @@ where
 /// This function will hang if given an infinite weakly descending iterator.
 ///
 /// $$
-/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k \leq x\_{k-1}}
+/// f((x_k)\_{k=0}^N) = \\bigwedge\_{k=1}^N{x\_k \leq x\_{k-1}},
 /// $$
 /// where $N$ may be $\infty$.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -198,18 +167,11 @@ where
 
 /// Determines whether the sequence strictly zigzags.
 ///
-/// A strictly zigzagging sequence is one where every odd-indexed element is greater than its even-
-/// indexed neighbors, or one where every odd-indexed element is less than its even-indexed
+/// A strictly zigzagging sequence is one where every odd-indexed element is greater than its
+/// even-indexed neighbors, or one where every odd-indexed element is less than its even-indexed
 /// neighbors.
 ///
 /// This function will hang if given an infinite strictly zigzagging iterator.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -246,13 +208,6 @@ where
 /// even-indexed neighbors.
 ///
 /// This function will hang if given an infinite strictly zigzagging iterator.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```

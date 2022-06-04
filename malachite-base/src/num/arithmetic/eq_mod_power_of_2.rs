@@ -3,17 +3,17 @@ use num::arithmetic::traits::{DivisibleByPowerOf2, EqModPowerOf2};
 macro_rules! impl_eq_mod_power_of_2 {
     ($t:ident) => {
         impl EqModPowerOf2<$t> for $t {
-            /// Returns whether `self` is equal to `other` mod $2^p$.
+            /// Returns whether one number is equal to another modulo $2^k$.
             ///
-            /// $f(x, y, p) = (x \equiv y \mod 2^p)$.
+            /// $f(x, y, k) = (x \equiv y \mod 2^k)$.
             ///
-            /// $f(x, y, p) = (\exists k \in \Z \ x - y = k2^p)$.
+            /// $f(x, y, k) = (\exists n \in \Z : x - y = n2^k)$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::eq_mod_power_of_2` module.
+            /// See [here](super::eq_mod_power_of_2#eq_mod_power_of_2).
             #[inline]
             fn eq_mod_power_of_2(self, other: $t, pow: u64) -> bool {
                 (self ^ other).divisible_by_power_of_2(pow)

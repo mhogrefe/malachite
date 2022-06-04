@@ -1,13 +1,22 @@
+/// Comparison of [`Rational`](crate::Rational)s.
 pub mod cmp;
+/// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
+/// and [`OrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`) (traits for comparing
+/// the absolute values of numbers by order) for [`Rational`](crate::Rational)s.
 pub mod cmp_abs;
+/// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
+/// (a trait for comparing the absolute values of numbers by order) for
+/// [`Rational`](crate::Rational)s and [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_cmp_abs_integer;
+/// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
+/// (a trait for comparing the absolute values of numbers by order) for
+/// [`Rational`](crate::Rational)s and [`Natural`](malachite_nz::natural::Natural)s.
 pub mod partial_cmp_abs_natural;
-/// Trait implementations for comparing the absolute value of a `Rational` and the absolute value
-/// of a primitive float.
+/// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
+/// (a trait for comparing the absolute values of numbers by order) for
+/// [`Rational`](crate::Rational)s and primitive floats.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational.partial_cmp_abs(&PrimitiveFloat)
+/// # partial_cmp_abs
 /// ```
 /// extern crate malachite_base;
 ///
@@ -16,180 +25,129 @@ pub mod partial_cmp_abs_natural;
 ///
 /// assert!(Rational::from_signeds(1, 3).gt_abs(&-0.33f32));
 /// assert!(Rational::from_signeds(1, 3).lt_abs(&-0.34f32));
-/// ```
-///
-/// # PrimitiveFloat.partial_cmp_abs(&Rational)
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::num::comparison::traits::PartialOrdAbs;
-/// use malachite_q::Rational;
 ///
 /// assert!((-0.33f32).lt_abs(&Rational::from_signeds(1, 3)));
 /// assert!((-0.34f32).gt_abs(&Rational::from_signeds(1, 3)));
 /// ```
 pub mod partial_cmp_abs_primitive_float;
-/// Trait implementations for comparing the absolute value of a `Rational` to the absolute value of
-/// a primitive integer.
+/// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
+/// (a trait for comparing the absolute values of numbers by order) for
+/// [`Rational`](crate::Rational)s and primitive integers.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational.partial_cmp_abs(&PrimitiveInt)
+/// # partial_cmp_abs
 /// ```
 /// extern crate malachite_base;
-/// extern crate malachite_q;
 ///
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_q::Rational;
 /// use std::cmp::Ordering;
-/// use std::str::FromStr;
 ///
-/// assert!(Rational::from_str("22/7").unwrap().gt_abs(&3u32));
-/// assert!(Rational::from_str("22/7").unwrap().lt_abs(&4u32));
-/// assert!(Rational::from_str("-22/7").unwrap().gt_abs(&3u32));
-/// assert!(Rational::from_str("-22/7").unwrap().lt_abs(&4u32));
+/// assert!(Rational::from_signeds(22, 7).gt_abs(&3u32));
+/// assert!(Rational::from_signeds(22, 7).lt_abs(&4u32));
+/// assert!(Rational::from_signeds(-22, 7).gt_abs(&3u32));
+/// assert!(Rational::from_signeds(-22, 7).lt_abs(&4u32));
 ///
-/// assert!(Rational::from_str("22/7").unwrap().gt_abs(&3i32));
-/// assert!(Rational::from_str("22/7").unwrap().lt_abs(&4i32));
-/// assert!(Rational::from_str("-22/7").unwrap().gt_abs(&-3i32));
-/// assert!(Rational::from_str("-22/7").unwrap().lt_abs(&-4i32));
-/// ```
+/// assert!(Rational::from_signeds(22, 7).gt_abs(&3i32));
+/// assert!(Rational::from_signeds(22, 7).lt_abs(&4i32));
+/// assert!(Rational::from_signeds(-22, 7).gt_abs(&-3i32));
+/// assert!(Rational::from_signeds(-22, 7).lt_abs(&-4i32));
 ///
-/// # PrimitiveInt.partial_cmp_abs(&Rational)
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_q;
+/// assert!(3u32.lt_abs(&Rational::from_signeds(22, 7)));
+/// assert!(4u32.gt_abs(&Rational::from_signeds(22, 7)));
+/// assert!(3u32.lt_abs(&Rational::from_signeds(-22, 7)));
+/// assert!(4u32.gt_abs(&Rational::from_signeds(-22, 7)));
 ///
-/// use malachite_base::num::comparison::traits::PartialOrdAbs;
-/// use malachite_q::Rational;
-/// use std::cmp::Ordering;
-/// use std::str::FromStr;
-///
-/// assert!(3u32.lt_abs(&Rational::from_str("22/7").unwrap()));
-/// assert!(4u32.gt_abs(&Rational::from_str("22/7").unwrap()));
-/// assert!(3u32.lt_abs(&Rational::from_str("-22/7").unwrap()));
-/// assert!(4u32.gt_abs(&Rational::from_str("-22/7").unwrap()));
-///
-/// assert!(3i32.lt_abs(&Rational::from_str("22/7").unwrap()));
-/// assert!(4i32.gt_abs(&Rational::from_str("22/7").unwrap()));
-/// assert!((-3i32).lt_abs(&Rational::from_str("-22/7").unwrap()));
-/// assert!((-4i32).gt_abs(&Rational::from_str("-22/7").unwrap()));
+/// assert!(3i32.lt_abs(&Rational::from_signeds(22, 7)));
+/// assert!(4i32.gt_abs(&Rational::from_signeds(22, 7)));
+/// assert!((-3i32).lt_abs(&Rational::from_signeds(-22, 7)));
+/// assert!((-4i32).gt_abs(&Rational::from_signeds(-22, 7)));
 /// ```
 pub mod partial_cmp_abs_primitive_int;
+/// Comparison of [`Rational`](crate::Rational)s and [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_cmp_integer;
+/// Comparison of [`Rational`](crate::Rational)s and [`Natural`](malachite_nz::natural::Natural)s.
 pub mod partial_cmp_natural;
-/// Trait implementations for comparing an `Rational` and a primitive float.
+/// Comparison of [`Rational`](crate::Rational)s and primitive floats.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational.partial_cmp(&PrimitiveFloat)
+/// # partial_cmp
 /// ```
 /// use malachite_q::Rational;
 ///
 /// assert!(Rational::from_signeds(1, 3) > 0.33f32);
 /// assert!(Rational::from_signeds(1, 3) < 0.34f32);
-/// ```
-///
-/// # PrimitiveFloat.partial_cmp(&Rational)
-/// ```
-/// use malachite_q::Rational;
 ///
 /// assert!(0.33f32 < Rational::from_signeds(1, 3));
 /// assert!(0.34f32 > Rational::from_signeds(1, 3));
 /// ```
 pub mod partial_cmp_primitive_float;
-/// Trait implementations for comparing a `Rational` to a primitive integer.
+/// Comparison of [`Rational`](crate::Rational)s and primitive integers.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational.partial_cmp(&PrimitiveInt)
+/// # partial_cmp
 /// ```
 /// use malachite_q::Rational;
-/// use std::str::FromStr;
 ///
-/// assert!(Rational::from_str("22/7").unwrap() > 3u32);
-/// assert!(Rational::from_str("22/7").unwrap() < 4u32);
-/// assert!(Rational::from_str("-22/7").unwrap() < 3u32);
-/// assert!(Rational::from_str("-22/7").unwrap() < 4u32);
+/// assert!(Rational::from_signeds(22, 7) > 3u32);
+/// assert!(Rational::from_signeds(22, 7) < 4u32);
+/// assert!(Rational::from_signeds(-22, 7) < 3u32);
+/// assert!(Rational::from_signeds(-22, 7) < 4u32);
 ///
-/// assert!(Rational::from_str("22/7").unwrap() > 3i32);
-/// assert!(Rational::from_str("22/7").unwrap() < 4i32);
-/// assert!(Rational::from_str("-22/7").unwrap() < -3i32);
-/// assert!(Rational::from_str("-22/7").unwrap() > -4i32);
-/// ```
+/// assert!(Rational::from_signeds(22, 7) > 3i32);
+/// assert!(Rational::from_signeds(22, 7) < 4i32);
+/// assert!(Rational::from_signeds(-22, 7) < -3i32);
+/// assert!(Rational::from_signeds(-22, 7) > -4i32);
 ///
-/// # PrimitiveInt.partial_cmp(&Rational)
-/// ```
-/// use malachite_q::Rational;
-/// use std::str::FromStr;
+/// assert!(3u32 < Rational::from_signeds(22, 7));
+/// assert!(4u32 > Rational::from_signeds(22, 7));
+/// assert!(3u32 > Rational::from_signeds(-22, 7));
+/// assert!(4u32 > Rational::from_signeds(-22, 7));
 ///
-/// assert!(3u32 < Rational::from_str("22/7").unwrap());
-/// assert!(4u32 > Rational::from_str("22/7").unwrap());
-/// assert!(3u32 > Rational::from_str("-22/7").unwrap());
-/// assert!(4u32 > Rational::from_str("-22/7").unwrap());
-///
-/// assert!(3i32 < Rational::from_str("22/7").unwrap());
-/// assert!(4i32 > Rational::from_str("22/7").unwrap());
-/// assert!(-3i32 > Rational::from_str("-22/7").unwrap());
-/// assert!(-4i32 < Rational::from_str("-22/7").unwrap());
+/// assert!(3i32 < Rational::from_signeds(22, 7));
+/// assert!(4i32 > Rational::from_signeds(22, 7));
+/// assert!(-3i32 > Rational::from_signeds(-22, 7));
+/// assert!(-4i32 < Rational::from_signeds(-22, 7));
 /// ```
 pub mod partial_cmp_primitive_int;
+/// Equality of [`Rational`](crate::Rational)s and [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_eq_integer;
+/// Equality of [`Rational`](crate::Rational)s and [`Natural`](malachite_nz::natural::Natural)s.
 pub mod partial_eq_natural;
-/// Trait implementations for comparing the equality of a `Rational` and a primitive float.
+/// Equality of [`Rational`](crate::Rational)s and primitive floats.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational == PrimitiveFloat
+/// # partial_eq
 /// ```
 /// use malachite_q::Rational;
 ///
 /// assert!(Rational::from_signeds(3, 2) == 1.5f32);
 /// assert!(Rational::from_signeds(3, 2) != 1.4f32);
-/// ```
-///
-/// # PrimitiveFloat == Rational
-/// ```
-/// use malachite_q::Rational;
 ///
 /// assert!(1.5f32 == Rational::from_signeds(3, 2));
 /// assert!(1.4f32 != Rational::from_signeds(3, 2));
 /// ```
 pub mod partial_eq_primitive_float;
-/// Trait implementations for comparing the equality of a `Rational` and a primitive integer.
+/// Equality of [`Rational`](crate::Rational)s and primitive integers.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # Rational == PrimitiveInt
+/// # partial_eq
 /// ```
 /// use malachite_q::Rational;
-/// use std::str::FromStr;
 ///
 /// assert!(Rational::from(123) == 123u64);
 /// assert!(Rational::from(-123) != 123u64);
-/// assert!(Rational::from_str("22/7").unwrap() != 123u64);
-/// assert!(Rational::from_str("-22/7").unwrap() != 123u64);
+/// assert!(Rational::from_signeds(22, 7) != 123u64);
+/// assert!(Rational::from_signeds(-22, 7) != 123u64);
 ///
 /// assert!(Rational::from(123) == 123i64);
 /// assert!(Rational::from(-123) == -123i64);
-/// assert!(Rational::from_str("22/7").unwrap() != -123i64);
-/// assert!(Rational::from_str("-22/7").unwrap() != -123i64);
-///
-/// ```
-///
-/// # PrimitiveInt == Rational
-/// ```
-/// use malachite_q::Rational;
-/// use std::str::FromStr;
+/// assert!(Rational::from_signeds(22, 7) != -123i64);
+/// assert!(Rational::from_signeds(-22, 7) != -123i64);
 ///
 /// assert!(123u64 == Rational::from(123));
 /// assert!(123u64 != Rational::from(-123));
-/// assert!(123u64 != Rational::from_str("22/7").unwrap());
-/// assert!(123u64 != Rational::from_str("-22/7").unwrap());
+/// assert!(123u64 != Rational::from_signeds(22, 7));
+/// assert!(123u64 != Rational::from_signeds(-22, 7));
 ///
 /// assert!(123i64 == Rational::from(123));
 /// assert!(-123i64 == Rational::from(-123));
-/// assert!(-123i64 != Rational::from_str("22/7").unwrap());
-/// assert!(-123i64 != Rational::from_str("-22/7").unwrap());
+/// assert!(-123i64 != Rational::from_signeds(22, 7));
+/// assert!(-123i64 != Rational::from_signeds(-22, 7));
 /// ```
 pub mod partial_eq_primitive_int;

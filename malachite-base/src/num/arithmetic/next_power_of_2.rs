@@ -8,6 +8,8 @@ macro_rules! impl_next_power_of_2_unsigned {
         impl NextPowerOf2 for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `next_power_of_two` functions in the standard library,
+            /// for example [this one](u32::next_power_of_two).
             #[inline]
             fn next_power_of_2(self) -> $t {
                 $t::next_power_of_two(self)
@@ -15,7 +17,7 @@ macro_rules! impl_next_power_of_2_unsigned {
         }
 
         impl NextPowerOf2Assign for $t {
-            /// Replaces `self` with the smallest power of 2 greater than or equal to `self`.
+            /// Replaces a number with the smallest power of 2 greater than or equal to it.
             ///
             /// $x \gets 2^{\lceil \log_2 x \rceil}$.
             ///
@@ -26,7 +28,7 @@ macro_rules! impl_next_power_of_2_unsigned {
             /// Panics if the next power of 2 is greater than the type's maximum value.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::next_power_of_2` module.
+            /// See [here](super::next_power_of_2#next_power_of_2_assign).
             #[inline]
             fn next_power_of_2_assign(&mut self) {
                 *self = $t::next_power_of_2(*self);
@@ -41,6 +43,19 @@ macro_rules! impl_next_power_of_2_primitive_float {
         impl NextPowerOf2 for $t {
             type Output = $t;
 
+            /// Finds the smallest power of 2 greater than or equal to a number.
+            ///
+            /// $x \gets 2^{\lceil \log_2 x \rceil}$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` has a negative sign (positive zero is allowed, but negative zero
+            /// is not), or if the next power of 2 is greater than the type's maximum value.
+            ///
+            /// # Examples
+            /// See [here](super::next_power_of_2#next_power_of_2).
             #[inline]
             fn next_power_of_2(self) -> $t {
                 assert_eq!(self.sign(), Ordering::Greater);
@@ -60,7 +75,7 @@ macro_rules! impl_next_power_of_2_primitive_float {
         }
 
         impl NextPowerOf2Assign for $t {
-            /// Replaces `self` with the smallest power of 2 greater than or equal to `self`.
+            /// Replaces a number with the smallest power of 2 greater than or equal to it.
             ///
             /// $x \gets 2^{\lceil \log_2 x \rceil}$.
             ///
@@ -71,7 +86,7 @@ macro_rules! impl_next_power_of_2_primitive_float {
             /// Panics if the next power of 2 is greater than the type's maximum value.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::next_power_of_2` module.
+            /// See [here](super::next_power_of_2#next_power_of_2_assign).
             #[inline]
             fn next_power_of_2_assign(&mut self) {
                 *self = $t::next_power_of_2(*self);

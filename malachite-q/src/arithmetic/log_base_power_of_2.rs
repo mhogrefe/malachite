@@ -9,11 +9,11 @@ use Rational;
 impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
     type Output = i64;
 
-    /// Returns the floor of the base-$2^p$ logarithm of a positive `Rational`.
+    /// Returns the floor of the base-$2^k$ logarithm of a positive [`Rational`].
     ///
-    /// $p$ may be negative.
+    /// $k$ may be negative.
     ///
-    /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
+    /// $f(x, k) = \lfloor\log_{2^k} x\rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -28,7 +28,6 @@ impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2;
     /// use malachite_q::Rational;
@@ -58,9 +57,9 @@ impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
 impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
     type Output = i64;
 
-    /// Returns the ceiling of the base-$2^p$ logarithm of a positive `Rational`.
+    /// Returns the ceiling of the base-$2^k$ logarithm of a positive [`Rational`].
     ///
-    /// $p$ may be negative.
+    /// $k$ may be negative.
     ///
     /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
     ///
@@ -77,7 +76,6 @@ impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2;
     /// use malachite_q::Rational;
@@ -105,15 +103,15 @@ impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
 impl<'a> CheckedLogBasePowerOf2<i64> for &'a Rational {
     type Output = i64;
 
-    /// Returns the base-$2^p$ logarithm of a positive `Rational`. If the `Rational` is not a power
-    /// of $2^p$, `None` is returned.
+    /// Returns the base-$2^k$ logarithm of a positive [`Rational`]. If the [`Rational`] is not a
+    /// power of $2^k$, then `None` is returned.
     ///
-    /// $p$ may be negative.
+    /// $k$ may be negative.
     ///
     /// $$
     /// f(x, p) = \\begin{cases}
-    ///     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(\log_{2^p} x) & \text{if} \\quad \log_{2^p} x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -130,7 +128,6 @@ impl<'a> CheckedLogBasePowerOf2<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2;
     /// use malachite_q::Rational;

@@ -9,29 +9,33 @@ use std::cmp::Ordering;
 use Rational;
 
 impl PartialOrdAbs<Integer> for Rational {
-    /// Compares the absolute value of a `Rational` to the absolute value of an `Integer`.
+    /// Compares the absolute values of a [`Rational`] and an
+    /// [`Integer`](malachite_nz::integer::Integer).
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Rational::from_str("22/7").unwrap().partial_cmp_abs(&Integer::from(3)),
+    ///     Rational::from_signeds(22, 7).partial_cmp_abs(&Integer::from(3)),
     ///     Some(Ordering::Greater)
     /// );
     /// assert_eq!(
-    ///     Rational::from_str("-22/7").unwrap().partial_cmp_abs(&Integer::from(-3)),
+    ///     Rational::from_signeds(-22, 7).partial_cmp_abs(&Integer::from(-3)),
     ///     Some(Ordering::Greater)
     /// );
     /// ```
@@ -77,29 +81,33 @@ impl PartialOrdAbs<Integer> for Rational {
 }
 
 impl PartialOrdAbs<Rational> for Integer {
-    /// Compares the absolute value of an `Integer` to the absolute value of a `Rational`.
+    /// Compares the absolute values of an [`Integer`](malachite_nz::integer::Integer) and a
+    /// [`Rational`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     Integer::from(3).partial_cmp_abs(&Rational::from_str("22/7").unwrap()),
+    ///     Integer::from(3).partial_cmp_abs(&Rational::from_signeds(22, 7)),
     ///     Some(Ordering::Less)
     /// );
     /// assert_eq!(
-    ///     Integer::from(-3).partial_cmp_abs(&Rational::from_str("-22/7").unwrap()),
+    ///     Integer::from(-3).partial_cmp_abs(&Rational::from_signeds(-22, 7)),
     ///     Some(Ordering::Less)
     /// );
     /// ```

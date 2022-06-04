@@ -10,13 +10,14 @@ use std::mem::swap;
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, compares the two `Natural`s.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_cmp from gmp.h, GMP 6.2.1.
+// This is equivalent to `mpn_cmp` from `gmp.h`, GMP 6.2.1.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
@@ -131,9 +132,9 @@ pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
 }}
 
 impl PartialOrd for Natural {
-    /// Compares a `Natural` to another `Natural`.
+    /// Compares two [`Natural`]s.
     ///
-    /// See the documentation for the `Ord` implementation.
+    /// See the documentation for the [`Ord`] implementation.
     #[inline]
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -141,7 +142,7 @@ impl PartialOrd for Natural {
 }
 
 impl Ord for Natural {
-    /// Compares a `Natural` to another `Natural`.
+    /// Compares two [`Natural`]s.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -174,7 +175,7 @@ impl Ord for Natural {
 }
 
 impl Natural {
-    /// Returns a result of a comparison between two `Natural`s as if each had been multiplied by
+    /// Returns a result of a comparison between two [`Natural`]s as if each had been multiplied by
     /// some power of 2 to bring it into the interval $[1, 2)$.
     ///
     /// That is, the comparison is equivalent to a comparison between $f(x)$ and $f(y)$, where
@@ -200,20 +201,20 @@ impl Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::cmp::Ordering;
     ///
-    /// // 1 = 1.0 * 2^0, 4 = 1.0 * 2^2
-    /// // 1.0 = 1.0
+    /// // 1 == 1.0 * 2^0, 4 == 1.0 * 2^2
+    /// // 1.0 == 1.0
     /// assert_eq!(Natural::from(1u32).cmp_normalized(&Natural::from(4u32)), Ordering::Equal);
     ///
-    /// // 5 = 1.25 * 2^2, 6 = 1.5 * 2^2
+    /// // 5 == 1.25 * 2^2, 6 == 1.5 * 2^2
     /// // 1.25 < 1.5
     /// assert_eq!(Natural::from(5u32).cmp_normalized(&Natural::from(6u32)), Ordering::Less);
     ///
-    /// // 3 = 1.5 * 2^1, 17 = 1.0625 * 2^4
+    /// // 3 == 1.5 * 2^1, 17 == 1.0625 * 2^4
     /// // 1.5 > 1.0625
     /// assert_eq!(Natural::from(3u32).cmp_normalized(&Natural::from(17u32)), Ordering::Greater);
     ///
-    /// // 9 = 1.125 * 2^3, 36 = 1.125 * 2^5
-    /// // 1.125 = 1.125
+    /// // 9 == 1.125 * 2^3, 36 == 1.125 * 2^5
+    /// // 1.125 == 1.125
     /// assert_eq!(Natural::from(9u32).cmp_normalized(&Natural::from(36u32)), Ordering::Equal);
     /// ```
     pub fn cmp_normalized(&self, other: &Natural) -> Ordering {

@@ -10,6 +10,7 @@ path = "src/lib.rs"
 [[bin]]
 name = "malachite_base_main"
 path = "src/bin.rs"
+test = false
 
 [dependencies]
 itertools = "0.9.0"
@@ -24,7 +25,8 @@ time = { version = "0.1.40", optional = true }
 walkdir = { version = "2", optional = true }
 
 [features]
-test_build = ["clap", "gnuplot", "time", "walkdir"]
+test_build = ["gnuplot", "time", "clap"]
+bin_build = ["walkdir", "test_build"]
 
 [profile.release]
 lto = true

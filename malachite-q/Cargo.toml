@@ -19,11 +19,12 @@ serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }
 num = { version = "0.4.0", optional = true, features = ["serde"] }
-rug = { version = "1.14.1", default-features = false, optional = true, features = ["rational", "serde"] }
+rug = { version = "1.16.0", default-features = false, optional = true, features = ["rational", "serde"] }
 
 [features]
 32_bit_limbs = ["malachite-nz/32_bit_limbs"]
 test_build = ["malachite-base/test_build", "malachite-nz/test_build", "serde", "serde_json", "num", "rug"]
+bin_build = ["test_build"]
 
 [profile.release]
 lto = true

@@ -1,20 +1,5 @@
-/// Trait implementations for comparing the absolute values of numbers by equality.
-///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # eq_abs
-/// ```
-/// use malachite_base::num::comparison::traits::EqAbs;
-///
-/// assert_eq!(123u32.eq_abs(&456), false);
-/// assert_eq!(123u32.eq_abs(&123), true);
-/// assert_eq!(123i32.eq_abs(&-456), false);
-/// assert_eq!(123i32.eq_abs(&-123), true);
-/// ```
-pub mod eq_abs;
-/// Trait implementations for comparing the absolute values of numbers by order.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`PartialOrdAbs`](`traits::PartialOrdAbs`) and [`OrdAbs`](`traits::OrdAbs`), traits for
+/// comparing the absolute values of numbers by order.
 ///
 /// # partial_cmp_abs
 /// ```
@@ -35,6 +20,18 @@ pub mod eq_abs;
 /// assert_eq!(123i32.cmp_abs(&-456), Ordering::Less);
 /// assert_eq!(123i32.cmp_abs(&-123), Ordering::Equal);
 /// ```
-pub mod ord_abs;
-/// Vsarious traits for comparing numbers.
+pub mod cmp_abs;
+/// [`EqAbs`](`traits::EqAbs`), a trait for comparing the absolute values of numbers by equality.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+///
+/// assert_eq!(123u32.eq_abs(&456), false);
+/// assert_eq!(123u32.eq_abs(&123), true);
+/// assert_eq!(123i32.eq_abs(&-456), false);
+/// assert_eq!(123i32.eq_abs(&-123), true);
+/// ```
+pub mod eq_abs;
+/// Various traits for comparing numbers.
 pub mod traits;

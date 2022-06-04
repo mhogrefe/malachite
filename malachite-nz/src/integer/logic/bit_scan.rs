@@ -14,13 +14,14 @@ use std::cmp::Ordering;
 // `Integer` has a `false` bit. If the starting index is too large and there are no more `false`
 // bits above it, `None` is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpz_scan0 from mpz/scan0.c, GMP 6.2.1.
+// This is equivalent to `mpz_scan0` from `mpz/scan0.c`, GMP 6.2.1.
 pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
@@ -59,13 +60,14 @@ pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u6
 // `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
 // `Integer` has a `true` bit.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpz_scan1 from mpz/scan1.c, GMP 6.2.1.
+// This is equivalent to `mpz_scan1` from `mpz/scan1.c`, GMP 6.2.1.
 pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
@@ -133,20 +135,22 @@ impl Natural {
 }
 
 impl<'a> BitScan for &'a Integer {
-    /// Finds the lowest index greater than or equal to `starting_index` at which the `Integer` has
-    /// a `false` bit. If the `Integer` as negative, and the starting index is too large and there
-    /// are no more `false` bits above it, `None` is returned.
+    /// Given an [`Integer`] and a starting index, searches the [`Integer`] for the smallest index
+    /// of a `false` bit that is greater than or equal to the starting index.
     ///
-    /// Time: worst case O(n)
+    /// If the [`Integer]` is negative, and the starting index is too large and there are no more
+    /// `false` bits above it, `None` is returned.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::integer::Integer;
@@ -168,20 +172,22 @@ impl<'a> BitScan for &'a Integer {
         }
     }
 
-    /// Finds the lowest index greater than or equal to `starting_index` at which the `Integer` has
-    /// a `true` bit. If the `Integer` is non-negative, and the starting index is too large and
-    /// there are no more `true` bits above it, `None` is returned.
+    /// Given an [`Integer`] and a starting index, searches the [`Integer`] for the smallest index
+    /// of a `true` bit that is greater than or equal to the starting index.
     ///
-    /// Time: worst case O(n)
+    /// If the [`Integer`] is non-negative, and the starting index is too large and there are no
+    /// more `true` bits above it, `None` is returned.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::integer::Integer;

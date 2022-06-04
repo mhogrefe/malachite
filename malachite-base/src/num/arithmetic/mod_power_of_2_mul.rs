@@ -18,15 +18,19 @@ macro_rules! impl_mod_power_of_2_mul {
         impl ModPowerOf2Mul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self * other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
+            /// Multiplies two numbers modulo a third number $2^k$. Assumes the inputs are already
+            /// reduced modulo $2^k$.
             ///
-            /// $f(x, y, p) = z$, where $x, y, z < 2^p$ and $xy \equiv z \mod 2^p$.
+            /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
+            /// See [here](super::mod_power_of_2_mul#mod_power_of_2_mul).
             #[inline]
             fn mod_power_of_2_mul(self, other: $t, pow: u64) -> $t {
                 mod_power_of_2_mul(self, other, pow)
@@ -34,16 +38,19 @@ macro_rules! impl_mod_power_of_2_mul {
         }
 
         impl ModPowerOf2MulAssign<$t> for $t {
-            /// Replaces `self` with `self * other` mod $2^p$. Assumes the inputs are already
-            /// reduced mod $2^p$.
+            /// Multiplies two numbers modulo a third number $2^k$, in place. Assumes the inputs
+            /// are already reduced modulo $2^k$.
             ///
-            /// $x \gets z$, where $x, y, z < 2^p$ and $xy \equiv z \mod 2^p$.
+            /// $x \gets z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
+            /// See [here](super::mod_power_of_2_mul#mod_power_of_2_mul_assign).
             #[inline]
             fn mod_power_of_2_mul_assign(&mut self, other: $t, pow: u64) {
                 mod_power_of_2_mul_assign(self, other, pow)

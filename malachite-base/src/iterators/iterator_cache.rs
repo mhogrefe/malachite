@@ -2,7 +2,7 @@
 ///
 /// After wrapping an iterator with an `IteratorCache`, you can retrieve a reference to the $n$th
 /// element of an iterator, and then retrieve a reference to the $m$th element in constant time for
-/// any $m \leq n$.
+/// any $m \leq n$ (not counting the time it took to first get the $n$th element).
 #[derive(Clone, Debug)]
 pub struct IteratorCache<I: Iterator> {
     xs: I,
@@ -24,7 +24,7 @@ impl<I: Iterator> IteratorCache<I> {
     ///
     /// let xs = IteratorCache::new([1, 2, 3].iter());
     /// ```
-    pub fn new(xs: I) -> IteratorCache<I> {
+    pub const fn new(xs: I) -> IteratorCache<I> {
         IteratorCache {
             xs,
             cache: Vec::new(),
@@ -32,12 +32,15 @@ impl<I: Iterator> IteratorCache<I> {
         }
     }
 
-    /// Retrieves the $n$th element of an iterator (the first element is at index 0).
+    /// Retrieves the $n$th element of an iterator. Indexing starts at 0.
     ///
     /// If the index is higher than any other previously-requested index, the iterator is advanced
     /// to that index, or until it runs out. If the iterator has previously been advanced past the
     /// index, the requested element is returned from the cache in constant time. If the iterator is
     /// too short to have an element at the index, `None` is returned.
+    ///
+    /// If you know that the element is present, and want to only take an immutable reference to
+    /// `self`, consider using [`assert_get`](Self::assert_get) instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -69,14 +72,15 @@ impl<I: Iterator> IteratorCache<I> {
         self.cache.get(index)
     }
 
-    /// Retrieves the $n$th element of an iterator (the first element is at index 0), while
-    /// asserting that the iterator has already reached that element.
+    /// Retrieves the $n$th element of an iterator, while asserting that the iterator has already
+    /// reached that element. Indexing starts at 0.
     ///
-    /// If the iterator has not advanced that far, or if it has fewer than $n + 1$ element, this
+    /// If the iterator has not advanced that far, or if it has fewer than $n + 1$ elements, this
     /// function panics.
     ///
     /// The purpose of this function is to allow the caller to get an element immutably, assuming
-    /// that the caller knows that the element is present.
+    /// that the caller knows that the element is present. The [`get`](Self::get) function has to
+    /// take a mutable reference.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

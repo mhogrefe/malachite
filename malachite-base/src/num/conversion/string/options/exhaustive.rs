@@ -6,7 +6,9 @@ use rounding_modes::exhaustive::exhaustive_rounding_modes;
 use rounding_modes::RoundingMode;
 use tuples::exhaustive::{exhaustive_triples, lex_pairs, lex_quadruples_from_single};
 
-/// Generates all `SciSizeOptions`s.
+/// Generates all [`SciSizeOptions`](super::SciSizeOptions)s.
+///
+/// This struct is created by [`exhaustive_sci_size_options`]; see its documentation for more.
 pub struct ExhaustiveSciSizeOptions {
     i: u64,
     even: bool,
@@ -32,7 +34,7 @@ impl Iterator for ExhaustiveSciSizeOptions {
     }
 }
 
-/// Generates all `SciSizeOptions`s.
+/// Generates all [`SciSizeOptions`](super::SciSizeOptions)s.
 ///
 /// The output length is $2^{65}$.
 ///
@@ -42,7 +44,9 @@ pub const fn exhaustive_sci_size_options() -> ExhaustiveSciSizeOptions {
     ExhaustiveSciSizeOptions { i: 0, even: true }
 }
 
-/// Generates all `ToSciOptions`s.
+/// Generates all [`ToSciOptions`](super::ToSciOptions)s.
+///
+/// This struct is created by [`exhaustive_to_sci_options`]; see its documentation for more.
 pub struct ExhaustiveToSciOptions(
     Box<
         dyn Iterator<
@@ -78,7 +82,7 @@ impl Iterator for ExhaustiveToSciOptions {
     }
 }
 
-/// Generates all `ToSciOptions`s.
+/// Generates all [`ToSciOptions`](super::ToSciOptions)s.
 ///
 /// The output length is $2^{133}\times 3 \times 5 \times 7 \approx 1.4335 \times 10^{42}$.
 ///
@@ -98,7 +102,10 @@ pub fn exhaustive_to_sci_options() -> ExhaustiveToSciOptions {
     )))
 }
 
-/// Generates all `FromSciStringOptions`s.
+/// Generates all [`FromSciStringOptions`](super::FromSciStringOptions)s.
+///
+/// This struct is created by [`exhaustive_from_sci_string_options`]; see its documentation for
+/// more.
 pub struct ExhaustiveFromSciStringOptions(Box<dyn Iterator<Item = (u8, RoundingMode)>>);
 
 impl Iterator for ExhaustiveFromSciStringOptions {
@@ -113,7 +120,7 @@ impl Iterator for ExhaustiveFromSciStringOptions {
     }
 }
 
-/// Generates all `FromSciStringOptions`s.
+/// Generates all [`FromSciStringOptions`](super::FromSciStringOptions)s.
 ///
 /// The output length is 210.
 ///

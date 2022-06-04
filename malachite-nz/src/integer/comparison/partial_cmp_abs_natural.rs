@@ -4,18 +4,19 @@ use natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrdAbs<Natural> for Integer {
-    /// Compares the absolute value of an `Integer` to the absolute value of a `Natural`.
+    /// Compares the absolute values of an [`Integer`] and a [`Natural`].
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
@@ -34,18 +35,19 @@ impl PartialOrdAbs<Natural> for Integer {
 }
 
 impl PartialOrdAbs<Integer> for Natural {
-    /// Compares the absolute value of a `Natural` to the absolute value of an `Integer`.
+    /// Compares the absolute values of a [`Natural`] and an [`Integer`].
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;

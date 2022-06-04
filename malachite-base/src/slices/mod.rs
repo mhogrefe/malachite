@@ -24,8 +24,9 @@ use random::Seed;
 /// assert_eq!(xs, [1, 0, 0, 0, 5]);
 /// ```
 ///
-/// This is `mpn_zero` from `mpn/generic/zero.c`, GMP 6.2.1. Note that this is needed less often in
-/// Malachite than in GMP, since Malachite generally initializes new memory with zeros.
+/// This is equivalent to `mpn_zero` from `mpn/generic/zero.c`, GMP 6.2.1. Note that this is needed
+/// less often in Malachite than in GMP, since Malachite generally initializes new memory with
+/// zeros.
 pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
     for x in xs.iter_mut() {
         *x = T::ZERO;
@@ -49,7 +50,7 @@ pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
 /// assert!(!slice_test_zero::<u32>(&[0, 1, 0]));
 /// ```
 ///
-/// This is mpn_zero_p from gmp-h.in, GMP 6.2.1.
+/// This is equivalent to `mpn_zero_p` from `gmp-h.in`, GMP 6.2.1.
 pub fn slice_test_zero<T: Eq + Zero>(xs: &[T]) -> bool {
     let zero = T::ZERO;
     xs.iter().all(|x| x == &zero)
@@ -97,7 +98,7 @@ pub fn slice_trailing_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
     xs.iter().rev().take_while(|&x| x == &zero).count()
 }
 
-/// Given a slice `xs` and an starting index, copies the subslice starting from that index to the
+/// Given a slice and an starting index, copies the subslice starting from that index to the
 /// beginning of the slice.
 ///
 /// In other words, this function copies the contents of `&xs[starting_index..]` to
@@ -131,7 +132,7 @@ pub fn slice_move_left<T: Copy>(xs: &mut [T], starting_index: usize) {
     xs.copy_within(starting_index..xs.len(), 0);
 }
 
-/// This macro splits an immutable slice into adjacent immutable chunks.
+/// Splits an immutable slice into adjacent immutable chunks.
 ///
 /// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
 /// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
@@ -176,7 +177,7 @@ macro_rules! split_into_chunks {
     }
 }
 
-/// This macro splits a mutable slice into adjacent mutable chunks.
+/// Splits a mutable slice into adjacent mutable chunks.
 ///
 /// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
 /// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
@@ -227,6 +228,8 @@ macro_rules! split_into_chunks_mut {
 }
 
 /// Uniformly generates a random reference to a value from a nonempty slice.
+///
+/// This `struct` is created by [`random_values_from_slice`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromSlice<'a, T> {
     xs: &'a [T],
@@ -245,7 +248,8 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// Uniformly generates a random reference to a value from a nonempty slice.
 ///
 /// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the
-/// data, in which case you may use `random_values_from_vec` instead.
+/// data, in which case you may use [`random_values_from_vec`](crate::vecs::random_values_from_vec)
+/// instead.
 ///
 /// The output length is infinite.
 ///
@@ -262,7 +266,6 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_values_from_slice;
 ///
@@ -318,6 +321,8 @@ pub(crate) fn advance_indices(indices: &mut [usize]) -> bool {
 }
 
 /// Generates every permutation of a slice.
+///
+/// This `struct` is created by [`exhaustive_slice_permutations`]; see its documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveSlicePermutations<'a, T> {
     xs: &'a [T],
@@ -341,10 +346,12 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 
 /// Generates every permutation of a slice.
 ///
-/// The permutations are `Vec`s of references to the slice. It may be more convenient for the
-/// iterator to own the data, in which case you may use `exhaustive_vec_permutations` instead.
+/// The permutations are [`Vec`]s of references into the slice. It may be more convenient for the
+/// iterator to own the data, in which case you may use
+/// [`exhaustive_vec_permutations`](crate::vecs::exhaustive_vec_permutations) instead.
 ///
-/// The permutations are generated in lexicographic order with respect to the ordering in the slice.
+/// The permutations are generated in lexicographic order with respect to the ordering in the
+/// slice.
 ///
 /// The output length is $n!$, where $n$ is `xs.len()`.
 ///
@@ -360,7 +367,6 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::slices::exhaustive_slice_permutations;
 ///
 /// let css: Vec<String> = exhaustive_slice_permutations(&['a', 'b', 'c', 'd'])
@@ -384,6 +390,8 @@ pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations
 }
 
 /// Uniformly generates a random permutation of references to a slice.
+///
+/// This `struct` is created by [`random_slice_permutations`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSlicePermutations<'a, T> {
     xs: &'a [T],
@@ -403,7 +411,8 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 /// Uniformly generates a random permutation of references to a slice.
 ///
 /// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the
-/// data, in which case you may use `random_vec_permutations` instead.
+/// data, in which case you may use
+/// [`random_vec_permutations`](crate::vecs::random_vec_permutations) instead.
 ///
 /// The output length is infinite.
 ///
@@ -421,7 +430,6 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_slice_permutations;
 ///
@@ -446,7 +454,9 @@ pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutat
 }
 
 /// Given a slice with nonzero length $\ell$, returns the smallest $n$ such that the slice consists
-/// of $n/\ell$ copies of a length-$\ell$ subslice. Typically $\ell = n$.
+/// of $n/\ell$ copies of a length-$\ell$ subslice.
+///
+/// Typically $\ell = n$.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n^{1+\epsilon})$ for all $\epsilon > 0$

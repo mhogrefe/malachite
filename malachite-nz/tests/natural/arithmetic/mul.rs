@@ -2789,8 +2789,8 @@ fn test_limbs_mul_greater_to_out_toom_44() {
         limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut tp[..n + 1])
-    // limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut tp[..n + 1])
+    // limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
+    // limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
     // s <= t
     // !w1_neg
     // !w3neg
@@ -12010,11 +12010,11 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
                 rn: usize,
                 xs: Vec<Limb>,
                 ys: Vec<Limb>,
-                tp_before: Vec<Limb>,
+                scratch_before: Vec<Limb>,
                 out_after: Vec<Limb>| {
         let mut out = out_before;
-        let mut tp = tp_before;
-        limbs_mul_mod_base_pow_n_minus_1(&mut out, rn, &xs, &ys, &mut tp);
+        let mut scratch = scratch_before;
+        limbs_mul_mod_base_pow_n_minus_1(&mut out, rn, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     let out = vec![10; 905];
@@ -12635,7 +12635,7 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
         11105648925812514991,
         13827146014280242829,
     ];
-    let tp = vec![0; 964];
+    let scratch = vec![0; 964];
     let out_after = vec![
         14914577666128062141,
         12068273989972843735,
@@ -13543,7 +13543,7 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
         10,
         10,
     ];
-    test(out, 480, xs, ys, tp, out_after);
+    test(out, 480, xs, ys, scratch, out_after);
 
     let out = vec![10; 905];
     let xs = vec![
@@ -14455,7 +14455,7 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
         11105648925812514991,
         13827146014280242829,
     ];
-    let tp = vec![0; 1444];
+    let scratch = vec![0; 1444];
     let out_after = vec![
         7119213209737455664,
         8035111372284977647,
@@ -15363,7 +15363,7 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
         4618564184049153098,
         11716810196377677056,
     ];
-    test(out, 960, xs, ys, tp, out_after);
+    test(out, 960, xs, ys, scratch, out_after);
     test(
         vec![
             14220278540957382380,
@@ -17333,27 +17333,27 @@ fn test_limbs_mul_greater_to_out_fft() {
 fn test_limbs_mul_fft_fft() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
-                ll: Vec<Vec<usize>>,
+                ll: Vec<Vec<Limb>>,
                 ll_offset: usize,
                 omega: usize,
                 inc: usize,
-                tp_before: Vec<Limb>,
+                scratch_before: Vec<Limb>,
                 ap_after: Vec<Vec<Limb>>,
-                tp_after: Vec<Limb>| {
+                scratch_after: Vec<Limb>| {
         let mut ap_clone = ap_before.clone();
         let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(ap_before.len());
         for a in &mut ap_clone {
             ap.push(a);
         }
         let ll = ll.iter().map(Vec::as_slice).collect_vec();
-        let mut tp = tp_before;
-        limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
+        let mut scratch = scratch_before;
+        limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut scratch);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
             .zip(ap_after.iter())
             .all(|(xs, ys)| &**xs == ys.as_slice()));
-        assert_eq!(tp, tp_after);
+        assert_eq!(scratch, scratch_after);
     };
     // *xss_0last > 1 in limbs_mul_fft_fft
     test(
@@ -17375,22 +17375,22 @@ fn test_limbs_mul_fft_inverse() {
     let test = |ap_before: Vec<Vec<Limb>>,
                 k: usize,
                 omega: usize,
-                tp_before: Vec<Limb>,
+                scratch_before: Vec<Limb>,
                 ap_after: Vec<Vec<Limb>>,
-                tp_after: Vec<Limb>| {
+                scratch_after: Vec<Limb>| {
         let mut ap_clone = ap_before.clone();
         let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(ap_before.len());
         for a in &mut ap_clone {
             ap.push(a);
         }
-        let mut tp = tp_before;
-        limbs_mul_fft_inverse(&mut ap, k, omega, &mut tp);
+        let mut scratch = scratch_before;
+        limbs_mul_fft_inverse(&mut ap, k, omega, &mut scratch);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
             .zip(ap_after.iter())
             .all(|(xs, ys)| &**xs == ys.as_slice()));
-        assert_eq!(tp, tp_after);
+        assert_eq!(scratch, scratch_after);
     };
     // *xss_0last > 1 in limbs_mul_fft_inverse
     test(
@@ -17430,7 +17430,7 @@ fn test_limbs_mul_fft_internal() {
                 b_before: Vec<Limb>,
                 l: usize,
                 mp: usize,
-                fft_l: Vec<Vec<usize>>,
+                fft_l: Vec<Vec<Limb>>,
                 t_before: Vec<Limb>,
                 sqr: bool,
                 op_after: Vec<Limb>,

@@ -19,14 +19,15 @@ use platform::Limb;
 // there are no restrictions on the index values. If they index beyond the physical size of the
 // input limbs, the function interprets them as pointing to `false` bits.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
-// Panics if `start` > `end`.
+// Panics if `start > end`.
 pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -55,14 +56,15 @@ pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<
 // there are no restrictions on the index values. If they index beyond the physical size of the
 // input limbs, the function interprets them as pointing to `false` bits.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
-// Panics if `start` > `end`.
+// Panics if `start > end`.
 pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -78,18 +80,19 @@ pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
     xs
 }}
 
-/// Copy values from `ys` into `xs`.
-///
-/// If `ys` has the same length as `xs`, the usual copy is performed.
-/// If `ys` is longer than `xs`, the first `xs.len()` limbs of `ys` are copied.
-/// If `ys` is shorter than `xs`, `ys` is copied and the remaining bits of `xs` are filled with
-/// zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
+// Copy values from `ys` into `xs`.
+//
+// If `ys` has the same length as `xs`, the usual copy is performed.
+// If `ys` is longer than `xs`, the first `xs.len()` limbs of `ys` are copied.
+// If `ys` is shorter than `xs`, `ys` is copied and the remaining bits of `xs` are filled with
+// zeros.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn copy_from_diff_len_slice(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -148,14 +151,15 @@ pub(crate) fn limbs_assign_bits_helper(
 // bits are written. If `bits` has fewer than `end` - `start` bits, the remaining written bits are
 // zero. `xs` may be extended to accommodate the new bits. `start` must be smaller than `end`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `end`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `end`.
 //
 // # Panics
-// Panics if `start` >= `end`.
+// Panics if `start >= end`.
 pub_test! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     limbs_assign_bits_helper(xs, start, end, bits, false);
@@ -164,41 +168,43 @@ pub_test! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[L
 impl BitBlockAccess for Natural {
     type Bits = Natural;
 
-    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
-    /// is taken by reference, and the resulting bits are returned as a `Natural`. If `end` is
-    /// greater than the type's width, the high bits of the result are all 0.
+    /// Extracts a block of adjacent bits from a [`Natural`], taking the [`Natural`] by reference.
     ///
-    /// Time: worst case O(n)
+    /// The first index is `start` and last index is `end - 1`.
     ///
-    /// Additional memory: worst case O(n)
+    /// Let $n$ be `self`, and let $p$ and $q$ be `start` and `end`, respectively.
     ///
-    /// where n = `self.significant_bits()`
+    /// Let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
+    /// rest are 0. Then
+    /// $$
+    /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::from(0xabcdef0112345678u64).get_bits(16, 48),
-    ///     Natural::from(0xef011234u32)
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(0xabcdef0112345678u64).get_bits(4, 16),
-    ///     Natural::from(0x567u32)
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(0xabcdef0112345678u64).get_bits(0, 100),
-    ///     Natural::from(0xabcdef0112345678u64)
-    /// );
-    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), Natural::ZERO);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(16, 48), 0xef011234u32);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(4, 16), 0x567u32);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(0, 100), 0xabcdef0112345678u64);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), 0);
     /// ```
     fn get_bits(&self, start: u64, end: u64) -> Natural {
         match *self {
@@ -209,38 +215,44 @@ impl BitBlockAccess for Natural {
         }
     }
 
-    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
-    /// is taken by value, and the resulting bits are returned as a `Natural`. If `end` is greater
-    /// than the type's width, the high bits of the result are all 0.
+    /// Extracts a block of adjacent bits from a [`Natural`], taking the [`Natural`] by value.
     ///
-    /// Time: worst case O(n)
+    /// The first index is `start` and last index is `end - 1`.
     ///
-    /// Additional memory: worst case O(1)
+    /// Let $n$ be `self`, and let $p$ and $q$ be `start` and `end`, respectively.
     ///
-    /// where n = `self.significant_bits()`
+    /// Let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
+    /// are 0. Then
+    /// $$
+    /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(16, 48),
-    ///     Natural::from(0xef011234u32)
-    /// );
-    /// assert_eq!(
-    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(4, 16),
-    ///     Natural::from(0x567u32)
-    /// );
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(16, 48), 0xef011234u32);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(4, 16), 0x567u32);
     /// assert_eq!(
     ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(0, 100),
-    ///     Natural::from(0xabcdef0112345678u64)
+    ///     0xabcdef0112345678u64
     /// );
     /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(10, 10), 0);
     /// ```
@@ -253,33 +265,59 @@ impl BitBlockAccess for Natural {
         }
     }
 
-    /// Writes the bits of `bits` to `self`. The first index that the bits are written to in `self`
-    /// is `start` and last index is `end - 1`. The bit indices do not need to be aligned with any
-    /// limb boundaries. If `bits` has more than `end` - `start` bits, only the first
-    /// `end` - `start` bits are written. If `bits` has fewer than `end` - `start` bits, the
-    /// remaining written bits are zero. `self` may be extended to accommodate the new bits. `start`
-    /// must be less than or equal to `end`.
+    /// Replaces a block of adjacent bits in a [`Natural`] with other bits.
     ///
-    /// Time: worst case O(n)
+    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through
+    /// `end - 1`, inclusive, of `self`.
     ///
-    /// Additional memory: worst case O(n)
+    /// Let $n$ be `self` and let $m$ be `bits`, and let $p$ and $q$ be `start` and `end`,
+    /// respectively.
     ///
-    /// where n = `end`
+    /// If `bits` has fewer bits than `end - start`, the high bits are interpreted as 0.
+    /// Let
+    /// $$
+    /// n = \sum_{i=0}^\infty 2^{b_i},
+    /// $$
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
+    /// are 0.
+    /// Let
+    /// $$
+    /// m = \sum_{i=0}^k 2^{d_i},
+    /// $$
+    /// where for all $i$, $d_i\in \\{0, 1\\}$.
+    /// Also, let $p, q \in \mathbb{N}$, and let $W$ be `max(self.significant_bits(), end + 1)`.
+    ///
+    /// Then
+    /// $$
+    /// n \gets \sum_{i=0}^{W-1} 2^{c_i},
+    /// $$
+    /// where
+    /// $$
+    /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+    /// \\{b_0, b_1, b_2, \ldots, b_{p-1}, d_0, d_1, \ldots, d_{p-q-1}, b_q, \ldots,
+    /// b_ {W-1}\\}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `end`.
     ///
     /// # Panics
-    /// Panics if `start` > `end`.
+    /// Panics if `start > end`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(123u32);
     /// n.assign_bits(5, 7, &Natural::from(456u32));
-    /// assert_eq!(n.to_string(), "27");
+    /// assert_eq!(n, 27);
     ///
     /// let mut n = Natural::from(123u32);
     /// n.assign_bits(64, 128, &Natural::from(456u32));

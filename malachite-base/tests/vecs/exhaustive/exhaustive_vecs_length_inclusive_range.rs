@@ -46,6 +46,7 @@ fn exhaustive_vecs_length_inclusive_range_small_helper<I: Clone + Iterator>(
 fn test_exhaustive_vecs_length_inclusive_range() {
     exhaustive_vecs_length_inclusive_range_small_helper(0, 4, nevers(), 1, &[&[]]);
     exhaustive_vecs_length_inclusive_range_small_helper(6, 9, nevers(), 0, &[]);
+    exhaustive_vecs_length_inclusive_range_small_helper(5, 3, exhaustive_bools(), 0, &[]);
     exhaustive_vecs_length_inclusive_range_small_helper(
         0,
         4,
@@ -142,10 +143,4 @@ fn test_exhaustive_vecs_length_inclusive_range() {
             &[2, 3],
         ],
     );
-}
-
-#[test]
-#[should_panic]
-fn exhaustive_vecs_length_inclusive_range_fail() {
-    exhaustive_vecs_length_inclusive_range(1, 0, exhaustive_bools());
 }

@@ -14,9 +14,9 @@ fn test_from_continued_fraction() {
     let test = |floor: &str, xs: &str, out: &str| {
         let floor = Integer::from_str(floor).unwrap();
         let xs: Vec<Natural> = vec_from_str(xs).unwrap();
-        let x = Rational::from_continued_fraction(floor.clone(), xs.clone());
+        let x = Rational::from_continued_fraction(floor.clone(), xs.iter().cloned());
         assert!(x.is_valid());
-        assert_eq!(Rational::from_continued_fraction_ref(&floor, &xs), x);
+        assert_eq!(Rational::from_continued_fraction_ref(&floor, xs.iter()), x);
         assert_eq!(from_continued_fraction_alt(floor, xs), x);
         assert_eq!(x.to_string(), out);
     };
@@ -34,7 +34,7 @@ fn test_from_continued_fraction() {
 #[test]
 #[should_panic]
 fn from_continued_fraction_fail_1() {
-    Rational::from_continued_fraction(Integer::ONE, vec![Natural::ZERO]);
+    Rational::from_continued_fraction(Integer::ONE, std::iter::once(Natural::ZERO));
 }
 
 #[test]
@@ -42,14 +42,14 @@ fn from_continued_fraction_fail_1() {
 fn from_continued_fraction_fail_2() {
     Rational::from_continued_fraction(
         Integer::ONE,
-        vec![Natural::from(3u32), Natural::ZERO, Natural::ONE],
+        vec![Natural::from(3u32), Natural::ZERO, Natural::ONE].into_iter(),
     );
 }
 
 #[test]
 #[should_panic]
 fn from_continued_fraction_ref_fail_1() {
-    Rational::from_continued_fraction_ref(&Integer::ONE, &[Natural::ZERO]);
+    Rational::from_continued_fraction_ref(&Integer::ONE, [Natural::ZERO].iter());
 }
 
 #[test]
@@ -57,16 +57,16 @@ fn from_continued_fraction_ref_fail_1() {
 fn from_continued_fraction_ref_fail_2() {
     Rational::from_continued_fraction_ref(
         &Integer::ONE,
-        &[Natural::from(3u32), Natural::ZERO, Natural::ONE],
+        [Natural::from(3u32), Natural::ZERO, Natural::ONE].iter(),
     );
 }
 
 #[test]
 fn from_continued_fraction_properties() {
     natural_vec_integer_pair_gen_var_1().test_properties(|(xs, floor)| {
-        let x = Rational::from_continued_fraction(floor.clone(), xs.clone());
+        let x = Rational::from_continued_fraction(floor.clone(), xs.iter().cloned());
         assert!(x.is_valid());
-        assert_eq!(Rational::from_continued_fraction_ref(&floor, &xs), x);
+        assert_eq!(Rational::from_continued_fraction_ref(&floor, xs.iter()), x);
         assert_eq!(from_continued_fraction_alt(floor.clone(), xs.clone()), x);
         if xs.last() != Some(&Natural::ONE) {
             let (floor_alt, cf) = (&x).continued_fraction();
@@ -80,12 +80,18 @@ fn from_continued_fraction_properties() {
             if *last > 1u32 {
                 *last -= Natural::ONE;
                 alt_xs.push(Natural::ONE);
-                assert_eq!(Rational::from_continued_fraction(floor, alt_xs), x);
+                assert_eq!(
+                    Rational::from_continued_fraction(floor, alt_xs.into_iter()),
+                    x
+                );
             }
         }
     });
 
     integer_gen().test_properties(|x| {
-        assert_eq!(Rational::from_continued_fraction_ref(&x, &[]), x);
+        assert_eq!(
+            Rational::from_continued_fraction_ref(&x, std::iter::empty()),
+            x
+        );
     });
 }

@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
@@ -12,20 +13,20 @@ use natural::logic::bit_access::limbs_get_bit;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::fmt::Display;
 use std::ops::{Shl, ShlAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
-// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
-// the result is returned.
+// This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
+// non-negative, `dir == 1`, and the result is returned.
 pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -45,6 +46,12 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -67,11 +74,13 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is exactly between
 // two integers, it is rounded to the even one.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
+// `max(1, xs.len() - bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
         xs.to_vec()
@@ -88,11 +97,13 @@ pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // limbs of the `Natural` right-shifted by a `Limb`, if the shift is exact (doesn't remove any
 // `true` bits). If the shift is inexact, `None` is returned. The limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(m)$
 //
-// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
+// `max(1, xs.len() - bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
@@ -105,11 +116,13 @@ pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 // limbs of the `Natural` right-shifted by a `Limb`, rounded using a specified rounding format. The
 // limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
+// `max(1, xs.len() - bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
@@ -123,14 +136,15 @@ pub_test! {limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<V
 // limbs of the `Natural` right-shifted by a `Limb`, rounding up, to the input `Vec`. The limbs
 // should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
-// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
-// w == u.
+// This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
+// non-negative, `dir == 1`, and `w == u`.
 pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -149,6 +163,12 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -170,11 +190,12 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 // nearest to the actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is
 // exactly between two integers, it is rounded to the even one.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
     } else if !limbs_get_bit(xs, bits - 1) {
@@ -191,11 +212,12 @@ pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 // (doesn't remove any `true` bits). Returns whether the shift was exact. The limbs should not all
 // be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_2(xs, bits) {
         limbs_vec_shr_in_place(xs, bits);
@@ -211,11 +233,12 @@ pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 // `Exact`, the value of `xs` becomes unspecified and `false` is returned. Otherwise, `true` is
 // returned. The limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
 pub_test! {limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {
@@ -234,11 +257,7 @@ pub_test! {limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: Round
     }
 }}
 
-fn shr_round_unsigned_ref_n<T: Copy + Display + Eq + Zero>(
-    x: &Natural,
-    bits: T,
-    rm: RoundingMode,
-) -> Natural
+fn shr_round_unsigned_ref_n<T: PrimitiveUnsigned>(x: &Natural, bits: T, rm: RoundingMode) -> Natural
 where
     u64: ExactFrom<T>,
     Limb: ShrRound<T, Output = Limb>,
@@ -257,7 +276,7 @@ where
     }
 }
 
-fn shr_round_assign_unsigned_n<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, rm: RoundingMode)
+fn shr_round_assign_unsigned_n<T: PrimitiveUnsigned>(x: &mut Natural, bits: T, rm: RoundingMode)
 where
     u64: ExactFrom<T>,
     Limb: ShrRoundAssign<T>,
@@ -282,60 +301,49 @@ macro_rules! impl_natural_shr_round_unsigned {
         impl ShrRound<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
-            /// specified rounding mode, taking the `Natural` by value. Passing
-            /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
-            /// whether `RoundingMode::Exact` can be passed, use
+            /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by value, and
+            /// rounds according to the specified rounding mode.
+            ///
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Time: worst case O(n)
+            /// Let $q = \frac{x}{2^k}$:
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
-            /// where n = `xs.len()`
+            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & \text{if}
+            ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & \text{if}
+            ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+            ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even}, \\\\
+            ///     \lceil q \rceil &
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///         \\ \lfloor q \rfloor \\ \text{is odd}.
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRound;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(Natural::from(0x101u32).shr_round(8u8, RoundingMode::Down).to_string(),
-            ///     "1");
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(8u16, RoundingMode::Up).to_string(),
-            ///     "2"
-            /// );
-            ///
-            /// assert_eq!(Natural::from(0x101u32).shr_round(9u32, RoundingMode::Down).to_string(),
-            ///     "0");
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(9u64, RoundingMode::Up).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(9u8, RoundingMode::Nearest).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0xffu32).shr_round(9u16, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0x100u32).shr_round(9u32, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            ///
-            /// assert_eq!(Natural::from(0x100u32).shr_round(8u64, RoundingMode::Exact).to_string(),
-            ///     "1");
-            /// ```
+            /// See [here](super::shr_round#shr_round).
             #[inline]
             fn shr_round(mut self, bits: $t, rm: RoundingMode) -> Natural {
                 self.shr_round_assign(bits, rm);
@@ -346,62 +354,50 @@ macro_rules! impl_natural_shr_round_unsigned {
         impl<'a> ShrRound<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
-            /// specified rounding mode, taking the `Natural` by reference. Passing
-            /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
-            /// whether `RoundingMode::Exact` can be passed, use
+            /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by reference,
+            /// and rounds according to the specified rounding mode.
+            ///
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Time: worst case O(n)
+            /// Let $q = \frac{x}{2^k}$:
             ///
-            /// Additional memory: worst case O(m)
+            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
-            /// where n = `self.significant_bits()`, m = max(1, `self.significant_bits()` - `bits`)
+            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & \text{if}
+            ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & \text{if}
+            ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+            ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even}, \\\\
+            ///     \lceil q \rceil &
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///         \\ \lfloor q \rfloor \\ \text{is odd}.
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(m) = O(m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(1, self.significant_bits() - bits)`.
             ///
             /// # Panics
-            /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRound;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(8u8, RoundingMode::Down).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(8u16, RoundingMode::Up).to_string(),
-            ///     "2"
-            /// );
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(9u32, RoundingMode::Down).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!((&Natural::from(0x101u32)).shr_round(9u64, RoundingMode::Up).to_string(),
-            ///     "1");
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(9u8, RoundingMode::Nearest).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     (&Natural::from(0xffu32)).shr_round(9u16, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!((&Natural::from(0x100u32)).shr_round(9u32, RoundingMode::Nearest)
-            ///     .to_string(), "0");
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x100u32)).shr_round(8u64, RoundingMode::Exact).to_string(),
-            ///     "1"
-            /// );
-            /// ```
+            /// See [here](super::shr_round#shr_round).
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
                 shr_round_unsigned_ref_n(self, bits, rm)
@@ -409,62 +405,27 @@ macro_rules! impl_natural_shr_round_unsigned {
         }
 
         impl ShrRoundAssign<$t> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
+            /// Shifts a [`Natural`] right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Time: worst case O(n)
+            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
+            /// documentation for details.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `xs.len()`
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(8u8, RoundingMode::Down);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(8u16, RoundingMode::Up);
-            /// assert_eq!(n.to_string(), "2");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9u32, RoundingMode::Down);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9u64, RoundingMode::Up);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9u8, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0xffu32);
-            /// n.shr_round_assign(9u16, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x100u32);
-            /// n.shr_round_assign(9u32, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x100u32);
-            /// n.shr_round_assign(8u64, RoundingMode::Exact);
-            /// assert_eq!(n.to_string(), "1");
-            /// ```
+            /// See [here](super::shr_round#shr_round_assign).
             #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
                 shr_round_assign_unsigned_n(self, bits, rm);
@@ -474,7 +435,7 @@ macro_rules! impl_natural_shr_round_unsigned {
 }
 apply_to_unsigneds!(impl_natural_shr_round_unsigned);
 
-fn shr_round_signed_ref_n<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_signed_ref_n<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
     rm: RoundingMode,
@@ -489,7 +450,7 @@ where
     }
 }
 
-fn shr_round_assign_signed_n<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_assign_signed_n<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &mut Natural,
     bits: S,
     rm: RoundingMode,
@@ -508,69 +469,50 @@ macro_rules! impl_natural_shr_round_signed {
         impl ShrRound<$t> for Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
-            /// taking the `Natural` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down`
-            /// is equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed,
-            /// use `bits < 0 || self.divisible_by_power_of_2(bits)`.
+            /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2), taking it by
+            /// value, and rounds according to the specified rounding mode.
             ///
-            /// Time: worst case O(`bits`)
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// Let $q = \frac{x}{2^k}$:
+            ///
+            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            ///
+            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & \text{if}
+            ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & \text{if}
+            ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+            ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even}, \\\\
+            ///     \lceil q \rceil &
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///         \\ \lfloor q \rfloor \\ \text{is odd}.
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
+            /// `self` is not divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRound;
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(8i8, RoundingMode::Down).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(8i16, RoundingMode::Up).to_string(),
-            ///     "2"
-            /// );
-            ///
-            /// assert_eq!(Natural::from(0x101u32).shr_round(9i32, RoundingMode::Down).to_string(),
-            ///     "0");
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(9i64, RoundingMode::Up).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0x101u32).shr_round(9i8, RoundingMode::Nearest).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0xffu32).shr_round(9i16, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!(
-            ///     Natural::from(0x100u32).shr_round(9i32, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            ///
-            /// assert_eq!(Natural::from(0x100u32).shr_round(8i64, RoundingMode::Exact).to_string(),
-            ///     "1");
-            ///
-            /// assert_eq!(Natural::ZERO.shr_round(-10i8, RoundingMode::Exact).to_string(), "0");
-            /// assert_eq!(Natural::from(123u32).shr_round(-2i16, RoundingMode::Exact).to_string(),
-            ///     "492");
-            /// assert_eq!(
-            ///     Natural::from(123u32).shr_round(-100i32, RoundingMode::Exact).to_string(),
-            ///     "155921023828072216384094494261248"
-            /// );
-            /// ```
+            /// See [here](super::shr_round#shr_round).
             #[inline]
             fn shr_round(mut self, bits: $t, rm: RoundingMode) -> Natural {
                 self.shr_round_assign(bits, rm);
@@ -581,72 +523,58 @@ macro_rules! impl_natural_shr_round_signed {
         impl<'a> ShrRound<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
-            /// taking the `Natural` by reference. Passing `RoundingMode::Floor` or
-            /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use
-            /// `bits < 0 || self.divisible_by_power_of_2(bits)`.
+            /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2), taking it by
+            /// reference, and rounds according to the specified rounding mode.
             ///
-            /// Time: worst case O(`bits`)
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// Let $q = \frac{x}{2^k}$:
+            ///
+            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            ///
+            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & \text{if}
+            ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
+            ///     \lceil q \rceil & \text{if}
+            ///         \\quad q - \lfloor q \rfloor > \frac{1}{2}, \\\\
+            ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor =
+            ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even}, \\\\
+            ///     \lceil q \rceil &
+            ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and}
+            ///         \\ \lfloor q \rfloor \\ \text{is odd}.
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(-bits, 0)`.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
+            /// `self` is not divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRound;
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(8i8, RoundingMode::Down).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(8i16, RoundingMode::Up).to_string(),
-            ///     "2"
-            /// );
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(9i32, RoundingMode::Down).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!((&Natural::from(0x101u32)).shr_round(9i64, RoundingMode::Up).to_string(),
-            ///     "1");
-            /// assert_eq!(
-            ///     (&Natural::from(0x101u32)).shr_round(9i8, RoundingMode::Nearest).to_string(),
-            ///     "1"
-            /// );
-            /// assert_eq!(
-            ///     (&Natural::from(0xffu32)).shr_round(9i16, RoundingMode::Nearest).to_string(),
-            ///     "0"
-            /// );
-            /// assert_eq!((&Natural::from(0x100u32)).shr_round(9i32, RoundingMode::Nearest)
-            ///     .to_string(), "0");
-            ///
-            /// assert_eq!(
-            ///     (&Natural::from(0x100u32)).shr_round(8i64, RoundingMode::Exact).to_string(),
-            ///     "1"
-            /// );
-            ///
-            /// assert_eq!((&Natural::ZERO).shr_round(-10i8, RoundingMode::Exact).to_string(), "0");
-            /// assert_eq!(
-            ///     (&Natural::from(123u32)).shr_round(-2i16, RoundingMode::Exact).to_string(),
-            ///     "492"
-            /// );
-            /// assert_eq!(
-            ///     (&Natural::from(123u32)).shr_round(-100i32, RoundingMode::Exact).to_string(),
-            ///     "155921023828072216384094494261248"
-            /// );
-            /// ```
+            /// See [here](super::shr_round#shr_round).
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
                 shr_round_signed_ref_n(self, bits, rm)
@@ -654,69 +582,30 @@ macro_rules! impl_natural_shr_round_signed {
         }
 
         impl ShrRoundAssign<$t> for Natural {
-            /// Shifts a `Natural` right (divides it by a power of 2 and takes the floor or
-            /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
-            /// in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-            /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits < 0 || self.divisible_by_power_of_2(bits)`.
+            /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2) and rounds
+            /// according to the specified rounding mode, in place.
             ///
-            /// Time: worst case O(`bits`)
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Additional memory: worst case O(`bits`)
+            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
+            /// documentation for details.
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(-bits, 0)`.
             ///
             /// # Panics
-            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`bits`</sup>.
+            /// Let $k$ be `bits`. Panics if $k$ is positive and `rm` is `RoundingMode::Exact` but
+            /// `self` is not divisible by $2^k$.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(8i8, RoundingMode::Down);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(8i16, RoundingMode::Up);
-            /// assert_eq!(n.to_string(), "2");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9i32, RoundingMode::Down);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9i64, RoundingMode::Up);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0x101u32);
-            /// n.shr_round_assign(9i8, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut n = Natural::from(0xffu32);
-            /// n.shr_round_assign(9i16, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x100u32);
-            /// n.shr_round_assign(9i32, RoundingMode::Nearest);
-            /// assert_eq!(n.to_string(), "0");
-            ///
-            /// let mut n = Natural::from(0x100u32);
-            /// n.shr_round_assign(8i64, RoundingMode::Exact);
-            /// assert_eq!(n.to_string(), "1");
-            ///
-            /// let mut x = Natural::ONE;
-            /// x.shr_round_assign(-1i8, RoundingMode::Exact);
-            /// x.shr_round_assign(-2i16, RoundingMode::Exact);
-            /// x.shr_round_assign(-3i32, RoundingMode::Exact);
-            /// x.shr_round_assign(-4i64, RoundingMode::Exact);
-            /// assert_eq!(x.to_string(), "1024");
-            /// ```
+            /// See [here](super::shr_round#shr_round_assign).
             #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
                 shr_round_assign_signed_n(self, bits, rm);

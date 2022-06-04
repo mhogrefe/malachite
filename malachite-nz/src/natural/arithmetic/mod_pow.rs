@@ -44,8 +44,11 @@ use std::cmp::{max, min, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //
-// This is getbits from mpn/generic/powm.c and mpn/generic/powlo.c, GMP 6.2.1. Investigate changes
-// from 6.1.2?
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `getbits` from `mpn/generic/powm.c` and `mpn/generic/powlo.c`, GMP 6.2.1.
+// Investigate changes from 6.1.2?
 pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
     usize::exact_from(if end < len {
         xs[0].mod_power_of_2(end)
@@ -62,7 +65,14 @@ pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
     })
 }
 
-// This is mpn_redc_1 from mpn/generic/redc_1.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n^2)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
+//
+// This is equivalent to `mpn_redc_1` from `mpn/generic/redc_1.c`, GMP 6.2.1.
 #[allow(clippy::redundant_slicing)]
 fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) -> bool {
     let len = ms.len();
@@ -81,7 +91,15 @@ fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Li
     limbs_add_same_length_to_out(out, xs_hi, xs_lo)
 }
 
-// This is MPN_REDC_1 from mpn/generic/powm.c, GMP 6.2.1. Investigate changes from 6.1.2?
+// # Worst-case complexity
+// $T(n) = O(n^2)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
+//
+// This is equivalent to `MPN_REDC_1` from `mpn/generic/powm.c`, GMP 6.2.1. Investigate changes
+// from 6.1.2?
 fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) {
     if limbs_redc_limb_raw(out, xs, ms, m_inv) {
         limbs_sub_same_length_in_place_left(&mut out[..ms.len()], ms);
@@ -90,7 +108,11 @@ fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) 
 
 const WIDTH_LIMITS: [u64; 10] = [7, 25, 81, 241, 673, 1793, 4609, 11521, 28161, u64::MAX];
 
-// This is win_size from mpn/generic/powm.c, 6.2.1. Investigate changes from 6.1.2?
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `win_size` from `mpn/generic/powm.c`, 6.2.1. Investigate changes from
+// 6.1.2?
 pub(crate) fn get_window_size(width: u64) -> u64 {
     u64::wrapping_from(
         WIDTH_LIMITS
@@ -101,7 +123,14 @@ pub(crate) fn get_window_size(width: u64) -> u64 {
     )
 }
 
-// This is mpn_redc_n from mpn/generic/redc_n.c, GMP 6.2.1.
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
+//
+// This is equivalent to `mpn_redc_n` from `mpn/generic/redc_n.c`, GMP 6.2.1.
 fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
     let ms_len = ms.len();
     assert!(ms_len > 8);
@@ -126,7 +155,16 @@ fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
 }
 
 // Convert U to REDC form, U_r = B^n * U mod M
-// This is redcify from mpn/generic/powm.c, 6.2.1. Investigate changes from 6.1.2?
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
+//
+// This is equivalent to `redcify` from `mpn/generic/powm.c`, 6.2.1. Investigate changes from
+// 6.1.2?
 fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
     let xs_len = xs.len();
     let ms_len = ms.len();
@@ -145,22 +183,44 @@ fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
 //TODO tune
 const REDC_1_TO_REDC_N_THRESHOLD: usize = 100;
 
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_test! {limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
     max(limbs_modular_invert_scratch_len(n), n << 1)
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn square_using_basecase_mul(out: &mut [Limb], xs: &[Limb]) {
     limbs_mul_greater_to_out_basecase(out, xs, xs)
 }
 
+// # Worst-case complexity
+// $T(n) = O(n^2)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 fn limbs_redc_limb_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
     limbs_redc_limb(out, xs, ms, is[0])
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 fn limbs_redc_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
     limbs_redc(out, xs, ms, is)
 }
 
+// # Worst-case complexity
+// Constant time and additional memory.
 #[allow(clippy::absurd_extreme_comparisons, clippy::type_complexity)]
 fn select_fns(
     ms_len: usize,
@@ -235,13 +295,18 @@ fn select_fns(
 // $E$ must be greater than 1, and `out` must be at least as long as `ms`. It is not required than
 // `xs` be less than `ms`.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n, m) = O(mn \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `ms.len()`, and $m$ is `es.len()`.
 //
 // # Panics
 // Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
 // `ms` is even, or if $E$ less than 2.
 //
-// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
+// This is equivalent to `mpn_powm` from `mpn/generic/powm.c`, GMP 6.2.1.
 pub_test! {limbs_mod_pow_odd(
     out: &mut [Limb],
     xs: &[Limb],
@@ -342,13 +407,18 @@ pub_test! {limbs_mod_pow_odd(
 // trailing zeros, the exponent must be greater than 1, and the output slice must be at least as
 // long as `ms`.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n, m) = O(mn \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `ms.len()`, and $m$ is `es.len()`.
 //
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
 //
-// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
-// Investigate changes from 6.1.2?
+// This is equivalent to `mpz_powm` from `mpn/generic/powm.c`, GMP 6.2.1, where `b`, `e`, and `m`
+// are non-negative. Investigate changes from 6.1.2?
 pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
     let ms_len = ms.len();
     let es_len = es.len();
@@ -445,15 +515,22 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
 impl ModPow<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking all three `Natural`s by
-    /// value. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. All three [`Natural`]s are taken by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -471,15 +548,23 @@ impl ModPow<Natural, Natural> for Natural {
 impl<'a> ModPow<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first two `Natural`s by
-    /// value and the third by reference. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. The first two [`Natural`]s are taken by value and the
+    /// third by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -497,16 +582,23 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
 impl<'a> ModPow<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first and third
-    /// `Natural`s by value and the second by reference. Assumes the base is already reduced mod
-    /// `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. The first and third [`Natural`]s are taken by value and
+    /// the second by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -524,15 +616,23 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first `Natural` by
-    /// value and the second and third by reference. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. The first [`Natural`] is taken by value and the second
+    /// and third by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -553,15 +653,23 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
 impl<'a> ModPow<Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first `Natural` by
-    /// reference and the second and third by value. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`]$m$. Assumes the
+    /// input is already reduced mod $m$. The first [`Natural`] is taken by reference and the
+    /// second and third by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -601,16 +709,23 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first and third
-    /// `Natural`s by reference and the second by value. Assumes the base is already reduced mod
-    /// `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. The first and third [`Natural`]s are taken by reference
+    /// and the second by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -650,15 +765,23 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking the first two `Natural` by
-    /// reference and the third by value. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. The first two [`Natural`]s are taken by reference and the
+    /// third by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -698,15 +821,22 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod a `Natural`, taking all three `Natural`s by
-    /// reference. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
+    /// input is already reduced mod $m$. All three [`Natural`]s are taken by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
@@ -744,15 +874,23 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModPowAssign<Natural, Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod a `Natural` in place, taking the second and
-    /// third `Natural`s by value. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
+    /// Assumes the input is already reduced mod $m$. Both [`Natural`]s on the right-hand side are
+    /// taken by value.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
@@ -792,15 +930,23 @@ impl ModPowAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod a `Natural` in place, taking the second
-    /// `Natural` by value and the third by reference. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
+    /// Assumes the input is already reduced mod $m$. The first [`Natural`] on the right-hand side
+    /// is taken by value and the second by reference.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
@@ -840,15 +986,23 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod a `Natural` in place, taking the second
-    /// `Natural` by reference and the third by value. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
+    /// Assumes the input is already reduced mod $m$. The first [`Natural`] on the right-hand side
+    /// is taken by reference and the second by value.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
@@ -883,15 +1037,23 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod a `Natural` in place, taking the second and
-    /// third `Natural`s by reference. Assumes the base is already reduced mod `m`.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
+    /// Assumes the input is already reduced mod $m$. Both [`Natural`]s on the right-hand side are
+    /// taken by reference.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;

@@ -85,18 +85,18 @@ fn update_best(best: &mut Option<Rational>, x: &Rational, y: &Rational, candidat
 }
 
 impl Rational {
-    /// Compares two `Rational`s according to their complexity.
+    /// Compares two [`Rational`]s according to their complexity.
     ///
-    /// Complexity is defined as follows: If two `Rational`s have different denominators, then the
-    /// one with the larger denominator is more complex. If they have the same denominator, then
-    /// the one whose numerator is further from zero is more complex. Finally, if $q > 0$, then $q$
-    /// is simpler than $-q$.
+    /// Complexity is defined as follows: If two [`Rational`]s have different denominators, then
+    /// the one with the larger denominator is more complex. If they have the same denominator,
+    /// then the one whose numerator is further from zero is more complex. Finally, if $q > 0$,
+    /// then $q$ is simpler than $-q$.
     ///
-    /// The `Rational`s ordered by complexity look like this:
+    /// The [`Rational`]s ordered by complexity look like this:
     /// $$
     /// 0, 1, -1, 2, -2, \ldots, 1/2, -1/2, 3/2, -3/2, \ldots, 1/3, -1/3, 2/3, -2/3, \ldots, \ldots.
     /// $$
-    /// This order is a well-order, and the order type of the `Rational`s under this order is
+    /// This order is a well-order, and the order type of the [`Rational`]s under this order is
     /// $\omega^2$.
     ///
     /// # Worst-case complexity
@@ -133,7 +133,7 @@ impl Rational {
 }
 
 impl SimplestRationalInInterval for Rational {
-    /// Finds the simplest `Rational` contained in an open interval.
+    /// Finds the simplest [`Rational`] contained in an open interval.
     ///
     /// Let $f(x, y) = p/q$, with $p$ and $q$ relatively prime. Then the following properties hold:
     /// - $x < p/q < y$
@@ -141,7 +141,12 @@ impl SimplestRationalInInterval for Rational {
     /// - If $x < m/q < y$, then $|p| \leq |m|$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n^2 \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if $x \geq y$.
@@ -336,7 +341,7 @@ impl SimplestRationalInInterval for Rational {
         }
     }
 
-    /// Finds the simplest `Rational` contained in a closed interval.
+    /// Finds the simplest [`Rational`] contained in a closed interval.
     ///
     /// Let $f(x, y) = p/q$, with $p$ and $q$ relatively prime. Then the following properties hold:
     /// - $x \leq p/q \leq y$
@@ -344,7 +349,12 @@ impl SimplestRationalInInterval for Rational {
     /// - If $x \leq m/q \leq y$, then $|p| \leq |m|$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n^2 \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if $x > y$.

@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivRound, DivisibleBy};
+use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     ExactFrom, IntegerMantissaAndExponent, SciMantissaAndExponent, WrappingFrom,
@@ -9,7 +9,8 @@ use std::cmp::Ordering;
 use Rational;
 
 impl Rational {
-    /// Returns the scientific mantissa and exponent, taking `self` by reference.
+    /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by
+    /// value.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -21,12 +22,15 @@ impl Rational {
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
@@ -66,7 +70,7 @@ impl Rational {
         }
         self >>= exponent - i64::wrapping_from(T::MANTISSA_WIDTH);
         let (n, d) = self.into_numerator_and_denominator();
-        if rm == RoundingMode::Exact && !(&n).divisible_by(&d) {
+        if rm == RoundingMode::Exact && d != 1u32 {
             return None;
         }
         let mut mantissa = n.div_round(d, rm);
@@ -87,7 +91,8 @@ impl Rational {
         ))
     }
 
-    /// Returns the scientific mantissa and exponent, taking `self` by reference.
+    /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by
+    /// reference.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -99,12 +104,15 @@ impl Rational {
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
@@ -144,7 +152,7 @@ impl Rational {
         }
         let x = self >> (exponent - i64::wrapping_from(T::MANTISSA_WIDTH));
         let (n, d) = x.into_numerator_and_denominator();
-        if rm == RoundingMode::Exact && !(&n).divisible_by(&d) {
+        if rm == RoundingMode::Exact && d != 1u32 {
             return None;
         }
         let mut mantissa = n.div_round(d, rm);
@@ -169,44 +177,53 @@ impl Rational {
 macro_rules! impl_mantissa_and_exponent {
     ($t:ident) => {
         impl SciMantissaAndExponent<$t, i64> for Rational {
-            /// Returns the scientific mantissa and exponent, taking `self` by value
+            /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`]
+            /// by value.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent_with_rounding`.
+            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
                 self.sci_mantissa_and_exponent_with_rounding(RoundingMode::Nearest)
                     .unwrap()
             }
 
-            /// Returns the scientific exponent, taking `self` by value
+            /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by value.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent_with_rounding`.
+            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_exponent).
             fn sci_exponent(mut self) -> i64 {
                 assert!(self != 0);
                 let mut exponent = i64::exact_from(self.numerator.significant_bits())
@@ -224,7 +241,7 @@ macro_rules! impl_mantissa_and_exponent {
                 }
             }
 
-            /// Constructs a `Rational` from its scientific mantissa and exponent.
+            /// Constructs a [`Rational`] from its scientific mantissa and exponent.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is
@@ -243,9 +260,6 @@ macro_rules! impl_mantissa_and_exponent {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `sci_exponent`.
-            ///
-            /// # Examples
-            /// See the documentation of the `conversion::mantissa_and_exponent` module.
             #[allow(clippy::manual_range_contains)]
             #[inline]
             fn from_sci_mantissa_and_exponent(
@@ -266,44 +280,50 @@ macro_rules! impl_mantissa_and_exponent {
         }
 
         impl<'a> SciMantissaAndExponent<$t, i64, Rational> for &'a Rational {
-            /// Returns the scientific mantissa and exponent, taking `self` by reference.
+            /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`]
+            /// by reference.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent_with_rounding`.
+            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `conversion::mantissa_and_exponent` module.
+            /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
                 self.sci_mantissa_and_exponent_with_rounding_ref(RoundingMode::Nearest)
                     .unwrap()
             }
 
-            /// Returns the scientific exponent, taking `self` by reference.
+            /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by reference.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent_with_rounding`.
+            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.
             /// $$
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
             ///
-            /// # Examples
-            /// See the documentation of the `conversion::mantissa_and_exponent` module.
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             fn sci_exponent(self) -> i64 {
                 assert!(*self != 0);
                 let mut exponent = i64::exact_from(self.numerator.significant_bits())
@@ -321,9 +341,27 @@ macro_rules! impl_mantissa_and_exponent {
                 }
             }
 
-            /// Constructs a `Rational` from its scientific mantissa and exponent.
+            /// Constructs a [`Rational`] from its scientific mantissa and exponent.
             ///
-            /// See the identical implementation on `&Rational`.
+            /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is
+            /// provided as a float. If the mantissa is outside the range $[1, 2)$, `None` is
+            /// returned.
+            ///
+            /// All finite floats can be represented using `Rational`s, so no rounding is needed.
+            ///
+            /// $$
+            /// f(x) \approx 2^{e_s}m_s.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `sci_exponent`.
+            ///
+            /// See [here](super::mantissa_and_exponent#from_sci_mantissa_and_exponent).
             #[inline]
             fn from_sci_mantissa_and_exponent(
                 sci_mantissa: $t,

@@ -3,9 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::{
-    signed_unsigned_pair_gen_var_14, unsigned_pair_gen_var_28,
-};
+use malachite_base::test_util::generators::{signed_unsigned_pair_gen, unsigned_pair_gen};
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -20,10 +18,7 @@ fn demo_wrapping_pow_assign_unsigned<T: PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_28::<T, u64>()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (mut x, y) in unsigned_pair_gen::<T, u64>().get(gm, &config).take(limit) {
         let old_x = x;
         x.wrapping_pow_assign(y);
         println!("x := {}; x.wrapping_pow_assign({}); x = {}", old_x, y, x);
@@ -35,7 +30,7 @@ fn demo_wrapping_pow_assign_signed<T: PrimitiveSigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in signed_unsigned_pair_gen_var_14::<T, u64>()
+    for (mut x, y) in signed_unsigned_pair_gen::<T, u64>()
         .get(gm, &config)
         .take(limit)
     {
@@ -54,7 +49,7 @@ fn benchmark_wrapping_pow_assign_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.wrapping_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_28::<T, u64>().get(gm, &config),
+        unsigned_pair_gen::<T, u64>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -72,7 +67,7 @@ fn benchmark_wrapping_pow_assign_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.wrapping_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_14::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen::<T, u64>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

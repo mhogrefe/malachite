@@ -2,51 +2,55 @@ use integer::Integer;
 use malachite_base::num::arithmetic::traits::Parity;
 
 impl<'a> Parity for &'a Integer {
-    /// Determines whether `self` is even.
+    /// Tests whether an [`Integer`] is even.
     ///
-    /// Time: worst case O(1)
+    /// $f(x) = (2|x)$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $f(x) = (\exists k \in \N : x = 2k)$.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::Parity;
+    /// use malachite_base::num::arithmetic::traits::{Parity, Pow};
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO.even(), true);
     /// assert_eq!(Integer::from(123).even(), false);
     /// assert_eq!(Integer::from(-0x80).even(), true);
-    /// assert_eq!(Integer::trillion().even(), true);
-    /// assert_eq!((-Integer::trillion() - Integer::ONE).even(), false);
+    /// assert_eq!(Integer::from(10u32).pow(12).even(), true);
+    /// assert_eq!((-Integer::from(10u32).pow(12) - Integer::ONE).even(), false);
     /// ```
     fn even(self) -> bool {
         self.abs.even()
     }
 
-    /// Determines whether `self` is odd.
+    /// Tests whether an [`Integer`] is odd.
     ///
-    /// Time: worst case O(1)
+    /// $f(x) = (2\nmid x)$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $f(x) = (\exists k \in \N : x = 2k+1)$.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::Parity;;
+    /// use malachite_base::num::arithmetic::traits::{Parity, Pow};
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO.odd(), false);
     /// assert_eq!(Integer::from(123).odd(), true);
     /// assert_eq!(Integer::from(-0x80).odd(), false);
-    /// assert_eq!(Integer::trillion().odd(), false);
-    /// assert_eq!((-Integer::trillion() - Integer::ONE).odd(), true);
+    /// assert_eq!(Integer::from(10u32).pow(12).odd(), false);
+    /// assert_eq!((-Integer::from(10u32).pow(12) - Integer::ONE).odd(), true);
     /// ```
     fn odd(self) -> bool {
         self.abs.odd()

@@ -1,7 +1,7 @@
 use rational_sequences::{rational_sequence_reduce, RationalSequence};
 
 impl<T: Eq> RationalSequence<T> {
-    /// Converts a `Vec` to a finite `RationalSequence`.
+    /// Converts a [`Vec`] to a finite [`RationalSequence`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -20,8 +20,8 @@ impl<T: Eq> RationalSequence<T> {
         }
     }
 
-    /// Converts two `Vec`s to a finite `RationalSequence`. The first `Vec` is the nonrepeating
-    /// part and the second is the repeating part.
+    /// Converts two [`Vec`]s to a finite [`RationalSequence`]. The first [`Vec`] is the
+    /// nonrepeating part and the second is the repeating part.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n + m^{1+\epsilon})$ for all $\epsilon > 0$
@@ -42,6 +42,10 @@ impl<T: Eq> RationalSequence<T> {
     ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]).to_string(),
     ///     "[1, 2, [3, 4]]"
     /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![1, 2, 3], vec![4, 3]).to_string(),
+    ///     "[1, 2, [3, 4]]"
+    /// );
     /// ```
     pub fn from_vecs(mut non_repeating: Vec<T>, mut repeating: Vec<T>) -> RationalSequence<T> {
         rational_sequence_reduce(&mut non_repeating, &mut repeating);
@@ -51,8 +55,8 @@ impl<T: Eq> RationalSequence<T> {
         }
     }
 
-    /// Converts a `RationalSequence` to a pair of `Vec`s containing the non-repeating and
-    /// repeating parts, taking the `RationalSequence` by value.
+    /// Converts a [`RationalSequence`] to a pair of [`Vec`]s containing the non-repeating and
+    /// repeating parts, taking the [`RationalSequence`] by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -66,11 +70,12 @@ impl<T: Eq> RationalSequence<T> {
     ///     (vec![1, 2], vec![3, 4])
     /// );
     /// ```
+    #[allow(clippy::missing_const_for_fn)] // can't be const because of destructors
     pub fn into_vecs(self) -> (Vec<T>, Vec<T>) {
         (self.non_repeating, self.repeating)
     }
 
-    /// Returns references to the non-repeating and repeating parts of a `RationalSequence`.
+    /// Returns references to the non-repeating and repeating parts of a [`RationalSequence`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -90,7 +95,7 @@ impl<T: Eq> RationalSequence<T> {
 }
 
 impl<T: Clone + Eq> RationalSequence<T> {
-    /// Converts a slice to a finite `RationalSequence`.
+    /// Converts a slice to a finite [`RationalSequence`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -113,7 +118,7 @@ impl<T: Clone + Eq> RationalSequence<T> {
         }
     }
 
-    /// Converts two slices to a finite `RationalSequence`. The first slice is the nonrepeating
+    /// Converts two slices to a finite [`RationalSequence`]. The first slice is the nonrepeating
     /// part and the second is the repeating part.
     ///
     /// # Worst-case complexity
@@ -135,6 +140,10 @@ impl<T: Clone + Eq> RationalSequence<T> {
     ///     RationalSequence::<u8>::from_slices(&[1, 2], &[3, 4]).to_string(),
     ///     "[1, 2, [3, 4]]"
     /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_slices(&[1, 2, 3], &[4, 3]).to_string(),
+    ///     "[1, 2, [3, 4]]"
+    /// );
     /// ```
     pub fn from_slices(non_repeating: &[T], repeating: &[T]) -> RationalSequence<T> {
         let mut non_repeating = non_repeating.to_vec();
@@ -146,8 +155,8 @@ impl<T: Clone + Eq> RationalSequence<T> {
         }
     }
 
-    /// Converts a `RationalSequence` to a pair of `Vec`s containing the non-repeating and
-    /// repeating parts, taking the `RationalSequence` by reference.
+    /// Converts a [`RationalSequence`] to a pair of [`Vec`]s containing the non-repeating and
+    /// repeating parts, taking the [`RationalSequence`] by reference.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

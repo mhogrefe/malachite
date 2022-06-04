@@ -87,13 +87,13 @@ pub(crate) fn register(runner: &mut Runner) {
     wrapping_square::register(runner);
     wrapping_sub::register(runner);
     wrapping_sub_mul::register(runner);
-    x_mul_y_is_zz::register(runner);
-    xx_add_yy_is_zz::register(runner);
-    xx_div_mod_y_is_qr::register(runner);
-    xx_sub_yy_is_zz::register(runner);
-    xxx_add_yyy_is_zzz::register(runner);
-    xxx_sub_yyy_is_zzz::register(runner);
-    xxxx_add_yyyy_is_zzzz::register(runner);
+    x_mul_y_to_zz::register(runner);
+    xx_add_yy_to_zz::register(runner);
+    xx_div_mod_y_to_qr::register(runner);
+    xx_sub_yy_to_zz::register(runner);
+    xxx_add_yyy_to_zzz::register(runner);
+    xxx_sub_yyy_to_zzz::register(runner);
+    xxxx_add_yyyy_to_zzzz::register(runner);
 }
 
 mod abs;
@@ -182,10 +182,10 @@ mod wrapping_pow;
 mod wrapping_square;
 mod wrapping_sub;
 mod wrapping_sub_mul;
-mod x_mul_y_is_zz;
-mod xx_add_yy_is_zz;
-mod xx_div_mod_y_is_qr;
-mod xx_sub_yy_is_zz;
-mod xxx_add_yyy_is_zzz;
-mod xxx_sub_yyy_is_zzz;
-mod xxxx_add_yyyy_is_zzzz;
+mod x_mul_y_to_zz;
+mod xx_add_yy_to_zz;
+mod xx_div_mod_y_to_qr;
+mod xx_sub_yy_to_zz;
+mod xxx_add_yyy_to_zzz;
+mod xxx_sub_yyy_to_zzz;
+mod xxxx_add_yyyy_to_zzzz;

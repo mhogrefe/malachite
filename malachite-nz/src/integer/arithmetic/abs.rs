@@ -2,61 +2,29 @@ use integer::Integer;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use natural::Natural;
 
-impl AbsAssign for Integer {
-    /// Replaces an `Integer` with its absolute value.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::arithmetic::traits::AbsAssign;
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// let mut x = Integer::ZERO;
-    /// x.abs_assign();
-    /// assert_eq!(x.to_string(), "0");
-    ///
-    /// let mut x = Integer::from(123);
-    /// x.abs_assign();
-    /// assert_eq!(x.to_string(), "123");
-    ///
-    /// let mut x = Integer::from(-123);
-    /// x.abs_assign();
-    /// assert_eq!(x.to_string(), "123");
-    /// ```
-    #[inline]
-    fn abs_assign(&mut self) {
-        self.sign = true;
-    }
-}
-
 impl Abs for Integer {
     type Output = Integer;
 
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by value.
+    /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by value.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.abs().to_string(), "0");
-    /// assert_eq!(Integer::from(123).abs().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
+    /// assert_eq!(Integer::ZERO.abs(), 0);
+    /// assert_eq!(Integer::from(123).abs(), 123);
+    /// assert_eq!(Integer::from(-123).abs(), 123);
     /// ```
     #[inline]
     fn abs(mut self) -> Integer {
@@ -68,26 +36,30 @@ impl Abs for Integer {
 impl<'a> Abs for &'a Integer {
     type Output = Integer;
 
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference.
+    /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO).abs().to_string(), "0");
-    /// assert_eq!((&Integer::from(123)).abs().to_string(), "123");
-    /// assert_eq!((&Integer::from(-123)).abs().to_string(), "123");
+    /// assert_eq!((&Integer::ZERO).abs(), 0);
+    /// assert_eq!((&Integer::from(123)).abs(), 123);
+    /// assert_eq!((&Integer::from(-123)).abs(), 123);
     /// ```
     fn abs(self) -> Integer {
         Integer {
@@ -97,28 +69,66 @@ impl<'a> Abs for &'a Integer {
     }
 }
 
-impl UnsignedAbs for Integer {
-    type Output = Natural;
-
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by value and converting the
-    /// result to a `Natural`.
+impl AbsAssign for Integer {
+    /// Replaces an [`Integer`] with its absolute value.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// x \gets |x|.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AbsAssign;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::ZERO;
+    /// x.abs_assign();
+    /// assert_eq!(x, 0);
+    ///
+    /// let mut x = Integer::from(123);
+    /// x.abs_assign();
+    /// assert_eq!(x, 123);
+    ///
+    /// let mut x = Integer::from(-123);
+    /// x.abs_assign();
+    /// assert_eq!(x, 123);
+    /// ```
+    #[inline]
+    fn abs_assign(&mut self) {
+        self.sign = true;
+    }
+}
+
+impl UnsignedAbs for Integer {
+    type Output = Natural;
+
+    /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by value and converting
+    /// the result to a [`Natural`].
+    ///
+    /// $$
+    /// f(x) = |x|.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::UnsignedAbs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.unsigned_abs().to_string(), "0");
-    /// assert_eq!(Integer::from(123).unsigned_abs().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
+    /// assert_eq!(Integer::ZERO.unsigned_abs(), 0);
+    /// assert_eq!(Integer::from(123).unsigned_abs(), 123);
+    /// assert_eq!(Integer::from(-123).unsigned_abs(), 123);
     /// ```
     #[inline]
     fn unsigned_abs(self) -> Natural {
@@ -129,27 +139,31 @@ impl UnsignedAbs for Integer {
 impl<'a> UnsignedAbs for &'a Integer {
     type Output = Natural;
 
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference and converting
-    /// the result to a `Natural`.
+    /// Takes the absolute value of an [`Integer`], taking the [`Integer`] by reference and
+    /// converting the result to a [`Natural`].
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::UnsignedAbs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::ZERO).unsigned_abs().to_string(), "0");
-    /// assert_eq!((&Integer::from(123)).unsigned_abs().to_string(), "123");
-    /// assert_eq!((&Integer::from(-123)).unsigned_abs().to_string(), "123");
+    /// assert_eq!((&Integer::ZERO).unsigned_abs(), 0);
+    /// assert_eq!((&Integer::from(123)).unsigned_abs(), 123);
+    /// assert_eq!((&Integer::from(-123)).unsigned_abs(), 123);
     /// ```
     #[inline]
     fn unsigned_abs(self) -> Natural {
@@ -158,39 +172,41 @@ impl<'a> UnsignedAbs for &'a Integer {
 }
 
 impl Integer {
-    /// Finds the absolute value of an `Integer`, taking the `Integer` by reference and returning a
-    /// reference to the internal `Natural` absolute value.
+    /// Finds the absolute value of an [`Integer`], taking the [`Integer`] by reference and
+    /// returning a reference to the internal [`Natural`] absolute value.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// f(x) = |x|.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.unsigned_abs_ref().to_string(), "0");
-    /// assert_eq!(Integer::from(123).unsigned_abs_ref().to_string(), "123");
-    /// assert_eq!(Integer::from(-123).unsigned_abs_ref().to_string(), "123");
+    /// assert_eq!(*Integer::ZERO.unsigned_abs_ref(), 0);
+    /// assert_eq!(*Integer::from(123).unsigned_abs_ref(), 123);
+    /// assert_eq!(*Integer::from(-123).unsigned_abs_ref(), 123);
     /// ```
     #[inline]
     pub const fn unsigned_abs_ref(&self) -> &Natural {
         &self.abs
     }
 
-    /// Mutates the absolute value of an `Integer` using a provided closure, and then returns
+    /// Mutates the absolute value of an [`Integer`] using a provided closure, and then returns
     /// whatever the closure returns.
     ///
-    /// This function is similar to the `Integer::unsigned_abs_ref()` function, which returns a
-    /// reference to the absolute value. A function that returns a _mutable_ reference would be too
-    /// dangerous, as it could leave the `Integer` in an invalid state (specifically, with a
-    /// negative sign but a zero absolute value). So rather than returning a mutable reference,
-    /// this function allows mutation of the absolute value using a closure. After the closure
-    /// executes, this function ensures that the `Integer` remains valid.
+    /// This function is similar to the [`unsigned_abs_ref`](Integer::unsigned_abs_ref) function,
+    /// which returns a reference to the absolute value. A function that returns a _mutable_
+    /// reference would be too dangerous, as it could leave the [`Integer`] in an invalid state
+    /// (specifically, with a negative sign but a zero absolute value). So rather than returning a
+    /// mutable reference, this function allows mutation of the absolute value using a closure.
+    /// After the closure executes, this function ensures that the [`Integer`] remains valid.
     ///
     /// There is only constant time and memory overhead on top of the time and memory used by the
     /// closure.
@@ -198,7 +214,6 @@ impl Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_base::num::basic::traits::Two;

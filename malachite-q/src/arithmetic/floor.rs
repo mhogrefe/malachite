@@ -9,19 +9,23 @@ use Rational;
 impl Floor for Rational {
     type Output = Integer;
 
-    /// Finds the floor of a `Rational`, taking the `Rational` by value.
+    /// Finds the floor of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// $$
     /// f(x) = \lfloor x \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Floor;
     /// use malachite_base::num::basic::traits::Zero;
@@ -47,19 +51,23 @@ impl Floor for Rational {
 impl<'a> Floor for &'a Rational {
     type Output = Integer;
 
-    /// Finds the floor of a `Rational`, taking the `Rational` by reference.
+    /// Finds the floor of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// $$
     /// f(x) = \lfloor x \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Floor;
     /// use malachite_base::num::basic::traits::Zero;
@@ -83,19 +91,23 @@ impl<'a> Floor for &'a Rational {
 }
 
 impl FloorAssign for Rational {
-    /// Replaces a `Rational` with its floor.
+    /// Replaces a [`Rational`] with its floor.
     ///
     /// $$
     /// x \gets \lfloor x \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorAssign;
     /// use malachite_base::num::basic::traits::Zero;

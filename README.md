@@ -1,6 +1,7 @@
-# malachite
+![Logo](images/logo-and-name.svg)
 An arbitrary-precision arithmetic library for Rust.
 
-Parts of this library are derived from GMP, FLINT, and rugint. Incomplete; don't use this yet.
+Parts of Malachite are derived from [GMP](https://gmplib.org/) and
+[FLINT](https://www.flintlib.org/).
 
-Copyright (C) 2022 Mikhail Hogrefe
+Copyright © 2022 Mikhail Hogrefe

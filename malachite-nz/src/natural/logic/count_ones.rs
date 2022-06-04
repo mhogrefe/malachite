@@ -6,29 +6,31 @@ use platform::Limb;
 // Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
 // number of ones in the binary expansion of the `Natural`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_crate_test! {limbs_count_ones(xs: &[Limb]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }}
 
 impl CountOnes for &Natural {
-    /// Counts the number of ones in the binary expansion of a `Natural`.
+    /// Counts the number of ones in the binary expansion of a [`Natural`].
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::CountOnes;
     /// use malachite_nz::natural::Natural;
@@ -37,7 +39,7 @@ impl CountOnes for &Natural {
     /// // 105 = 1101001b
     /// assert_eq!(Natural::from(105u32).count_ones(), 4);
     /// // 10^12 = 1110100011010100101001010001000000000000b
-    /// assert_eq!(Natural::trillion().count_ones(), 13);
+    /// assert_eq!(Natural::from(10u32).pow(12).count_ones(), 13);
     /// ```
     fn count_ones(self) -> u64 {
         match *self {

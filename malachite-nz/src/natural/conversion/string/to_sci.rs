@@ -11,7 +11,7 @@ use malachite_base::num::conversion::string::to_string::{
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
 use natural::arithmetic::log_base::log_base_helper_with_pow;
-use natural::conversion::string::BaseFmtWrapper;
+use natural::conversion::string::to_string::BaseFmtWrapper;
 use natural::slice_trailing_zeros;
 use natural::Natural;
 use std::fmt::{Display, Formatter, Write};
@@ -32,8 +32,15 @@ where
 }
 
 impl ToSci for Natural {
-    /// Determines whether a `Natural` can be converted to a string using `to_sci` and a particular
-    /// set of options.
+    /// Determines whether a [`Natural`] can be converted to a string using
+    /// [`to_sci`](`Self::to_sci`) and a particular set of options.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -75,15 +82,19 @@ impl ToSci for Natural {
         }
     }
 
-    /// Converts a `Natural` to a string using a specified base, possibly formatting the number
+    /// Converts a [`Natural`] to a string using a specified base, possibly formatting the number
     /// using scientific notation.
     ///
-    /// See `ToSciOptions` for details on the available options. Note that setting
+    /// See [`ToSciOptions`] for details on the available options. Note that setting
     /// `neg_exp_threshold` has no effect, since there is never a need to use negative exponents
-    /// when representing a `Natural`.
+    /// when representing a [`Natural`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the input
@@ -98,10 +109,12 @@ impl ToSci for Natural {
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(format!("{}", Natural::from(u128::MAX).to_sci()), "3.402823669209385e38");
     /// assert_eq!(Natural::from(u128::MAX).to_sci().to_string(), "3.402823669209385e38");
     ///
     /// let n = Natural::from(123456u32);
     /// let mut options = ToSciOptions::default();
+    /// assert_eq!(format!("{}", n.to_sci_with_options(options)), "123456");
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "123456");
     ///
     /// options.set_precision(3);

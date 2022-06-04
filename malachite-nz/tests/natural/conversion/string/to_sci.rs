@@ -24,7 +24,7 @@ pub fn test_to_sci() {
         "-9.900656229295898e301029"
     );
 
-    fn test_i(x: Natural, out: &str) {
+    fn test_i(x: &Natural, out: &str) {
         assert_eq!(x.to_sci().to_string(), out);
         assert_eq!(
             x.to_sci_with_options(ToSciOptions::default()).to_string(),
@@ -32,7 +32,7 @@ pub fn test_to_sci() {
         );
     }
     fn test(s: &str, out: &str) {
-        test_i(Natural::from_str(s).unwrap(), out);
+        test_i(&Natural::from_str(s).unwrap(), out);
     }
     test("0", "0");
     test("1", "1");
@@ -53,8 +53,8 @@ pub fn test_to_sci() {
     test("1000000000000000", "1000000000000000");
     test("10000000000000000", "1e16");
     test("100000000000000000", "1e17");
-    test_i(Natural::from(u64::MAX), "1.844674407370955e19");
-    test_i(Natural::from(u128::MAX), "3.402823669209385e38");
+    test_i(&Natural::from(u64::MAX), "1.844674407370955e19");
+    test_i(&Natural::from(u128::MAX), "3.402823669209385e38");
 
     test("999999999999999", "999999999999999");
     test("9999999999999999", "9999999999999999");
@@ -64,11 +64,11 @@ pub fn test_to_sci() {
 
 #[test]
 pub fn test_to_sci_with_options() {
-    fn test_i(x: Natural, options: ToSciOptions, out: &str) {
+    fn test_i(x: &Natural, options: ToSciOptions, out: &str) {
         assert_eq!(x.to_sci_with_options(options).to_string(), out);
     }
     fn test(s: &str, options: ToSciOptions, out: &str) {
-        test_i(Natural::from_str(s).unwrap(), options, out);
+        test_i(&Natural::from_str(s).unwrap(), options, out);
     }
     // For tests with the default options, see `test_to_sci`
 
@@ -93,8 +93,8 @@ pub fn test_to_sci_with_options() {
     test("1000000000000000", options, "1000000000000000");
     test("10000000000000000", options, "1.000000000000000e16");
     test("100000000000000000", options, "1.000000000000000e17");
-    test_i(Natural::from(u64::MAX), options, "1.844674407370955e19");
-    test_i(Natural::from(u128::MAX), options, "3.402823669209385e38");
+    test_i(&Natural::from(u64::MAX), options, "1.844674407370955e19");
+    test_i(&Natural::from(u128::MAX), options, "3.402823669209385e38");
 
     test("999999999999999", options, "999999999999999.0");
     test("9999999999999999", options, "9999999999999999");
@@ -103,90 +103,90 @@ pub fn test_to_sci_with_options() {
 
     options = ToSciOptions::default();
     options.set_base(2);
-    test_i(Natural::from(u128::MAX), options, "1e128");
+    test_i(&Natural::from(u128::MAX), options, "1e128");
     options.set_base(3);
-    test_i(Natural::from(u128::MAX), options, "2.022011021210021e80");
+    test_i(&Natural::from(u128::MAX), options, "2.022011021210021e80");
     options.set_base(4);
-    test_i(Natural::from(u128::MAX), options, "1e64");
+    test_i(&Natural::from(u128::MAX), options, "1e64");
     options.set_base(5);
-    test_i(Natural::from(u128::MAX), options, "1.103111044120131e55");
+    test_i(&Natural::from(u128::MAX), options, "1.103111044120131e55");
     options.set_base(8);
-    test_i(Natural::from(u128::MAX), options, "4e42");
+    test_i(&Natural::from(u128::MAX), options, "4e42");
     // When base >= 15, there is a mandatory sign after the exponent indicator "e", to distinguish
     // it from the digit "e"
     options.set_base(16);
-    test_i(Natural::from(u128::MAX), options, "1e+32");
+    test_i(&Natural::from(u128::MAX), options, "1e+32");
     options.set_base(32);
-    test_i(Natural::from(u128::MAX), options, "8e+25");
+    test_i(&Natural::from(u128::MAX), options, "8e+25");
     options.set_base(36);
-    test_i(Natural::from(u128::MAX), options, "f.5lxx1zz5pnorynqe+24");
+    test_i(&Natural::from(u128::MAX), options, "f.5lxx1zz5pnorynqe+24");
 
     // The sign can be forced in other cases too
     options.set_base(3);
     options.set_force_exponent_plus_sign(true);
-    test_i(Natural::from(u128::MAX), options, "2.022011021210021e+80");
+    test_i(&Natural::from(u128::MAX), options, "2.022011021210021e+80");
 
     // The digits can be uppercase, and so can the exponent indicator
     options = ToSciOptions::default();
     options.set_base(36);
     options.set_uppercase();
-    test_i(Natural::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQe+24");
+    test_i(&Natural::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQe+24");
 
     options.set_lowercase();
     options.set_e_uppercase();
-    test_i(Natural::from(u128::MAX), options, "f.5lxx1zz5pnorynqE+24");
+    test_i(&Natural::from(u128::MAX), options, "f.5lxx1zz5pnorynqE+24");
 
     options.set_uppercase();
-    test_i(Natural::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQE+24");
+    test_i(&Natural::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQE+24");
 
     options = ToSciOptions::default();
     options.set_size_complete();
     options.set_base(2);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\
         111111111111111111111111111111111111111",
     );
     options.set_base(3);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "202201102121002021012000211012011021221022212021111001022110211020010021100121010",
     );
     options.set_base(4);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "3333333333333333333333333333333333333333333333333333333333333333",
     );
     options.set_base(5);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "11031110441201303134210404233413032443021130230130231310",
     );
     options.set_base(8);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "3777777777777777777777777777777777777777777",
     );
     options.set_base(16);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "ffffffffffffffffffffffffffffffff",
     );
     options.set_base(32);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "7vvvvvvvvvvvvvvvvvvvvvvvvv",
     );
     options.set_base(36);
     test_i(
-        Natural::from(u128::MAX),
+        &Natural::from(u128::MAX),
         options,
         "f5lxx1zz5pnorynqglhzmsp33",
     );
@@ -426,8 +426,7 @@ fn to_sci_with_options_properties() {
         } else {
             let base = Natural::from(options.get_base());
             let neg_scale = match options.get_size_options() {
-                SciSizeOptions::Complete => None,
-                SciSizeOptions::Scale(_) => None,
+                SciSizeOptions::Complete | SciSizeOptions::Scale(_) => None,
                 SciSizeOptions::Precision(p) => {
                     let log = x.floor_log_base(&base);
                     if log >= p {

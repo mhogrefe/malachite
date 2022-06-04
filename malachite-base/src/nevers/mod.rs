@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 /// `Never` is a type that cannot be instantiated.
 ///
-/// In other languages this type may be called `Nothing`, `Empty`, or `Void`.
+/// This is a [bottom type](https://en.wikipedia.org/wiki/Bottom_type).
 ///
 /// # Examples
 /// ```
@@ -16,7 +16,7 @@ use std::str::FromStr;
 pub enum Never {}
 
 impl Display for Never {
-    /// Would convert a `Never` to a `String`.
+    /// Would convert a [`Never`] to a [`String`].
     fn fmt(&self, _f: &mut Formatter) -> std::fmt::Result {
         unreachable!()
     }
@@ -25,9 +25,9 @@ impl Display for Never {
 impl FromStr for Never {
     type Err = &'static str;
 
-    /// Would convert a `String` to a `Never`.
+    /// Would convert a [`String`] to a [`Never`].
     ///
-    /// Since a `Never` can never be instantiated, `from_str` never succeeds.
+    /// Since a [`Never`] can never be instantiated, `from_str` never succeeds.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -45,7 +45,7 @@ impl FromStr for Never {
     }
 }
 
-/// Generates all (none) of the `Never`s.
+/// Generates all (none) of the [`Never`]s.
 ///
 /// The output length is 0.
 ///
@@ -57,7 +57,6 @@ impl FromStr for Never {
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::nevers::nevers;
 ///
 /// assert_eq!(nevers().collect_vec(), &[]);

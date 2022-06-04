@@ -14,11 +14,12 @@ use std::cmp::Ordering;
 // This function assumes that `xs` has length at least 2 and the last (most significant) limb is
 // nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= xs.len() {
@@ -62,19 +63,21 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     }
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// whether the `Natural`s are equivalent mod two to the power of `pow`; that is, whether their
-/// `pow` least-significant bits are equal.
+/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two [`Natural`]s,
+/// returns whether the [`Natural`]s are equivalent mod two to the power of `pow`; that is, whether
+/// their `pow` least-significant bits are equal.
 ///
 /// This function assumes that neither slice is empty and their last elements are nonzero.
 ///
-/// Time: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// Additional memory: worst case O(1)
+/// $M(n) = O(1)$
 ///
-/// where n = min(pow, `xs.len()`, `ys.len()`)
+/// where $T$ is time, $M$ is additional memory, and $n$ is `min(pow, xs.len(), ys.len())`.
 ///
-/// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a and c are non-negative.
+/// This is equivalent to `mpz_congruent_2exp_p` from `mpz/cong_2exp.c`, GMP 6.2.1, where `a` and
+/// `c` are non-negative.
 #[doc(hidden)]
 pub fn limbs_eq_mod_power_of_2(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     match xs.len().cmp(&ys.len()) {
@@ -94,19 +97,24 @@ impl Natural {
 }
 
 impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
-    /// Returns whether two `Natural`s are equivalent mod two to the power of `pow`; that is,
-    /// whether their `pow` least-significant bits are equal.
+    /// Returns whether one [`Natural`] is equal to another modulo $2^k$; that is, whether their
+    /// $k$ least-significant bits are equal.
     ///
-    /// Time: worst case O(n)
+    /// $f(x, y, k) = (x \equiv y \mod 2^k)$.
     ///
-    /// Additional memory: worst case O(1)
+    /// $f(x, y, k) = (\exists n \in \Z : x - y = n2^k)$.
     ///
-    /// where n = min(`pow`, `self.significant_bits()`, `other.significant_bits()`)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(pow, self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqModPowerOf2;
     /// use malachite_base::num::basic::traits::Zero;

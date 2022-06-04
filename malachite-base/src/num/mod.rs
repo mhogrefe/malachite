@@ -2,22 +2,22 @@
 #[macro_use]
 pub mod macros;
 
-/// Traits for primitive integer arithmetic.
+/// Traits for arithmetic.
 pub mod arithmetic;
-/// Traits for primitive integers and some of their basic functionality.
+/// Traits for primitive integers or floats and some of their basic functionality.
 pub mod basic;
 /// Traits for comparing the absolute values of numbers for equality or order.
 pub mod comparison;
-/// Traits for converting to and from numbers, converting to and from strings,
-/// and extracting digits.
+/// Traits for converting to and from numbers, converting to and from strings, and extracting
+/// digits.
 pub mod conversion;
-/// Iterators that generate primitive integers without repetition.
+/// Iterators that generate numbers without repetition.
 pub mod exhaustive;
-/// Functions specific to primitive floating-point numbers.
+/// [`NiceFloat`](float::NiceFloat), a wrapper around primitive floats.
 pub mod float;
 /// Iterators related to numbers.
 pub mod iterators;
-/// Functions related to logic and bit manipulation.
+/// Traits for logic and bit manipulation.
 pub mod logic;
-/// Iterators that generate primitive integers randomly.
+/// Iterators that generate numbers randomly.
 pub mod random;

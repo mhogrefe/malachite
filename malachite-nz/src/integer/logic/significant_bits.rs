@@ -2,17 +2,21 @@ use integer::Integer;
 use malachite_base::num::logic::traits::SignificantBits;
 
 impl<'a> SignificantBits for &'a Integer {
-    /// Returns the smallest number of bits necessary to represent the absolute value of an
-    /// `Integer`. 0 has zero significant bits.
+    /// Returns the number of significant bits of an [`Integer`]'s absolute value.
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// f(n) = \\begin{cases}
+    ///     0 & \text{if} \\quad n = 0, \\\\
+    ///     \lfloor \log_2 |n| \rfloor + 1 & \\text{otherwise}.
+    /// \\end{cases}
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::basic::traits::Zero;

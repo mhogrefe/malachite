@@ -31,7 +31,7 @@ impl Rational {
 impl<'a> FloorLogBase2 for &'a Rational {
     type Output = i64;
 
-    /// Returns the floor of the base-2 logarithm of a positive `Rational`.
+    /// Returns the floor of the base-2 logarithm of a positive [`Rational`].
     ///
     /// $f(x) = \lfloor\log_2 x\rfloor$.
     ///
@@ -48,7 +48,6 @@ impl<'a> FloorLogBase2 for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase2;
     /// use malachite_q::Rational;
@@ -68,7 +67,7 @@ impl<'a> FloorLogBase2 for &'a Rational {
 impl<'a> CeilingLogBase2 for &'a Rational {
     type Output = i64;
 
-    /// Returns the ceiling of the base-2 logarithm of a positive `Rational`.
+    /// Returns the ceiling of the base-2 logarithm of a positive [`Rational`].
     ///
     /// $f(x) = \lfloor\log_2 x\rfloor$.
     ///
@@ -85,7 +84,6 @@ impl<'a> CeilingLogBase2 for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase2;
     /// use malachite_q::Rational;
@@ -105,13 +103,13 @@ impl<'a> CeilingLogBase2 for &'a Rational {
 impl<'a> CheckedLogBase2 for &'a Rational {
     type Output = i64;
 
-    /// Returns the base-2 logarithm of a positive `Rational`. If the `Rational` is not a power of
-    /// 2, then `None` is returned.
+    /// Returns the base-2 logarithm of a positive [`Rational`]. If the [`Rational`] is not a power
+    /// of 2, then `None` is returned.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(\log_2 x) & \log_2 x \in \Z \\\\
-    ///     \operatorname{None} & \textrm{otherwise},
+    ///     \operatorname{Some}(\log_2 x) & \text{if} \\quad \log_2 x \in \Z, \\\\
+    ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
     ///
@@ -128,7 +126,6 @@ impl<'a> CheckedLogBase2 for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
     /// use malachite_q::Rational;

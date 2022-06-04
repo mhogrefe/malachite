@@ -15,14 +15,15 @@ use std::mem::swap;
 // and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
 // will have no trailing zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// positive, and w is returned instead of overwriting the first input.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is positive, and `w` is returned instead of overwriting the first input.
 pub_test! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut out;
     if xs.len() >= ys.len() {
@@ -39,16 +40,17 @@ pub_test! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb>
 // lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of y * z, plus
 // the carry-out from the addition, is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.2.1.
+// This is equivalent to `mpn_addmul_1` from `mpn/generic/addmul_1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -70,18 +72,19 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
 // of the result are written to `ys` and the highest limb is returned. `xs` must have the same
 // length as `ys`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
-// same lengths, sub is positive, the lowest limbs of the result are written to the second input
-// rather than the first, and the highest limb is returned.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive and have the same lengths, `sub` is positive, the lowest limbs of the result are
+// written to the second input rather than the first, and the highest limb is returned.
 pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -103,15 +106,16 @@ pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
 // first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
 // no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//       m = max(1, `ys.len()` - `xs.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and sub is
-// positive.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive and sub is positive.
 pub_test! {limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
@@ -148,15 +152,16 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 // second (right) input, corresponding to the limbs of y. `xs` and `ys` should be nonempty and have
 // no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//       m = max(1, `xs.len()` - `ys.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// positive, and the result is written to the second input rather than the first.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is positive, and the result is written to the second input rather than the first.
 pub_test! {limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
@@ -192,14 +197,15 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 // to the second, `true` is returned. `xs` and `ys` should be nonempty and have no trailing zeros,
 // and `z` should be nonzero. The result will have no trailing zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-// positive, and the result is written to the longer input.
+// This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
+// positive, `sub` is positive, and the result is written to the longer input.
 pub_test! {limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -218,18 +224,19 @@ pub_test! {limbs_vec_add_mul_limb_in_place_either(
 // x + y * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
 // slices should have any trailing zeros. The result will have no trailing zeros.
 //
-// Time: O(m + n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(m + n * log(n))
+// $M(n, m) = O(m + n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
-//       m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
 // Panics if `ys` or `zs` are empty.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-// positive, and w is returned instead of overwriting the first input.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive, `sub` is positive, and `w` is returned instead of overwriting the first input.
 pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
@@ -254,18 +261,19 @@ pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 // length at least 2. None of the slices should have any trailing zeros. The result will have no
 // trailing zeros.
 //
-// Time: O(m + n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n, m) = O(m + n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`ys.len()`, `zs.len()`)
-//       m = `xs.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(ys.len(), zs.len())`, and $m$ is
+// `xs.len()`.
 //
 // # Panics
 // Panics if `ys` or `zs` are empty.
 //
-// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive and sub is
-// positive.
+// This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
+// positive and `sub` is positive.
 pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
@@ -326,31 +334,35 @@ impl Natural {
 impl<'a> AddMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking
-    /// `self`, y, and z by value.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x10000u32),
-    ///     Natural::trillion()).to_string(), "65537000000000000");
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///         .add_mul(Natural::from(0x10000u32), Natural::from(10u32).pow(12)),
+    ///     65537000000000000u64
+    /// );
     /// ```
     #[inline]
-    fn add_mul(mut self, b: Natural, c: Natural) -> Natural {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: Natural, z: Natural) -> Natural {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -358,27 +370,32 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 impl<'a> AddMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
-    /// and y by value and z by reference.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first two by value
+    /// and the third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x10000u32),
-    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///         .add_mul(Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),
+    ///     65537000000000000u64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: Natural, z: &'a Natural) -> Natural {
@@ -390,27 +407,32 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 impl<'a> AddMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
-    /// and z by value and y by reference.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first and third by
+    /// value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x10000u32),
-    ///     Natural::trillion()).to_string(), "65537000000000000");
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///         .add_mul(&Natural::from(0x10000u32), Natural::from(10u32).pow(12)),
+    ///     65537000000000000u64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: &'a Natural, z: Natural) -> Natural {
@@ -422,27 +444,32 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
-    /// by value and y and z by reference.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking the first by value and
+    /// the second and third by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x10000u32),
-    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12)
+    ///         .add_mul(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),
+    ///     65537000000000000u64
+    /// );
     /// ```
     #[inline]
     fn add_mul(mut self, y: &'a Natural, z: &'b Natural) -> Natural {
@@ -454,27 +481,32 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking
-    /// `self`, y, and z by reference.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by
+    /// reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $f(x, y, z) = x + yz$.
     ///
-    /// Additional memory: O(m + n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n, m) = O(m + n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x10000u32),
-    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// assert_eq!(
+    ///     (&Natural::from(10u32).pow(12))
+    ///         .add_mul(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12)),
+    ///     65537000000000000u64
+    /// );
     /// ```
     fn add_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
         match (self, y, z) {
@@ -489,31 +521,33 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 }
 
 impl AddMulAssign<Natural, Natural> for Natural {
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
-    /// taking y and z by value.
+    /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking both
+    /// [`Natural`]s on the right-hand side by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
     /// x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(Natural::from(0x10000u32), Natural::trillion());
-    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// let mut x = Natural::from(10u32).pow(12);
+    /// x.add_mul_assign(Natural::from(0x10000u32), Natural::from(10u32).pow(12));
+    /// assert_eq!(x, 65537000000000000u64);
     /// ```
     fn add_mul_assign(&mut self, mut y: Natural, mut z: Natural) {
         match (&mut *self, &mut y, &mut z) {
@@ -528,31 +562,33 @@ impl AddMulAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
-    /// taking y by value and z by reference.
+    /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking the first
+    /// [`Natural`] on the right-hand side by value and the second by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
     /// x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(Natural::from(0x10000u32), &Natural::trillion());
-    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// let mut x = Natural::from(10u32).pow(12);
+    /// x.add_mul_assign(Natural::from(0x10000u32), &Natural::from(10u32).pow(12));
+    /// assert_eq!(x, 65537000000000000u64);
     /// ```
     fn add_mul_assign(&mut self, mut y: Natural, z: &'a Natural) {
         match (&mut *self, &mut y, z) {
@@ -567,31 +603,33 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
-    /// taking y by reference and z by value.
+    /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking the first
+    /// [`Natural`] on the right-hand side by reference and the second by value.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
     /// x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(&Natural::from(0x10000u32), Natural::trillion());
-    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// let mut x = Natural::from(10u32).pow(12);
+    /// x.add_mul_assign(&Natural::from(0x10000u32), Natural::from(10u32).pow(12));
+    /// assert_eq!(x, 65537000000000000u64);
     /// ```
     fn add_mul_assign(&mut self, y: &'a Natural, mut z: Natural) {
         match (&mut *self, y, &mut z) {
@@ -606,31 +644,33 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
-    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
-    /// taking y and z by reference.
+    /// Adds the product of two other [`Natural`]s to a [`Natural`] in place, taking both
+    /// [`Natural`]s on the right-hand side by reference.
     ///
-    /// Time: O(m + n * log(n) * log(log(n)))
+    /// $x \gets x + yz$.
     ///
-    /// Additional memory: O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n, m) = O(m + n \log n \log\log n)$
     ///
-    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
-    ///       m = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
     /// x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
     /// assert_eq!(x, 22);
     ///
-    /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(&Natural::from(0x10000u32), &Natural::trillion());
-    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// let mut x = Natural::from(10u32).pow(12);
+    /// x.add_mul_assign(&Natural::from(0x10000u32), &Natural::from(10u32).pow(12));
+    /// assert_eq!(x, 65537000000000000u64);
     /// ```
     fn add_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
         match (&mut *self, y, z) {

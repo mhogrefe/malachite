@@ -6,29 +6,20 @@ use vecs::random::{
     random_vecs, random_vecs_fixed_length_from_single, RandomFixedLengthVecsFromSingle, RandomVecs,
 };
 
-/// Randomly generates `String`s of a given length using `char`s from a single iterator.
+/// Randomly generates [`String`]s of a given length using [`char`]s from a single iterator.
 ///
-/// The probability of a particular length-$n$ `String` being generated is the product of the
+/// The probability of a particular length-$n$ [`String`] being generated is the product of the
 /// probabilities of each of its `char`s.
 ///
-/// If `len` is 0, the output consists of the empty `String`, repeated.
+/// If `len` is 0, the output consists of the empty [`String`], repeated.
 ///
 /// `cs` must be infinite.
-///
-/// # Expected complexity per iteration
-/// $T(n) = O(nT^\prime)$
-///
-/// $M(n) = O(nM^\prime)$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
-/// time and additional memory taken by `cs`.
 ///
 /// # Examples
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_fixed_length_strings_using_chars;
@@ -45,7 +36,7 @@ use vecs::random::{
 /// );
 /// ```
 #[inline]
-pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
+pub const fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     len: u64,
     cs: I,
 ) -> StringsFromCharVecs<RandomFixedLengthVecsFromSingle<I>> {
@@ -54,12 +45,12 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     }
 }
 
-/// Randomly generates `String`s of a given length.
+/// Randomly generates [`String`]s of a given length.
 ///
-/// The probability of a particular length-$n$ `String` being generated is $1112064^{-\ell}$, where
-/// $\ell$ is `len`.
+/// The probability of a particular length-$n$ [`String`] being generated is $1112064^{-\ell}$,
+/// where $\ell$ is `len`.
 ///
-/// If `len` is 0, the output consists of the empty `String`, repeated.
+/// If `len` is 0, the output consists of the empty [`String`], repeated.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -73,7 +64,6 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_fixed_length_strings;
 ///
@@ -104,9 +94,9 @@ pub fn random_fixed_length_strings(
     random_fixed_length_strings_using_chars(len, random_chars(seed))
 }
 
-/// Generates random `String`s using `char`s from an iterator.
+/// Generates random [`String`]s using [`char`]s from an iterator.
 ///
-/// The lengths of the `String`s are sampled from a geometric distribution with a specified mean
+/// The lengths of the [`String`]s are sampled from a geometric distribution with a specified mean
 /// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
 /// $$
@@ -114,15 +104,6 @@ pub fn random_fixed_length_strings(
 /// $$
 ///
 /// The iterators produced by `cs_gen` must be infinite.
-///
-/// # Expected complexity per iteration
-/// $T(n) = O(mT^\prime(n))$
-///
-/// $M(n) = O(mM^\prime(n))$
-///
-/// where $T$ is time, $M$ is additional memory, $m$ is
-/// `mean_length_numerator` / `mean_length_denominator`, and $T^\prime$ and $M^\prime$ are the time
-/// and additional memory functions of the iterators produced by `cs_gen`.
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
@@ -133,7 +114,6 @@ pub fn random_fixed_length_strings(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_strings_using_chars;
@@ -163,9 +143,9 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
     }
 }
 
-/// Generates random `String`s.
+/// Generates random [`String`]s.
 ///
-/// The lengths of the `String`s are sampled from a geometric distribution with a specified mean
+/// The lengths of the [`String`]s are sampled from a geometric distribution with a specified mean
 /// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
 /// $$
@@ -178,7 +158,7 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 /// $M(n) = O(m)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $m$ is
-/// `mean_length_numerator` / `mean_length_denominator`.
+/// `mean_length_numerator / mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
@@ -189,7 +169,6 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_strings;
 ///

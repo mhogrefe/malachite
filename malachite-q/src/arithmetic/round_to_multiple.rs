@@ -8,11 +8,36 @@ use Rational;
 impl RoundToMultiple<Rational> for Rational {
     type Output = Rational;
 
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// taking both `Rational`s by value.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
+    /// specified rounding mode. Both [`Rational`]s are taken by value.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \Z$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -21,7 +46,6 @@ impl RoundToMultiple<Rational> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -63,11 +87,37 @@ impl RoundToMultiple<Rational> for Rational {
 impl<'a> RoundToMultiple<&'a Rational> for Rational {
     type Output = Rational;
 
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// taking the first `Rational` by value and the second by reference.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
+    /// specified rounding mode. The first [`Rational`] is taken by value and the second by
+    /// reference.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \Z$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -76,7 +126,6 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -118,11 +167,37 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
 impl<'a> RoundToMultiple<Rational> for &'a Rational {
     type Output = Rational;
 
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// taking the first `Rational` by reference and the second by value.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
+    /// specified rounding mode. The first [`Rational`] is taken by reference and the second by
+    /// value.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \Z$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -131,7 +206,6 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -192,11 +266,36 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
 impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     type Output = Rational;
 
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// taking both `Rational`s by reference.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
+    /// specified rounding mode. Both [`Rational`]s are taken by reference.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \Z$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -205,7 +304,6 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -252,11 +350,18 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
 }
 
 impl RoundToMultipleAssign<Rational> for Rational {
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// in place. The second `Rational` is taken by value.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
+    /// a  specified rounding mode. The [`Rational`] on the right-hand side is taken by value.
+    ///
+    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+    /// documentation for details.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -265,7 +370,6 @@ impl RoundToMultipleAssign<Rational> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -328,11 +432,18 @@ impl RoundToMultipleAssign<Rational> for Rational {
 }
 
 impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
-    /// Rounds a `Rational` to a multiple of a `Rational` according to a specified rounding mode,
-    /// in place. The second `Rational` is taken by reference.
+    /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
+    /// a  specified rounding mode. The [`Rational`] on the right-hand side is taken by reference.
+    ///
+    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+    /// documentation for details.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -341,7 +452,6 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;

@@ -17,15 +17,19 @@ macro_rules! impl_mod_power_of_2_neg {
         impl ModPowerOf2Neg for $t {
             type Output = $t;
 
-            /// Computes `-self` mod $2^p$. Assumes the input is already reduced mod $2^p$.
+            /// Negates a number modulo another number $2^k$. Assumes the input is already reduced
+            /// modulo $2^k$.
             ///
-            /// $f(x, p) = y$, where $x, y < 2^p$ and $-x \equiv y \mod 2^p$.
+            /// $f(x, k) = y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_neg` module.
+            /// See [here](super::mod_power_of_2_neg#mod_power_of_2_neg).
             #[inline]
             fn mod_power_of_2_neg(self, pow: u64) -> $t {
                 mod_power_of_2_neg(self, pow)
@@ -33,16 +37,19 @@ macro_rules! impl_mod_power_of_2_neg {
         }
 
         impl ModPowerOf2NegAssign for $t {
-            /// Replaces `self` with `-self` mod $2^p$. Assumes the input is already reduced mod
-            /// $2^p$.
+            /// Negates a number modulo another number $2^k$, in place. Assumes the input is
+            /// already reduced modulo $2^k$.
             ///
-            /// $x \gets y$, where $x, y < 2^p$ and $-x \equiv y \mod 2^p$.
+            /// $x \gets y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_neg` module.
+            /// See [here](super::mod_power_of_2_neg#mod_power_of_2_neg_assign).
             #[inline]
             fn mod_power_of_2_neg_assign(&mut self, pow: u64) {
                 mod_power_of_2_neg_assign(self, pow);

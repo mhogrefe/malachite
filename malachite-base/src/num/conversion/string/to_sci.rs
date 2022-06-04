@@ -3,15 +3,16 @@ use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::string::options::{SciSizeOptions, ToSciOptions};
+use num::conversion::string::to_string::BaseFmtWrapper;
 use num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use num::conversion::string::BaseFmtWrapper;
 use num::conversion::traits::{ExactFrom, ToSci};
 use rounding_modes::RoundingMode;
 use slices::slice_trailing_zeros;
 use std::fmt::{Display, Formatter, Write};
 
+/// A `struct` that can be used to format a number in scientific notation.
 pub struct SciWrapper<'a, T: ToSci> {
     pub(crate) x: &'a T,
     pub(crate) options: ToSciOptions,
@@ -187,11 +188,15 @@ where
 macro_rules! impl_to_sci_unsigned {
     ($t:ident) => {
         impl ToSci for $t {
-            /// Determines whether an unsigned number can be converted to a string using `to_sci`
-            /// and a particular set of options.
+            /// Determines whether an unsigned number can be converted to a string using
+            /// [`to_sci_with_options`](super::super::traits::ToSci::to_sci_with_options) and a
+            /// particular set of options.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_sci` module.
+            /// See [here](super::to_sci#fmt_sci_valid).
             #[inline]
             fn fmt_sci_valid(&self, options: ToSciOptions) -> bool {
                 fmt_sci_valid_unsigned(*self, options)
@@ -200,19 +205,23 @@ macro_rules! impl_to_sci_unsigned {
             /// Converts an unsigned number to a string using a specified base, possibly formatting
             /// the number using scientific notation.
             ///
-            /// See `ToSciOptions` for details on the available options. Note that setting
-            /// `neg_exp_threshold` has no effect, since there is never a need to use negative
-            /// exponents when representing an integer.
+            /// See [`ToSciOptions`](super::options::ToSciOptions) for details on the available
+            /// options. Note that setting `neg_exp_threshold` has no effect, since there is never
+            /// a need to use negative exponents when representing an integer.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that
             /// the input must be rounded.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_sci` module.
+            /// See [here](super::to_sci).
             #[inline]
             fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
                 fmt_sci_unsigned(*self, f, options)
@@ -225,11 +234,15 @@ apply_to_unsigneds!(impl_to_sci_unsigned);
 macro_rules! impl_to_sci_signed {
     ($t:ident) => {
         impl ToSci for $t {
-            /// Determines whether a signed number can be converted to a string using `to_sci` and
-            /// a particular set of options.
+            /// Determines whether a signed number can be converted to a string using
+            /// [`to_sci_with_options`](super::super::traits::ToSci::to_sci_with_options) and a
+            /// particular set of options.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_sci` module.
+            /// See [here](super::to_sci#fmt_sci_valid).
             #[inline]
             fn fmt_sci_valid(&self, options: ToSciOptions) -> bool {
                 fmt_sci_valid_signed(*self, options)
@@ -238,19 +251,23 @@ macro_rules! impl_to_sci_signed {
             /// Converts a signed number to a string using a specified base, possibly formatting
             /// the number using scientific notation.
             ///
-            /// See `ToSciOptions` for details on the available options. Note that setting
-            /// `neg_exp_threshold` has no effect, since there is never a need to use negative
-            /// exponents when representing an integer.
+            /// See [`ToSciOptions`](super::options::ToSciOptions) for details on the available
+            /// options. Note that setting `neg_exp_threshold` has no effect, since there is never
+            /// a need to use negative exponents when representing an integer.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that
             /// the input must be rounded.
             ///
             /// # Examples
-            /// See the documentation of the `num::conversion::string::to_sci` module.
+            /// See [here](super::to_sci).
             #[inline]
             fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
                 fmt_sci_signed(*self, f, options)

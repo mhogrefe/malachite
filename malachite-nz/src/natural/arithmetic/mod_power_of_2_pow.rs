@@ -18,10 +18,15 @@ use platform::Limb;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
 //
-// //TODO complexity
+// # Worst-case complexity
+// $T(n, m) = O(mn \log n \log\log n)$
 //
-// This is mpn_powlo from mpn/generic/powlo.c, GMP 6.2.1, where rp == bp. Investigate changes from
-// 6.1.2?
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `es.len()`.
+//
+// This is equivalent to `mpn_powlo` from `mpn/generic/powlo.c`, GMP 6.2.1, where `rp == bp`.
+// Investigate changes from 6.1.2?
 pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
@@ -85,11 +90,16 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
 }}
 
 // Interpreting a `Vec<Limb>` and a `&[Limb]` as the limbs (in ascending order) of two `Natural`s,
-// writes the limbs of the first `Natural` raised to the second, mod 2<sup>`pow`</sup>, to the
-// input `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>. Neither input may be
-// empty or have trailing zeros, and the exponent must be greater than 1.
+// writes the limbs of the first `Natural` raised to the second, mod $2^k$, to the input `Vec`.
+// Assumes the input is already reduced mod $2^k$. Neither input may be empty or have trailing
+// zeros, and the exponent must be greater than 1.
 //
-// TODO complexity
+// # Worst-case complexity
+// $T(n, m) = O(mn \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `es.len()`.
 //
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
@@ -104,15 +114,22 @@ pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
 impl ModPowerOf2Pow<Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup>, taking both `Natural`s by
-    /// value. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
+    /// reduced mod $2^k$. Both [`Natural`]s are taken by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
@@ -133,15 +150,22 @@ impl ModPowerOf2Pow<Natural> for Natural {
 impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup>, taking the base by value and
-    /// the exponent by reference. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
+    /// reduced mod $2^k$. The first [`Natural`] is taken by value and the second by reference.
     ///
-    /// //TODO complexity
+    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
@@ -162,15 +186,22 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup>, taking the base by reference
-    /// and the exponent by value. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
+    /// reduced mod $2^k$. The first [`Natural`] is taken by reference and the second by value.
     ///
-    /// //TODO complexity
+    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
@@ -190,15 +221,20 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup>, taking both `Natural`s by
-    /// reference. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
+    /// reduced mod $2^k$. Both [`Natural`]s are taken by reference.
     ///
-    /// //TODO complexity
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
@@ -235,15 +271,22 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
 }
 
 impl ModPowerOf2PowAssign<Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup> in place, taking the exponent
-    /// by value. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. Assumes the input is
+    /// already reduced mod $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign;
     /// use malachite_nz::natural::Natural;
@@ -263,15 +306,22 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
-    /// Raises a `Natural` to a `Natural` power mod 2<sup>`pow`</sup> in place, taking the exponent
-    /// by reference. Assumes the base is already reduced mod 2<sup>`pow`</sup>.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. Assumes the input is
+    /// already reduced mod $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
-    /// //TODO complexity
+    /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
+    /// `exp.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign;
     /// use malachite_nz::natural::Natural;

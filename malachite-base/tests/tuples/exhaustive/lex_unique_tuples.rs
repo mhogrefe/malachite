@@ -1,12 +1,10 @@
+use extra_variadic::{lex_unique_quadruples, lex_unique_quintuples, lex_unique_triples};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
-use malachite_base::tuples::exhaustive::{
-    exhaustive_units, lex_unique_pairs, lex_unique_quadruples, lex_unique_quintuples,
-    lex_unique_triples,
-};
+use malachite_base::tuples::exhaustive::{exhaustive_units, lex_unique_pairs};
 use std::fmt::Debug;
 
 macro_rules! helpers {

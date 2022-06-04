@@ -5,6 +5,8 @@ macro_rules! impl_overflowing_neg {
         impl OverflowingNeg for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `overflowing_neg` functions in the standard library, for
+            /// example [this one](u32::overflowing_neg).
             #[inline]
             fn overflowing_neg(self) -> ($t, bool) {
                 $t::overflowing_neg(self)
@@ -12,16 +14,16 @@ macro_rules! impl_overflowing_neg {
         }
 
         impl OverflowingNegAssign for $t {
-            /// Replaces `self` with its negative.
+            /// Negates a number in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_neg` module.
+            /// See [here](super::overflowing_neg#overflowing_neg_assign).
             #[inline]
             fn overflowing_neg_assign(&mut self) -> bool {
                 let overflow;

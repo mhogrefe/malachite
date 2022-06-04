@@ -8,20 +8,20 @@ fn eq_mod<U: Eq, S: Copy + Eq + Mod<S, Output = U> + Zero>(x: S, other: S, m: S)
 macro_rules! impl_eq_mod {
     ($t:ident) => {
         impl EqMod<$t> for $t {
-            /// Returns whether a value is equivalent to another value mod a third value `m`; that
-            /// is, whether `self` - `other` is a multiple of `m`.
+            /// Returns whether a number is equivalent to another number modulo a third; that is,
+            /// whether the difference between the first two is a multiple of the third.
             ///
-            /// Two numbers are equal to each other mod 0 iff they are equal.
+            /// Two numbers are equal to each other modulo 0 iff they are equal.
             ///
             /// $f(x, y, m) = (x \equiv y \mod m)$.
             ///
-            /// $f(x, y, m) = (\exists k \in \Z \ x - y = km)$.
+            /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::eq_mod` module.
+            /// See [here](super::eq_mod#eq_mod).
             #[inline]
             fn eq_mod(self, other: $t, m: $t) -> bool {
                 eq_mod(self, other, m)

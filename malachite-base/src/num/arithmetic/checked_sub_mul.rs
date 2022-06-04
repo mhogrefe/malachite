@@ -12,13 +12,22 @@ macro_rules! impl_checked_sub_mul_unsigned {
         impl CheckedSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`, returning `None` if there is no valid result.
+            /// Subtracts a number by the product of two other numbers, returning `None` if the
+            /// result cannot be represented.
+            ///
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     \operatorname{Some}(x - yz) & \text{if} \\quad x \geq yz, \\\\
+            ///     \operatorname{None} & \text{if} \\quad x < yz,
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::checked_sub_mul` module.
+            /// See [here](super::checked_sub_mul#checked_sub_mul).
             #[inline]
             fn checked_sub_mul(self, y: $t, z: $t) -> Option<$t> {
                 checked_sub_mul_unsigned(self, y, z)
@@ -66,13 +75,25 @@ macro_rules! impl_checked_sub_mul_signed {
         impl CheckedSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`, returning `None` if there is no valid result.
+            /// Subtracts a number by the product of two other numbers, returning `None` if the
+            /// result cannot be represented.
+            ///
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     \operatorname{Some}(x - yz) &
+            ///         \text{if} \\quad -2^{W-1} \leq x - yz < 2^{W-1}, \\\\
+            ///     \operatorname{None} &
+            ///         \text{if} \\quad x - yz < -2^{W-1} \\ \mathrm{or}
+            ///         \\ xy - z \geq 2^{W-1}, \\\\
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::checked_sub_mul` module.
+            /// See [here](super::checked_sub_mul#checked_sub_mul).
             #[inline]
             fn checked_sub_mul(self, y: $t, z: $t) -> Option<$t> {
                 checked_sub_mul_signed(self, y, z)

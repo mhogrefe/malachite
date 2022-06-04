@@ -1,13 +1,13 @@
 use num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
 use std::cmp::min;
-use std::ops::Neg;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u64, end: u64) -> T {
+fn get_bits_unsigned<T: PrimitiveUnsigned>(x: &T, start: u64, end: u64) -> T {
     assert!(start <= end);
     if start >= T::WIDTH {
         T::ZERO
@@ -16,12 +16,7 @@ fn get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u6
     }
 }
 
-fn assign_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(
-    x: &mut T,
-    start: u64,
-    end: u64,
-    bits: &T,
-) {
+fn assign_bits_unsigned<T: PrimitiveUnsigned>(x: &mut T, start: u64, end: u64, bits: &T) {
     assert!(start <= end);
     let width = T::WIDTH;
     let bits_width = end - start;
@@ -39,7 +34,9 @@ macro_rules! impl_bit_block_access_unsigned {
         impl BitBlockAccess for $t {
             type Bits = $t;
 
-            /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            /// Extracts a block of adjacent bits from a number.
+            ///
+            /// The first index is `start` and last index is `end - 1`.
             ///
             /// The block of bits has the same type as the input. If `end` is greater than the
             /// type's width, the high bits of the result are all 0.
@@ -61,14 +58,16 @@ macro_rules! impl_bit_block_access_unsigned {
             /// Panics if `start < end`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_block_access` module.
+            /// See [here](super::bit_block_access#get_bits).
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
                 get_bits_unsigned(self, start, end)
             }
 
-            /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
-            /// (inclusive) through `end` (exclusive) of `self`.
+            /// Replaces a block of adjacent bits in a number with other bits.
+            ///
+            /// The least-significant `end - start` bits of `bits` are assigned to bits `start`
+            /// through `end - 1`, inclusive, of `self`.
             ///
             /// The block of bits has the same type as the input. If `bits` has fewer bits than
             /// `end - start`, the high bits are interpreted as 0. If `end` is greater than the
@@ -88,7 +87,7 @@ macro_rules! impl_bit_block_access_unsigned {
             ///
             /// Then
             /// $$
-            /// f(n, p, q, m) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// n \gets \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
             /// where
             /// $$
@@ -101,11 +100,11 @@ macro_rules! impl_bit_block_access_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `start < end`, or if `end > $t::WIDTH` and bits `$t::WIDTH - start`
-            /// through `end - start` of `bits` are nonzero.
+            /// Let `W` be the type's width. Panics if `start < end`, or if `end > W` and bits
+            /// `W - start` through `end - start` of `bits` are nonzero.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_block_access` module.
+            /// See [here](super::bit_block_access#assign_bits).
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 assign_bits_unsigned(self, start, end, bits)
@@ -115,7 +114,7 @@ macro_rules! impl_bit_block_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-fn get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
+fn get_bits_signed<T: ModPowerOf2<Output = U> + PrimitiveSigned, U>(
     x: &T,
     start: u64,
     end: u64,
@@ -130,8 +129,8 @@ fn get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt, 
 }
 
 fn assign_bits_signed<
-    T: PrimitiveInt + UnsignedAbs<Output = U> + WrappingFrom<U>,
-    U: BitBlockAccess<Bits = U> + ModPowerOf2<Output = U> + PrimitiveInt,
+    T: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+    U: PrimitiveUnsigned,
 >(
     x: &mut T,
     start: u64,
@@ -175,7 +174,9 @@ macro_rules! impl_bit_block_access_signed {
         impl BitBlockAccess for $s {
             type Bits = $u;
 
-            /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            /// Extracts a block of adjacent bits from a number.
+            ///
+            /// The first index is `start` and last index is `end - 1`.
             ///
             /// The type of the block of bits is the unsigned version of the input type. If `end` is
             /// greater than the type's width, the high bits of the result are all 0, or all 1,
@@ -208,17 +209,20 @@ macro_rules! impl_bit_block_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `start < end` or `self < 0 && end - start > $s::WIDTH`.
+            /// Let `W` be the type's width. Panics if `start < end` or (`self < 0` and
+            /// `end - start > W`).
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_block_access` module.
+            /// See [here](super::bit_block_access#get_bits).
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
                 get_bits_signed(self, start, end)
             }
 
-            /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
-            /// (inclusive) through `end` (exclusive) of `self`.
+            /// Replaces a block of adjacent bits in a number with other bits.
+            ///
+            /// The least-significant `end - start` bits of `bits` are assigned to bits `start`
+            /// through `end - 1`, inclusive, of `self`.
             ///
             /// The type of the block of bits is the unsigned version of the input type. If `bits`
             /// has fewer bits than `end - start`, the high bits are interpreted as 0 or 1,
@@ -240,7 +244,7 @@ macro_rules! impl_bit_block_access_signed {
             /// where for all $i$, $d_i\in \\{0, 1\\}$.
             /// Also, let $p, q \in \mathbb{N}$, where $d_i = 0$ for all $i \geq W + p - 1$. Then
             /// $$
-            /// f(n, p, q, m) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// n \gets \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
             /// where
             /// $$
@@ -274,11 +278,12 @@ macro_rules! impl_bit_block_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `start < end`, or if `end >= $s::WIDTH` and bits `$s::WIDTH - start`
-            /// through `end - start` of `bits` are not equal to the original sign bit of `self`.
+            /// Let `W` be the type's width Panics if `start < end`, or if `end >= W` and bits
+            /// `W - start` through `end - start` of `bits` are not equal to the original sign bit
+            /// of `self`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic::bit_block_access` module.
+            /// See [here](super::bit_block_access#assign_bits).
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 assign_bits_signed(self, start, end, bits)

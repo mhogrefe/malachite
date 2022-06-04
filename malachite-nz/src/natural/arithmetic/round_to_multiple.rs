@@ -8,21 +8,42 @@ use std::cmp::Ordering;
 impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;
 
-    /// Rounds a `Natural` to a multiple of a `Natural` according to a specified rounding mode,
-    /// taking both `Natural`s by value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
+    /// rounding mode. Both [`Natural`]s are taken by value.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -31,7 +52,6 @@ impl RoundToMultiple<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -79,21 +99,42 @@ impl RoundToMultiple<Natural> for Natural {
 impl<'a> RoundToMultiple<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Rounds a `Natural` to a multiple of a `Natural` according to a specified rounding mode,
-    /// taking the first `Natural` by value and the second by reference.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
+    /// rounding mode. The first [`Natural`] is taken by value and the second by reference.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -102,7 +143,6 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -150,21 +190,42 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
 impl<'a> RoundToMultiple<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Rounds a `Natural` to a multiple of a `Natural` according to a specified rounding mode,
-    /// taking the first `Natural` by reference and the second by value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
+    /// rounding mode. The first [`Natural`] is taken by reference and the second by value.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -173,7 +234,6 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -259,21 +319,42 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
 impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Rounds a `Natural` to a multiple of a `Natural` according to a specified rounding mode,
-    /// taking both `Natural`s by reference.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
+    /// rounding mode. Both [`Natural`]s are taken by reference.
+    ///
+    /// Let $q = \frac{x}{y}$:
+    ///
+    /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+    ///
+    /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+    ///     y \lfloor q \rfloor & \text{if} \\quad
+    ///         q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     y \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     y \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor = \frac{1}{2}
+    ///         \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple(other, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by(other)); x }`
+    /// - `x.round_to_multiple(other, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by(other)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -282,7 +363,6 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
@@ -366,21 +446,25 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
 }
 
 impl RoundToMultipleAssign<Natural> for Natural {
-    /// Rounds a `Natural` to a multiple of another `Natural` in place according to a specified
-    /// rounding mode, taking the `Natural` on the right-hand side by value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
+    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by value.
+    ///
+    /// See the
+    /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
+    /// for details.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
-    /// `assert!(x.divisible_by(other));`
+    /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+    /// - `assert!(x.divisible_by(other));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -389,7 +473,6 @@ impl RoundToMultipleAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -470,21 +553,25 @@ impl RoundToMultipleAssign<Natural> for Natural {
 }
 
 impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
-    /// Rounds a `Natural` to a multiple of another `Natural` in place according to a specified
-    /// rounding mode, taking the `Natural` on the right-hand side by reference.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
+    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by reference.
+    ///
+    /// See the
+    /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
+    /// for details.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
-    /// `assert!(x.divisible_by(other));`
+    /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+    /// - `assert!(x.divisible_by(other));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -493,7 +580,6 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;

@@ -1,20 +1,182 @@
 use num::random::{random_unsigned_range, RandomUnsignedRange};
 use random::Seed;
-use unions::{Union2, Union3, Union4, Union5, Union6, Union7, Union8};
+use unions::Union2;
 
+/// Defines random union generators.
+///
+/// Malachite provides [`random_union2s`], but you can also define `random_union3s`,
+/// `random_union4s`, and so on, in your program using the code below. The documentation for
+/// [`random_union2s`] describes these other functions as well.
+///
+/// See usage examples [here](self#random_union2s).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
+/// use malachite_base::random::Seed;
+/// use malachite_base::unions::UnionFromStrError;
+/// use std::fmt::{self, Display, Formatter};
+/// use std::str::FromStr;
+///
+/// union_struct!(
+///     (pub(crate)),
+///     Union3,
+///     Union3<T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union4,
+///     Union4<T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union5,
+///     Union5<T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union6,
+///     Union6<T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union7,
+///     Union7<T, T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f],
+///     [G, G, 'G', g]
+/// );
+/// union_struct!(
+///     (pub(crate)),
+///     Union8,
+///     Union8<T, T, T, T, T, T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c],
+///     [D, D, 'D', d],
+///     [E, E, 'E', e],
+///     [F, F, 'F', f],
+///     [G, G, 'G', g],
+///     [H, H, 'H', h]
+/// );
+///
+/// random_unions!(
+///     (pub(crate)),
+///     Union3,
+///     RandomUnion3s,
+///     random_union3s,
+///     3,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen]
+/// );
+/// random_unions!(
+///     (pub(crate)),
+///     Union4,
+///     RandomUnion4s,
+///     random_union4s,
+///     4,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen],
+///     [3, W, L, D, ws, ws_gen]
+/// );
+/// random_unions!(
+///     (pub(crate)),
+///     Union5,
+///     RandomUnion5s,
+///     random_union5s,
+///     5,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen],
+///     [3, W, L, D, ws, ws_gen],
+///     [4, V, M, E, vs, vs_gen]
+/// );
+/// random_unions!(
+///     (pub(crate)),
+///     Union6,
+///     RandomUnion6s,
+///     random_union6s,
+///     6,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen],
+///     [3, W, L, D, ws, ws_gen],
+///     [4, V, M, E, vs, vs_gen],
+///     [5, U, N, F, us, us_gen]
+/// );
+/// random_unions!(
+///     (pub(crate)),
+///     Union7,
+///     RandomUnion7s,
+///     random_union7s,
+///     7,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen],
+///     [3, W, L, D, ws, ws_gen],
+///     [4, V, M, E, vs, vs_gen],
+///     [5, U, N, F, us, us_gen],
+///     [6, T, O, G, ts, ts_gen]
+/// );
+/// random_unions!(
+///     (pub(crate)),
+///     Union8,
+///     RandomUnion8s,
+///     random_union8s,
+///     8,
+///     [0, X, I, A, xs, xs_gen],
+///     [1, Y, J, B, ys, ys_gen],
+///     [2, Z, K, C, zs, zs_gen],
+///     [3, W, L, D, ws, ws_gen],
+///     [4, V, M, E, vs, vs_gen],
+///     [5, U, N, F, us, us_gen],
+///     [6, T, O, G, ts, ts_gen],
+///     [7, S, P, H, ss, ss_gen]
+/// );
+/// # }
+/// ```
+#[macro_export]
 macro_rules! random_unions {
     (
+        ($($vis:tt)*),
         $union: ident,
         $random_struct: ident,
         $random_fn: ident,
         $n: expr,
         $([$i: expr, $t: ident, $it: ident, $variant: ident, $xs: ident, $xs_gen: ident]),*
     ) => {
-        /// Generates random $n$-unions with elements from $n$ iterators.
+        /// This documentation applies not only to `RandomUnion2s`, but also to `RandomUnion3s`,
+        /// `RandomUnion4s`, and so on. See [`random_unions`] for more information.
         ///
-        /// This `struct` is created by `random_union[n]s`. See its documentation for more.
+        /// Generates random $n$-unions with elements from $n$ iterators.
         #[derive(Clone, Debug)]
-        pub struct $random_struct<$($t, $it: Iterator<Item=$t>),*> {
+        $($vis)* struct $random_struct<$($t, $it: Iterator<Item=$t>),*> {
             indices: RandomUnsignedRange<usize>,
             $($xs: $it,)*
         }
@@ -30,6 +192,9 @@ macro_rules! random_unions {
             }
         }
 
+        /// This documentation applies not only to `random_union2s`, but also to `random_union3s`,
+        /// `random_union4s`, and so on. See [`random_unions`] for more information.
+        ///
         /// Generates random $n$-unions with elements from $n$ iterators.
         ///
         /// The probability of a particular $n$-union being generated is the probability of its
@@ -37,23 +202,9 @@ macro_rules! random_unions {
         ///
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
-        /// # Expected complexity per iteration
-        /// We have
-        ///
-        /// $$
-        /// T(n) = O(\max_{j=0}^{n-1}T_j)
-        /// $$
-        ///
-        /// $$
-        /// M(n) = O(\max_{j=0}^{n-1}M_j)
-        /// $$
-        ///
-        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_j$ and $M_j$ are the time and additional memory of the $j$th input iterator.
-        ///
         /// # Examples
-        /// See the documentation of the `unions::random` module.
-        pub fn $random_fn<$($t, $it: Iterator<Item=$t>),*>(
+        /// See [here](self#random_union2s).
+        $($vis)* fn $random_fn<$($t, $it: Iterator<Item=$t>),*>(
             seed: Seed, $($xs_gen: &dyn Fn(Seed) -> $it),*
         ) -> $random_struct<$($t, $it),*> {
             $random_struct {
@@ -64,79 +215,11 @@ macro_rules! random_unions {
     }
 }
 random_unions!(
+    (pub),
     Union2,
     RandomUnion2s,
     random_union2s,
     2,
     [0, X, I, A, xs, xs_gen],
     [1, Y, J, B, ys, ys_gen]
-);
-random_unions!(
-    Union3,
-    RandomUnion3s,
-    random_union3s,
-    3,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen]
-);
-random_unions!(
-    Union4,
-    RandomUnion4s,
-    random_union4s,
-    4,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen],
-    [3, W, L, D, ws, ws_gen]
-);
-random_unions!(
-    Union5,
-    RandomUnion5s,
-    random_union5s,
-    5,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen],
-    [3, W, L, D, ws, ws_gen],
-    [4, V, M, E, vs, vs_gen]
-);
-random_unions!(
-    Union6,
-    RandomUnion6s,
-    random_union6s,
-    6,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen],
-    [3, W, L, D, ws, ws_gen],
-    [4, V, M, E, vs, vs_gen],
-    [5, U, N, F, us, us_gen]
-);
-random_unions!(
-    Union7,
-    RandomUnion7s,
-    random_union7s,
-    7,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen],
-    [3, W, L, D, ws, ws_gen],
-    [4, V, M, E, vs, vs_gen],
-    [5, U, N, F, us, us_gen],
-    [6, T, O, G, ts, ts_gen]
-);
-random_unions!(
-    Union8,
-    RandomUnion8s,
-    random_union8s,
-    8,
-    [0, X, I, A, xs, xs_gen],
-    [1, Y, J, B, ys, ys_gen],
-    [2, Z, K, C, zs, zs_gen],
-    [3, W, L, D, ws, ws_gen],
-    [4, V, M, E, vs, vs_gen],
-    [5, U, N, F, us, us_gen],
-    [6, T, O, G, ts, ts_gen],
-    [7, S, P, H, ss, ss_gen]
 );

@@ -1,4 +1,5 @@
-use malachite_base::unions::{Union3, UnionFromStrError};
+use extra_variadic::Union3;
+use malachite_base::unions::UnionFromStrError;
 use std::result::Result;
 use std::str::FromStr;
 

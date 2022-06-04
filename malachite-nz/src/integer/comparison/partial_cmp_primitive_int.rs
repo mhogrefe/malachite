@@ -18,14 +18,13 @@ where
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialOrd<$t> for Integer {
-            /// Compares an `Integer` to a value of unsigned primitive integer type.
+            /// Compares an [`Integer`] to an unsigned primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_unsigned(self, other)
@@ -33,14 +32,13 @@ macro_rules! impl_unsigned {
         }
 
         impl PartialOrd<Integer> for $t {
-            /// Compares a value of unsigned primitive integer type to an `Integer`.
+            /// Compares an unsigned primitive integer to an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -73,14 +71,13 @@ where
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialOrd<$t> for Integer {
-            /// Compares an `Integer` to a value of signed primitive integer type.
+            /// Compares an [`Integer`] to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_signed(self, other)
@@ -88,14 +85,13 @@ macro_rules! impl_signed {
         }
 
         impl PartialOrd<Integer> for $t {
-            /// Compares a value of signed primitive integer type to an `Integer`.
+            /// Compares a signed primitive integer to an [`Integer`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)

@@ -4,7 +4,7 @@ use std::ops::Index;
 impl<T: Eq> Index<usize> for RationalSequence<T> {
     type Output = T;
 
-    /// Gets a reference to an element of a `RationalSequence` at an index.
+    /// Gets a reference to an element of a [`RationalSequence`] at an index.
     ///
     /// If the index is greater than or equal to the length of the sequence, this function panics.
     ///
@@ -28,7 +28,7 @@ impl<T: Eq> Index<usize> for RationalSequence<T> {
 }
 
 impl<T: Eq> RationalSequence<T> {
-    /// Gets a reference to an element of a `RationalSequence` at an index.
+    /// Gets a reference to an element of a [`RationalSequence`] at an index.
     ///
     /// If the index is greater than or equal to the length of the sequence, `None` is returned.
     ///
@@ -55,7 +55,7 @@ impl<T: Eq> RationalSequence<T> {
 }
 
 impl<T: Clone + Eq> RationalSequence<T> {
-    /// Mutates an element of a `RationalSequence` at an index using a provided closure, and then
+    /// Mutates an element of a [`RationalSequence`] at an index using a provided closure, and then
     /// returns whatever the closure returns.
     ///
     /// If the index is greater than or equal to the length of the sequence, this function panics.
@@ -92,7 +92,7 @@ impl<T: Clone + Eq> RationalSequence<T> {
             let repeating_len = self.repeating.len();
             let extra = i - non_repeating_len + 1;
             self.non_repeating
-                .extend(self.repeating.iter().cycle().cloned().take(extra));
+                .extend(self.repeating.iter().cycle().take(extra).cloned());
             self.repeating.rotate_left(extra % repeating_len);
             f(&mut self.non_repeating[i])
         };

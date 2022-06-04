@@ -13,11 +13,12 @@ use std::ops::{BitOr, BitOrAssign};
 // `Integer`, returns the limbs of the bitwise or of the `Integer` and a `Limb`. `xs` cannot be
 // empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if `xs` is empty or only contains zeros.
@@ -46,11 +47,12 @@ pub_test! {limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // The output slice must be at least as long as the input slice. `xs` cannot be empty or only
 // contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
@@ -79,11 +81,12 @@ pub_test! {limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 // `Integer`, writes the limbs of the bitwise or of the `Integer`, writes the limbs of the bitwise
 // or of the `Integer` and a `Limb` to the input slice. `xs` cannot be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // May panic if `xs` is empty or only contains zeros.
@@ -108,9 +111,8 @@ pub_test! {limbs_neg_or_limb_in_place(xs: &mut [Limb], y: Limb) {
 // `y` and whose other limbs are full of `true` bits. The slice cannot be empty or only contain
 // zeros.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -123,9 +125,8 @@ pub_const_test! {limbs_pos_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 // lowest limb is given by `y` and whose other limbs are full of `true` bits. The slice cannot be
 // empty or only contain zeros.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -137,17 +138,19 @@ pub_const_test! {limbs_neg_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 // negative of another, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may
 // not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = `ys.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `ys.len()`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned, the first input is positive,
-// and the second is negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res` is returned, the first
+// input is positive, and the second is negative.
 pub_test! {limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -201,17 +204,18 @@ pub_test! {limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // as the second input slice. `ys.len()` limbs will be written; if the number of significant limbs
 // of the result is lower, some of the written limbs will be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `ys`.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where the first input is positive and the second is
-// negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where the first input is positive
+// and the second is negative.
 pub_test! {limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -266,17 +270,19 @@ pub_test! {limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // large to be contained in the first slice; if it is, only the lowest `xs.len()` limbs are
 // written.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, the first input is positive and the
-// second is negative, and the length of op1 is not changed; instead, a carry is returned.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1`, the first input
+// is positive and the second is negative, and the length of `op1` is not changed; instead, a carry
+// is returned.
 pub_test! {limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -327,17 +333,19 @@ pub_test! {limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) ->
 // negative of another, writes the limbs of the bitwise or of the `Integer`s to the first (left)
 // slice. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and the first input is positive and
-// the second is negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1` and the first
+// input is positive and the second is negative.
 pub_test! {limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -387,17 +395,18 @@ pub_test! {limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 // negative of another, writes the limbs of the bitwise or of the `Integer`s to the second (right)
 // slice. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op2 and the first input is positive and
-// the second is negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op2` and the first
+// input is positive and the second is negative.
 pub_test! {limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -443,16 +452,19 @@ pub_test! {limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 // `Integer`s, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not be
 // empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = min(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `min(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned and both inputs are negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res` is returned and both
+// inputs are negative.
 pub_test! {limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -494,17 +506,18 @@ pub_test! {limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // an output slice. `xs` and `ys` may not be empty or only contain zeros. The output slice must be
 // at least as long as the shorter input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 // shorter of `xs` and `ys`.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -546,17 +559,18 @@ pub_test! {limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // and `ys` may not be empty or only contain zeros. If the result has fewer significant limbs than
 // the left slice, the remaining limbs in the left slice are set to `Limb::MAX`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, both inputs are negative, and the
-// length of op1 is not changed.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1`, both inputs are
+// negative, and the length of `op1` is not changed.
 pub_test! {limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -591,16 +605,18 @@ pub_test! {limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 // negatives of two `Integer`s, writes the limbs of the bitwise or of the `Integer`s to the `Vec`.
 // `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and both inputs are negative.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are negative.
 pub_test! {limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -635,17 +651,18 @@ pub_test! {limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 // not be empty or only contain zeros. Returns a `bool` which is `false` when the output is to the
 // first slice and `true` when it's to the second slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative and the result is
-// written to the shorter input slice.
+// This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are negative and
+// the result is written to the shorter input slice.
 pub_test! {limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -834,27 +851,33 @@ impl Natural {
 impl BitOr<Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise or of two `Integer`s, taking both by value.
+    /// Takes the bitwise or of two [`Integer`]s, taking both by value.
     ///
-    /// Time: worst case O(m)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`,
-    ///     n = `min(self.significant_bits(), other.significant_bits)`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
+    /// assert_eq!(Integer::from(-123) | Integer::from(-456), -67);
     /// assert_eq!(
-    ///     (-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-999999995905"
+    ///     -Integer::from(10u32).pow(12) | -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -999999995905i64
     /// );
     /// ```
     #[inline]
@@ -867,26 +890,35 @@ impl BitOr<Integer> for Integer {
 impl<'a> BitOr<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise or of two `Integer`s, taking the left `Integer` by value and the right
-    /// `Integer` by reference.
+    /// Takes the bitwise or of two [`Integer`]s, taking the first by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(m)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`, n = `other.significant_bits`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-    /// assert_eq!((-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-999999995905");
+    /// assert_eq!(Integer::from(-123) | &Integer::from(-456), -67);
+    /// assert_eq!(
+    ///     -Integer::from(10u32).pow(12) | &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -999999995905i64
+    /// );
     /// ```
     #[inline]
     fn bitor(mut self, other: &'a Integer) -> Integer {
@@ -898,26 +930,35 @@ impl<'a> BitOr<&'a Integer> for Integer {
 impl<'a> BitOr<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Takes the bitwise or of two `Integer`s, taking the left `Integer` by reference and the right
-    /// `Integer` by value.
+    /// Takes the bitwise or of two [`Integer`]s, taking the first by reference and the second by
+    /// value.
     ///
-    /// Time: worst case O(m)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`, n = `other.significant_bits`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
-    /// assert_eq!((&-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-999999995905");
+    /// assert_eq!(&Integer::from(-123) | Integer::from(-456), -67);
+    /// assert_eq!(
+    ///     &-Integer::from(10u32).pow(12) | -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -999999995905i64
+    /// );
     /// ```
     #[inline]
     fn bitor(self, mut other: Integer) -> Integer {
@@ -929,26 +970,33 @@ impl<'a> BitOr<Integer> for &'a Integer {
 impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    /// Takes the bitwise or of an `Integer` and a `Natural`, taking both by reference.
+    /// Takes the bitwise or of two [`Integer`]s, taking both by reference.
     ///
-    /// Time: worst case O(m)
+    /// $$
+    /// f(x, y) = x \vee y.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`,
-    ///     n = `max(self.significant_bits(), other.significant_bits)`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-    /// assert_eq!((&-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-999999995905");
+    /// assert_eq!(&Integer::from(-123) | &Integer::from(-456), -67);
+    /// assert_eq!(
+    ///     &-Integer::from(10u32).pow(12) | &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     -999999995905i64
+    /// );
     /// ```
     fn bitor(self, other: &'a Integer) -> Integer {
         match (self.sign, other.sign) {
@@ -973,20 +1021,21 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
 }
 
 impl BitOrAssign<Integer> for Integer {
-    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// Bitwise-ors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by value.
     ///
-    /// Time: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(m) = O(m)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`,
-    ///     n = `min(self.significant_bits(), other.significant_bits)`
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -1012,19 +1061,21 @@ impl BitOrAssign<Integer> for Integer {
 }
 
 impl<'a> BitOrAssign<&'a Integer> for Integer {
-    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// Bitwise-ors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
     /// right-hand side by reference.
     ///
-    /// Time: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(m) = O(m)$
     ///
-    /// where m = `self.significant_bits() + other.significant_bits`, n = `other.significant_bits`
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;

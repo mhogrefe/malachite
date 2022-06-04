@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivRound, Square};
+use malachite_base::num::arithmetic::traits::{DivRound, Pow, Square};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -90,7 +90,7 @@ pub fn test_power_of_2_digits_primitive() {
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    let n = Natural::trillion();
+    let n = Natural::from(10u32).pow(12);
     assert_eq!(
         PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&n, 16),
         &[4096, 54437, 232]
@@ -108,7 +108,7 @@ pub fn test_power_of_2_digits_primitive() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion();
+    let n = Natural::from(10u32).pow(12);
     assert_eq!(
         PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&n, 17),
         &[69632, 27218, 58]
@@ -126,7 +126,7 @@ pub fn test_power_of_2_digits_primitive() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&n, 32),
         &[2701131776, 466537709, 54210]
@@ -144,7 +144,7 @@ pub fn test_power_of_2_digits_primitive() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&n, 64),
         &[2003764205206896640, 54210]
@@ -160,7 +160,7 @@ pub fn test_power_of_2_digits_primitive() {
     assert_eq!(digits.get(2), 0);
     assert_eq!(digits.get(3), 0);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&n, 37),
         &[58535706624, 129132033639, 52]
@@ -267,7 +267,7 @@ pub fn test_power_of_2_digits_natural() {
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    let n = Natural::trillion();
+    let n = Natural::from(10u32).pow(12);
     assert_eq!(
         PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, 16).to_debug_string(),
         "[4096, 54437, 232]"
@@ -285,7 +285,7 @@ pub fn test_power_of_2_digits_natural() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion();
+    let n = Natural::from(10u32).pow(12);
     assert_eq!(
         PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, 17).to_debug_string(),
         "[69632, 27218, 58]"
@@ -303,7 +303,7 @@ pub fn test_power_of_2_digits_natural() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, 32).to_debug_string(),
         "[2701131776, 466537709, 54210]"
@@ -321,7 +321,7 @@ pub fn test_power_of_2_digits_natural() {
     assert_eq!(digits.get(3), 0u32);
     assert_eq!(digits.get(4), 0u32);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, 64).to_debug_string(),
         "[2003764205206896640, 54210]"
@@ -337,7 +337,7 @@ pub fn test_power_of_2_digits_natural() {
     assert_eq!(digits.get(2), 0u64);
     assert_eq!(digits.get(3), 0u64);
 
-    let n = Natural::trillion().square();
+    let n = Natural::from(10u32).pow(12).square();
     assert_eq!(
         PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, 37).to_debug_string(),
         "[58535706624, 129132033639, 52]"

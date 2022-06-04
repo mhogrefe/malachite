@@ -25,6 +25,8 @@ pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
 //TODO tune
 pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 40;
 
+// # Worst-case complexity
+// Constant time and additional memory.
 pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     n: usize,
     low_threshold: usize,
@@ -50,13 +52,12 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     }
 }
 
-// Time: O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: O(1)
+// The result is $O(n)$.
 //
-// Result is O(`n`)
-//
-// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+// This is equivalent to `mpn_mulmod_bnm1_next_size` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n,
@@ -66,13 +67,12 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     )
 }}
 
-/// Time: O(1)
-///
-/// Additional memory: O(1)
-///
-/// Result is O(`n`)
-///
-/// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// The result is $O(n)$.
+//
+// This is equivalent to `mpn_mulmod_bnm1_itch` from `gmp-impl.h`, GMP 6.2.1.
 pub(crate) const fn limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
@@ -90,23 +90,24 @@ pub(crate) const fn limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     }
 }
 
-/// Interpreting two equal-length, nonempty slices of `Limb`s as the limbs (in ascending order) of
-/// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1, where n is the
-/// length of either slice. The result is semi-normalized: zero is represented as either 0 or
-/// `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written to `out`. `out` should have
-/// length at least n, and `scratch` at least 2 * n. This is the basecase algorithm.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths, if `out` or `scratch` are too short, or if the
-/// input slices are empty.
-///
-/// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+// Interpreting two equal-length, nonempty slices of `Limb`s as the limbs (in ascending order) of
+// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1, where n is the
+// length of either slice. The result is semi-normalized: zero is represented as either 0 or
+// `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written to `out`. `out` should have
+// length at least n, and `scratch` at least 2 * n. This is the basecase algorithm.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `out` or `scratch` are too short, or if the
+// input slices are empty.
+//
+// This is equivalent to `mpn_bc_mulmod_bnm1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1.
 fn limbs_mul_mod_base_pow_n_minus_1_basecase(
     out: &mut [Limb],
     xs: &[Limb],
@@ -124,6 +125,12 @@ fn limbs_mul_mod_base_pow_n_minus_1_basecase(
     }
 }
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], n: usize) {
     split_into_chunks_mut!(out, n, [out_0, out_1], out_2);
     assert_eq!(out_2[1], 0);
@@ -136,20 +143,22 @@ pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], 
     assert!(!limbs_slice_add_limb_in_place(&mut out[..n + 1], carry));
 }
 
-/// Interpreting the first n + 1 limbs of two slices of `Limb`s as the limbs (in ascending order) of
-/// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> + 1. The limbs of
-/// the result are written to `out`, which should have length at least 2 * n + 2.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `n`
-///
-/// # Panics
-/// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
-///
-/// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
+// Interpreting the first n + 1 limbs of two slices of `Limb`s as the limbs (in ascending order) of
+// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> + 1. The limbs of
+// the result are written to `out`, which should have length at least 2 * n + 2.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// # Panics
+// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
+//
+// This is equivalent to `mpn_bc_mulmod_bnp1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1, where
+// `rp == tp`.
 fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     let m = n + 1;
@@ -180,17 +189,18 @@ pub(crate) const FFT_FIRST_K: usize = 4;
 // Scratch need: n + (need for recursive call OR n + 4). This gives
 // S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`, if `ys` is empty, is `xs` is longer than n, or if `out` or
 // `scratch` are too short.
 //
-// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+// This is equivalent to `mpn_mulmod_bnm1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,

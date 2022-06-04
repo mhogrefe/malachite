@@ -1,12 +1,12 @@
+use extra_variadic::{
+    exhaustive_unique_quadruples, exhaustive_unique_quintuples, exhaustive_unique_triples,
+};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
-use malachite_base::tuples::exhaustive::{
-    exhaustive_unique_pairs, exhaustive_unique_quadruples, exhaustive_unique_quintuples,
-    exhaustive_unique_triples, exhaustive_units,
-};
+use malachite_base::tuples::exhaustive::{exhaustive_unique_pairs, exhaustive_units};
 use std::fmt::Debug;
 
 macro_rules! helpers {

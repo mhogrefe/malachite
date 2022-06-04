@@ -1,52 +1,5 @@
-/// A struct that allows for formatting a numeric type and rendering its digits in a specified base.
-#[derive(Clone, Eq, Hash, PartialEq)]
-pub struct BaseFmtWrapper<T> {
-    x: T,
-    base: u8,
-}
-
-impl<T> BaseFmtWrapper<T> {
-    /// Creates a new `BaseFmtWrapper`.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::conversion::string::BaseFmtWrapper;
-    ///
-    /// let x = BaseFmtWrapper::new(1000000000u32, 36);
-    /// assert_eq!(format!("{}", x), "gjdgxs");
-    /// assert_eq!(format!("{:#}", x), "GJDGXS");
-    /// ```
-    pub fn new(x: T, base: u8) -> Self {
-        assert!((2..=36).contains(&base), "base out of range");
-        BaseFmtWrapper { x, base }
-    }
-
-    /// Recovers the value from a `BaseFmtWrapper`.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::conversion::string::BaseFmtWrapper;
-    ///
-    /// assert_eq!(BaseFmtWrapper::new(1000000000u32, 36).unwrap(), 1000000000);
-    /// ```
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn unwrap(self) -> T {
-        self.x
-    }
-}
-
-/// Trait implementations for strings, possibly using scientific notation, to numbers.
-///
-/// Here are usage examples of the macro-generated functions:
+/// [`FromSciString`](super::traits::FromSciString), a trait for converting strings, possibly using
+/// scientific notation, to numbers.
 ///
 /// # from_sci_string
 /// ```
@@ -75,13 +28,18 @@ impl<T> BaseFmtWrapper<T> {
 /// assert_eq!(u8::from_sci_string_with_options("ff", options), Some(255));
 /// ```
 pub mod from_sci_string;
+/// [`FromStringBase`](super::traits::FromStringBase), a trait for converting strings in a
+/// specified base to numbers.
 pub mod from_string;
+/// [`ToSciOptions`](options::ToSciOptions) and
+/// [`FromSciSringOptions`](options::FromSciStringOptions), `struct`s for specifying parameters
+/// when using the [`FromSciString`](super::traits::FromSciString) and
+/// [`ToSci`](super::traits::ToSci) traits.
 pub mod options;
-/// Trait implementations for converting numbers to strings, possibly using scientific notation.
+/// [`ToSci`](super::traits::ToSci), a trait for converting a number to string, possibly using
+/// scientific notation.
 ///
-/// Here are usage examples of the macro-generated functions:
-///
-/// # to_sci()
+/// # to_sci
 /// ```
 /// use malachite_base::num::conversion::traits::ToSci;
 ///
@@ -92,7 +50,7 @@ pub mod options;
 /// assert_eq!(i128::MIN.to_sci().to_string(), "-1.701411834604692e38");
 /// ```
 ///
-/// # to_sci_with_options()
+/// # to_sci_with_options
 /// ```
 /// use malachite_base::num::conversion::string::options::ToSciOptions;
 /// use malachite_base::num::conversion::traits::ToSci;
@@ -128,7 +86,7 @@ pub mod options;
 /// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.111000100e16");
 /// ```
 ///
-/// # fmt_sci_valid()
+/// # fmt_sci_valid
 /// ```
 /// use malachite_base::num::conversion::string::options::ToSciOptions;
 /// use malachite_base::num::conversion::traits::ToSci;
@@ -143,13 +101,12 @@ pub mod options;
 /// assert!(u128::MAX.fmt_sci_valid(options));
 /// ```
 pub mod to_sci;
-/// Trait implementations for converting numbers to strings.
-///
-/// Here are usage examples of the macro-generated functions:
+/// The [`BaseFmtWrapper`](to_string::BaseFmtWrapper) struct and
+/// [`ToStringBase`](super::traits::ToStringBase) trait, used for converting numbers to strings.
 ///
 /// # Display::fmt for BaseFmtWrapper
 /// ```
-/// use malachite_base::num::conversion::string::BaseFmtWrapper;
+/// use malachite_base::num::conversion::string::to_string::BaseFmtWrapper;
 ///
 /// let x = BaseFmtWrapper::new(1000000000u32, 36);
 /// assert_eq!(format!("{}", x), "gjdgxs");
@@ -166,7 +123,7 @@ pub mod to_sci;
 ///
 /// # Debug::fmt for BaseFmtWrapper
 /// ```
-/// use malachite_base::num::conversion::string::BaseFmtWrapper;
+/// use malachite_base::num::conversion::string::to_string::BaseFmtWrapper;
 ///
 /// let x = BaseFmtWrapper::new(1000000000u32, 36);
 /// assert_eq!(format!("{:?}", x), "gjdgxs");

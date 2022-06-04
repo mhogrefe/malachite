@@ -21,23 +21,25 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 // This function assumes that `m` is nonzero, `limbs` has at least two elements, and the last
 // element of `limbs` is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `limbs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if the length of `limbs` is less than 2.
 //
-// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is negative.
+// This is equivalent to `mpz_congruent_ui_p` from `mpz/cong_ui.c`, GMP 6.2.1, where `a` is
+// negative.
 pub_test! {limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     limbs_eq_limb_mod_limb(xs, y.neg_mod(m), m)
 }}
 
 /// Set r to -n mod d. n >= d is allowed. Can give r > d. d cannot equal 0.
 ///
-/// This is NEG_MOD from gmp-impl.h, GMP 6.2.1, where r is returned.
+/// This is equivalent to `NEG_MOD` from `gmp-impl.h`, GMP 6.2.1, where `r` is returned.
 const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
     if n <= d {
         d - n
@@ -53,12 +55,11 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 // This function assumes that the input slice has at least two elements, its last element is
 // nonzero, and `x` and `y` are nonzero.
 //
-// Time: Worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: Worst case O(1)
-//
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-// and d are one limb long, and c is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, `a` and `d` are one limb long, and `c` is longer than one limb.
 pub_const_test! {limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
     // We are checking whether x ≡ -y mod m; that is, whether x + y = k * m for some k in Z. But
     // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
@@ -115,18 +116,19 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
 // This function assumes that each of the two input slices have at least two elements, their last
 // elements are nonzero, and `y` is nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-// and d are longer than one limb, and c is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -142,18 +144,19 @@ pub_test! {limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> b
 // This function assumes that each of the two input slices have at least two elements, their last
 // elements are nonzero, and `y` is nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-// and d are longer than one limb, and c is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -169,18 +172,19 @@ pub_test! {limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> b
 // This function assumes that each of the two input slices have at least two elements, their last
 // elements are nonzero, and `m` is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs.len()`, `ys.len`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 // is zero, or if `m` is zero.
 //
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-// and c are longer than one limb, and m is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, `a` and `c` are longer than one limb, and `m` is one limb long.
 pub_test! {limbs_pos_eq_neg_mod_limb(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_mod_neg_limb_greater(xs, ys, m)
@@ -232,18 +236,19 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
 // This function assumes that each of the three input slices have at least two elements, and their
 // last elements are nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 // slices is zero.
 //
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
-// and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, and each is longer than one limb.
 pub_test! {limbs_pos_eq_neg_mod_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater_ref(xs, ys, ms)
@@ -269,18 +274,19 @@ fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 // This function assumes that each of the three input slices have at least two elements, and their
 // last elements are nonzero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 // slices is zero.
 //
-// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
-// and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a` and `d` are
+// positive, `c` is negative, and each is longer than one limb.
 pub_test! {limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater(xs, ys, ms)
@@ -360,20 +366,27 @@ impl Natural {
 }
 
 impl EqMod<Integer, Natural> for Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self`, `other`, and `m` are all taken by value.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. All three numbers are taken by value.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -386,15 +399,15 @@ impl EqMod<Integer, Natural> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             Integer::from_str("-999999012346").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("-999999012346").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             Integer::from_str("2000000987655").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("2000000987655").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -409,21 +422,27 @@ impl EqMod<Integer, Natural> for Integer {
 }
 
 impl<'a> EqMod<Integer, &'a Natural> for Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self` and `other` are taken by value, and `m` is taken by
-    /// reference.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first two numbers are taken by value and the third by reference.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -436,15 +455,15 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             Integer::from_str("-999999012346").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("-999999012346").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             Integer::from_str("2000000987655").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("2000000987655").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -459,21 +478,27 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
 }
 
 impl<'a> EqMod<&'a Integer, Natural> for Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self` and `m` are taken by value, and `other` is taken by
-    /// reference.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first and third numbers are taken by value and the second by reference.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -486,15 +511,15 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             &Integer::from_str("-999999012346").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("-999999012346").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             &Integer::from_str("2000000987655").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("2000000987655").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -509,21 +534,27 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
 }
 
 impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `other` and `m` are taken by reference, and `self` is taken by
-    /// value.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first number is taken by value and the second and third by reference.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -536,15 +567,15 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             &Integer::from_str("-999999012346").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("-999999012346").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     Integer::from_str("1000000987654").unwrap().eq_mod(
-    ///             &Integer::from_str("2000000987655").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("2000000987655").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -559,21 +590,27 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
 }
 
 impl<'a> EqMod<Integer, Natural> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `other` and `m` are taken by value, and `self` is taken by
-    /// reference.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first number is taken by reference and the second and third by value.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -586,15 +623,15 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             Integer::from_str("-999999012346").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("-999999012346").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             Integer::from_str("2000000987655").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("2000000987655").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -609,21 +646,27 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
 }
 
 impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self` and `m` are taken by reference, and `other` is taken by
-    /// value.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first and third numbers are taken by reference and the third by value.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -636,15 +679,15 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             Integer::from_str("-999999012346").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("-999999012346").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             Integer::from_str("2000000987655").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         Integer::from_str("2000000987655").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -659,21 +702,27 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
 }
 
 impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self` and `other` are taken by reference, and `m` is taken by
-    /// value.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. The first two numbers are taken by reference and the third by value.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -686,15 +735,15 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             &Integer::from_str("-999999012346").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("-999999012346").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             &Integer::from_str("2000000987655").unwrap(),
-    ///             Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("2000000987655").unwrap(),
+    ///         Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );
@@ -709,20 +758,27 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
 }
 
 impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
-    /// Returns whether this `Integer` is equivalent to another `Integer` mod a third `Natural` `m`;
-    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
-    /// mod 0 iff they are equal. `self`, `other`, and `m` are all taken by reference.
+    /// Returns whether an [`Integer`] is equivalent to another [`Integer`] modulo a [`Natural`];
+    /// that is, whether the difference between the two [`Integer`]s is a multiple of the
+    /// [`Natural`]. All three numbers are taken by reference.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// Two [`Integer`]s are equal to each other modulo 0 iff they are equal.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $f(x, y, m) = (x \equiv y \mod m)$.
     ///
-    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    /// $f(x, y, m) = (\exists k \in \Z : x - y = km)$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
@@ -735,15 +791,15 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             &Integer::from_str("-999999012346").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("-999999012346").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     true
     /// );
     /// assert_eq!(
     ///     (&Integer::from_str("1000000987654").unwrap()).eq_mod(
-    ///             &Integer::from_str("2000000987655").unwrap(),
-    ///             &Natural::from_str("1000000000000").unwrap()
+    ///         &Integer::from_str("2000000987655").unwrap(),
+    ///         &Natural::from_str("1000000000000").unwrap()
     ///     ),
     ///     false
     /// );

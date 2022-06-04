@@ -11,19 +11,20 @@ use num::arithmetic::traits::{
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
     ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
     NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem,
-    SqrtAssignRem, SqrtRem, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
-    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    SqrtAssignRem, SqrtRem, XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ,
+    XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
 };
-use num::logic::traits::HammingDistance;
+use num::logic::traits::{BitBlockAccess, HammingDistance};
 
-/// This trait defines functions on primitive unsigned integral types: uxx and usize.
+/// Defines functions on primitive unsigned integer types: uxx and usize.
 pub trait PrimitiveUnsigned:
-    CeilingLogBase<Output = u64>
+    BitBlockAccess<Bits = Self>
+    + CeilingLogBase<Output = u64>
     + CeilingLogBase2<Output = u64>
     + CeilingLogBasePowerOf2<u64, Output = u64>
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
@@ -142,8 +143,8 @@ pub trait PrimitiveUnsigned:
     + PowerOf2DigitIterable<u128>
     + PowerOf2DigitIterable<usize>
     + PrimitiveInt
-    + RootRem<RootOutput = Self, RemOutput = Self>
-    + RootAssignRem<RemOutput = Self>
+    + RootRem<u64, RootOutput = Self, RemOutput = Self>
+    + RootAssignRem<u64, RemOutput = Self>
     + SciMantissaAndExponent<f32, u64>
     + SciMantissaAndExponent<f64, u64>
     + SqrtRem<SqrtOutput = Self, RemOutput = Self>
@@ -160,13 +161,13 @@ pub trait PrimitiveUnsigned:
     + VecFromOtherTypeSlice<u64>
     + VecFromOtherTypeSlice<u128>
     + VecFromOtherTypeSlice<usize>
-    + XXAddYYIsZZ
-    + XXDivModYIsQR
-    + XXSubYYIsZZ
-    + XMulYIsZZ
-    + XXXAddYYYIsZZZ
-    + XXXSubYYYIsZZZ
-    + XXXXAddYYYYIsZZZZ
+    + XXAddYYToZZ
+    + XXDivModYToQR
+    + XXSubYYToZZ
+    + XMulYToZZ
+    + XXXAddYYYToZZZ
+    + XXXSubYYYToZZZ
+    + XXXXAddYYYYToZZZZ
 {
 }
 

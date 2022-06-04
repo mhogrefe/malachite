@@ -11,14 +11,13 @@ use std::cmp::Ordering;
 macro_rules! impl_partial_ord_limb {
     ($u: ident) => {
         impl PartialOrd<$u> for Natural {
-            /// Compares a `Natural` to a `Limb`.
+            /// Compares a [`Natural`] to a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 match *self {
                     Natural(Small(small)) => small.partial_cmp(other),
@@ -28,14 +27,13 @@ macro_rules! impl_partial_ord_limb {
         }
 
         impl PartialOrd<Natural> for $u {
-            /// Compares a `Limb` to a `Natural`.
+            /// Compares a [`Limb`](crate#limbs) to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -47,15 +45,14 @@ macro_rules! impl_partial_ord_limb {
 macro_rules! impl_partial_ord_smaller_than_limb {
     ($u: ident) => {
         impl PartialOrd<$u> for Natural {
-            /// Compares a `Natural` to a value of a primitive unsigned integer type that's smaller
-            /// than a `Limb`.
+            /// Compares a [`Natural`] to a value of an unsigned primitive integer type that's
+            /// smaller than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 self.partial_cmp(&Limb::from(*other))
@@ -63,15 +60,14 @@ macro_rules! impl_partial_ord_smaller_than_limb {
         }
 
         impl PartialOrd<Natural> for $u {
-            /// Compares a value of a primitive unsigned integer type that's smaller than a `Limb`
-            /// to a `Natural`.
+            /// Compares a value of an unsigned primitive integer type that's smaller than a
+            /// [`Limb`](crate#limbs) to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -83,16 +79,16 @@ macro_rules! impl_partial_ord_smaller_than_limb {
 macro_rules! impl_partial_ord_larger_than_limb_or_usize {
     ($u: ident) => {
         impl PartialOrd<Natural> for $u {
-            /// Compares a value of a primitive unsigned integer type that's larger than a
-            /// `Limb` to a `Natural`. This implementation is general enough to also work for
-            /// `usize`, regardless of whether it is equal in width to `Limb`.
+            /// Compares a value of an unsigned primitive integer type that's larger than a
+            /// [`Limb`](crate#limbs) to a [`Natural`]. This implementation is general enough to
+            /// also work for [`usize`], regardless of whether it is equal in width to
+            /// [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -106,15 +102,14 @@ macro_rules! impl_partial_ord_larger_than_limb {
         impl_partial_ord_larger_than_limb_or_usize!($u);
 
         impl PartialOrd<$u> for Natural {
-            /// Compares a `Natural` to a value of a primitive unsigned integer type that's larger
-            /// than a `Limb`.
+            /// Compares a [`Natural`] to a value of an unsigned primitive integer type that's
+            /// larger than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 let limb_count = other
@@ -144,14 +139,13 @@ macro_rules! impl_partial_ord_larger_than_limb {
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialOrd<$t> for Natural {
-            /// Compares a `Natural` to a a value of signed primitive integer type.
+            /// Compares a [`Natural`] to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 if *other < 0 {
                     Some(Ordering::Greater)
@@ -162,14 +156,13 @@ macro_rules! impl_signed {
         }
 
         impl PartialOrd<Natural> for $t {
-            /// Compares a value of signed primitive integer type to a `Natural`.
+            /// Compares a signed primitive integer to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_int#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -194,13 +187,13 @@ impl_partial_ord_larger_than_limb_or_usize!(usize);
 apply_to_signeds!(impl_signed);
 
 impl PartialOrd<usize> for Natural {
-    /// Compares a `Natural` to a `usize`.
+    /// Compares a [`Natural`] to a [`usize`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See the documentation of the `natural::comparison::partial_cmp_primitive_int` module.
+    /// See [here](super::partial_cmp_primitive_int#partial_cmp).
     #[inline]
     fn partial_cmp(&self, other: &usize) -> Option<Ordering> {
         if usize::WIDTH == u32::WIDTH {

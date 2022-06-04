@@ -121,38 +121,14 @@ fn convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
 macro_rules! impl_from {
     ($u: ident, $s: ident) => {
         impl<'a> CheckedFrom<&'a Integer> for $u {
-            /// Converts an `Integer` to a value of a primitive unsigned integer type, taking the
-            /// `Integer` by reference and returning `None` if the `Integer` is negative or too
-            /// large.
+            /// Converts an [`Integer`] to an unsigned primitive integer, returning `None` if the
+            /// [`Integer`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(
-            ///     format!("{:?}", u32::checked_from(&Integer::from(123))),
-            ///     "Some(123)"
-            /// );
-            /// assert_eq!(
-            ///     format!("{:?}", u32::checked_from(&Integer::from(-123))),
-            ///     "None"
-            /// );
-            /// assert_eq!(
-            ///     format!("{:?}", u32::checked_from(&Integer::trillion())),
-            ///     "None"
-            /// );
-            /// assert_eq!(
-            ///     format!("{:?}", u32::checked_from(&-Integer::trillion())),
-            ///     "None"
-            /// );
-            /// ```
+            /// See [here](super::primitive_int_from_integer#checked_from).
             #[inline]
             fn checked_from(value: &Integer) -> Option<$u> {
                 checked_from_unsigned(value)
@@ -160,25 +136,14 @@ macro_rules! impl_from {
         }
 
         impl<'a> WrappingFrom<&'a Integer> for $u {
-            /// Converts an `Integer` to a value of a primitive unsigned integer type, taking the
-            /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>.
+            /// Converts an [`Integer`] to an unsigned primitive integer, wrapping modulo $2^W$,
+            /// where $W$ is the width of the primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(u32::wrapping_from(&Integer::from(123)), 123);
-            /// assert_eq!(u32::wrapping_from(&Integer::from(-123)), 4294967173);
-            /// assert_eq!(u32::wrapping_from(&Integer::trillion()), 3567587328);
-            /// assert_eq!(u32::wrapping_from(&-Integer::trillion()), 727379968);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#wrapping_from).
             #[inline]
             fn wrapping_from(value: &Integer) -> $u {
                 wrapping_from_unsigned(value)
@@ -186,26 +151,16 @@ macro_rules! impl_from {
         }
 
         impl<'a> SaturatingFrom<&'a Integer> for $u {
-            /// Converts an `Integer` to a value of a primitive unsigned integer type, taking the
-            /// `Integer` by reference. If the `Integer` is too large to fit in a `$u`, `$u::MAX` is
-            /// returned. If it is negative, 0 is returned.
+            /// Converts an [`Integer`] to an unsigned primitive integer.
+            ///
+            /// If the [`Integer`] cannot be represented by the output type, then either zero or
+            /// the maximum representable value is returned, whichever is closer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(u32::saturating_from(&Integer::from(123)), 123);
-            /// assert_eq!(u32::saturating_from(&Integer::from(-123)), 0);
-            /// assert_eq!(u32::saturating_from(&Integer::trillion()), u32::MAX);
-            /// assert_eq!(u32::saturating_from(&-Integer::trillion()), 0);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#saturating_from).
             #[inline]
             fn saturating_from(value: &Integer) -> $u {
                 saturating_from_unsigned(value)
@@ -213,35 +168,16 @@ macro_rules! impl_from {
         }
 
         impl<'a> OverflowingFrom<&'a Integer> for $u {
-            /// Converts an `Integer` to a value of a primitive unsigned integer type, taking the
-            /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>. The returned
-            /// boolean value indicates whether wrapping occurred.
+            /// Converts an [`Integer`] to an unsigned primitive integer, wrapping modulo $2^W$,
+            /// where $W$ is the width of the primitive integer.
+            ///
+            /// The returned boolean value indicates whether wrapping occurred.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(u32::overflowing_from(&Integer::from(123)), (123, false));
-            /// assert_eq!(
-            ///     u32::overflowing_from(&Integer::from(-123)),
-            ///     (4294967173, true)
-            /// );
-            /// assert_eq!(
-            ///     u32::overflowing_from(&Integer::trillion()),
-            ///     (3567587328, true)
-            /// );
-            /// assert_eq!(
-            ///     u32::overflowing_from(&-Integer::trillion()),
-            ///     (727379968, true)
-            /// );
-            /// ```
+            /// See [here](super::primitive_int_from_integer#overflowing_from).
             #[inline]
             fn overflowing_from(value: &Integer) -> ($u, bool) {
                 overflowing_from_unsigned(value)
@@ -249,25 +185,13 @@ macro_rules! impl_from {
         }
 
         impl<'a> ConvertibleFrom<&'a Integer> for $u {
-            /// Determines whether an `Integer` can be converted to a value of a primitive unsigned
-            /// integer type. Takes the `Integer` by reference.
+            /// Determines whether an [`Integer`] can be converted to an unsigned primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(u32::convertible_from(&Integer::from(123)), true);
-            /// assert_eq!(u32::convertible_from(&Integer::from(-123)), false);
-            /// assert_eq!(u32::convertible_from(&Integer::trillion()), false);
-            /// assert_eq!(u32::convertible_from(&-Integer::trillion()), false);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#convertible_from).
             #[inline]
             fn convertible_from(value: &Integer) -> bool {
                 value.sign && $u::convertible_from(&value.abs)
@@ -275,26 +199,14 @@ macro_rules! impl_from {
         }
 
         impl<'a> CheckedFrom<&'a Integer> for $s {
-            /// Converts an `Integer` to a value of a primitive signed integer type, taking the
-            /// `Integer` by reference and returning `None` if the `Integer` is outside the range of
-            /// an `$s`.
+            /// Converts an [`Integer`] to a signed primitive integer, returning `None` if the
+            /// [`Integer`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(i32::checked_from(&Integer::from(123)), Some(123));
-            /// assert_eq!(i32::checked_from(&Integer::from(-123)), Some(-123));
-            /// assert_eq!(i32::checked_from(&Integer::trillion()), None);
-            /// assert_eq!(i32::checked_from(&-Integer::trillion()), None);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#checked_from).
             #[inline]
             fn checked_from(value: &Integer) -> Option<$s> {
                 checked_from_signed(value)
@@ -302,25 +214,14 @@ macro_rules! impl_from {
         }
 
         impl<'a> WrappingFrom<&'a Integer> for $s {
-            /// Converts an `Integer` to a value of a primitive signed integer type, taking the
-            /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>.
+            /// Converts an [`Integer`] to a signed primitive integer, wrapping modulo $2^W$, where
+            /// $W$ is the width of the primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(i32::wrapping_from(&Integer::from(123)), 123);
-            /// assert_eq!(i32::wrapping_from(&Integer::from(-123)), -123);
-            /// assert_eq!(i32::wrapping_from(&Integer::trillion()), -727379968);
-            /// assert_eq!(i32::wrapping_from(&-Integer::trillion()), 727379968);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#wrapping_from).
             #[inline]
             fn wrapping_from(value: &Integer) -> $s {
                 $s::wrapping_from($u::wrapping_from(value))
@@ -328,26 +229,16 @@ macro_rules! impl_from {
         }
 
         impl<'a> SaturatingFrom<&'a Integer> for $s {
-            /// Converts an `Integer` to a value of a primitive signed integer type, taking the
-            /// `Integer` by reference. If the `Integer` is larger than `$s::MAX`, `$s::MAX` is
-            /// returned. If it is smaller than `$s::MIN`, `$s::MIN` is returned.
+            /// Converts an [`Integer`] to a signed primitive integer.
+            ///
+            /// If the [`Integer`] cannot be represented by the output type, then either the
+            /// maximum or the minimum representable value is returned, whichever is closer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(i32::saturating_from(&Integer::from(123)), 123);
-            /// assert_eq!(i32::saturating_from(&Integer::from(-123)), -123);
-            /// assert_eq!(i32::saturating_from(&Integer::trillion()), 2147483647);
-            /// assert_eq!(i32::saturating_from(&-Integer::trillion()), -2147483648);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#saturating_from).
             #[inline]
             fn saturating_from(value: &Integer) -> $s {
                 saturating_from_signed::<$u, $s>(value)
@@ -355,32 +246,16 @@ macro_rules! impl_from {
         }
 
         impl<'a> OverflowingFrom<&'a Integer> for $s {
-            /// Converts an `Integer` to a value of a primitive signed integer type, taking the
-            /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>. The returned
-            /// boolean value indicates whether wrapping occurred.
+            /// Converts an [`Integer`] to a signed primitive integer, wrapping modulo $2^W$, where
+            /// $W$ is the width of the primitive integer.
+            ///
+            /// The returned boolean value indicates whether wrapping occurred.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(i32::overflowing_from(&Integer::from(123)), (123, false));
-            /// assert_eq!(i32::overflowing_from(&Integer::from(-123)), (-123, false));
-            /// assert_eq!(
-            ///     i32::overflowing_from(&Integer::trillion()),
-            ///     (-727379968, true)
-            /// );
-            /// assert_eq!(
-            ///     i32::overflowing_from(&-Integer::trillion()),
-            ///     (727379968, true)
-            /// );
-            /// ```
+            /// See [here](super::primitive_int_from_integer#overflowing_from).
             #[inline]
             fn overflowing_from(value: &Integer) -> ($s, bool) {
                 ($s::wrapping_from(value), !$s::convertible_from(value))
@@ -388,25 +263,13 @@ macro_rules! impl_from {
         }
 
         impl<'a> ConvertibleFrom<&'a Integer> for $s {
-            /// Determines whether an `Integer` can be converted to a value of a primitive signed
-            /// integer type. Takes the `Integer` by reference.
+            /// Determines whether an [`Integer`] can be converted to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert_eq!(i32::convertible_from(&Integer::from(123)), true);
-            /// assert_eq!(i32::convertible_from(&Integer::from(-123)), true);
-            /// assert_eq!(i32::convertible_from(&Integer::trillion()), false);
-            /// assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
-            /// ```
+            /// See [here](super::primitive_int_from_integer#convertible_from).
             #[inline]
             fn convertible_from(value: &Integer) -> bool {
                 convertible_from_signed::<$u>(value)

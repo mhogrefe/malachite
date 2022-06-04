@@ -5,13 +5,18 @@ use Rational;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialOrd<$t> for Rational {
-            /// Compares a `Rational` to a value of primitive float type.
+            /// Compares a [`Rational`] to a primitive float.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.sci_exponent())`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_primitive_float` module.
+            /// See [here](super::partial_cmp_primitive_float#partial_cmp).
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 if other.is_nan() {
                     None
@@ -49,13 +54,18 @@ macro_rules! impl_float {
         }
 
         impl PartialOrd<Rational> for $t {
-            /// Compares a value of primitive float type to a `Rational`.
+            /// Compares a primitive float to a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(other.sci_exponent(), self.significant_bits())`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_primitive_float` module.
+            /// See [here](super::partial_cmp_primitive_float#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Rational) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)

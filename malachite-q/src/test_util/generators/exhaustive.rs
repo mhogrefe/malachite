@@ -26,10 +26,9 @@ use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
 use malachite_base::tuples::exhaustive::{
-    exhaustive_ordered_unique_pairs, exhaustive_ordered_unique_triples, exhaustive_pairs,
-    exhaustive_pairs_from_single, exhaustive_quadruples_xxyz, exhaustive_triples_custom_output,
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
-    exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs,
+    exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
+    lex_pairs,
 };
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
@@ -39,6 +38,10 @@ use malachite_nz::natural::exhaustive::{
 use malachite_nz::natural::Natural;
 use std::ops::Shr;
 use test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use test_util::extra_variadic::{
+    exhaustive_ordered_unique_triples, exhaustive_quadruples_xxyz, exhaustive_triples_from_single,
+    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+};
 use Rational;
 
 // -- Rational --

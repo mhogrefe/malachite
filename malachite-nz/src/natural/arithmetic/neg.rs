@@ -5,23 +5,24 @@ use std::ops::Neg;
 impl Neg for Natural {
     type Output = Integer;
 
-    /// Returns the negative of a `Natural`, taking the `Natural` by value and returning an
-    /// `Integer`.
+    /// Negates a [`Natural`], taking it by value and returning an [`Integer`].
     ///
-    /// Time: worst case O(1)
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((-Natural::ZERO).to_string(), "0");
-    /// assert_eq!((-Natural::from(123u32)).to_string(), "-123");
+    /// assert_eq!(-Natural::ZERO, 0);
+    /// assert_eq!(-Natural::from(123u32), -123);
     /// ```
     fn neg(self) -> Integer {
         Integer::from_sign_and_abs(self == 0, self)
@@ -31,25 +32,28 @@ impl Neg for Natural {
 impl<'a> Neg for &'a Natural {
     type Output = Integer;
 
-    /// Returns the negative of a `Natural`, taking the `Natural` by reference and returning an
-    /// `Integer`.
+    /// Negates a [`Natural`], taking it by reference and returning an [`Integer`].
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x) = -x.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((-&Natural::ZERO).to_string(), "0");
-    /// assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
+    /// assert_eq!(-&Natural::ZERO, 0);
+    /// assert_eq!(-&Natural::from(123u32), -123);
     /// ```
     fn neg(self) -> Integer {
         Integer::from_sign_and_abs_ref(*self == 0, self)

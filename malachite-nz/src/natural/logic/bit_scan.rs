@@ -9,13 +9,14 @@ use platform::Limb;
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
 // lowest index greater than or equal to `start` at which the `Natural` has a `false` bit.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
+// This is equivalent to `mpn_scan0` from `mpn/generic/scan0.c`, GMP 6.2.1.
 pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {
@@ -46,13 +47,14 @@ pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 // lowest index greater than or equal to `start` at which the `Natural` has a `true` bit. If the
 // starting index is too large and there are no more `true` bits above it, `None` is returned.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
+// This is equivalent to `mpn_scan1` from `mpn/generic/scan1.c`, GMP 6.2.1.
 pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {
@@ -78,19 +80,24 @@ pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option
 }}
 
 impl<'a> BitScan for &'a Natural {
-    /// Finds the lowest index greater than or equal to `start` at which the `Natural` has a `false`
-    /// bit. This function always returns a `Some`.
+    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index
+    /// of a `false` bit that is greater than or equal to the starting index.
     ///
-    /// Time: worst case O(n)
+    /// Since every [`Natural`] has an implicit prefix of infinitely-many zeros, this function
+    /// always returns a value.
     ///
-    /// Additional memory: worst case O(1)
+    /// Starting beyond the [`Natural`]'s width is allowed; the result is the starting index.
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::natural::Natural;
@@ -111,20 +118,22 @@ impl<'a> BitScan for &'a Natural {
         }
     }
 
-    /// Finds the lowest index greater than or equal to `start` at which the `Natural` has a `true`
-    /// bit. If the starting index is too large and there are no more `true` bits above it, `None`
-    /// is returned.
+    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index
+    /// of a `true` bit that is greater than or equal to the starting index.
     ///
-    /// Time: worst case O(n)
+    /// If the starting index is greater than or equal to the [`Natural`]'s width, the result is
+    /// `None` since there are no `true` bits past that point.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::natural::Natural;

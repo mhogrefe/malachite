@@ -1,62 +1,17 @@
-/// A struct that allows for formatting a numeric type and rendering its digits in a specified base.
-#[derive(Clone, Eq, Hash, PartialEq)]
-pub struct BaseFmtWrapper<T> {
-    pub(crate) x: T,
-    pub(crate) base: u8,
-}
-
-impl<T> BaseFmtWrapper<T> {
-    /// Creates a new `BaseFmtWrapper`.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let n = Natural::from(1000000000u32);
-    /// let x = BaseFmtWrapper::new(&n, 36);
-    /// assert_eq!(format!("{}", x), "gjdgxs");
-    /// assert_eq!(format!("{:#}", x), "GJDGXS");
-    ///
-    /// let n = Integer::from(-1000000000);
-    /// let x = BaseFmtWrapper::new(&n, 36);
-    /// assert_eq!(format!("{}", x), "-gjdgxs");
-    /// assert_eq!(format!("{:#}", x), "-GJDGXS");
-    /// ```
-    pub fn new(x: T, base: u8) -> Self {
-        assert!((2..=36).contains(&base), "base out of range");
-        BaseFmtWrapper { x, base }
-    }
-
-    /// Recovers the value from a `BaseFmtWrapper`.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(
-    ///     BaseFmtWrapper::new(Natural::from(1000000000u32), 36).unwrap(),
-    ///     1000000000
-    /// );
-    /// ```
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn unwrap(self) -> T {
-        self.x
-    }
-}
-
+/// Implementations of [`FromSciString`](malachite_base::num::conversion::traits::FromSciString).
+/// This is a trait for converting strings, possibly using scientific notation, to numbers.
 pub mod from_sci_string;
+/// Implementations of [`FromStr`](std::str::FromStr) and of
+/// [`FromStringBase`](malachite_base::num::conversion::traits::FromStringBase), a trait for
+/// converting strings in a specified base to numbers.
 pub mod from_string;
+/// Implementations of [`ToSci`](malachite_base::num::conversion::traits::ToSci), a trait for
+/// converting a number to string, possibly using scientific notation.
 pub mod to_sci;
+/// The [`BaseFmtWrapper`](to_string::BaseFmtWrapper) struct and implementations of
+/// [`Display`](std::fmt::Display), [`Debug`], [`Binary`](std::fmt::Binary),
+/// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), and
+/// [`UpperHex`](std::fmt::UpperHex), and of the
+/// [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase) trait, used for
+/// converting numbers to strings.
 pub mod to_string;

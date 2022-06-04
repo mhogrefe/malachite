@@ -6,15 +6,21 @@ use Rational;
 impl Pow<u64> for Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by value.
+    /// Raises a [`Rational`] to a power, taking the [`Rational`] by value.
+    ///
+    /// $f(x, n) = x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
@@ -34,15 +40,21 @@ impl Pow<u64> for Rational {
 impl<'a> Pow<u64> for &'a Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by reference.
+    /// Raises a [`Rational`] to a power, taking the [`Rational`] by reference.
+    ///
+    /// $f(x, n) = x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
@@ -63,15 +75,21 @@ impl<'a> Pow<u64> for &'a Rational {
 }
 
 impl PowAssign<u64> for Rational {
-    /// Squares a `Rational` in place.
+    /// Raises a [`Rational`] to a power in place.
+    ///
+    /// $x \gets x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -99,10 +117,17 @@ impl PowAssign<u64> for Rational {
 impl Pow<i64> for Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by value.
+    /// Raises a [`Rational`] to a power, taking the [`Rational`] by value.
+    ///
+    /// $f(x, n) = x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp.abs()`.
     ///
     /// # Panics
     /// Panics if `self` is zero and `exp` is negative.
@@ -110,7 +135,6 @@ impl Pow<i64> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
@@ -133,10 +157,17 @@ impl Pow<i64> for Rational {
 impl<'a> Pow<i64> for &'a Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by reference.
+    /// Raises a [`Rational`] to a power, taking the [`Rational`] by reference.
+    ///
+    /// $f(x, n) = x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp.abs()`.
     ///
     /// # Panics
     /// Panics if `self` is zero and `exp` is negative.
@@ -144,7 +175,6 @@ impl<'a> Pow<i64> for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
@@ -169,10 +199,17 @@ impl<'a> Pow<i64> for &'a Rational {
 }
 
 impl PowAssign<i64> for Rational {
-    /// Squares a `Rational` in place.
+    /// Raises a [`Rational`] to a power in place.
+    ///
+    /// $x \gets x^n$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// `exp.abs()`.
     ///
     /// # Panics
     /// Panics if `self` is zero and `exp` is negative.
@@ -180,7 +217,6 @@ impl PowAssign<i64> for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_base::num::basic::traits::Zero;

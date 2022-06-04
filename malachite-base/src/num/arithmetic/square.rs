@@ -5,7 +5,7 @@ macro_rules! impl_square {
         impl Square for $t {
             type Output = $t;
 
-            /// Squares `self`.
+            /// Squares a number.
             ///
             /// $f(x) = x^2$.
             ///
@@ -13,7 +13,7 @@ macro_rules! impl_square {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::square` module.
+            /// See [here](super::square#square).
             #[inline]
             fn square(self) -> $t {
                 self * self
@@ -21,7 +21,7 @@ macro_rules! impl_square {
         }
 
         impl SquareAssign for $t {
-            /// Replaces `self` with `self` squared.
+            /// Squares a number in place.
             ///
             /// $x \gets x^2$.
             ///
@@ -29,7 +29,7 @@ macro_rules! impl_square {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::square` module.
+            /// See [here](super::square#square_assign).
             #[inline]
             fn square_assign(&mut self) {
                 *self *= *self;

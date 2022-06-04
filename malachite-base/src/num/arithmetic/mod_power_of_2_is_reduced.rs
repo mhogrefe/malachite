@@ -4,16 +4,16 @@ use num::logic::traits::SignificantBits;
 macro_rules! impl_mod_power_of_2_is_reduced {
     ($t:ident) => {
         impl ModPowerOf2IsReduced for $t {
-            /// Returns whether `self` is reduced mod $2^p$; in other words, whether it has no more
-            /// than `pow` significant bits.
+            /// Returns whether a number is reduced modulo another number $2^k$; in other words,
+            /// whether it has no more than $k$ significant bits.
             ///
-            /// $f(x, p) = (x < 2^p)$.
+            /// $f(x, k) = (x < 2^k)$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_is_reduced` module.
+            /// See [here](super::mod_power_of_2_is_reduced#mod_power_of_2_is_reduced).
             #[inline]
             fn mod_power_of_2_is_reduced(&self, pow: u64) -> bool {
                 self.significant_bits() <= pow

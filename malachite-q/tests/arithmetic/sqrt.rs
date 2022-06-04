@@ -9,7 +9,7 @@ use std::str::FromStr;
 fn test_checked_sqrt() {
     let test = |s, out: Option<&str>| {
         let n = Rational::from_str(s).unwrap();
-        let out = out.map(|s| s.to_string());
+        let out = out.map(ToString::to_string);
         assert_eq!(n.clone().checked_sqrt().map(|x| x.to_string()), out);
         assert_eq!((&n).checked_sqrt().map(|x| x.to_string()), out);
     };
@@ -46,7 +46,7 @@ fn checked_sqrt_properties() {
         if n != 0 {
             assert_eq!(
                 (&n).reciprocal().checked_sqrt(),
-                sqrt.as_ref().map(|q| q.reciprocal())
+                sqrt.as_ref().map(Reciprocal::reciprocal)
             );
         }
         if let Some(sqrt) = sqrt {

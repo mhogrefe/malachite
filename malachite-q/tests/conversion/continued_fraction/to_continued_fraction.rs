@@ -65,7 +65,7 @@ fn continued_fraction_properties() {
         assert!(continued_fraction.iter().all(|n| *n > 0u32));
         assert_ne!(continued_fraction.last(), Some(&Natural::ONE));
         assert_eq!(
-            Rational::from_continued_fraction(floor, continued_fraction),
+            Rational::from_continued_fraction(floor, continued_fraction.into_iter()),
             x
         );
     });

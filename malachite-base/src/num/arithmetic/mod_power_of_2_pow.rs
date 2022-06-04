@@ -22,9 +22,10 @@ macro_rules! impl_mod_power_of_2_pow {
         impl ModPowerOf2Pow<u64> for $t {
             type Output = $t;
 
-            /// Computes `self.pow(exp)` mod $2^p$. Assumes the input is already reduced mod $2^p$.
+            /// Raises a number to a power modulo another number $2^k$. Assumes the input is
+            /// already reduced modulo $2^k$.
             ///
-            /// $f(x, n, p) = y$, where $x, y < 2^p$ and $x^n \equiv y \mod 2^p$.
+            /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -33,8 +34,11 @@ macro_rules! impl_mod_power_of_2_pow {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_pow` module.
+            /// See [here](super::mod_power_of_2_pow#mod_power_of_2_pow).
             #[inline]
             fn mod_power_of_2_pow(self, exp: u64, pow: u64) -> $t {
                 mod_power_of_2_pow(self, exp, pow)
@@ -42,10 +46,10 @@ macro_rules! impl_mod_power_of_2_pow {
         }
 
         impl ModPowerOf2PowAssign<u64> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod $2^p$. Assumes the input is already
-            /// reduced mod $2^p$.
+            /// Raises a number to a power modulo another number $2^k$, in place. Assumes the input
+            /// is already reduced modulo $2^k$.
             ///
-            /// $x \gets y$, where $x, y < 2^p$ and $x^n \equiv y \mod 2^p$.
+            /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -54,8 +58,11 @@ macro_rules! impl_mod_power_of_2_pow {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`.
+            ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_power_of_2_pow` module.
+            /// See [here](super::mod_power_of_2_pow#mod_power_of_2_pow_assign).
             #[inline]
             fn mod_power_of_2_pow_assign(&mut self, exp: u64, pow: u64) {
                 *self = self.mod_power_of_2_pow(exp, pow);

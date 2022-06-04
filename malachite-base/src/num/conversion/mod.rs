@@ -1,8 +1,9 @@
-/// Trait implementations for working with the digits of numbers.
+/// Traits for working with the digits of numbers.
 pub mod digits;
-/// Trait implementations for converting between different number types.
-///
-/// Here are usage examples of the macro-generated functions:
+/// Traits for converting between different number types. The traits are
+/// [`CheckedFrom`](traits::CheckedFrom), [`WrappingFrom`](traits::WrappingFrom),
+/// [`SaturatingFrom`](traits::SaturatingFrom), [`OverflowingFrom`](traits::OverflowingFrom),
+/// [`ConvertibleFrom`](traits::ConvertibleFrom), and [`RoundingFrom`](traits::RoundingFrom).
 ///
 /// # checked_from
 /// ```
@@ -149,9 +150,8 @@ pub mod digits;
 /// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Nearest), 100);
 /// ```
 pub mod from;
-/// Traits for bitwise joining two numbers or splitting them in half.
-///
-/// Here are some examples of the macro-generated functions:
+/// [`JoinHalves`](traits::JoinHalves) and [`SplitInHalf`](traits::SplitInHalf), traits for joining
+/// the bits of two numbers or for splitting a number in half.
 ///
 /// # join_halves
 /// ```
@@ -185,14 +185,18 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
-/// A trait for determining whether a value is an integer.
-///
-/// Here are some examples of the macro-generated functions:
+/// [`IsInteger`](traits::IsInteger), a trait for determining whether a value is an integer.
 ///
 /// # is_integer
 /// ```
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::conversion::traits::IsInteger;
+///
+/// assert_eq!(0.is_integer(), true);
+/// assert_eq!(1.is_integer(), true);
+/// assert_eq!(100.is_integer(), true);
+/// assert_eq!((-1).is_integer(), true);
+/// assert_eq!((-100).is_integer(), true);
 ///
 /// assert_eq!(0.0.is_integer(), true);
 /// assert_eq!(1.0.is_integer(), true);
@@ -209,7 +213,11 @@ pub mod half;
 pub mod is_integer;
 /// Traits for converting numbers to and from mantissa and exponent representations.
 ///
-/// Here are some examples of the macro-generated functions:
+/// See [`PrimitiveFloat`](super::basic::floats::PrimitiveFloat) for a description of the
+/// different types of mantissas and exponents. The traits are
+/// [`RawMantissaAndExponent`](traits::RawMantissaAndExponent),
+/// [`IntegerMantissaAndExponent`](traits::IntegerMantissaAndExponent), and
+/// [`SciMantissaAndExponent`](traits::SciMantissaAndExponent).
 ///
 /// # raw_mantissa_and_exponent
 /// ```
@@ -260,7 +268,7 @@ pub mod is_integer;
 /// assert_eq!(0.1f32.raw_exponent(), 123);
 /// ```
 ///
-/// # from_raw_mantissa_and_exponent;
+/// # from_raw_mantissa_and_exponent
 /// ```
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
@@ -543,9 +551,10 @@ pub mod is_integer;
 /// assert_eq!(f32::from_sci_mantissa_and_exponent(1.999, -149), None);
 /// ```
 pub mod mantissa_and_exponent;
-/// Traits for converting numbers to `Vec`s of numbers, slices to numbers, or slices to `Vec`s.
-///
-/// Here are some examples of the macro-generated functions:
+/// Traits for converting slices to numbers, slices to [`Vec`]s, or numbers to [`Vec`]s. The traits
+/// are [`FromOtherTypeSlice`](traits::FromOtherTypeSlice),
+/// [`VecFromOtherTypeSlice`](traits::VecFromOtherTypeSlice), and
+/// [`VecFromOtherType`](traits::VecFromOtherType).
 ///
 /// # from_other_type_slice
 /// ```
@@ -585,7 +594,7 @@ pub mod mantissa_and_exponent;
 /// assert_eq!(u16::vec_from_other_type(0xabu8), &[0xab]);
 /// ```
 pub mod slice;
-/// Trait implementations for converting numbers to and from `String`s.
+/// Traits for converting numbers to and from [`String`]s.
 pub mod string;
 /// Various traits for converting numbers.
 pub mod traits;

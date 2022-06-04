@@ -122,11 +122,11 @@ pub fn test_to_sci() {
 
 #[test]
 pub fn test_to_sci_with_options() {
-    fn test_i(x: Rational, options: ToSciOptions, out: &str) {
+    fn test_i(x: &Rational, options: ToSciOptions, out: &str) {
         assert_eq!(x.to_sci_with_options(options).to_string(), out);
     }
     fn test(s: &str, options: ToSciOptions, out: &str) {
-        test_i(Rational::from_str(s).unwrap(), options, out);
+        test_i(&Rational::from_str(s).unwrap(), options, out);
     }
     // For tests with the default options, see `test_to_sci`
 
@@ -151,8 +151,8 @@ pub fn test_to_sci_with_options() {
     test("1000000000000000", options, "1000000000000000");
     test("10000000000000000", options, "1.000000000000000e16");
     test("100000000000000000", options, "1.000000000000000e17");
-    test_i(Rational::from(u64::MAX), options, "1.844674407370955e19");
-    test_i(Rational::from(u128::MAX), options, "3.402823669209385e38");
+    test_i(&Rational::from(u64::MAX), options, "1.844674407370955e19");
+    test_i(&Rational::from(u128::MAX), options, "3.402823669209385e38");
 
     test("999999999999999", options, "999999999999999.0");
     test("9999999999999999", options, "9999999999999999");
@@ -161,90 +161,90 @@ pub fn test_to_sci_with_options() {
 
     options = ToSciOptions::default();
     options.set_base(2);
-    test_i(Rational::from(u128::MAX), options, "1e128");
+    test_i(&Rational::from(u128::MAX), options, "1e128");
     options.set_base(3);
-    test_i(Rational::from(u128::MAX), options, "2.022011021210021e80");
+    test_i(&Rational::from(u128::MAX), options, "2.022011021210021e80");
     options.set_base(4);
-    test_i(Rational::from(u128::MAX), options, "1e64");
+    test_i(&Rational::from(u128::MAX), options, "1e64");
     options.set_base(5);
-    test_i(Rational::from(u128::MAX), options, "1.103111044120131e55");
+    test_i(&Rational::from(u128::MAX), options, "1.103111044120131e55");
     options.set_base(8);
-    test_i(Rational::from(u128::MAX), options, "4e42");
+    test_i(&Rational::from(u128::MAX), options, "4e42");
     // When base >= 15, there is a mandatory sign after the exponent indicator "e", to distinguish
     // it from the digit "e"
     options.set_base(16);
-    test_i(Rational::from(u128::MAX), options, "1e+32");
+    test_i(&Rational::from(u128::MAX), options, "1e+32");
     options.set_base(32);
-    test_i(Rational::from(u128::MAX), options, "8e+25");
+    test_i(&Rational::from(u128::MAX), options, "8e+25");
     options.set_base(36);
-    test_i(Rational::from(u128::MAX), options, "f.5lxx1zz5pnorynqe+24");
+    test_i(&Rational::from(u128::MAX), options, "f.5lxx1zz5pnorynqe+24");
 
     // The sign can be forced in other cases too
     options.set_base(3);
     options.set_force_exponent_plus_sign(true);
-    test_i(Rational::from(u128::MAX), options, "2.022011021210021e+80");
+    test_i(&Rational::from(u128::MAX), options, "2.022011021210021e+80");
 
     // The digits can be uppercase, and so can the exponent indicator
     options = ToSciOptions::default();
     options.set_base(36);
     options.set_uppercase();
-    test_i(Rational::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQe+24");
+    test_i(&Rational::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQe+24");
 
     options.set_lowercase();
     options.set_e_uppercase();
-    test_i(Rational::from(u128::MAX), options, "f.5lxx1zz5pnorynqE+24");
+    test_i(&Rational::from(u128::MAX), options, "f.5lxx1zz5pnorynqE+24");
 
     options.set_uppercase();
-    test_i(Rational::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQE+24");
+    test_i(&Rational::from(u128::MAX), options, "F.5LXX1ZZ5PNORYNQE+24");
 
     options = ToSciOptions::default();
     options.set_size_complete();
     options.set_base(2);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\
         111111111111111111111111111111111111111",
     );
     options.set_base(3);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "202201102121002021012000211012011021221022212021111001022110211020010021100121010",
     );
     options.set_base(4);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "3333333333333333333333333333333333333333333333333333333333333333",
     );
     options.set_base(5);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "11031110441201303134210404233413032443021130230130231310",
     );
     options.set_base(8);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "3777777777777777777777777777777777777777777",
     );
     options.set_base(16);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "ffffffffffffffffffffffffffffffff",
     );
     options.set_base(32);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "7vvvvvvvvvvvvvvvvvvvvvvvvv",
     );
     options.set_base(36);
     test_i(
-        Rational::from(u128::MAX),
+        &Rational::from(u128::MAX),
         options,
         "f5lxx1zz5pnorynqglhzmsp33",
     );
@@ -401,8 +401,8 @@ pub fn test_to_sci_with_options() {
 
     let mut options = ToSciOptions::default();
     options.set_include_trailing_zeros(true);
-    test_i(Rational::from(i64::MAX), options, "9.223372036854776e18");
-    test_i(Rational::from(i128::MAX), options, "1.701411834604692e38");
+    test_i(&Rational::from(i64::MAX), options, "9.223372036854776e18");
+    test_i(&Rational::from(i128::MAX), options, "1.701411834604692e38");
     test("-1", options, "-1.000000000000000");
     test("-10", options, "-10.00000000000000");
     test("-100", options, "-100.0000000000000");
@@ -421,8 +421,8 @@ pub fn test_to_sci_with_options() {
     test("-1000000000000000", options, "-1000000000000000");
     test("-10000000000000000", options, "-1.000000000000000e16");
     test("-100000000000000000", options, "-1.000000000000000e17");
-    test_i(Rational::from(i64::MIN), options, "-9.223372036854776e18");
-    test_i(Rational::from(i128::MIN), options, "-1.701411834604692e38");
+    test_i(&Rational::from(i64::MIN), options, "-9.223372036854776e18");
+    test_i(&Rational::from(i128::MIN), options, "-1.701411834604692e38");
 
     test("-999999999999999", options, "-999999999999999.0");
     test("-9999999999999999", options, "-9999999999999999");
@@ -431,143 +431,159 @@ pub fn test_to_sci_with_options() {
 
     options = ToSciOptions::default();
     options.set_base(2);
-    test_i(Rational::from(i128::MAX), options, "1e127");
-    test_i(Rational::from(i128::MIN), options, "-1e127");
+    test_i(&Rational::from(i128::MAX), options, "1e127");
+    test_i(&Rational::from(i128::MIN), options, "-1e127");
     options.set_base(3);
-    test_i(Rational::from(i128::MAX), options, "1.01100201022001e80");
-    test_i(Rational::from(i128::MIN), options, "-1.01100201022001e80");
+    test_i(&Rational::from(i128::MAX), options, "1.01100201022001e80");
+    test_i(&Rational::from(i128::MIN), options, "-1.01100201022001e80");
     options.set_base(4);
-    test_i(Rational::from(i128::MAX), options, "2e63");
-    test_i(Rational::from(i128::MIN), options, "-2e63");
+    test_i(&Rational::from(i128::MAX), options, "2e63");
+    test_i(&Rational::from(i128::MIN), options, "-2e63");
     options.set_base(5);
-    test_i(Rational::from(i128::MAX), options, "3.013030220323124e54");
-    test_i(Rational::from(i128::MIN), options, "-3.013030220323124e54");
+    test_i(&Rational::from(i128::MAX), options, "3.013030220323124e54");
+    test_i(&Rational::from(i128::MIN), options, "-3.013030220323124e54");
     options.set_base(8);
-    test_i(Rational::from(i128::MAX), options, "2e42");
-    test_i(Rational::from(i128::MIN), options, "-2e42");
+    test_i(&Rational::from(i128::MAX), options, "2e42");
+    test_i(&Rational::from(i128::MIN), options, "-2e42");
     // When base >= 15, there is a mandatory sign after the exponent indicator "e", to distinguish
     // it from the digit "e"
     options.set_base(16);
-    test_i(Rational::from(i128::MAX), options, "8e+31");
-    test_i(Rational::from(i128::MIN), options, "-8e+31");
+    test_i(&Rational::from(i128::MAX), options, "8e+31");
+    test_i(&Rational::from(i128::MIN), options, "-8e+31");
     options.set_base(32);
-    test_i(Rational::from(i128::MAX), options, "4e+25");
-    test_i(Rational::from(i128::MIN), options, "-4e+25");
+    test_i(&Rational::from(i128::MAX), options, "4e+25");
+    test_i(&Rational::from(i128::MIN), options, "-4e+25");
     options.set_base(36);
-    test_i(Rational::from(i128::MAX), options, "7.ksyyizzkutudzbve+24");
-    test_i(Rational::from(i128::MIN), options, "-7.ksyyizzkutudzbve+24");
+    test_i(&Rational::from(i128::MAX), options, "7.ksyyizzkutudzbve+24");
+    test_i(
+        &Rational::from(i128::MIN),
+        options,
+        "-7.ksyyizzkutudzbve+24",
+    );
 
     // The sign can be forced in other cases too
     options.set_base(3);
     options.set_force_exponent_plus_sign(true);
-    test_i(Rational::from(i128::MAX), options, "1.01100201022001e+80");
-    test_i(Rational::from(i128::MIN), options, "-1.01100201022001e+80");
+    test_i(&Rational::from(i128::MAX), options, "1.01100201022001e+80");
+    test_i(&Rational::from(i128::MIN), options, "-1.01100201022001e+80");
 
     // The digits can be uppercase, and so can the exponent indicator
     options = ToSciOptions::default();
     options.set_base(36);
     options.set_uppercase();
-    test_i(Rational::from(i128::MAX), options, "7.KSYYIZZKUTUDZBVe+24");
-    test_i(Rational::from(i128::MIN), options, "-7.KSYYIZZKUTUDZBVe+24");
+    test_i(&Rational::from(i128::MAX), options, "7.KSYYIZZKUTUDZBVe+24");
+    test_i(
+        &Rational::from(i128::MIN),
+        options,
+        "-7.KSYYIZZKUTUDZBVe+24",
+    );
 
     options.set_lowercase();
     options.set_e_uppercase();
-    test_i(Rational::from(i128::MAX), options, "7.ksyyizzkutudzbvE+24");
-    test_i(Rational::from(i128::MIN), options, "-7.ksyyizzkutudzbvE+24");
+    test_i(&Rational::from(i128::MAX), options, "7.ksyyizzkutudzbvE+24");
+    test_i(
+        &Rational::from(i128::MIN),
+        options,
+        "-7.ksyyizzkutudzbvE+24",
+    );
 
     options.set_uppercase();
-    test_i(Rational::from(i128::MAX), options, "7.KSYYIZZKUTUDZBVE+24");
-    test_i(Rational::from(i128::MIN), options, "-7.KSYYIZZKUTUDZBVE+24");
+    test_i(&Rational::from(i128::MAX), options, "7.KSYYIZZKUTUDZBVE+24");
+    test_i(
+        &Rational::from(i128::MIN),
+        options,
+        "-7.KSYYIZZKUTUDZBVE+24",
+    );
 
     options = ToSciOptions::default();
     options.set_size_complete();
     options.set_base(2);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\
         11111111111111111111111111111111111111",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
         0000000000000000000000000000000000000000",
     );
     options.set_base(3);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "101100201022001010121000102002120122110122221010202000122201220121120010200022001",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-101100201022001010121000102002120122110122221010202000122201220121120010200022002",
     );
     options.set_base(4);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "1333333333333333333333333333333333333333333333333333333333333333",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-2000000000000000000000000000000000000000000000000000000000000000",
     );
     options.set_base(5);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "3013030220323124042102424341431241221233040112312340402",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-3013030220323124042102424341431241221233040112312340403",
     );
     options.set_base(8);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "1777777777777777777777777777777777777777777",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-2000000000000000000000000000000000000000000",
     );
     options.set_base(16);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "7fffffffffffffffffffffffffffffff",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-80000000000000000000000000000000",
     );
     options.set_base(32);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "3vvvvvvvvvvvvvvvvvvvvvvvvv",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-40000000000000000000000000",
     );
     options.set_base(36);
     test_i(
-        Rational::from(i128::MAX),
+        &Rational::from(i128::MAX),
         options,
         "7ksyyizzkutudzbv8aqztecjj",
     );
     test_i(
-        Rational::from(i128::MIN),
+        &Rational::from(i128::MIN),
         options,
         "-7ksyyizzkutudzbv8aqztecjk",
     );
@@ -801,39 +817,39 @@ pub fn test_to_sci_with_options() {
     options = ToSciOptions::default();
     options.set_size_complete();
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.401298464324817070923729583289916131280261941876515771757068283889791082685860601486638\
         18836212158203125e-45",
     );
     options.set_base(2);
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1e-149",
     );
     options.set_base(32);
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "2e-30",
     );
     options.set_base(36);
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.whin9rvdkphvrmxkdwtoq8t963n428tj1p07aaum2yy14ie-29",
     );
     options.set_uppercase();
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.WHIN9RVDKPHVRMXKDWTOQ8T963N428TJ1P07AAUM2YY14Ie-29",
     );
     options.set_base(10);
     options.set_neg_exp_threshold(-200);
     test_i(
-        Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "0.000000000000000000000000000000000000000000001401298464324817070923729583289916131280261\
         94187651577175706828388979108268586060148663818836212158203125",
@@ -969,7 +985,7 @@ fn to_sci_with_options_properties() {
                 }
                 SciSizeOptions::Scale(scale) => {
                     let scale = i64::exact_from(scale);
-                    (Some(scale), scale + log + 1 <= 0)
+                    (Some(scale), scale + log < 0)
                 }
                 SciSizeOptions::Precision(precision) => {
                     (Some(i64::exact_from(precision - 1) - log), false)

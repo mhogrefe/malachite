@@ -24,9 +24,7 @@ use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::{GenConfig, It};
 use malachite_base::tuples::random::{
-    random_ordered_unique_pairs, random_ordered_unique_triples, random_pairs,
-    random_pairs_from_single, random_quadruples_xxyz, random_triples, random_triples_from_single,
-    random_triples_xxy, random_triples_xyy,
+    random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -44,6 +42,10 @@ use random::{
 };
 use std::ops::Shr;
 use test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use test_util::extra_variadic::{
+    random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyy,
+};
 use test_util::generators::round_to_multiple_rational_filter;
 use Rational;
 

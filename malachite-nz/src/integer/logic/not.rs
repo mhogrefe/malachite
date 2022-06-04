@@ -7,26 +7,29 @@ use std::ops::Not;
 impl Not for Integer {
     type Output = Integer;
 
-    /// Returns the bitwise complement of an `Integer`, as if it were represented in two's
-    /// complement, taking the `Integer` by value.
+    /// Returns the bitwise negation of an [`Integer`], taking it by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(n) = -n - 1.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((!Integer::ZERO).to_string(), "-1");
-    /// assert_eq!((!Integer::from(123)).to_string(), "-124");
-    /// assert_eq!((!Integer::from(-123)).to_string(), "122");
+    /// assert_eq!(!Integer::ZERO, -1);
+    /// assert_eq!(!Integer::from(123), -124);
+    /// assert_eq!(!Integer::from(-123), 122);
     /// ```
     #[inline]
     fn not(mut self) -> Integer {
@@ -38,26 +41,29 @@ impl Not for Integer {
 impl<'a> Not for &'a Integer {
     type Output = Integer;
 
-    /// Returns the bitwise complement of an `Integer`, as if it were represented in two's
-    /// complement, taking the `Integer` by reference.
+    /// Returns the bitwise negation of an [`Integer`], taking it by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(n) = -n - 1.
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((!&Integer::ZERO).to_string(), "-1");
-    /// assert_eq!((!&Integer::from(123)).to_string(), "-124");
-    /// assert_eq!((!&Integer::from(-123)).to_string(), "122");
+    /// assert_eq!(!&Integer::ZERO, -1);
+    /// assert_eq!(!&Integer::from(123), -124);
+    /// assert_eq!(!&Integer::from(-123), 122);
     /// ```
     fn not(self) -> Integer {
         match *self {
@@ -80,19 +86,22 @@ impl<'a> Not for &'a Integer {
 }
 
 impl NotAssign for Integer {
-    /// Replaces an `Integer` with its bitwise complement, as if it were represented in two's
-    /// complement.
+    /// Replaces an [`Integer`] with its bitwise negation.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// n \gets -n - 1.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::NotAssign;
@@ -100,15 +109,15 @@ impl NotAssign for Integer {
     ///
     /// let mut x = Integer::ZERO;
     /// x.not_assign();
-    /// assert_eq!(x.to_string(), "-1");
+    /// assert_eq!(x, -1);
     ///
     /// let mut x = Integer::from(123);
     /// x.not_assign();
-    /// assert_eq!(x.to_string(), "-124");
+    /// assert_eq!(x, -124);
     ///
     /// let mut x = Integer::from(-123);
     /// x.not_assign();
-    /// assert_eq!(x.to_string(), "122");
+    /// assert_eq!(x, 122);
     /// ```
     fn not_assign(&mut self) {
         if self.sign {

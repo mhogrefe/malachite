@@ -1,10 +1,7 @@
-use num::arithmetic::traits::{ModSub, ModSubAssign, WrappingAdd, WrappingSub};
+use num::arithmetic::traits::{ModSub, ModSubAssign};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_sub<T: Copy + Ord + WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>>(
-    x: T,
-    other: T,
-    m: T,
-) -> T {
+fn mod_sub<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
     let diff = x.wrapping_sub(other);
     if x < other {
         m.wrapping_add(diff)
@@ -18,7 +15,8 @@ macro_rules! impl_mod_sub {
         impl ModSub<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Subtracts two numbers modulo a third number $m$. Assumes the inputs are already
+            /// reduced modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
@@ -26,9 +24,9 @@ macro_rules! impl_mod_sub {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_sub` module.
+            /// See [here](super::mod_sub#mod_sub).
             ///
-            /// This is nmod_sub from nmod_vec.h, FLINT 2.7.1.
+            /// This is equivalent to `nmod_sub` from `nmod_vec.h`, FLINT 2.7.1.
             #[inline]
             fn mod_sub(self, other: $t, m: $t) -> $t {
                 mod_sub(self, other, m)
@@ -36,8 +34,8 @@ macro_rules! impl_mod_sub {
         }
 
         impl ModSubAssign<$t> for $t {
-            /// Replaces `self` with `self - other` mod `m`. Assumes the inputs are already reduced
-            /// mod `m`.
+            /// Subtracts two numbers modulo a third number $m$, in place. Assumes the inputs are
+            /// already reduced modulo $m$.
             ///
             /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
@@ -45,9 +43,10 @@ macro_rules! impl_mod_sub {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::mod_sub` module.
+            /// See [here](super::mod_sub#mod_sub_assign).
             ///
-            /// This is nmod_sub from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
+            /// This is equivalent to `nmod_sub` from `nmod_vec.h`, FLINT 2.7.1, where the result
+            /// is assigned to `a`.
             #[inline]
             fn mod_sub_assign(&mut self, other: $t, m: $t) {
                 *self = self.mod_sub(other, m);

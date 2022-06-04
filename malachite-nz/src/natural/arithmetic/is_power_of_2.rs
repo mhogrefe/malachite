@@ -9,11 +9,12 @@ use platform::Limb;
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -23,28 +24,30 @@ pub_crate_test! {limbs_is_power_of_2(xs: &[Limb]) -> bool {
 }}
 
 impl IsPowerOf2 for Natural {
-    /// Determines whether a `Natural` is an integer power of 2.
+    /// Determines whether a [`Natural`] is an integer power of 2.
     ///
-    /// Time: worst case O(n)
+    /// $f(x) = (\exists n \in \Z : 2^n = x)$.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::arithmetic::traits::IsPowerOf2;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.is_power_of_2(), false);
     /// assert_eq!(Natural::from(123u32).is_power_of_2(), false);
     /// assert_eq!(Natural::from(0x80u32).is_power_of_2(), true);
-    /// assert_eq!(Natural::trillion().is_power_of_2(), false);
+    /// assert_eq!(Natural::from(10u32).pow(12).is_power_of_2(), false);
     /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_2(), true);
     /// ```
     fn is_power_of_2(&self) -> bool {

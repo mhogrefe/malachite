@@ -5,7 +5,7 @@ macro_rules! impl_sub_mul_primitive_int {
         impl SubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`.
+            /// Subtracts a number by the product of two other numbers.
             ///
             /// $f(x, y, z) = x - yz$.
             ///
@@ -13,7 +13,7 @@ macro_rules! impl_sub_mul_primitive_int {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sub_mul` module.
+            /// See [here](super::sub_mul#sub_mul).
             #[inline]
             fn sub_mul(self, y: $t, z: $t) -> $t {
                 self.wrapping_sub_mul(y, z)
@@ -21,7 +21,7 @@ macro_rules! impl_sub_mul_primitive_int {
         }
 
         impl SubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`.
+            /// Subtracts a number by the product of two other numbers in place.
             ///
             /// $x \gets x - yz$.
             ///
@@ -29,7 +29,7 @@ macro_rules! impl_sub_mul_primitive_int {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sub_mul` module.
+            /// See [here](super::sub_mul#sub_mul_assign).
             #[inline]
             fn sub_mul_assign(&mut self, y: $t, z: $t) {
                 self.wrapping_sub_mul_assign(y, z);
@@ -44,7 +44,7 @@ macro_rules! impl_sub_mul_primitive_float {
         impl SubMul for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`.
+            /// Subtracts a number by the product of two other numbers.
             ///
             /// $f(x, y, z) = x - yz$.
             ///
@@ -52,7 +52,7 @@ macro_rules! impl_sub_mul_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sub_mul` module.
+            /// See [here](super::sub_mul#sub_mul).
             #[inline]
             fn sub_mul(self, y: $t, z: $t) -> $t {
                 self - y * z
@@ -60,7 +60,7 @@ macro_rules! impl_sub_mul_primitive_float {
         }
 
         impl SubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`.
+            /// Subtracts a number by the product of two other numbers in place.
             ///
             /// $x \gets x - yz$.
             ///
@@ -68,7 +68,7 @@ macro_rules! impl_sub_mul_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::sub_mul` module.
+            /// See [here](super::sub_mul#sub_mul_assign).
             #[inline]
             fn sub_mul_assign(&mut self, y: $t, z: $t) {
                 *self -= y * z;

@@ -76,14 +76,13 @@ pub fn test_invert_limb_table() {
 // x * y ≡ 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
 // be odd.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `x` is even.
 //
-// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
+// This is equivalent to `binvert_limb` from `gmp-impl.h`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
     assert!(x.odd());
     let index = (x >> 1).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
@@ -101,32 +100,35 @@ pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
 // limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
 // the behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where the result
+// is returned.
 pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_limb_to_out(&mut q, ns, d);
     q
 }}
 
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -174,16 +176,18 @@ pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb
     }
 }}
 
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dst == src.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where
+// `dst == src`.
 pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -241,17 +245,18 @@ const MAX_OVER_3: Limb = Limb::MAX / 3;
 // quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural`
 // must be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty.
 //
-// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
-// and no carry-in, where the result is returned.
+// This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
+// `DIVEXACT_BY3_METHOD == 0` and no carry-in, where the result is returned.
 pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_3_to_out(&mut q, ns);
@@ -263,17 +268,18 @@ pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 // least as long as the input slice. The input limb slice must be nonempty. The `Natural` must be
 // exactly divisible by 3. If it isn't, the behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `ns` or if `ns` is empty.
 //
-// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
-// no carry-in, and no return value.
+// This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
+// `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value.
 pub_test! {limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
     let (out_last, out_init) = out[..ns.len()].split_last_mut().unwrap();
     let (ns_last, ns_init) = ns.split_last().unwrap();
@@ -287,17 +293,18 @@ pub_test! {limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 // nonempty. The `Natural` must be exactly divisible by 3. If it isn't, the behavior of this
 // function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty.
 //
-// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
-// no carry-in, and no return value, where rp == up.
+// This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
+// `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value, where `rp == up`.
 pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, MAX_OVER_3, 0);
@@ -311,16 +318,17 @@ pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 // must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
 // behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns)
@@ -334,16 +342,18 @@ pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 // limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
 // the behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where the result
+// is returned.
 pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     if d == 3 {
         limbs_div_exact_3(ns)
@@ -357,16 +367,18 @@ pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 // be zero and the input limb slice must be nonempty. The `Natural` must be exactly divisible by
 // the `Limb`. If it isn't, the behavior of this function is undefined.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where
+// `dest == src`.
 pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)
@@ -375,13 +387,12 @@ pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     }
 }}
 
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
+// The result is $O(n)$.
 //
-// Result is O(`n`)
-//
-// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.2.1.
+// This is equivalent to `mpn_binvert_itch` from `mpn/generic/binvert.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
@@ -392,6 +403,12 @@ pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     itch_local + itch_out
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 pub_test! {limbs_modular_invert_small(
     size: usize,
     is: &mut [Limb],
@@ -410,16 +427,17 @@ pub_test! {limbs_modular_invert_small(
 // such that x * y ≡ 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
 // x, so the least-significant limb of `ds` must be odd.
 //
-// Time: O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ds.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 //
 // # Panics
 // Panics if `is` is shorter than `ds`, if `ds` is empty, or if `scratch` is too short.
 //
-// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
+// This is equivalent to `mpn_binvert` from `mpn/generic/binvert.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     // Compute the computation precisions from highest to lowest, leaving the basecase size in
@@ -466,14 +484,15 @@ pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mu
 // Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
 // the subtraction N - Q * D.
 //
-// Time: worst case O(n ^ 2)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// where n = `ns.len()`
+// $M(n) = O(1)$
 //
-// Additional memory: worst case O(1)
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.2.1. Note: need to investigate
-// changes from 6.1.2.
+// This is equivalent to `mpn_sbpi1_bdiv_qr` from `mpn/generic/sbpi1_bdiv_qr.c`, GMP 6.2.1.
+// Investigate changes from 6.1.2?
 pub_crate_test! {limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -532,6 +551,12 @@ pub_crate_test! {limbs_modular_div_mod_schoolbook(
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 fn limbs_modular_div_mod_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -547,13 +572,14 @@ fn limbs_modular_div_mod_helper(
     }
 }
 
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 ///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// This is mpn_dcpi1_bdiv_qr_n from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
+/// This is equivalent to `mpn_dcpi1_bdiv_qr_n` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
 fn limbs_modular_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -600,13 +626,14 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
 // Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
 // the subtraction N - Q * D.
 //
-// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
+// # Worst-case complexity
+// $T(n, d) = O(n (\log d)^2 \log \log d)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`, d = `ds.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
-// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_dcpi1_bdiv_qr` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -681,16 +708,18 @@ pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
     borrow
 }}
 
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_dcpi1_bdiv_qr_n_itch` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
 pub_const_test! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }}
 
-// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_mu_bdiv_qr_itch` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
@@ -714,6 +743,12 @@ pub_crate_test! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: 
     i_len + max(scratch_len, modular_invert_scratch_len)
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_modular_div_mod_barrett_unbalanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -821,6 +856,12 @@ fn limbs_modular_div_mod_barrett_unbalanced(
     )
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_modular_div_mod_barrett_balanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -908,18 +949,19 @@ fn limbs_modular_div_mod_barrett_balanced(
 //    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
 //    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()` + 2, `qs` has
 // length less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or
 // the last limb of `ds` is even.
 //
-// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
+// This is equivalent to `mpn_mu_bdiv_qr` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -953,14 +995,15 @@ pub_crate_test! {limbs_modular_div_mod_barrett(
 //
 // And then we flip the sign: -Q = ~Q + 1.
 //
-// Time: worst case O(n ^ 2)
+// # Worst-case complexity
+// $T(n) = O(n^2)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
-// changes from 6.1.2.
+// This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1.
+// Investigate changes from 6.1.2?
 pub_test! {limbs_modular_div_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -994,23 +1037,23 @@ pub_test! {limbs_modular_div_schoolbook(
     limbs_slice_add_limb_in_place(qs, 1);
 }}
 
-// Time: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
-// Additional memory: worst case O(1)
-//
-// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1.
+// This is equivalent to `mpn_dcpi1_bdiv_q_n_itch` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
 pub_const_test! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }}
 
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 ///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// This is mpn_dcpi1_bdiv_q_n from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
-/// changes from 6.1.2.
+/// This is equivalent to `mpn_dcpi1_bdiv_q_n` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
+/// Investigate changes from 6.1.2?
 fn limbs_modular_div_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -1049,14 +1092,15 @@ fn limbs_modular_div_divide_and_conquer_helper(
 // Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
 // (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 //
-// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
+// # Worst-case complexity
+// $T(n, d) = O(n (\log d)^2 \log \log d)$
 //
-// Additional memory: worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`, d = `ds.len()`
+// where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
-// This is mpn_dcpi1_bdiv_q from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
-// changes from 6.1.2.
+// This is equivalent to `mpn_dcpi1_bdiv_q` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
+// Investigate changes from 6.1.2?
 pub_test! {limbs_modular_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -1125,7 +1169,10 @@ pub_test! {limbs_modular_div_divide_and_conquer(
     }
 }}
 
-// This is mpn_mu_bdiv_q_itch from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_mu_bdiv_q_itch` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1.
 pub_test! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
@@ -1159,6 +1206,12 @@ pub_test! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> 
     i_len + max(mul_len, invert_len)
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_modular_div_barrett_greater(
     qs: &mut [Limb],
     ns: &[Limb],
@@ -1269,6 +1322,12 @@ fn limbs_modular_div_barrett_greater(
     limbs_mul_low_same_length(qs_hi, &rs[..limit], &is[..limit]);
 }
 
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_modular_div_barrett_same_length(
     qs: &mut [Limb],
     ns: &[Limb],
@@ -1311,13 +1370,14 @@ fn limbs_modular_div_barrett_same_length(
 
 // Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`). D must be odd.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_mu_bdiv_q from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
+// This is equivalent to `mpn_mu_bdiv_q` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1.
 pub_test! {limbs_modular_div_barrett(
     qs: &mut [Limb],
     ns: &[Limb],
@@ -1335,8 +1395,11 @@ pub_test! {limbs_modular_div_barrett(
     }
 }}
 
-// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1, where nothing is allocated for
-// inputs that are too small for Barrett division. Note: need to investigate changes from 6.1.2.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_bdiv_q_itch` from mpn/generic/bdiv_q.c, GMP 6.2.1, where nothing is
+// allocated for inputs that are too small for Barrett division. Investigate changes from 6.1.2?
 pub_test! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         0
@@ -1347,14 +1410,15 @@ pub_test! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
 
 // Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by value. D must be odd.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1. Note: need to investigate changes from
-// 6.1.2.
+// This is equivalent to `mpn_bdiv_q` from `mpn/generic/bdiv_q.c`, GMP 6.2.1. Investigate changes
+// from 6.1.2?
 pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
@@ -1368,7 +1432,10 @@ pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scra
     }
 }}
 
-// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1.
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1.
 pub_test! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         n_len
@@ -1379,13 +1446,14 @@ pub_test! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usiz
 
 // Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by reference. D must be odd.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1.
+// This is equivalent to `mpn_bdiv_q` from `mpn/generic/bdiv_q.c`, GMP 6.2.1.
 pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1414,18 +1482,19 @@ pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scra
 // `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
 // significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
 // zero.
 //
-// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1, where scratch is allocated
-// internally and qp is returned.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, where `scratch`
+// is allocated internally and `qp` is returned.
 pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
@@ -1442,17 +1511,18 @@ pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 // `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
 // and `ds` must be nonempty and its most significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1494,17 +1564,18 @@ pub_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Li
 // `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
 // and `ds` must be nonempty and its most significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1549,17 +1620,18 @@ pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: 
 // `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
 // and `ds` must be nonempty and its most significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1605,17 +1677,18 @@ pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut
 // `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
 // and `ds` must be nonempty and its most significant limb must be greater than zero.
 //
-// Time: Worst case O(n * log(n) * log(log(n)))
+// # Worst-case complexity
+// $T(n) = O(n \log n \log \log n)$
 //
-// Additional memory: Worst case O(n * log(n))
+// $M(n) = O(n \log n)$
 //
-// where n = `ns.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
 pub_test! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1682,20 +1755,25 @@ impl Natural {
 impl DivExact<Natural> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value. The first `Natural`
-    /// must be exactly divisible by the second. If it isn't, this function may crash or return a
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value. The first [`Natural`]
+    /// must be exactly divisible by the second. If it isn't, this function may panic or return a
     /// meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
+    ///
+    /// If you are unsure whether the division will be exact, use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
     /// zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round(other, RoundingMode::Exact)`.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -1703,20 +1781,19 @@ impl DivExact<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)).to_string(), "123");
+    /// assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)), 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     Natural::from_str("121932631112635269000000").unwrap()
-    ///         .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
-    ///     "123456789000"
+    ///             .div_exact(Natural::from_str("987654321000").unwrap()),
+    ///     123456789000u64
     /// );
     /// ```
     #[inline]
@@ -1729,20 +1806,25 @@ impl DivExact<Natural> for Natural {
 impl<'a> DivExact<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
-    /// reference. The first `Natural` must be exactly divisible by the second. If it isn't, this
-    /// function may crash or return a meaningless result.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference. The first [`Natural`] must be exactly divisible by the second. If it isn't, this
+    /// function may panic or return a meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
-    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
-    /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(other, RoundingMode::Exact)`.
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If you are unsure whether the division will be exact, use `self / &other` instead. If
+    /// you're unsure and you want to know, use `self.div_mod(&other)` and check whether the
+    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round(&other, RoundingMode::Exact)`.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -1750,23 +1832,19 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(
-    ///     Natural::from(56088u32).div_exact(&Natural::from(456u32)).to_string(),
-    ///     "123"
-    /// );
+    /// assert_eq!(Natural::from(56088u32).div_exact(&Natural::from(456u32)), 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     Natural::from_str("121932631112635269000000").unwrap()
-    ///         .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
-    ///     "123456789000"
+    ///             .div_exact(&Natural::from_str("987654321000").unwrap()),
+    ///     123456789000u64
     /// );
     /// ```
     #[inline]
@@ -1779,20 +1857,25 @@ impl<'a> DivExact<&'a Natural> for Natural {
 impl<'a> DivExact<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
-    /// by value. The first `Natural` must be exactly divisible by the second. If it isn't, this
-    /// function may crash or return a meaningless result.
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value. The first [`Natural`] must be exactly divisible by the second. If it isn't, this
+    /// function may panic or return a meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
-    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
-    /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(other, RoundingMode::Exact)`.
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If you are unsure whether the division will be exact, use `&self / other` instead. If
+    /// you're unsure and you want to know, use `self.div_mod(other)` and check whether the
+    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// `(&self).div_round(other, RoundingMode::Exact)`.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -1800,23 +1883,19 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(
-    ///     (&Natural::from(56088u32)).div_exact(Natural::from(456u32)).to_string(),
-    ///     "123"
-    /// );
+    /// assert_eq!((&Natural::from(56088u32)).div_exact(Natural::from(456u32)), 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Natural::from_str("121932631112635269000000").unwrap())
-    ///         .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
-    ///     "123456789000"
+    ///             .div_exact(Natural::from_str("987654321000").unwrap()),
+    ///     123456789000u64
     /// );
     /// ```
     fn div_exact(self, mut other: Natural) -> Natural {
@@ -1847,20 +1926,25 @@ impl<'a> DivExact<Natural> for &'a Natural {
 impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference. The first `Natural`
-    /// must be exactly divisible by the second. If it isn't, this function may crash or return a
-    /// meaningless result.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The first
+    /// [`Natural`] must be exactly divisible by the second. If it isn't, this function may panic
+    /// or return a meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
-    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
-    /// zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round(other, RoundingMode::Exact)`.
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// If you are unsure whether the division will be exact, use `&self / &other` instead. If
+    /// you're unsure and you want to know, use `(&self).div_mod(&other)` and check whether the
+    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// `(&self).div_round(&other, RoundingMode::Exact)`.
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -1868,23 +1952,19 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// // 123 * 456 = 56088
-    /// assert_eq!(
-    ///     (&Natural::from(56088u32)).div_exact(&Natural::from(456u32)).to_string(),
-    ///     "123"
-    /// );
+    /// assert_eq!((&Natural::from(56088u32)).div_exact(&Natural::from(456u32)), 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// assert_eq!(
     ///     (&Natural::from_str("121932631112635269000000").unwrap())
-    ///         .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
-    ///     "123456789000"
+    ///             .div_exact(&Natural::from_str("987654321000").unwrap()),
+    ///     123456789000u64
     /// );
     /// ```
     fn div_exact(self, other: &'b Natural) -> Natural {
@@ -1913,21 +1993,25 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
 }
 
 impl DivExactAssign<Natural> for Natural {
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value. The
-    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the right-hand
-    /// side. If it isn't, this function may crash or assign a meaningless value to the first
-    /// `Natural`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value. The first [`Natural`] must be exactly divisible by the second. If
+    /// it isn't, this function may panic or return a meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
-    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// $$
+    /// x \gets \frac{x}{y}.
+    /// $$
+    ///
+    /// If you are unsure whether the division will be exact, use `self /= other` instead. If
+    /// you're unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round_assign(other, RoundingMode::Exact)`.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -1935,7 +2019,6 @@ impl DivExactAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
@@ -1944,12 +2027,12 @@ impl DivExactAssign<Natural> for Natural {
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);
     /// x.div_exact_assign(Natural::from(456u32));
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(x, 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// let mut x = Natural::from_str("121932631112635269000000").unwrap();
     /// x.div_exact_assign(Natural::from_str("987654321000").unwrap());
-    /// assert_eq!(x.to_string(), "123456789000");
+    /// assert_eq!(x, 123456789000u64);
     /// ```
     fn div_exact_assign(&mut self, mut other: Natural) {
         if *self == other {
@@ -1978,21 +2061,25 @@ impl DivExactAssign<Natural> for Natural {
 }
 
 impl<'a> DivExactAssign<&'a Natural> for Natural {
-    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference. The
-    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the right-hand
-    /// side. If it isn't, this function may crash or assign a meaningless value to the first
-    /// `Natural`.
+    /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference. The first [`Natural`] must be exactly divisible by the
+    /// second. If it isn't, this function may panic or return a meaningless result.
     ///
-    /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
-    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// $$
+    /// x \gets \frac{x}{y}.
+    /// $$
+    ///
+    /// If you are unsure whether the division will be exact, use `self /= &other` instead. If
+    /// you're unsure and you want to know, use `self.div_assign_mod(&other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
-    /// `self.div_round_assign(other, RoundingMode::Exact)`.
+    /// `self.div_round_assign(&other, RoundingMode::Exact)`.
     ///
-    /// Time: Worst case O(n * log(n) * log(log(n)))
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log \log n)$
     ///
-    /// Additional memory: Worst case O(n * log(n))
+    /// $M(n) = O(n \log n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
@@ -2000,7 +2087,6 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
@@ -2009,12 +2095,12 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);
     /// x.div_exact_assign(&Natural::from(456u32));
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(x, 123);
     ///
     /// // 123456789000 * 987654321000 = 121932631112635269000000
     /// let mut x = Natural::from_str("121932631112635269000000").unwrap();
     /// x.div_exact_assign(&Natural::from_str("987654321000").unwrap());
-    /// assert_eq!(x.to_string(), "123456789000");
+    /// assert_eq!(x, 123456789000u64);
     /// ```
     fn div_exact_assign(&mut self, other: &'a Natural) {
         if self == other {

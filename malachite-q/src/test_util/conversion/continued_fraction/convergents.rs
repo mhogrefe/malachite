@@ -21,7 +21,10 @@ impl Iterator for ConvergentsAlt {
             Some(Rational::from(&self.floor))
         } else if let Some(n) = self.cf.next() {
             self.xs.push(n);
-            Some(Rational::from_continued_fraction_ref(&self.floor, &self.xs))
+            Some(Rational::from_continued_fraction_ref(
+                &self.floor,
+                self.xs.iter(),
+            ))
         } else {
             self.xs.clear();
             None

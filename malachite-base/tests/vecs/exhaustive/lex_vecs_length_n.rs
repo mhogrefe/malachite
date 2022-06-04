@@ -1,9 +1,10 @@
+use extra_variadic::lex_vecs_length_3;
 use itertools::Itertools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::vecs::exhaustive::{
-    exhaustive_vecs_fixed_length_from_single, lex_vecs_length_2, lex_vecs_length_3,
+    exhaustive_vecs_fixed_length_from_single, lex_vecs_length_2,
 };
 use std::cmp::Ordering;
 use std::fmt::Debug;

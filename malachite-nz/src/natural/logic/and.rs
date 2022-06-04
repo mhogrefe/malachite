@@ -10,9 +10,8 @@ use std::ops::{BitAnd, BitAndAssign};
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -24,14 +23,15 @@ pub_const_test! {limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
 // a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
 // length of the shorter input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = min(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
-// negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned and both
+// inputs are non-negative.
 pub_test! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
 }}
@@ -40,16 +40,17 @@ pub_test! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // `Natural`s, writes the limbs of the bitwise and of the `Natural`s to a specified slice. The
 // output slice must be at least as long as the length of one of the input slices.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpn_and_n from gmp-impl.h, GMP 6.2.1.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
+//
+// This is equivalent to `mpn_and_n` from `gmp-impl.h`, GMP 6.2.1.
 pub_test! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -63,16 +64,17 @@ pub_test! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Lim
 // the limbs of the bitwise and of the `Natural`s to a specified slice. The output slice must be at
 // least as long as the longer input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = max(`xs.len()`, `ys.len()`)
-//
-// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `out` is too short.
+//
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are non-negative.
 pub_test! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -90,16 +92,17 @@ pub_test! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the first (left) slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()` = `ys.len()`
-//
-// This is mpn_and_n from gmp-impl.h, GMP 6.2.1, where rp == up.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
+//
+// This is equivalent to `mpn_and_n` from `gmp-impl.h`, GMP 6.2.1, where `rp == up`.
 pub_test! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
@@ -114,13 +117,15 @@ pub_test! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
 // significant part of the slice. The caller can decide whether to zero the rest. If `None` is
 // returned, the entire slice remains significant.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = min(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are non-negative.
 pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -145,15 +150,16 @@ pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option
 // shorter than the `Vec`, then some of the most-significant bits of the `Vec` should become zero.
 // Rather than setting them to zero, this function truncates the `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = min(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative and
-// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
-// trailing zero limbs.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are non-negative and have the same length, and `res` is truncated afterwards to remove the
+// `max(0, xs.len() - ys.len())` trailing zero limbs.
 pub_test! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
         xs.truncate(truncate_size);
@@ -165,14 +171,15 @@ pub_test! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 // first one, if they are equally long). If the function writes to the first slice, it returns
 // `false`; otherwise, it returns `true`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = min(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
-// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
-// written to the shorter input slice.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are non-negative
+// and the result is written to the shorter input slice.
 pub_test! {limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -206,29 +213,37 @@ impl Natural {
     }
 }
 
-/// Takes the bitwise and of two `Natural`s, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((Natural::trillion() & (Natural::trillion() - Natural::ONE)).to_string(),
-///     "999999995904");
-/// ```
 impl BitAnd<Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise and of two [`Natural`]s, taking both by value.
+    ///
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(123u32) & Natural::from(456u32), 72);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12) & (Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     999999995904u64
+    /// );
+    /// ```
     #[inline]
     fn bitand(mut self, other: Natural) -> Natural {
         self &= other;
@@ -236,30 +251,37 @@ impl BitAnd<Natural> for Natural {
     }
 }
 
-/// Takes the bitwise and of two `Natural`s, taking the left `Natural` by value and the right
-/// `Natural` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((Natural::trillion() & &(Natural::trillion() - Natural::ONE)).to_string(),
-///     "999999995904");
-/// ```
 impl<'a> BitAnd<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise and of two [`Natural`]s, taking the first by value and the second by
+    /// reference.
+    ///
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(123u32) & &Natural::from(456u32), 72);
+    /// assert_eq!(
+    ///     Natural::from(10u32).pow(12) & &(Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     999999995904u64
+    /// );
+    /// ```
     #[inline]
     fn bitand(mut self, other: &'a Natural) -> Natural {
         self &= other;
@@ -267,30 +289,37 @@ impl<'a> BitAnd<&'a Natural> for Natural {
     }
 }
 
-/// Takes the bitwise and of two `Natural`s, taking the left `Natural` by reference and the right
-/// `Natural` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((&Natural::trillion() & (Natural::trillion() - Natural::ONE)).to_string(),
-///     "999999995904");
-/// ```
 impl<'a> BitAnd<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Takes the bitwise and of two [`Natural`]s, taking the first by reference and the seocnd by
+    /// value.
+    ///
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(&Natural::from(123u32) & Natural::from(456u32), 72);
+    /// assert_eq!(
+    ///     &Natural::from(10u32).pow(12) & (Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     999999995904u64
+    /// );
+    /// ```
     #[inline]
     fn bitand(self, mut other: Natural) -> Natural {
         other &= self;
@@ -298,29 +327,37 @@ impl<'a> BitAnd<Natural> for &'a Natural {
     }
 }
 
-/// Takes the bitwise and of two `Natural`s, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((&Natural::trillion() & &(Natural::trillion() - Natural::ONE)).to_string(),
-///     "999999995904");
-/// ```
 impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Takes the bitwise and of two [`Natural`]s, taking both by reference.
+    ///
+    /// $$
+    /// f(x, y) = x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(&Natural::from(123u32) & &Natural::from(456u32), 72);
+    /// assert_eq!(
+    ///     &Natural::from(10u32).pow(12) & &(Natural::from(10u32).pow(12) - Natural::ONE),
+    ///     999999995904u64
+    /// );
+    /// ```
     fn bitand(self, other: &'a Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => Natural(Small(x.and_limb_ref(y))),
@@ -332,27 +369,33 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     }
 }
 
-/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the
-/// right-hand side by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(u32::MAX);
-/// x &= Natural::from(0xf0ffffffu32);
-/// x &= Natural::from(0xfff0_ffffu32);
-/// x &= Natural::from(0xfffff0ffu32);
-/// x &= Natural::from(0xfffffff0u32);
-/// assert_eq!(x, 0xf0f0_f0f0u32);
-/// ```
 impl BitAndAssign<Natural> for Natural {
+    /// Bitwise-ands a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value.
+    ///
+    /// $$
+    /// x \gets x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(u32::MAX);
+    /// x &= Natural::from(0xf0ffffffu32);
+    /// x &= Natural::from(0xfff0_ffffu32);
+    /// x &= Natural::from(0xfffff0ffu32);
+    /// x &= Natural::from(0xfffffff0u32);
+    /// assert_eq!(x, 0xf0f0_f0f0u32);
+    /// ```
     fn bitand_assign(&mut self, mut other: Natural) {
         match (&mut *self, &mut other) {
             (_, Natural(Small(y))) => self.and_assign_limb(*y),
@@ -367,27 +410,32 @@ impl BitAndAssign<Natural> for Natural {
     }
 }
 
-/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the
-/// right-hand side by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(u32::MAX);
-/// x &= &Natural::from(0xf0ffffffu32);
-/// x &= &Natural::from(0xfff0_ffffu32);
-/// x &= &Natural::from(0xfffff0ffu32);
-/// x &= &Natural::from(0xfffffff0u32);
-/// assert_eq!(x, 0xf0f0_f0f0u32);
-/// ```
 impl<'a> BitAndAssign<&'a Natural> for Natural {
+    /// Bitwise-ands a [`Natural`] with another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference.
+    ///
+    /// $$
+    /// x \gets x \wedge y.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(u32::MAX);
+    /// x &= &Natural::from(0xf0ffffffu32);
+    /// x &= &Natural::from(0xfff0_ffffu32);
+    /// x &= &Natural::from(0xfffff0ffu32);
+    /// x &= &Natural::from(0xfffffff0u32);
+    /// assert_eq!(x, 0xf0f0_f0f0u32);
+    /// ```
     fn bitand_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
             (_, Natural(Small(y))) => self.and_assign_limb(*y),

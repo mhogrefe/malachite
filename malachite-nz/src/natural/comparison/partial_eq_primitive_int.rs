@@ -7,14 +7,13 @@ use platform::Limb;
 macro_rules! impl_partial_eq_limb {
     ($u: ident) => {
         impl PartialEq<$u> for Natural {
-            /// Determines whether a `Natural` is equal to a `Limb`.
+            /// Determines whether a [`Natural`] is equal to a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             fn eq(&self, other: &$u) -> bool {
                 match *self {
                     Natural(Small(x)) => x == *other,
@@ -24,14 +23,13 @@ macro_rules! impl_partial_eq_limb {
         }
 
         impl PartialEq<Natural> for $u {
-            /// Determines whether a `Limb` is equal to a `Natural`.
+            /// Determines whether a [`Limb`](crate#limbs) is equal to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
                 other == self
@@ -43,15 +41,14 @@ macro_rules! impl_partial_eq_limb {
 macro_rules! impl_partial_eq_smaller_than_limb {
     ($u: ident) => {
         impl PartialEq<$u> for Natural {
-            /// Determines whether a `Natural` is equal to a value of a primitive unsigned integer
-            /// type that's smaller than a `Limb`.
+            /// Determines whether a [`Natural`] is equal to a value of an unsigned primitive
+            /// integer type that's smaller than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[allow(clippy::cmp_owned)]
             #[inline]
             fn eq(&self, other: &$u) -> bool {
@@ -60,15 +57,14 @@ macro_rules! impl_partial_eq_smaller_than_limb {
         }
 
         impl PartialEq<Natural> for $u {
-            /// Determines whether a value of a primitive unsigned integer type that's smaller than
-            /// a `Limb` is equal to a `Natural`.
+            /// Determines whether a value of an unsigned primitive integer type that's smaller than
+            /// a [`Limb`](crate#limbs) is equal to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[allow(clippy::cmp_owned)]
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
@@ -81,18 +77,17 @@ macro_rules! impl_partial_eq_smaller_than_limb {
 macro_rules! impl_partial_eq_larger_than_limb_or_usize {
     ($u: ident) => {
         impl PartialEq<Natural> for $u {
-            /// Determines whether a value of a primitive unsigned integer type that's larger than a
-            /// `Limb` is equal to a `Natural`.
+            /// Determines whether a value of an unsigned primitive integer type that's larger than
+            /// a [`Limb`](crate#limbs) is equal to a [`Natural`].
             ///
-            /// This implementation is general enough to also work for `usize`, regardless of
-            /// whether it is equal in width to `Limb`.
+            /// This implementation is general enough to also work for [`usize`], regardless of
+            /// whether it is equal in width to [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
                 other == self
@@ -106,15 +101,14 @@ macro_rules! impl_partial_eq_larger_than_limb {
         impl_partial_eq_larger_than_limb_or_usize!($u);
 
         impl PartialEq<$u> for Natural {
-            /// Determines whether a `Natural` is equal to a value of a primitive unsigned integer
-            /// type that's larger than a `Limb`.
+            /// Determines whether a [`Natural`] is equal to a value of an unsigned primitive
+            /// integer type that's larger than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &$u) -> bool {
                 let mut other = *other;
@@ -133,29 +127,26 @@ macro_rules! impl_partial_eq_larger_than_limb {
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialEq<$t> for Natural {
-            /// Determines whether a `Natural` is equal to a a value of signed primitive integer
-            /// type.
+            /// Determines whether a [`Natural`] is equal to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             fn eq(&self, other: &$t) -> bool {
                 *other >= 0 && *self == other.unsigned_abs()
             }
         }
 
         impl PartialEq<Natural> for $t {
-            /// Determines whether a value of signed primitive integer type is equal to a `Natural`.
+            /// Determines whether a signed primitive integer is equal to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `natural::comparison::partial_eq_primitive_int`
-            /// module.
+            /// See [here](super::partial_eq_primitive_int#partial_eq).
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
                 other == self
@@ -180,12 +171,12 @@ impl_partial_eq_larger_than_limb_or_usize!(usize);
 apply_to_signeds!(impl_signed);
 
 impl PartialEq<usize> for Natural {
-    /// Determines whether a `Natural` is equal to a `usize`.
+    /// Determines whether a [`Natural`] is equal to a [`usize`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
-    /// See the documentation of the `natural::comparison::partial_eq_primitive_int` module.
+    /// See [here](super::partial_eq_primitive_int#partial_eq).
     #[inline]
     fn eq(&self, other: &usize) -> bool {
         if usize::WIDTH == u32::WIDTH {

@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialOrd<$t> for Natural {
-            /// Compares a `Natural` to a value of primitive float type.
+            /// Compares a [`Natural`] to a primitive float.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -15,9 +15,7 @@ macro_rules! impl_float {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
-            /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_float`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_float#partial_cmp).
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 if other.is_nan() {
                     None
@@ -43,7 +41,7 @@ macro_rules! impl_float {
         }
 
         impl PartialOrd<Natural> for $t {
-            /// Compares a value of primitive float type to a `Natural`.
+            /// Compares a primitive float to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -52,9 +50,7 @@ macro_rules! impl_float {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
             ///
-            /// # Examples
-            /// See the documentation of the `natural::comparison::partial_cmp_primitive_float`
-            /// module.
+            /// See [here](super::partial_cmp_primitive_float#partial_cmp).
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)

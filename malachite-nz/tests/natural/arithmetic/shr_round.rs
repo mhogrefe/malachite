@@ -1363,13 +1363,16 @@ fn limbs_shr_exact_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(&config, |(xs, bits)| {
         let n = Natural::from_limbs_asc(&xs);
-        if let Some(result_xs) = limbs_shr_exact(&xs, bits) {
-            let m = (&n).shr_round(bits, RoundingMode::Exact);
-            assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
-            assert_eq!(m << bits, n);
-        } else {
-            assert!(!n.divisible_by_power_of_2(bits));
-        }
+        limbs_shr_exact(&xs, bits).map_or_else(
+            || {
+                assert!(!n.divisible_by_power_of_2(bits));
+            },
+            |result_xs| {
+                let m = (&n).shr_round(bits, RoundingMode::Exact);
+                assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
+                assert_eq!(m << bits, n);
+            },
+        );
     });
 }
 
@@ -1382,16 +1385,19 @@ fn limbs_shr_round_properties() {
         &config,
         |(xs, bits, rm)| {
             let n = Natural::from_limbs_asc(&xs);
-            if let Some(result_xs) = limbs_shr_round(&xs, bits, rm) {
-                let m = (&n).shr_round(bits, rm);
-                assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
-                if rm == RoundingMode::Exact {
-                    assert_eq!(m << bits, n);
-                }
-            } else {
-                assert_eq!(rm, RoundingMode::Exact);
-                assert!(!n.divisible_by_power_of_2(bits));
-            }
+            limbs_shr_round(&xs, bits, rm).map_or_else(
+                || {
+                    assert_eq!(rm, RoundingMode::Exact);
+                    assert!(!n.divisible_by_power_of_2(bits));
+                },
+                |result_xs| {
+                    let m = (&n).shr_round(bits, rm);
+                    assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
+                    if rm == RoundingMode::Exact {
+                        assert_eq!(m << bits, n);
+                    }
+                },
+            );
         },
     );
 }

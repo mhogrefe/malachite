@@ -2,7 +2,7 @@ use malachite_base::num::conversion::traits::IsInteger;
 use natural::Natural;
 
 impl<'a> IsInteger for &'a Natural {
-    /// Determines whether a `Natural` is an integer. It always returns `true`.
+    /// Determines whether a [`Natural`] is an integer. It always returns `true`.
     ///
     /// $f(x) = \textrm{true}$.
     ///
@@ -12,7 +12,6 @@ impl<'a> IsInteger for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_base::num::conversion::traits::IsInteger;

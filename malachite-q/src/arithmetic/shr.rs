@@ -50,18 +50,21 @@ macro_rules! impl_shr_unsigned {
         impl Shr<$t> for Rational {
             type Output = Rational;
 
-            /// Shifts an `Rational` right (divides it by a power of 2), taking the `Rational` by
-            /// value.
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by value.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
-            /// # Examples
-            /// See the documentation of the `arithmetic::shr` module.
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Rational {
                 self >>= bits;
@@ -72,18 +75,21 @@ macro_rules! impl_shr_unsigned {
         impl<'a> Shr<$t> for &'a Rational {
             type Output = Rational;
 
-            /// Shifts an `Rational` right (divides it by a power of 2), taking the `Rational` by
-            /// reference.
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by reference.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
-            /// # Examples
-            /// See the documentation of the `arithmetic::shr` module.
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Rational {
                 shr_unsigned_ref(self, bits)
@@ -91,17 +97,21 @@ macro_rules! impl_shr_unsigned {
         }
 
         impl ShrAssign<$t> for Rational {
-            /// Shifts an `Rational` right (divides it by a power of 2), in place.
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), in place.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n, m) = O(n + m)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n, m) = O(n + m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
             ///
-            /// # Examples
-            /// See the documentation of the `arithmetic::shr` module.
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_unsigned_assign(self, bits);
@@ -141,6 +151,21 @@ macro_rules! impl_shr_signed {
         impl Shr<$t> for Rational {
             type Output = Rational;
 
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by value.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
+            ///
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(mut self, bits: $t) -> Rational {
                 self >>= bits;
@@ -151,6 +176,21 @@ macro_rules! impl_shr_signed {
         impl<'a> Shr<$t> for &'a Rational {
             type Output = Rational;
 
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), taking it by reference.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
+            ///
+            /// See [here](super::shr#shr).
             #[inline]
             fn shr(self, bits: $t) -> Rational {
                 shr_signed_ref(self, bits)
@@ -158,6 +198,21 @@ macro_rules! impl_shr_signed {
         }
 
         impl ShrAssign<$t> for Rational {
+            /// Right-shifts a [`Rational`] (divides it by a power of 2), in reference.
+            ///
+            /// $$
+            /// f(x, k) = \frac{x}{2^k}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n, m) = O(n + m)$
+            ///
+            /// $M(n, m) = O(n + m)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and
+            /// $m$ is `max(bits, 0)`.
+            ///
+            /// See [here](super::shr#shr_assign).
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign_signed(self, bits)

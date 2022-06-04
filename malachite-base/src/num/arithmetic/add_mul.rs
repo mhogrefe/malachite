@@ -5,7 +5,7 @@ macro_rules! impl_add_mul_primitive_int {
         impl AddMul for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`.
+            /// Adds a number and the product of two other numbers.
             ///
             /// $f(x, y, z) = x + yz$.
             ///
@@ -13,7 +13,7 @@ macro_rules! impl_add_mul_primitive_int {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::add_mul` module.
+            /// See [here](super::add_mul#add_mul).
             #[inline]
             fn add_mul(self, y: $t, z: $t) -> $t {
                 self.wrapping_add_mul(y, z)
@@ -21,7 +21,7 @@ macro_rules! impl_add_mul_primitive_int {
         }
 
         impl AddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`.
+            /// Adds the product of two other numbers to a number in place.
             ///
             /// $x \gets x + yz$.
             ///
@@ -29,7 +29,7 @@ macro_rules! impl_add_mul_primitive_int {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::add_mul` module.
+            /// See [here](super::add_mul#add_mul_assign).
             #[inline]
             fn add_mul_assign(&mut self, y: $t, z: $t) {
                 self.wrapping_add_mul_assign(y, z)
@@ -44,7 +44,7 @@ macro_rules! impl_add_mul_primitive_float {
         impl AddMul for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`.
+            /// Adds a number and the product of two other numbers.
             ///
             /// $f(x, y, z) = x + yz$.
             ///
@@ -52,7 +52,7 @@ macro_rules! impl_add_mul_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::add_mul` module.
+            /// See [here](super::add_mul#add_mul).
             #[inline]
             fn add_mul(self, y: $t, z: $t) -> $t {
                 self + y * z
@@ -60,7 +60,7 @@ macro_rules! impl_add_mul_primitive_float {
         }
 
         impl AddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`.
+            /// Adds the product of two other numbers to a number in place.
             ///
             /// $x \gets x + yz$.
             ///
@@ -68,7 +68,7 @@ macro_rules! impl_add_mul_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::add_mul` module.
+            /// See [here](super::add_mul#add_mul_assign).
             #[inline]
             fn add_mul_assign(&mut self, y: $t, z: $t) {
                 *self += y * z;

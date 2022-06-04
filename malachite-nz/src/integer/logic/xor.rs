@@ -20,11 +20,12 @@ use std::ops::{BitXor, BitXorAssign};
 // `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `xs` cannot be
 // empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
         return xs.to_vec();
@@ -53,11 +54,12 @@ pub_test! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // xor of the `Integer` and a `Limb` to an output slice. The output slice must be at least as long
 // as the input slice. `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
@@ -88,11 +90,12 @@ pub_test! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 // `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
 // `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     if y == 0 {
         return false;
@@ -118,11 +121,12 @@ pub_test! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
 // `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
 // `xs` cannot be empty or only contain zeros. If a carry occurs, extends the `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_xor_limb_in_place(xs, y) {
         xs.push(1);
@@ -133,11 +137,12 @@ pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 // limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
 // `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -161,11 +166,12 @@ pub_test! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // only contain zeros. The output slice must be at least as long as the input slice. Returns
 // whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
@@ -188,11 +194,12 @@ pub_test! {limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 // other limbs are full of `true` bits, in place. `xs` may not be empty. Returns whether there is a
 // carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -212,11 +219,12 @@ pub_test! {limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bo
 // bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
 // other limbs are full of `true` bits, in place. `xs` may not be empty.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty.
@@ -231,11 +239,12 @@ pub_test! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 // lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
 // or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros.
@@ -259,11 +268,12 @@ pub_test! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // `xs` may not be empty or only contain zeros. The output slice must be at least as long as the
 // input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
@@ -284,11 +294,12 @@ pub_test! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 // given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
 // only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros.
@@ -318,18 +329,18 @@ fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
 // negative of another, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may
 // not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(n)$
 //
-// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned, the first input is positive,
-// and the second is negative.
-// [0, 1], &[0, Limb::MAX, Limb::MAX]
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res` is returned, the first
+// input is positive, and the second is negative.
 pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -406,18 +417,19 @@ pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // Returns whether there is a carry.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 // longer of `xs` and `ys`.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive and the second is
-// negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where the first input is positive
+// and the second is negative.
 pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -538,17 +550,19 @@ fn limbs_xor_pos_neg_in_place_left_helper(
 // `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
 // the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and the first input is positive and
-// the second is negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op1` and the first
+// input is positive and the second is negative.
 pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -636,17 +650,19 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 // `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
 // the second (right) slice. `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = `max(1, xs.len() - ys.len())`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op2 and the first input is positive and
-// the second is negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op2` and the first
+// input is positive and the second is negative.
 pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -693,17 +709,18 @@ pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
 // zeros. Returns a `bool` which is `false` when the output is to the first `Vec` and `true` when
 // it's to the second `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive, the second is
-// negative, and the result is written to the longer input slice.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where the first input is positive,
+// the second is negative, and the result is written to the longer input slice.
 pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -754,16 +771,18 @@ pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
 // `Integer`s, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may not be
 // empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(n) = O(n)$
 //
-// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned and both inputs are negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res` is returned and both
+// inputs are negative.
 pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -809,17 +828,18 @@ pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // an output slice. `xs` and `ys` may not be empty or only contain zeros. The output slice must be
 // at least as long as the longer input slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 // longer of `xs` and `ys`.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -889,16 +909,19 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
 // negatives of two `Integer`s, writes the limbs of the bitwise xor of the `Integer`s to the `Vec`.
 // `xs` and `ys` may not be empty or only contain zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(m)
+// $M(m) = O(m)$
 //
-// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
+// `max(1, ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and both inputs are negative.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op1` and both inputs
+// are negative.
 pub_test! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -923,17 +946,18 @@ pub_test! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 // first one, if they are equally long). `xs` and `ys` may not be empty or only contain zeros.
 // Returns `false` when the output is to the first slice and `true` when it's to the second slice.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len() + ys.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
 //
-// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative and the result is
-// written to the longer input slice.
+// This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are negative and
+// the result is written to the longer input slice.
 pub_test! {limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -1133,26 +1157,32 @@ impl Natural {
 impl BitXor<Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise xor of two `Integer`s, taking both by value.
+    /// Takes the bitwise xor of two [`Integer`]s, taking both by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(Integer::from(-123) ^ Integer::from(-456), 445);
     /// assert_eq!(
-    ///     (-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "8191"
+    ///     -Integer::from(10u32).pow(12) ^ -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     8191
     /// );
     /// ```
     #[inline]
@@ -1165,28 +1195,34 @@ impl BitXor<Integer> for Integer {
 impl<'a> BitXor<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by value and the right
-    /// `Integer` by reference.
+    /// Takes the bitwise xor of two [`Integer`]s, taking the first by value and the second by
+    /// reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`,
-    ///       m = `other.significant_bits()`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(Integer::from(-123) ^ &Integer::from(-456), 445);
     /// assert_eq!(
-    ///     (-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "8191"
+    ///     -Integer::from(10u32).pow(12) ^ &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     8191
     /// );
     /// ```
     #[inline]
@@ -1199,28 +1235,35 @@ impl<'a> BitXor<&'a Integer> for Integer {
 impl<'a> BitXor<Integer> for &'a Integer {
     type Output = Integer;
 
-    /// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by reference and the
-    /// right `Integer` by value.
+    /// Takes the bitwise xor of two [`Integer`]s, taking the first by reference and the second by
+    /// value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(&Integer::from(-123) ^ Integer::from(-456), 445);
     /// assert_eq!(
-    ///     (&-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "8191"
+    ///     &-Integer::from(10u32).pow(12) ^ -(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     8191
     /// );
     /// ```
     #[inline]
@@ -1233,28 +1276,28 @@ impl<'a> BitXor<Integer> for &'a Integer {
 impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     type Output = Integer;
 
-    /// Takes the bitwise xor of two `Integer`s, taking both `Integer`s by reference.
+    /// Takes the bitwise xor of two [`Integer`]s, taking both by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
-    ///
-    /// where n = `self.significant_bits() + other.significant_bits()`,
-    ///     m = `max(self.significant_bits(), other.significant_bits)`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!((&Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(&Integer::from(-123) ^ &Integer::from(-456), 445);
     /// assert_eq!(
-    ///     (&-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "8191"
+    ///     &-Integer::from(10u32).pow(12) ^ &-(Integer::from(10u32).pow(12) + Integer::ONE),
+    ///     8191
     /// );
     /// ```
     fn bitxor(self, other: &'a Integer) -> Integer {
@@ -1280,19 +1323,24 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
 }
 
 impl BitXorAssign<Integer> for Integer {
-    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the
-    /// right-hand side by value.
+    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
+    /// the right-hand side by value.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits() + other.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
@@ -1321,19 +1369,25 @@ impl BitXorAssign<Integer> for Integer {
 }
 
 impl<'a> BitXorAssign<&'a Integer> for Integer {
-    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the
-    /// right-hand side by reference.
+    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
+    /// the right-hand side by reference.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets x \oplus y.
+    /// $$
     ///
-    /// Additional memory: worst case O(m)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
+    /// `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;

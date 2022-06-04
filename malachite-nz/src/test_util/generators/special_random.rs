@@ -56,10 +56,6 @@ use malachite_base::test_util::generators::special_random::{
 };
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
-    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
-    random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
-    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -114,6 +110,12 @@ use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 use test_util::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
+use test_util::extra_variadic::{
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
+    random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
+    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
+    random_triples_xyx, random_triples_xyy,
 };
 use test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,

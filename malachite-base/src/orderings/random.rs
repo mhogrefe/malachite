@@ -6,15 +6,14 @@ use std::iter::Cloned;
 
 pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 
-/// Generates a random `Ordering` that has an equal probability of being `Less`, `Greater`, or
+/// Generates a random [`Ordering`] that has an equal probability of being `Less`, `Greater`, or
 /// `Equal`.
 ///
 /// $P(<) = P(=) = P(>) = \frac{1}{3}$.
 ///
 /// The output length is infinite.
 ///
-/// # Expected worst-case complexity
-///
+/// # Expected complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -22,7 +21,6 @@ pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::orderings::random::random_orderings;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use std::cmp::Ordering::{self, Equal, Greater, Less};

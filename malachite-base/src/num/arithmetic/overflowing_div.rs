@@ -5,6 +5,8 @@ macro_rules! impl_overflowing_div {
         impl OverflowingDiv<$t> for $t {
             type Output = $t;
 
+            /// This is a wrapper over the `overflowing_div` functions in the standard library, for
+            /// example [this one](u32::overflowing_div).
             #[inline]
             fn overflowing_div(self, other: $t) -> ($t, bool) {
                 $t::overflowing_div(self, other)
@@ -12,18 +14,18 @@ macro_rules! impl_overflowing_div {
         }
 
         impl OverflowingDivAssign<$t> for $t {
-            /// Replaces `self` with `self / other`.
+            /// Divides a number by another number, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned. Overflow only
-            /// occurs when `$t` is signed, `self` is `$t::MIN`, and `other` is -1. The "actual"
-            /// result, -`$t::MIN`, can't be represented and is wrapped back to `$t::MIN`.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned. Overflow only occurs when
+            /// `Self` is signed, `self` is `Self::MIN`, and `other` is -1. The "actual" result,
+            /// `-Self::MIN`, can't be represented and is wrapped back to `Self::MIN`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_div` module.
+            /// See [here](super::overflowing_div#overflowing_div_assign).
             #[inline]
             fn overflowing_div_assign(&mut self, other: $t) -> bool {
                 let overflow;

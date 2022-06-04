@@ -1,6 +1,6 @@
 use itertools::repeat_n;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
+use malachite_base::num::conversion::string::to_string::BaseFmtWrapper as BaseBaseFmtWrapper;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString,
@@ -10,8 +10,9 @@ use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_8, unsigned_pair_gen_var_2, unsigned_pair_gen_var_9,
     unsigned_triple_gen_var_6,
 };
-use malachite_nz::natural::conversion::string::to_string::{NaturalAlt, NaturalAlt2};
-use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+use malachite_nz::natural::conversion::string::to_string::{
+    BaseFmtWrapper, NaturalAlt, NaturalAlt2,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};

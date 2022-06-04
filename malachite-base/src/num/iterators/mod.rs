@@ -31,7 +31,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     }
 }
 
-fn same_width_iterator_to_bit_chunks<
+const fn same_width_iterator_to_bit_chunks<
     I: Iterator<Item = T>,
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
@@ -85,7 +85,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     }
 }
 
-fn even_fraction_iterator_to_bit_chunks<
+const fn even_fraction_iterator_to_bit_chunks<
     I: Iterator<Item = T>,
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
@@ -148,7 +148,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     }
 }
 
-fn even_multiple_iterator_to_bit_chunks<
+const fn even_multiple_iterator_to_bit_chunks<
     I: Iterator<Item = T>,
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
@@ -227,7 +227,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     }
 }
 
-fn irregular_iterator_to_bit_chunks<
+const fn irregular_iterator_to_bit_chunks<
     I: Iterator<Item = T>,
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
@@ -250,7 +250,7 @@ fn irregular_iterator_to_bit_chunks<
 /// Regroups an iterator of bit chunks into another iterator of bit chunks, possibly with a
 /// different chunk size.
 ///
-/// This `enum` is created by the `iterator_to_bit_chunks` function. See its documentation for more.
+/// This `enum` is created by [`iterator_to_bit_chunks`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub enum IteratorToBitChunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     SameWidth(SameWidthIteratorToBitChunks<I, T, U>),
@@ -305,7 +305,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// Note that the sequence $y$ is not uniquely specified, since it may contain arbitrarily many
 /// trailing zeros. However, if $x$ is finite, $y$ is guaranteed to also be finite.
 ///
-/// The output length is $An/B + O(1)$, where $n$ is $xs.count()$, $A$ is `in_chunk_size`, and $B$
+/// The output length is $An/B + O(1)$, where $n$ is `xs.count()`, $A$ is `in_chunk_size`, and $B$
 /// is `out_chunk_size`.
 ///
 /// # Complexity per iteration
@@ -316,7 +316,6 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
-///
 /// use malachite_base::num::iterators::iterator_to_bit_chunks;
 ///
 /// assert_eq!(
@@ -397,7 +396,7 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
 
 /// A `struct` that holds the state of the ruler sequence.
 ///
-/// This `struct` is created by the `ruler_sequence` function. See its documentation for more.
+/// This `struct` is created by [`ruler_sequence`]; see its documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct RulerSequence<T: ExactFrom<u32>> {
     i: u64,
@@ -421,8 +420,9 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 /// $(x_i)_{i=1}^\infty = t_i$, where for each $i$, $i = (2k_i+1)2^{t_i}$ for some
 /// $k_i\in \mathbb{Z}$.
 ///
-/// The sequence grows logarithmically. Every number occurs infinitely many times, and its first
-/// occurrence is after all smaller numbers have occured.
+/// The $n$th term of this sequence is no greater than $\log_2(n + 1)$. Every number occurs
+/// infinitely many times, and any number's first occurrence is after all smaller numbers have
+/// occured.
 ///
 /// The output length is infinite.
 ///
@@ -431,18 +431,15 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::iterators::ruler_sequence;
 ///
 /// assert_eq!(
-///     ruler_sequence::<u32>().take(20).collect_vec(),
-///     &[0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2]
+///     prefix_to_string(ruler_sequence::<u32>(), 20),
+///     "[0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, ...]"
 /// );
 /// ```
-pub fn ruler_sequence<T: ExactFrom<u32>>() -> RulerSequence<T> {
+pub const fn ruler_sequence<T: ExactFrom<u32>>() -> RulerSequence<T> {
     RulerSequence {
         i: 0,
         phantom: PhantomData,
@@ -451,8 +448,7 @@ pub fn ruler_sequence<T: ExactFrom<u32>>() -> RulerSequence<T> {
 
 /// A `struct` that holds the state of a bit distributor sequence.
 ///
-/// This `struct` is created by the `bit_distributor_sequence` function. See its documentation for
-/// more.
+/// This `struct` is created by [`bit_distributor_sequence`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct BitDistributorSequence {
     bit_distributor: BitDistributor,
@@ -468,9 +464,9 @@ impl Iterator for BitDistributorSequence {
     }
 }
 
-/// Returns a sequence based on a `BitGenerator`.
+/// Returns a sequence based on a [`BitDistributor`].
 ///
-/// The sequence is obtained by taking the second output of a two-output `BitGenerator`. If both
+/// The sequence is obtained by taking the second output of a two-output [`BitDistributor`]. If both
 /// output types are normal with weight 1, the sequence is <https://oeis.org/A059905>.
 ///
 /// The smaller the first output type is relative to the second (where tiny outputs are smaller than
@@ -482,9 +478,9 @@ impl Iterator for BitDistributorSequence {
 ///   $O(n^\frac{p}{p+q})$.
 /// - The output types cannot both be tiny.
 ///
-/// Every number occurs infinitely many times, and its first occurrence is after all smaller numbers
-/// have occured. The sequence increases by no more than 1 at each step, but may decrease by an
-/// unboundedly high amount.
+/// Every number occurs infinitely many times, and any number's first occurrence is after all
+/// smaller numbers have occured. The sequence increases by no more than 1 at each step, but may
+/// decrease by an arbitrarily large amount.
 ///
 /// The output length is infinite.
 ///
@@ -496,36 +492,31 @@ impl Iterator for BitDistributorSequence {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
-/// use itertools::Itertools;
-///
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::iterators::bit_distributor_sequence;
 ///
 /// assert_eq!(
-///     bit_distributor_sequence(
-///         BitDistributorOutputType::normal(1),
-///         BitDistributorOutputType::normal(2)
-///     )
-///     .take(50)
-///     .collect_vec(),
-///     &[
-///         0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2,
-///         3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1
-///     ]
+///     prefix_to_string(
+///         bit_distributor_sequence(
+///             BitDistributorOutputType::normal(1),
+///             BitDistributorOutputType::normal(2)
+///         ),
+///         50
+///     ),
+///     "[0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, \
+///     3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, ...]"
 /// );
 /// assert_eq!(
-///     bit_distributor_sequence(
-///         BitDistributorOutputType::normal(2),
-///         BitDistributorOutputType::normal(1)
-///     )
-///     .take(50)
-///     .collect_vec(),
-///     &[
-///         0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, 10, 11, 8, 9, 10, 11, 12, 13, 14,
-///         15, 12, 13, 14, 15, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9,
-///     ]
+///     prefix_to_string(
+///         bit_distributor_sequence(
+///             BitDistributorOutputType::normal(2),
+///             BitDistributorOutputType::normal(1)
+///         ),
+///         50
+///     ),
+///     "[0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, 10, 11, 8, 9, 10, 11, 12, 13, 14, \
+///     15, 12, 13, 14, 15, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, ...]"
 /// );
 /// ```
 pub fn bit_distributor_sequence(

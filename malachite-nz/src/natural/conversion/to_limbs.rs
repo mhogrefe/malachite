@@ -4,8 +4,10 @@ use natural::Natural;
 use platform::Limb;
 use std::ops::Index;
 
-/// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
-/// significant first). The iterator does not iterate over the implicit leading zero limbs.
+/// A double-ended iterator over the [limbs](crate#limbs) of a [`Natural`].
+///
+/// The forward order is ascending (least-significant first). The iterator does not iterate over
+/// any implicit leading zero limbs.
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero limbs is allowed.
@@ -27,17 +29,17 @@ pub struct LimbIterator<'a> {
 impl<'a> Iterator for LimbIterator<'a> {
     type Item = Limb;
 
-    /// A function to iterate through the limbs of a `Natural` in ascending order (least-significant
-    /// first).
+    /// A function to iterate through the [limbs](crate#limbs) of a [`Natural`] in ascending order
+    /// (least-significant first).
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -47,7 +49,7 @@ impl<'a> Iterator for LimbIterator<'a> {
     ///     assert_eq!(Natural::ZERO.limbs().next(), None);
     ///
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
+    ///     let trillion = Natural::from(10u32).pow(12);
     ///     let mut limbs = trillion.limbs();
     ///     assert_eq!(limbs.next(), Some(3567587328));
     ///     assert_eq!(limbs.next(), Some(232));
@@ -71,45 +73,23 @@ impl<'a> Iterator for LimbIterator<'a> {
         }
     }
 
-    /// A function that returns the length of the limbs iterator; that is, the `Natural`'s limb
-    /// count. The format is (lower bound, Option<upper bound>), but in this case it's trivial to
-    /// always have an exact bound.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    ///
-    /// use malachite_base::num::basic::integers::PrimitiveInt;
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_nz::natural::Natural;
-    /// use malachite_nz::platform::Limb;
-    ///
-    /// if Limb::WIDTH == u32::WIDTH {
-    ///     assert_eq!(Natural::ZERO.limbs().size_hint(), (0, Some(0)));
-    ///     assert_eq!(Natural::trillion().limbs().size_hint(), (2, Some(2)));
-    /// }
-    /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.limb_count, Some(self.limb_count))
     }
 }
 
 impl<'a> DoubleEndedIterator for LimbIterator<'a> {
-    /// A function to iterate through the limbs of a `Natural` in descending order (most-significant
-    /// first).
+    /// A function to iterate through the [limbs](crate#limbs) of a [`Natural`] in descending order
+    /// (most-significant first).
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -119,7 +99,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     ///     assert_eq!(Natural::ZERO.limbs().next_back(), None);
     ///
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
+    ///     let trillion = Natural::from(10u32).pow(12);
     ///     let mut limbs = trillion.limbs();
     ///     assert_eq!(limbs.next_back(), Some(232));
     ///     assert_eq!(limbs.next_back(), Some(3567587328));
@@ -144,23 +124,24 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     }
 }
 
-/// This allows for some optimizations, e.g. when collecting into a `Vec`.
 impl<'a> ExactSizeIterator for LimbIterator<'a> {}
 
 impl<'a> Index<usize> for LimbIterator<'a> {
     type Output = Limb;
 
-    /// A function to retrieve limbs by index. The index is the power of 2<sup>32</sub> of which the
-    /// limbs is a coefficient. Indexing at or above the limb count returns zero limbs.
+    /// A function to retrieve a [`Natural`]'s [limbs](crate#limbs) by index.
     ///
-    /// Time: worst case O(1)
+    /// The index is the power of $2^W$ of which the limbs is a coefficient, where $W$ is the width
+    /// of a limb. Indexing at or above the limb count returns zeros.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -170,7 +151,7 @@ impl<'a> Index<usize> for LimbIterator<'a> {
     ///     assert_eq!(Natural::ZERO.limbs()[0], 0);
     ///
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
+    ///     let trillion = Natural::from(10u32).pow(12);
     ///     let limbs = trillion.limbs();
     ///     assert_eq!(limbs[0], 3567587328);
     ///     assert_eq!(limbs[1], 232);
@@ -191,24 +172,28 @@ impl<'a> Index<usize> for LimbIterator<'a> {
 }
 
 impl Natural {
-    /// Returns the limbs of a `Natural`, in ascending order, so that less significant limbs have
-    /// lower indices in the output vector. There are no trailing zero limbs.
+    /// Returns the [limbs](crate#limbs) of a [`Natural`], in ascending order, so that
+    /// less-significant limbs have lower indices in the output vector.
     ///
-    /// This function borrows `self`. If taking ownership of `self` is possible, `into_limbs_asc` is
-    /// more efficient.
+    /// There are no trailing zero limbs.
     ///
-    /// Time: worst case O(n)
+    /// This function borrows the [`Natural`]. If taking ownership is possible instead,
+    /// [`into_limbs_asc`](Self::into_limbs_asc) is more efficient.
     ///
-    /// Additional memory: worst case O(n)
+    /// This function is more efficient than [`to_limbs_desc`](Self::to_limbs_desc).
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// This function is more efficient than `Natural::to_limbs_desc`.
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -218,7 +203,7 @@ impl Natural {
     ///     assert!(Natural::ZERO.to_limbs_asc().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_asc(), &[3567587328, 232]);
+    ///     assert_eq!(Natural::from(10u32).pow(12).to_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
@@ -229,24 +214,28 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in descending order, so that less significant limbs have
-    /// higher indices in the output vector. There are no leading zero limbs.
+    /// Returns the [limbs](crate#limbs) of a [`Natural`] in descending order, so that
+    /// less-significant limbs have higher indices in the output vector.
     ///
-    /// This function borrows `self`. If taking ownership of `self` is possible, `into_limbs_desc`
-    /// is more efficient.
+    /// There are no leading zero limbs.
     ///
-    /// Time: worst case O(n)
+    /// This function borrows the [`Natural`]. If taking ownership is possible instead,
+    /// [`into_limbs_desc`](Self::into_limbs_desc) is more efficient.
     ///
-    /// Additional memory: worst case O(n)
+    /// This function is less efficient than [`to_limbs_asc`](Self::to_limbs_asc).
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// This function is less efficient than `Natural::to_limbs_asc`.
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -256,7 +245,7 @@ impl Natural {
     ///     assert!(Natural::ZERO.to_limbs_desc().is_empty());
     ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_desc(), &[232, 3567587328]);
+    ///     assert_eq!(Natural::from(10u32).pow(12).to_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
@@ -267,22 +256,24 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in ascending order, so that less significant limbs have
-    /// lower indices in the output vector. There are no trailing zero limbs.
+    /// Returns the [limbs](crate#limbs) of a [`Natural`], in ascending order, so that
+    /// less-significant limbs have lower indices in the output vector.
     ///
-    /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
-    /// `to_limbs_asc`.
+    /// There are no trailing zero limbs.
     ///
-    /// Time: worst case O(1)
+    /// This function takes ownership of the [`Natural`]. If it's necessary to borrow instead, use
+    /// [`to_limbs_asc`](Self::to_limbs_asc).
     ///
-    /// Additional memory: worst case O(1)
+    /// This function is more efficient than [`into_limbs_desc`](Self::into_limbs_desc).
     ///
-    /// This function is more efficient than `Natural::into_limbs_desc`.
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -292,7 +283,7 @@ impl Natural {
     ///     assert!(Natural::ZERO.into_limbs_asc().is_empty());
     ///     assert_eq!(Natural::from(123u32).into_limbs_asc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_asc(), &[3567587328, 232]);
+    ///     assert_eq!(Natural::from(10u32).pow(12).into_limbs_asc(), &[3567587328, 232]);
     /// }
     /// ```
     pub fn into_limbs_asc(self) -> Vec<Limb> {
@@ -303,24 +294,28 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in descending order, so that less significant limbs have
-    /// higher indices in the output vector. There are no leading zero limbs.
+    /// Returns the [limbs](crate#limbs) of a [`Natural`], in descending order, so that
+    /// less-significant limbs have higher indices in the output vector.
     ///
-    /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
-    /// `to_limbs_desc`.
+    /// There are no leading zero limbs.
     ///
-    /// Time: worst case O(n)
+    /// This function takes ownership of the [`Natural`]. If it's necessary to borrow instead, use
+    /// [`to_limbs_desc`](Self::to_limbs_desc).
     ///
-    /// Additional memory: worst case O(1)
+    /// This function is less efficient than [`into_limbs_asc`](Self::into_limbs_asc).
     ///
-    /// where n = `self.significant_bits()`
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// This function is less efficient than `Natural::into_limbs_asc`.
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -330,7 +325,7 @@ impl Natural {
     ///     assert!(Natural::ZERO.into_limbs_desc().is_empty());
     ///     assert_eq!(Natural::from(123u32).into_limbs_desc(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_desc(), &[232, 3567587328]);
+    ///     assert_eq!(Natural::from(10u32).pow(12).into_limbs_desc(), &[232, 3567587328]);
     /// }
     /// ```
     pub fn into_limbs_desc(self) -> Vec<Limb> {
@@ -344,16 +339,18 @@ impl Natural {
         }
     }
 
-    /// Returns a double-ended iterator over the limbs of a `Natural`. The forward order is
-    /// ascending, so that less significant limbs appear first. There are no trailing zero limbs
-    /// going forward, or leading zeros going backward.
+    /// Returns a double-ended iterator over the [limbs](crate#limbs) of a [`Natural`].
     ///
-    /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_asc`,
-    /// `to_limbs_desc`, `into_limbs_asc`, or `into_limbs_desc` instead.
+    /// The forward order is ascending, so that less-significant limbs appear first. There are no
+    /// trailing zero limbs going forward, or leading zeros going backward.
     ///
-    /// Time: worst case O(1)
+    /// If it's necessary to get a [`Vec`] of all the limbs, consider using
+    /// [`to_limbs_asc`](Self::to_limbs_asc), [`to_limbs_desc`](Self::to_limbs_desc),
+    /// [`into_limbs_asc`](Self::into_limbs_asc), or [`into_limbs_desc`](Self::into_limbs_desc)
+    /// instead.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -361,6 +358,7 @@ impl Natural {
     /// extern crate malachite_base;
     ///
     /// use itertools::Itertools;
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -370,12 +368,15 @@ impl Natural {
     ///     assert!(Natural::ZERO.limbs().next().is_none());
     ///     assert_eq!(Natural::from(123u32).limbs().collect_vec(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs().collect_vec(), &[3567587328, 232]);
+    ///     assert_eq!(Natural::from(10u32).pow(12).limbs().collect_vec(), &[3567587328, 232]);
     ///
     ///     assert!(Natural::ZERO.limbs().rev().next().is_none());
     ///     assert_eq!(Natural::from(123u32).limbs().rev().collect_vec(), &[123]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs().rev().collect_vec(), &[232, 3567587328]);
+    ///     assert_eq!(
+    ///         Natural::from(10u32).pow(12).limbs().rev().collect_vec(),
+    ///         &[232, 3567587328]
+    ///     );
     /// }
     /// ```
     pub fn limbs(&self) -> LimbIterator {

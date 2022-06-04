@@ -11,11 +11,12 @@ use platform::Limb;
 // Given the limbs of the absolute value of an `Integer`, in ascending order, returns the two's
 // complement limbs. The input limbs should not be all zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
     let mut result = vec![0; i];
@@ -32,9 +33,8 @@ pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 // significant bit is `false`; if it isn't, appends an extra zero bit. This way the `Integer`'s
 // non-negativity is preserved in its limbs.
 //
-// Time: worst case O(1)
-//
-// Additional memory: worst case O(1)
+// # Worst-case complexity
+// Constant time and additional memory.
 pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() {
         if last.get_highest_bit() {
@@ -48,11 +48,12 @@ pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 // two's complement. Returns whether there is a carry left over from the two's complement
 // conversion process.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
     limbs_slice_add_limb_in_place(xs, 1)
@@ -63,11 +64,12 @@ pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 // appends an extra `Limb::MAX` bit. This way the `Integer`'s negativity is preserved in its limbs.
 // The limbs cannot be empty or contain only zeros.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` contains only zeros.
@@ -84,9 +86,11 @@ pub_test! {limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mu
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NegativeLimbIterator<'a>(NLIterator<'a>);
 
-/// A double-ended iterator over the two's complement limbs of the negative of a `Natural`. The
-/// forward order is ascending (least-significant first). There may be at most one implicit
-/// most-significant `Limb::MAX` limb.
+// A double-ended iterator over the two's complement [limbs](crate#limbs) of the negative of an
+// [`Integer`].
+//
+// The forward order is ascending (least-significant first). There may be at most one
+// most-significant `Limb::MAX` limb.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct NLIterator<'a> {
     pub(crate) limbs: LimbIterator<'a>,
@@ -113,12 +117,11 @@ impl<'a> NLIterator<'a> {
 impl<'a> Iterator for NLIterator<'a> {
     type Item = Limb;
 
-    /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
-    /// ascending order (least-significant first).
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    // A function to iterate through the two's complement limbs of the negative of a `Natural` in
+    // ascending order (least-significant first).
+    //
+    // # Worst-case complexity
+    // Constant time and additional memory.
     fn next(&mut self) -> Option<Limb> {
         let previous_i = self.limbs.i;
         self.limbs.next().map(|limb| {
@@ -137,28 +140,28 @@ impl<'a> Iterator for NLIterator<'a> {
         })
     }
 
-    /// A function that returns the length of the negative limbs iterator; that is, the `Natural`'s
-    /// negative limb count (this is the same as its limb count). The format is (lower bound,
-    /// Option<upper bound>), but in this case it's trivial to always have an exact bound.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    // A function that returns the length of the negative limbs iterator; that is, the `Natural`'s
+    // negative limb count (this is the same as its limb count). The format is (lower bound,
+    // Option<upper bound>), but in this case it's trivial to always have an exact bound.
+    //
+    // # Worst-case complexity
+    // Constant time and additional memory.
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.limbs.limb_count, Some(self.limbs.limb_count))
     }
 }
 
 impl<'a> DoubleEndedIterator for NLIterator<'a> {
-    /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
-    /// descending order (most-significant first). This is worst-case linear since the first
-    /// `next_back` call needs to determine the index of the least-significant nonzero limb.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `self.significant_bits()`
+    // A function to iterate through the two's complement limbs of the negative of a `Natural` in
+    // descending order (most-significant first). This is worst-case linear since the first
+    // `next_back` call needs to determine the index of the least-significant nonzero limb.
+    //
+    // # Worst-case complexity
+    // $T(n) = O(n)$
+    //
+    // $M(n) = O(1)$
+    //
+    // where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     fn next_back(&mut self) -> Option<Limb> {
         let previous_j = self.limbs.j;
         self.limbs.next_back().map(|limb| {
@@ -240,10 +243,12 @@ impl<'a> SignExtendedLimbIterator for NLIterator<'a> {
     }
 }
 
-/// A double-ended iterator over the twos-complement limbs of an `Integer`. The forward order is
-/// ascending (least-significant first). The most significant bit of the most significant limb
-/// corresponds to the sign of the `Integer`; `false` for non-negative and `true` for negative. This
-/// means that there may be a single most-significant sign-extension limb that is 0 or `Limb::MAX`.
+/// A double-ended iterator over the twos-complement [limbs](crate#limbs) of an [`Integer`].
+///
+/// The forward order is ascending (least-significant first). The most significant bit of the most
+/// significant limb corresponds to the sign of the [`Integer`]; `false` for non-negative and
+/// `true` for negative. This means that there may be a single most-significant sign-extension limb
+/// that is 0 or `Limb::MAX`.
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading limbs is allowed.
@@ -255,19 +260,21 @@ pub enum TwosComplementLimbIterator<'a> {
 }
 
 impl<'a> TwosComplementLimbIterator<'a> {
-    /// A function to retrieve twos-complement limbs by index. Indexing at or above the limb count
-    /// returns zero or `Limb::MAX` limbs, depending on the sign of `self`.
+    /// A function to retrieve twos-complement [limbs](crate#limbs) by index. Indexing at or above
+    /// the limb count returns zero or `Limb::MAX` limbs, depending on the sign of the `[Integer`].
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -277,7 +284,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
     ///     assert_eq!(Integer::ZERO.twos_complement_limbs().get(0), 0);
     ///
     ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    ///     let negative_trillion = -Integer::trillion();
+    ///     let negative_trillion = -Integer::from(10u32).pow(12);
     ///     let limbs = negative_trillion.twos_complement_limbs();
     ///     assert_eq!(limbs.get(0), 727379968);
     ///     assert_eq!(limbs.get(1), 4294967063);
@@ -297,17 +304,17 @@ impl<'a> TwosComplementLimbIterator<'a> {
 impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     type Item = Limb;
 
-    /// A function to iterate through the twos-complement limbs of an `Integer` in ascending order
-    /// (least-significant first). The last limb may be a sign-extension limb.
+    /// A function to iterate through the twos-complement [limbs](crate#limbs) of an [`Integer`] in
+    /// ascending order (least-significant first). The last limb may be a sign-extension limb.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -317,7 +324,7 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next(), None);
     ///
     ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    ///     let negative_trillion = -Integer::trillion();
+    ///     let negative_trillion = -Integer::from(10u32).pow(12);
     ///     let mut limbs = negative_trillion.twos_complement_limbs();
     ///     assert_eq!(limbs.next(), Some(727379968));
     ///     assert_eq!(limbs.next(), Some(4294967063));
@@ -338,19 +345,21 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
 }
 
 impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
-    /// A function to iterate through the twos-complement limbs of an `Integer` in descending order
-    /// (most-significant first). The first limb may be a sign-extension limb.
+    /// A function to iterate through the twos-complement [limbs](crate#limbs) of an [`Integer`] in
+    /// descending order (most-significant first). The first limb may be a sign-extension limb.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -360,7 +369,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next_back(), None);
     ///
     ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    ///     let negative_trillion = -Integer::trillion();
+    ///     let negative_trillion = -Integer::from(10u32).pow(12);
     ///     let mut limbs = negative_trillion.twos_complement_limbs();
     ///     assert_eq!(limbs.next_back(), Some(4294967063));
     ///     assert_eq!(limbs.next_back(), Some(727379968));
@@ -382,13 +391,12 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
 
 impl Natural {
     /// Returns a double-ended iterator over the two's complement limbs of the negative of a
-    /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
+    /// [`Natural`]. The forward order is ascending, so that less significant limbs appear first.
     /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX`
-    /// limb going backward. The `Natural` cannot be zero.
+    /// limb going backward. The [`Natural`] cannot be zero.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn negative_limbs(&self) -> NegativeLimbIterator {
         assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
         NegativeLimbIterator(NLIterator {
@@ -399,28 +407,34 @@ impl Natural {
 }
 
 impl Integer {
-    /// Returns the limbs of an `Integer`, in ascending order, so that less significant limbs have
-    /// lower indices in the output vector. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
-    /// positive, and if the bit is one it is negative. There are no trailing zero limbs if the
-    /// `Integer` is positive or trailing !0 limbs if `Integer` is negative, except as necessary to
-    /// include the correct sign bit. Zero is a special case: it contains no limbs.
+    /// Returns the [limbs](crate#limbs) of an [`Integer`], in ascending order, so that less
+    /// significant limbs have lower indices in the output vector.
+    ///
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
+    /// negative. There are no trailing zero limbs if the [`Integer`] is positive or trailing
+    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
+    /// correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible,
-    /// `into_twos_complement_limbs_asc` is more efficient.
+    /// [`into_twos_complement_limbs_asc`](`Self::into_twos_complement_limbs_asc`) is more
+    /// efficient.
     ///
-    /// This function is more efficient than `to_twos_complement_limbs_desc`.
+    /// This function is more efficient than
+    /// [`to_twos_complement_limbs_desc`](`Self::to_twos_complement_limbs_desc`).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -429,17 +443,14 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_asc().is_empty());
     ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), &[123]);
-    ///     assert_eq!(
-    ///         Integer::from(-123).to_twos_complement_limbs_asc(),
-    ///         &[4294967173]
-    ///     );
+    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_asc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().to_twos_complement_limbs_asc(),
+    ///         Integer::from(10u32).pow(12).to_twos_complement_limbs_asc(),
     ///         &[3567587328, 232]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).to_twos_complement_limbs_asc(),
+    ///         (-Integer::from(10u32).pow(12)).to_twos_complement_limbs_asc(),
     ///         &[727379968, 4294967063]
     ///     );
     /// }
@@ -454,30 +465,36 @@ impl Integer {
         limbs
     }
 
-    /// Returns the limbs of an `Integer`, in descending order, so that less significant limbs have
-    /// higher indices in the output vector. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
-    /// positive, and if the bit is one it is negative. There are no leading zero limbs if the
-    /// `Integer` is non-negative or leading !0 limbs if `Integer` is negative, except as necessary
-    /// to include the correct sign bit. Zero is a special case: it contains no limbs.
+    /// Returns the [limbs](crate#limbs) of an [`Integer`], in descending order, so that less
+    /// significant limbs have higher indices in the output vector.
     ///
-    /// This is similar to how BigIntegers in Java are represented.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
+    /// negative. There are no leading zero limbs if the [`Integer`] is non-negative or leading
+    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
+    /// correct sign bit. Zero is a special case: it contains no limbs.
+    ///
+    /// This is similar to how `BigInteger`s in Java are represented.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible,
-    /// `into_twos_complement_limbs_desc` is more efficient.
+    /// [`into_twos_complement_limbs_desc`](`Self::into_twos_complement_limbs_desc`) is more
+    /// efficient.
     ///
-    /// This function is less efficient than `to_twos_complement_limbs_asc`.
+    /// This function is less efficient than
+    /// [`to_twos_complement_limbs_asc`](`Self::to_twos_complement_limbs_asc`).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -486,17 +503,14 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.to_twos_complement_limbs_desc().is_empty());
     ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), &[123]);
-    ///     assert_eq!(
-    ///         Integer::from(-123).to_twos_complement_limbs_desc(),
-    ///         &[4294967173]
-    ///     );
+    ///     assert_eq!(Integer::from(-123).to_twos_complement_limbs_desc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().to_twos_complement_limbs_desc(),
+    ///         Integer::from(10u32).pow(12).to_twos_complement_limbs_desc(),
     ///         &[232, 3567587328]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).to_twos_complement_limbs_desc(),
+    ///         (-Integer::from(10u32).pow(12)).to_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]
     ///     );
     /// }
@@ -507,28 +521,33 @@ impl Integer {
         xs
     }
 
-    /// Returns the limbs of an `Integer`, in ascending order, so that less significant limbs have
-    /// lower indices in the output vector. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
-    /// positive, and if the bit is one it is negative. There are no trailing zero limbs if the
-    /// `Integer` is positive or trailing !0 limbs if `Integer` is negative, except as necessary to
-    /// include the correct sign bit. Zero is a special case: it contains no limbs.
+    /// Returns the [limbs](crate#limbs) of an [`Integer`], in ascending order, so that less
+    /// significant limbs have lower indices in the output vector.
+    ///
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
+    /// negative. There are no trailing zero limbs if the [`Integer`] is positive or trailing
+    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
+    /// correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
-    /// `to_twos_complement_limbs_asc`.
+    /// [`to_twos_complement_limbs_asc`](`Self::to_twos_complement_limbs_asc`).
     ///
-    /// This function is more efficient than `into_twos_complement_limbs_desc`.
+    /// This function is more efficient than
+    /// [`into_twos_complement_limbs_desc`](`Self::into_twos_complement_limbs_desc`).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -537,17 +556,14 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_asc().is_empty());
     ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), &[123]);
-    ///     assert_eq!(
-    ///         Integer::from(-123).into_twos_complement_limbs_asc(),
-    ///         &[4294967173]
-    ///     );
+    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_asc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().into_twos_complement_limbs_asc(),
+    ///         Integer::from(10u32).pow(12).into_twos_complement_limbs_asc(),
     ///         &[3567587328, 232]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).into_twos_complement_limbs_asc(),
+    ///         (-Integer::from(10u32).pow(12)).into_twos_complement_limbs_asc(),
     ///         &[727379968, 4294967063]
     ///     );
     /// }
@@ -562,30 +578,35 @@ impl Integer {
         xs
     }
 
-    /// Returns the limbs of an `Integer`, in descending order, so that less significant limbs have
-    /// higher indices in the output vector. The limbs are in two's complement, and the most
-    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
-    /// positive, and if the bit is one it is negative. There are no leading zero limbs if the
-    /// `Integer` is non-negative or leading !0 limbs if `Integer` is negative, except as necessary
-    /// to include the correct sign bit. Zero is a special case: it contains no limbs.
+    /// Returns the [limbs](crate#limbs) of an [`Integer`], in descending order, so that less
+    /// significant limbs have higher indices in the output vector.
     ///
-    /// This is similar to how BigIntegers in Java are represented.
+    /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
+    /// negative. There are no leading zero limbs if the [`Integer`] is non-negative or leading
+    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
+    /// correct sign bit. Zero is a special case: it contains no limbs.
+    ///
+    /// This is similar to how `BigInteger`s in Java are represented.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
-    /// `to_twos_complement_limbs_desc`.
+    /// [`to_twos_complement_limbs_desc`](`Self::to_twos_complement_limbs_desc`).
     ///
-    /// This function is less efficient than `into_twos_complement_limbs_asc`.
+    /// This function is less efficient than
+    /// [`into_twos_complement_limbs_asc`](`Self::into_twos_complement_limbs_asc`).
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -594,17 +615,14 @@ impl Integer {
     /// if Limb::WIDTH == u32::WIDTH {
     ///     assert!(Integer::ZERO.into_twos_complement_limbs_desc().is_empty());
     ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), &[123]);
-    ///     assert_eq!(
-    ///         Integer::from(-123).into_twos_complement_limbs_desc(),
-    ///         &[4294967173]
-    ///     );
+    ///     assert_eq!(Integer::from(-123).into_twos_complement_limbs_desc(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().into_twos_complement_limbs_desc(),
+    ///         Integer::from(10u32).pow(12).into_twos_complement_limbs_desc(),
     ///         &[232, 3567587328]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).into_twos_complement_limbs_desc(),
+    ///         (-Integer::from(10u32).pow(12)).into_twos_complement_limbs_desc(),
     ///         &[4294967063, 727379968]
     ///     );
     /// }
@@ -615,18 +633,20 @@ impl Integer {
         xs
     }
 
-    /// Returns a double-ended iterator over the twos-complement limbs of an `Integer`. The forward
-    /// order is ascending, so that less significant limbs appear first. There may be a most-
-    /// significant sign-extension limb.
+    /// Returns a double-ended iterator over the twos-complement [limbs](crate#limbs) of an
+    /// [`Integer`].
     ///
-    /// If it's necessary to get a `Vec` of all the twos_complement limbs, consider using
-    /// `to_twos_complement_limbs_asc`,
-    /// `to_twos_complement_limbs_desc`, `into_twos_complement_limbs_asc`, or
-    /// `into_twos_complement_limbs_desc` instead.
+    /// The forward order is ascending, so that less significant limbs appear first. There may be a
+    /// most-significant sign-extension limb.
     ///
-    /// Time: worst case O(1)
+    /// If it's necessary to get a [`Vec`] of all the twos_complement limbs, consider using
+    /// [`to_twos_complement_limbs_asc`](`Self::to_twos_complement_limbs_asc`),
+    /// [`to_twos_complement_limbs_desc`](`Self::to_twos_complement_limbs_desc`),
+    /// [`into_twos_complement_limbs_asc`](`Self::into_twos_complement_limbs_asc`), or
+    /// [`into_twos_complement_limbs_desc`](`Self::into_twos_complement_limbs_desc`) instead.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -634,6 +654,7 @@ impl Integer {
     /// extern crate malachite_base;
     ///
     /// use itertools::Itertools;
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -645,7 +666,7 @@ impl Integer {
     ///     assert_eq!(Integer::from(-123).twos_complement_limbs().collect_vec(), &[4294967173]);
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().twos_complement_limbs().collect_vec(),
+    ///         Integer::from(10u32).pow(12).twos_complement_limbs().collect_vec(),
     ///         &[3567587328, 232]
     ///     );
     ///     // Sign-extension for a non-negative `Integer`
@@ -654,7 +675,7 @@ impl Integer {
     ///         &[4294967295, 0]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).twos_complement_limbs().collect_vec(),
+    ///         (-Integer::from(10u32).pow(12)).twos_complement_limbs().collect_vec(),
     ///         &[727379968, 4294967063]
     ///     );
     ///     // Sign-extension for a negative `Integer`
@@ -671,7 +692,7 @@ impl Integer {
     ///     );
     ///     // 10^12 = 232 * 2^32 + 3567587328
     ///     assert_eq!(
-    ///         Integer::trillion().twos_complement_limbs().rev().collect_vec(),
+    ///         Integer::from(10u32).pow(12).twos_complement_limbs().rev().collect_vec(),
     ///         &[232, 3567587328]
     ///     );
     ///     // Sign-extension for a non-negative `Integer`
@@ -680,7 +701,7 @@ impl Integer {
     ///         &[0, 4294967295]
     ///     );
     ///     assert_eq!(
-    ///         (-Integer::trillion()).twos_complement_limbs().rev().collect_vec(),
+    ///         (-Integer::from(10u32).pow(12)).twos_complement_limbs().rev().collect_vec(),
     ///         &[4294967063, 727379968]
     ///     );
     ///     // Sign-extension for a negative `Integer`

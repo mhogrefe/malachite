@@ -92,7 +92,7 @@ impl<T: Eq> RationalSequence<T> {
     /// Returns the length of this `RationalSequence`. If the sequence is infinite, `None` is
     /// returned.
     ///
-    /// For a measure of length that always exists, try `component_len`.
+    /// For a measure of length that always exists, try [`component_len`](Self::component_len).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -117,7 +117,8 @@ impl<T: Eq> RationalSequence<T> {
     /// Returns the sum of the lengths of the non-repeating and repeating parts of this
     /// `RationalSequence`.
     ///
-    /// This is often a more useful way of measuring the complexity of a sequence than `len`.
+    /// This is often a more useful way of measuring the complexity of a sequence than
+    /// [`len`](Self::len).
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -172,27 +173,27 @@ impl<T: Eq> RationalSequence<T> {
 }
 
 impl<T: Clone + Eq> RationalSequence<T> {
-    /// Returns true iff `self` is valid.
-    ///
-    /// To be valid, the non-repeating and repeating parts must be reduced. For example, `[1, 2]`
-    /// and `[3, 4]` are a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` are a
-    /// non-reduced pair representing the same sequence, as are `[1, 2, 3]` and `[4, 3]`. All
-    /// `RationalSequence`s must be valid.
+    // Returns true iff `self` is valid.
+    //
+    // To be valid, the non-repeating and repeating parts must be reduced. For example, `[1, 2]`
+    // and `[3, 4]` is a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` is a
+    // non-reduced pair representing the same sequence, as is `[1, 2, 3]` and `[4, 3]`. All
+    // `RationalSequence`s must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         rational_sequence_is_reduced(&self.non_repeating, &self.repeating)
     }
 }
 
-/// Functions for getting and setting elements in a `RationalSequence`.
+/// Functions for getting and setting elements in a [`RationalSequence`].
 pub mod access;
-/// The `Ord` and `PartialOrd` implementations for `RationalSequence`s.
+/// Functions for comparing [`RationalSequence`]s.
 pub mod cmp;
-/// Functions for converting `RationalSequence`s to and from `Vec`s and slices.
+/// Functions for converting a [`RationalSequence`]s to and from a [`Vec`] or a slice.
 pub mod conversion;
-/// Functions for generating all `RationalSequences` over a set of elements.
+/// Functions for generating all [`RationalSequence`]s over a set of elements.
 pub mod exhaustive;
-/// Functions for generating random `RationalSequences` from a set of elements.
+/// Functions for generating random [`RationalSequence`]s from a set of elements.
 pub mod random;
-/// The `Display` implementation for `RationalSequence`s.
+/// Functions for displaying a [`RationalSequence`].
 pub mod to_string;

@@ -3,9 +3,8 @@ use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper,
+    digit_to_display_byte_lower, digit_to_display_byte_upper, BaseFmtWrapper as BaseBaseFmtWrapper,
 };
-use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
 #[cfg(feature = "test_build")]
 use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, WrappingFrom};
@@ -15,7 +14,6 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
-use natural::conversion::string::BaseFmtWrapper;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -24,21 +22,84 @@ use platform::Limb;
 use std::fmt::Write;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 
-impl<'a> Display for BaseFmtWrapper<&'a Natural> {
-    /// Writes a wrapped `Natural` to a string using a specified base.
-    ///
-    /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
-    /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
+/// A `struct` that allows for formatting a [`Natural`] or [`Integer`](crate::integer::Integer) and
+/// rendering its digits in a specified base.
+#[derive(Clone, Eq, Hash, PartialEq)]
+pub struct BaseFmtWrapper<T> {
+    pub(crate) x: T,
+    pub(crate) base: u8,
+}
+
+impl<T> BaseFmtWrapper<T> {
+    /// Creates a new `BaseFmtWrapper`.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// Constant time and additional memory.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let n = Natural::from(1000000000u32);
+    /// let x = BaseFmtWrapper::new(&n, 36);
+    /// assert_eq!(format!("{}", x), "gjdgxs");
+    /// assert_eq!(format!("{:#}", x), "GJDGXS");
+    ///
+    /// let n = Integer::from(-1000000000);
+    /// let x = BaseFmtWrapper::new(&n, 36);
+    /// assert_eq!(format!("{}", x), "-gjdgxs");
+    /// assert_eq!(format!("{:#}", x), "-GJDGXS");
+    /// ```
+    pub fn new(x: T, base: u8) -> Self {
+        assert!((2..=36).contains(&base), "base out of range");
+        BaseFmtWrapper { x, base }
+    }
+
+    /// Recovers the value from a `BaseFmtWrapper`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     BaseFmtWrapper::new(Natural::from(1000000000u32), 36).unwrap(),
+    ///     1000000000
+    /// );
+    /// ```
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn unwrap(self) -> T {
+        self.x
+    }
+}
+
+impl<'a> Display for BaseFmtWrapper<&'a Natural> {
+    /// Writes a wrapped [`Natural`] to a string using a specified base.
+    ///
+    /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
+    /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2 or greater than 36.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::from(1000000000u32);
@@ -69,22 +130,26 @@ impl<'a> Display for BaseFmtWrapper<&'a Natural> {
 }
 
 impl<'a> Debug for BaseFmtWrapper<&'a Natural> {
-    /// Writes a wrapped `Natural` to a string using a specified base.
+    /// Writes a wrapped [`Natural`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
     /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
     ///
-    /// This is the same as the `Display::fmt` implementation.
+    /// This is the same as the [`Display::fmt`] implementation.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::from(1000000000u32);
@@ -101,13 +166,17 @@ impl<'a> Debug for BaseFmtWrapper<&'a Natural> {
 }
 
 impl ToStringBase for Natural {
-    /// Converts a `Natural` to a string using a specified base.
+    /// Converts a [`Natural`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the lowercase
-    /// `char`s 'a' to 'z'.
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
+    /// lowercase [`char`]s `'a'` to `'z'`.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -136,13 +205,17 @@ impl ToStringBase for Natural {
         }
     }
 
-    /// Converts a `Natural` to a string using a specified base.
+    /// Converts a [`Natural`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the uppercase
-    /// `char`s 'A' to 'Z'.
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
+    /// uppercase [`char`]s `'A'` to `'Z'`.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
@@ -173,10 +246,14 @@ impl ToStringBase for Natural {
 }
 
 impl Display for Natural {
-    /// Converts a `Natural` to a `String`.
+    /// Converts a [`Natural`] to a [`String`].
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -212,12 +289,16 @@ impl Display for Natural {
 }
 
 impl Debug for Natural {
-    /// Converts a `Natural` to a `String`.
+    /// Converts a [`Natural`] to a [`String`].
     ///
-    /// This is the same as the `Display::fmt` implementation.
+    /// This is the same as the [`Display::fmt`] implementation.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -231,9 +312,7 @@ impl Debug for Natural {
     /// assert_eq!(Natural::ZERO.to_debug_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_debug_string(), "123");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000")
-    ///         .unwrap()
-    ///         .to_debug_string(),
+    ///     Natural::from_str("1000000000000").unwrap().to_debug_string(),
     ///     "1000000000000"
     /// );
     /// assert_eq!(format!("{:05?}", Natural::from(123u32)), "00123");
@@ -310,7 +389,7 @@ impl Binary for NaturalAlt2 {
 }
 
 impl Binary for Natural {
-    /// Converts a `Natural` to a binary `String`.
+    /// Converts a [`Natural`] to a binary [`String`].
     ///
     /// Using the `#` format flag prepends `"0b"` to the string.
     ///
@@ -333,9 +412,7 @@ impl Binary for Natural {
     /// assert_eq!(Natural::ZERO.to_binary_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_binary_string(), "1111011");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000")
-    ///         .unwrap()
-    ///         .to_binary_string(),
+    ///     Natural::from_str("1000000000000").unwrap().to_binary_string(),
     ///     "1110100011010100101001010001000000000000"
     /// );
     /// assert_eq!(format!("{:011b}", Natural::from(123u32)), "00001111011");
@@ -496,7 +573,7 @@ impl Octal for NaturalAlt2 {
 }
 
 impl Octal for Natural {
-    /// Converts a `Natural` to an octal `String`.
+    /// Converts a [`Natural`] to an octal [`String`].
     ///
     /// Using the `#` format flag prepends `"0o"` to the string.
     ///
@@ -519,9 +596,7 @@ impl Octal for Natural {
     /// assert_eq!(Natural::ZERO.to_octal_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_octal_string(), "173");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000")
-    ///         .unwrap()
-    ///         .to_octal_string(),
+    ///     Natural::from_str("1000000000000").unwrap().to_octal_string(),
     ///     "16432451210000"
     /// );
     /// assert_eq!(format!("{:07o}", Natural::from(123u32)), "0000173");
@@ -654,7 +729,7 @@ impl LowerHex for NaturalAlt2 {
 }
 
 impl LowerHex for Natural {
-    /// Converts a `Natural` to a hexadecimal `String` using lowercase characters.
+    /// Converts a [`Natural`] to a hexadecimal [`String`] using lowercase characters.
     ///
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///
@@ -677,9 +752,7 @@ impl LowerHex for Natural {
     /// assert_eq!(Natural::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_lower_hex_string(), "7b");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000")
-    ///         .unwrap()
-    ///         .to_lower_hex_string(),
+    ///     Natural::from_str("1000000000000").unwrap().to_lower_hex_string(),
     ///     "e8d4a51000"
     /// );
     /// assert_eq!(format!("{:07x}", Natural::from(123u32)), "000007b");
@@ -722,7 +795,7 @@ impl LowerHex for Natural {
 }
 
 impl UpperHex for Natural {
-    /// Converts a `Natural` to a hexadecimal `String` using uppercase characters.
+    /// Converts a [`Natural`] to a hexadecimal [`String`] using uppercase characters.
     ///
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///
@@ -745,9 +818,7 @@ impl UpperHex for Natural {
     /// assert_eq!(Natural::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_upper_hex_string(), "7B");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000")
-    ///         .unwrap()
-    ///         .to_upper_hex_string(),
+    ///     Natural::from_str("1000000000000").unwrap().to_upper_hex_string(),
     ///     "E8D4A51000"
     /// );
     /// assert_eq!(format!("{:07X}", Natural::from(123u32)), "000007B");

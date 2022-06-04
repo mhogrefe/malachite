@@ -4,15 +4,22 @@ use Rational;
 impl Square for Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by value.
+    /// Squares a [`Rational`], taking it by value.
+    ///
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -32,15 +39,22 @@ impl Square for Rational {
 impl<'a> Square for &'a Rational {
     type Output = Rational;
 
-    /// Squares a `Rational`, taking it by reference.
+    /// Squares a [`Rational`], taking it by reference.
+    ///
+    /// $$
+    /// f(x) = x^2.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
@@ -61,15 +75,22 @@ impl<'a> Square for &'a Rational {
 }
 
 impl SquareAssign for Rational {
-    /// Squares a `Rational` in place.
+    /// Squares a [`Rational`] in place.
+    ///
+    /// $$
+    /// x \gets x^2.
+    /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;

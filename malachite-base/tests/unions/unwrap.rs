@@ -1,4 +1,4 @@
-use malachite_base::unions::Union3;
+use extra_variadic::Union3;
 
 #[test]
 fn test_unwrap() {

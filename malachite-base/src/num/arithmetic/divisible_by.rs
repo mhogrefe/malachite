@@ -9,21 +9,21 @@ fn divisible_by_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> bool {
 macro_rules! impl_divisible_by_unsigned {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
-            /// Returns whether a value is divisible by another value; in other words, whether the
-            /// first value is a multiple of the second.
+            /// Returns whether a number is divisible by another number; in other words, whether
+            /// the first number is a multiple of the second.
             ///
             /// This means that zero is divisible by any number, including zero; but a nonzero
             /// number is never divisible by zero.
             ///
             /// $f(x, m) = (m|x)$.
             ///
-            /// $f(x, m) = (\exists k \in \N \ x = km)$.
+            /// $f(x, m) = (\exists k \in \N : x = km)$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::divisible_by` module.
+            /// See [here](super::divisible_by#divisible_by).
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
                 divisible_by_unsigned(self, other)
@@ -42,21 +42,21 @@ fn divisible_by_signed<T: PrimitiveSigned>(x: T, other: T) -> bool {
 macro_rules! impl_divisible_by_signed {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
-            /// Returns whether a value is divisible by another value; in other words, whether the
-            /// first value is a multiple of the second.
+            /// Returns whether a number is divisible by another number; in other words, whether
+            /// the first number is a multiple of the second.
             ///
             /// This means that zero is divisible by any number, including zero; but a nonzero
             /// number is never divisible by zero.
             ///
             /// $f(x, m) = (m|x)$.
             ///
-            /// $f(x, m) = (\exists k \in \Z \ x = km)$.
+            /// $f(x, m) = (\exists k \in \Z : \ x = km)$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::divisible_by` module.
+            /// See [here](super::divisible_by#divisible_by).
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
                 divisible_by_signed(self, other)

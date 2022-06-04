@@ -17,11 +17,12 @@ use platform::Limb;
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` rounded down to a multiple of 2<sup>`pow`</sup>.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -42,11 +43,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> 
 // limbs of the `Natural` rounded up to a multiple of 2<sup>`pow`</sup>. The limbs should not all
 // be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(xs.len(), pow / Limb::WIDTH)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -75,6 +77,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Ve
     out
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.s
 fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -102,11 +110,12 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: 
 // limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup>. If the original
 // value is exactly between two multiples, it is rounded to the one whose `pow`th bit is zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         xs.to_vec()
@@ -124,11 +133,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) 
 // format. If the original value is not already a multiple of the power of 2, and the
 // `RoundingMode` is `Exact`, `None` is returned. The limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2(
     xs: &[Limb],
     pow: u64,
@@ -155,11 +165,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2(
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the `Natural`, rounded down to a multiple of 2<sup>`pow`</sup>, to the input `Vec`.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(1)
+// $M(n) = O(1)$
 //
-// where n = `xs.len()`
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -178,11 +189,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb
 // limbs of the `Natural`, rounded up to a multiple of 2<sup>`pow`</sup>, to the input `Vec`. The
 // limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -207,6 +219,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>,
     }
 }}
 
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,
@@ -237,11 +255,12 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
 // `Vec`. If the original value is exactly between two multiples, it is rounded to the one whose
 // `pow`th bit is zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
     } else if !limbs_get_bit(xs, pow - 1) {
@@ -259,11 +278,12 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<L
 // of two, and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `false` is
 // returned. Otherwise, `true` is returned. The limbs should not all be zero.
 //
-// Time: worst case O(n)
+// # Worst-case complexity
+// $T(n) = O(n)$
 //
-// Additional memory: worst case O(n)
+// $M(n) = O(n)$
 //
-// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,
@@ -289,21 +309,45 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
 impl RoundToMultipleOfPowerOf2<u64> for Natural {
     type Output = Natural;
 
-    /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, taking
-    /// `self` by value.
+    /// Rounds a [`Natural`] to a multiple of $2^k$ according to a specified rounding mode. The
+    /// [`Natural`] is taken by value.
+    ///
+    /// Let $q = \frac{x}{2^k}$:
+    ///
+    /// $f(x, k, \mathrm{Down}) = f(x, k, \mathrm{Floor}) = 2^k \lfloor q \rfloor.$
+    ///
+    /// $f(x, k, \mathrm{Up}) = f(x, k, \mathrm{Ceiling}) = 2^k \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+    ///     2^k \lfloor q \rfloor & \text{if} \\quad
+    ///     q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     2^k \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     2^k \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     2^k \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by_power_of_2(pow)); x }`
+    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = max(self.significant_bits(), pow)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -311,7 +355,6 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -349,21 +392,45 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
 impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     type Output = Natural;
 
-    /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, taking
-    /// `self` by reference.
+    /// Rounds a [`Natural`] to a multiple of $2^k$ according to a specified rounding mode. The
+    /// [`Natural`] is taken by reference.
+    ///
+    /// Let $q = \frac{x}{2^k}$:
+    ///
+    /// $f(x, k, \mathrm{Down}) = f(x, k, \mathrm{Floor}) = 2^k \lfloor q \rfloor.$
+    ///
+    /// $f(x, k, \mathrm{Up}) = f(x, k, \mathrm{Ceiling}) = 2^k \lceil q \rceil.$
+    ///
+    /// $$
+    /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+    ///     2^k \lfloor q \rfloor & \text{if} \\quad
+    ///     q - \lfloor q \rfloor < \frac{1}{2} \\\\
+    ///     2^k \lceil q \rceil & \text{if} \\quad q - \lfloor q \rfloor > \frac{1}{2} \\\\
+    ///     2^k \lfloor q \rfloor &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+    ///     \\ \text{is even} \\\\
+    ///     2^k \lceil q \rceil &
+    ///     \text{if} \\quad q - \lfloor q \rfloor =
+    ///         \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor \\ \text{is odd.}
+    /// \end{cases}
+    /// $$
+    ///
+    /// $f(x, k, \mathrm{Exact}) = 2^k q$, but panics if $q \notin \Z$.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
-    /// `{ assert!(x.divisible_by_power_of_2(pow)); x }`
+    /// - `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+    /// - `{ assert!(x.divisible_by_power_of_2(pow)); x }`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = max(self.significant_bits(), pow)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -371,7 +438,6 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -418,21 +484,24 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
 }
 
 impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
-    /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, in
-    /// place.
+    /// Rounds a [`Natural`] to a multiple of $2^k$ in place, according to a specified rounding
+    /// mode.
+    ///
+    /// See the [`RoundToMultipleOfPowerOf2`](RoundToMultipleOfPowerOf2) documentation for details.
     ///
     /// The following two expressions are equivalent:
-    ///
-    /// `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
-    /// `assert!(x.divisible_by_power_of_2(pow));`
+    /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
+    /// - `assert!(x.divisible_by_power_of_2(pow));`
     ///
     /// but the latter should be used as it is clearer and more efficient.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = max(self.significant_bits(), pow)
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -440,7 +509,6 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
     /// use malachite_base::rounding_modes::RoundingMode;

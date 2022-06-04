@@ -1,11 +1,13 @@
+use extra_variadic::lex_union3s;
+use extra_variadic::Union3;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
-use malachite_base::unions::exhaustive::{lex_union2s, lex_union3s};
-use malachite_base::unions::{Union2, Union3};
+use malachite_base::unions::exhaustive::lex_union2s;
+use malachite_base::unions::Union2;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;

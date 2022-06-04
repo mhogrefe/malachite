@@ -3,18 +3,30 @@ use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
 
 impl PartialOrdAbs for Integer {
-    /// Compares the absolute value of an `Integer` to the absolute value of another `Integer`.
+    /// Compares the absolute values of two [`Integer`]s.
     ///
-    /// Time: worst case O(n)
+    /// See the documentation for the
+    /// [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) implementation.
+    #[inline]
+    fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
+        Some(self.cmp_abs(other))
+    }
+}
+
+impl OrdAbs for Integer {
+    /// Compares the absolute values of two [`Integer`]s.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
@@ -24,14 +36,6 @@ impl PartialOrdAbs for Integer {
     /// assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
     /// assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
     /// ```
-    #[inline]
-    fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
-        Some(self.cmp_abs(other))
-    }
-}
-
-/// Asserts that `Integer` absolute value ordering is a total order.
-impl OrdAbs for Integer {
     fn cmp_abs(&self, other: &Integer) -> Ordering {
         self.abs.cmp(&other.abs)
     }

@@ -5,31 +5,35 @@ use natural::Natural;
 impl SaturatingSub<Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second
-    /// `Natural` is greater than the first, returns zero.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning 0 if the
+    /// result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSub;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSub};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)).to_string(), "0");
-    /// assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO).to_string(), "123");
-    /// assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)), 0);
+    /// assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO), 123);
+    /// assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)), 333);
     /// assert_eq!(
-    ///     (Natural::trillion() * Natural::from(3u32))
-    ///         .saturating_sub(Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
+    ///             .saturating_sub(Natural::from(10u32).pow(12)),
+    ///     2000000000000u64
     /// );
     /// ```
     #[inline]
@@ -41,31 +45,35 @@ impl SaturatingSub<Natural> for Natural {
 impl<'a> SaturatingSub<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
-    /// `Natural` by reference. If the second `Natural` is greater than the first, returns zero.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSub;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSub};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)).to_string(), "0");
-    /// assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO).to_string(), "123");
-    /// assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)), 0);
+    /// assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO), 123);
+    /// assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)), 333);
     /// assert_eq!(
-    ///     (Natural::trillion() * Natural::from(3u32))
-    ///         .saturating_sub(&Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     (Natural::from(10u32).pow(12) * Natural::from(3u32))
+    ///             .saturating_sub(&Natural::from(10u32).pow(12)),
+    ///     2000000000000u64
     /// );
     /// ```
     #[inline]
@@ -77,32 +85,35 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
 impl<'a> SaturatingSub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-    /// `Natural` by value. If the second `Natural` is greater than the first, returns zero.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
+    /// second by value and returning 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSub;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSub};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).saturating_sub(Natural::from(123u32)).to_string(), "0");
-    /// assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)).to_string(),
-    ///     "333");
+    /// assert_eq!((&Natural::ZERO).saturating_sub(Natural::from(123u32)), 0);
+    /// assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO), 123);
+    /// assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)), 333);
     /// assert_eq!(
-    ///     (&(Natural::trillion() * Natural::from(3u32)))
-    ///         .saturating_sub(Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
+    ///         .saturating_sub(Natural::from(10u32).pow(12)),
+    ///     2000000000000u64
     /// );
     /// ```
     #[inline]
@@ -114,32 +125,35 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
 impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference. If the second
-    /// `Natural` is greater than the first, returns zero.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by reference and returning 0 if
+    /// the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// f(x, y) = \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SaturatingSub;
+    /// use malachite_base::num::arithmetic::traits::{Pow, SaturatingSub};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::ZERO).saturating_sub(&Natural::from(123u32)).to_string(), "0");
-    /// assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO).to_string(), "123");
-    /// assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)).to_string(),
-    ///     "333");
+    /// assert_eq!((&Natural::ZERO).saturating_sub(&Natural::from(123u32)), 0);
+    /// assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO), 123);
+    /// assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)), 333);
     /// assert_eq!(
-    ///     (&(Natural::trillion() * Natural::from(3u32)))
-    ///         .saturating_sub(&Natural::trillion()).to_string(),
-    ///     "2000000000000"
+    ///     (&(Natural::from(10u32).pow(12) * Natural::from(3u32)))
+    ///             .saturating_sub(&Natural::from(10u32).pow(12)),
+    ///     2000000000000u64
     /// );
     /// ```
     #[inline]
@@ -149,14 +163,19 @@ impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
 }
 
 impl SaturatingSubAssign<Natural> for Natural {
-    /// Subtracts a `Natural` from another `Natural` in place, taking the `Natural` by value,
-    /// returning zero if the second `Natural` is greater than the first.
+    /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by value and setting the left-hand side to 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is greater than `self`.
@@ -164,7 +183,6 @@ impl SaturatingSubAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -172,19 +190,19 @@ impl SaturatingSubAssign<Natural> for Natural {
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(Natural::from(123u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(Natural::ZERO);
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(x, 123);
     ///
     /// let mut x = Natural::from(456u32);
     /// x.saturating_sub_assign(Natural::from(123u32));
-    /// assert_eq!(x.to_string(), "333");
+    /// assert_eq!(x, 333);
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(Natural::from(456u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     /// ```
     #[inline]
     fn saturating_sub_assign(&mut self, other: Natural) {
@@ -195,14 +213,19 @@ impl SaturatingSubAssign<Natural> for Natural {
 }
 
 impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
-    /// Subtracts a `Natural` from another `Natural` in place, taking the `Natural` by reference,
-    /// returning zero if the second `Natural` is greater than the first.
+    /// Subtracts a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
+    /// right-hand side by reference and setting the left-hand side to 0 if the result is negative.
     ///
-    /// Time: worst case O(n)
+    /// $$
+    /// x \gets \max(x - y, 0).
+    /// $$
     ///
-    /// Additional memory: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// where n = `self.significant_bits()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `other` is greater than `self`.
@@ -210,7 +233,6 @@ impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
     /// use malachite_base::num::basic::traits::Zero;
@@ -218,19 +240,19 @@ impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(&Natural::from(123u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(&Natural::ZERO);
-    /// assert_eq!(x.to_string(), "123");
+    /// assert_eq!(x, 123);
     ///
     /// let mut x = Natural::from(456u32);
     /// x.saturating_sub_assign(&Natural::from(123u32));
-    /// assert_eq!(x.to_string(), "333");
+    /// assert_eq!(x, 333);
     ///
     /// let mut x = Natural::from(123u32);
     /// x.saturating_sub_assign(&Natural::from(456u32));
-    /// assert_eq!(x.to_string(), "0");
+    /// assert_eq!(x, 0);
     /// ```
     #[inline]
     fn saturating_sub_assign(&mut self, other: &'a Natural) {

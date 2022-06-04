@@ -53,14 +53,17 @@ where
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Rational {
-            /// Compares the absolute value of a `Rational` to the absolute value of a value of
-            /// unsigned primitive integer type.
+            /// Compares the absolute values of a [`Rational`] and an unsigned primitive integer.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_int` module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_abs_unsigned(self, other)
@@ -68,14 +71,16 @@ macro_rules! impl_unsigned {
         }
 
         impl PartialOrdAbs<Rational> for $t {
-            /// Compares the absolute value of a value of unsigned primitive integer type to the
-            /// absolute value of a `Rational`.
+            /// Compares the absolute values of an unsigned primitive integer and a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
             ///
-            /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_int` module.
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+            ///
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)
@@ -138,14 +143,17 @@ where
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Rational {
-            /// Compares the absolute value of a `Rational` to the absolute value of a value of
-            /// signed primitive integer type.
+            /// Compares the absolute values of a [`Rational`] and a signed primitive integer.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_int` module.
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_abs_signed(self, other)
@@ -153,14 +161,16 @@ macro_rules! impl_signed {
         }
 
         impl PartialOrdAbs<Rational> for $t {
-            /// Compares the absolute value of a value of signed primitive integer type to the
-            /// absolute value of a `Rational`.
+            /// Compares the absolute values of a signed primitive integer and a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n \log n \log\log n)$
             ///
-            /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_int` module.
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+            ///
+            /// See [here](super::partial_cmp_abs_primitive_int#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

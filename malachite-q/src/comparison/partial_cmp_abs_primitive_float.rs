@@ -6,14 +6,18 @@ use Rational;
 macro_rules! impl_float {
     ($t: ident) => {
         impl PartialOrdAbs<$t> for Rational {
-            /// Compares the absolute value of a `Rational` to the absolute value of a value of
-            /// primitive float type.
+            /// Compares the absolute values of a [`Rational`] and a primitive float.
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
+            ///
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.significant_bits(), other.sci_exponent())`.
             ///
             /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_float` module.
+            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 if other.is_nan() {
                     None
@@ -35,14 +39,17 @@ macro_rules! impl_float {
         }
 
         impl PartialOrdAbs<Rational> for $t {
-            /// Compares the absolute value of a value of primitive float type to the absolute
-            /// value of a `Rational`.
+            /// Compares the absolute values of a primitive float and a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// TODO
+            /// $T(n) = O(n \log n \log\log n)$
             ///
-            /// # Examples
-            /// See the documentation of the `comparison::partial_cmp_abs_primitive_float` module.
+            /// $M(n) = O(n \log n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `max(self.sci_exponent(), other.significant_bits())`.
+            ///
+            /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             #[inline]
             fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

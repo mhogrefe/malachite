@@ -86,49 +86,9 @@ fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
     }
 }
 
-impl ApproximateAssign for Rational {
-    /// Finds the best approximation of a `Rational` using a denominator no greater than a
-    /// specified maximum, mutating the `Rational` in place.
-    ///
-    /// See `Rational::approximate` for more information.
-    ///
-    /// # Worst-case complexity
-    /// TODO
-    ///
-    /// # Panics
-    /// - If `max_denominator` is zero.
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_nz;
-    /// extern crate malachite_q;
-    ///
-    /// use malachite_nz::natural::Natural;
-    /// use malachite_q::arithmetic::traits::ApproximateAssign;
-    /// use malachite_q::Rational;
-    ///
-    /// let mut x = Rational::from(std::f64::consts::PI);
-    /// x.approximate_assign(&Natural::from(1000u32));
-    /// assert_eq!(x.to_string(), "355/113");
-    ///
-    /// let mut x = Rational::from_signeds(333i32, 1000);
-    /// x.approximate_assign(&Natural::from(100u32));
-    /// assert_eq!(x.to_string(), "1/3");
-    /// ```
-    fn approximate_assign(&mut self, max_denominator: &Natural) {
-        assert_ne!(*max_denominator, 0);
-        if self.denominator_ref() <= max_denominator {
-        } else if *max_denominator == 1u32 {
-            *self = Rational::from(Integer::rounding_from(&*self, RoundingMode::Nearest));
-        } else {
-            *self = approximate_helper(&*self, max_denominator);
-        }
-    }
-}
-
 impl Approximate for Rational {
-    /// Finds the best approximation of a `Rational` using a denominator no greater than a
-    /// specified maximum, taking the `Rational` by value.
+    /// Finds the best approximation of a [`Rational`] using a denominator no greater than a
+    /// specified maximum, taking the [`Rational`] by value.
     ///
     /// Let $f(x, d) = p/q$, with $p$ and $q$ relatively prime. Then the following properties hold:
     /// - $q \leq d$
@@ -137,7 +97,12 @@ impl Approximate for Rational {
     /// - If $|x - n/q| = |x - p/q|$, then $p$ is even and $n$ is either equal to $p$ or odd.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n^2 \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// - If `max_denominator` is zero.
@@ -145,7 +110,6 @@ impl Approximate for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::arithmetic::traits::Approximate;
@@ -180,8 +144,8 @@ impl Approximate for Rational {
 }
 
 impl<'a> Approximate for &'a Rational {
-    /// Finds the best approximation of a `Rational` using a denominator no greater than a
-    /// specified maximum, taking the `Rational` by reference.
+    /// Finds the best approximation of a [`Rational`] using a denominator no greater than a
+    /// specified maximum, taking the [`Rational`] by reference.
     ///
     /// Let $f(x, d) = p/q$, with $p$ and $q$ relatively prime. Then the following properties hold:
     /// - $q \leq d$
@@ -190,7 +154,12 @@ impl<'a> Approximate for &'a Rational {
     /// - If $|x - n/q| = |x - p/q|$, then $p$ is even and $n$ is either equal to $p$ or odd.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n^2 \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// - If `max_denominator` is zero.
@@ -198,7 +167,6 @@ impl<'a> Approximate for &'a Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_nz;
-    /// extern crate malachite_q;
     ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::arithmetic::traits::Approximate;
@@ -206,12 +174,12 @@ impl<'a> Approximate for &'a Rational {
     ///
     /// assert_eq!(
     ///     (&Rational::from(std::f64::consts::PI)).approximate(&Natural::from(1000u32))
-    ///         .to_string(),
+    ///             .to_string(),
     ///     "355/113"
     /// );
     /// assert_eq!(
     ///     (&Rational::from_signeds(333i32, 1000)).approximate(&Natural::from(100u32))
-    ///         .to_string(),
+    ///             .to_string(),
     ///     "1/3"
     /// );
     /// ```
@@ -231,5 +199,49 @@ impl<'a> Approximate for &'a Rational {
             return Rational::from(Integer::rounding_from(self, RoundingMode::Nearest));
         }
         approximate_helper(self, max_denominator)
+    }
+}
+
+impl ApproximateAssign for Rational {
+    /// Finds the best approximation of a [`Rational`] using a denominator no greater than a
+    /// specified maximum, mutating the [`Rational`] in place.
+    ///
+    /// See [`Rational::approximate`] for more information.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2 \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// - If `max_denominator` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_q::arithmetic::traits::ApproximateAssign;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Rational::from(std::f64::consts::PI);
+    /// x.approximate_assign(&Natural::from(1000u32));
+    /// assert_eq!(x.to_string(), "355/113");
+    ///
+    /// let mut x = Rational::from_signeds(333i32, 1000);
+    /// x.approximate_assign(&Natural::from(100u32));
+    /// assert_eq!(x.to_string(), "1/3");
+    /// ```
+    fn approximate_assign(&mut self, max_denominator: &Natural) {
+        assert_ne!(*max_denominator, 0);
+        if self.denominator_ref() <= max_denominator {
+        } else if *max_denominator == 1u32 {
+            *self = Rational::from(Integer::rounding_from(&*self, RoundingMode::Nearest));
+        } else {
+            *self = approximate_helper(&*self, max_denominator);
+        }
     }
 }

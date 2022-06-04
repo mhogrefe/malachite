@@ -1,13 +1,10 @@
 use std::str::FromStr;
 
-/// Converts a `&str` to an `Option<T>`, where `T` implements `FromStr`.
+/// Converts a string to an `Option<T>`, where `T` implements [`FromStr`].
 ///
-/// If the `&str` does not represent a valid `Option<T>`, `None` is returned.
+/// If the string does not represent a valid `Option<T>`, `None` is returned.
 ///
-/// If `T` does not implement `FromStr`, try using `option_from_str_custom` instead.
-///
-/// # Worst-case complexity
-/// Same time and additional memory complexity as `T::from_str`.
+/// If `T` does not implement [`FromStr`], try using [`option_from_str_custom`] instead.
 ///
 /// # Examples
 /// ```
@@ -24,14 +21,12 @@ pub fn option_from_str<T: FromStr>(src: &str) -> Option<Option<T>> {
     option_from_str_custom(&(|t| t.parse().ok()), src)
 }
 
-/// Converts a `&str` to an `Option<T>`, given a function to parse a `&str` into a `T`.
+/// Converts a string to an `Option<T>`, given a function to parse a string into a `T`.
 ///
-/// If the `&str` does not represent a valid `Option<T>`, `None` is returned.
+/// If the string does not represent a valid `Option<T>`, `None` is returned.
 ///
-/// If `f` just uses `T::from_str`, you can use `option_from_str` instead.
-///
-/// # Worst-case complexity
-/// Same time and additional memory complexity as `f`.
+/// If `f` just uses the [`FromStr`] implementation on `T`, you can use [`option_from_str`]
+/// instead.
 ///
 /// # Examples
 /// ```
@@ -66,7 +61,7 @@ pub fn option_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Op
     }
 }
 
-/// Iterators that generate `Option`s without repetition.
+/// Iterators that generate [`Option`]s without repetition.
 pub mod exhaustive;
-/// Iterators that generate `Option`s randomly.
+/// Iterators that generate [`Option`]s randomly.
 pub mod random;

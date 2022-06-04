@@ -1,20 +1,22 @@
 use integer::Integer;
 
 impl Integer {
-    /// Returns the number of trailing zeros in the binary expansion of an `Integer` (equivalently,
-    /// the multiplicity of 2 in its prime factorization) or `None` is the `Integer` is 0.
+    /// Returns the number of trailing zeros in the binary expansion of an [`Integer`]
+    /// (equivalently, the multiplicity of 2 in its prime factorization), or `None` is the
+    /// [`Integer`] is 0.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = `self.significant_bits()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
@@ -22,7 +24,7 @@ impl Integer {
     /// assert_eq!(Integer::from(3).trailing_zeros(), Some(0));
     /// assert_eq!(Integer::from(-72).trailing_zeros(), Some(3));
     /// assert_eq!(Integer::from(100).trailing_zeros(), Some(2));
-    /// assert_eq!((-Integer::trillion()).trailing_zeros(), Some(12));
+    /// assert_eq!((-Integer::from(10u32).pow(12)).trailing_zeros(), Some(12));
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         self.abs.trailing_zeros()

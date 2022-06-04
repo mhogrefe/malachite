@@ -1,17 +1,10 @@
 use num::arithmetic::traits::{
-    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
-    OverflowingMul, UnsignedAbs, WrappingAdd, WrappingMul,
+    OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn overflowing_add_mul_unsigned<
-    T: OverflowingAdd<T, Output = T> + OverflowingMul<T, Output = T>,
->(
-    x: T,
-    y: T,
-    z: T,
-) -> (T, bool) {
+fn overflowing_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, bool) {
     let (product, overflow_1) = y.overflowing_mul(z);
     let (result, overflow_2) = x.overflowing_add(product);
     (result, overflow_1 | overflow_2)
@@ -22,17 +15,17 @@ macro_rules! impl_overflowing_add_mul_unsigned {
         impl OverflowingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Calculates $x + yz$.
+            /// Adds a number and the product of two other numbers.
             ///
-            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
-            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// Returns a tuple containing the result and a boolean indicating whether an
+            /// arithmetic overflow occured. If an overflow occurred, then the wrapped value is
             /// returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
+            /// See [here](super::overflowing_add_mul#overflowing_add_mul).
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
                 overflowing_add_mul_unsigned(self, y, z)
@@ -40,16 +33,16 @@ macro_rules! impl_overflowing_add_mul_unsigned {
         }
 
         impl OverflowingAddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`.
+            /// Adds a number and the product of two other numbers, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
+            /// See [here](super::overflowing_add_mul#overflowing_add_mul_assign).
             #[inline]
             fn overflowing_add_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let (product, overflow) = y.overflowing_mul(z);
@@ -61,16 +54,8 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
 fn overflowing_add_mul_signed<
-    U: PrimitiveInt,
-    S: Copy
-        + Eq
-        + Ord
-        + OverflowingAdd<S, Output = S>
-        + OverflowingMul<S, Output = S>
-        + UnsignedAbs<Output = U>
-        + WrappingAdd<S, Output = S>
-        + WrappingMul<S, Output = S>
-        + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: S,
     y: S,
@@ -109,17 +94,17 @@ macro_rules! impl_overflowing_add_mul_signed {
         impl OverflowingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Calculates $x + yz$.
+            /// Adds a number and the product of two other numbers.
             ///
-            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
-            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// Returns a tuple containing the result and a boolean indicating whether an
+            /// arithmetic overflow occurred. If an overflow occurred, then the wrapped value is
             /// returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
+            /// See [here](super::overflowing_add_mul#overflowing_add_mul).
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
                 overflowing_add_mul_signed(self, y, z)
@@ -127,16 +112,16 @@ macro_rules! impl_overflowing_add_mul_signed {
         }
 
         impl OverflowingAddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`.
+            /// Adds a number and the product of two other numbers, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
+            /// overflow occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
+            /// See [here](super::overflowing_add_mul#overflowing_add_mul_assign).
             #[inline]
             fn overflowing_add_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let overflow;

@@ -10,7 +10,7 @@ use num::logic::traits::CheckedHammingDistance;
 use num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use std::ops::Neg;
 
-/// This trait defines functions on primitive signed integral types: ixx and isize.
+/// Defines functions on primitive signed integer types: ixx and isize.
 pub trait PrimitiveSigned:
     Abs<Output = Self>
     + AbsAssign
@@ -41,15 +41,15 @@ pub trait PrimitiveSigned:
 {
 }
 
-/// This macro defines basic trait implementations for signed types.
+/// Defines basic trait implementations for signed types.
 macro_rules! impl_basic_traits {
     ($s: ident) => {
         impl PrimitiveSigned for $s {}
 
         /// The constant -1.
         ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
+        /// # Examples
+        /// See [here](self).
         impl NegativeOne for $s {
             const NEGATIVE_ONE: $s = -1;
         }

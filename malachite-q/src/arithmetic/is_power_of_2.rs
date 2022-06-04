@@ -2,7 +2,9 @@ use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use Rational;
 
 impl IsPowerOf2 for Rational {
-    /// Determines whether a `Rational` is an integer power of 2.
+    /// Determines whether a [`Rational`] is an integer power of 2.
+    ///
+    /// $f(x) = (\exists n \in \Z : 2^n = x)$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -14,7 +16,6 @@ impl IsPowerOf2 for Rational {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_q;
     ///
     /// use malachite_base::num::arithmetic::traits::IsPowerOf2;
     /// use malachite_q::Rational;
