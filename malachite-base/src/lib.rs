@@ -1,4 +1,5 @@
-//! This crate contains many utilities that are used by the `malachite-nz` and `malachite-q`
+//! This crate contains many utilities that are used by the
+//! [`malachite-nz`](https://docs.rs/malachite-nz/0.2.1/malachite_nz/) and `malachite-q`
 //! crates. These utilities include
 //! - Traits that wrap functions from the standard library, like
 //!   [`CheckedAdd`](num::arithmetic::traits::CheckedAdd).
@@ -56,7 +57,7 @@
 //! # Features
 //! - `test_build`: A large proportion of the code in this crate is only used for testing. For a
 //!   typical user, building this code would result in an unnecessarily long compilation time and
-//!   an unnecessarily large binary. Much of it is also used for testing `malachite-nz` and
+//!   an unnecessarily large binary. Much of it is also used for testing [`malachite-nz`](https://docs.rs/malachite-nz/0.2.1/malachite_nz/) and
 //!   `malachite-q`, so it can't just be confined to the `tests` directory. My solution is to only
 //!   build this code when the `test_build` feature is enabled. If you want to run unit tests, you
 //!   must enable `test_build`. However, doctests don't require it, since they only test the public
