@@ -248,7 +248,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// provided as a float. If the mantissa is outside the range $[1, 2)$, `None` is
             /// returned.
             ///
-            /// All finite floats can be represented using `Rational`s, so no rounding is needed.
+            /// All finite floats can be represented using [`Rational`]s, so no rounding is needed.
             ///
             /// $$
             /// f(x) \approx 2^{e_s}m_s.
@@ -348,7 +348,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// provided as a float. If the mantissa is outside the range $[1, 2)$, `None` is
             /// returned.
             ///
-            /// All finite floats can be represented using `Rational`s, so no rounding is needed.
+            /// All finite floats can be represented using [`Rational`]s, so no rounding is needed.
             ///
             /// $$
             /// f(x) \approx 2^{e_s}m_s.

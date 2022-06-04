@@ -104,7 +104,7 @@ pub fn exhaustive_non_negative_rationals() -> Chain<Once<Rational>, ExhaustivePo
     once(Rational::ZERO).chain(exhaustive_positive_rationals())
 }
 
-/// Generates all negative `Rational`s.
+/// Generates all negative [`Rational`]s.
 ///
 /// This `struct` is created by [`exhaustive_negative_rationals`]; see its documentation for more.
 #[derive(Clone, Debug)]

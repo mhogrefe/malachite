@@ -169,7 +169,7 @@ impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
     }
 }
 
-/// Generates random negative `Rational`s with a specified numerator and denominator mean bit
+/// Generates random negative [`Rational`]s with a specified numerator and denominator mean bit
 /// length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is

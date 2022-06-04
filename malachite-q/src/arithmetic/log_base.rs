@@ -14,7 +14,7 @@ fn approx_log_helper(x: &Rational) -> f64 {
 }
 
 impl Rational {
-    /// Calculates the approximate natural logarithm of a positive `Rational`.
+    /// Calculates the approximate natural logarithm of a positive [`Rational`].
     ///
     /// $f(x) = (1+\epsilon)(\log x)$, where $|\epsilon| < 2^{-52}.$
     ///

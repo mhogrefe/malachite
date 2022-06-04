@@ -112,7 +112,7 @@ impl Rational {
     /// This method allows the function to convert `"0.333"` to $1/3$, since $1/3$ is the simplest
     /// [`Rational`] in the interval $[0.3325, 0.3335]$. But note that if the scale of the input is
     /// low, some unexpected behavior may occur. For example, `"0.1"` will be converted into $1/7$
-    /// rather than $1/10$, since $1/7$ is the simplest `Rational` in $[0.05, 0.15]$. If you'd
+    /// rather than $1/10$, since $1/7$ is the simplest [`Rational`] in $[0.05, 0.15]$. If you'd
     /// prefer that result be $1/10$, you have a few options:
     /// - Use [`from_sci_string_with_options`](Rational::from_sci_string_with_options) instead.
     ///   This function interprets its input literally; it converts `"0.333"` to $333/1000$.
@@ -197,7 +197,7 @@ impl Rational {
     /// This method allows the function to convert `"0.333"` to $1/3$, since $1/3$ is the simplest
     /// [`Rational`] in the interval $[0.3325, 0.3335]$. But note that if the scale of the input is
     /// low, some unexpected behavior may occur. For example, `"0.1"` will be converted into $1/7$
-    /// rather than $1/10$, since $1/7$ is the simplest `Rational` in $[0.05, 0.15]$. If you'd
+    /// rather than $1/10$, since $1/7$ is the simplest [`Rational`] in $[0.05, 0.15]$. If you'd
     /// prefer that result be $1/10$, you have a few options:
     /// - Use [`from_sci_string`](Rational::from_sci_string) instead. This function interprets its
     ///   input literally; it converts `"0.333"` to $333/1000$.

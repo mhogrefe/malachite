@@ -7,7 +7,7 @@ impl Rational {
     ///
     /// To be more specific: Suppose the floating-point input is $x$. If $x$ is an integer, its
     /// [`Rational`] equivalent is returned. Otherwise, this function finds $a$ and $b$, which are
-    /// the floating point predecessor and successor of $x$, and finds the simplest `Rational` in
+    /// the floating point predecessor and successor of $x$, and finds the simplest [`Rational`] in
     /// the open interval $(\frac{x + a}{2}, \frac{x + b}{2})$. "Simplicity" refers to low
     /// complexity. See [`Rational::cmp_complexity`] for a definition of complexity.
     ///

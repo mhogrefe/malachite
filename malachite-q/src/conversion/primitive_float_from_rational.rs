@@ -181,7 +181,7 @@ macro_rules! float_impls {
         }
 
         impl CheckedFrom<Rational> for $f {
-            /// Converts a `Rational` to a primitive float, taking the [`Rational`] by value. If
+            /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by value. If
             /// the input isn't exactly equal to any float, `None` is returned.
             ///
             /// # Worst-case complexity
@@ -411,7 +411,7 @@ macro_rules! float_impls {
         }
 
         impl<'a> CheckedFrom<&'a Rational> for $f {
-            /// Converts a `Rational` to a primitive float, taking the [`Rational`] by reference.
+            /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by reference.
             /// If the input isn't exactly equal to any float, `None` is returned.
             ///
             /// # Worst-case complexity

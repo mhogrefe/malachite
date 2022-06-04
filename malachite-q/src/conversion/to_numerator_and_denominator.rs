@@ -2,7 +2,7 @@ use malachite_nz::natural::Natural;
 use Rational;
 
 impl Rational {
-    /// Extracts the numerator of a [`Rational`], taking the `Rational` by reference and cloning.
+    /// Extracts the numerator of a [`Rational`], taking the [`Rational`] by reference and cloning.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -24,7 +24,8 @@ impl Rational {
         self.numerator.clone()
     }
 
-    /// Extracts the denominator of a [`Rational`], taking the `Rational` by reference and cloning.
+    /// Extracts the denominator of a [`Rational`], taking the [`Rational`] by reference and
+    /// cloning.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
