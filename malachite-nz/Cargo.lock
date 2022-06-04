@@ -186,6 +186,8 @@ checksum = "349d5a591cd28b49e1d1037471617a32ddcda5731b99419008085f72d5a53836"
 [[package]]
 name = "malachite-base"
 version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7eb9ea481c635afc9b263b4c9918954caae3257dc5434cf1cce20f7923d5718c"
 dependencies = [
  "clap",
  "gnuplot",
@@ -199,7 +201,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "embed-doc-image",
  "itertools",

@@ -1,6 +1,6 @@
 [package]
 name = "malachite-base"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "A collection of utilities, including new arithmetic traits and iterators that generate all values of a type"
@@ -43,5 +43,5 @@ strip = true
 [dev-dependencies]
 maplit = "1.0.2"
 
-[badges]
-maintenance = { status = "actively-maintained" }
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]

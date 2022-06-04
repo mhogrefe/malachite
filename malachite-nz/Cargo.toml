@@ -1,6 +1,6 @@
 [package]
 name = "malachite-nz"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "The bignum types Natural and Integer, with efficient algorithms partially derived from GMP"
@@ -22,7 +22,7 @@ path = "src/bin.rs"
 [dependencies]
 embed-doc-image = "0.1.4"
 itertools = "0.9.0"
-malachite-base = { path = "../malachite-base" }
+malachite-base = "0.2.1"
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }
@@ -39,6 +39,7 @@ doc-images = []
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
 # ensure that it will render any images that we may have in inner attribute documentation.
 features = ["doc-images"]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 [profile.release]
 lto = true
