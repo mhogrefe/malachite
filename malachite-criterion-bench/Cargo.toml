@@ -1,6 +1,6 @@
 [package]
 name = "malachite-criterion-bench"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 autobenches = false
 
