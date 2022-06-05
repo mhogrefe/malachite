@@ -1,3 +1,7 @@
+<head>
+  <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+
 <p align="center">
   <img width="650" src="assets/logo-and-name.svg" alt="Logo">
 </p>
