@@ -62,13 +62,13 @@ Malachite uses a divide-and-conquer algorithm that takes $$O(n (\log n)^2 \log \
   <img width="650" src="/assets/benchmarks/2022-06-04-n-mul.svg" alt="Natural multiplication">
 </p>
 
-For multiplying two natural numbers, `num` uses, a basecase quadratic algorithm for small inputs,
+For multiplying two natural numbers, `num` uses a basecase quadratic algorithm for small inputs,
 then [Toom-22](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication) (Karatsuba)
 multiplication for larger inputs, and finally Toom-33 for the largest ones. This means that
 multiplication takes $$O(n^{\log_3 5}) \approx O(n^{1.465})$$ time.
 
 Malachite also uses a basecase quadratic algorithm, then 13 variants of Toom-Cook multiplication,
-and finally [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm) for the largest inputs, achieving $$O(n (\log n)^2 \log \log n)$$
+and finally [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm) for the largest inputs, achieving $$O(n \log n \log \log n)$$
 time.
 
 Given all of this machinery, it's a little disappointing that the Malachite isn't much faster at
@@ -80,5 +80,16 @@ For numbers of up to 1000 bits, all three libraries are about equally fast:
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-n-mul-small.svg" alt="Natural multiplication">
 </p>
+
+## Natural addition
+
+<p align="center">
+  <img width="650" src="/assets/benchmarks/2022-06-04-n-add.svg" alt="Natural addition">
+</p>
+
+Addition of natural numbers is fast for all three libraries, being a straightforward and
+linear-time affair. Interestingly, `rug` is the slowest of the bunch. I find it hard to
+believe that GMP is slower than `num` or Malachite, so maybe there's some overhead
+associated with FFI.
 
 Copyright © 2022 Mikhail Hogrefe
