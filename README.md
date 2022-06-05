@@ -1,6 +1,4 @@
-<p align="center">
-  <img width="500" src="docs/assets/logo-and-name.svg" alt="Logo">
-</p>
+<img width="500" src="docs/assets/logo-and-name.svg" alt="Logo">
 
 An arbitrary-precision arithmetic library for Rust.
 
