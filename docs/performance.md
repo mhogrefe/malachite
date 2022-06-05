@@ -50,7 +50,7 @@ O(n log n log log n) time.
 ## Converting a Natural to a string
 
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2022-06-04-n-to-string.svg" alt="Natural to string">
+  <img width="650" src="/assets/benchmarks/2022-06-04-n-to_string.svg" alt="Natural to string">
 </p>
 
 When converting a Natural to a string, `num` uses...
