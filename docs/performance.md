@@ -46,3 +46,13 @@ also quadratic. Malachite, again following GMP, uses several division algorithms
 input size. For the largest inputs, it uses a kind of
 [Barrett reduction](https://en.wikipedia.org/wiki/Barrett_reduction), which takes
 O(n log n log log n) time.
+
+## Converting a Natural to a string
+
+<p align="center">
+  <img width="650" src="/assets/benchmarks/2022-06-04-n-to-string.svg" alt="Natural to string">
+</p>
+
+When converting a Natural to a string, `num` uses...
+
+Copyright © 2022 Mikhail Hogrefe
