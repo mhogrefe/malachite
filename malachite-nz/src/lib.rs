@@ -25,7 +25,7 @@
 //!   13 variants of
 //!   [Toom-Cook multiplication](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication),
 //!   or
-//!   [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Sch%C3%B6nhage%E2%80%93Strassen_algorithm),
+//!   [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm),
 //!   depending on the input size.
 //! - Small numbers are also handled efficiently. Any [`Natural`](natural::Natural) smaller than
 //!   $2^{64}$ does not use any allocated memory, and working with such numbers is almost as fast

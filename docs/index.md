@@ -19,7 +19,7 @@ Malachite comes in three crates.
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html);
   - Iterator-producing functions that let you generate values for testing.
 - **malachite-nz** ([crates.io](https://crates.io/crates/malachite-nz),
-  [docs.rs](https://docs.rs/  malachite-base/latest/malachite_nz/)) defines two bignum types,
+  [docs.rs](https://docs.rs/malachite-nz/latest/malachite_nz/)) defines two bignum types,
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s and
   [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)s. The
   functions defined on these types include
@@ -44,7 +44,7 @@ Malachite comes in three crates.
     [`BitAnd`](https://doc.rust-lang.org/nightly/core/ops/trait.BitAnd.html) and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
 - **malachite-q** ([crates.io](https://crates.io/crates/malachite-q),
-  [docs.rs](https://docs.rs/  malachite-base/latest/malachite_q/)) defines
+  [docs.rs](https://docs.rs/malachite-q/latest/malachite_q/)) defines
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The
   functions defined on this type include
   - All the ones you'd expect, like addition, subtraction, multiplication, and division;

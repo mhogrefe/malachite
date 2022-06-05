@@ -39,7 +39,7 @@ and integers, ℕ and ℤ.
   13 variants of
   [Toom-Cook multiplication](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication),
   or
-  [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/C3%B6nhage%E2%80%93Strassen_algorithm),
+  [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm),
   depending on the input size.
 - Small numbers are also handled efficiently. Any
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) smaller
@@ -79,7 +79,7 @@ and integers, ℕ and ℤ.
 
   Now consider what happens when evaluating the expression `&x + &y + &z`, where each [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) has
   _n_ bits. Malachite must allocate about _n_ bits for the result, but what about the intermediate
-  sum `&x + &y`? Does Malachite need to allocate another _n_ bits for that, for a total of 2_n_
+  sum `&x + &y`? Does Malachite need to allocate another _n_ bits for that, for a total of 2 _n_
   bits? No! Malachite first allocates _n_ bits for `&x + &y`, but then that partial sum is taken by
   _value_ using the `Natural + &Natural` implementation described above; so those _n_ bits are
   reused for the final sum.
