@@ -1,13 +1,13 @@
 [package]
 name = "malachite-nz"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "The bignum types Natural and Integer, with efficient algorithms partially derived from GMP"
 readme = "README.md"
 homepage = "https://malachite.rs/"
 repository = "https://github.com/mhogrefe/malachite"
-license = "LGPL-3.0"
+license = "LGPL-3.0-only"
 keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
@@ -22,7 +22,7 @@ path = "src/bin.rs"
 [dependencies]
 embed-doc-image = "0.1.4"
 itertools = "0.9.0"
-malachite-base = "0.2.1"
+malachite-base = "0.2.2"
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }

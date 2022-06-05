@@ -48,11 +48,11 @@
 //!   implementation chooses to reuse the memory of the larger one.
 //!
 //!   Now consider what happens when evaluating the expression `&x + &y + &z`, where each
-//!   [`Natural`](natural::Natural) has $n$ bits. Malachite must allocate $n$ bits for the result,
-//!   but what about the intermediate sum `&x + &y`? Does Malachite need to allocate another $n$
-//!   bits for that? No! Malachite first allocates $n$ bits for `&x + &y`, but then that partial
-//!   sum is taken by _value_ using the `Natural + &Natural` implementation described above; so
-//!   those $n$ bits are reused for the final sum.
+//!   [`Natural`](natural::Natural) has $n$ bits. Malachite must allocate about $n$ bits for the
+//!   result, but what about the intermediate sum `&x + &y`? Does Malachite need to allocate
+//!   another $n$ bits for that, for a total of $2n$ bits? No! Malachite first allocates $n$ bits
+//!   for `&x + &y`, but then that partial sum is taken by _value_ using the `Natural + &Natural`
+//!   implementation described above; so those $n$ bits are reused for the final sum.
 //!
 //! # Limbs
 //! Large [`Natural`](natural::Natural)s and [`Integer`](integer::Integer)s store their data as
@@ -90,7 +90,8 @@
 //!   ```
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
-//! browsing through `bin_util/demo_and_bench`.
+//! browsing through
+//! [`bin_util/demo_and_bench`](https://github.com/mhogrefe/malachite/tree/master/malachite-nz/src/bin_util/demo_and_bench).
 //!
 //! # Features
 //! - `32_bit_limbs`: Sets the type of [`Limb`](crate#limbs) to [`u32`] instead of the default,

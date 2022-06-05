@@ -5,7 +5,8 @@
 //!   - All the ones you'd expect, like addition, subtraction, multiplication, and division;
 //!   - Functions related to conversion between [`Rational`]s and other kinds of numbers, including
 //!     primitive floats;
-//!   - Functions for Diophantine approximation.
+//!   - Functions for Diophantine approximation;
+//!   - Functions for expressing [`Rational`]s in scientific notation.
 //! - The numerators and denominators of [`Rational`]s are stored as
 //!   [`Natural`](malachite_nz::natural::Natural)s, so [`Rational`]s with small numerators and
 //!   denominators can be stored entirely on the stack.
@@ -42,7 +43,8 @@
 //!   ```
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
-//! browsing through `bin_util/demo_and_bench`.
+//! browsing through
+//! [`bin_util/demo_and_bench`](https://github.com/mhogrefe/malachite/tree/master/malachite-q/src/bin_util/demo_and_bench).
 //!
 //! # Features
 //! - `32_bit_limbs`: Sets the type of [`Limb`](malachite_nz#limbs) to [`u32`] instead of the

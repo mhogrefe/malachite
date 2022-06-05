@@ -1,6 +1,7 @@
 //! This crate contains many utilities that are used by the
-//! [`malachite-nz`](https://docs.rs/malachite-nz/0.2.1/malachite_nz/) and `malachite-q`
-//! crates. These utilities include
+//! [`malachite-nz`](https://docs.rs/malachite-nz/latest/malachite_nz/) and
+//! [`malachite-q`]((https://docs.rs/malachite-q/latest/malachite_q/)) crates. These utilities
+//! include
 //! - Traits that wrap functions from the standard library, like
 //!   [`CheckedAdd`](num::arithmetic::traits::CheckedAdd).
 //! - Traits that give extra functionality to primitive types, like
@@ -52,16 +53,18 @@
 //!   ```
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
-//! browsing through `bin_util/demo_and_bench`.
+//! browsing through
+//! [`bin_util/demo_and_bench`](https://github.com/mhogrefe/malachite/tree/master/malachite-base/src/bin_util/demo_and_bench).
 //!
 //! # Features
 //! - `test_build`: A large proportion of the code in this crate is only used for testing. For a
 //!   typical user, building this code would result in an unnecessarily long compilation time and
-//!   an unnecessarily large binary. Much of it is also used for testing [`malachite-nz`](https://docs.rs/malachite-nz/0.2.1/malachite_nz/) and
-//!   `malachite-q`, so it can't just be confined to the `tests` directory. My solution is to only
-//!   build this code when the `test_build` feature is enabled. If you want to run unit tests, you
-//!   must enable `test_build`. However, doctests don't require it, since they only test the public
-//!   interface.
+//!   an unnecessarily large binary. Much of it is also used for testing
+//!   [`malachite-nz`](https://docs.rs/malachite-nz/latest/malachite_nz/) and
+//!   [`malachite-q`](https://docs.rs/malachite-q/latest/malachite_q/), so it can't just be
+//!   confined to the `tests` directory. My solution is to only build this code when the
+//!   `test_build` feature is enabled. If you want to run unit tests, you must enable `test_build`.
+//!   However, doctests don't require it, since they only test the public interface.
 //! - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
 //!   takes a long time to build. Enabling this feature also enables `test_build`.
 
