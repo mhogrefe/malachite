@@ -38,14 +38,14 @@ For GCD computation, `num` uses the
 [binary GCD algorithm](https://en.wikipedia.org/wiki/Binary_GCD_algorithm), a quadratic algorithm.
 Malachite follows GMP in using
 [Lehmer's GCD algorithm](https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm), which takes
-advantage of fast multiplication algorithms to achieve O(n (log n)^2 log log n) time.
+advantage of fast multiplication algorithms to achieve $$O(n (\log n)^2 \log \log n)$$ time.
 
 For division, `num` uses Knuth's
 [Algorithm D](https://ridiculousfish.com/blog/posts/labor-of-division-episode-iv.html), which is
 also quadratic. Malachite, again following GMP, uses several division algorithms depending on the
 input size. For the largest inputs, it uses a kind of
 [Barrett reduction](https://en.wikipedia.org/wiki/Barrett_reduction), which takes
-O(n log n log log n) time.
+$$O(n \log n \log \log n)$$ time.
 
 ## Converting a Natural to a string
 
@@ -53,7 +53,32 @@ O(n log n log log n) time.
   <img width="650" src="/assets/benchmarks/2022-06-04-n-to_string.svg" alt="Natural to string">
 </p>
 
-When converting a Natural to a string, `num` seems to use an $$O(n^{3/2})$$ algorithm. Malachite uses
-a divide-and-conquer algorithm that takes O(n (log n)^2 log log n) time.
+When converting a natural number to a string, `num` seems to use an $$O(n^{3/2})$$ algorithm.
+Malachite uses a divide-and-conquer algorithm that takes $$O(n (\log n)^2 \log \log n)$$ time.
+
+## Natural multiplication
+
+<p align="center">
+  <img width="650" src="/assets/benchmarks/2022-06-04-n-mul.svg" alt="Natural multiplication">
+</p>
+
+For multiplying two natural numbers, `num` uses, a basecase quadratic algorithm for small inputs,
+then [Toom-22](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication) (Karatsuba)
+multiplication for larger inputs, and finally Toom-33 for the largest ones. This means that
+multiplication takes $$O(n^{\log_3 5}) \approx O(n^{1.465})$$ time.
+
+Malachite also uses a basecase quadratic algorithm, then 13 variants of Toom-Cook multiplication,
+and finally [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm) for the largest inputs, achieving $$O(n (\log n)^2 \log \log n)$$
+time.
+
+Given all of this machinery, it's a little disappointing that the Malachite isn't much faster at
+multiplying than `num` is, in practice. I have a few improvements in mind that should boost
+Malachite's multiplication performance further.
+
+For numbers of up to 1000 bits, all three libraries are about equally fast:
+
+<p align="center">
+  <img width="650" src="/assets/benchmarks/2022-06-04-n-mul-small.svg" alt="Natural multiplication">
+</p>
 
 Copyright © 2022 Mikhail Hogrefe

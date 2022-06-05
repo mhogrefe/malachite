@@ -60,6 +60,4 @@ Malachite is under active development, with many more types and features planned
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
 its API is not stable yet, and that it is licensed under LGPL 3.0.
 
-Test KaTeX: $$\pi$$
-
 Copyright © 2022 Mikhail Hogrefe
