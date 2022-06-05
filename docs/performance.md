@@ -53,6 +53,7 @@ O(n log n log log n) time.
   <img width="650" src="/assets/benchmarks/2022-06-04-n-to_string.svg" alt="Natural to string">
 </p>
 
-When converting a Natural to a string, `num` uses...
+When converting a Natural to a string, `num` seems to use a $O(n^{3/2})$ algorithm. Malachite uses a
+divide-and-conquer algorithm that takes O(n (log n)^2 log log n) time.
 
 Copyright © 2022 Mikhail Hogrefe
