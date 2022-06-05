@@ -71,7 +71,7 @@ and integers, ℕ and ℤ.
   the smaller
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)'s data
   can be extended to hold 1000 bits, in hopes that this will be more efficient than allocating 1000
-  bits in a completely new [`Vec`]https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html.
+  bits in a completely new [`Vec`](https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html).
   Finally, if both
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s are
   taken by value, then the `Natural + Natural` implementation chooses to reuse the memory of the
