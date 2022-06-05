@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="650" src="assets/logo-and-name.svg" alt="Logo">
+  <img width="650" src="/assets/logo-and-name.svg" alt="Logo">
 </p>
 
 Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.rust-lang.org/). It

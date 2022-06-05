@@ -28,7 +28,7 @@ the `.gp` to your format of choice. I like SVG:
 ## Rational addition
 
 <p align="center">
-  <img width="650" src="/assets/logo.svg" alt="Rational addition, take 2">
+  <img width="650" src="/assets/benchmarks/2022-06-04-q-add.svg" alt="Rational addition">
 </p>
 
 The most significant operations involved in adding two rational numbers (fractions) are GCD
