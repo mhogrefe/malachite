@@ -28,18 +28,17 @@ the `.gp` to your format of choice. I like SVG:
 ## Rational addition
 
 <p align="center">
-  <img width="650" src="assets/benchmarks/2022-06-04-q-add.svg" alt="Rational addition">
+  <img width="650" src="assets/2022-06-04-q-add.svg" alt="Rational addition">
 </p>
 
 The most significant operations involved in adding two rational numbers (fractions) are GCD
 computation and division.
 
 For GCD computation, `num` uses the
-[binary GCD algorithm](https://en.wikipedia.org/wiki/Binary_GCD_algorithm). This is better than
-the Euclidean algorithm that we learn in CS 101, but still quadratic. Malachite follows GMP in
-using [Lehmer's GCD algorithm](https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm), a
-complicated algorithm that takes advantage of fast multiplication algorithms to achieve
-O(n (log n)<sup>2</sup> log log n) time.
+[binary GCD algorithm](https://en.wikipedia.org/wiki/Binary_GCD_algorithm), a quadratic algorithm.
+Malachite follows GMP in using
+[Lehmer's GCD algorithm](https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm), which takes
+advantage of fast multiplication algorithms to achieve O(n (log n)^2 log log n) time.
 
 For division, `num` uses Knuth's
 [Algorithm D](https://ridiculousfish.com/blog/posts/labor-of-division-episode-iv.html), which is
