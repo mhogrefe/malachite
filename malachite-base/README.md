@@ -3,8 +3,8 @@
 
 # malachite-base
 This crate contains many utilities that are used by the
-[`malachite-nz`](https://crates.io/crates/malachite-nz) and `malachite-q` crates. These utilities
-include
+[`malachite-nz`](https://crates.io/crates/malachite-nz) and
+[`malachite-q`](https://crates.io/crates/malachite-q) crates. These utilities include
 - Traits that wrap functions from the standard library, like
   [`CheckedAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedAdd.html).
 - Traits that give extra functionality to primitive types, like

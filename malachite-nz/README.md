@@ -43,9 +43,9 @@ and integers, ℕ and ℤ.
   depending on the input size.
 - Small numbers are also handled efficiently. Any
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) smaller
-  than 2^(64) does not use any allocated memory, and working with such numbers is almost as fast as
-  working with primitive integers. As a result, Malachite does not provide implementations for
-  _e.g._ adding a
+  than 2<sup>64</sup> does not use any allocated memory, and working with such numbers is almost as
+  fast as working with primitive integers. As a result, Malachite does not provide implementations
+  for _e.g._ adding a
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
   to a [`u64`](https://doc.rust-lang.org/nightly/std/primitive.u64.html), since the
   [`u64`](https://doc.rust-lang.org/nightly/std/primitive.u64.html) can be converted to a
