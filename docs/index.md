@@ -1,7 +1,7 @@
-![Logo](../images/logo-and-name.svg)
+![Logo](assets/logo-and-name.svg)
 
 Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.rust-lang.org/). It
-achieves high performance by using algorithms derived from [GMP](https://gmplib.org/) and
+achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/) and
 [FLINT](https://www.flintlib.org/).
 
 Malachite comes in three crates.

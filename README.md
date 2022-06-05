@@ -1,4 +1,4 @@
-![Logo](docs/images/logo-and-name.svg)
+![Logo](docs/assets/logo-and-name.svg)
 
 An arbitrary-precision arithmetic library for Rust.
 
