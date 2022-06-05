@@ -4,7 +4,6 @@ title: "Malachite Performance"
 permalink: /performance/
 theme: jekyll-theme-slate
 ---
-<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
 
 # Performance
 Here are some benchmarks comparing the Malachite to two other libraries:
