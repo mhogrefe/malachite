@@ -26,7 +26,7 @@ the `.gp` to your format of choice. I like SVG:
 `gnuplot -e "set terminal svg; l \"benchfile.gp\"" > benchfile.svg`
 
 ## Rational addition
-
+`cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_rational_add_library_comparison -c "mean_bits_n 256"`
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-q-add.svg" alt="Rational addition">
 </p>
@@ -48,7 +48,7 @@ input size. For the largest inputs, it uses a kind of
 $$O(n \log n \log \log n)$$ time.
 
 ## Converting a Natural to a string
-
+`cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_to_string_library_comparison -c "mean_bits_n 1024"`
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-n-to_string.svg" alt="Natural to string">
 </p>
@@ -57,7 +57,7 @@ When converting a natural number to a string, `num` seems to use an $$O(n^{3/2})
 Malachite uses a divide-and-conquer algorithm that takes $$O(n (\log n)^2 \log \log n)$$ time.
 
 ## Natural multiplication
-
+`cargo run --features bin_build --release -- -l 20000 -m random -b benchmark_natural_mul_library_comparison -c "mean_bits_n 16384"`
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-n-mul.svg" alt="Natural multiplication">
 </p>
@@ -77,12 +77,13 @@ Malachite's multiplication performance further.
 
 For numbers of up to 1000 bits, all three libraries are about equally fast:
 
+`cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_mul_library_comparison -c "mean_bits_n 64"`
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-n-mul-small.svg" alt="Natural multiplication">
 </p>
 
 ## Natural addition
-
+`cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_add_library_comparison -c "mean_bits_n 1024"`
 <p align="center">
   <img width="650" src="/assets/benchmarks/2022-06-04-n-add.svg" alt="Natural addition">
 </p>
