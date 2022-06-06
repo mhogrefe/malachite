@@ -71,7 +71,7 @@ Malachite also uses a basecase quadratic algorithm, then 13 variants of Toom-Coo
 and finally [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm) for the largest inputs, achieving $$O(n \log n \log \log n)$$
 time.
 
-Given all of this machinery, it's a little disappointing that the Malachite isn't much faster at
+Given all of this machinery, it's a little disappointing that Malachite isn't much faster at
 multiplying than `num` is, in practice. I have a few improvements in mind that should boost
 Malachite's multiplication performance further.
 
