@@ -2,8 +2,8 @@
 layout: default
 theme: jekyll-theme-slate
 ---
-<h1>{{ page.title }}</h1>
-<p><b>{{ page.date | date_to_string }}</b> &emdash; {{ page.author }}</p>
+# {{ page.title }}
+**{{ page.date | date_to_string }}** &emdash; {{ page.author }}
 
 {{ content }}
 
