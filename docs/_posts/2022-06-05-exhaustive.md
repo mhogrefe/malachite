@@ -15,8 +15,7 @@ for x in &xs {
 ```
 This code takes `xs` and produces an iterator, a thing that knows how to spit out elements. Iterators
 are very flexible: you can filter them, map them, zip them, and collect them into concrete
-collections like `Vec`s or sets. In Haskell (the language that popularized functional
-programming), the basic aggregate type, `List`, _is_ an iterator.
+collections like `Vec`s or sets. In Haskell, the basic aggregate type, `List`, _is_ an iterator.
 
 Iterators are also very general. An iterator doesn't have to be backed by anything in memory. You can
 easily write this:
