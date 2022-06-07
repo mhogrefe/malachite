@@ -62,6 +62,25 @@ Malachite is under active development, with many more types and features planned
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
 its API is not stable yet, and that it is licensed under LGPL 3.0.
 
+# FAQ
+**How is "Malachite" pronounced, and what does it mean?**
+"Malachite" is pronounced MA-luh-kite, or /ˈmæl.əˌkaɪt/. It is the name of
+[a green gemstone](https://en.wikipedia.org/wiki/Malachite). Unfortunately, malachite does not
+contain iron, which would have made it a particularly good namesake for a Rust library.
+
+Malachite's logo is an image of a [snub cube](https://en.wikipedia.org/wiki/Snub_cube).
+
+**When does Malachite allocate memory?**
+Any `Natural` less than $$2^(64)$$ is represented inline, without allocating memory. Any `Integer`
+whose absolute value is less than $$2^(64)$$ doesn't allocate either, and neither does any
+`Rational` whose absolute numerator and denominator are both less than $$2^(64)$$. If you're using
+a build with `--features 32_bit_limbs`, then the threshold is $$2^(32)$$ instead.
+
+**Can I build Malachite for WASM?**
+Yes. If, in the future, Malachite includes code incompatible with WASM (for example, code that uses
+[rayon](https://docs.rs/rayon/latest/rayon/)), it will be possible to disable that code with cargo
+flags.
+
 # Blog Posts
 <ul>
   {% for post in site.posts %}
