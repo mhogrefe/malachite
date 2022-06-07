@@ -40,7 +40,7 @@ pub enum RoundingMode {
     /// rounded towards $-\infty$.
     Floor,
     /// Applies the ceiling function: $x \mapsto \lceil x \rceil$. In other words, the value is
-    /// towards $\infty$.
+    /// rounded towards $\infty$.
     Ceiling,
     /// Applies the function
     /// $$
