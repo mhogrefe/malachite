@@ -59,6 +59,7 @@ MAX_LINE_LENGTH = 100
 
 line_length_exceptions = set((
     # long Markdown table rows and/or links
+    ('./malachite-base/src/lib.rs', 57),
     ('./malachite-base/src/num/arithmetic/mod.rs', 267),
     ('./malachite-base/src/num/arithmetic/mod.rs', 268),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1017),
@@ -81,6 +82,7 @@ line_length_exceptions = set((
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 97),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 99),
     ('./malachite-nz/src/lib.rs', 28),
+    ('./malachite-nz/src/lib.rs', 94),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 30),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 31),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 32),
@@ -111,6 +113,7 @@ line_length_exceptions = set((
     ('./malachite-q/src/conversion/string/from_sci_string.rs', 207),
     ('./malachite-q/src/exhaustive/mod.rs', 36),
     ('./malachite-q/src/exhaustive/mod.rs', 38),
+    ('./malachite-q/src/lib.rs', 47),
 ))
 
 def lint(filename):
