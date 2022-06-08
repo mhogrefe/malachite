@@ -76,8 +76,8 @@ whose absolute value is less than $$2^{64}$$ doesn't allocate either, and neithe
 `Rational` whose absolute numerator and denominator are both less than $$2^{64}$$. If you're using
 a build with `--features 32_bit_limbs`, then the threshold is $$2^{32}$$ instead.
 
-**Can I build Malachite for WASM?**
-Yes. If, in the future, Malachite includes code incompatible with WASM (for example, code that uses
+**Can I build Malachite for WebAssembly?**
+Yes. If, in the future, Malachite includes code incompatible with Wasm (for example, code that uses
 [rayon](https://docs.rs/rayon/latest/rayon/)), it will be possible to disable that code with cargo
 flags.
 
