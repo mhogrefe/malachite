@@ -638,6 +638,18 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
+/// [`ExtendedGcd`](traits::ExtendedGcd), a trait for computing the GCD (greatest common divisor)
+/// of two numbers as well as the coefficients of Bézout's identity $ax+by=\gcd(a,b)$.
+///
+/// # extended_gcd
+/// ```
+/// use malachite_base::num::arithmetic::traits::ExtendedGcd;
+///
+/// assert_eq!(3u8.extended_gcd(5), (1, 2, -1));
+/// assert_eq!(240u16.extended_gcd(46), (2, -9, 47));
+/// assert_eq!((-111i16).extended_gcd(300), (3, 27, 10));
+/// ```
+pub mod extended_gcd;
 /// [`Floor`](traits::Floor) and [`FloorAssign`](traits::FloorAssign), traits for computing the
 /// floor of a number.
 ///

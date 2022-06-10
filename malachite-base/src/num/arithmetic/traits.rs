@@ -282,6 +282,27 @@ pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
 }
 
+/// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the
+/// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
+/// 
+/// The are infinitely many $x$, $y$ that satisfy the identity, so the full specification is more
+/// detailed:
+/// 
+/// - $f(0, 0) = (0, 0, 1)$.
+/// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
+/// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
+/// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
+/// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
+/// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
+///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and
+///   $y \leq \lfloor a/g \rfloor$.
+pub trait ExtendedGcd<RHS = Self> {
+    type Gcd;
+    type Cofactor;
+
+    fn extended_gcd(self, other: RHS) -> (Self::Gcd, Self::Cofactor, Self::Cofactor);
+}
+
 /// Takes the floor of a number.
 pub trait Floor {
     type Output;

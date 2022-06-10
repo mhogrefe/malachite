@@ -5,7 +5,7 @@ use num::arithmetic::traits::{
     CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul, CheckedDiv,
     CheckedMul, CheckedNeg, CheckedPow, CheckedRoot, CheckedSqrt, CheckedSquare, CheckedSub,
     CheckedSubMul, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
-    DivRoundAssign, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, FloorRoot,
+    DivRoundAssign, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ExtendedGcd, FloorRoot,
     FloorRootAssign, FloorSqrt, FloorSqrtAssign, Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign,
     OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
     OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
@@ -189,6 +189,7 @@ pub trait PrimitiveInt:
     + ExactInto<i64>
     + ExactInto<i128>
     + ExactInto<isize>
+    + ExtendedGcd<Self>
     + FloorRoot<u64, Output = Self>
     + FloorRootAssign<u64>
     + FloorSqrt<Output = Self>

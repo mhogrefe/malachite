@@ -1,8 +1,8 @@
 use num::arithmetic::traits::{
     Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign,
-    CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedAbs, NegAssign, OverflowingAbs,
-    OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
-    UnsignedAbs, WrappingAbs, WrappingAbsAssign,
+    CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedAbs, ExtendedGcd, NegAssign,
+    OverflowingAbs, OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg,
+    SaturatingNegAssign, UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::NegativeOne;
@@ -22,6 +22,7 @@ pub trait PrimitiveSigned:
     + CeilingModPowerOf2Assign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
+    + ExtendedGcd<Self, Cofactor = Self>
     + From<i8>
     + HasRandomSignedRange
     + Neg<Output = Self>
