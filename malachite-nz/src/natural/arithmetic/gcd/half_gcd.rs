@@ -29,16 +29,16 @@ use platform::{DoubleLimb, Limb};
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 
-trait GcdSubdivideStepContext {
+pub(crate) trait GcdSubdivideStepContext {
     fn gcd_subdiv_step_hook(
         &mut self,
         g: Option<&[Limb]>,
         q: Option<&mut [Limb]>,
         q_len: usize,
-        d: bool,
+        d: i8,
     );
 
-    fn gcd_subdiv_step_hook_with_1(&mut self, d: bool) {
+    fn gcd_subdiv_step_hook_with_1(&mut self, d: i8) {
         self.gcd_subdiv_step_hook(None, Some(&mut [1]), 1, d);
     }
 }
@@ -53,7 +53,7 @@ impl<'a> GcdSubdivideStepContext for GcdContext<'a> {
         g: Option<&[Limb]>,
         _q: Option<&mut [Limb]>,
         _q_len: usize,
-        _d: bool,
+        _d: i8,
     ) {
         if let Some(g) = g {
             self.0[..g.len()].copy_from_slice(g);
@@ -71,18 +71,18 @@ pub struct HalfGcdMatrix<'a> {
 }
 
 #[cfg(not(feature = "test_build"))]
-struct HalfGcdMatrix<'a> {
+pub(crate) struct HalfGcdMatrix<'a> {
     data: &'a mut [Limb],
     s: usize,
     two_s: usize,
     three_s: usize,
-    n: usize,
+    pub(crate) n: usize,
 }
 
 impl<'a> HalfGcdMatrix<'a> {
     // # Worst-case complexity
     // Constant time and additional memory.
-    pub_test! {get(&self, row: u8, column: u8) -> &[Limb] {
+    pub_crate_test! {get(&self, row: u8, column: u8) -> &[Limb] {
         match (row, column) {
             (0, 0) => &self.data[..self.s],
             (0, 1) => &self.data[self.s..self.two_s],
@@ -132,6 +132,14 @@ impl<'a> HalfGcdMatrix<'a> {
     // # Worst-case complexity
     // Constant time and additional memory.
     #[inline]
+    pub(crate) fn get_four(&mut self) -> (&[Limb], &[Limb], &[Limb], &[Limb]) {
+        split_into_chunks!(self.data, self.s, [x00, x01, x10], x11);
+        (x00, x01, x10, x11)
+    }
+
+    // # Worst-case complexity
+    // Constant time and additional memory.
+    #[inline]
     fn get_four_mut(&mut self) -> (&mut [Limb], &mut [Limb], &mut [Limb], &mut [Limb]) {
         split_into_chunks_mut!(self.data, self.s, [x00, x01, x10], x11);
         (x00, x01, x10, x11)
@@ -155,7 +163,7 @@ impl<'a> HalfGcdMatrix<'a> {
     //
     // This is equivalent to `mpn_hgcd_matrix_init` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1,
     // where the matrix is returned.
-    pub_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix {
+    pub_crate_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix {
         let s = (n + 1) / 2 + 1;
         let two_s = s << 1;
         let three_s = two_s + s;
@@ -356,7 +364,7 @@ pub_test! {limbs_half_gcd_matrix_update_q(
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
 // This is equivalent to `mpn_hgcd_matrix_adjust` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-fn limbs_half_gcd_matrix_adjust(
+pub(crate) fn limbs_half_gcd_matrix_adjust(
     m: &HalfGcdMatrix,
     mut n: usize,
     xs: &mut [Limb],
@@ -393,7 +401,6 @@ fn limbs_half_gcd_matrix_adjust(
         y_high = false;
     }
     if x_high || y_high {
-        fail_on_untested_path("limbs_half_gcd_matrix_adjust, x_high || y_high");
         xs[n] = Limb::iverson(x_high);
         ys[n] = Limb::iverson(y_high);
         n += 1;
@@ -613,7 +620,7 @@ pub struct HalfGcdMatrix1 {
 
 #[cfg(not(feature = "test_build"))]
 #[derive(Default)]
-struct HalfGcdMatrix1 {
+pub(crate) struct HalfGcdMatrix1 {
     data: [[Limb; 2]; 2],
 }
 
@@ -628,7 +635,7 @@ struct HalfGcdMatrix1 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
 //
 // This is equivalent to `mpn_hgcd_mul_matrix1_vector` from `mpn/generic/hgcd2.c`, GMP 6.2.1.
-pub_test! {limbs_half_gcd_matrix_1_mul_vector(
+pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
     m: &HalfGcdMatrix1,
     out: &mut [Limb],
     xs: &[Limb],
@@ -667,7 +674,7 @@ pub_test! {limbs_half_gcd_matrix_1_mul_vector(
 //
 // This is equivalent to `mpn_matrix22_mul1_inverse_vector` from
 // `mpn/generic/matrix22_mul1_inverse_vector.c`, GMP 6.2.1.
-fn limbs_half_gcd_matrix_1_mul_inverse_vector(
+pub(crate) fn limbs_half_gcd_matrix_1_mul_inverse_vector(
     m: &HalfGcdMatrix1,
     out: &mut [Limb],
     xs: &[Limb],
@@ -697,7 +704,7 @@ fn limbs_half_gcd_matrix_1_mul_inverse_vector(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_gcd_subdiv_step` from `mpn/generic/gcd_subdiv_step.c`, GMP 6.2.1.
-fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
+pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     mut xs: &'a mut [Limb],
     mut ys: &'a mut [Limb],
     s: usize,
@@ -720,7 +727,7 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
                 Ordering::Equal => {
                     // For gcdext, return the smallest of the two cofactors.
                     if s == 0 {
-                        context.gcd_subdiv_step_hook(Some(xs_init), None, 0, true);
+                        context.gcd_subdiv_step_hook(Some(xs_init), None, 0, -1);
                     }
                     return 0;
                 }
@@ -744,8 +751,7 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     }
     if xs_len <= s {
         if s == 0 {
-            fail_on_untested_path("limbs_gcd_subdivide_step, s == 0 second time");
-            context.gcd_subdiv_step_hook(Some(ys_init), None, 0, !swapped);
+            context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::iverson(!swapped));
         }
         return 0;
     }
@@ -768,28 +774,28 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
                     fail_on_untested_path("limbs_gcd_subdivide_step, c == Ordering::Equal");
                     if s != 0 {
                         // Just record subtraction and return
-                        context.gcd_subdiv_step_hook_with_1(swapped);
-                        context.gcd_subdiv_step_hook_with_1(swapped);
+                        context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+                        context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
                     } else {
                         // Found gcd.
-                        context.gcd_subdiv_step_hook(Some(ys_init), None, 0, swapped);
+                        context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::iverson(swapped));
                         return 0;
                     }
                 }
                 Ordering::Greater => {
-                    context.gcd_subdiv_step_hook_with_1(swapped);
+                    context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
                     swap(&mut xs, &mut ys);
                     xs_init = &mut xs[..xs_len];
                     ys_init = &mut ys[..ys_len];
                     swapped.not_assign();
                 }
                 Ordering::Less => {
-                    context.gcd_subdiv_step_hook_with_1(swapped);
+                    context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
                 }
             }
         }
         Ordering::Greater => {
-            context.gcd_subdiv_step_hook_with_1(swapped);
+            context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
             swap(&mut xs, &mut ys);
             swap(&mut xs_len, &mut ys_len);
             xs_init = &mut xs[..xs_len];
@@ -797,11 +803,15 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
             swapped.not_assign();
         }
         Ordering::Less => {
-            context.gcd_subdiv_step_hook_with_1(swapped);
+            context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
         }
     }
     if xs_len == 1 {
-        ys_init[0] = limbs_div_limb_to_out_mod(scratch, ys_init, xs_init[0]);
+        if ys_init.len() == 1 {
+            (scratch[0], ys_init[0]) = ys_init[0].div_mod(xs_init[0]);
+        } else {
+            ys_init[0] = limbs_div_limb_to_out_mod(scratch, ys_init, xs_init[0]);
+        }
     } else {
         limbs_div_mod_qs_to_out_rs_to_ns(scratch, ys_init, xs_init);
     }
@@ -809,7 +819,7 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     let ys_len = xs_len - slice_trailing_zeros(&ys_init[..xs_len]);
     if ys_len <= s {
         if s == 0 {
-            context.gcd_subdiv_step_hook(Some(xs_init), Some(scratch), qn, swapped);
+            context.gcd_subdiv_step_hook(Some(xs_init), Some(scratch), qn, i8::iverson(swapped));
             return 0;
         }
         // Quotient is one too large, so decrement it and add back X.
@@ -823,7 +833,7 @@ fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
         }
         assert!(!limbs_sub_limb_in_place(&mut scratch[..qn], 1));
     }
-    context.gcd_subdiv_step_hook(None, Some(scratch), qn, swapped);
+    context.gcd_subdiv_step_hook(None, Some(scratch), qn, i8::iverson(swapped));
     xs_len
 }
 
@@ -841,14 +851,14 @@ impl<'a> GcdSubdivideStepContext for HalfGcdMatrix<'a> {
         g: Option<&[Limb]>,
         q: Option<&mut [Limb]>,
         mut q_len: usize,
-        d: bool,
+        d: i8,
     ) {
         assert!(g.is_none());
         let q = q.unwrap();
         q_len -= slice_trailing_zeros(&q[..q_len]);
         if q_len != 0 {
             let (q, scratch) = q.split_at_mut(q_len);
-            limbs_half_gcd_matrix_update_q(self, q, u8::iverson(d), scratch);
+            limbs_half_gcd_matrix_update_q(self, q, u8::exact_from(d), scratch);
         }
     }
 }
@@ -857,7 +867,7 @@ impl<'a> GcdSubdivideStepContext for HalfGcdMatrix<'a> {
 // Constant time and additional memory.
 //
 // This is equivalent to `MPN_EXTRACT_NUMB` from `gmp-impl.h`, GMP 6.2.1.
-const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
+pub(crate) const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
     (x1 << count) | (x0 >> (Limb::WIDTH - count))
 }
 
@@ -910,7 +920,7 @@ pub_test! {limbs_gcd_div(
 // we make progress, i.e. can perform at least one subtraction. Otherwise returns zero.
 //
 // This is equivalent to `mpn_hgcd2` from `mpn/generic/hgcd2.c`, GMP 6.2.1.
-fn limbs_half_gcd_2(
+pub(crate) fn limbs_half_gcd_2(
     mut x_high: Limb,
     mut a_low: Limb,
     mut y_high: Limb,
@@ -1149,7 +1159,7 @@ const fn limbs_gcd_choose_p(n: usize) -> usize {
 // Constant time and additional memory.
 //
 // This is equivalent to `MPN_HGCD_MATRIX_INIT_ITCH` from `gmp-impl.h`, GMP 6.2.1.
-const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
+pub(crate) const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
     (((n + 1) >> 1) + 1) << 2
 }
 
@@ -1160,7 +1170,7 @@ const HGCD_THRESHOLD: usize = 101;
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_hgcd_itch` from `mpn/generic/hgcd.c`, GMP 6.2.1.
-fn limbs_half_gcd_scratch_len(n: usize) -> usize {
+pub(crate) fn limbs_half_gcd_scratch_len(n: usize) -> usize {
     if n < HGCD_THRESHOLD {
         n
     } else {
@@ -1354,8 +1364,6 @@ fn limbs_half_gcd_approx(
             let new_n = limbs_half_gcd_step(xs, ys, s, a, scratch);
             if new_n == 0 {
                 return success;
-            } else {
-                fail_on_untested_path("limbs_half_gcd_approx, n != 0 fifth time");
             }
             n = new_n;
             xs = &mut xs[..n];
@@ -1376,7 +1384,7 @@ fn limbs_half_gcd_approx(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_hgcd` from `mpn/generic/hgcd.c`, GMP 6.2.1.
-fn limbs_half_gcd(
+pub(crate) fn limbs_half_gcd(
     xs: &mut [Limb],
     ys: &mut [Limb],
     a: &mut HalfGcdMatrix,

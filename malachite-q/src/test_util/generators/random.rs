@@ -934,21 +934,23 @@ pub fn random_rational_pair_gen_var_4(config: &GenConfig) -> It<(Rational, Ratio
 pub fn random_rational_pair_gen_var_5(config: &GenConfig) -> It<(Rational, Rational)> {
     // TODO
     Box::new(
-        random_pairs_from_single(RandomRationalsFromDoubleAndSign {
-            bs: random_bools(EXAMPLE_SEED.fork("sign")),
-            xs: geometric_random_unsigneds::<u32>(
-                EXAMPLE_SEED.fork("numerator"),
-                config.get_or("mean_small_n", 64),
-                config.get_or("mean_small_d", 1),
-            )
-            .map(Natural::from),
-            ys: geometric_random_positive_unsigneds::<u32>(
-                EXAMPLE_SEED.fork("denominator"),
-                config.get_or("mean_small_n", 64),
-                config.get_or("mean_small_d", 1),
-            )
-            .map(Natural::from),
-        })
+        random_pairs_from_single(
+            RandomRationalsFromDoubleAndSign {
+                bs: random_bools(EXAMPLE_SEED.fork("sign")),
+                xs: geometric_random_unsigneds::<u32>(
+                    EXAMPLE_SEED.fork("numerator"),
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+                .map(Natural::from),
+                ys: geometric_random_positive_unsigneds::<u32>(
+                    EXAMPLE_SEED.fork("denominator"),
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+                .map(Natural::from),
+            },
+        )
         .filter_map(|(x, y)| match x.cmp(&y) {
             Ordering::Equal => None,
             Ordering::Less => Some((x, y)),
@@ -960,21 +962,23 @@ pub fn random_rational_pair_gen_var_5(config: &GenConfig) -> It<(Rational, Ratio
 pub fn random_rational_pair_gen_var_6(config: &GenConfig) -> It<(Rational, Rational)> {
     // TODO
     Box::new(
-        random_pairs_from_single(RandomRationalsFromDoubleAndSign {
-            bs: random_bools(EXAMPLE_SEED.fork("sign")),
-            xs: geometric_random_unsigneds::<u32>(
-                EXAMPLE_SEED.fork("numerator"),
-                config.get_or("mean_small_n", 64),
-                config.get_or("mean_small_d", 1),
-            )
-            .map(Natural::from),
-            ys: geometric_random_positive_unsigneds::<u32>(
-                EXAMPLE_SEED.fork("denominator"),
-                config.get_or("mean_small_n", 64),
-                config.get_or("mean_small_d", 1),
-            )
-            .map(Natural::from),
-        })
+        random_pairs_from_single(
+            RandomRationalsFromDoubleAndSign {
+                bs: random_bools(EXAMPLE_SEED.fork("sign")),
+                xs: geometric_random_unsigneds::<u32>(
+                    EXAMPLE_SEED.fork("numerator"),
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+                .map(Natural::from),
+                ys: geometric_random_positive_unsigneds::<u32>(
+                    EXAMPLE_SEED.fork("denominator"),
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+                .map(Natural::from),
+            },
+        )
         .map(|(x, y)| if x <= y { (x, y) } else { (y, x) }),
     )
 }

@@ -385,6 +385,9 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     }
 }
 
+/// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
+/// trait for computing the extended GCD of two numbers.
+pub mod extended_gcd;
 /// Code for the half-GCD algorithm, described [here](https://gmplib.org/manual/Subquadratic-GCD).
 pub mod half_gcd;
 /// Code for working with 2-by-2 matrices.

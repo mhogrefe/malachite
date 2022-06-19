@@ -13,7 +13,7 @@ pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
 pub const MUL_TOOM22_THRESHOLD: usize = 20;
 pub const MUL_TOOM33_THRESHOLD: usize = 39;
-pub const MUL_TOOM44_THRESHOLD: usize = usize::MAX; // unclear when 44 is better than 33
+pub const MUL_TOOM44_THRESHOLD: usize = 340; // unclear when 44 is better than 33
 pub const MUL_TOOM6H_THRESHOLD: usize = 345;
 pub const MUL_TOOM8H_THRESHOLD: usize = 640;
 
@@ -53,7 +53,7 @@ pub const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 0;
 pub const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
 pub const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
 
-pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = std::usize::MAX;
+pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = 100000000;
 
 pub const SQR_BASECASE_THRESHOLD: usize = 0;
 pub const SQR_TOOM2_THRESHOLD: usize = 43;

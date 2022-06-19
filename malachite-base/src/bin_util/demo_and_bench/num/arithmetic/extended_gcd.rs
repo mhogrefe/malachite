@@ -1,6 +1,4 @@
-use malachite_base::num::arithmetic::extended_gcd::{
-    extended_gcd_unsigned_euclidean, extended_gcd_unsigned_fast,
-};
+use malachite_base::num::arithmetic::extended_gcd::extended_gcd_unsigned_binary;
 use malachite_base::num::arithmetic::traits::ExtendedGcd;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -9,6 +7,7 @@ use malachite_base::test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
+use malachite_base::test_util::num::arithmetic::extended_gcd::extended_gcd_unsigned_euclidean;
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -64,8 +63,8 @@ fn benchmark_extended_gcd_algorithms_unsigned<
             ("Euclidean", &mut |(x, y)| {
                 no_out!(extended_gcd_unsigned_euclidean::<U, S>(x, y))
             }),
-            ("fast", &mut |(x, y)| {
-                no_out!(extended_gcd_unsigned_fast::<U, S>(x, y))
+            ("binary", &mut |(x, y)| {
+                no_out!(extended_gcd_unsigned_binary::<U, S>(x, y))
             }),
         ],
     );

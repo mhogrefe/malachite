@@ -1522,8 +1522,9 @@ pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
-pub_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `np`
+// and `dp` are consumed.
+pub_crate_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1575,7 +1576,8 @@ pub_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Li
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `np`
+// is consumed.
 pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1631,7 +1633,8 @@ pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: 
 // Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 // limb of `ds` is zero.
 //
-// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `dp`
+// is consumed.
 pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();

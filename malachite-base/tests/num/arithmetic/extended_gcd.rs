@@ -1,6 +1,4 @@
-use malachite_base::num::arithmetic::extended_gcd::{
-    extended_gcd_unsigned_euclidean, extended_gcd_unsigned_fast,
-};
+use malachite_base::num::arithmetic::extended_gcd::extended_gcd_unsigned_binary;
 use malachite_base::num::arithmetic::traits::{ExtendedGcd, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -8,6 +6,7 @@ use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen, unsigned_gen, unsigned_pair_gen_var_27,
 };
+use malachite_base::test_util::num::arithmetic::extended_gcd::extended_gcd_unsigned_euclidean;
 use std::cmp::min;
 
 #[test]
@@ -24,9 +23,9 @@ fn test_extended_gcd() {
     ) {
         assert_eq!(a.extended_gcd(b), (gcd, x, y));
         assert_eq!(extended_gcd_unsigned_euclidean(a, b), (gcd, x, y));
-        assert_eq!(extended_gcd_unsigned_fast::<U, S>(a, b), (gcd, x, y));
+        assert_eq!(extended_gcd_unsigned_binary::<U, S>(a, b), (gcd, x, y));
     }
-    test_u::<u8, _>(0, 0, 0, 0, 1);
+    test_u::<u8, _>(0, 0, 0, 0, 0);
     test_u::<u8, _>(0, 1, 1, 0, 1);
     test_u::<u8, _>(1, 0, 1, 1, 0);
     test_u::<u8, _>(1, 1, 1, 0, 1);
@@ -53,7 +52,7 @@ fn test_extended_gcd() {
     ) {
         assert_eq!(a.extended_gcd(b), (gcd, x, y));
     }
-    test_s::<_, i8>(0, 0, 0, 0, 1);
+    test_s::<_, i8>(0, 0, 0, 0, 0);
     test_s::<_, i8>(0, 1, 1, 0, 1);
     test_s::<_, i8>(0, -1, 1, 0, -1);
     test_s::<_, i8>(1, 0, 1, 1, 0);
@@ -136,19 +135,19 @@ fn extended_gcd_properties_helper_unsigned<
         }
 
         assert_eq!(extended_gcd_unsigned_euclidean(a, b), (gcd, x, y));
-        assert_eq!(extended_gcd_unsigned_fast::<U, S>(a, b), (gcd, x, y));
+        assert_eq!(extended_gcd_unsigned_binary::<U, S>(a, b), (gcd, x, y));
     });
 
     unsigned_gen::<U>().test_properties(|x| {
-        assert_eq!(x.extended_gcd(x), (x, S::ZERO, S::ONE));
         if x != U::ZERO {
+            assert_eq!(x.extended_gcd(x), (x, S::ZERO, S::ONE));
             assert_eq!(x.extended_gcd(U::ZERO), (x, S::ONE, S::ZERO));
+            assert_eq!(U::ZERO.extended_gcd(x), (x, S::ZERO, S::ONE));
         }
         if x != U::ONE {
             assert_eq!(U::ONE.extended_gcd(x), (U::ONE, S::ONE, S::ZERO));
         }
         assert_eq!(x.extended_gcd(U::ONE), (U::ONE, S::ZERO, S::ONE));
-        assert_eq!(U::ZERO.extended_gcd(x), (x, S::ZERO, S::ONE));
     });
 }
 
@@ -220,23 +219,23 @@ fn extended_gcd_properties_helper_signed<
                     S::ZERO
                 )
             );
+            assert_eq!(
+                S::ZERO.extended_gcd(x),
+                (
+                    x.unsigned_abs(),
+                    S::ZERO,
+                    if x >= S::ZERO {
+                        S::ONE
+                    } else {
+                        S::NEGATIVE_ONE
+                    }
+                )
+            );
         }
         if x.unsigned_abs() != U::ONE {
-            assert_eq!(S::ONE.extended_gcd(x), (U::ONE, S::ONE, S::ZERO), "{}", x);
+            assert_eq!(S::ONE.extended_gcd(x), (U::ONE, S::ONE, S::ZERO));
         }
         assert_eq!(x.extended_gcd(S::ONE), (U::ONE, S::ZERO, S::ONE));
-        assert_eq!(
-            S::ZERO.extended_gcd(x),
-            (
-                x.unsigned_abs(),
-                S::ZERO,
-                if x >= S::ZERO {
-                    S::ONE
-                } else {
-                    S::NEGATIVE_ONE
-                }
-            )
-        );
     });
 }
 

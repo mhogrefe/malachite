@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     divisible_by_power_of_2::register(runner);
     eq_mod::register(runner);
     eq_mod_power_of_2::register(runner);
+    extended_gcd::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     mul::register(runner);
@@ -44,6 +45,7 @@ mod divisible_by;
 mod divisible_by_power_of_2;
 mod eq_mod;
 mod eq_mod_power_of_2;
+mod extended_gcd;
 mod mod_op;
 mod mod_power_of_2;
 mod mul;

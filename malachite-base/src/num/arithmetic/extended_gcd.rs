@@ -6,21 +6,6 @@ use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 use std::mem::swap;
 
-pub fn extended_gcd_unsigned_euclidean<
-    U: PrimitiveUnsigned,
-    S: PrimitiveSigned + WrappingFrom<U>,
->(
-    a: U,
-    b: U,
-) -> (U, S, S) {
-    if a == b || a == U::ZERO {
-        (b, S::ZERO, S::ONE)
-    } else {
-        let (gcd, x, y) = extended_gcd_unsigned_euclidean(b % a, a);
-        (gcd, y - S::wrapping_from(b / a) * x, x)
-    }
-}
-
 fn extended_gcd_signed<
     U: ExtendedGcd<Cofactor = S> + PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
@@ -40,14 +25,16 @@ fn extended_gcd_signed<
 
 // This is equivalent to `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1, with an adjustment to
 // find the minimal cofactors.
-pub fn extended_gcd_unsigned_fast<
+pub_test! {extended_gcd_unsigned_binary<
     U: WrappingFrom<S> + PrimitiveUnsigned,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     mut a: U,
     mut b: U,
 ) -> (U, S, S) {
-    if a == b || a == U::ZERO {
+    if a == U::ZERO && b == U::ZERO {
+        return (U::ZERO, S::ZERO, S::ZERO);
+    } else if a == b || a == U::ZERO {
         return (b, S::ZERO, S::ONE);
     } else if b == U::ZERO {
         return (a, S::ONE, S::ZERO);
@@ -179,7 +166,7 @@ pub fn extended_gcd_unsigned_fast<
         swap(&mut x, &mut y);
     }
     (gcd, S::wrapping_from(x), S::wrapping_from(y))
-}
+}}
 
 macro_rules! impl_extended_gcd {
     ($u:ident, $s:ident) => {
@@ -189,17 +176,17 @@ macro_rules! impl_extended_gcd {
 
             /// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the
             /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
-            /// 
+            ///
             /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
             /// full specification is more detailed:
-            /// 
-            /// - $f(0, 0) = (0, 0, 1)$.
+            ///
+            /// - $f(0, 0) = (0, 0, 0)$.
             /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
             /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
             /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
             ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
             ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
-            /// 
+            ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$
             ///
@@ -212,7 +199,7 @@ macro_rules! impl_extended_gcd {
             /// See [here](super::extended_gcd#extended_gcd).
             #[inline]
             fn extended_gcd(self, other: $u) -> ($u, $s, $s) {
-                extended_gcd_unsigned_fast(self, other)
+                extended_gcd_unsigned_binary(self, other)
             }
         }
 
@@ -222,11 +209,11 @@ macro_rules! impl_extended_gcd {
 
             /// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the
             /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
-            /// 
+            ///
             /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
             /// full specification is more detailed:
-            /// 
-            /// - $f(0, 0) = (0, 0, 1)$.
+            ///
+            /// - $f(0, 0) = (0, 0, 0)$.
             /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
             /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
             /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
@@ -234,7 +221,7 @@ macro_rules! impl_extended_gcd {
             /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
             ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
             ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
-            /// 
+            ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$
             ///

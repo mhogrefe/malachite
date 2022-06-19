@@ -6820,25 +6820,27 @@ pub fn special_random_large_type_gen_var_6(
         .map(|(m00, m01, m10, m11)| HalfGcdMatrix1 {
             data: [[m00, m01], [m10, m11]],
         })
-        .zip(UnsignedVecTripleLenGenerator1 {
-            phantom: PhantomData,
-            lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
-                EXAMPLE_SEED.fork("lengths"),
-                config.get_or("mean_length_n", 4),
-                config.get_or("mean_length_d", 1),
-            ))
-            .flat_map(|(x, y, z)| {
-                let xs_len = x;
-                let ys_len = x.checked_add(1)?.checked_add(y)?;
-                let out_len = x.checked_add(1)?.checked_add(z)?;
-                Some((out_len, xs_len, ys_len))
-            }),
-            striped_bit_source: StripedBitSource::new(
-                EXAMPLE_SEED.fork("striped_bit_source"),
-                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
-                config.get_or("mean_stripe_d", 1),
-            ),
-        }),
+        .zip(
+            UnsignedVecTripleLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                    EXAMPLE_SEED.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .flat_map(|(x, y, z)| {
+                    let xs_len = x;
+                    let ys_len = x.checked_add(1)?.checked_add(y)?;
+                    let out_len = x.checked_add(1)?.checked_add(z)?;
+                    Some((out_len, xs_len, ys_len))
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    EXAMPLE_SEED.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+        ),
     ))
 }
 

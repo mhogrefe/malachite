@@ -57,6 +57,7 @@ pub mod integer {
         pub mod divisible_by_power_of_2;
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
+        pub mod extended_gcd;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul;
@@ -196,6 +197,7 @@ pub mod natural {
         pub mod divisible_by_power_of_2;
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
+        pub mod extended_gcd;
         pub mod gcd;
         pub mod is_power_of_2;
         pub mod lcm;

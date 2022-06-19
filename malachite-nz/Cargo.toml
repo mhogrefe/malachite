@@ -1,6 +1,6 @@
 [package]
 name = "malachite-nz"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "The bignum types Natural and Integer, with efficient algorithms partially derived from GMP"
@@ -22,7 +22,7 @@ path = "src/bin.rs"
 [dependencies]
 embed-doc-image = "0.1.4"
 itertools = "0.9.0"
-malachite-base = "0.2.2"
+malachite-base = "0.2.3"
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }

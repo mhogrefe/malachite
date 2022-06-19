@@ -148,6 +148,7 @@ pub_crate_test! {limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
+    assert!(out.len() >= xs_len + ys_len);
     if xs_len == ys_len {
         limbs_mul_same_length_to_out(out, xs, ys);
     } else if ys_len < MUL_TOOM22_THRESHOLD {

@@ -284,11 +284,11 @@ pub trait EqMod<RHS = Self, M = Self> {
 
 /// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the
 /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
-/// 
+///
 /// The are infinitely many $x$, $y$ that satisfy the identity, so the full specification is more
 /// detailed:
-/// 
-/// - $f(0, 0) = (0, 0, 1)$.
+///
+/// - $f(0, 0) = (0, 0, 0)$.
 /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
 /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
 /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.

@@ -151,7 +151,7 @@ fn limbs_div_limb_normalized_to_out_mod(
         }
         let (q_higher, q_high) = q.split_in_half();
         out[j + 1] = q_high;
-        assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher,));
+        assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();

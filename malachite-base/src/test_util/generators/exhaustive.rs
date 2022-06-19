@@ -4490,10 +4490,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_10<T: PrimitiveUnsigned>() -> It<(Ve
 pub fn exhaustive_unsigned_vec_pair_gen_var_12<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
     Box::new(
         exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::tiny(),
-                BitDistributorOutputType::normal(1),
-            ),
+            ruler_sequence(),
             //TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),

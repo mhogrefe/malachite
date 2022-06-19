@@ -1,6 +1,6 @@
 [package]
 name = "malachite-base"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "A collection of utilities, including new arithmetic traits and iterators that generate all values of a type"

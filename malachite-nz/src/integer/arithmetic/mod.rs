@@ -43,6 +43,9 @@ pub mod eq_mod;
 /// Implementations of [`EqModPowerOf2`](malachite_base::num::arithmetic::traits::EqModPowerOf2),
 /// a trait for determining whether one number is equal to another modulo $2^k$.
 pub mod eq_mod_power_of_2;
+/// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
+/// trait for computing the extended GCD of two numbers.
+pub mod extended_gcd;
 /// Implementations of traits for finding the remainder of two numbers, subject to various rounding
 /// rules.
 ///
