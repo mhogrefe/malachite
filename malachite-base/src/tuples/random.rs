@@ -450,26 +450,26 @@ where
                 match x.cmp(out_0.as_ref().unwrap()) {
                     Ordering::Equal => {}
                     Ordering::Greater => {
-                        out_1 = Some(x);
+                        out_1 = x;
                         break;
                     }
                     Ordering::Less => {
-                        out_1 = out_0;
+                        out_1 = out_0.unwrap();
                         out_0 = Some(x);
                         break;
                     }
                 }
             }
         }
-        Some((out_0.unwrap(), out_1.unwrap()))
+        Some((out_0.unwrap(), out_1))
     }
 }
 
 /// Generates random pairs using elements from a single iterator, where the first element of each
 /// pair is less than the second.
 ///
-/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator
-/// will hang.
+/// The input iterator must generate at least two distinct elements; otherwise, this iterator will
+/// hang.
 ///
 /// $$
 /// P((x\_0, x\_1)) = 2P(x\_0)P(x\_1).
@@ -623,6 +623,186 @@ macro_rules! random_ordered_unique_tuples {
             $struct {
                 xs: random_b_tree_sets_fixed_length($k, xs),
             }
+        }
+    }
+}
+
+/// Generates random pairs using elements from a single iterator, where the first element is not
+/// equal to the second.
+#[derive(Clone, Debug)]
+pub struct RandomUniquePairs<I: Iterator>
+where
+    I::Item: Eq,
+{
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for RandomUniquePairs<I>
+where
+    I::Item: Eq,
+{
+    type Item = (I::Item, I::Item);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut out_0 = None;
+        let out_1;
+        loop {
+            let x = self.xs.next().unwrap();
+            if let Some(out_0) = out_0.as_ref() {
+                if x != *out_0 {
+                    out_1 = x;
+                    break;
+                }
+            } else {
+                out_0 = Some(x);
+            }
+        }
+        Some((out_0.unwrap(), out_1))
+    }
+}
+
+/// Generates random pairs using elements from a single iterator, where the two elements of each
+/// pair are unequal.
+///
+/// The input iterator must generate at least two distinct elements; otherwise, this iterator will
+/// hang.
+///
+/// `xs` must be infinite.
+#[inline]
+pub const fn random_unique_pairs<I: Iterator>(xs: I) -> RandomUniquePairs<I>
+where
+    I::Item: Eq,
+{
+    RandomUniquePairs { xs }
+}
+
+/// Defines random unique tuple generators.
+///
+/// Malachite provides [`random_unique_pairs`], but you can also define `random_unique_triples`,
+/// `random_unique_quadruples`, and so on, in your program using the code below.
+///
+/// See usage examples [here](self#random_unique_quadruples).
+///
+/// ```
+/// # #[macro_use]
+/// # extern crate malachite_base;
+/// # fn main() {
+/// use std::collections::HashMap;
+/// use std::hash::Hash;
+///
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueTriples,
+///     3,
+///     (I::Item, I::Item, I::Item),
+///     random_unique_triples,
+///     [0, 1, 2]
+/// );
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     random_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuintuples,
+///     5,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item),
+///     random_unique_quintuples,
+///     [0, 1, 2, 3, 4]
+/// );
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueSextuples,
+///     6,
+///     (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+///     random_unique_sextuples,
+///     [0, 1, 2, 3, 4, 5]
+/// );
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueSeptuples,
+///     7,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     random_unique_septuples,
+///     [0, 1, 2, 3, 4, 5, 6]
+/// );
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueOctuples,
+///     8,
+///     (
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item,
+///         I::Item
+///     ),
+///     random_unique_octuples,
+///     [0, 1, 2, 3, 4, 5, 6, 7]
+/// );
+/// # }
+/// ```
+#[macro_export]
+macro_rules! random_unique_tuples {
+    (
+        ($($vis:tt)*),
+        $struct: ident,
+        $k: expr,
+        $out_t: ty,
+        $fn: ident,
+        [$($i: tt),*]
+    ) => {
+        #[derive(Clone, Debug)]
+        $($vis)* struct $struct<I: Iterator> where I::Item: Eq + Hash {
+            xs: I,
+        }
+
+        impl<I: Iterator> Iterator for $struct<I> where I::Item: Eq + Hash {
+            type Item = $out_t;
+
+            #[inline]
+            fn next(&mut self) -> Option<Self::Item> {
+                let mut xs_to_indices = HashMap::with_capacity($k);
+                let mut i = 0;
+                while i < $k {
+                    xs_to_indices
+                        .entry(self.xs.next().unwrap())
+                        .or_insert_with(|| {
+                            i += 1;
+                            i - 1
+                        });
+                }
+                let mut out = ($((None, $i).0),*);
+                for (x, i) in xs_to_indices {
+                    match i {
+                        $($i => {out.$i = Some(x)},)*
+                        _ => {}
+                    }
+                }
+                Some(($(out.$i.unwrap()),*))
+            }
+        }
+
+        #[inline]
+        $($vis)* fn $fn<I: Iterator>(xs: I) -> $struct<I> where I::Item: Eq + Hash,
+        {
+            $struct { xs }
         }
     }
 }

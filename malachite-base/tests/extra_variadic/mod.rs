@@ -20,7 +20,9 @@ use malachite_base::vecs::exhaustive::{
 };
 use malachite_base::vecs::ExhaustiveVecPermutations;
 use std::cmp::max;
+use std::collections::HashMap;
 use std::fmt::{self, Display, Formatter};
+use std::hash::Hash;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
@@ -326,6 +328,14 @@ random_ordered_unique_tuples!(
     3,
     (I::Item, I::Item, I::Item),
     random_ordered_unique_triples,
+    [0, 1, 2]
+);
+random_unique_tuples!(
+    (pub(crate)),
+    RandomUniqueTriples,
+    3,
+    (I::Item, I::Item, I::Item),
+    random_unique_triples,
     [0, 1, 2]
 );
 

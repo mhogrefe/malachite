@@ -745,4 +745,38 @@ pub mod exhaustive;
 ///     ]
 /// );
 /// ```
+///
+/// # random_unique_quadruples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::random_unique_tuples;
+/// use std::collections::HashMap;
+/// use std::hash::Hash;
+///
+/// random_unique_tuples!(
+///     (pub(crate)),
+///     RandomOrderedUniqueQuadruples,
+///     4,
+///     (I::Item, I::Item, I::Item, I::Item),
+///     random_unique_quadruples,
+///     [0, 1, 2, 3]
+/// );
+///
+/// let qs = random_unique_quadruples(
+///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 10)
+/// );
+/// assert_eq!(
+///     qs.take(20).collect_vec().as_slice(),
+///     &[
+///         (2, 8, 6, 5), (7, 5, 3, 9), (2, 8, 6, 1), (3, 7, 4, 6), (3, 10, 6, 9), (6, 10, 4, 8),
+///         (6, 10, 8, 3), (10, 2, 9, 5), (8, 10, 2, 3), (8, 1, 7, 3), (2, 6, 1, 10), (9, 5, 8, 2),
+///         (8, 1, 9, 10), (7, 3, 8, 1), (3, 2, 5, 4), (3, 8, 4, 1), (9, 7, 6, 3), (5, 7, 8, 6),
+///         (5, 3, 9, 4), (9, 10, 4, 6)
+///     ]
+/// );
+/// ```
 pub mod random;

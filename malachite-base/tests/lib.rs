@@ -669,6 +669,7 @@ pub mod tuples {
         pub mod random_ordered_unique_tuples;
         pub mod random_tuples;
         pub mod random_tuples_from_single;
+        pub mod random_unique_tuples;
         pub mod random_units;
     }
     pub mod singletons;
@@ -745,6 +746,12 @@ pub mod vecs {
         pub mod random_ordered_unique_vecs_length_inclusive_range;
         pub mod random_ordered_unique_vecs_length_range;
         pub mod random_ordered_unique_vecs_min_length;
+        pub mod random_unique_vecs;
+        pub mod random_unique_vecs_fixed_length;
+        pub mod random_unique_vecs_from_length_iterator;
+        pub mod random_unique_vecs_length_inclusive_range;
+        pub mod random_unique_vecs_length_range;
+        pub mod random_unique_vecs_min_length;
         pub mod random_vecs;
         pub mod random_vecs_fixed_length;
         pub mod random_vecs_fixed_length_from_single;
