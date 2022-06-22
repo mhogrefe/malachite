@@ -2051,6 +2051,9 @@ impl FloorRoot<u64> for u128 {
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
     fn floor_root(self, exp: u64) -> u128 {
+        if exp == 2 {
+            return self.floor_sqrt();
+        }
         floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp)
     }
 }
@@ -2075,6 +2078,9 @@ impl CeilingRoot<u64> for u128 {
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
     fn ceiling_root(self, exp: u64) -> u128 {
+        if exp == 2 {
+            return self.ceiling_sqrt();
+        }
         let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             root
@@ -2110,6 +2116,9 @@ impl CheckedRoot<u64> for u128 {
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
     fn checked_root(self, exp: u64) -> Option<u128> {
+        if exp == 2 {
+            return self.checked_sqrt();
+        }
         let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             Some(root)
@@ -2141,6 +2150,9 @@ impl RootRem<u64> for u128 {
     /// The [`u128`] implementation computes the root using floating-point arithmetic. The
     /// approximate result is adjusted afterwards to account for error.
     fn root_rem(self, exp: u64) -> (u128, u128) {
+        if exp == 2 {
+            return self.sqrt_rem();
+        }
         let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         (root, self - root.pow(u32::saturating_from(exp)))
     }
