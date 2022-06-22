@@ -3118,6 +3118,29 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator<T> {
     }
 }
 
+struct ModPowerOfTwoSingleGenerator2<T: PrimitiveUnsigned> {
+    ms: GeometricRandomNaturalValues<u64>,
+    xss: Vec<Option<Box<dyn Iterator<Item = T>>>>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator2<T> {
+    type Item = (T, u64);
+
+    fn next(&mut self) -> Option<(T, u64)> {
+        let pow = self.ms.next().unwrap();
+        assert_ne!(pow, 0);
+        let xs = &mut self.xss[usize::wrapping_from(pow)];
+        if xs.is_none() {
+            *xs = Some(Box::new(
+                random_unsigned_bit_chunks(EXAMPLE_SEED.fork(&pow.to_string()), pow)
+                    .filter(|&x| x != T::ZERO),
+            ));
+        }
+        let x = xs.as_mut().unwrap().next().unwrap();
+        Some((x, pow))
+    }
+}
+
 pub fn random_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
     Box::new(ModPowerOfTwoSingleGenerator {
         ms: geometric_random_unsigned_range(
@@ -3391,6 +3414,30 @@ pub fn random_unsigned_pair_gen_var_25<T: PrimitiveUnsigned, U: PrimitiveUnsigne
             )
         },
     ))
+}
+
+pub fn random_unsigned_pair_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(random_ordered_unique_pairs(random_positive_unsigneds::<T>(
+        EXAMPLE_SEED,
+    )))
+}
+
+pub fn random_unsigned_pair_gen_var_27<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
+    Box::new(ModPowerOfTwoSingleGenerator2 {
+        ms: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("ms"),
+            1,
+            T::WIDTH,
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
+        xss: {
+            let len = usize::wrapping_from(T::WIDTH) + 1;
+            let mut xss = Vec::with_capacity(len);
+            xss.resize_with(len, || None);
+            xss
+        },
+    })
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --

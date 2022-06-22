@@ -1248,11 +1248,9 @@ where
             let x = self.xs.next().unwrap();
             if out.is_empty() {
                 out.push(x);
-            } else {
-                if x != out[0] {
-                    out.push(x);
-                    return Some(out);
-                }
+            } else if x != out[0] {
+                out.push(x);
+                return Some(out);
             }
         }
     }

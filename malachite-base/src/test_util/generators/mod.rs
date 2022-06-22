@@ -1960,6 +1960,26 @@ pub fn unsigned_pair_gen_var_37<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() ->
     )
 }
 
+// All `(T, T)` where `T` is unsigned, both elements are nonzero, and the first element is smaller
+// than the second.
+pub fn unsigned_pair_gen_var_38<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_primitive_int_pair_gen_var_4,
+        &random_unsigned_pair_gen_var_26,
+        &special_random_unsigned_pair_gen_var_36,
+    )
+}
+
+// All `(T, u64)` where `T` is unsigned, the u64 is no greater than `T::WIDTH`, the `T` is
+// positive, and the `T` is less than 2 to the power of the `u64`.
+pub fn unsigned_pair_gen_var_39<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_26,
+        &random_unsigned_pair_gen_var_27,
+        &special_random_unsigned_pair_gen_var_37,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 // All `(T, u64, `bool) where `T` is unsigned and either the `bool` is false or the `u64` is

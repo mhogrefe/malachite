@@ -880,6 +880,18 @@ pub mod log_base_power_of_2;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_add;
+/// [`ModInverse`](traits::ModInverse), a trait for finding the multiplicative inverse of a number
+/// modulo another number.
+///
+/// # mod_inverse
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModInverse;
+///
+/// assert_eq!(7u8.mod_inverse(10), Some(3));
+/// assert_eq!(8u8.mod_inverse(10), None);
+/// assert_eq!(123u32.mod_inverse(4567), Some(854));
+/// ```
+pub mod mod_inverse;
 /// [`ModIsReduced`](traits::ModIsReduced), a trait for checking whether a number is reduced modulo
 /// another number.
 ///
@@ -1440,6 +1452,18 @@ pub mod mod_power_of_2;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_power_of_2_add;
+/// [`ModPowerOf2Inverse`](traits::ModPowerOf2Inverse), a trait for finding the multiplicative
+/// inverse of a number modulo $2^k$.
+///
+/// # mod_inverse
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
+///
+/// assert_eq!(7u8.mod_power_of_2_inverse(4), Some(7));
+/// assert_eq!(8u8.mod_power_of_2_inverse(4), None);
+/// assert_eq!(123u32.mod_power_of_2_inverse(7), Some(51));
+/// ```
+pub mod mod_power_of_2_inverse;
 /// [`ModPowerOf2IsReduced`](traits::ModPowerOf2IsReduced), a trait for checking whether a number
 /// is reduced modulo $2^k$.
 ///

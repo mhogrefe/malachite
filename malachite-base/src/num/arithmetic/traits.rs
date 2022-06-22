@@ -431,6 +431,14 @@ pub trait ModAddAssign<RHS = Self, M = Self> {
     fn mod_add_assign(&mut self, other: RHS, m: M);
 }
 
+/// Finds the multiplicative inverse of a number modulo another number $m$. Assumes the input is
+/// already reduced modulo $m$.
+pub trait ModInverse<M = Self> {
+    type Output;
+
+    fn mod_inverse(self, m: M) -> Option<Self::Output>;
+}
+
 /// Checks whether a number is reduced modulo another number $m$.
 pub trait ModIsReduced<M = Self> {
     fn mod_is_reduced(&self, m: &M) -> bool;
@@ -605,6 +613,14 @@ pub trait ModPowerOf2Add<RHS = Self> {
 /// Adds two numbers modulo $2^k$, in place. Assumes the inputs are already reduced modulo $2^k$.
 pub trait ModPowerOf2AddAssign<RHS = Self> {
     fn mod_power_of_2_add_assign(&mut self, other: RHS, pow: u64);
+}
+
+/// Finds the multiplicative inverse of a number modulo $2^k$. Assumes the input is already reduced
+/// modulo $2^k$.
+pub trait ModPowerOf2Inverse {
+    type Output;
+
+    fn mod_power_of_2_inverse(self, pow: u64) -> Option<Self::Output>;
 }
 
 /// Checks whether a number is reduced modulo $2^k$.

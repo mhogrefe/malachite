@@ -564,6 +564,12 @@ pub fn exhaustive_primitive_int_pair_gen_var_3<T: PrimitiveInt, U: PrimitiveInt>
     ))
 }
 
+pub fn exhaustive_primitive_int_pair_gen_var_4<T: PrimitiveInt>() -> It<(T, T)> {
+    Box::new(exhaustive_ordered_unique_pairs(
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (PrimitiveInt, PrimitiveUnsigned) --
 
 pub fn exhaustive_primitive_int_unsigned_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveUnsigned>(
@@ -2123,6 +2129,20 @@ impl<T: PrimitiveUnsigned>
     }
 }
 
+struct ModPowerOfTwoSingleGenerator2<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<u64, T, PrimitiveIntIncreasingRange<T>>
+    for ModPowerOfTwoSingleGenerator2<T>
+{
+    #[inline]
+    fn get_ys(&self, &pow: &u64) -> PrimitiveIntIncreasingRange<T> {
+        primitive_int_increasing_inclusive_range(T::ONE, T::low_mask(pow))
+    }
+}
+
 pub fn exhaustive_unsigned_pair_gen_var_14<T: PrimitiveUnsigned>() -> It<(T, u64)> {
     permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
@@ -2207,6 +2227,16 @@ pub fn exhaustive_unsigned_pair_gen_var_25<T: PrimitiveUnsigned>() -> It<(T, T)>
         exhaustive_pairs(exhaustive_positive_primitive_ints(), exhaustive_unsigneds())
             .filter(|&(x, y)| x != T::ONE || y != T::ZERO),
     )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_26<T: PrimitiveUnsigned>() -> It<(T, u64)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        primitive_int_increasing_inclusive_range(1, T::WIDTH),
+        ModPowerOfTwoSingleGenerator2 {
+            phantom: PhantomData,
+        },
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

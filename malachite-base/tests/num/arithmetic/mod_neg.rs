@@ -1,5 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
+use malachite_base::test_util::generators::{
+    unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_16,
+};
 
 fn mod_neg_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, m, out| {
@@ -35,6 +37,15 @@ fn mod_neg_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(neg.mod_neg(m), n);
         assert_eq!(n.mod_add(neg, m), T::ZERO);
         assert_eq!(n == neg, n == T::ZERO || m.even() && n == m >> 1);
+    });
+
+    unsigned_gen_var_1::<T>().test_properties(|m| {
+        assert_eq!(T::ZERO.mod_neg(m), T::ZERO);
+    });
+
+    unsigned_gen_var_6::<T>().test_properties(|m| {
+        assert_eq!(T::ONE.mod_neg(m), m - T::ONE);
+        assert_eq!((m - T::ONE).mod_neg(m), T::ONE);
     });
 }
 

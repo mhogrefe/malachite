@@ -3256,6 +3256,36 @@ impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator<T> {
     }
 }
 
+struct ModPowerOfTwoSingleGenerator2<T: PrimitiveUnsigned> {
+    ms: GeometricRandomNaturalValues<u64>,
+    xss: Vec<Option<Box<dyn Iterator<Item = T>>>>,
+    mean_stripe_n: u64,
+    mean_stripe_d: u64,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for ModPowerOfTwoSingleGenerator2<T> {
+    type Item = (T, u64);
+
+    fn next(&mut self) -> Option<(T, u64)> {
+        let pow = self.ms.next().unwrap();
+        assert_ne!(pow, 0);
+        let xs = &mut self.xss[usize::wrapping_from(pow)];
+        if xs.is_none() {
+            *xs = Some(Box::new(
+                striped_random_unsigned_bit_chunks(
+                    EXAMPLE_SEED.fork(&pow.to_string()),
+                    pow,
+                    self.mean_stripe_n,
+                    self.mean_stripe_d,
+                )
+                .filter(|&x| x != T::ZERO),
+            ));
+        }
+        let x = xs.as_mut().unwrap().next().unwrap();
+        Some((x, pow))
+    }
+}
+
 pub fn special_random_unsigned_pair_gen_var_13<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, u64)> {
@@ -3749,6 +3779,40 @@ pub fn special_random_unsigned_pair_gen_var_35<T: PrimitiveUnsigned>(
         config.get_or("mean_stripe_n", T::WIDTH >> 1),
         config.get_or("mean_stripe_d", 1),
     )))
+}
+
+pub fn special_random_unsigned_pair_gen_var_36<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(random_ordered_unique_pairs(
+        striped_random_positive_unsigneds::<T>(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    ))
+}
+
+pub fn special_random_unsigned_pair_gen_var_37<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(ModPowerOfTwoSingleGenerator2 {
+        ms: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("ms"),
+            1,
+            T::WIDTH,
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
+        xss: {
+            let len = usize::wrapping_from(T::WIDTH) + 1;
+            let mut xss = Vec::with_capacity(len);
+            xss.resize_with(len, || None);
+            xss
+        },
+        mean_stripe_n: config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        mean_stripe_d: config.get_or("mean_stripe_d", 1),
+    })
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

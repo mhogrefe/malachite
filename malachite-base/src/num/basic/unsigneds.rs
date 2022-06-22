@@ -3,10 +3,10 @@ use num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLcm, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
     CheckedNextPowerOf2, CoprimeWith, ExtendedGcd, FloorLogBase, FloorLogBase2,
     FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign, ModAdd, ModAddAssign,
-    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
-    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
-    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul,
-    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
+    ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
+    ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced,
+    ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
     ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
     ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
     ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
@@ -63,6 +63,7 @@ pub trait PrimitiveUnsigned:
     + ModIsReduced<Self>
     + ModAdd<Self, Self, Output = Self>
     + ModAddAssign<Self, Self>
+    + ModInverse<Self, Output = Self>
     + ModMul<Self, Self, Output = Self>
     + ModMulAssign<Self, Self>
     + ModMulPrecomputed<Self, Self, Output = Self>
@@ -74,6 +75,7 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2<Output = Self>
     + ModPowerOf2Add<Self, Output = Self>
     + ModPowerOf2AddAssign<Self>
+    + ModPowerOf2Inverse<Output = Self>
     + ModPowerOf2IsReduced
     + ModPowerOf2Mul<Self, Output = Self>
     + ModPowerOf2MulAssign<Self>
