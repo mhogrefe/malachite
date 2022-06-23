@@ -694,6 +694,7 @@ pub mod unions {
 }
 pub mod vecs {
     pub mod exhaustive {
+        pub mod exhaustive_combined_k_compositions;
         pub mod exhaustive_ordered_unique_vecs;
         pub mod exhaustive_ordered_unique_vecs_fixed_length;
         pub mod exhaustive_ordered_unique_vecs_length_inclusive_range;
@@ -712,6 +713,7 @@ pub mod vecs {
         pub mod exhaustive_vecs_length_n;
         pub mod exhaustive_vecs_length_range;
         pub mod exhaustive_vecs_min_length;
+        pub mod lex_k_compositions;
         pub mod lex_ordered_unique_vecs;
         pub mod lex_ordered_unique_vecs_fixed_length;
         pub mod lex_ordered_unique_vecs_length_inclusive_range;

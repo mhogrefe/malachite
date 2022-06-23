@@ -4497,3 +4497,164 @@ where
         ),
     }
 }
+
+/// Generates all $k$-compositions of a number: all length-$k$ [`Vec`]s of positive [`usize`]s
+/// whose sum is a given number.
+#[derive(Clone, Debug)]
+pub struct LexKCompositions {
+    done: bool,
+    first: bool,
+    xs: Vec<usize>,
+}
+
+impl Iterator for LexKCompositions {
+    type Item = Vec<usize>;
+
+    fn next(&mut self) -> Option<Vec<usize>> {
+        if self.done {
+            return None;
+        } else if self.first {
+            self.first = false;
+            return Some(self.xs.clone());
+        }
+        let last_not_one_index = self.xs.iter().rposition(|&x| x != 1);
+        if last_not_one_index == None || last_not_one_index == Some(0) {
+            self.done = true;
+            return None;
+        }
+        let last_not_one_index = last_not_one_index.unwrap();
+        self.xs[last_not_one_index - 1] += 1;
+        let last_not_one = self.xs[last_not_one_index];
+        let (last, init) = self.xs.split_last_mut().unwrap();
+        *last = last_not_one - 1;
+        for x in &mut init[last_not_one_index..] {
+            *x = 1;
+        }
+        Some(self.xs.clone())
+    }
+}
+
+/// Generates all $k$-compositions of a number: given $n$ and $k$, generates all length-$k$
+/// [`Vec`]s of positive [`usize`]s whose sum is $n$.
+///
+/// The [`Vec`]s are output in lexicographic order.
+///
+/// If $k = 0$ and $n \neq 0$, or if $n < k$, then the output is empty.
+///
+/// The output length is
+/// $$
+/// \binom{n-1}{k-1}.
+/// $$
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::lex_k_compositions;
+///
+/// let xss = lex_k_compositions(5, 3).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[1, 1, 3], &[1, 2, 2], &[1, 3, 1], &[2, 1, 2], &[2, 2, 1], &[3, 1, 1]]
+/// );
+/// ```
+pub fn lex_k_compositions(n: usize, k: usize) -> LexKCompositions {
+    if k == 0 && n != 0 || n < k {
+        return LexKCompositions {
+            done: true,
+            first: true,
+            xs: Vec::new(),
+        };
+    }
+    let mut xs = vec![1; k];
+    if k != 0 {
+        xs[k - 1] = n + 1 - k;
+    }
+    LexKCompositions {
+        done: false,
+        first: true,
+        xs,
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct LexKCompositionsGenerator {
+    k: usize,
+}
+
+impl ExhaustiveDependentPairsYsGenerator<usize, Vec<usize>, LexKCompositions>
+    for LexKCompositionsGenerator
+{
+    #[inline]
+    fn get_ys(&self, &n: &usize) -> LexKCompositions {
+        lex_k_compositions(n, self.k)
+    }
+}
+
+/// Generates $k$-compositions of $n$ for all $n$ in a given range: all length-$k$ [`Vec`]s of
+/// positive [`usize`]s whose sum is in a given range.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveCombinedKCompositions {
+    xs: ExhaustiveDependentPairs<
+        usize,
+        Vec<usize>,
+        RulerSequence<usize>,
+        LexKCompositionsGenerator,
+        PrimitiveIntIncreasingRange<usize>,
+        LexKCompositions,
+    >,
+}
+
+impl Iterator for ExhaustiveCombinedKCompositions {
+    type Item = Vec<usize>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<usize>> {
+        self.xs.next().map(|p| p.1)
+    }
+}
+
+/// Given $n_\text{min}$, $n_\text{max}$, and $k$, generates all length-$k$ [`Vec`]s of positive
+/// [`usize`]s whose sum is in the closed interval $[n_\text{min}, n_\text{max}]$.
+///
+/// The output length is
+/// $$
+/// \sum_{n=n_\text{min}}^{n_\text{max}} \binom{n-1}{k-1}.
+/// $$
+///
+/// # Panics
+/// Panics if $n_\text{min} > n_\text{max}$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::exhaustive_combined_k_compositions;
+///
+/// let xss = exhaustive_combined_k_compositions(4, 6, 3).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 1, 2], &[1, 1, 3], &[1, 2, 1], &[1, 1, 4], &[2, 1, 1], &[1, 2, 2], &[1, 3, 1],
+///         &[1, 2, 3], &[2, 1, 2], &[1, 3, 2], &[2, 2, 1], &[3, 1, 1], &[1, 4, 1], &[2, 1, 3],
+///         &[2, 2, 2], &[2, 3, 1], &[3, 1, 2], &[3, 2, 1], &[4, 1, 1]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_combined_k_compositions(
+    n_min: usize,
+    n_max: usize,
+    k: usize,
+) -> ExhaustiveCombinedKCompositions {
+    ExhaustiveCombinedKCompositions {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            primitive_int_increasing_inclusive_range(n_min, n_max),
+            LexKCompositionsGenerator { k },
+        ),
+    }
+}

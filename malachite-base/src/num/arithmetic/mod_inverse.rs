@@ -141,7 +141,7 @@ macro_rules! impl_mod_inverse {
 
             /// Computes multiplicative inverse of a number modulo another number $m$. Assumes the
             /// first number is already reduced modulo $m$.
-            /// 
+            ///
             /// Returns `None` if $x$ and $m$ are not coprime.
             ///
             /// $f(x, m) = y$, where $x, y < m$, $\gcd(x, y) = 1$, and $xy \equiv 1 \mod m$.

@@ -38,7 +38,7 @@ macro_rules! impl_mod_power_of_2_inverse {
 
             /// Computes multiplicative inverse of a number modulo $2^k$. Assumes the number is
             /// already reduced modulo $2^k$.
-            /// 
+            ///
             /// Returns `None` if $x$ is even.
             ///
             /// $f(x, k) = y$, where $x, y < 2^k$, $x$ is odd, and $xy \equiv 1 \mod 2^k$.
