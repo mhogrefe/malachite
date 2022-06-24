@@ -1193,6 +1193,15 @@ pub fn natural_pair_gen_var_10_nrm() -> Generator<(
     )
 }
 
+// All pairs of positive `Natural`s where the first is smaller than the second.
+pub fn natural_pair_gen_var_11() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_11,
+        &random_natural_pair_gen_var_11,
+        &special_random_natural_pair_gen_var_11,
+    )
+}
+
 // -- (Natural, Natural, bool) --
 
 // All `(Natural, Natural, bool)` where the second `Natural` is positive.
@@ -1778,7 +1787,7 @@ pub fn natural_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
-// All `(Natural, u64)`, where the `u64` is between 1 and `T::WIDTH`, inclusive.
+// All `(Natural, T)`, where the `T` is between 1 and `T::WIDTH`, inclusive.
 pub fn natural_unsigned_pair_gen_var_6<T: PrimitiveInt>() -> Generator<(Natural, u64)> {
     Generator::new(
         &exhaustive_natural_unsigned_pair_gen_var_4::<T>,
@@ -1868,6 +1877,15 @@ pub fn natural_unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(Na
         &exhaustive_natural_unsigned_pair_gen_var_9,
         &random_natural_unsigned_pair_gen_var_12,
         &special_random_natural_unsigned_pair_gen_var_13,
+    )
+}
+
+// All `(Natural, u64)` where the `Natural` is nonzero and less than 2 to the power of the `u64`.
+pub fn natural_unsigned_pair_gen_var_14() -> Generator<(Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_pair_gen_var_10,
+        &random_natural_unsigned_pair_gen_var_13,
+        &special_random_natural_unsigned_pair_gen_var_14,
     )
 }
 

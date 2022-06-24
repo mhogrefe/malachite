@@ -36,7 +36,7 @@ macro_rules! impl_mod_power_of_2_inverse {
         impl ModPowerOf2Inverse for $u {
             type Output = $u;
 
-            /// Computes multiplicative inverse of a number modulo $2^k$. Assumes the number is
+            /// Computes the multiplicative inverse of a number modulo $2^k$. Assumes the number is
             /// already reduced modulo $2^k$.
             ///
             /// Returns `None` if $x$ is even.

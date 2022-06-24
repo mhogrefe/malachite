@@ -1009,6 +1009,12 @@ pub fn exhaustive_natural_pair_gen_var_10() -> It<(Natural, Natural)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_naturals()).filter(|(x, y)| x >= y))
 }
 
+pub fn exhaustive_natural_pair_gen_var_11() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_ordered_unique_pairs(
+        exhaustive_positive_naturals(),
+    ))
+}
+
 // -- (Natural, Natural, bool) --
 
 pub fn exhaustive_natural_natural_bool_triple_gen_var_1() -> It<(Natural, Natural, bool)> {
@@ -1591,6 +1597,19 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -> It<
         exhaustive_positive_naturals(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_10() -> It<(Natural, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_positive_naturals(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(x, mut m)| {
+            m += x.significant_bits();
+            (x, m)
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveUnsigned, bool) --

@@ -1745,6 +1745,14 @@ pub fn random_natural_pair_gen_var_10(config: &GenConfig) -> It<(Natural, Natura
     )
 }
 
+pub fn random_natural_pair_gen_var_11(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_ordered_unique_pairs(random_positive_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 // -- (Natural, Natural, bool) --
 
 pub fn random_natural_natural_bool_triple_gen_var_1(
@@ -2851,6 +2859,32 @@ pub fn random_natural_unsigned_pair_gen_var_12<T: PrimitiveUnsigned>(
             )
         },
     ))
+}
+
+pub fn random_natural_unsigned_pair_gen_var_13(config: &GenConfig) -> It<(Natural, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, mut m)| {
+            m += x.significant_bits();
+            (x, m)
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveUnsigned, bool) --

@@ -205,6 +205,7 @@ pub mod natural {
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
+        pub mod mod_inverse;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
@@ -212,6 +213,7 @@ pub mod natural {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;

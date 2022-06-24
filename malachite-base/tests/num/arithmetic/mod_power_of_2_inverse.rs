@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::generators::{unsigned_gen_var_3, unsigned_pair_gen_var_39};
-use malachite_base::test_util::num::arithmetic::mod_power_of_2_inverse::mod_power_of_2_inverse_euclidean;
+use malachite_base::test_util::num::arithmetic::mod_power_of_2_inverse::*;
 use std::panic::catch_unwind;
 
 fn mod_power_of_2_inverse_helper<

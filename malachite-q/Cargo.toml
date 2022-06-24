@@ -1,6 +1,6 @@
 [package]
 name = "malachite-q"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 description = "The arbitrary-precision type Rational, with efficient algorithms partially derived from GMP"
@@ -21,8 +21,8 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = "0.9.0"
-malachite-base = "0.2.3"
-malachite-nz = { version = "0.2.3", features = ["serde"] }
+malachite-base = "0.2.4"
+malachite-nz = { version = "0.2.4", features = ["serde"] }
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }

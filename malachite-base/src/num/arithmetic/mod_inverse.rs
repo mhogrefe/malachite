@@ -139,8 +139,8 @@ macro_rules! impl_mod_inverse {
         impl ModInverse<$u> for $u {
             type Output = $u;
 
-            /// Computes multiplicative inverse of a number modulo another number $m$. Assumes the
-            /// first number is already reduced modulo $m$.
+            /// Computes the multiplicative inverse of a number modulo another number $m$. Assumes
+            /// the first number is already reduced modulo $m$.
             ///
             /// Returns `None` if $x$ and $m$ are not coprime.
             ///

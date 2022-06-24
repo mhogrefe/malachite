@@ -90,6 +90,10 @@ pub mod log_base_power_of_2;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
 pub mod mod_add;
+/// Implementations of
+/// [`ModInverse`](malachite_base::num::arithmetic::traits::ModInverse), a trait for finding the
+/// multiplicative inverse of a number modulo another number.
+pub mod mod_inverse;
 /// Implementations of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
 /// trait for checking whether a number is reduced modulo another number.
 pub mod mod_is_reduced;
@@ -150,6 +154,10 @@ pub mod mod_power_of_2;
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign),
 /// traits for adding two numbers modulo $2^k$.
 pub mod mod_power_of_2_add;
+/// Implementations of
+/// [`ModPowerOf2Inverse`](malachite_base::num::arithmetic::traits::ModPowerOf2Inverse), a trait
+/// for finding the multiplicative inverse of a number modulo $2^k$.
+pub mod mod_power_of_2_inverse;
 /// Implementations of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), a
 /// trait for checking whether a number is reduced modulo $2^k$.
