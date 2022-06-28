@@ -851,6 +851,24 @@ pub fn special_random_signed_gen_var_10<T: PrimitiveSigned>(config: &GenConfig) 
     )
 }
 
+pub fn special_random_signed_gen_var_11<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    config: &GenConfig,
+) -> It<S> {
+    Box::new(
+        striped_random_signed_inclusive_range::<U, S>(
+            EXAMPLE_SEED,
+            S::ZERO,
+            S::low_mask(S::WIDTH - 2),
+            config.get_or("mean_stripe_n", S::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(|u| (u << 1) | S::ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn special_random_signed_pair_gen<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T)> {
@@ -1010,6 +1028,71 @@ pub fn special_random_signed_pair_gen_var_7<T: PrimitiveSigned>(config: &GenConf
     )))
 }
 
+pub fn special_random_signed_pair_gen_var_8<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    config: &GenConfig,
+) -> It<(S, S)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_signed_inclusive_range::<U, S>(
+                seed,
+                S::ZERO,
+                S::low_mask(S::WIDTH - 2),
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | S::ONE)
+        },
+    ))
+}
+
+pub fn special_random_signed_pair_gen_var_9<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>(
+    config: &GenConfig,
+) -> It<(S, S)> {
+    Box::new(
+        random_pairs_from_single(
+            striped_random_signed_inclusive_range::<U, S>(
+                EXAMPLE_SEED,
+                S::ZERO,
+                S::low_mask(S::WIDTH - 2),
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | S::ONE),
+        )
+        .filter(|&(a, b): &(S, S)| a.unsigned_abs().coprime_with(b.unsigned_abs())),
+    )
+}
+
+pub fn special_random_signed_pair_gen_var_10<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    config: &GenConfig,
+) -> It<(S, S)> {
+    Box::new(
+        random_pairs_from_single(striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", S::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .filter(|&(x, y): &(S, S)| x.unsigned_abs().coprime_with(y.unsigned_abs())),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn special_random_signed_triple_gen<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T, T)> {
@@ -1119,6 +1202,62 @@ pub fn special_random_signed_triple_gen_var_5<T: PrimitiveSigned>(
         ))
         .filter(|&(x, y, m)| !x.eq_mod(y, m)),
     )
+}
+
+pub fn special_random_signed_triple_gen_var_6<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    config: &GenConfig,
+) -> It<(S, S, S)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_signed_inclusive_range::<U, S>(
+                seed,
+                S::ZERO,
+                S::low_mask(S::WIDTH - 2),
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | S::ONE)
+        },
+    ))
+}
+
+pub fn special_random_signed_triple_gen_var_7<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    config: &GenConfig,
+) -> It<(S, S, S)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_signed_inclusive_range::<U, S>(
+                seed,
+                S::ZERO,
+                S::low_mask(S::WIDTH - 2),
+                config.get_or("mean_stripe_n", S::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | S::ONE)
+        },
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -3815,6 +3954,62 @@ pub fn special_random_unsigned_pair_gen_var_37<T: PrimitiveUnsigned>(
     })
 }
 
+pub fn special_random_unsigned_pair_gen_var_38<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::ZERO,
+                T::low_mask(T::WIDTH - 1),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn special_random_unsigned_pair_gen_var_39<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(
+            striped_random_unsigned_inclusive_range(
+                EXAMPLE_SEED,
+                T::ZERO,
+                T::low_mask(T::WIDTH - 1),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | T::ONE),
+        )
+        .filter(|&(a, b): &(T, T)| a.coprime_with(b)),
+    )
+}
+
+pub fn special_random_unsigned_pair_gen_var_40<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .filter(|&(x, y): &(T, T)| x.coprime_with(y)),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 pub fn special_random_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -4450,6 +4645,56 @@ pub fn special_random_unsigned_triple_gen_var_21<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, T, T)> {
     Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::ZERO,
+                T::low_mask(T::WIDTH - 1),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn special_random_unsigned_triple_gen_var_22<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::ZERO,
+                T::low_mask(T::WIDTH - 1),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn special_random_unsigned_triple_gen_var_23<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(random_triples_xyy(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_unsigneds(

@@ -7,6 +7,7 @@ use comparison::traits::Min;
 use iterators::with_special_value;
 use itertools::repeat_n;
 use itertools::Itertools;
+use num::arithmetic::traits::CoprimeWith;
 use num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -1963,6 +1964,13 @@ pub fn random_signed_gen_var_11<T: PrimitiveSigned>(_config: &GenConfig) -> It<T
     Box::new(random_primitive_ints(EXAMPLE_SEED).filter(|&x| x != T::ZERO && x != T::MIN))
 }
 
+pub fn random_signed_gen_var_12<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
+    Box::new(
+        random_signed_inclusive_range(EXAMPLE_SEED, T::ZERO, T::low_mask(T::WIDTH - 2))
+            .map(|u| (u << 1) | T::ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn random_signed_pair_gen_var_1<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T)> {
@@ -2028,6 +2036,42 @@ pub fn random_signed_pair_gen_var_6<T: PrimitiveSigned>(_config: &GenConfig) -> 
     Box::new(random_pairs_from_single(random_natural_signeds::<T>(
         EXAMPLE_SEED,
     )))
+}
+
+pub fn random_signed_pair_gen_var_7<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_signed_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 2))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn random_signed_pair_gen_var_8<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T)>
+where
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    Box::new(
+        random_pairs_from_single(
+            random_signed_inclusive_range(EXAMPLE_SEED, T::ZERO, T::low_mask(T::WIDTH - 2))
+                .map(|u| (u << 1) | T::ONE),
+        )
+        .filter(|&(a, b): &(T, T)| a.unsigned_abs().coprime_with(b.unsigned_abs())),
+    )
+}
+
+pub fn random_signed_pair_gen_var_9<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    _config: &GenConfig,
+) -> It<(S, S)> {
+    Box::new(
+        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .filter(|&(x, y): &(S, S)| x.unsigned_abs().coprime_with(y.unsigned_abs())),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -2113,6 +2157,28 @@ pub fn random_signed_triple_gen_var_4<
             }
         }),
     )
+}
+
+pub fn random_signed_triple_gen_var_5<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_signed_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 2))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn random_signed_triple_gen_var_6<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T, T)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_signed_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 2))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
@@ -3440,6 +3506,34 @@ pub fn random_unsigned_pair_gen_var_27<T: PrimitiveUnsigned>(config: &GenConfig)
     })
 }
 
+pub fn random_unsigned_pair_gen_var_28<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_unsigned_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn random_unsigned_pair_gen_var_29<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(
+            random_unsigned_inclusive_range(EXAMPLE_SEED, T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE),
+        )
+        .filter(|&(a, b): &(T, T)| a.coprime_with(b)),
+    )
+}
+
+pub fn random_unsigned_pair_gen_var_30<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .filter(|&(x, y): &(T, T)| x.coprime_with(y)),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
 struct ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
@@ -3710,6 +3804,32 @@ pub fn random_unsigned_triple_gen_var_8<T: PrimitiveUnsigned>(
     _config: &GenConfig,
 ) -> It<(T, T, T)> {
     Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_unsigned_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn random_unsigned_triple_gen_var_9<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_unsigned_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
+pub fn random_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(random_triples_xyy(
         EXAMPLE_SEED,
         &random_primitive_ints,
         &|seed| {

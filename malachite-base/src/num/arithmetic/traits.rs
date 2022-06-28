@@ -352,6 +352,22 @@ pub trait CheckedLcm<RHS = Self> {
     fn checked_lcm(self, other: RHS) -> Option<Self::Output>;
 }
 
+/// Calculates the Legendre symbol of two numbers. Typically the implementations will be identical
+/// to those of [`JacobiSymbol`].
+pub trait LegendreSymbol<RHS = Self> {
+    fn legendre_symbol(self, other: RHS) -> i8;
+}
+
+/// Calculates the Jacobi symbol of two numbers.
+pub trait JacobiSymbol<RHS = Self> {
+    fn jacobi_symbol(self, other: RHS) -> i8;
+}
+
+/// Calculates the Kronecker symbol of two numbers.
+pub trait KroneckerSymbol<RHS = Self> {
+    fn kronecker_symbol(self, other: RHS) -> i8;
+}
+
 /// Calculates the base-$b$ logarithm of a number, or returns `None` if the number is not a perfect
 /// power of $b$.
 pub trait CheckedLogBase<B = Self> {

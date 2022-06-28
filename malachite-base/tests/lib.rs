@@ -195,6 +195,7 @@ pub mod num {
         pub mod floor;
         pub mod gcd;
         pub mod is_power_of_2;
+        pub mod kronecker_symbol;
         pub mod lcm;
         pub mod log_base;
         pub mod log_base_2;

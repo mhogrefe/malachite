@@ -631,7 +631,7 @@ pub fn signed_gen_var_9<
     )
 }
 
-// All unsigned `T`s whose square is also representable as a `T`.
+// All signed `T`s whose square is also representable as a `T`.
 pub fn signed_gen_var_10<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -658,6 +658,18 @@ pub fn signed_gen_var_12<T: PrimitiveSigned>() -> Generator<T> {
         &exhaustive_signed_gen_var_11,
         &random_signed_gen_var_11,
         &special_random_signed_gen_var_10,
+    )
+}
+
+// All pairs of signeds where the second element is odd and positive.
+pub fn signed_gen_var_13<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<S> {
+    Generator::new(
+        &exhaustive_signed_gen_var_12,
+        &random_signed_gen_var_12,
+        &special_random_signed_gen_var_11::<U, S>,
     )
 }
 
@@ -735,6 +747,41 @@ pub fn signed_pair_gen_var_7<T: PrimitiveSigned>() -> Generator<(T, T)> {
     )
 }
 
+// All pairs of signeds where the second element is odd and positive.
+pub fn signed_pair_gen_var_8<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<(S, S)> {
+    Generator::new(
+        &exhaustive_signed_pair_gen_var_9,
+        &random_signed_pair_gen_var_7,
+        &special_random_signed_pair_gen_var_8::<U, S>,
+    )
+}
+
+// All coprime pairs of signeds where both elements are odd and positive.
+pub fn signed_pair_gen_var_9<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>() -> Generator<(S, S)> {
+    Generator::new(
+        &exhaustive_signed_pair_gen_var_10,
+        &random_signed_pair_gen_var_8,
+        &special_random_signed_pair_gen_var_9::<U, S>,
+    )
+}
+
+pub fn signed_pair_gen_var_10<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
+>() -> Generator<(S, S)> {
+    Generator::new(
+        &exhaustive_signed_pair_gen_var_11,
+        &random_signed_pair_gen_var_9,
+        &special_random_signed_pair_gen_var_10,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
@@ -790,6 +837,30 @@ pub fn signed_triple_gen_var_5<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
         &exhaustive_signed_triple_gen_var_5,
         &random_primitive_int_triple_gen_var_1,
         &special_random_signed_triple_gen_var_5,
+    )
+}
+
+// All triples of signeds where the third element is odd.
+pub fn signed_triple_gen_var_6<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<(S, S, S)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_6,
+        &random_signed_triple_gen_var_5,
+        &special_random_signed_triple_gen_var_6::<U, S>,
+    )
+}
+
+// All triples of signeds where the second and third elements are odd.
+pub fn signed_triple_gen_var_7<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<(S, S, S)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_7,
+        &random_signed_triple_gen_var_6,
+        &special_random_signed_triple_gen_var_7::<U, S>,
     )
 }
 
@@ -1980,6 +2051,33 @@ pub fn unsigned_pair_gen_var_39<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
     )
 }
 
+// All pairs of unsigneds where the second element is odd.
+pub fn unsigned_pair_gen_var_40<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_27,
+        &random_unsigned_pair_gen_var_28,
+        &special_random_unsigned_pair_gen_var_38,
+    )
+}
+
+// All coprime pairs of unsigneds where both elements are odd.
+pub fn unsigned_pair_gen_var_41<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_28,
+        &random_unsigned_pair_gen_var_29,
+        &special_random_unsigned_pair_gen_var_39,
+    )
+}
+
+// All coprime pairs of unsigneds of the same type.
+pub fn unsigned_pair_gen_var_42<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_29,
+        &random_unsigned_pair_gen_var_30,
+        &special_random_unsigned_pair_gen_var_40,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 // All `(T, u64, `bool) where `T` is unsigned and either the `bool` is false or the `u64` is
@@ -2208,12 +2306,30 @@ pub fn unsigned_triple_gen_var_20<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     )
 }
 
-// All triples of unsigneds where the second unsigned is odd.
+// All triples of unsigneds where the second element is odd.
 pub fn unsigned_triple_gen_var_21<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
     Generator::new(
         &exhaustive_unsigned_triple_gen_var_18,
         &random_unsigned_triple_gen_var_8,
         &special_random_unsigned_triple_gen_var_21,
+    )
+}
+
+// All triples of unsigneds where the third element is odd.
+pub fn unsigned_triple_gen_var_22<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_19,
+        &random_unsigned_triple_gen_var_9,
+        &special_random_unsigned_triple_gen_var_22,
+    )
+}
+
+// All triples of unsigneds where the second and third elements are odd.
+pub fn unsigned_triple_gen_var_23<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_20,
+        &random_unsigned_triple_gen_var_10,
+        &special_random_unsigned_triple_gen_var_23,
     )
 }
 

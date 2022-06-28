@@ -6,21 +6,22 @@ use num::arithmetic::traits::{
     CheckedMul, CheckedNeg, CheckedPow, CheckedRoot, CheckedSqrt, CheckedSquare, CheckedSub,
     CheckedSubMul, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
     DivRoundAssign, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ExtendedGcd, FloorRoot,
-    FloorRootAssign, FloorSqrt, FloorSqrtAssign, Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign,
-    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
-    OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
-    OverflowingNegAssign, OverflowingPow, OverflowingPowAssign, OverflowingSquare,
-    OverflowingSquareAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
-    OverflowingSubMulAssign, Parity, Pow, PowAssign, PowerOf2, RemPowerOf2, RemPowerOf2Assign,
-    RoundToMultiple, RoundToMultipleAssign, RoundToMultipleOfPowerOf2,
-    RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
-    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingPowAssign,
-    SaturatingSquare, SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
-    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, Square,
-    SquareAssign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul,
-    WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
-    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign, WrappingSquare,
-    WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
+    FloorRootAssign, FloorSqrt, FloorSqrtAssign, JacobiSymbol, KroneckerSymbol, LegendreSymbol,
+    Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign,
+    OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign,
+    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
+    OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
+    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowAssign,
+    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RoundToMultiple, RoundToMultipleAssign,
+    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign,
+    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
+    SaturatingPowAssign, SaturatingSquare, SaturatingSquareAssign, SaturatingSub,
+    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
+    ShrRound, ShrRoundAssign, Sign, Square, SquareAssign, SubMul, SubMulAssign, WrappingAdd,
+    WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign,
+    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign,
+    WrappingSquare, WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
+    WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
@@ -201,7 +202,10 @@ pub trait PrimitiveInt:
     + HasRandomPrimitiveInts
     + IsInteger
     + Iverson
+    + JacobiSymbol<Self>
+    + KroneckerSymbol<Self>
     + LeadingZeros
+    + LegendreSymbol<Self>
     + LowerHex
     + LowMask
     + Min

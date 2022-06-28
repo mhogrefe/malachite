@@ -703,6 +703,53 @@ pub mod gcd;
 /// assert_eq!((-4.0).is_power_of_2(), false);
 /// ```
 pub mod is_power_of_2;
+/// [`LegendreSymbol`](traits::LegendreSymbol), [`JacobiSymbol`](traits::JacobiSymbol), and
+/// [`KroneckerSymbol`](traits::KroneckerSymbol), traits for computing the Legendre, Jacobi, and
+/// Kronecker symbols of two numbers.
+///
+/// # legendre_symbol
+/// ```
+/// use malachite_base::num::arithmetic::traits::LegendreSymbol;
+///
+/// assert_eq!(10u8.legendre_symbol(5), 0);
+/// assert_eq!(7u8.legendre_symbol(5), -1);
+/// assert_eq!(11u8.legendre_symbol(5), 1);
+///
+/// assert_eq!((-7i8).legendre_symbol(5), -1);
+/// assert_eq!((-11i8).legendre_symbol(5), 1);
+/// ```
+///
+/// # jacobi_symbol
+/// ```
+/// use malachite_base::num::arithmetic::traits::JacobiSymbol;
+///
+/// assert_eq!(10u8.jacobi_symbol(5), 0);
+/// assert_eq!(7u8.jacobi_symbol(5), -1);
+/// assert_eq!(11u8.jacobi_symbol(5), 1);
+/// assert_eq!(11u8.jacobi_symbol(9), 1);
+///
+/// assert_eq!((-7i8).jacobi_symbol(5), -1);
+/// assert_eq!((-11i8).jacobi_symbol(5), 1);
+/// assert_eq!((-11i8).jacobi_symbol(9), 1);
+/// ```
+///
+/// # kronecker_symbol
+/// ```
+/// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
+///
+/// assert_eq!(10u8.kronecker_symbol(5), 0);
+/// assert_eq!(7u8.kronecker_symbol(5), -1);
+/// assert_eq!(11u8.kronecker_symbol(5), 1);
+/// assert_eq!(11u8.kronecker_symbol(9), 1);
+/// assert_eq!(11u8.kronecker_symbol(8), -1);
+///
+/// assert_eq!((-7i8).kronecker_symbol(5), -1);
+/// assert_eq!((-11i8).kronecker_symbol(5), 1);
+/// assert_eq!((-11i8).kronecker_symbol(9), 1);
+/// assert_eq!((-11i8).kronecker_symbol(8), -1);
+/// assert_eq!((-11i8).kronecker_symbol(-8), 1);
+/// ```
+pub mod kronecker_symbol;
 /// [`Lcm`](traits::Lcm), [`LcmAssign`](traits::LcmAssign), and [`CheckedLcm`](traits::CheckedLcm),
 /// traits for computing the LCM (least common multiple) of two numbers.
 ///

@@ -6,6 +6,7 @@ use iterators::bit_distributor::BitDistributorOutputType;
 use iterators::iter_windows;
 use itertools::{repeat_n, Itertools};
 use max;
+use num::arithmetic::traits::CoprimeWith;
 use num::arithmetic::traits::{
     ArithmeticCheckedShl, CheckedNeg, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -733,6 +734,13 @@ pub fn exhaustive_signed_gen_var_11<T: PrimitiveSigned>() -> It<T> {
     Box::new(exhaustive_signeds().filter(|&x| x != T::ZERO && x != T::MIN))
 }
 
+pub fn exhaustive_signed_gen_var_12<T: PrimitiveSigned>() -> It<T> {
+    Box::new(
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 2))
+            .map(|u| (u << 1) | T::ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_pair_gen<T: PrimitiveSigned>() -> It<(T, T)> {
@@ -855,6 +863,37 @@ pub fn exhaustive_signed_pair_gen_var_8<T: PrimitiveSigned>() -> It<(T, T)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_natural_signeds()))
 }
 
+pub fn exhaustive_signed_pair_gen_var_9<T: PrimitiveSigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 2))
+            .map(|u| (u << 1) | T::ONE),
+    ))
+}
+
+pub fn exhaustive_signed_pair_gen_var_10<T: PrimitiveSigned>() -> It<(T, T)>
+where
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    Box::new(
+        exhaustive_pairs_from_single(
+            primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 2))
+                .map(|u| (u << 1) | T::ONE),
+        )
+        .filter(|&(a, b): &(T, T)| a.unsigned_abs().coprime_with(b.unsigned_abs())),
+    )
+}
+
+pub fn exhaustive_signed_pair_gen_var_11<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
+>() -> It<(S, S)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_signeds())
+            .filter(|&(x, y): &(S, S)| x.unsigned_abs().coprime_with(y.unsigned_abs())),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, T, T)> {
@@ -968,6 +1007,22 @@ pub fn exhaustive_signed_triple_gen_var_5<T: PrimitiveSigned>() -> It<(T, T, T)>
         exhaustive_triples_from_single(exhaustive_signeds::<T>())
             .filter(|&(x, y, m)| !x.eq_mod(y, m)),
     )
+}
+
+pub fn exhaustive_signed_triple_gen_var_6<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_signeds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 2))
+            .map(|u| (u << 1) | T::ONE),
+    ))
+}
+
+pub fn exhaustive_signed_triple_gen_var_7<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_signeds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 2))
+            .map(|u| (u << 1) | T::ONE),
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -2239,6 +2294,31 @@ pub fn exhaustive_unsigned_pair_gen_var_26<T: PrimitiveUnsigned>() -> It<(T, u64
     )))
 }
 
+pub fn exhaustive_unsigned_pair_gen_var_27<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
+            .map(|u| (u << 1) | T::ONE),
+    ))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_28<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(
+            primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE),
+        )
+        .filter(|&(a, b): &(T, T)| a.coprime_with(b)),
+    )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_29<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_unsigneds())
+            .filter(|&(x, y): &(T, T)| x.coprime_with(y)),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -2599,6 +2679,22 @@ pub fn exhaustive_unsigned_triple_gen_var_17<T: PrimitiveUnsigned>() -> It<(T, T
 
 pub fn exhaustive_unsigned_triple_gen_var_18<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
     Box::new(exhaustive_triples_xyx(
+        exhaustive_unsigneds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
+            .map(|u| (u << 1) | T::ONE),
+    ))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_19<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_unsigneds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
+            .map(|u| (u << 1) | T::ONE),
+    ))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_20<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    Box::new(exhaustive_triples_xyy(
         exhaustive_unsigneds(),
         primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
             .map(|u| (u << 1) | T::ONE),
