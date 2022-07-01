@@ -869,10 +869,8 @@ impl Iterator for RandomIntegerRangeToInfinity {
 
 /// Generates random [`Integer`]s greater than or equal to a lower bound $a$.
 ///
-/// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
-/// length of the absolute values of the generated values; but the actual mean will always be lower
-/// than $m$. If $a > 0$, $m$ must be greater than the bit length of $a$; otherwise, $m$ must be
-/// positive. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the absolute values of the generated values is specified. $m$ is
+/// equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -930,10 +928,8 @@ pub fn random_integer_range_to_infinity(
 
 /// Generates random [`Integer`]s less than or equal to an upper bound $a$.
 ///
-/// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
-/// length of the absolute values of the generated values; but the actual mean will always be lower
-/// than $m$. If $a < 0$, $m$ must be greater than the bit length of $a$; otherwise, $m$ must be
-/// positive. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the absolute values of the generated values is specified. $m$ is
+/// equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -1051,7 +1047,7 @@ impl Iterator for RandomIntegerRange {
 /// as bit length increases. The larger it is, the more closely the distribution approaches a
 /// uniform distribution over the bit lengths.
 ///
-/// Once a bit length is selected, the [`Integer` ]is chosen uniformly from all [`Integer`]s with
+/// Once a bit length is selected, the [`Integer`] is chosen uniformly from all [`Integer`]s with
 /// that bit length that are in $[a, b)$.
 ///
 /// The output length is infinite.

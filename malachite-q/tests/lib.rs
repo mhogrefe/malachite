@@ -142,6 +142,10 @@ pub mod exhaustive {
     pub mod exhaustive_nonzero_rationals;
     pub mod exhaustive_positive_rationals;
     pub mod exhaustive_rationals;
+    pub mod exhaustive_rationals_with_denominator_inclusive_range;
+    pub mod exhaustive_rationals_with_denominator_range;
+    pub mod exhaustive_rationals_with_denominator_range_to_infinity;
+    pub mod exhaustive_rationals_with_denominator_range_to_negative_infinity;
 }
 pub mod random {
     pub mod random_negative_rationals;
@@ -149,6 +153,10 @@ pub mod random {
     pub mod random_nonzero_rationals;
     pub mod random_positive_rationals;
     pub mod random_rationals;
+    pub mod random_rationals_with_denominator_inclusive_range;
+    pub mod random_rationals_with_denominator_range;
+    pub mod random_rationals_with_denominator_range_to_infinity;
+    pub mod random_rationals_with_denominator_range_to_negative_infinity;
     pub mod striped_random_negative_rationals;
     pub mod striped_random_non_negative_rationals;
     pub mod striped_random_nonzero_rationals;

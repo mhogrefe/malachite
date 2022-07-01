@@ -1,4 +1,13 @@
+use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::RoundingFrom;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_nz::integer::exhaustive::{
+    exhaustive_integer_range, exhaustive_integer_range_to_infinity,
+    exhaustive_integer_range_to_negative_infinity, ExhaustiveIntegerRange,
+    ExhaustiveIntegerRangeToInfinity, ExhaustiveIntegerRangeToNegativeInfinity,
+};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::iter::{once, Chain, Once};
 use std::mem::swap;
@@ -252,4 +261,313 @@ pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 /// ```
 pub fn exhaustive_rationals() -> Chain<Once<Rational>, ExhaustiveNonzeroRationals> {
     once(Rational::ZERO).chain(exhaustive_nonzero_rationals())
+}
+
+/// Generates all [`Rational`]s with a specific denominator and with numerators from a given
+/// iterator. Numerators that are not coprime with the denominator are skipped.
+#[derive(Clone, Debug)]
+pub struct RationalsWithDenominator<'a, I: Iterator<Item = Integer>> {
+    pub(crate) numerators: I,
+    pub(crate) denominator: &'a Natural,
+}
+
+impl<'a, I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<'a, I> {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        loop {
+            let n = self.numerators.next()?;
+            if n.unsigned_abs_ref().coprime_with(self.denominator) {
+                return Some(Rational {
+                    sign: n >= 0u32,
+                    numerator: n.unsigned_abs(),
+                    denominator: self.denominator.clone(),
+                });
+            }
+        }
+    }
+}
+
+/// Generates all [`Rational`]s greater than or equal to some number $a$ and with a specific
+/// denominator, in order of increasing absolute value.
+///
+/// When two [`Rational`]s have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log \log n)^2 \log\log\log i)$
+///
+/// $M(n) = O(\log i \log \log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `d` is zero.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_nz::natural::Natural;
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_rationals_with_denominator_range_to_infinity(
+///             &Natural::from(5u32),
+///             Rational::from_signeds(22i32, 7)
+///         ),
+///         10
+///     ),
+///     "[16/5, 17/5, 18/5, 19/5, 21/5, 22/5, 23/5, 24/5, 26/5, 27/5, ...]"
+/// );
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_rationals_with_denominator_range_to_infinity(
+///             &Natural::from(2u32),
+///             Rational::from_signeds(-22i32, 7)
+///         ),
+///         10
+///     ),
+///     "[1/2, -1/2, 3/2, -3/2, 5/2, -5/2, 7/2, 9/2, 11/2, 13/2, ...]"
+/// );
+/// ```
+pub fn exhaustive_rationals_with_denominator_range_to_infinity(
+    d: &Natural,
+    a: Rational,
+) -> RationalsWithDenominator<ExhaustiveIntegerRangeToInfinity> {
+    assert_ne!(*d, 0u32);
+    RationalsWithDenominator {
+        numerators: exhaustive_integer_range_to_infinity(Integer::rounding_from(
+            a * Rational::from(d),
+            RoundingMode::Ceiling,
+        )),
+        denominator: d,
+    }
+}
+
+/// Generates all [`Rational`]s less than or equal to some number $a$ and with a specific
+/// denominator, in order of increasing absolute value.
+///
+/// When two [`Rational`]s have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log \log n)^2 \log\log\log i)$
+///
+/// $M(n) = O(\log i \log \log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `d` is zero.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_nz::natural::Natural;
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_negative_infinity;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_rationals_with_denominator_range_to_negative_infinity(
+///             &Natural::from(5u32),
+///             Rational::from_signeds(-22i32, 7)
+///         ),
+///         10
+///     ),
+///     "[-16/5, -17/5, -18/5, -19/5, -21/5, -22/5, -23/5, -24/5, -26/5, -27/5, ...]"
+/// );
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_rationals_with_denominator_range_to_negative_infinity(
+///             &Natural::from(2u32),
+///             Rational::from_signeds(22i32, 7)
+///         ),
+///         10
+///     ),
+///     "[1/2, -1/2, 3/2, -3/2, 5/2, -5/2, -7/2, -9/2, -11/2, -13/2, ...]"
+/// );
+/// ```
+pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
+    d: &Natural,
+    a: Rational,
+) -> RationalsWithDenominator<ExhaustiveIntegerRangeToNegativeInfinity> {
+    assert_ne!(*d, 0u32);
+    RationalsWithDenominator {
+        numerators: exhaustive_integer_range_to_negative_infinity(Integer::rounding_from(
+            a * Rational::from(d),
+            RoundingMode::Floor,
+        )),
+        denominator: d,
+    }
+}
+
+/// Generates all [`Rational`]s in the half-open range $[a, b)$ and with a specific denominator,
+/// in order of increasing absolute value.
+///
+/// When two [`Rational`]s have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log \log n)^2 \log\log\log i)$
+///
+/// $M(n) = O(\log i \log \log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `d` is zero or if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use itertools::Itertools;
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::natural::Natural;
+/// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_range(
+///         &Natural::from(2u32),
+///         Rational::from_signeds(1i32, 3),
+///         Rational::from_signeds(5i32, 2)
+///     ).collect_vec().to_debug_string(),
+///     "[1/2, 3/2]"
+/// );
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_range(
+///         &Natural::from(2u32),
+///         Rational::from_signeds(-5i32, 3),
+///         Rational::from_signeds(5i32, 2)
+///     ).collect_vec().to_debug_string(),
+///     "[1/2, -1/2, 3/2, -3/2]"
+/// );
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_range(
+///         &Natural::from(10u32),
+///         Rational::from_float_simplest(std::f64::consts::E),
+///         Rational::from_float_simplest(std::f64::consts::PI),
+///     ).collect_vec().to_debug_string(),
+///     "[29/10, 31/10]"
+/// );
+/// ```
+pub fn exhaustive_rationals_with_denominator_range(
+    d: &Natural,
+    a: Rational,
+    b: Rational,
+) -> RationalsWithDenominator<ExhaustiveIntegerRange> {
+    assert_ne!(*d, 0u32);
+    assert!(a < b);
+    let q_d = Rational::from(d);
+    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling);
+    let upper_included = b.denominator_ref() == d;
+    let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor);
+    if !upper_included {
+        b_i += Integer::ONE;
+    }
+    RationalsWithDenominator {
+        numerators: exhaustive_integer_range(a_i, b_i),
+        denominator: d,
+    }
+}
+
+/// Generates all [`Rational`]s in the closed range $[a, b]$ and with a specific denominator, in
+/// order of increasing absolute value.
+///
+/// When two [`Rational`]s have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log \log n)^2 \log\log\log i)$
+///
+/// $M(n) = O(\log i \log \log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `d` is zero or if $a < b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use itertools::Itertools;
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::natural::Natural;
+/// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_inclusive_range(
+///         &Natural::from(2u32),
+///         Rational::from_signeds(1i32, 3),
+///         Rational::from_signeds(5i32, 2)
+///     ).collect_vec().to_debug_string(),
+///     "[1/2, 3/2, 5/2]"
+/// );
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_inclusive_range(
+///         &Natural::from(2u32),
+///         Rational::from_signeds(-5i32, 3),
+///         Rational::from_signeds(5i32, 2)
+///     ).collect_vec().to_debug_string(),
+///     "[1/2, -1/2, 3/2, -3/2, 5/2]"
+/// );
+/// assert_eq!(
+///     exhaustive_rationals_with_denominator_inclusive_range(
+///         &Natural::from(10u32),
+///         Rational::from_float_simplest(std::f64::consts::E),
+///         Rational::from_float_simplest(std::f64::consts::PI),
+///     ).collect_vec().to_debug_string(),
+///     "[29/10, 31/10]"
+/// );
+/// ```
+pub fn exhaustive_rationals_with_denominator_inclusive_range(
+    d: &Natural,
+    a: Rational,
+    b: Rational,
+) -> RationalsWithDenominator<ExhaustiveIntegerRange> {
+    assert_ne!(*d, 0u32);
+    assert!(a <= b);
+    let q_d = Rational::from(d);
+    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling);
+    let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor) + Integer::ONE;
+    RationalsWithDenominator {
+        numerators: exhaustive_integer_range(a_i, b_i),
+        denominator: d,
+    }
 }

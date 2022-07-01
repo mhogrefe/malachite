@@ -599,7 +599,7 @@ pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveI
 ///
 /// The output satisfies
 /// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a]$ and $i < j$.
+/// $i < j$.
 ///
 /// The output length is infinite.
 ///
@@ -648,7 +648,7 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 ///
 /// The output satisfies
 /// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a]$ and $i < j$.
+/// $i < j$.
 ///
 /// The output length is infinite.
 ///
