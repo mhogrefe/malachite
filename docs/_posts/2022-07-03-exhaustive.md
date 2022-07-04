@@ -48,13 +48,13 @@ This bijection has some nice properties; for example, the function from pairs to
   <img width="650" src="/assets/exhaustive-part-2/cantor-graph.svg" alt="The inverses of the Cantor pairing function">
 </p>
 
-Although the functions jump around a lot (they have to, since they must evaluate to every natural number infinitely many times), there's a sense in which they are nicely balanced. Both have a growth rate of $$O(\sqrt n)$$, and if you take evaluate them at a random large input, they're generally about the same size:
+Although the functions jump around a lot (they have to, since they must evaluate to every natural number infinitely many times), there's a sense in which they are nicely balanced. Both are $$O(\sqrt n)$$, and if you take evaluate them at a random large input, they're generally about the same size:
 
 <p align="center">
   <img height="150" src="/assets/exhaustive-part-2/cantor-large.svg" alt="The Cantor unpairing of powers of 3">
 </p>
 
-However, it isn't obvious how generalize the Cantor pairing function to triples in a balanced way. The standard way to create a tripling function from a pairing function is $$g(x, y, z) = f(x, f(y, z))$$, but this is no longer balanced. If $$f$$ is the Cantor pairing function, then the three outputs of $$g^{-1}$$ grow as $$O(\sqrt n)$$, $$O(\sqrt[4] n)$$, and $$O(\sqrt[4]n)$$. Here's what the corresponding table looks like:
+However, it isn't obvious how generalize the Cantor pairing function to triples in a balanced way. The standard way to create a tripling function from a pairing function is $$g(x, y, z) = f(x, f(y, z))$$, but this is no longer balanced. If $$f$$ is the Cantor pairing function, then the three outputs of $$g^{-1}$$ are $$O(\sqrt n)$$, $$O(\sqrt[4] n)$$, and $$O(\sqrt[4]n)$$. Here's what the corresponding table looks like:
 
 <p align="center">
   <img height="150" src="/assets/exhaustive-part-2/cantor-triples-large.svg" alt="An unbalanced Cantor untripling of powers of 3">
@@ -92,7 +92,7 @@ And here's what the functions from the index to the first and second elements of
   <img width="650" src="/assets/exhaustive-part-2/interleave-pairs-graph.svg" alt="The inverses of the bit interleaving pairing function">
 </p>
 
-Like the inverses of the Cantor pairing function, these functions are balanced in the sense that both have growth rate $$O(\sqrt n)$$, although here the first element lags noticeably behind the second. And here's a table showing them evaluated at large indices:
+Like the inverses of the Cantor pairing function, these functions are balanced in the sense that both are $$O(\sqrt n)$$, although here the first element lags noticeably behind the second. And here's a table showing them evaluated at large indices:
 
 <p align="center">
   <img height="150" src="/assets/exhaustive-part-2/interleave-large.svg" alt="Bit un-interleaving of powers of 3">
@@ -104,7 +104,7 @@ The advantage that this approach has over the Cantor pairing approach is flexibi
   <img height="400" src="/assets/exhaustive-part-2/interleave-triples-bits.svg" alt="un-interleaving bits to form triples">
 </p>
 
-Here are the three functions from index to output. They each grow as $$O(\sqrt[3]n)$$.
+Here are the three functions from index to output. They each are $$O(\sqrt[3]n)$$.
 
 <p align="center">
   <img width="650" src="/assets/exhaustive-part-2/interleave-triples-graph.svg" alt="The inverses of the bit interleaving tripling function">
@@ -120,7 +120,7 @@ This generalizes straightforwardly to $$n$$-tuples for any $$n$$. Notice that th
 
 ## Customized balancing
 
-By changing the bit map further, we can deliberately unbalance the tuples. For example, if we want to produce pairs where the second element of the pair grows as $$O(\sqrt[3]n)$$ and the first element as $$O(n^{2/3})$$, we can use the bit map $$[1, 0, 0, 1, 0, 0, 1, 0, 0, \ldots]$$. If we want the the first element to be exponentially larger than the second, we can use $$[0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, \ldots]$$, where there is a 1 at the $$2^i$$th position and 0 elsewhere.
+By changing the bit map further, we can deliberately unbalance the tuples. For example, if we want to produce pairs where the second element of the pair is $$O(\sqrt[3]n)$$ and the first element is $$O(n^{2/3})$$, we can use the bit map $$[1, 0, 0, 1, 0, 0, 1, 0, 0, \ldots]$$. If we want the the first element to be exponentially larger than the second, we can use $$[0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, \ldots]$$, where there is a 1 at the $$2^i$$th position and 0 elsewhere.
 
 To actually generate the pair sequences in the two preceding examples, you can use
 
@@ -178,6 +178,8 @@ Finite iterators are a bit of a problem. You can't generate the (8th, 3rd) pair 
 My original solution was just to skip over the invalid indices, with a bit of extra logic to determine when both input iterators are finished. This was very slow: out of the first $$n$$ pairs, only about $$2 \sqrt n$$ are valid, and the situation gets worse for higher-arity tuples. So what does `exhaustive_pairs` do instead?
 
 Again, we can leverage the bit map! This scenario is actually what led me to make the bit map an explicit object in memory. What `exhaustive_pairs` does is notice when one of its iterators has completed, and then adjusts the bit map on the fly. In this particular case, it realizes that since `exhaustive_bools` produces two elements, it only needs a single bit for indexing; and then bit map is modified from $$[1, 0, 1, 0, 1, 0, 1, 0, \ldots]$$, to $$[1, 0, 0, 0, 0, 0, 0, \ldots]$$. In general, modifying the bit map on the fly is dangerous because you might end up repeating some output that you've already produced, but `exhaustive_pairs` only modifies the part of the map that hasn't been used yet.
+
+If the finite iterator's length is a power of 2, as it was in this example, then updating the bit map results in all indices being valid. If it isn't a power of 2, then some indices will remain invalid; for example, in `exhaustive_pairs(exhaustive_naturals(), 0..6)` the bit map will be updated from $$[1, 0, 1, 0, 1, 0, 1, 0, \ldots]$$, to $$[1, 0, 1, 0, 1, 0, 0, 0, \ldots]$$, so that the index of the second pair slot will vary from 0 to 7, and only $$3/4$$ of all the indices will be valid. But this is a constant proportion; it's much better than the earlier example where only $$(2 \sqrt n)/n$$ were valid.
 
 (In this particular case, the best thing to do would be to use `lex_pairs(exhaustive_naturals(), exhaustive_bools())`, which would produce (0, false), (0, true), (1, false), (1, true), and so on. But in general, when you call `exhaustive_pairs(xs, ys)` you might not know ahead of time whether ys is short, long, or infinite.)
 
