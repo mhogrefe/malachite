@@ -181,6 +181,6 @@ Again, we can leverage the bit map! This scenario is actually what led me to mak
 
 If the finite iterator's length is a power of 2, as it was in this example, then updating the bit map results in all indices being valid. If it isn't a power of 2, then some indices will remain invalid; for example, in `exhaustive_pairs(exhaustive_naturals(), 0..6)` the bit map will be updated from $$[1, 0, 1, 0, 1, 0, 1, 0, \ldots]$$, to $$[1, 0, 1, 0, 1, 0, 0, 0, \ldots]$$, so that the index of the second pair slot will vary from 0 to 7, and only $$3/4$$ of all the indices will be valid. But this is a constant proportion; it's much better than the earlier example where only $$(2 \sqrt n)/n$$ were valid.
 
-(In this particular case, the best thing to do would be to use `lex_pairs(exhaustive_naturals(), exhaustive_bools())`, which would produce (0, false), (0, true), (1, false), (1, true), and so on. But in general, when you call `exhaustive_pairs(xs, ys)` you might not know ahead of time whether ys is short, long, or infinite.)
+(In this particular case, the best thing to do would be to use `lex_pairs(exhaustive_naturals(), exhaustive_bools())`, which would produce (0, false), (0, true), (1, false), (1, true), and so on. But in general, when you call `exhaustive_pairs(xs, ys)` you might not know ahead of time whether `ys` is short, long, or infinite.)
 
 In the next part, I will discuss how Malachite generates all `Vec`s containing elements from some iterator.
