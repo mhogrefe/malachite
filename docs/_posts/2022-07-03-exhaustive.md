@@ -30,7 +30,7 @@ for p in lex_pairs_from_single(exhaustive_unsigneds::<u64>()).take(10) {
 
 (The "from_single" in [`lex_pairs_from_single`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.lex_pairs_from_single.html) indicates that both elements of the output pairs come from the same iterator. There's also a [`lex_pairs`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.lex_pairs.html) function that accepts two iterators.)
 
-As you can see, lexicographic generation only makes sense if the input iterator has a small number of elements, like `exhaustive_bools`. It doesn't work so well for `exhaustive_unsigneds::<u64>`, since you'd have to wait forever to get any pair that doesn't start with 0. But Malachite does provide [`exhaustive_pairs`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_pairs.html) and [`exhaustive_pairs_from_single`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_pairs_from_single.html), that work well for any input iterators. How do these functions work?
+As you can see, lexicographic generation only makes sense if the input iterator has a small number of elements, like `exhaustive_bools`. It doesn't work so well for `exhaustive_unsigneds::<u64>`, since you'd have to wait forever to get to any pair that doesn't start with 0. But Malachite does provide [`exhaustive_pairs`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_pairs.html) and [`exhaustive_pairs_from_single`](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_pairs_from_single.html), that work well for any input iterators. How do these functions work?
 
 ## First attempt: the Cantor pairing function
 
@@ -42,7 +42,7 @@ For simplicity, let's first consider `exhaustive_pairs_from_single(exhaustive_na
 
 You can think of it as first generating (0, 0), whose sum is 0; then (1, 0) and (0, 1), whose sum is 1; then (2, 0), (1, 1), and (0, 2), whose sum is 2; and so on. This path describes a bijection between the indices 0, 1, 2, ..., and all pairs of natural numbers. The opposite direction of this bijection, that takes pairs to indices, is known as the Cantor pairing function.
 
-This bijection has some nice properties; for example, the function from pairs to indices is a polynomial in the elements of the pair: the pair $$(x, y)$$ corresponds index $$\tfrac{1}{2}(x + y)(x + y + 1)$$. We can also look at the two functions from sequence index to the first and second elements of the pairs. These functions look like this:
+This bijection has some nice properties; for example, the function from pairs to indices is a polynomial in the elements of the pair: the pair $$(x, y)$$ corresponds to index $$\tfrac{1}{2}(x + y)(x + y + 1)$$. We can also look at the two functions from sequence index to the first and second elements of the pairs. These functions look like this:
 
 <p align="center">
   <img width="650" src="/assets/exhaustive-part-2/cantor-graph.svg" alt="The inverses of the Cantor pairing function">
@@ -76,7 +76,7 @@ And then distribute the bits of each index into the two slots of the correspondi
   <img height="200" src="/assets/exhaustive-part-2/interleave-bits-2.svg" alt="Final steps in un-interleaving bits">
 </p>
 
-I've color-coded the bits according to which slot they end up in. Malachite keeps track of this using an explicit bit map that looks like $$[1, 0, 1, 0, 1, 0, ldots]$, indicating that bit 0 goes to slot 1, bit 1 goes to slot 0, bit 2 goes to slot 1, and so on.
+I've color-coded the bits according to which slot they end up in. Malachite keeps track of this using an explicit bit map that looks like $$[1, 0, 1, 0, 1, 0, \ldots]$$, indicating that bit 0 goes to slot 1, bit 1 goes to slot 0, bit 2 goes to slot 1, and so on.
 
 This is how this method walks through the grid of pairs of natural numbers:
 
@@ -175,7 +175,7 @@ Finite iterators are a bit of a problem. You can't generate the (8th, 3rd) pair 
   <img width="400" src="/assets/exhaustive-part-2/interleave-grid-filtered.svg" alt="Valid indices when one iterator has length 2">
 </p>
 
-My original solution was just to skip over the invalid indices, with a bit of extra logic to determine when both input iterators are finished. This was very slow: out of the first $$n$$ pairs, only about $$2 \sqrt n$$ are valid, and the situation gets worse for $$n$$-tuples with larger $$n$$. So what does `exhaustive_pairs` do instead?
+My original solution was just to skip over the invalid indices, with a bit of extra logic to determine when both input iterators are finished. This was very slow: out of the first $$n$$ pairs, only about $$2 \sqrt n$$ are valid, and the situation gets worse for higher-arity tuples. So what does `exhaustive_pairs` do instead?
 
 Again, we can leverage the bit map! This scenario is actually what led me to make the bit map an explicit object in memory. What `exhaustive_pairs` does is notice when one of its iterators has completed, and then adjusts the bit map on the fly. In this particular case, it realizes that since `exhaustive_bools` produces two elements, it only needs a single bit for indexing; and then bit map is modified from $$[1, 0, 1, 0, 1, 0, 1, 0, \ldots]$$, to $$[1, 0, 0, 0, 0, 0, 0, \ldots]$$. In general, modifying the bit map on the fly is dangerous because you might end up repeating some output that you've already produced, but `exhaustive_pairs` only modifies the part of the map that hasn't been used yet.
 
