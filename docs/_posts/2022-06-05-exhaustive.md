@@ -195,3 +195,5 @@ way, selecting between their variants in a round-robin fashion.
 
 We haven't gotten to the really interesting bits, which have to do with generating
 tuples (and after that, lists, sets, and floats). I'll talk about those in future posts.
+
+[Part 2: Generating tuples](/2022-07-03-exhaustive)
