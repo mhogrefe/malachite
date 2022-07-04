@@ -141,7 +141,7 @@ exhaustive_pairs_custom_output(
     BitDistributorOutputType::tiny(),
 )
 ```
-respectively. See the documentation of [exhaustive_pairs_custom_output](https://docs.rs/malachite-base/0.2.4/malachite_base/tuples/exhaustive/fn.exhaustive_pairs_custom_output.html) and [BitDistributorOutputType](https://docs.rs/malachite-base/latest/malachite_base/iterators/bit_distributor/struct.BitDistributorOutputType.html) for more details
+respectively. See the documentation of [exhaustive_pairs_custom_output](https://docs.rs/malachite-base/0.2.4/malachite_base/tuples/exhaustive/fn.exhaustive_pairs_custom_output.html) and [BitDistributorOutputType](https://docs.rs/malachite-base/latest/malachite_base/iterators/bit_distributor/struct.BitDistributorOutputType.html) for more details.
 
 ## Generating tuples of other iterators
 
