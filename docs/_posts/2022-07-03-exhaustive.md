@@ -37,10 +37,10 @@ As you can see, lexicographic generation only makes sense if the input iterator 
 For simplicity, let's first consider `exhaustive_pairs_from_single(exhaustive_naturals())`. To think about generating every pair of `Natural`s, it helps to visualize a path through an infinite grid. One such path is this:
 
 <p align="center">
-  <img width="400" src="/assets/exhaustive-part-2/cantor-grid.svg" alt="The path defined by the Cantor pairing function">
+  <img width="300" src="/assets/exhaustive-part-2/cantor-grid.svg" alt="The path defined by the Cantor pairing function">
 </p>
 
-You can think of it as first generating (0, 0), whose sum is 0; then (1, 0) and (0, 1), whose sum is 1; then (2, 0), (1, 1), and (0, 2), whose sum is 2; and so on. This path describes a bijection between the indices 0, 1, 2, ..., and all pairs of natural numbers. The opposite direction of this bijection, that takes pairs to indices, is known as Cantor's pairing function.
+You can think of it as first generating (0, 0), whose sum is 0; then (1, 0) and (0, 1), whose sum is 1; then (2, 0), (1, 1), and (0, 2), whose sum is 2; and so on. This path describes a bijection between the indices 0, 1, 2, ..., and all pairs of natural numbers. The opposite direction of this bijection, that takes pairs to indices, is known as the Cantor pairing function.
 
 This bijection has some nice properties; for example, the function from pairs to indices is a polynomial in the elements of the pair: the pair $$(x, y)$$ corresponds index $$\tfrac{1}{2}(x + y)(x + y + 1)$$. We can also look at the two functions from sequence index to the first and second elements of the pairs. These functions look like this:
 
@@ -51,13 +51,13 @@ This bijection has some nice properties; for example, the function from pairs to
 Although the functions jump around a lot (they have to, since they must evaluate to every natural number infinitely many times), there's a sense in which they are nicely balanced. Both have a growth rate of $$O(\sqrt n)$$, and if you take evaluate them at a random large input, they're generally about the same size:
 
 <p align="center">
-  <img height="200" src="/assets/exhaustive-part-2/cantor-large.svg" alt="The Cantor unpairing of powers of 3">
+  <img height="150" src="/assets/exhaustive-part-2/cantor-large.svg" alt="The Cantor unpairing of powers of 3">
 </p>
 
 However, it isn't obvious how generalize the Cantor pairing function to triples in a balanced way. The standard way to create a tripling function from a pairing function is $$g(x, y, z) = f(x, f(y, z))$$, but this is no longer balanced. If $$f$$ is the Cantor pairing function, then the three outputs of $$g^{-1}$$ grow as $$O(\sqrt n)$$, $$O(\sqrt[4] n)$$, and $$O(\sqrt[4]n)$$. Here's what the corresponding table looks like:
 
 <p align="center">
-  <img height="200" src="/assets/exhaustive-part-2/cantor-triples-large.svg" alt="An unbalanced Cantor untripling of powers of 3">
+  <img height="150" src="/assets/exhaustive-part-2/cantor-triples-large.svg" alt="An unbalanced Cantor untripling of powers of 3">
 </p>
 
 ## More balance and flexibility with bit interleaving
@@ -89,13 +89,13 @@ This path is called a [Z-order curve](https://en.wikipedia.org/wiki/Z-order_curv
 And here's what the functions from the index to the first and second elements of the pairs look like:
 
 <p align="center">
-  <img width="650" src="/assets/exhaustive-part-2/interleave-pairs_graph.svg" alt="The inverses of the bit interleaving pairing function">
+  <img width="650" src="/assets/exhaustive-part-2/interleave-pairs-graph.svg" alt="The inverses of the bit interleaving pairing function">
 </p>
 
 Like the inverses of the Cantor pairing function, these functions are balanced in the sense that both have growth rate $$O(\sqrt n)$$, although here the first element lags noticeably behind the second. And here's a table showing them evaluated at large indices:
 
 <p align="center">
-  <img height="200" src="/assets/exhaustive-part-2/interleave-large.svg" alt="Bit un-interleaving of powers of 3">
+  <img height="150" src="/assets/exhaustive-part-2/interleave-large.svg" alt="Bit un-interleaving of powers of 3">
 </p>
 
 The advantage that this approach has over the Cantor pairing approach is flexibility. We can generate triples in a balanced way simply by changing the bit map to $$[2, 1, 0, 2, 1, 0, 2, 1, 0, \ldots]$$:
@@ -113,7 +113,7 @@ Here are the three functions from index to output. They each grow as $$O(\sqrt[3
 Here they are evaluated at large indices:
 
 <p align="center">
-  <img height="200" src="/assets/exhaustive-part-2/interleave-triples-large.svg" alt="Bit un-interleaving of powers of 3 to form triples">
+  <img height="150" src="/assets/exhaustive-part-2/interleave-triples-large.svg" alt="Bit un-interleaving of powers of 3 to form triples">
 </p>
 
 This generalizes straightforwardly to $$n$$-tuples for any $$n$$. Notice that the first $$2^{kn}$$ tuples are all the tuples with elements less than $$2^k$$.
