@@ -116,7 +116,7 @@ Here they are evaluated at large indices:
   <img height="150" src="/assets/exhaustive-part-2/interleave-triples-large.svg" alt="Bit un-interleaving of powers of 3 to form triples">
 </p>
 
-This generalizes straightforwardly to $$n$$-tuples for any $$n$$. Notice that the first $$2^{kn}$$ tuples are all the tuples with elements less than $$2^k$$.
+This generalizes straightforwardly to $$k$$-tuples for any $$k$$. Notice that the first $$2^{ka}$$ tuples are all the tuples with elements less than $$2^a$$.
 
 ## Customized balancing
 
