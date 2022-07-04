@@ -6,13 +6,13 @@ author: Mikhail Hogrefe
 
 ## Introduction
 
-In [Part 1](/_posts/2022-06-05-2-exhaustive) of this series, I described how Malachite provides iterators that generate all values of a type, or all values satisfying some condition. Now I'm going to show you how to generate tuples.
+In [Part 1](/2022/06/05/2-exhaustive) of this series, I described how Malachite provides iterators that generate all values of a type, or all values satisfying some condition. Now I'm going to show you how to generate tuples.
 
 It's not immediately obvious how to do this. One thing you might try is generating the tuples in lexicographic order. Malachite lets you do this:
 
 ```rust
 for p in lex_pairs_from_single(exhaustive_unsigneds::<u64>()).take(10) {
-    println!("{}", b);
+    println!("{}", p);
 }
 ```
 ```
@@ -51,13 +51,13 @@ This bijection has some nice properties; for example, the function from pairs to
 Although the functions jump around a lot (they have to, since they must evaluate to every natural number infinitely many times), there's a sense in which they are nicely balanced. Both have a growth rate of $$O(\sqrt n)$$, and if you take evaluate them at a random large input, they're generally about the same size:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/cantor-large.svg" alt="The Cantor unpairing of powers of 3">
+  <img height="300" src="/assets/pairs-part-2/cantor-large.svg" alt="The Cantor unpairing of powers of 3">
 </p>
 
-However, it isn't obvious how generalize the Cantor pairing function to triples in a balanced way. The standard way to create a tripling function from a pairing function is $$g(x, y, z) = f(x, f(y, z))$$, but this is no longer balanced. If $$f$$ is the Cantor pairing function, then the three outputs of $$g^{-1}$$ grow as $$O(\sqrt n)$$, $$O(\sqrt[4] n)$$, and $$O(\sqrt[4]n$$. Here's what the corresponding table looks like:
+However, it isn't obvious how generalize the Cantor pairing function to triples in a balanced way. The standard way to create a tripling function from a pairing function is $$g(x, y, z) = f(x, f(y, z))$$, but this is no longer balanced. If $$f$$ is the Cantor pairing function, then the three outputs of $$g^{-1}$$ grow as $$O(\sqrt n)$$, $$O(\sqrt[4] n)$$, and $$O(\sqrt[4]n)$$. Here's what the corresponding table looks like:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/cantor-triples-large.svg" alt="An unbalanced Cantor untripling of powers of 3">
+  <img height="300" src="/assets/pairs-part-2/cantor-triples-large.svg" alt="An unbalanced Cantor untripling of powers of 3">
 </p>
 
 ## More balance and flexibility with bit interleaving
@@ -67,13 +67,13 @@ Instead of the Cantor pairing function, Malachite uses bit interleaving. This id
 To generate the pairs corresponding to index 0, 1, 2, and so on, first write the indices in binary, with infinitely many leading zeros:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/interleave-bits-1.svg" alt="First step in un-interleaving bits">
+  <img height="200" src="/assets/pairs-part-2/interleave-bits-1.svg" alt="First step in un-interleaving bits">
 </p>
 
 And then distribute the bits of each index into the two slots of the corresponding pair. The even-indexed bits (counting from the right) end up in the second slot, and the odd-indexed bits in the first:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/interleave-bits-2.svg" alt="Final steps in un-interleaving bits">
+  <img height="200" src="/assets/pairs-part-2/interleave-bits-2.svg" alt="Final steps in un-interleaving bits">
 </p>
 
 I've color-coded the bits according to which slot they end up in. Malachite keeps track of this using an explicit bit map that looks like $$[1, 0, 1, 0, 1, 0, ldots]$, indicating that bit 0 goes to slot 1, bit 1 goes to slot 0, bit 2 goes to slot 1, and so on.
@@ -81,7 +81,7 @@ I've color-coded the bits according to which slot they end up in. Malachite keep
 This is how this method walks through the grid of pairs of natural numbers:
 
 <p align="center">
-  <img width="500" src="/assets/pairs-part-2/interleave-grid.svg" alt="The path defined by the bit-interleaving pairing function">
+  <img width="400" src="/assets/pairs-part-2/interleave-grid.svg" alt="The path defined by the bit-interleaving pairing function">
 </p>
 
 This path is called a [Z-order curve](https://en.wikipedia.org/wiki/Z-order_curve), although with this choice of coordinates it looks like it's made up of N's rather than Z's.
@@ -95,7 +95,7 @@ And here's what the functions from the index to the first and second elements of
 Like the inverses of the Cantor pairing function, these functions are balanced in the sense that both have growth rate $$O(\sqrt n)$$, although here the first element lags noticeably behind the second. And here's a table showing them evaluated at large indices:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/interleave-large.svg" alt="Bit un-interleaving of powers of 3">
+  <img height="300" src="/assets/pairs-part-2/interleave-large.svg" alt="Bit un-interleaving of powers of 3">
 </p>
 
 The advantage that this approach has over the Cantor pairing approach is flexibility. We can generate triples in a balanced way simply by changing the bit map to $$[2, 1, 0, 2, 1, 0, 2, 1, 0, \ldots]$$:
@@ -113,7 +113,7 @@ Here are the three functions from index to output. They each grow as $$O(\sqrt[3
 Here they are evaluated at large indices:
 
 <p align="center">
-  <img height="400" src="/assets/pairs-part-2/interleave-triples-large.svg" alt="Bit un-interleaving of powers of 3 to form triples">
+  <img height="300" src="/assets/pairs-part-2/interleave-triples-large.svg" alt="Bit un-interleaving of powers of 3 to form triples">
 </p>
 
 This generalizes straightforwardly to $$n$$-tuples for any $$n$$. Notice that the first $$2^{kn}$$ tuples are all the tuples with elements less than $$2^k$$.
@@ -151,7 +151,7 @@ For example, here's how to generate all pairs of the characters `'a'` to `'z'` (
 
 ```rust
 for p in exhaustive_pairs_from_single('a'..='z').take(10) {
-    println!("{}", b);
+    println!("{}", p);
 }
 ```
 ```
@@ -172,7 +172,7 @@ for p in exhaustive_pairs_from_single('a'..='z').take(10) {
 Finite iterators are a bit of a problem. You can't generate the (8th, 3rd) pair if the input iterator has no 8th element. To take an extreme case, consider `exhaustive_pairs(exhaustive_naturals(), exhaustive_bools())`. There are only two bools, so any index pair $$(i, j)$$ where $$j \geq 2$$ can't be used for indexing. Here's our grid of indices again, with valid indices green and invalid indices red:
 
 <p align="center">
-  <img width="500" src="/assets/pairs-part-2/interleave-grid-filtered.svg" alt="Valid indices when one iterator has length 2">
+  <img width="400" src="/assets/pairs-part-2/interleave-grid-filtered.svg" alt="Valid indices when one iterator has length 2">
 </p>
 
 My original solution was just to skip over the invalid indices, with a bit of extra logic to determine when both input iterators are finished. This was very slow: out of the first $$n$$ pairs, only about $$2 \sqrt n$$ are valid, and the situation gets worse for $$n$$-tuples with larger $$n$$. So what does `exhaustive_pairs` do instead?
