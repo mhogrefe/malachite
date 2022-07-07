@@ -111,6 +111,7 @@ fn test_mod_shl() {
     apply_to_signeds!(test_mod_shl_signed);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn unsigned_properties<T: PrimitiveUnsigned>()
 where
     for<'a> Natural: ModShlAssign<T>
@@ -176,6 +177,7 @@ where
     });
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn signed_properties<U: PrimitiveUnsigned + WrappingFrom<T>, T: PrimitiveSigned + WrappingFrom<U>>()
 where
     for<'a> Natural: ModShlAssign<T>

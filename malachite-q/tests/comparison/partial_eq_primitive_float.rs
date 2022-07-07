@@ -42,6 +42,7 @@ fn test_partial_eq() {
     test("-3/2", -1.5, true);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Rational> + PartialEq<Natural> + PartialEq<rug::Rational> + PrimitiveFloat,
 >()

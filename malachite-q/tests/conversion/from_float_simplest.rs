@@ -234,6 +234,7 @@ fn from_f64_simplest_fail_3() {
     Rational::from_float_simplest(f64::NEGATIVE_INFINITY);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn from_float_simplest_properties_helper<
     T: From<Rational> + for<'a> From<&'a Rational> + PrimitiveFloat,
 >()

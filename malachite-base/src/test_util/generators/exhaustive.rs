@@ -47,8 +47,9 @@ use strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use strings::{strings_from_char_vecs, StringsFromCharVecs};
 use test_util::extra_variadic::{
     exhaustive_duodecuples_from_single, exhaustive_octuples_from_single,
-    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
-    exhaustive_quadruples_xxyx, exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyx,
+    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
     exhaustive_quadruples_xyyz_custom_output, exhaustive_quadruples_xyzz,
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
@@ -2897,6 +2898,14 @@ pub fn exhaustive_unsigned_quadruple_gen_var_11<T: PrimitiveUnsigned>() -> It<(T
             d1 != T::ZERO && (n1 > d1 || n1 == d1 && n0 >= d0)
         }),
     )
+}
+
+pub fn exhaustive_unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
+    Box::new(exhaustive_quadruples_xxxy(
+        exhaustive_unsigneds(),
+        primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - 1))
+            .map(|u| (u << 1) | T::ONE),
+    ))
 }
 
 // -- (PrimitiveUnsigned * 6) --

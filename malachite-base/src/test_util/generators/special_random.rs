@@ -5091,6 +5091,31 @@ pub fn special_random_unsigned_quadruple_gen_var_11<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn special_random_unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::ZERO,
+                T::low_mask(T::WIDTH - 1),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+            .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 pub fn special_random_unsigned_sextuple_gen_var_1<T: PrimitiveUnsigned>(

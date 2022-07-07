@@ -1,4 +1,4 @@
-use fail_on_untested_path;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, DivMod, DivRound,
     FloorRoot, FloorRootAssign, FloorSqrt, ModPowerOf2Assign, PowerOf2, RootAssignRem, RootRem,

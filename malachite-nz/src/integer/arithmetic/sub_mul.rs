@@ -335,7 +335,7 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
     }
 }
 
-impl<'a> SubMul<Integer, Integer> for Integer {
+impl SubMul<Integer, Integer> for Integer {
     type Output = Integer;
 
     /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking all three by

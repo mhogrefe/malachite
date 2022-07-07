@@ -7,8 +7,8 @@ use integer::Integer;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
+    ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
+    EqMod, EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -258,6 +258,7 @@ pub fn special_random_integer_gen_var_7(config: &GenConfig) -> It<Integer> {
     ))
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn special_random_integer_gen_var_8<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
 where
     for<'a> T: ConvertibleFrom<&'a Natural>,
@@ -279,6 +280,19 @@ where
             &random_bools,
         )
         .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
+}
+
+pub fn special_random_integer_gen_var_9(config: &GenConfig) -> It<Integer> {
+    Box::new(
+        striped_random_natural_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| (n << 1u32) | Integer::ONE),
     )
 }
 
@@ -372,6 +386,62 @@ pub fn special_random_integer_pair_gen_var_3(config: &GenConfig) -> It<(Integer,
     )
 }
 
+pub fn special_random_integer_pair_gen_var_4(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, n)| (a, (n << 1u32) | Integer::ONE)),
+    )
+}
+
+pub fn special_random_integer_pair_gen_var_5(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs_from_single(striped_random_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
+    )
+}
+
+pub fn special_random_integer_pair_gen_var_6(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs_from_single(
+            striped_random_natural_integers(
+                EXAMPLE_SEED,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .map(|n| (n << 1u32) | Integer::ONE),
+        )
+        .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
+    )
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn special_random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
@@ -394,6 +464,64 @@ pub fn special_random_integer_triple_gen_var_1(
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+pub fn special_random_integer_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Integer)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, b, n)| (a, b, (n << 1u32) | Integer::ONE)),
+    )
+}
+
+pub fn special_random_integer_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Integer)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, m, n)| (a, (m << 1u32) | Integer::ONE, (n << 1u32) | Integer::ONE)),
+    )
 }
 
 // -- (Integer, Integer, Integer, PrimitiveUnsigned) --
@@ -1801,6 +1929,7 @@ pub fn special_random_natural_gen_var_6(config: &GenConfig) -> It<Natural> {
     ))
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn special_random_natural_gen_var_7<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
 where
     for<'a> T: ConvertibleFrom<&'a Natural>,
@@ -1815,6 +1944,19 @@ where
             config.get_or("mean_bits_d", 1),
         )
         .filter(|n| !T::convertible_from(n)),
+    )
+}
+
+pub fn special_random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| (n << 1u32) | Natural::ONE),
     )
 }
 
@@ -2089,6 +2231,48 @@ pub fn special_random_natural_pair_gen_var_11(config: &GenConfig) -> It<(Natural
     ))
 }
 
+pub fn special_random_natural_pair_gen_var_12(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, n)| (a, (n << 1u32) | Natural::ONE)),
+    )
+}
+
+pub fn special_random_natural_pair_gen_var_13(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(
+            striped_random_naturals(
+                EXAMPLE_SEED,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .map(|n| (n << 1u32) | Natural::ONE),
+        )
+        .filter(|(x, y)| x.coprime_with(y)),
+    )
+}
+
+pub fn special_random_natural_pair_gen_var_14(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(x, y)| x.coprime_with(y)),
+    )
+}
+
 // -- (Natural, Natural, bool) --
 
 pub fn special_random_natural_natural_bool_triple_gen_var_1(
@@ -2249,6 +2433,36 @@ pub fn special_random_natural_triple_gen_var_7(
             config.get_or("mean_bits_d", 1),
         ))
         .map(|(x, y, z)| (x + &y * &z, y, z)),
+    )
+}
+
+pub fn special_random_natural_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, b, n)| (a, b, (n << 1u32) | Natural::ONE)),
+    )
+}
+
+pub fn special_random_natural_triple_gen_var_9(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
     )
 }
 
@@ -6860,27 +7074,25 @@ pub fn special_random_large_type_gen_var_6(
         .map(|(m00, m01, m10, m11)| HalfGcdMatrix1 {
             data: [[m00, m01], [m10, m11]],
         })
-        .zip(
-            UnsignedVecTripleLenGenerator1 {
-                phantom: PhantomData,
-                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
-                    EXAMPLE_SEED.fork("lengths"),
-                    config.get_or("mean_length_n", 4),
-                    config.get_or("mean_length_d", 1),
-                ))
-                .flat_map(|(x, y, z)| {
-                    let xs_len = x;
-                    let ys_len = x.checked_add(1)?.checked_add(y)?;
-                    let out_len = x.checked_add(1)?.checked_add(z)?;
-                    Some((out_len, xs_len, ys_len))
-                }),
-                striped_bit_source: StripedBitSource::new(
-                    EXAMPLE_SEED.fork("striped_bit_source"),
-                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
-                    config.get_or("mean_stripe_d", 1),
-                ),
-            },
-        ),
+        .zip(UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .flat_map(|(x, y, z)| {
+                let xs_len = x;
+                let ys_len = x.checked_add(1)?.checked_add(y)?;
+                let out_len = x.checked_add(1)?.checked_add(z)?;
+                Some((out_len, xs_len, ys_len))
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }),
     ))
 }
 

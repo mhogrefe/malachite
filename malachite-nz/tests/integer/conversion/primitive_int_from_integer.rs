@@ -531,6 +531,7 @@ fn test_i64_convertible_from_integer() {
     test("-9223372036854775809", false);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn unsigned_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Integer>
         + for<'a> CheckedFrom<&'a Natural>

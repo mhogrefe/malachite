@@ -610,6 +610,7 @@ fn test_partial_cmp_abs_i64() {
     test("-22/7", -4, Some(Ordering::Less), true, false, true, false);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_abs_primitive_int_properties_helper_unsigned<
     T: PartialOrdAbs<Rational> + PrimitiveUnsigned,
 >()
@@ -650,6 +651,7 @@ where
     });
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_abs_primitive_int_properties_helper_signed<
     T: PartialOrdAbs<Rational> + PartialOrd<rug::Rational> + PrimitiveSigned,
 >()

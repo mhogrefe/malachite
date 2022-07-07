@@ -177,7 +177,7 @@ impl Natural {
     }
 }
 
-impl<'a> AddMul<Integer, Integer> for Integer {
+impl AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
     /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking all three by value.

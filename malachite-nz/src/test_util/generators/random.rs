@@ -8,8 +8,8 @@ use itertools::Itertools;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
+    ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
+    EqMod, EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -157,6 +157,7 @@ pub fn random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Int
     ))
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn random_integer_gen_var_2<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
 where
     for<'a> T: ConvertibleFrom<&'a Natural>,
@@ -243,6 +244,17 @@ pub fn random_integer_gen_var_7(config: &GenConfig) -> It<Integer> {
     ))
 }
 
+pub fn random_integer_gen_var_8(config: &GenConfig) -> It<Integer> {
+    Box::new(
+        random_natural_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| (n << 1u32) | Integer::ONE),
+    )
+}
+
 // -- (Integer, Integer) --
 
 pub fn random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
@@ -319,6 +331,54 @@ pub fn random_integer_pair_gen_var_3(config: &GenConfig) -> It<(Integer, Integer
     )
 }
 
+pub fn random_integer_pair_gen_var_4(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, n)| (a, (n << 1u32) | Integer::ONE)),
+    )
+}
+
+pub fn random_integer_pair_gen_var_5(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs_from_single(random_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
+    )
+}
+
+pub fn random_integer_pair_gen_var_6(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs_from_single(
+            random_natural_integers(
+                EXAMPLE_SEED,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .map(|n| (n << 1u32) | Integer::ONE),
+        )
+        .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
+    )
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
@@ -335,6 +395,52 @@ pub fn random_integer_triple_gen_var_1(config: &GenConfig) -> It<(Integer, Integ
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+pub fn random_integer_triple_gen_var_2(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, b, n)| (a, b, (n << 1u32) | Integer::ONE)),
+    )
+}
+
+pub fn random_integer_triple_gen_var_3(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, m, n)| (a, (m << 1u32) | Integer::ONE, (n << 1u32) | Integer::ONE)),
+    )
 }
 
 // -- (Integer, Integer, Integer, PrimitiveUnsigned) --
@@ -1471,6 +1577,7 @@ pub fn random_natural_gen_var_3<T: PrimitiveFloat>(config: &GenConfig) -> It<Nat
     ))
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn random_natural_gen_var_4<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
 where
     for<'a> T: ConvertibleFrom<&'a Natural>,
@@ -1524,6 +1631,17 @@ where
     Natural: ExactFrom<T>,
 {
     Box::new(random_natural_signeds(EXAMPLE_SEED).map(Natural::exact_from))
+}
+
+pub fn random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| (n << 1u32) | Natural::ONE),
+    )
 }
 
 // -- (Natural, bool) --
@@ -1753,6 +1871,42 @@ pub fn random_natural_pair_gen_var_11(config: &GenConfig) -> It<(Natural, Natura
     )))
 }
 
+pub fn random_natural_pair_gen_var_12(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, n)| (a, (n << 1u32) | Natural::ONE)),
+    )
+}
+
+pub fn random_natural_pair_gen_var_13(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(
+            random_naturals(
+                EXAMPLE_SEED,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .map(|n| (n << 1u32) | Natural::ONE),
+        )
+        .filter(|(x, y)| x.coprime_with(y)),
+    )
+}
+
+pub fn random_natural_pair_gen_var_14(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(x, y)| x.coprime_with(y)),
+    )
+}
+
 // -- (Natural, Natural, bool) --
 
 pub fn random_natural_natural_bool_triple_gen_var_1(
@@ -1875,6 +2029,28 @@ pub fn random_natural_triple_gen_var_7(config: &GenConfig) -> It<(Natural, Natur
             config.get_or("mean_bits_d", 1),
         ))
         .map(|(x, y, z)| (x + &y * &z, y, z)),
+    )
+}
+
+pub fn random_natural_triple_gen_var_8(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, b, n)| (a, b, (n << 1u32) | Natural::ONE)),
+    )
+}
+
+pub fn random_natural_triple_gen_var_9(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
     )
 }
 

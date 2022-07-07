@@ -71,6 +71,7 @@ fn test_partial_cmp_primitive_float() {
     );
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_primitive_float_properties_helper<
     T: PartialOrd<Natural> + PartialOrd<rug::Integer> + PrimitiveFloat,
 >()

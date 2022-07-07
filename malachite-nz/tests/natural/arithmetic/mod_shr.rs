@@ -65,6 +65,7 @@ fn test_mod_shr() {
     apply_to_signeds!(test_mod_shr_signed);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn properties_helper<U: PrimitiveUnsigned + WrappingFrom<T>, T: PrimitiveSigned + WrappingFrom<U>>()
 where
     for<'a> Natural: ModShrAssign<T>

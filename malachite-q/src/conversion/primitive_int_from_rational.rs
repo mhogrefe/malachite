@@ -56,6 +56,7 @@ fn rounding_from_unsigned<'a, T: for<'b> CheckedFrom<&'b Natural> + Max + Named 
     }
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn checked_from_signed<
     'a,
     U: WrappingFrom<&'a Natural>,

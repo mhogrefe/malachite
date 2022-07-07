@@ -1,4 +1,4 @@
-use fail_on_untested_path;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivMod, Gcd, Parity, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };

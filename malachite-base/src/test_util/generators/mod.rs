@@ -661,7 +661,7 @@ pub fn signed_gen_var_12<T: PrimitiveSigned>() -> Generator<T> {
     )
 }
 
-// All pairs of signeds where the second element is odd and positive.
+// All odd positive signeds.
 pub fn signed_gen_var_13<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -747,7 +747,7 @@ pub fn signed_pair_gen_var_7<T: PrimitiveSigned>() -> Generator<(T, T)> {
     )
 }
 
-// All pairs of signeds where the second element is odd and positive.
+// All pairs of signeds where the second element is positive and odd.
 pub fn signed_pair_gen_var_8<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -771,6 +771,7 @@ pub fn signed_pair_gen_var_9<
     )
 }
 
+// All coprime pairs of signeds.
 pub fn signed_pair_gen_var_10<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U>,
@@ -840,7 +841,7 @@ pub fn signed_triple_gen_var_5<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
     )
 }
 
-// All triples of signeds where the third element is odd.
+// All triples of signeds where the third element is positive and odd.
 pub fn signed_triple_gen_var_6<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -852,7 +853,7 @@ pub fn signed_triple_gen_var_6<
     )
 }
 
-// All triples of signeds where the second and third elements are odd.
+// All triples of signeds where the second and third elements are positive and odd.
 pub fn signed_triple_gen_var_7<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
@@ -2450,6 +2451,15 @@ pub fn unsigned_quadruple_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(T, T,
     )
 }
 
+// All quadruples of unsigneds where the fourth element is odd.
+pub fn unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_12,
+        &random_unsigned_quadruple_gen_var_3,
+        &special_random_unsigned_quadruple_gen_var_12,
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 // All sextuples of unsigneds of the same type.
@@ -2832,7 +2842,7 @@ fn large_exponent(s: &str) -> bool {
     for c in s.chars().rev() {
         if expect_e {
             return c == 'e' || c == 'E';
-        } else if c.is_digit(10) {
+        } else if c.is_ascii_digit() {
             i += 1;
         } else if i <= 3 {
             return false;

@@ -1,4 +1,4 @@
-use fail_on_untested_path;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,
 };

@@ -3,7 +3,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::BitAccess;
 
 fn get_bit_unsigned<T: PrimitiveUnsigned>(x: &T, index: u64) -> bool {
-    index < T::WIDTH && *x & T::power_of_2(index) != T::ZERO
+    index < T::WIDTH && (*x >> index).odd()
 }
 
 fn set_bit_unsigned<T: PrimitiveUnsigned>(x: &mut T, index: u64) {
@@ -115,7 +115,7 @@ apply_to_unsigneds!(impl_bit_access_unsigned);
 
 fn get_bit_signed<T: PrimitiveSigned>(x: &T, index: u64) -> bool {
     if index < T::WIDTH {
-        *x & (T::ONE << index) != T::ZERO
+        (*x >> index).odd()
     } else {
         *x < T::ZERO
     }

@@ -59,6 +59,7 @@ fn test_partial_eq() {
     test("-1208925819614629174706177", -1.2089258e24, false);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Integer> + PartialEq<Natural> + PartialEq<rug::Integer> + PrimitiveFloat,
 >()

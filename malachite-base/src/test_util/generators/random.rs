@@ -3902,6 +3902,19 @@ pub fn random_unsigned_quadruple_gen_var_2<
     )
 }
 
+pub fn random_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_unsigned_inclusive_range(seed, T::ZERO, T::low_mask(T::WIDTH - 1))
+                .map(|u| (u << 1) | T::ONE)
+        },
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 struct UnsignedUnsignedRoundingModeTripleGenerator<T: PrimitiveUnsigned> {

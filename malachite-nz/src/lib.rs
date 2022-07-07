@@ -160,18 +160,6 @@ pub use platform_32 as platform;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub use platform_64 as platform;
 
-#[cfg(feature = "test_build")]
-#[doc(hidden)]
-#[inline]
-pub fn fail_on_untested_path(message: &str) {
-    panic!("Untested path. {}", message);
-}
-
-#[cfg(not(feature = "test_build"))]
-#[doc(hidden)]
-#[inline]
-pub const fn fail_on_untested_path(_message: &str) {}
-
 #[doc(hidden)]
 #[cfg(feature = "32_bit_limbs")]
 pub mod platform_32;

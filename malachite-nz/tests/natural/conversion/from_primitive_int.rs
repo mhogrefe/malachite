@@ -142,6 +142,7 @@ fn test_convertible_from_i64() {
     test(i64::MIN, false);
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn unsigned_properties<T: PrimitiveUnsigned>()
 where
     Natural: From<T>,
@@ -157,6 +158,7 @@ where
     });
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn signed_properties<T: PrimitiveSigned>()
 where
     Natural: CheckedFrom<T> + ConvertibleFrom<T> + SaturatingFrom<T>,

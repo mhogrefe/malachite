@@ -1,5 +1,5 @@
-use fail_on_untested_path;
 use integer::Integer;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign,
 };

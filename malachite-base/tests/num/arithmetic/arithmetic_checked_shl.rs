@@ -78,12 +78,11 @@ where
 }
 
 fn arithmetic_checked_shl_properties_helper_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T> + PrimitiveUnsigned,
     U: PrimitiveSigned,
 >()
 where
     u64: ExactFrom<U>,
-    T: PrimitiveUnsigned,
 {
     unsigned_signed_pair_gen_var_1::<T, U>().test_properties(|(n, i)| {
         let shifted = n.arithmetic_checked_shl(i);

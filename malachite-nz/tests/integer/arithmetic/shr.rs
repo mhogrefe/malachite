@@ -367,6 +367,7 @@ where
     });
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn shr_properties_helper_signed<T: PrimitiveSigned>()
 where
     Integer:

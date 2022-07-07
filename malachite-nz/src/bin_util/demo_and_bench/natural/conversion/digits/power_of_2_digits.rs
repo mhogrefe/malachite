@@ -279,6 +279,7 @@ fn benchmark_natural_power_of_2_digits_size_hint_natural(
     );
 }
 
+#[allow(clippy::let_unit_value)]
 fn benchmark_natural_power_of_2_digits_get_natural_algorithms(
     gm: GenMode,
     config: GenConfig,

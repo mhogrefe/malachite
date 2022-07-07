@@ -116,6 +116,7 @@ fn test_partial_cmp_i64() {
     test("1000000000000", -1000000000001, Some(Ordering::Greater));
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_primitive_int_properties_helper_unsigned<
     T: PartialOrd<Natural> + PartialOrd<rug::Integer> + PrimitiveUnsigned,
 >()
@@ -162,6 +163,7 @@ where
     });
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn partial_cmp_primitive_int_properties_helper_signed<
     T: PartialOrd<Natural> + PartialOrd<rug::Integer> + PrimitiveSigned,
 >()

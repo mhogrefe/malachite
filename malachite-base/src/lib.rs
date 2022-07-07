@@ -115,6 +115,18 @@ extern crate time;
 #[cfg(feature = "bin_build")]
 extern crate walkdir;
 
+#[cfg(feature = "test_build")]
+#[doc(hidden)]
+#[inline]
+pub fn fail_on_untested_path(message: &str) {
+    panic!("Untested path. {}", message);
+}
+
+#[cfg(not(feature = "test_build"))]
+#[doc(hidden)]
+#[inline]
+pub const fn fail_on_untested_path(_message: &str) {}
+
 // TODO links for malachite-nz and malachite-q
 
 /// The [`Named`](named::Named) trait, for getting a type's name.

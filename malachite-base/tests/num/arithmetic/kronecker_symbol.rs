@@ -1,22 +1,24 @@
 use malachite_base::num::arithmetic::kronecker_symbol::{
-    jacobi_symbol_unsigned_fast_2_2, jacobi_symbol_unsigned_simple,
+    jacobi_symbol_unsigned_double_fast_2, jacobi_symbol_unsigned_simple,
 };
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, WrappingFrom};
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_13, signed_pair_gen, signed_pair_gen_var_10, signed_pair_gen_var_8,
     signed_pair_gen_var_9, signed_triple_gen, signed_triple_gen_var_6, signed_triple_gen_var_7,
     unsigned_gen, unsigned_gen_var_22, unsigned_pair_gen_var_27, unsigned_pair_gen_var_40,
-    unsigned_pair_gen_var_41, unsigned_pair_gen_var_42, unsigned_triple_gen_var_19,
-    unsigned_triple_gen_var_22, unsigned_triple_gen_var_23,
+    unsigned_pair_gen_var_41, unsigned_pair_gen_var_42, unsigned_quadruple_gen_var_12,
+    unsigned_triple_gen_var_19, unsigned_triple_gen_var_22, unsigned_triple_gen_var_23,
 };
 use malachite_base::test_util::num::arithmetic::kronecker_symbol::{
+    jacobi_symbol_unsigned_double_fast_1, jacobi_symbol_unsigned_double_simple,
     jacobi_symbol_unsigned_fast_1, jacobi_symbol_unsigned_fast_2_1,
-    jacobi_symbol_unsigned_fast_2_3, jacobi_symbol_unsigned_fast_2_4,
+    jacobi_symbol_unsigned_fast_2_2, jacobi_symbol_unsigned_fast_2_3,
+    jacobi_symbol_unsigned_fast_2_4,
 };
 use std::panic::catch_unwind;
 
@@ -165,6 +167,107 @@ fn jacobi_symbol_fail_helper_signed<T: PrimitiveSigned>() {
 fn jacobi_symbol_fail() {
     apply_fn_to_primitive_ints!(jacobi_symbol_fail_helper);
     apply_fn_to_signeds!(jacobi_symbol_fail_helper_signed);
+}
+
+#[test]
+fn test_jacobi_symbol_unsigned_double() {
+    fn test<T: PrimitiveUnsigned, D: HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned>(
+        x_1: T,
+        x_0: T,
+        y_1: T,
+        y_0: T,
+        s: i8,
+    ) {
+        assert_eq!(
+            jacobi_symbol_unsigned_double_simple::<T, D>(x_1, x_0, y_1, y_0),
+            s
+        );
+        assert_eq!(jacobi_symbol_unsigned_double_fast_1(x_1, x_0, y_1, y_0), s);
+        assert_eq!(jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0), s);
+    }
+    // fast_1: y_1 == T::ZERO || y_0 == T::ZERO first time
+    // fast_2: y_1 == T::ZERO && y_0 == T::ONE
+    test::<u64, u128>(0, 0, 0, 1, 1);
+    // fast_1: y_1 != T::ZERO && y_0 != T::ZERO first time
+    // fast_1: x_1 != T::ZERO && x_0 != T::ZERO
+    // fast_1: x_0 != T::ZERO first time
+    // fast_1: c != T::WIDTH first time
+    // fast_1: diff_0 != T::ZERO && diff_1 != T::ZERO
+    // fast_1: diff_1.get_highest_bit()
+    // fast_1: y_1 != T::ZERO && y_0 != T::ZERO second time
+    // fast_1: x_0 == T::ZERO second time
+    // fast_1: c != T::WIDTH second time
+    // fast_1: bit.even()
+    // fast_2: y_1 != T::ZERO || y_0 != T::ONE
+    // fast_2: x_0 != T::ZERO first time
+    // fast_2: x_0.odd()
+    // fast_2: x_1 == T::ZERO second time
+    // fast_2: y_1 != T::ZERO
+    // fast_2: skip_loop
+    // fast_2: y_0 != T::ONE second time
+    // fast_2: x_0 == T::ZERO fourth time
+    // fast_2: x_1 != T::ZERO fourth time
+    // fast_2: !bit.get_bit(1)
+    test::<u64, u128>(0, 3, 2, 3, 1);
+    // fast_1: x_1 == T::ZERO || x_0 == T::ZERO
+    // fast_2: x_0 == T::ZERO first time
+    // fast_2: x_1 == T::ZERO first time
+    test::<u64, u128>(0, 0, 0, 3, 0);
+    // fast_1: t != T::ZERO
+    // fast_1: c == T::WIDTH third time
+    // fast_2: y_0 == T::ONE second time
+    test::<u64, u128>(0, 1, 1, 1, 1);
+    // fast_1: c != T::WIDTH third time
+    test::<u64, u128>(0, 1, 1, 3, 1);
+    // fast_1: x_0 == T::ZERO first time
+    // fast_2: x_1 != T::ZERO first time
+    // fast_2: y_0 == T::ONE first time
+    test::<u64, u128>(1, 0, 0, 3, 1);
+    // fast_1: bit.odd()
+    // fast_2: x_1 != T::ZERO second time
+    // fast_2: !skip_loop
+    // fast_2: x_0 != T::ZERO fourth time
+    // fast_2: bit.get_bit(1)
+    test::<u64, u128>(1, 1, 0, 3, -1);
+    // fast_1: t == T::ZERO
+    // fast_2: x_1 == y_1 first time
+    // fast_2: x_1 == y_1 second time
+    // fast_2: x_0 >= y_0
+    // fast_2: x_0 == T::ZERO third time
+    test::<u64, u128>(1, 1, 1, 1, 0);
+    // fast_1: y_1 == T::ZERO || y_0 == T::ZERO second time
+    test::<u64, u128>(0, 1, 2, 1, 1);
+    // fast_1: x_0 != T::ZERO second time
+    // fast_1: c == T::WIDTH second time
+    // fast_2: x_1 != y_1 first time
+    // fast_2: x_1 != T::ZERO third time
+    // fast_2: y_0 == T::ZERO
+    test::<u64, u128>(1, 1, 2, 1, 1);
+    // fast_1: !diff_1.get_highest_bit()
+    test::<u64, u128>(2, 1, 0, 3, 0);
+    // fast_1: diff_0 == T::ZERO || diff_1 == T::ZERO
+    test::<u64, u128>(2, 1, 2, 1, 0);
+    // fast_1: c == T::WIDTH first time
+    // fast_2: x_0.even()
+    // fast_2: y_0 != T::ZERO
+    test::<u8, u16>(242, 128, 173, 173, -1);
+    // fast_2: y_1 == T::ZERO
+    test::<u8, u16>(0, 1, 0, 3, 1);
+    // fast_2: x_0 < y_0
+    // fast_2: x_0 != T::ZERO third time
+    // fast_2: x_0 == T::ONE
+    test::<u8, u16>(1, 1, 1, 3, 1);
+    // fast_2: x_0 != T::ONE
+    test::<u8, u16>(1, 1, 1, 7, -1);
+    // fast_2: x_1 != y_1 second time
+    test::<u8, u16>(1, 1, 2, 3, 1);
+    // fast_2: x_0 == T::ZERO second time
+    test::<u8, u16>(2, 1, 1, 1, 1);
+    // fast_2: x_0 != T::ZERO second time
+    // fast_2: x_1 == T::ZERO third time
+    test::<u8, u16>(2, 1, 1, 3, -1);
+    // fast_2: y_0 != T::ONE first time
+    test::<u8, u16>(3, 0, 0, 3, 0);
 }
 
 // Odd n is already tested in test_jacobi_symbol, so here we just test even n
@@ -437,6 +540,17 @@ fn jacobi_symbol_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
+fn jacobi_symbol_properties_double_helper_unsigned<
+    T: PrimitiveUnsigned,
+    D: HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned,
+>() {
+    unsigned_quadruple_gen_var_12::<T>().test_properties(|(x_1, x_0, y_1, y_0)| {
+        let s = jacobi_symbol_unsigned_double_simple::<T, D>(x_1, x_0, y_1, y_0);
+        assert_eq!(jacobi_symbol_unsigned_double_fast_1(x_1, x_0, y_1, y_0), s,);
+        assert_eq!(jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0), s,);
+    });
+}
+
 fn jacobi_symbol_properties_helper_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: ModPowerOf2<Output = U> + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
@@ -511,6 +625,10 @@ fn jacobi_symbol_properties_helper_signed<
 #[test]
 fn jacobi_symbol_properties() {
     apply_fn_to_unsigneds!(jacobi_symbol_properties_helper_unsigned);
+    jacobi_symbol_properties_double_helper_unsigned::<u8, u16>();
+    jacobi_symbol_properties_double_helper_unsigned::<u16, u32>();
+    jacobi_symbol_properties_double_helper_unsigned::<u32, u64>();
+    jacobi_symbol_properties_double_helper_unsigned::<u64, u128>();
     apply_fn_to_unsigned_signed_pairs!(jacobi_symbol_properties_helper_signed);
 }
 

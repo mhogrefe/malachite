@@ -1,15 +1,16 @@
+use fail_on_untested_path;
 use num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, NegAssign, Parity, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::Iverson;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::SignificantBits;
+use num::conversion::traits::SplitInHalf;
+use num::logic::traits::NotAssign;
 use std::mem::swap;
 
 pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: T) -> i8 {
-    assert!(n > T::ZERO);
+    assert_ne!(n, T::ZERO);
     assert!(n.odd());
     a %= n;
     let mut t = 1i8;
@@ -34,64 +35,196 @@ pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: 
     }
 }}
 
-// This is equivalent to `mpn_jacobi_base` from `mpn/jacbase.c`, GMP 6.2.1, where
-// `JACOBI_BASE_METHOD == 2` and `result_bit_1` is false.
-pub_test! {jacobi_symbol_unsigned_fast_2_2<T: PrimitiveUnsigned>(mut a: T, mut b: T) -> i8 {
-    assert!(b.odd());
-    if b == T::ONE {
+// Computes (a / b) where b is odd, and a and b are otherwise arbitrary
+// two-limb numbers.
+//
+// This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where
+// `JACOBI_2_METHOD == 2` and `bit` is 0.
+pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
+    mut x_1: T,
+    mut x_0: T,
+    mut y_1: T,
+    mut y_0: T,
+) -> i8 {
+    assert!(y_0.odd());
+    if y_1 == T::ZERO && y_0 == T::ONE {
+        // (x|1) = 1
         return 1;
-    } else if a == T::ZERO {
-        return 0;
     }
-    let mut s = 1;
-    if a.even() {
-        let two = (b >> 1u32) ^ b;
-        loop {
-            a >>= 1;
-            if two.get_bit(1) {
-                s.neg_assign()
-            }
-            if a.odd() {
-                break;
-            }
-        }
-    }
-    if a == T::ONE {
-        return s;
-    }
-    if a < b {
-        if (a & b).get_bit(1) {
-            s.neg_assign();
-        }
-        swap(&mut a, &mut b);
-    }
-    loop {
-        assert!(a.odd());
-        assert!(b.odd());
-        assert!(a >= b);
-        a -= b;
-        if a == T::ZERO {
+    let mut bit = false;
+    if x_0 == T::ZERO {
+        if x_1 == T::ZERO {
+            // (0|y) = 0, y > 1
             return 0;
         }
-        let two = (b >> 1u32) ^ b;
-        loop {
-            a >>= 1;
-            if two.get_bit(1) {
-                s.neg_assign()
-            }
-            if a.odd() {
-                break;
+        let c = x_1.trailing_zeros();
+        if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+            bit.not_assign();
+        }
+        x_0 = y_0;
+        y_0 = x_1 >> c;
+        if y_0 == T::ONE {
+            // (1|y) = 1
+            return if bit { -1 } else { 1 };
+        }
+        x_1 = y_1;
+        if (x_0 & y_0).get_bit(1) {
+            bit.not_assign();
+        }
+    } else {
+        if x_0.even() {
+            let c = x_0.trailing_zeros();
+            x_0 = (x_1 << (T::WIDTH - c)) | (x_0 >> c);
+            x_1 >>= c;
+            if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+                bit.not_assign();
             }
         }
-        if a == T::ONE {
-            return s;
-        }
-        if a < b {
-            if (a & b).get_bit(1) {
-                s.neg_assign();
+        let mut skip_loop = false;
+        if x_1 == T::ZERO {
+            if y_1 != T::ZERO {
+                if (x_0 & y_0).get_bit(1) {
+                    bit.not_assign();
+                }
+                swap(&mut x_0, &mut y_0);
+                x_1 = y_1;
+                skip_loop = true;
+            } else {
+                assert!(y_0.odd());
+                assert!(y_0 > T::ONE);
+                let j = x_0.jacobi_symbol(y_0);
+                return if bit { -j } else { j };
             }
-            swap(&mut a, &mut b);
         }
+        if !skip_loop {
+            'outer: while y_1 != T::ZERO {
+                // Compute (x|y)
+                while x_1 > y_1 {
+                    (x_1, x_0) = T::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0);
+                    if x_0 == T::ZERO {
+                        let c = x_1.trailing_zeros();
+                        if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+                            bit.not_assign();
+                        }
+                        x_0 = y_0;
+                        y_0 = x_1 >> c;
+                        x_1 = y_1;
+                        if (x_0 & y_0).get_bit(1) {
+                            bit.not_assign();
+                        }
+                        break 'outer;
+                    } else {
+                        let c = x_0.trailing_zeros();
+                        if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+                            bit.not_assign();
+                        }
+                        x_0 = (x_1 << (T::WIDTH - c)) | (x_0 >> c);
+                        x_1 >>= c;
+                    }
+                }
+                if x_1 != y_1 {
+                    if x_1 == T::ZERO {
+                        if (x_0 & y_0).get_bit(1) {
+                            bit.not_assign();
+                        }
+                        swap(&mut x_0, &mut y_0);
+                        x_1 = y_1;
+                        break;
+                    }
+                    if (x_0 & y_0).get_bit(1) {
+                        bit.not_assign();
+                    }
+                    // Compute (y|x)
+                    while y_1 > x_1 {
+                        (y_1, y_0) = T::xx_sub_yy_to_zz(y_1, y_0, x_1, x_0);
+                        if y_0 == T::ZERO {
+                            let c = y_1.trailing_zeros();
+                            if c.odd() & (x_0 ^ (x_0 >> 1)).get_bit(1) {
+                                bit.not_assign();
+                            }
+                            y_0 = y_1 >> c;
+                            if (x_0 & y_0).get_bit(1) {
+                                bit.not_assign();
+                            }
+                            break 'outer;
+                        }
+                        let c = y_0.trailing_zeros();
+                        if c.odd() & (x_0 ^ (x_0 >> 1)).get_bit(1) {
+                            bit.not_assign()
+                        }
+                        y_0 = (y_1 << (T::WIDTH - c)) | (y_0 >> c);
+                        y_1 >>= c;
+                    }
+                    if (x_0 & y_0).get_bit(1) {
+                        bit.not_assign();
+                    }
+                }
+                // Compute (x|y)
+                if x_1 == y_1 {
+                    if x_0 < y_0 {
+                        swap(&mut x_0, &mut y_0);
+                        if (x_0 & y_0).get_bit(1) {
+                            bit.not_assign();
+                        }
+                    }
+                    x_0 -= y_0;
+                    if x_0 == T::ZERO {
+                        return 0;
+                    }
+                    let c = x_0.trailing_zeros();
+                    if c.odd() & (y_0 ^ (y_0 >> 1)).get_bit(1) {
+                        bit.not_assign();
+                    }
+                    x_0 >>= c;
+                    if x_0 == T::ONE {
+                        return if bit { -1 } else { 1 };
+                    }
+                    swap(&mut x_0, &mut y_0);
+                    if (x_0 & y_0).get_bit(1) {
+                        bit.not_assign();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    // Compute (x|y), with y a single limb.
+    assert!(y_0.odd());
+    if y_0 == T::ONE {
+        // (x|1) = 1
+        return if bit { -1 } else { 1 };
+    }
+    while x_1 != T::ZERO {
+        x_1 -= if x_0 < y_0 { T::ONE } else { T::ZERO };
+        x_0.wrapping_sub_assign(y_0);
+        if x_0 == T::ZERO {
+            if x_1 == T::ZERO {
+                fail_on_untested_path(
+                    "jacobi_symbol_unsigned_double_fast_2, x_1 == T::ZERO fourth time",
+                );
+                return 0;
+            }
+            let c = x_1.trailing_zeros();
+            if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+                bit.not_assign();
+            }
+            x_0 = x_1 >> c;
+            break;
+        }
+        let c = x_0.trailing_zeros();
+        x_0 = (x_1 << (T::WIDTH - c)) | (x_0 >> c);
+        x_1 >>= c;
+        if c.odd() && (y_0 ^ (y_0 >> 1)).get_bit(1) {
+            bit.not_assign();
+        }
+    }
+    assert!(y_0.odd());
+    assert!(y_0 > T::ONE);
+    let j = x_0.jacobi_symbol(y_0);
+    if bit {
+        -j
+    } else {
+        j
     }
 }}
 
@@ -104,14 +237,12 @@ fn jacobi_symbol_signed<
 ) -> i8 {
     assert!(n > S::ZERO);
     assert!(n.odd());
-    let mut s = a.unsigned_abs().jacobi_symbol(n.unsigned_abs());
-    if a < S::ZERO {
-        let n_mod_4: u8 = n.mod_power_of_2(2).wrapping_into();
-        if n_mod_4 == 3 {
-            s.neg_assign()
-        }
+    let s = a.unsigned_abs().jacobi_symbol(n.unsigned_abs());
+    if a < S::ZERO && n.get_bit(1) {
+        -s
+    } else {
+        s
     }
-    s
 }
 
 fn kronecker_symbol_unsigned<T: PrimitiveUnsigned>(a: T, b: T) -> i8 {
@@ -345,10 +476,8 @@ impl JacobiSymbol<u128> for u128 {
     /// See [here](super::kronecker_symbol#jacobi_symbol).
     #[inline]
     fn jacobi_symbol(self, n: u128) -> i8 {
-        if n.significant_bits() <= u64::WIDTH {
-            jacobi_symbol_unsigned_simple(self, n)
-        } else {
-            jacobi_symbol_unsigned_fast_2_2(self, n)
-        }
+        let (x_1, x_0) = self.split_in_half();
+        let (y_1, y_0) = n.split_in_half();
+        jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0)
     }
 }

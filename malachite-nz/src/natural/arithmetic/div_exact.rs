@@ -1,5 +1,5 @@
-use fail_on_untested_path;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
 };

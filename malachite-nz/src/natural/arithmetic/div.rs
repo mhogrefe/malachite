@@ -1,4 +1,4 @@
-use fail_on_untested_path;
+use malachite_base::fail_on_untested_path;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ};

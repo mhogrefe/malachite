@@ -153,6 +153,15 @@ pub fn integer_gen_var_8() -> Generator<Integer> {
     )
 }
 
+// All odd positive `Integer`s.
+pub fn integer_gen_var_9() -> Generator<Integer> {
+    Generator::new(
+        &exhaustive_integer_gen_var_9,
+        &random_integer_gen_var_8,
+        &special_random_integer_gen_var_9,
+    )
+}
+
 // -- (Integer, Integer) --
 
 pub fn integer_pair_gen() -> Generator<(Integer, Integer)> {
@@ -248,6 +257,33 @@ pub fn integer_pair_gen_var_3() -> Generator<(Integer, Integer)> {
     )
 }
 
+// All pairs of `Integer`s where the second `Integer` is positive and odd.
+pub fn integer_pair_gen_var_4() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_4,
+        &random_integer_pair_gen_var_4,
+        &special_random_integer_pair_gen_var_4,
+    )
+}
+
+// All coprime pairs of `Integer`s.
+pub fn integer_pair_gen_var_5() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_5,
+        &random_integer_pair_gen_var_5,
+        &special_random_integer_pair_gen_var_5,
+    )
+}
+
+// All coprime pairs of odd positive `Integer`s.
+pub fn integer_pair_gen_var_6() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_6,
+        &random_integer_pair_gen_var_6,
+        &special_random_integer_pair_gen_var_6,
+    )
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn integer_triple_gen() -> Generator<(Integer, Integer, Integer)> {
@@ -264,6 +300,24 @@ pub fn integer_triple_gen_var_1() -> Generator<(Integer, Integer, Integer)> {
         &exhaustive_integer_triple_gen_var_1,
         &random_integer_triple_gen_var_1,
         &special_random_integer_triple_gen_var_1,
+    )
+}
+
+// All triples of `Integer`s where the third `Integer` is positive and odd.
+pub fn integer_triple_gen_var_2() -> Generator<(Integer, Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_triple_gen_var_2,
+        &random_integer_triple_gen_var_2,
+        &special_random_integer_triple_gen_var_2,
+    )
+}
+
+// All triples of `Integer`s where the second and third `Integer`s are positive and odd.
+pub fn integer_triple_gen_var_3() -> Generator<(Integer, Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_triple_gen_var_3,
+        &random_integer_triple_gen_var_3,
+        &special_random_integer_triple_gen_var_3,
     )
 }
 
@@ -980,6 +1034,15 @@ where
     )
 }
 
+// All odd `Natural`s.
+pub fn natural_gen_var_8() -> Generator<Natural> {
+    Generator::new(
+        &exhaustive_natural_gen_var_8,
+        &random_natural_gen_var_8,
+        &special_random_natural_gen_var_8,
+    )
+}
+
 // -- (Natural, bool) --
 
 pub fn natural_bool_pair_gen() -> Generator<(Natural, bool)> {
@@ -1202,6 +1265,33 @@ pub fn natural_pair_gen_var_11() -> Generator<(Natural, Natural)> {
     )
 }
 
+// All pairs of `Natural`s where the second `Natural` is odd.
+pub fn natural_pair_gen_var_12() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_12,
+        &random_natural_pair_gen_var_12,
+        &special_random_natural_pair_gen_var_12,
+    )
+}
+
+// All coprime pairs of odd `Natural`s.
+pub fn natural_pair_gen_var_13() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_13,
+        &random_natural_pair_gen_var_13,
+        &special_random_natural_pair_gen_var_13,
+    )
+}
+
+// All coprime pairs of `Natural`s.
+pub fn natural_pair_gen_var_14() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_14,
+        &random_natural_pair_gen_var_14,
+        &special_random_natural_pair_gen_var_14,
+    )
+}
+
 // -- (Natural, Natural, bool) --
 
 // All `(Natural, Natural, bool)` where the second `Natural` is positive.
@@ -1309,6 +1399,24 @@ pub fn natural_triple_gen_var_7() -> Generator<(Natural, Natural, Natural)> {
         &exhaustive_natural_triple_gen_var_7,
         &random_natural_triple_gen_var_7,
         &special_random_natural_triple_gen_var_7,
+    )
+}
+
+// All triples of `Natural`s where the third `Natural` is odd.
+pub fn natural_triple_gen_var_8() -> Generator<(Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_triple_gen_var_8,
+        &random_natural_triple_gen_var_8,
+        &special_random_natural_triple_gen_var_8,
+    )
+}
+
+// All triples of `Natural`s where the second and third `Natural`s are odd.
+pub fn natural_triple_gen_var_9() -> Generator<(Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_triple_gen_var_9,
+        &random_natural_triple_gen_var_9,
+        &special_random_natural_triple_gen_var_9,
     )
 }
 

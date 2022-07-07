@@ -1149,6 +1149,7 @@ fn test_f64_convertible_from_integer() {
         38177180919299881250404026184124858369", false);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_rounding_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Integer>
@@ -1315,6 +1316,7 @@ fn float_from_integer_properties() {
     apply_fn_to_primitive_floats!(float_from_integer_properties_helper);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_checked_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Integer>
         + for<'a> CheckedFrom<&'a Natural>
@@ -1371,6 +1373,7 @@ fn float_checked_from_integer_properties() {
     apply_fn_to_primitive_floats!(float_checked_from_integer_properties_helper);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_convertible_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Integer>

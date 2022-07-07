@@ -1,5 +1,5 @@
-use fail_on_untested_path;
 use itertools::Itertools;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2, ModPowerOf2Assign,
     Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
@@ -1667,6 +1667,7 @@ where
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
+#[allow(clippy::trait_duplication_in_bounds)]
 fn from_digits_asc_limb_from_natural<
     I: Iterator<Item = Natural>,
     T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
@@ -1759,6 +1760,7 @@ where
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
+#[allow(clippy::trait_duplication_in_bounds)]
 fn from_digits_desc_limb_from_natural<
     I: Iterator<Item = Natural>,
     T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,

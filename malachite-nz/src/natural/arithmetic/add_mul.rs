@@ -331,7 +331,7 @@ impl Natural {
     }
 }
 
-impl<'a> AddMul<Natural, Natural> for Natural {
+impl AddMul<Natural, Natural> for Natural {
     type Output = Natural;
 
     /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by value.

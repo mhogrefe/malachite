@@ -38,16 +38,13 @@ macro_rules! impl_checked_sub_mul_unsigned {
 apply_to_unsigneds!(impl_checked_sub_mul_unsigned);
 
 fn checked_sub_mul_signed<
-    U: PrimitiveUnsigned,
+    U: Ord + PrimitiveUnsigned,
     T: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: T,
     y: T,
     z: T,
-) -> Option<T>
-where
-    U: Ord,
-{
+) -> Option<T> {
     if y == T::ZERO || z == T::ZERO {
         return Some(x);
     }

@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     extended_gcd::register(runner);
     gcd::register(runner);
     is_power_of_2::register(runner);
+    kronecker_symbol::register(runner);
     lcm::register(runner);
     log_base::register(runner);
     log_base_2::register(runner);
@@ -81,6 +82,7 @@ mod eq_mod_power_of_2;
 mod extended_gcd;
 mod gcd;
 mod is_power_of_2;
+mod kronecker_symbol;
 mod lcm;
 mod log_base;
 mod log_base_2;

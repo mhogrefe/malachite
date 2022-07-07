@@ -1513,6 +1513,7 @@ fn test_f64_convertible_from_rational() {
     test("-1/3", false);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_rounding_from_rational_properties_helper<
     T: for<'a> ConvertibleFrom<&'a Integer>
         + for<'a> ConvertibleFrom<&'a Rational>
@@ -1653,6 +1654,7 @@ fn float_rounding_from_rational_properties() {
     });
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_from_rational_properties_helper<
     T: for<'a> ConvertibleFrom<&'a Rational>
         + for<'a> From<&'a Rational>
@@ -1725,6 +1727,7 @@ fn float_from_rational_properties() {
     apply_fn_to_primitive_floats!(float_from_rational_properties_helper);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_checked_from_rational_properties_helper<
     T: CheckedFrom<Rational>
         + for<'a> CheckedFrom<&'a Integer>
@@ -1784,6 +1787,7 @@ fn float_checked_from_rational_properties() {
     apply_fn_to_primitive_floats!(float_checked_from_rational_properties_helper);
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn float_convertible_from_rational_properties_helper<
     T: ConvertibleFrom<Rational>
         + for<'a> ConvertibleFrom<&'a Integer>
