@@ -61,8 +61,8 @@ use strings::random::{random_strings, random_strings_using_chars};
 use strings::strings_from_char_vecs;
 use test_util::extra_variadic::{
     random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
-    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz,
-    random_quadruples_xyzz, random_sextuples_from_single, random_triples,
+    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyxy, random_quadruples_xyyx,
+    random_quadruples_xyyz, random_quadruples_xyzz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
     random_union3s, Union3,
 };
@@ -6098,6 +6098,25 @@ pub fn random_primitive_int_vec_pair_gen_var_26<T: PrimitiveInt>(
     })
 }
 
+pub fn random_primitive_int_vec_pair_gen_var_27<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        PrimitiveIntVecPairSameLenGenerator {
+            phantom: PhantomData,
+            lengths: geometric_random_positive_unsigneds(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ),
+            xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+        }
+        .filter(|(ref xs, ref ys): &(Vec<T>, Vec<T>)| {
+            (*xs.last().unwrap() != T::ZERO || *ys.last().unwrap() != T::ZERO) && ys[0].odd()
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, bool) --
 
 pub fn random_primitive_int_vec_primitive_int_vec_bool_triple_gen_var_1<T: PrimitiveInt>(
@@ -7669,4 +7688,24 @@ pub fn random_large_type_gen_var_22<T: PrimitiveInt>(
             }
         }),
     )
+}
+
+// vars 23 through 26 are in malachite-nz.
+
+pub fn random_large_type_gen_var_27<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(bool, Vec<T>, bool, Vec<T>)> {
+    Box::new(random_quadruples_xyxy(
+        EXAMPLE_SEED,
+        &random_bools,
+        &|seed| {
+            random_vecs(
+                seed,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| xs.last() != Some(&T::ZERO))
+        },
+    ))
 }

@@ -111,7 +111,8 @@ fn test_partial_eq_i64() {
     test("-1000000000000000000000000", -1000000000000, false);
 }
 
-#[allow(clippy::cmp_owned, clippy::op_ref, clippy::trait_duplication_in_bounds)] // Extra refs necessary for type inference
+// Extra refs necessary for type inference
+#[allow(clippy::cmp_owned, clippy::op_ref, clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_int_properties_helper_unsigned<
     T: PartialEq<Integer> + PartialEq<rug::Integer> + PrimitiveUnsigned,
 >()

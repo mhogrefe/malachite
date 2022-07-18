@@ -1,12 +1,22 @@
 use malachite_base::num::arithmetic::traits::{JacobiSymbol, KroneckerSymbol};
+use malachite_base::test_util::bench::bucketers::pair_vec_max_len_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::unsigned_vec_pair_gen_var_32;
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::kronecker_symbol::jacobi_symbol_simple;
-use malachite_nz::test_util::bench::bucketers::pair_2_natural_bit_bucketer;
-use malachite_nz::test_util::generators::{natural_pair_gen, natural_pair_gen_var_12};
+use malachite_nz::natural::arithmetic::kronecker_symbol::{
+    limbs_jacobi_symbol_init, limbs_jacobi_symbol_same_length,
+};
+use malachite_nz::test_util::bench::bucketers::{
+    pair_2_natural_bit_bucketer, pair_2_pair_natural_max_bit_bucketer,
+};
+use malachite_nz::test_util::generators::{
+    natural_pair_gen, natural_pair_gen_rm, natural_pair_gen_var_12, natural_pair_gen_var_12_rm,
+};
+use malachite_nz::test_util::natural::arithmetic::kronecker_symbol::jacobi_symbol_simple;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_limbs_jacobi_symbol_same_length);
     register_demo!(runner, demo_natural_jacobi_symbol);
     register_demo!(runner, demo_natural_jacobi_symbol_val_ref);
     register_demo!(runner, demo_natural_jacobi_symbol_ref_val);
@@ -16,12 +26,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_kronecker_symbol_ref_val);
     register_demo!(runner, demo_natural_kronecker_symbol_ref_ref);
 
+    register_bench!(runner, benchmark_limbs_jacobi_symbol_same_length);
+    register_bench!(runner, benchmark_natural_jacobi_symbol_library_comparison);
     register_bench!(runner, benchmark_natural_jacobi_symbol_evaluation_strategy);
     register_bench!(runner, benchmark_natural_jacobi_symbol_algorithms);
     register_bench!(
         runner,
+        benchmark_natural_kronecker_symbol_library_comparison
+    );
+    register_bench!(
+        runner,
         benchmark_natural_kronecker_symbol_evaluation_strategy
     );
+}
+
+fn demo_limbs_jacobi_symbol_same_length(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_32().get(gm, &config).take(limit) {
+        let xs_old = xs.clone();
+        let ys_old = ys.clone();
+        let bits = limbs_jacobi_symbol_init(xs[0], ys[0], 0);
+        let s = limbs_jacobi_symbol_same_length(&mut xs, &mut ys, bits);
+        println!(
+            "limbs_jacobi_symbol_same_length({:?}, {:?}) = {}",
+            xs_old, ys_old, s
+        );
+    }
 }
 
 fn demo_natural_jacobi_symbol(gm: GenMode, config: GenConfig, limit: usize) {
@@ -105,6 +134,48 @@ fn demo_natural_kronecker_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
+fn benchmark_limbs_jacobi_symbol_same_length(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_jacobi_symbol_same_length(&mut [Limb], &mut [Limb], u8)",
+        BenchmarkType::Single,
+        unsigned_vec_pair_gen_var_32().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_vec_max_len_bucketer("xs", "ys"),
+        &mut [("Malachite", &mut |(mut xs, mut ys)| {
+            let bits = limbs_jacobi_symbol_init(xs[0], ys[0], 0);
+            limbs_jacobi_symbol_same_length(&mut xs, &mut ys, bits);
+        })],
+    );
+}
+
+fn benchmark_natural_jacobi_symbol_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.jacobi_symbol(Natural)",
+        BenchmarkType::LibraryComparison,
+        natural_pair_gen_var_12_rm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y))| no_out!(x.jacobi_symbol(y))),
+            ("rug", &mut |((x, y), _)| no_out!(x.jacobi(&y))),
+        ],
+    );
+}
+
 fn benchmark_natural_jacobi_symbol_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,
@@ -153,6 +224,29 @@ fn benchmark_natural_jacobi_symbol_algorithms(
         &mut [
             ("default", &mut |(n, m)| no_out!(n.jacobi_symbol(m))),
             ("simple", &mut |(n, m)| no_out!(jacobi_symbol_simple(n, m))),
+        ],
+    );
+}
+
+fn benchmark_natural_kronecker_symbol_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.kronecker_symbol(Natural)",
+        BenchmarkType::LibraryComparison,
+        natural_pair_gen_rm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y))| {
+                no_out!(x.kronecker_symbol(y))
+            }),
+            ("rug", &mut |((x, y), _)| no_out!(x.kronecker(&y))),
         ],
     );
 }

@@ -46,7 +46,10 @@ pub mod eq_mod_power_of_2;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
 pub mod extended_gcd;
-/// TODOOOO
+/// Implementations of [`LegendreSymbol`](malachite_base::num::arithmetic::traits::LegendreSymbol),
+/// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), and
+/// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for
+/// computing the Legendre, Jacobi, and Kronecker symbols of two numbers.
 pub mod kronecker_symbol;
 /// Implementations of traits for finding the remainder of two numbers, subject to various rounding
 /// rules.

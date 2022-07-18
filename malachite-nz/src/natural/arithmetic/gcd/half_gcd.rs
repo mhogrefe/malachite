@@ -1,6 +1,6 @@
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivMod, Gcd, Parity, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+    DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -73,7 +73,7 @@ pub struct HalfGcdMatrix<'a> {
 #[cfg(not(feature = "test_build"))]
 pub(crate) struct HalfGcdMatrix<'a> {
     data: &'a mut [Limb],
-    s: usize,
+    pub(crate) s: usize,
     two_s: usize,
     three_s: usize,
     pub(crate) n: usize,
@@ -207,7 +207,7 @@ impl<'a> HalfGcdMatrix<'a> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(a.n, b.n)`.
 //
 // This is equivalent to `mpn_hgcd_matrix_mul` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_test! {limbs_half_gcd_matrix_mul_matrix(
+pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix,
     scratch: &mut [Limb]
@@ -264,7 +264,7 @@ pub_test! {limbs_half_gcd_matrix_mul_matrix(
 // where $T$ is time, $M$ is additional memory, and $n$ is `a.n`.
 //
 // This is equivalent to `mpn_hgcd_matrix_mul_1` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_test! {limbs_half_gcd_matrix_mul_matrix_1(
+pub_crate_test! {limbs_half_gcd_matrix_mul_matrix_1(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix1,
     scratch: &mut [Limb],
@@ -292,7 +292,7 @@ pub_test! {limbs_half_gcd_matrix_mul_matrix_1(
 // where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
 //
 // This is equivalent to `mpn_hgcd_matrix_update_q` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_test! {limbs_half_gcd_matrix_update_q(
+pub_crate_test! {limbs_half_gcd_matrix_update_q(
     m: &mut HalfGcdMatrix,
     qs: &[Limb],
     column: u8,
@@ -621,7 +621,7 @@ pub struct HalfGcdMatrix1 {
 #[cfg(not(feature = "test_build"))]
 #[derive(Default)]
 pub(crate) struct HalfGcdMatrix1 {
-    data: [[Limb; 2]; 2],
+    pub(crate) data: [[Limb; 2]; 2],
 }
 
 // Sets (r;b) = (a;b) M, with M = (u00, u01; u10, u11). Vector must
@@ -647,9 +647,13 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
     let (out_lo, out_hi) = out.split_at_mut(n);
     let (ys_lo, ys_hi) = ys.split_at_mut(n);
     let mut x_high = limbs_mul_limb_to_out(out_lo, xs, m.data[0][0]);
-    x_high += limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, ys_lo, m.data[1][0]);
+    x_high.wrapping_add_assign(
+        limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, ys_lo, m.data[1][0])
+    );
     let mut y_high = limbs_slice_mul_limb_in_place(ys_lo, m.data[1][1]);
-    y_high += limbs_slice_add_mul_limb_same_length_in_place_left(ys_lo, xs, m.data[0][1]);
+    y_high.wrapping_add_assign(
+        limbs_slice_add_mul_limb_same_length_in_place_left(ys_lo, xs, m.data[0][1])
+    );
     out_hi[0] = x_high;
     ys_hi[0] = y_high;
     if x_high == 0 && y_high == 0 {
@@ -876,7 +880,7 @@ pub(crate) const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
 //
 // This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where
 // `HGCD2_DIV2_METHOD == 1`.
-pub_test! {limbs_gcd_div(
+pub_crate_test! {limbs_gcd_div(
     mut n1: Limb,
     mut n0: Limb,
     mut d1: Limb,
@@ -1143,7 +1147,7 @@ fn limbs_half_gcd_step(
 // Constant time and additional memory.
 //
 // This is equivalent to `MPN_GCD_SUBDIV_STEP_ITCH` from `gmp-impl.h`, GMP 6.2.1.
-const fn limbs_gcd_subdivide_step_scratch_len(n: usize) -> usize {
+pub(crate) const fn limbs_gcd_subdivide_step_scratch_len(n: usize) -> usize {
     n
 }
 
@@ -1164,7 +1168,7 @@ pub(crate) const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
 }
 
 //TODO tune
-const HGCD_THRESHOLD: usize = 101;
+pub(crate) const HGCD_THRESHOLD: usize = 101;
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -1455,7 +1459,7 @@ pub(crate) fn limbs_half_gcd(
 }
 
 //TODO tune
-const GCD_DC_THRESHOLD: usize = 330;
+pub(crate) const GCD_DC_THRESHOLD: usize = 330;
 
 // X >= Y, X and Y not both even.
 //

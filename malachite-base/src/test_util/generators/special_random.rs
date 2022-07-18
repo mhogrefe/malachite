@@ -63,8 +63,8 @@ use std::marker::PhantomData;
 use strings::random::random_strings_using_chars;
 use test_util::extra_variadic::{
     random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
-    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz,
-    random_quadruples_xyzz, random_sextuples_from_single, random_triples,
+    random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyxy, random_quadruples_xyyx,
+    random_quadruples_xyyz, random_quadruples_xyzz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
     random_union3s, Union3,
 };
@@ -7868,6 +7868,29 @@ pub fn special_random_unsigned_vec_pair_gen_var_32<T: PrimitiveUnsigned>(
     })
 }
 
+pub fn special_random_unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        UnsignedVecPairSameLenGenerator {
+            phantom: PhantomData,
+            lengths: geometric_random_positive_unsigneds(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter(|(ref xs, ref ys): &(Vec<T>, Vec<T>)| {
+            (*xs.last().unwrap() != T::ZERO || *ys.last().unwrap() != T::ZERO) && ys[0].odd()
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, bool) --
 
 pub fn special_random_unsigned_vec_unsigned_vec_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -9284,4 +9307,25 @@ pub fn special_random_large_type_gen_var_22<T: PrimitiveUnsigned>(
             }
         }),
     )
+}
+
+// vars 23 through 24 are in malachite-nz.
+
+pub fn special_random_large_type_gen_var_25<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(bool, Vec<T>, bool, Vec<T>)> {
+    Box::new(random_quadruples_xyxy(
+        EXAMPLE_SEED,
+        &random_bools,
+        &|seed| {
+            striped_random_unsigned_vecs(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| xs.last() != Some(&T::ZERO))
+        },
+    ))
 }

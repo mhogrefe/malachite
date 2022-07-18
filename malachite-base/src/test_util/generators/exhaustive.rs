@@ -53,12 +53,12 @@ use test_util::extra_variadic::{
     exhaustive_quadruples_xyyz_custom_output, exhaustive_quadruples_xyzz,
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
-    exhaustive_triples_xyx_custom_output, lex_triples_from_single, lex_union3s,
+    exhaustive_triples_xyx_custom_output, lex_triples_from_single, lex_triples_xyy, lex_union3s,
     ExhaustiveTriples1Input, ExhaustiveTriplesXXY, Union3,
 };
 use test_util::generators::common::{
-    permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4,
-    reshape_3_1_to_4, It,
+    permute_1_3_2, permute_2_1, permute_3_1_4_2, reshape_1_2_to_3, reshape_2_1_1_to_4,
+    reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, It,
 };
 use test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
@@ -4769,6 +4769,26 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_32<T: PrimitiveUnsigned>() -> It<(Ve
     )
 }
 
+pub fn exhaustive_unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_positive_primitive_ints(),
+            UnsignedVecPairSameLenGenerator,
+        )
+        .filter_map(|(_, (xs, ys)): (_, (Vec<T>, Vec<T>))| {
+            if (*xs.last().unwrap() != T::ZERO || *ys.last().unwrap() != T::ZERO) && ys[0].odd() {
+                Some((xs, ys))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
 // --(Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, bool) --
 
 pub fn exhaustive_unsigned_vec_unsigned_vec_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -5866,4 +5886,16 @@ pub fn exhaustive_large_type_gen_var_22<T: PrimitiveUnsigned>(
             }
         }),
     )
+}
+
+// vars 23 through 26 are in malachite-nz.
+
+pub fn exhaustive_large_type_gen_var_27<T: PrimitiveUnsigned>() -> It<(bool, Vec<T>, bool, Vec<T>)>
+{
+    permute_3_1_4_2(reshape_2_1_1_to_4(Box::new(lex_triples_xyy(
+        exhaustive_pairs_from_single(
+            exhaustive_vecs(exhaustive_unsigneds()).filter(|xs| xs.last() != Some(&T::ZERO)),
+        ),
+        exhaustive_bools(),
+    ))))
 }

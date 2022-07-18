@@ -61,7 +61,10 @@ pub mod gcd;
 /// Implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a trait
 /// for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
-/// TODOOOOO
+/// Implementations of [`LegendreSymbol`](malachite_base::num::arithmetic::traits::LegendreSymbol),
+/// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), and
+/// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for
+/// computing the Legendre, Jacobi, and Kronecker symbols of two numbers.
 pub mod kronecker_symbol;
 /// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm),
 /// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), and

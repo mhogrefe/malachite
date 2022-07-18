@@ -184,7 +184,8 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, ...]";
+    let values = "[17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, \
+    17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, ...]";
     let common_values = "[(17/6, 1000000)]";
     let sample_median = "(17/6, None)";
     let sample_moment_stats = MomentStats {

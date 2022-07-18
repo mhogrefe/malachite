@@ -13,8 +13,8 @@ use tuples::exhaustive::clone_helper;
 use tuples::random::next_helper;
 use unions::UnionFromStrError;
 use {
-    custom_tuples, exhaustive_tuples_1_input, exhaustive_unions, lex_tuples, random_custom_tuples,
-    random_tuples, random_unions, union_struct,
+    custom_tuples, exhaustive_tuples_1_input, exhaustive_unions, lex_custom_tuples, lex_tuples,
+    random_custom_tuples, random_tuples, random_unions, union_struct,
 };
 
 fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
@@ -39,6 +39,17 @@ lex_tuples!(
     [0, X, I, xs, x],
     [1, Y, J, ys, y],
     [2, Z, K, zs, z]
+);
+
+lex_custom_tuples!(
+    (pub(crate)),
+    LexTriplesXYY,
+    (X, Y, Y),
+    (None, None, None),
+    unwrap_triple,
+    lex_triples_xyy,
+    [X, I, xs, [0, x_0]],
+    [Y, J, ys, [1, y_1], [2, y_2]]
 );
 
 exhaustive_tuples_1_input!(
@@ -355,6 +366,14 @@ random_custom_tuples!(
     random_quadruples_xyyx,
     [X, I, xs, xs_gen, [x_0, x_0], [x_3, y_1]],
     [Y, J, ys, ys_gen, [y_1, y_2], [y_2, x_3]]
+);
+random_custom_tuples!(
+    (pub(crate)),
+    RandomQuadruplesXYXY,
+    (X, Y, X, Y),
+    random_quadruples_xyxy,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
+    [Y, J, ys, ys_gen, [y_1, x_2], [y_3, y_3]]
 );
 random_custom_tuples!(
     (pub(crate)),

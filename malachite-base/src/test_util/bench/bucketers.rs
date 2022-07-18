@@ -654,6 +654,16 @@ pub fn quadruple_4_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U
     }
 }
 
+pub fn quadruple_1_3_vec_max_len_bucketer<'a, T, U, V, W>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (T, Vec<U>, V, Vec<W>)> {
+    Bucketer {
+        bucketing_function: &|(_, xs, _, ys)| max(xs.len(), ys.len()),
+        bucketing_label: format!("max({}.len(), {}.len())", xs_name, ys_name),
+    }
+}
+
 pub fn quintuple_1_vec_len_bucketer<T, U, V, W, X>(
     xs_name: &str,
 ) -> Bucketer<(Vec<T>, U, V, W, X)> {

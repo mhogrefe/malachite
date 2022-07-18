@@ -3789,6 +3789,16 @@ pub fn unsigned_vec_pair_gen_var_31<T: PrimitiveUnsigned>() -> Generator<(Vec<T>
     )
 }
 
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned, both `Vec`s have the same length, at least one
+// ends with a nonzero value, and the first element of the second `Vec` is odd.
+pub fn unsigned_vec_pair_gen_var_32<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_33,
+        &random_primitive_int_vec_pair_gen_var_27,
+        &special_random_unsigned_vec_pair_gen_var_33,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, bool) --
 
 // All `(Vec<T>, Vec<T>, bool)` where `T` is unsigned and both `Vec`s have the same length.
@@ -4307,6 +4317,17 @@ pub fn large_type_gen_var_22<T: PrimitiveUnsigned>() -> T2<T> {
         &exhaustive_large_type_gen_var_22,
         &random_large_type_gen_var_22,
         &special_random_large_type_gen_var_22,
+    )
+}
+
+// vars 23 through 26 are in malachite-nz.
+
+// All (bool, Vec<T>, bool, Vec<T>) where `T` is unsigned and neither `Vec` ends with a zero.
+pub fn large_type_gen_var_27<T: PrimitiveUnsigned>() -> Generator<(bool, Vec<T>, bool, Vec<T>)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_27,
+        &random_large_type_gen_var_27,
+        &special_random_large_type_gen_var_25,
     )
 }
 

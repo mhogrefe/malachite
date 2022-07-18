@@ -4,8 +4,12 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::WrappingInto;
-use malachite_base::test_util::generators::{signed_pair_gen, signed_pair_gen_var_8};
+use malachite_base::test_util::generators::{
+    large_type_gen_var_27, signed_pair_gen, signed_pair_gen_var_8,
+};
+use malachite_nz::integer::arithmetic::kronecker_symbol::limbs_kronecker_symbol;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_9, integer_pair_gen, integer_pair_gen_var_4,
@@ -15,6 +19,106 @@ use malachite_nz::test_util::generators::{
 use std::borrow::Cow;
 use std::panic::catch_unwind;
 use std::str::FromStr;
+
+#[test]
+fn test_limbs_kronecker_symbol() {
+    fn test(x_sign: bool, xs: &[Limb], y_sign: bool, ys: &[Limb], s: i8) {
+        let x = Integer::from_sign_and_abs(x_sign, Natural::from_limbs_asc(xs));
+        let y = Integer::from_sign_and_abs(y_sign, Natural::from_limbs_asc(ys));
+        assert_eq!((&x).kronecker_symbol(&y), s);
+        assert_eq!(limbs_kronecker_symbol(x_sign, xs, y_sign, ys), s);
+    }
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        // ys_len != 0
+        // xs_len != 0
+        // (x_lo | y_lo).odd()
+        // y_sign
+        // ys_len <= 1 || y_twos == 0 first time
+        // x_sign
+        // xs_len >= ys_len
+        // ys_len == 1
+        // y_lo == 1
+        test(true, &[1], true, &[1], 1);
+        // ys_len == 0
+        test(false, &[], false, &[], 0);
+        // xs_len == 0
+        test(false, &[], false, &[1], 1);
+        // !y_sign
+        // !x_sign
+        test(false, &[1], false, &[1], -1);
+        // y_lo != 1
+        // xs_len <= 1
+        test(false, &[1], false, &[3], 1);
+        // (x_lo | y_lo).even()
+        test(false, &[2], false, &[2], 0);
+        // xs_len < ys_len
+        // ys_len <= 1 || y_twos == 0 second time
+        test(false, &[1], false, &[1, 1], -1);
+        // xs_len > 1
+        // xs.len() < BMOD_1_TO_MOD_1_THRESHOLD
+        test(false, &[3], false, &[1, 1], 1);
+        // ys_len != 1
+        // xs_len < ys_len << 1
+        // xs_len <= ys_len
+        // y_twos == 0
+        test(false, &[1, 1], false, &[1, 1], 0);
+        // ys_len > 1 && y_twos != 0 first time
+        // ys_len == 2 && b1 >> y_twos == 0 first time
+        test(false, &[1], false, &[2, 1], -1);
+        // ys_len != 2 || b1 >> y_twos != 0 first time
+        test(false, &[1], false, &[2, 2], -1);
+        // xs_len > ys_len
+        test(false, &[1, 1], false, &[1, 0, 1], -1);
+        // y_twos != 0
+        test(false, &[1, 1], false, &[2, 2], 0);
+        // ys_len > 1 && y_twos != 0 second time
+        // ys_len == 2 && b1 >> y_twos == 0 second time
+        test(false, &[2, 1], false, &[1, 0, 1], -1);
+    }
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        // xs_len >= ys_len << 1
+        test(
+            true,
+            &[
+                809415104, 1710169977, 881476190, 1104012799, 1326347481, 682701285, 3321863945,
+                1051939994, 3108635835, 1895680941, 2854018447, 4014565990, 3427834973,
+            ],
+            false,
+            &[1909529931, 430037021],
+            1,
+        );
+        // ys_len != 2 || b1 >> y_twos != 0 second time
+        test(
+            false,
+            &[3810500016, 962414993, 1954977047],
+            false,
+            &[
+                2965238473, 2597078462, 113721090, 1560538966, 3708600302, 1747115778, 2509295310,
+                3964059579, 1937003961, 3783443612, 1437850759, 686587963, 1405672406,
+            ],
+            1,
+        );
+        // xs.len() >= BMOD_1_TO_MOD_1_THRESHOLD
+        test(
+            true,
+            &[95723951],
+            true,
+            &[
+                3104822486, 256665209, 1106870463, 2021763401, 3319578375, 3716316846, 413568526,
+                2889388423, 2677034801, 1809274412, 609675151, 2287549814, 2615809925, 2139281936,
+                2621623930, 2423765969, 2490520154, 276871549, 2835834558, 3643930811, 2346794500,
+                1716153848, 2882325673, 197745775, 1455312056, 2481758015, 1539562182, 1248381418,
+                643884751, 3963005283, 3999713854, 570674748, 1646619329, 4056981682, 2746165076,
+                2757679283, 1546323574, 3282851400, 1861976181, 2431917382, 1727042394, 490254435,
+                3636744381, 1560042014, 704706907, 4231077753, 3265644143, 25380599, 1231870002,
+                1477457950, 4289279025, 1339161480, 2290594253, 2530008576,
+            ],
+            1,
+        );
+    }
+}
 
 #[test]
 fn test_jacobi_symbol() {
@@ -122,7 +226,7 @@ fn test_kronecker_symbol() {
         assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
         assert_eq!(a.clone().kronecker_symbol(&n), s);
         assert_eq!((&a).kronecker_symbol(n.clone()), s);
-        assert_eq!((&a).kronecker_symbol(&n), s);
+        assert_eq!((&a).kronecker_symbol(&n), s, "{} {}", a, n);
     }
     test("0", "2", 0);
     test("1", "2", 1);
@@ -269,6 +373,16 @@ fn test_kronecker_symbol() {
     test("1001", "-9908", -1);
     test("10909", "-9908", -1);
     test("-8907", "-9908", 1);
+}
+
+#[test]
+fn limbs_kronecker_symbol_properties() {
+    large_type_gen_var_27().test_properties(|(x_sign, xs, y_sign, ys)| {
+        let x = Integer::from_sign_and_abs(x_sign, Natural::from_limbs_asc(&xs));
+        let y = Integer::from_sign_and_abs(y_sign, Natural::from_limbs_asc(&ys));
+        let s = (&x).kronecker_symbol(&y);
+        assert_eq!(limbs_kronecker_symbol(x_sign, &xs, y_sign, &ys), s);
+    });
 }
 
 #[test]

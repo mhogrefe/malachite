@@ -266,6 +266,15 @@ pub fn integer_pair_gen_var_4() -> Generator<(Integer, Integer)> {
     )
 }
 
+pub fn integer_pair_gen_var_4_rm() -> Generator<((rug::Integer, rug::Integer), (Integer, Integer))>
+{
+    Generator::new(
+        &|| integer_pair_rm(exhaustive_integer_pair_gen_var_4()),
+        &|config| integer_pair_rm(random_integer_pair_gen_var_4(config)),
+        &|config| integer_pair_rm(special_random_integer_pair_gen_var_4(config)),
+    )
+}
+
 // All coprime pairs of `Integer`s.
 pub fn integer_pair_gen_var_5() -> Generator<(Integer, Integer)> {
     Generator::new(
@@ -1271,6 +1280,15 @@ pub fn natural_pair_gen_var_12() -> Generator<(Natural, Natural)> {
         &exhaustive_natural_pair_gen_var_12,
         &random_natural_pair_gen_var_12,
         &special_random_natural_pair_gen_var_12,
+    )
+}
+
+pub fn natural_pair_gen_var_12_rm() -> Generator<((rug::Integer, rug::Integer), (Natural, Natural))>
+{
+    Generator::new(
+        &|| natural_pair_rm(exhaustive_natural_pair_gen_var_12()),
+        &|config| natural_pair_rm(random_natural_pair_gen_var_12(config)),
+        &|config| natural_pair_rm(special_random_natural_pair_gen_var_12(config)),
     )
 }
 
@@ -3516,6 +3534,8 @@ pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natu
         &random_large_type_gen_var_26,
     )
 }
+
+// var 27 is in malachite-base.
 
 pub mod common;
 pub mod exhaustive;
