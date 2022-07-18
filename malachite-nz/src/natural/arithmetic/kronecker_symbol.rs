@@ -640,31 +640,21 @@ pub_crate_test! {
         swap(&mut xs, &mut ys);
     }
     assert!(ys[0].odd());
-    if n == 1 {
+    let j = if n == 1 {
         let x_lo = xs[0];
         let y_lo = ys[0];
         if y_lo == 1 {
-            if bits.even() {
-                1
-            } else {
-                -1
-            }
+            1
         } else {
-            let j = x_lo.jacobi_symbol(y_lo);
-            if bits.even() {
-                j
-            } else {
-                -j
-            }
+            x_lo.jacobi_symbol(y_lo)
         }
     } else {
-        let j = DoubleLimb::join_halves(xs[1], xs[0])
-            .jacobi_symbol(DoubleLimb::join_halves(ys[1], ys[0]));
-        if bits.even() {
-            j
-        } else {
-            -j
-        }
+        DoubleLimb::join_halves(xs[1], xs[0]).jacobi_symbol(DoubleLimb::join_halves(ys[1], ys[0]))
+    };
+    if bits.even() {
+        j
+    } else {
+        -j
     }
 }}
 
