@@ -14,6 +14,7 @@ use malachite_nz::natural::arithmetic::kronecker_symbol::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_8, natural_pair_gen, natural_pair_gen_var_12,
     natural_pair_gen_var_13, natural_pair_gen_var_14, natural_pair_gen_var_4, natural_triple_gen,
@@ -906,7 +907,7 @@ fn test_limbs_jacobi_symbol_same_length() {
 }
 
 #[test]
-fn test_jacobi_symbol() {
+fn test_legendre_symbol() {
     fn test(u: &str, v: &str, s: i8) {
         let a = Natural::from_str(u).unwrap();
         let n = Natural::from_str(v).unwrap();
@@ -927,8 +928,13 @@ fn test_jacobi_symbol() {
         assert_eq!((&a).kronecker_symbol(&n), s);
 
         assert_eq!(jacobi_symbol_simple(a, n), s);
+        assert_eq!(
+            rug::Integer::from_str(u)
+                .unwrap()
+                .legendre(&rug::Integer::from_str(v).unwrap()),
+            i32::from(s)
+        );
     }
-    test("0", "1", 1);
     test("0", "3", 0);
     test("1", "3", 1);
     test("2", "3", -1);
@@ -944,6 +950,52 @@ fn test_jacobi_symbol() {
     test("4", "7", 1);
     test("5", "7", -1);
     test("6", "7", -1);
+
+    test("7", "7", 0);
+    test("8", "7", 1);
+    test("9", "7", 1);
+    test("10", "7", -1);
+    test("11", "7", 1);
+    test("12", "7", -1);
+    test("13", "7", -1);
+
+    test("1001", "9907", -1);
+    test("10908", "9907", -1);
+}
+
+#[test]
+fn legendre_symbol_fail() {
+    assert_panic!(Natural::ONE.legendre_symbol(Natural::TWO));
+    assert_panic!(Natural::ONE.legendre_symbol(&Natural::TWO));
+    assert_panic!((&Natural::ONE).legendre_symbol(Natural::TWO));
+    assert_panic!((&Natural::ONE).legendre_symbol(&Natural::TWO));
+}
+
+#[test]
+fn test_jacobi_symbol() {
+    fn test(u: &str, v: &str, s: i8) {
+        let a = Natural::from_str(u).unwrap();
+        let n = Natural::from_str(v).unwrap();
+
+        assert_eq!(a.clone().jacobi_symbol(n.clone()), s);
+        assert_eq!(a.clone().jacobi_symbol(&n), s);
+        assert_eq!((&a).jacobi_symbol(n.clone()), s);
+        assert_eq!((&a).jacobi_symbol(&n), s);
+
+        assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
+        assert_eq!(a.clone().kronecker_symbol(&n), s);
+        assert_eq!((&a).kronecker_symbol(n.clone()), s);
+        assert_eq!((&a).kronecker_symbol(&n), s);
+
+        assert_eq!(jacobi_symbol_simple(a, n), s);
+        assert_eq!(
+            rug::Integer::from_str(u)
+                .unwrap()
+                .jacobi(&rug::Integer::from_str(v).unwrap()),
+            i32::from(s)
+        );
+    }
+    test("0", "1", 1);
     test("0", "9", 0);
     test("1", "9", 1);
     test("2", "9", 1);
@@ -954,13 +1006,6 @@ fn test_jacobi_symbol() {
     test("7", "9", 1);
     test("8", "9", 1);
 
-    test("7", "7", 0);
-    test("8", "7", 1);
-    test("9", "7", 1);
-    test("10", "7", -1);
-    test("11", "7", 1);
-    test("12", "7", -1);
-    test("13", "7", -1);
     test("9", "9", 0);
     test("10", "9", 1);
     test("11", "9", 1);
@@ -970,14 +1015,14 @@ fn test_jacobi_symbol() {
     test("15", "9", 0);
     test("16", "9", 1);
     test("17", "9", 1);
-
-    test("1001", "9907", -1);
-    test("10908", "9907", -1);
 }
 
 #[test]
 fn jacobi_symbol_fail() {
     assert_panic!(Natural::ONE.jacobi_symbol(Natural::TWO));
+    assert_panic!(Natural::ONE.jacobi_symbol(&Natural::TWO));
+    assert_panic!((&Natural::ONE).jacobi_symbol(Natural::TWO));
+    assert_panic!((&Natural::ONE).jacobi_symbol(&Natural::TWO));
 }
 
 // Odd n is already tested in test_jacobi_symbol, so here we just test even n
@@ -991,6 +1036,12 @@ fn test_kronecker_symbol() {
         assert_eq!(a.clone().kronecker_symbol(&n), s);
         assert_eq!((&a).kronecker_symbol(n.clone()), s);
         assert_eq!((&a).kronecker_symbol(&n), s);
+        assert_eq!(
+            rug::Integer::from_str(u)
+                .unwrap()
+                .kronecker(&rug::Integer::from_str(v).unwrap()),
+            i32::from(s)
+        );
     }
     test("0", "2", 0);
     test("1", "2", 1);
@@ -1056,6 +1107,8 @@ fn jacobi_symbol_properties() {
         assert_eq!(a.clone().jacobi_symbol(&n), s);
         assert_eq!(a.clone().jacobi_symbol(n.clone()), s);
 
+        // Legendre should only be called on prime n, but it still works for non-prime odd n and we
+        // can't currently test primality anyway.
         assert_eq!((&a).legendre_symbol(&n), s);
         assert_eq!((&a).legendre_symbol(n.clone()), s);
         assert_eq!(a.clone().legendre_symbol(&n), s);
@@ -1067,6 +1120,10 @@ fn jacobi_symbol_properties() {
         assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
 
         assert_eq!(jacobi_symbol_simple(a.clone(), n.clone()), s);
+        assert_eq!(
+            natural_to_rug_integer(&a).jacobi(&natural_to_rug_integer(&n)),
+            i32::from(s)
+        );
         assert!(s.le_abs(&1i8));
 
         assert_eq!((&a + &n).jacobi_symbol(&n), s);
@@ -1133,6 +1190,14 @@ fn jacobi_symbol_properties() {
 
 fn kronecker_symbol_properties_helper(a: Natural, n: Natural) {
     let s = (&a).kronecker_symbol(&n);
+    assert_eq!((&a).kronecker_symbol(n.clone()), s);
+    assert_eq!(a.clone().kronecker_symbol(&n), s);
+    assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
+
+    assert_eq!(
+        natural_to_rug_integer(&a).kronecker(&natural_to_rug_integer(&n)),
+        i32::from(s)
+    );
     assert!(s.le_abs(&1i8));
 
     assert_eq!(s != 0, (&a).coprime_with(&n));
