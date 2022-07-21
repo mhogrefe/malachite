@@ -303,6 +303,40 @@ pub trait ExtendedGcd<RHS = Self> {
     fn extended_gcd(self, other: RHS) -> (Self::Gcd, Self::Cofactor, Self::Cofactor);
 }
 
+// TODOOOOO
+
+pub trait Factorial {
+    fn factorial(n: u64) -> Self;
+}
+
+pub trait CheckedFactorial: Sized {
+    fn checked_factorial(n: u64) -> Option<Self>;
+}
+
+pub trait DoubleFactorial {
+    fn double_factorial(n: u64) -> Self;
+}
+
+pub trait CheckedDoubleFactorial: Sized {
+    fn checked_double_factorial(n: u64) -> Option<Self>;
+}
+
+pub trait Multifactorial {
+    fn multifactorial(n: u64, m: u64) -> Self;
+}
+
+pub trait CheckedMultifactorial: Sized {
+    fn checked_multifactorial(n: u64, m: u64) -> Option<Self>;
+}
+
+pub trait Subfactorial {
+    fn subfactorial(n: u64) -> Self;
+}
+
+pub trait CheckedSubfactorial: Sized {
+    fn checked_subfactorial(n: u64) -> Option<Self>;
+}
+
 /// Takes the floor of a number.
 pub trait Floor {
     type Output;

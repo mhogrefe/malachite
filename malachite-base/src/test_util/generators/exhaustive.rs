@@ -62,7 +62,7 @@ use test_util::generators::common::{
 };
 use test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
-    signed_assign_bits_valid, unsigned_assign_bits_valid,
+    signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
 };
 use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -1807,6 +1807,21 @@ pub fn exhaustive_unsigned_gen_var_22<T: PrimitiveUnsigned>() -> It<T> {
     )
 }
 
+pub fn exhaustive_unsigned_gen_var_23<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_factorial);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
+pub fn exhaustive_unsigned_gen_var_24<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_double_factorial);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
+pub fn exhaustive_unsigned_gen_var_25<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_subfactorial);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
@@ -2318,6 +2333,34 @@ pub fn exhaustive_unsigned_pair_gen_var_29<T: PrimitiveUnsigned>() -> It<(T, T)>
         exhaustive_pairs_from_single(exhaustive_unsigneds())
             .filter(|&(x, y): &(T, T)| x.coprime_with(y)),
     )
+}
+
+struct MultifactorialNGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<u64, u64, PrimitiveIntIncreasingRange<u64>>
+    for MultifactorialNGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, &m: &u64) -> PrimitiveIntIncreasingRange<u64> {
+        let limit = smallest_invalid_value(|n| T::checked_multifactorial(n, m));
+        primitive_int_increasing_range(0, limit)
+    }
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_30<T: PrimitiveUnsigned>() -> It<(u64, u64)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_positive_primitive_ints(),
+        MultifactorialNGenerator {
+            phantom: PhantomData::<*const T>,
+        },
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

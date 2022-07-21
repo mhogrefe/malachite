@@ -76,7 +76,8 @@ use test_util::generators::{
     reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed,
     reduce_to_fit_sub_mul_unsigned, round_to_multiple_of_power_of_2_filter_map,
     round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
-    shift_integer_mantissa_and_exponent, signed_assign_bits_valid, unsigned_assign_bits_valid,
+    shift_integer_mantissa_and_exponent, signed_assign_bits_valid, smallest_invalid_value,
+    unsigned_assign_bits_valid,
 };
 use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
@@ -2797,6 +2798,39 @@ pub fn special_random_unsigned_gen_var_19<T: PrimitiveUnsigned>(config: &GenConf
         )
         .map(|u| (u << 1) | T::ONE),
     )
+}
+
+pub fn special_random_unsigned_gen_var_20<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_factorial);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_21<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_double_factorial);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_22<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_subfactorial);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveSigned) --

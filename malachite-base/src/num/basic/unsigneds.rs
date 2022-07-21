@@ -1,19 +1,20 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
-    CeilingLogBasePowerOf2, CheckedLcm, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
-    CheckedNextPowerOf2, CoprimeWith, ExtendedGcd, FloorLogBase, FloorLogBase2,
-    FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign, ModAdd, ModAddAssign,
-    ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
-    ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
-    ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced,
-    ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
-    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
-    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
-    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
-    ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOf2,
-    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem, SqrtAssignRem,
-    SqrtRem, XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
-    XXXXAddYYYYToZZZZ,
+    CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial, CheckedLcm, CheckedLogBase,
+    CheckedLogBase2, CheckedLogBasePowerOf2, CheckedMultifactorial, CheckedNextPowerOf2,
+    CheckedSubfactorial, CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial, FloorLogBase,
+    FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign, ModAdd,
+    ModAddAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed,
+    ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed,
+    ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse,
+    ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
+    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
+    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
+    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod,
+    NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
+    RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ, XXAddYYToZZ,
+    XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::{
@@ -30,12 +31,17 @@ pub trait PrimitiveUnsigned:
     + CeilingLogBasePowerOf2<u64, Output = u64>
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
+    + CheckedDoubleFactorial
+    + CheckedFactorial
+    + CheckedMultifactorial
+    + CheckedSubfactorial
     + CheckedLcm<Self, Output = Self>
     + CheckedLogBase<Output = u64>
     + CheckedLogBase2<Output = u64>
     + CheckedLogBasePowerOf2<u64, Output = u64>
     + CheckedNextPowerOf2<Output = Self>
     + CoprimeWith<Self>
+    + DoubleFactorial
     + Digits<u8>
     + Digits<u16>
     + Digits<u32>
@@ -43,6 +49,7 @@ pub trait PrimitiveUnsigned:
     + Digits<u128>
     + Digits<usize>
     + ExtendedGcd<Self, Gcd = Self>
+    + Factorial
     + FloorLogBase<Output = u64>
     + FloorLogBase2<Output = u64>
     + FloorLogBasePowerOf2<u64, Output = u64>
@@ -128,6 +135,7 @@ pub trait PrimitiveUnsigned:
     + ModSquarePrecomputedAssign<u64, Self>
     + ModSub<Self, Self, Output = Self>
     + ModSubAssign<Self, Self>
+    + Multifactorial
     + NegMod<Self, Output = Self>
     + NegModAssign<Self>
     + NegModPowerOf2<Output = Self>
@@ -153,6 +161,7 @@ pub trait PrimitiveUnsigned:
     + SciMantissaAndExponent<f64, u64>
     + SqrtRem<SqrtOutput = Self, RemOutput = Self>
     + SqrtAssignRem<RemOutput = Self>
+    + Subfactorial
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>
     + VecFromOtherType<u32>

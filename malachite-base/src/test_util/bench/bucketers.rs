@@ -115,6 +115,19 @@ where
     usize_convertible_direct_bucketer("i")
 }
 
+pub fn usize_convertible_pair_max_bucketer<'a, T: Copy + Ord>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, T)>
+where
+    usize: ExactFrom<T>,
+{
+    Bucketer {
+        bucketing_function: &|&(x, y)| usize::exact_from(max(x, y)),
+        bucketing_label: format!("max({}, {})", x_name, y_name),
+    }
+}
+
 pub fn signed_abs_bucketer<T: PrimitiveSigned>(var_name: &str) -> Bucketer<T>
 where
     usize: ExactFrom<<T as UnsignedAbs>::Output>,

@@ -1571,6 +1571,42 @@ pub fn unsigned_gen_var_22<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
+pub(crate) fn smallest_invalid_value<T: PrimitiveUnsigned, F: Fn(u64) -> Option<T>>(f: F) -> u64 {
+    for n in 0.. {
+        if f(n).is_none() {
+            return n;
+        }
+    }
+    0
+}
+
+// All `u64`s whose factorial is representable as a `T`.
+pub fn unsigned_gen_var_23<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_23::<T>,
+        &random_unsigned_gen_var_22::<T>,
+        &special_random_unsigned_gen_var_20::<T>,
+    )
+}
+
+// All `u64`s whose double factorial is representable as a `T`.
+pub fn unsigned_gen_var_24<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_24::<T>,
+        &random_unsigned_gen_var_23::<T>,
+        &special_random_unsigned_gen_var_21::<T>,
+    )
+}
+
+// All `u64`s whose subfactorial is representable as a `T`.
+pub fn unsigned_gen_var_25<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_25::<T>,
+        &random_unsigned_gen_var_24::<T>,
+        &special_random_unsigned_gen_var_22::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
@@ -2076,6 +2112,14 @@ pub fn unsigned_pair_gen_var_42<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
         &exhaustive_unsigned_pair_gen_var_29,
         &random_unsigned_pair_gen_var_30,
         &special_random_unsigned_pair_gen_var_40,
+    )
+}
+
+// All pairs `u64`s that are valid inputs to `T::multifactorial`.
+pub fn unsigned_pair_gen_var_43<T: PrimitiveUnsigned>() -> Generator<(u64, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_30::<T>,
+        &random_unsigned_pair_gen_var_31::<T>,
     )
 }
 

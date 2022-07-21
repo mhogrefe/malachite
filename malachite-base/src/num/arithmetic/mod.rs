@@ -650,6 +650,184 @@ pub mod eq_mod_power_of_2;
 /// assert_eq!((-111i16).extended_gcd(300), (3, 27, 10));
 /// ```
 pub mod extended_gcd;
+/// Traits for computing the factorial, double factorial, multifactorial, and subfactorial. Each
+/// function has a trait whose implementations panic if the result cannot be represented, and a
+/// checked trait whose implementations return `None` in that case. The traits are
+/// [`Factorial`](traits::Factorial), [`DoubleFactorial`](traits::DoubleFactorial),
+/// [`Multifactorial`](traits::Multifactorial), [`Subfactorial`](traits::Subfactorial),
+/// [`CheckedFactorial`](traits::CheckedFactorial),
+/// [`CheckedDoubleFactorial`](traits::CheckedDoubleFactorial),
+/// [`CheckedMultifactorial`](traits::CheckedMultifactorial), and
+/// [`CheckedSubfactorial`](traits::CheckedSubfactorial).
+///
+/// # factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::Factorial;
+///
+/// assert_eq!(u8::factorial(0), 1);
+/// assert_eq!(u8::factorial(1), 1);
+/// assert_eq!(u8::factorial(2), 2);
+/// assert_eq!(u8::factorial(3), 6);
+/// assert_eq!(u8::factorial(4), 24);
+/// assert_eq!(u8::factorial(5), 120);
+/// assert_eq!(u32::factorial(10), 3628800);
+/// ```
+///
+/// # checked_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedFactorial;
+///
+/// assert_eq!(u8::checked_factorial(0), Some(1));
+/// assert_eq!(u8::checked_factorial(1), Some(1));
+/// assert_eq!(u8::checked_factorial(2), Some(2));
+/// assert_eq!(u8::checked_factorial(3), Some(6));
+/// assert_eq!(u8::checked_factorial(4), Some(24));
+/// assert_eq!(u8::checked_factorial(5), Some(120));
+/// assert_eq!(u8::checked_factorial(6), None);
+/// assert_eq!(u32::checked_factorial(10), Some(3628800));
+/// assert_eq!(u32::checked_factorial(100), None);
+/// ```
+///
+/// # double_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::DoubleFactorial;
+///
+/// assert_eq!(u8::double_factorial(0), 1);
+/// assert_eq!(u8::double_factorial(1), 1);
+/// assert_eq!(u8::double_factorial(2), 2);
+/// assert_eq!(u8::double_factorial(3), 3);
+/// assert_eq!(u8::double_factorial(4), 8);
+/// assert_eq!(u8::double_factorial(5), 15);
+/// assert_eq!(u8::double_factorial(6), 48);
+/// assert_eq!(u8::double_factorial(7), 105);
+/// assert_eq!(u32::double_factorial(19), 654729075);
+/// assert_eq!(u32::double_factorial(20), 3715891200);
+/// ```
+///
+/// # checked_double_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedDoubleFactorial;
+///
+/// assert_eq!(u8::checked_double_factorial(0), Some(1));
+/// assert_eq!(u8::checked_double_factorial(1), Some(1));
+/// assert_eq!(u8::checked_double_factorial(2), Some(2));
+/// assert_eq!(u8::checked_double_factorial(3), Some(3));
+/// assert_eq!(u8::checked_double_factorial(4), Some(8));
+/// assert_eq!(u8::checked_double_factorial(5), Some(15));
+/// assert_eq!(u8::checked_double_factorial(6), Some(48));
+/// assert_eq!(u8::checked_double_factorial(7), Some(105));
+/// assert_eq!(u8::checked_double_factorial(8), None);
+/// assert_eq!(u32::checked_double_factorial(19), Some(654729075));
+/// assert_eq!(u32::checked_double_factorial(20), Some(3715891200));
+/// assert_eq!(u32::checked_double_factorial(100), None);
+/// ```
+///
+/// # multifactorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::Multifactorial;
+///
+/// assert_eq!(u8::multifactorial(0, 1), 1);
+/// assert_eq!(u8::multifactorial(1, 1), 1);
+/// assert_eq!(u8::multifactorial(2, 1), 2);
+/// assert_eq!(u8::multifactorial(3, 1), 6);
+/// assert_eq!(u8::multifactorial(4, 1), 24);
+/// assert_eq!(u8::multifactorial(5, 1), 120);
+///
+/// assert_eq!(u8::multifactorial(0, 2), 1);
+/// assert_eq!(u8::multifactorial(1, 2), 1);
+/// assert_eq!(u8::multifactorial(2, 2), 2);
+/// assert_eq!(u8::multifactorial(3, 2), 3);
+/// assert_eq!(u8::multifactorial(4, 2), 8);
+/// assert_eq!(u8::multifactorial(5, 2), 15);
+/// assert_eq!(u8::multifactorial(6, 2), 48);
+/// assert_eq!(u8::multifactorial(7, 2), 105);
+///
+/// assert_eq!(u8::multifactorial(0, 3), 1);
+/// assert_eq!(u8::multifactorial(1, 3), 1);
+/// assert_eq!(u8::multifactorial(2, 3), 2);
+/// assert_eq!(u8::multifactorial(3, 3), 3);
+/// assert_eq!(u8::multifactorial(4, 3), 4);
+/// assert_eq!(u8::multifactorial(5, 3), 10);
+/// assert_eq!(u8::multifactorial(6, 3), 18);
+/// assert_eq!(u8::multifactorial(7, 3), 28);
+/// assert_eq!(u8::multifactorial(8, 3), 80);
+/// assert_eq!(u8::multifactorial(9, 3), 162);
+///
+/// assert_eq!(u32::multifactorial(10, 1), 3628800);
+/// assert_eq!(u32::multifactorial(20, 2), 3715891200);
+/// assert_eq!(u32::multifactorial(25, 3), 608608000);
+/// ```
+///
+/// # checked_multifactorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedMultifactorial;
+///
+/// assert_eq!(u8::checked_multifactorial(0, 1), Some(1));
+/// assert_eq!(u8::checked_multifactorial(1, 1), Some(1));
+/// assert_eq!(u8::checked_multifactorial(2, 1), Some(2));
+/// assert_eq!(u8::checked_multifactorial(3, 1), Some(6));
+/// assert_eq!(u8::checked_multifactorial(4, 1), Some(24));
+/// assert_eq!(u8::checked_multifactorial(5, 1), Some(120));
+/// assert_eq!(u8::checked_multifactorial(6, 1), None);
+///
+/// assert_eq!(u8::checked_multifactorial(0, 2), Some(1));
+/// assert_eq!(u8::checked_multifactorial(1, 2), Some(1));
+/// assert_eq!(u8::checked_multifactorial(2, 2), Some(2));
+/// assert_eq!(u8::checked_multifactorial(3, 2), Some(3));
+/// assert_eq!(u8::checked_multifactorial(4, 2), Some(8));
+/// assert_eq!(u8::checked_multifactorial(5, 2), Some(15));
+/// assert_eq!(u8::checked_multifactorial(6, 2), Some(48));
+/// assert_eq!(u8::checked_multifactorial(7, 2), Some(105));
+/// assert_eq!(u8::checked_multifactorial(8, 2), None);
+///
+/// assert_eq!(u8::checked_multifactorial(0, 3), Some(1));
+/// assert_eq!(u8::checked_multifactorial(1, 3), Some(1));
+/// assert_eq!(u8::checked_multifactorial(2, 3), Some(2));
+/// assert_eq!(u8::checked_multifactorial(3, 3), Some(3));
+/// assert_eq!(u8::checked_multifactorial(4, 3), Some(4));
+/// assert_eq!(u8::checked_multifactorial(5, 3), Some(10));
+/// assert_eq!(u8::checked_multifactorial(6, 3), Some(18));
+/// assert_eq!(u8::checked_multifactorial(7, 3), Some(28));
+/// assert_eq!(u8::checked_multifactorial(8, 3), Some(80));
+/// assert_eq!(u8::checked_multifactorial(9, 3), Some(162));
+/// assert_eq!(u8::checked_multifactorial(10, 3), None);
+///
+/// assert_eq!(u32::checked_multifactorial(10, 1), Some(3628800));
+/// assert_eq!(u32::checked_multifactorial(20, 2), Some(3715891200));
+/// assert_eq!(u32::checked_multifactorial(25, 3), Some(608608000));
+/// assert_eq!(u32::checked_multifactorial(100, 1), None);
+/// assert_eq!(u32::checked_multifactorial(100, 2), None);
+/// assert_eq!(u32::checked_multifactorial(100, 3), None);
+/// ```
+///
+/// # subfactorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::Subfactorial;
+///
+/// assert_eq!(u8::subfactorial(0), 1);
+/// assert_eq!(u8::subfactorial(1), 0);
+/// assert_eq!(u8::subfactorial(2), 1);
+/// assert_eq!(u8::subfactorial(3), 2);
+/// assert_eq!(u8::subfactorial(4), 9);
+/// assert_eq!(u8::subfactorial(5), 44);
+/// assert_eq!(u32::subfactorial(10), 1334961);
+/// ```
+///
+/// # checked_subfactorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedSubfactorial;
+///
+/// assert_eq!(u8::checked_subfactorial(0), Some(1));
+/// assert_eq!(u8::checked_subfactorial(1), Some(0));
+/// assert_eq!(u8::checked_subfactorial(2), Some(1));
+/// assert_eq!(u8::checked_subfactorial(3), Some(2));
+/// assert_eq!(u8::checked_subfactorial(4), Some(9));
+/// assert_eq!(u8::checked_subfactorial(5), Some(44));
+/// assert_eq!(u8::checked_subfactorial(6), None);
+/// assert_eq!(u32::checked_subfactorial(10), Some(1334961));
+/// assert_eq!(u32::checked_subfactorial(100), None);
+/// ```
+pub mod factorial;
 /// [`Floor`](traits::Floor) and [`FloorAssign`](traits::FloorAssign), traits for computing the
 /// floor of a number.
 ///

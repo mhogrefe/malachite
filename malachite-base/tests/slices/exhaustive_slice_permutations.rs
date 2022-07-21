@@ -1,4 +1,6 @@
 use itertools::Itertools;
+use malachite_base::num::arithmetic::traits::Factorial;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::slices::exhaustive_slice_permutations;
 
 fn exhaustive_slice_permutations_helper(cs: &str, out: &[&str]) {
@@ -6,6 +8,7 @@ fn exhaustive_slice_permutations_helper(cs: &str, out: &[&str]) {
     let css: Vec<String> = exhaustive_slice_permutations(&cs)
         .map(|ds| ds.into_iter().copied().collect())
         .collect();
+    assert_eq!(css.len(), usize::factorial(u64::wrapping_from(cs.len())));
     assert_eq!(css.iter().map(String::as_str).collect_vec().as_slice(), out);
 }
 

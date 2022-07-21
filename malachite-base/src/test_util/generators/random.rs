@@ -73,7 +73,7 @@ use test_util::generators::exhaustive::{float_rounding_mode_filter_var_1, valid_
 use test_util::generators::{
     digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
     round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
-    signed_assign_bits_valid, unsigned_assign_bits_valid,
+    signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
 };
 use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -2840,6 +2840,21 @@ pub fn random_unsigned_gen_var_21<T: PrimitiveUnsigned>(_config: &GenConfig) -> 
     )
 }
 
+pub fn random_unsigned_gen_var_22<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_factorial);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_23<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_double_factorial);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_24<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_subfactorial);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
@@ -3532,6 +3547,40 @@ pub fn random_unsigned_pair_gen_var_30<T: PrimitiveUnsigned>(_config: &GenConfig
         random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
             .filter(|&(x, y): &(T, T)| x.coprime_with(y)),
     )
+}
+
+struct MultifactorialNGenerator<T: PrimitiveUnsigned> {
+    ms: GeometricRandomNaturalValues<u64>,
+    ranges: VariableRangeGenerator,
+    ms_to_n_limit: HashMap<u64, u64>,
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for MultifactorialNGenerator<T> {
+    type Item = (u64, u64);
+
+    fn next(&mut self) -> Option<(u64, u64)> {
+        let m = self.ms.next().unwrap();
+        let smallest_invalid_n = self
+            .ms_to_n_limit
+            .entry(m)
+            .or_insert_with(|| smallest_invalid_value(|n| T::checked_multifactorial(n, m)));
+        let n = self.ranges.next_less_than(*smallest_invalid_n);
+        Some((n, m))
+    }
+}
+
+pub fn random_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(MultifactorialNGenerator {
+        ms: geometric_random_positive_unsigneds(
+            EXAMPLE_SEED.fork("digit_counts"),
+            config.get_or("mean_m_n", 4),
+            config.get_or("mean_m_d", 1),
+        ),
+        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        ms_to_n_limit: HashMap::new(),
+        phantom: PhantomData::<*const T>,
+    })
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
