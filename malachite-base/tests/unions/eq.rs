@@ -1,4 +1,4 @@
-use extra_variadic::Union3;
+use crate::extra_variadic::Union3;
 use malachite_base::test_util::common::test_eq_helper;
 
 #[test]

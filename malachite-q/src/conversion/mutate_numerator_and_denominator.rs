@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{DivExactAssign, Gcd};
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 impl Rational {
     /// Mutates the numerator of a [`Rational`] using a provided closure, and then returns

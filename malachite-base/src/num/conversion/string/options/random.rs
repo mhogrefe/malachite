@@ -1,12 +1,12 @@
-use bools::random::{random_bools, RandomBools};
-use num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
-use num::random::geometric::{
+use crate::bools::random::{random_bools, RandomBools};
+use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
+use crate::num::random::geometric::{
     geometric_random_negative_signeds, geometric_random_unsigneds, GeometricRandomNaturalValues,
     GeometricRandomNegativeSigneds,
 };
-use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
-use random::Seed;
-use rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
+use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
+use crate::random::Seed;
+use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
 
 /// Generates random [`SciSizeOptions`](super::SciSizeOptions)s.
 ///

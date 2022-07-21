@@ -1,4 +1,4 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     exhaustive_unique_quadruples, exhaustive_unique_quintuples, exhaustive_unique_triples,
 };
 use itertools::Itertools;

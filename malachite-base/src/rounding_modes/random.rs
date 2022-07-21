@@ -1,6 +1,6 @@
-use random::Seed;
-use rounding_modes::{RoundingMode, ROUNDING_MODES};
-use slices::{random_values_from_slice, RandomValuesFromSlice};
+use crate::random::Seed;
+use crate::rounding_modes::{RoundingMode, ROUNDING_MODES};
+use crate::slices::{random_values_from_slice, RandomValuesFromSlice};
 use std::iter::Cloned;
 
 /// Uniformly generates random [`RoundingMode`]s.

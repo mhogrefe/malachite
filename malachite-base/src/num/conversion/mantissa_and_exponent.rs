@@ -1,13 +1,13 @@
-use num::arithmetic::traits::{ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound};
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{
+use crate::num::arithmetic::traits::{ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound};
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{
     ExactFrom, ExactInto, IntegerMantissaAndExponent, RawMantissaAndExponent,
     SciMantissaAndExponent, WrappingFrom,
 };
-use num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
-use rounding_modes::RoundingMode;
+use crate::num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
+use crate::rounding_modes::RoundingMode;
 
 fn raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
     let bits = x.to_bits();

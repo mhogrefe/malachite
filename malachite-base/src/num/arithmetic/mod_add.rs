@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{ModAdd, ModAddAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{ModAdd, ModAddAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_add<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
     let neg = m - x;

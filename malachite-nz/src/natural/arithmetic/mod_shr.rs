@@ -3,8 +3,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Two, Zero};
-use natural::InnerNatural::Small;
-use natural::Natural;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 

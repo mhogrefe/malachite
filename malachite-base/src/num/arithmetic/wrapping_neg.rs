@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{WrappingNeg, WrappingNegAssign};
+use crate::num::arithmetic::traits::{WrappingNeg, WrappingNegAssign};
 
 macro_rules! impl_wrapping_neg {
     ($t:ident) => {

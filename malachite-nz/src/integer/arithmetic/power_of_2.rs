@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 

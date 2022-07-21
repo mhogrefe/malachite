@@ -1,31 +1,31 @@
-use bools::random::random_bools;
-use chars::constants::NUMBER_OF_CHARS;
-use chars::random::{
+use crate::bools::random::random_bools;
+use crate::chars::constants::NUMBER_OF_CHARS;
+use crate::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
-use comparison::traits::Min;
-use iterators::{with_special_value, NonzeroValues};
+use crate::comparison::traits::Min;
+use crate::iterators::{with_special_value, NonzeroValues};
 use itertools::repeat_n;
 use itertools::Itertools;
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::string::options::random::{
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::string::options::random::{
     random_from_sci_string_options, random_to_sci_options,
 };
-use num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
-use num::conversion::traits::{
+use crate::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
+use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
     SplitInHalf, WrappingFrom, WrappingInto,
 };
-use num::float::NiceFloat;
-use num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
-use num::random::geometric::{
+use crate::num::float::NiceFloat;
+use crate::num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
+use crate::num::random::geometric::{
     geometric_random_natural_signeds, geometric_random_nonzero_signeds,
     geometric_random_positive_unsigneds, geometric_random_signed_inclusive_range,
     geometric_random_signed_range, geometric_random_signeds,
@@ -33,7 +33,7 @@ use num::random::geometric::{
     geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
     GeometricRandomSigneds,
 };
-use num::random::striped::{
+use crate::num::random::striped::{
     get_striped_bool_vec, get_striped_unsigned_vec, striped_random_bool_vecs,
     striped_random_bool_vecs_length_inclusive_range, striped_random_bool_vecs_min_length,
     striped_random_fixed_length_bool_vecs, striped_random_natural_signeds,
@@ -45,33 +45,33 @@ use num::random::striped::{
     striped_random_unsigned_vecs_min_length, striped_random_unsigneds, StripedBitSource,
     StripedRandomSigneds, StripedRandomUnsignedBitChunks, StripedRandomUnsignedInclusiveRange,
 };
-use num::random::{
+use crate::num::random::{
     random_finite_primitive_floats, random_nonzero_finite_primitive_floats,
     random_positive_finite_primitive_floats, random_primitive_float_inclusive_range,
     random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
     variable_range_generator, RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator,
 };
-use random::{Seed, EXAMPLE_SEED};
-use rational_sequences::random::random_rational_sequences;
-use rational_sequences::RationalSequence;
-use rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
-use rounding_modes::RoundingMode;
-use slices::slice_test_zero;
+use crate::random::{Seed, EXAMPLE_SEED};
+use crate::rational_sequences::random::random_rational_sequences;
+use crate::rational_sequences::RationalSequence;
+use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
+use crate::rounding_modes::RoundingMode;
+use crate::slices::slice_test_zero;
 use std::cmp::{max, min, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
-use strings::random::random_strings_using_chars;
-use test_util::extra_variadic::{
+use crate::strings::random::random_strings_using_chars;
+use crate::test_util::extra_variadic::{
     random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
     random_quadruples_xxxy, random_quadruples_xxyx, random_quadruples_xyxy, random_quadruples_xyyx,
     random_quadruples_xyyz, random_quadruples_xyzz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
     random_union3s, Union3,
 };
-use test_util::generators::common::{
+use crate::test_util::generators::common::{
     reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
 };
-use test_util::generators::{
+use crate::test_util::generators::{
     digits_valid, float_rounding_mode_filter_var_1, get_two_highest, large_exponent,
     reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed,
     reduce_to_fit_sub_mul_unsigned, round_to_multiple_of_power_of_2_filter_map,
@@ -79,10 +79,10 @@ use test_util::generators::{
     shift_integer_mantissa_and_exponent, signed_assign_bits_valid, smallest_invalid_value,
     unsigned_assign_bits_valid,
 };
-use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
-use tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
-use unions::random::random_union2s;
-use unions::Union2;
+use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
+use crate::unions::random::random_union2s;
+use crate::unions::Union2;
 
 // -- char --
 

@@ -1,9 +1,9 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::ExactFrom;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
 
 fn neg_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> T {
     let remainder = x % other;

@@ -1,13 +1,13 @@
-use chars::crement::char_to_contiguous_range;
-use max;
-use num::arithmetic::traits::UnsignedAbs;
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::SignificantBits;
-use rational_sequences::RationalSequence;
+use crate::chars::crement::char_to_contiguous_range;
+use crate::max;
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::logic::traits::SignificantBits;
+use crate::rational_sequences::RationalSequence;
 use std::cmp::{max, min};
 
 pub struct Bucketer<'a, T> {

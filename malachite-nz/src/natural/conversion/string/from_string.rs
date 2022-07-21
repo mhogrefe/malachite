@@ -3,8 +3,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
-use platform::Limb;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::str::FromStr;
 
 impl FromStr for Natural {

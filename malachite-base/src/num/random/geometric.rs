@@ -1,10 +1,10 @@
-use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
-use num::arithmetic::traits::Gcd;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::CheckedInto;
-use random::Seed;
+use crate::bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
+use crate::num::arithmetic::traits::Gcd;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::CheckedInto;
+use crate::random::Seed;
 
 /// Generates random unsigned integers from a truncated geometric distribution.
 #[derive(Clone, Debug)]

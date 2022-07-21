@@ -1,9 +1,9 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shr_signed<

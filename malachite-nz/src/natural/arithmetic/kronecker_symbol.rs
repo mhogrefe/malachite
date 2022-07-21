@@ -1,4 +1,4 @@
-use integer::arithmetic::kronecker_symbol::{
+use crate::integer::arithmetic::kronecker_symbol::{
     limbs_kronecker_symbol, limbs_kronecker_symbol_single,
 };
 use malachite_base::fail_on_untested_path;
@@ -10,16 +10,16 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_trailing_zeros;
-use natural::arithmetic::gcd::half_gcd::{
+use crate::natural::arithmetic::gcd::half_gcd::{
     extract_number, limbs_gcd_div, limbs_gcd_subdivide_step, limbs_gcd_subdivide_step_scratch_len,
     limbs_half_gcd_matrix_1_mul_inverse_vector, limbs_half_gcd_matrix_adjust,
     limbs_half_gcd_matrix_init_scratch_len, limbs_half_gcd_matrix_mul_matrix,
     limbs_half_gcd_matrix_mul_matrix_1, limbs_half_gcd_matrix_update_q, limbs_half_gcd_scratch_len,
     GcdSubdivideStepContext, HalfGcdMatrix, HalfGcdMatrix1, GCD_DC_THRESHOLD, HGCD_THRESHOLD,
 };
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
 use std::cmp::max;
 use std::mem::swap;
 

@@ -1,5 +1,5 @@
-use extra_variadic::exhaustive_union3s;
-use extra_variadic::Union3;
+use crate::extra_variadic::exhaustive_union3s;
+use crate::extra_variadic::Union3;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;

@@ -1,4 +1,4 @@
-use rational_sequences::{rational_sequence_reduce, RationalSequence};
+use crate::rational_sequences::{rational_sequence_reduce, RationalSequence};
 use std::ops::Index;
 
 impl<T: Eq> Index<usize> for RationalSequence<T> {

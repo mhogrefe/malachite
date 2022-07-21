@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 
 pub fn to_bits_asc_naive(n: &Integer) -> Vec<bool> {

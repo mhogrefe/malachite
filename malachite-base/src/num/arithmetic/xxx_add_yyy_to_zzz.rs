@@ -1,7 +1,7 @@
-use num::arithmetic::traits::XXXAddYYYToZZZ;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::XXXAddYYYToZZZ;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
 
 pub_test! {xxx_add_yyy_to_zzz<T: PrimitiveUnsigned>(
     x_2: T,

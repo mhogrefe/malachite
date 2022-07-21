@@ -1,10 +1,10 @@
-use num::arithmetic::traits::ShrRound;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{
+use crate::num::arithmetic::traits::ShrRound;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{
     FromOtherTypeSlice, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice, WrappingFrom,
 };
-use rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode;
 
 const fn from_other_type_slice_ident<T: PrimitiveUnsigned>(xs: &[T]) -> T {
     if xs.is_empty() {

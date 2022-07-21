@@ -1,12 +1,12 @@
-use fail_on_untested_path;
-use num::arithmetic::traits::{
+use crate::fail_on_untested_path;
+use crate::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, NegAssign, Parity, UnsignedAbs,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::Iverson;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::SplitInHalf;
-use num::logic::traits::NotAssign;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::traits::Iverson;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::SplitInHalf;
+use crate::num::logic::traits::NotAssign;
 use std::mem::swap;
 
 pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: T) -> i8 {

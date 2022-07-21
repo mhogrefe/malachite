@@ -1,4 +1,4 @@
-use extra_variadic::Union3;
+use crate::extra_variadic::Union3;
 
 #[test]
 fn test_to_string() {

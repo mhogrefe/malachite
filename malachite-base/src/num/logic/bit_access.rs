@@ -1,6 +1,6 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::BitAccess;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::BitAccess;
 
 fn get_bit_unsigned<T: PrimitiveUnsigned>(x: &T, index: u64) -> bool {
     index < T::WIDTH && (*x >> index).odd()

@@ -1,4 +1,4 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
@@ -9,33 +9,33 @@ use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::div::{
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out,
 };
-use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
-use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
-use natural::arithmetic::mul::mul_mod::{
+use crate::natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
+use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
     limbs_sub_same_length_to_out_with_overlap, limbs_sub_same_length_with_borrow_in_to_out,
 };
-use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     DoubleLimb, Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD,
     MU_BDIV_Q_THRESHOLD,
 };

@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 impl Rational {
     /// Converts two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`], taking the

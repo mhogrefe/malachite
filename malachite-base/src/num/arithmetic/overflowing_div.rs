@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{OverflowingDiv, OverflowingDivAssign};
+use crate::num::arithmetic::traits::{OverflowingDiv, OverflowingDivAssign};
 
 macro_rules! impl_overflowing_div {
     ($t:ident) => {

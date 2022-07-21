@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 pub fn floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {

@@ -1,9 +1,9 @@
-use num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::rounding_modes::RoundingMode;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_round_unsigned_unsigned<

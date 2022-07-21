@@ -1,5 +1,5 @@
-use num::basic::traits::Two;
-use rounding_modes::RoundingMode;
+use crate::num::basic::traits::Two;
+use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
 /// Takes the absolute value of a number. Assumes that the number has a representable absolute

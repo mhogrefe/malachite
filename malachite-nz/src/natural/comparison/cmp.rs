@@ -1,9 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_leading_zeros;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::Ordering;
 use std::mem::swap;
 

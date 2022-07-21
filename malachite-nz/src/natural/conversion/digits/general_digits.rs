@@ -14,21 +14,21 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
-use natural::arithmetic::div_mod::{
+use crate::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
+use crate::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns,
 };
-use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
-use natural::arithmetic::mul::limbs_mul_to_out;
-use natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
-use natural::arithmetic::square::limbs_square_to_out;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
+use crate::natural::arithmetic::mul::limbs_mul_to_out;
+use crate::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
+use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     Limb, BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };

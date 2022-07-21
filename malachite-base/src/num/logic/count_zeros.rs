@@ -1,4 +1,4 @@
-use num::logic::traits::CountZeros;
+use crate::num::logic::traits::CountZeros;
 
 macro_rules! impl_count_zeros {
     ($t:ident) => {

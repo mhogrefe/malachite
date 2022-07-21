@@ -1,6 +1,6 @@
-use num::random::{random_unsigned_range, RandomUnsignedRange};
-use random::Seed;
-use unions::Union2;
+use crate::num::random::{random_unsigned_range, RandomUnsignedRange};
+use crate::random::Seed;
+use crate::unions::Union2;
 
 /// Defines random union generators.
 ///

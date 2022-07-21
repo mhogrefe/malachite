@@ -1,4 +1,4 @@
-use num::conversion::traits::FromStringBase;
+use crate::num::conversion::traits::FromStringBase;
 
 /// Produces a digit from a byte corresponding to a numeric or alphabetic (lower- or uppercase)
 /// [`char`] that represents the digit.

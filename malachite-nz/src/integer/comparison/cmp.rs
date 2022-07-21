@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use std::cmp::Ordering;
 
 impl PartialOrd for Integer {

@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -9,22 +9,22 @@ use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
-use natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use natural::Natural;
+use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural::Natural;
 use num::{BigInt, BigUint};
-use platform::Limb;
+use crate::platform::Limb;
 use std::ops::{Shl, Shr};
-use test_util::generators::common::{
+use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
     integer_rm, integer_triple_1_rm, natural_natural_triple_1_2_rm, natural_nrm, natural_pair_1_nm,
     natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm,
     natural_triple_1_rm, natural_triple_nrm, natural_triple_rm,
 };
-use test_util::generators::exhaustive::*;
-use test_util::generators::random::*;
-use test_util::generators::special_random::*;
-use test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use crate::test_util::generators::exhaustive::*;
+use crate::test_util::generators::random::*;
+use crate::test_util::generators::special_random::*;
+use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 
 // -- Integer --
 

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
-use Rational;
+use crate::Rational;
 
 macro_rules! float_impls {
     ($f: ident) => {

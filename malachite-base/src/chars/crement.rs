@@ -1,8 +1,8 @@
-use chars::constants::{
+use crate::chars::constants::{
     CHAR_JUST_BELOW_SURROGATES, FIRST_SURROGATE_CODE_POINT, NUMBER_OF_CHARS,
     NUMBER_OF_SURROGATE_CODE_POINTS,
 };
-use comparison::traits::Min;
+use crate::comparison::traits::Min;
 
 /// Converts a [`char`] to a [`u32`].
 ///

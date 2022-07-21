@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::FromStringBase;
-use natural::{Natural, SerdeNatural};
+use crate::natural::{Natural, SerdeNatural};
 use std::convert::TryFrom;
 
 impl From<Natural> for SerdeNatural {

@@ -2,9 +2,9 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 // number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity

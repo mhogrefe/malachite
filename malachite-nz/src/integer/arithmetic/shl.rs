@@ -1,7 +1,7 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use natural::Natural;
+use crate::natural::Natural;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shl_unsigned<T>(x: Integer, bits: T) -> Integer

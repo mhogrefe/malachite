@@ -1,6 +1,6 @@
-use num::arithmetic::traits::{Parity, SaturatingPow, SaturatingPowAssign};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{Parity, SaturatingPow, SaturatingPowAssign};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn saturating_pow_unsigned<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
     if exp == 0 {

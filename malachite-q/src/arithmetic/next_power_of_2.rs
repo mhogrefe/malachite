@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{NextPowerOf2, NextPowerOf2Assign, 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::Ordering;
-use Rational;
+use crate::Rational;
 
 impl NextPowerOf2 for Rational {
     type Output = Rational;

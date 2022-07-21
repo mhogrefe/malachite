@@ -7,25 +7,25 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, NotAssign, TrailingZeros};
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns};
-use natural::arithmetic::gcd::matrix_2_2::limbs_matrix_2_2_mul;
-use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
-use natural::arithmetic::mul::mul_mod::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns};
+use crate::natural::arithmetic::gcd::matrix_2_2::limbs_matrix_2_2_mul;
+use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
+use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
-use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::platform::{DoubleLimb, Limb};
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 

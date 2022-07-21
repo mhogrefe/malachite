@@ -1,7 +1,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::ops::Index;
 
 /// A double-ended iterator over the [limbs](crate#limbs) of a [`Natural`].

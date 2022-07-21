@@ -1,8 +1,8 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 // smallest number of bits necessary to represent that `Natural`. 0 has zero significant bits. When

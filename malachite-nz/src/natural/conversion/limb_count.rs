@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::WrappingFrom;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 
 impl Natural {
     /// Returns the number of limbs of a [`Natural`].

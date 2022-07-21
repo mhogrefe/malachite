@@ -1,5 +1,5 @@
-use num::basic::traits::Zero;
-use num::logic::traits::BitAccess;
+use crate::num::basic::traits::Zero;
+use crate::num::logic::traits::BitAccess;
 
 pub fn get_bits_naive<T: BitAccess, U: BitAccess + Zero>(n: &T, start: u64, end: u64) -> U {
     let mut result = U::ZERO;

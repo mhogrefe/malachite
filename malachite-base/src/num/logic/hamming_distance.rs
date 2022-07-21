@@ -1,6 +1,6 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
 
 fn hamming_distance_unsigned<T: PrimitiveUnsigned>(x: T, y: T) -> u64 {
     CountOnes::count_ones(x ^ y)

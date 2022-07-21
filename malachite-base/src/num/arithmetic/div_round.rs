@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{DivRound, DivRoundAssign, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::{DivRound, DivRoundAssign, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::rounding_modes::RoundingMode;
 
 fn div_round_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> T {
     let quotient = x / other;

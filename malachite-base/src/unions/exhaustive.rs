@@ -1,4 +1,4 @@
-use unions::Union2;
+use crate::unions::Union2;
 
 /// Defines exhaustive union generators.
 ///

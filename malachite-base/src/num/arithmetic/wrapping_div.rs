@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{WrappingDiv, WrappingDivAssign};
+use crate::num::arithmetic::traits::{WrappingDiv, WrappingDivAssign};
 
 macro_rules! impl_wrapping_div {
     ($t:ident) => {

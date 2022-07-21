@@ -1,7 +1,7 @@
-use num::arithmetic::traits::{ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn mod_power_of_2_shl_unsigned<T: PrimitiveUnsigned + Shl<U, Output = T>, U: PrimitiveUnsigned>(

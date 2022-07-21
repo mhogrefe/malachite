@@ -1,5 +1,5 @@
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 /// Replaces a number with the closest [`Rational`] whose denominator does not exceed the specified
 /// maximum.

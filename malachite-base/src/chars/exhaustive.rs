@@ -1,6 +1,6 @@
-use chars::crement::increment_char;
-use chars::CharType;
-use comparison::traits::Min;
+use crate::chars::crement::increment_char;
+use crate::chars::CharType;
+use crate::comparison::traits::Min;
 use std::ops::RangeInclusive;
 
 /// Generates all ASCII [`char`]s, in ascending order.

@@ -1,6 +1,6 @@
-use arithmetic::traits::SimplestRationalInInterval;
+use crate::arithmetic::traits::SimplestRationalInInterval;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use Rational;
+use crate::Rational;
 
 impl Rational {
     /// Converts a primitive float to the simplest [`Rational`] that rounds to that value.

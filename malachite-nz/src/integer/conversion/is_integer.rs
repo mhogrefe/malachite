@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::traits::IsInteger;
 
 impl<'a> IsInteger for &'a Integer {

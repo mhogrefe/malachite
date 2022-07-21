@@ -1,4 +1,4 @@
-use conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
+use crate::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use malachite_base::num::arithmetic::traits::{
     Abs, AbsAssign, CheckedLogBase2, Floor, UnsignedAbs,
 };
@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::Digits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 use std::collections::HashMap;
-use Rational;
+use crate::Rational;
 
 fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
     if let Some(log_base) = base.checked_log_base_2() {

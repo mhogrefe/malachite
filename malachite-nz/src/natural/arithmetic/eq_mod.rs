@@ -5,20 +5,20 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_trailing_zeros;
-use natural::arithmetic::div_exact::limbs_modular_invert_limb;
-use natural::arithmetic::divisible_by::{
+use crate::natural::arithmetic::div_exact::limbs_modular_invert_limb;
+use crate::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
 };
-use natural::arithmetic::mod_op::limbs_mod_limb;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mod_op::limbs_mod_limb;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
-use natural::comparison::cmp::limbs_cmp;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::natural::comparison::cmp::limbs_cmp;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use std::cmp::Ordering;
 
 // See the description for `limbs_mod_exact_odd_limb`. divisor must be odd.

@@ -5,19 +5,19 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k};
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k};
+use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
     limbs_sub_same_length_with_borrow_in_in_place_right,
 };
-use platform::Limb;
+use crate::platform::Limb;
 use std::cmp::min;
 
 //TODO tune

@@ -1,4 +1,4 @@
-use Rational;
+use crate::Rational;
 
 macro_rules! impl_unsigned {
     ($t: ident) => {

@@ -11,13 +11,13 @@ use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, W
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::conversion::digits::general_digits::{
+use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 #[cfg(feature = "test_build")]
 use std::fmt::Write;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};

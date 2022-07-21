@@ -1,6 +1,6 @@
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 macro_rules! impl_from_unsigned {
     ($t: ident) => {

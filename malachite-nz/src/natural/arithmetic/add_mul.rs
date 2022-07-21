@@ -1,14 +1,14 @@
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
-use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
-use natural::arithmetic::mul::limbs_mul_to_out;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
+use crate::natural::arithmetic::mul::limbs_mul_to_out;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
 use std::mem::swap;
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`

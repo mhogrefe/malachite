@@ -1,6 +1,6 @@
 use itertools::Itertools;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
 };
 

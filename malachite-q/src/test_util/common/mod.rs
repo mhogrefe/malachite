@@ -2,7 +2,7 @@ use malachite_nz::test_util::common::{
     bigint_to_integer, natural_to_bigint, natural_to_rug_integer, rug_integer_to_integer,
 };
 use num::BigRational;
-use Rational;
+use crate::Rational;
 
 pub fn bigrational_to_rational(n: &BigRational) -> Rational {
     Rational::from_integers(bigint_to_integer(n.numer()), bigint_to_integer(n.denom()))

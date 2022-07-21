@@ -1,11 +1,11 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, DivRound, FloorLogBasePowerOf2,
 };
 #[cfg(feature = "test_build")]
-use num::basic::traits::Iverson;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
-use rounding_modes::RoundingMode;
+use crate::num::basic::traits::Iverson;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
+use crate::rounding_modes::RoundingMode;
 
 #[cfg(feature = "test_build")]
 pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {

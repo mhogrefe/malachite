@@ -1,4 +1,4 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 pub fn naive_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
     if m == T::ONE {

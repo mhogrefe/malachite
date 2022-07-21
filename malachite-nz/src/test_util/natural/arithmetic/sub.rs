@@ -1,5 +1,5 @@
-use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
-use platform::Limb;
+use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
+use crate::platform::Limb;
 
 pub fn limbs_sub_same_length_in_place_with_overlap_naive(
     xs: &mut [Limb],

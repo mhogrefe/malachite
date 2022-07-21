@@ -6,7 +6,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 impl Natural {

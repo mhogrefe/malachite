@@ -1,4 +1,4 @@
-use random::Seed;
+use crate::random::Seed;
 use std::cmp::Ordering;
 use std::iter::{repeat, Repeat};
 

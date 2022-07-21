@@ -1,7 +1,7 @@
-use num::arithmetic::traits::{CheckedAddMul, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::{CheckedAddMul, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
 
 fn checked_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> Option<T> {
     y.checked_mul(z).and_then(|yz| x.checked_add(yz))

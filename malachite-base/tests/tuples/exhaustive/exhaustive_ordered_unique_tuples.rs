@@ -1,4 +1,4 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     exhaustive_ordered_unique_quadruples, exhaustive_ordered_unique_quintuples,
     exhaustive_ordered_unique_triples,
 };

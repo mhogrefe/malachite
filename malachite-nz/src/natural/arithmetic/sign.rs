@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::Sign;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 impl Sign for Natural {

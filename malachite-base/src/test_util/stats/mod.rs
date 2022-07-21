@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use num::arithmetic::traits::Parity;
+use crate::num::arithmetic::traits::Parity;
 
 pub fn median<I: Iterator>(xs: I) -> (I::Item, Option<I::Item>)
 where

@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use std::ops::{Mul, MulAssign};
 
 impl Mul<Integer> for Integer {

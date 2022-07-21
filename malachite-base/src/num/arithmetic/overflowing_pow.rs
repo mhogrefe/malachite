@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{OverflowingPow, OverflowingPowAssign, Parity, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::OverflowingFrom;
-use num::logic::traits::BitIterable;
+use crate::num::arithmetic::traits::{OverflowingPow, OverflowingPowAssign, Parity, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::OverflowingFrom;
+use crate::num::logic::traits::BitIterable;
 
 fn overflowing_pow_unsigned<T: PrimitiveUnsigned>(x: T, exp: u64) -> (T, bool) {
     if exp == 0 {

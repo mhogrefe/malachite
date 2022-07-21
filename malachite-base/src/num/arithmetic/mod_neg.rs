@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{ModNeg, ModNegAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{ModNeg, ModNegAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_neg<T: PrimitiveUnsigned>(x: T, m: T) -> T {
     if x == T::ZERO {

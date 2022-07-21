@@ -1,14 +1,14 @@
-use num::conversion::traits::ExactFrom;
-use num::random::geometric::{
+use crate::num::conversion::traits::ExactFrom;
+use crate::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
     GeometricRandomNaturalValues,
 };
-use num::random::{
+use crate::num::random::{
     random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
     RandomUnsignedRange,
 };
-use random::Seed;
-use sets::random::{
+use crate::random::Seed;
+use crate::sets::random::{
     random_b_tree_sets_fixed_length, random_b_tree_sets_from_length_iterator, RandomBTreeSets,
     RandomBTreeSetsFixedLength,
 };
@@ -16,7 +16,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::{repeat, Repeat};
-use vecs::exhaustive::validate_oi_map;
+use crate::vecs::exhaustive::validate_oi_map;
 
 /// Generates random [`Vec`]s of a given length using elements from a single iterator.
 ///

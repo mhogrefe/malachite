@@ -1,6 +1,6 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::logic::traits::LowMask;
-use natural::Natural;
+use crate::natural::Natural;
 
 impl LowMask for Integer {
     /// Returns an [`Integer`] whose least significant $b$ bits are `true` and whose other bits are

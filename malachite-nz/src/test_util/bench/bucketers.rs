@@ -1,14 +1,14 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::test_util::bench::bucketers::Bucketer;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::Natural;
-use platform::Limb;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::{max, min};
-use test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
     Bucketer {

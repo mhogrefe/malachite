@@ -6,7 +6,7 @@ use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::conversion::traits::{RoundingFrom, SciMantissaAndExponent};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
-use Rational;
+use crate::Rational;
 
 fn approx_log_helper(x: &Rational) -> f64 {
     let (mantissa, exponent): (f64, i64) = x.sci_mantissa_and_exponent();

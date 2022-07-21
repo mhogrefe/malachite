@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{ModShl, ModShlAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::ExactFrom;
+use crate::num::arithmetic::traits::{ModShl, ModShlAssign, UnsignedAbs};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_shl_unsigned<T: PrimitiveUnsigned, U>(x: T, other: U, m: T) -> T

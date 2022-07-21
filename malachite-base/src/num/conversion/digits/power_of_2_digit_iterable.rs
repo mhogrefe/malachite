@@ -1,10 +1,10 @@
-use num::arithmetic::traits::{DivRound, SaturatingSubAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{
+use crate::num::arithmetic::traits::{DivRound, SaturatingSubAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator, WrappingFrom,
 };
-use num::logic::traits::BitBlockAccess;
-use rounding_modes::RoundingMode;
+use crate::num::logic::traits::BitBlockAccess;
+use crate::rounding_modes::RoundingMode;
 use std::marker::PhantomData;
 
 /// A double-ended iterator over the base-$2^k$ digits of an unsigned primitive integer.

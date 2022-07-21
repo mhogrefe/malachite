@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{Gcd, GcdAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{Gcd, GcdAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use std::cmp::min;
 
 #[cfg(feature = "test_build")]

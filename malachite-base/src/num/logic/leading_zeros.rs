@@ -1,4 +1,4 @@
-use num::logic::traits::LeadingZeros;
+use crate::num::logic::traits::LeadingZeros;
 
 macro_rules! impl_leading_zeros {
     ($t:ident) => {

@@ -10,11 +10,11 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::logic::bit_block_access::limbs_slice_get_bits;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::logic::bit_block_access::limbs_slice_get_bits;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::{min, Ordering};
 use std::marker::PhantomData;
 use std::slice::Chunks;

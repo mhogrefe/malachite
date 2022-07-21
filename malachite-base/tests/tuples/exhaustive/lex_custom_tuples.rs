@@ -1,4 +1,4 @@
-use extra_variadic::{lex_triples_from_single, lex_triples_xxy, lex_triples_xyx};
+use crate::extra_variadic::{lex_triples_from_single, lex_triples_xxy, lex_triples_xyx};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;

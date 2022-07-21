@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{EqMod, Mod};
-use num::basic::traits::Zero;
+use crate::num::arithmetic::traits::{EqMod, Mod};
+use crate::num::basic::traits::Zero;
 
 fn eq_mod<U: Eq, S: Copy + Eq + Mod<S, Output = U> + Zero>(x: S, other: S, m: S) -> bool {
     x == other || m != S::ZERO && x.mod_op(m) == other.mod_op(m)

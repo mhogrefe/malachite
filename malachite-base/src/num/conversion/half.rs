@@ -1,5 +1,5 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 
 #[inline]
 fn join_halves<T: From<H> + PrimitiveUnsigned, H: PrimitiveUnsigned>(upper: H, lower: H) -> T {

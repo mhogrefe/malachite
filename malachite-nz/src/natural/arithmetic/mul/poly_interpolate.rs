@@ -4,24 +4,24 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::slices::slice_test_zero;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div::limbs_div_divisor_of_limb_max_with_carry_in_place;
-use natural::arithmetic::div_exact::{limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place};
-use natural::arithmetic::mul::poly_eval::limbs_shl_and_add_same_length_in_place_left;
-use natural::arithmetic::mul::toom::BIT_CORRECTION;
-use natural::arithmetic::shl::limbs_shl_to_out;
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::div::limbs_div_divisor_of_limb_max_with_carry_in_place;
+use crate::natural::arithmetic::div_exact::{limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place};
+use crate::natural::arithmetic::mul::poly_eval::limbs_shl_and_add_same_length_in_place_left;
+use crate::natural::arithmetic::mul::toom::BIT_CORRECTION;
+use crate::natural::arithmetic::shl::limbs_shl_to_out;
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
     limbs_sub_same_length_to_out,
 };
-use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use platform::{
+use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
+use crate::platform::{
     Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
     AORSMUL_FASTER_AORS_AORSLSH,
 };

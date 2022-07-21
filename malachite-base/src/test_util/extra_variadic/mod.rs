@@ -1,18 +1,18 @@
-use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use iterators::iterator_cache::IteratorCache;
-use num::arithmetic::traits::CheckedPow;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::SignificantBits;
-use num::random::{random_unsigned_range, RandomUnsignedRange};
-use random::Seed;
+use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+use crate::iterators::iterator_cache::IteratorCache;
+use crate::num::arithmetic::traits::CheckedPow;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::logic::traits::SignificantBits;
+use crate::num::random::{random_unsigned_range, RandomUnsignedRange};
+use crate::random::Seed;
 use std::cmp::max;
 use std::fmt::{self, Display, Formatter};
 use std::marker::PhantomData;
 use std::str::FromStr;
-use tuples::exhaustive::clone_helper;
-use tuples::random::next_helper;
-use unions::UnionFromStrError;
-use {
+use crate::tuples::exhaustive::clone_helper;
+use crate::tuples::random::next_helper;
+use crate::unions::UnionFromStrError;
+use crate::{
     custom_tuples, exhaustive_tuples_1_input, exhaustive_unions, lex_custom_tuples, lex_tuples,
     random_custom_tuples, random_tuples, random_unions, union_struct,
 };

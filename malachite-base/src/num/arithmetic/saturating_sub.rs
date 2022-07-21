@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
+use crate::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
 
 macro_rules! impl_saturating_sub {
     ($t:ident) => {

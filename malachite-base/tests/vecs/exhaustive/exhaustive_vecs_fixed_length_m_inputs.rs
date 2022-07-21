@@ -1,4 +1,4 @@
-use get_sample_output_types;
+use crate::get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;

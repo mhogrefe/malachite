@@ -1,4 +1,4 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     lex_octuples_from_single, lex_quadruples_from_single, lex_quintuples_from_single,
     lex_triples_from_single,
 };

@@ -1,6 +1,6 @@
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::iter::repeat;
 
 pub fn natural_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Natural, y: &Natural) -> Natural {

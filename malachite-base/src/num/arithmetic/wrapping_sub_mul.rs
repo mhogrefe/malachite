@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{WrappingSubMul, WrappingSubMulAssign};
-use num::basic::integers::PrimitiveInt;
+use crate::num::arithmetic::traits::{WrappingSubMul, WrappingSubMulAssign};
+use crate::num::basic::integers::PrimitiveInt;
 
 fn wrapping_sub_mul<T: PrimitiveInt>(x: T, y: T, z: T) -> T {
     x.wrapping_sub(y.wrapping_mul(z))

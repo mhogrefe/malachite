@@ -1,4 +1,4 @@
-use slices::min_repeating_len;
+use crate::slices::min_repeating_len;
 use std::iter::{Chain, Cycle};
 
 fn rational_sequence_reduce<T: Eq>(non_repeating: &mut Vec<T>, repeating: &mut Vec<T>) {

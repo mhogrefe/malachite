@@ -1,15 +1,15 @@
 use itertools::Itertools;
-use num::arithmetic::traits::{SaturatingAbs, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::Zero;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use num::float::NiceFloat;
+use crate::num::arithmetic::traits::{SaturatingAbs, UnsignedAbs};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::traits::Zero;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::float::NiceFloat;
 use std::fmt::{self, Debug, Formatter};
-use test_util::stats::common_values_map::common_values_map;
-use test_util::stats::median;
-use test_util::stats::median::{
+use crate::test_util::stats::common_values_map::common_values_map;
+use crate::test_util::stats::median;
+use crate::test_util::stats::median::{
     deleted_uniform_primitive_int_median, double_geometric_median, double_nonzero_geometric_median,
     truncated_geometric_median, uniform_bool_median, uniform_primitive_int_median,
 };

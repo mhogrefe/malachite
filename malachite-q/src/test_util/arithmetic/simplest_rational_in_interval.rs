@@ -1,4 +1,4 @@
-use conversion::traits::ContinuedFraction;
+use crate::conversion::traits::ContinuedFraction;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple};
 use malachite_base::num::basic::traits::{One, Zero};
@@ -7,7 +7,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_nz::natural::Natural;
 use std::cmp::{min, Ordering};
-use Rational;
+use crate::Rational;
 
 // Slow! Only run for rationals with small denominators
 pub fn simplest_rational_in_open_interval_naive(x: &Rational, y: &Rational) -> Rational {

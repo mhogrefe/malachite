@@ -6,29 +6,29 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_set_zero;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::limbs_mul_same_length_to_out;
-use natural::arithmetic::mul::mul_mod::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mul::limbs_mul_same_length_to_out;
+use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len, MULMOD_BNM1_THRESHOLD, MUL_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::mul::square_mod::limbs_square_mod_base_pow_n_minus_1_next_size;
-use natural::arithmetic::mul::square_mod::{
+use crate::natural::arithmetic::mul::square_mod::limbs_square_mod_base_pow_n_minus_1_next_size;
+use crate::natural::arithmetic::mul::square_mod::{
     limbs_square_mod_base_pow_n_minus_1, limbs_square_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
-use natural::arithmetic::square::limbs_square_to_out;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
+use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::logic::not::limbs_not_to_out;
-use platform::{Limb, SQR_TOOM3_THRESHOLD};
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::logic::not::limbs_not_to_out;
+use crate::platform::{Limb, SQR_TOOM3_THRESHOLD};
 use std::cmp::{max, Ordering};
 
 //TODO double check this

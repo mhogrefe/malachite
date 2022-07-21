@@ -1,8 +1,8 @@
-use conversion::digits::power_of_2_digits::RationalPowerOf2Digits;
+use crate::conversion::digits::power_of_2_digits::RationalPowerOf2Digits;
 use malachite_base::num::arithmetic::traits::{Abs, CheckedLogBase2, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::Digits;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 #[doc(hidden)]
 #[derive(Clone, Debug, Eq, PartialEq)]

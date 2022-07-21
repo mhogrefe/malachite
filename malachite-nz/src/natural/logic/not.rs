@@ -1,7 +1,7 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::logic::traits::NotAssign;
-use natural::Natural;
-use platform::Limb;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::ops::Not;
 
 // Returns the bitwise not of a slice of limbs.

@@ -4,8 +4,8 @@ use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
-use natural::InnerNatural::{Large, Small};
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::platform::Limb;
 
 /// A natural (non-negative) integer.
 ///

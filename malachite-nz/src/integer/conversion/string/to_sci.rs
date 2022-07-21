@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ToSci;
 use std::fmt::{Formatter, Write};

@@ -1,7 +1,7 @@
-use num::arithmetic::traits::{SaturatingAddMul, SaturatingAddMulAssign, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::{SaturatingAddMul, SaturatingAddMulAssign, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
 
 fn saturating_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> T {
     x.saturating_add(y.saturating_mul(z))

@@ -3,10 +3,10 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
-use natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use crate::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::platform::{DoubleLimb, Limb};
 
 pub fn rug_ceiling_div_neg_mod(x: rug::Integer, y: rug::Integer) -> (rug::Integer, rug::Integer) {
     let (quotient, remainder) = x.div_rem_ceil(y);

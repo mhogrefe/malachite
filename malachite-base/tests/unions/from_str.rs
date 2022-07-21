@@ -1,4 +1,4 @@
-use extra_variadic::Union3;
+use crate::extra_variadic::Union3;
 use malachite_base::unions::UnionFromStrError;
 use std::result::Result;
 use std::str::FromStr;

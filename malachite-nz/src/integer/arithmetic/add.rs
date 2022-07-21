@@ -1,6 +1,6 @@
-use integer::Integer;
-use natural::InnerNatural::Small;
-use natural::Natural;
+use crate::integer::Integer;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 

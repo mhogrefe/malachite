@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use std::cmp::min;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";

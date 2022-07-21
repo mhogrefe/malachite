@@ -1,7 +1,7 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 fn partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>

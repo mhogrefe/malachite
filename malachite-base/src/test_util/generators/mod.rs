@@ -1,23 +1,23 @@
-use iterators::bit_distributor::BitDistributorOutputType;
-use num::arithmetic::traits::UnsignedAbs;
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
-use num::conversion::traits::{
+use crate::iterators::bit_distributor::BitDistributorOutputType;
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
+use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
 };
-use num::logic::traits::{BitBlockAccess, LeadingZeros};
-use rational_sequences::RationalSequence;
-use rounding_modes::RoundingMode;
-use slices::slice_trailing_zeros;
-use test_util::generators::common::Generator;
-use test_util::generators::exhaustive::*;
-use test_util::generators::random::*;
-use test_util::generators::special_random::*;
-use tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
+use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::rational_sequences::RationalSequence;
+use crate::rounding_modes::RoundingMode;
+use crate::slices::slice_trailing_zeros;
+use crate::test_util::generators::common::Generator;
+use crate::test_util::generators::exhaustive::*;
+use crate::test_util::generators::random::*;
+use crate::test_util::generators::special_random::*;
+use crate::tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
 
 // general
 

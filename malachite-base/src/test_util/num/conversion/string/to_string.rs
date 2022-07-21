@@ -1,9 +1,9 @@
-use num::arithmetic::traits::{DivAssignMod, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::Zero;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::string::to_string::digit_to_display_byte_lower;
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::{DivAssignMod, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::traits::Zero;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::string::to_string::digit_to_display_byte_lower;
+use crate::num::conversion::traits::WrappingFrom;
 
 pub fn to_string_base_unsigned_naive<T: PrimitiveUnsigned>(mut x: T, base: u8) -> String
 where

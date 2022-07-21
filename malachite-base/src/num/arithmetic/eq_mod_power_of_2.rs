@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{DivisibleByPowerOf2, EqModPowerOf2};
+use crate::num::arithmetic::traits::{DivisibleByPowerOf2, EqModPowerOf2};
 
 macro_rules! impl_eq_mod_power_of_2 {
     ($t:ident) => {

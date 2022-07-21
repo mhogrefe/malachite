@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Square, ModPowerOf2SquareAssign,
 };
 

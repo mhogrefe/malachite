@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{CheckedPow, Parity};
-use num::conversion::traits::CheckedFrom;
+use crate::num::arithmetic::traits::{CheckedPow, Parity};
+use crate::num::conversion::traits::CheckedFrom;
 
 macro_rules! impl_checked_pow_unsigned {
     ($t:ident) => {

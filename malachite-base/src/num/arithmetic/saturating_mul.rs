@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{SaturatingMul, SaturatingMulAssign};
+use crate::num::arithmetic::traits::{SaturatingMul, SaturatingMulAssign};
 
 macro_rules! impl_saturating_mul {
     ($t:ident) => {

@@ -4,7 +4,7 @@ use malachite_base::test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::max;
-use Rational;
+use crate::Rational;
 
 pub fn rational_bit_bucketer(var_name: &str) -> Bucketer<Rational> {
     Bucketer {

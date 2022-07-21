@@ -1,5 +1,5 @@
-use num::arithmetic::traits::NegAssign;
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::NegAssign;
+use crate::rounding_modes::RoundingMode;
 use std::ops::Neg;
 
 /// Returns the negative of a [`RoundingMode`].

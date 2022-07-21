@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedRoot, Reciprocal, UnsignedAbs};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
-use Rational;
+use crate::Rational;
 
 impl CheckedRoot<u64> for Rational {
     type Output = Rational;

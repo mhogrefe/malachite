@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{OverflowingSub, OverflowingSubAssign};
+use crate::num::arithmetic::traits::{OverflowingSub, OverflowingSubAssign};
 
 macro_rules! impl_overflowing_sub {
     ($t:ident) => {

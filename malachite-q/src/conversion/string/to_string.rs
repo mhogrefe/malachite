@@ -1,5 +1,5 @@
 use std::fmt::{Debug, Display, Formatter, Result, Write};
-use Rational;
+use crate::Rational;
 
 impl Display for Rational {
     /// Converts a [`Rational`] to a [`String`].

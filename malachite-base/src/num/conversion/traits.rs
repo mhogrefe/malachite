@@ -1,6 +1,6 @@
-use num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
-use num::conversion::string::to_sci::SciWrapper;
-use rounding_modes::RoundingMode;
+use crate::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
+use crate::num::conversion::string::to_sci::SciWrapper;
+use crate::rounding_modes::RoundingMode;
 use std::fmt::{Formatter, Result};
 
 /// Expresses a value as a [`Vec`] of digits, or reads a value from an iterator of digits.

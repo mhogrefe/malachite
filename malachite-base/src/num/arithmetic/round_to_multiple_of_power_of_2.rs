@@ -1,6 +1,6 @@
-use num::arithmetic::traits::{RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign};
-use num::basic::integers::PrimitiveInt;
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::{RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::rounding_modes::RoundingMode;
 
 fn round_to_multiple_of_power_of_2<T: PrimitiveInt>(x: T, pow: u64, rm: RoundingMode) -> T {
     x.shr_round(pow, rm).arithmetic_checked_shl(pow).unwrap()

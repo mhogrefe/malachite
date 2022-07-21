@@ -1,10 +1,10 @@
-use bools::random::{weighted_random_bools, WeightedRandomBools};
-use chars::char_is_graphic;
-use chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
-use comparison::traits::Min;
-use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
-use random::Seed;
-use vecs::{random_values_from_vec, RandomValuesFromVec};
+use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::chars::char_is_graphic;
+use crate::chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
+use crate::comparison::traits::Min;
+use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
+use crate::random::Seed;
+use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Uniformly generates random [`char`]s in a closed interval.
 ///

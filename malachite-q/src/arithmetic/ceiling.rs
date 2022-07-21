@@ -4,7 +4,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 impl Ceiling for Rational {
     type Output = Integer;

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial, CheckedLcm, CheckedLogBase,
     CheckedLogBase2, CheckedLogBasePowerOf2, CheckedMultifactorial, CheckedNextPowerOf2,
@@ -16,12 +16,12 @@ use num::arithmetic::traits::{
     RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ, XXAddYYToZZ,
     XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
-use num::basic::integers::PrimitiveInt;
-use num::conversion::traits::{
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
 };
-use num::logic::traits::{BitBlockAccess, HammingDistance};
+use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
 
 /// Defines functions on primitive unsigned integer types: uxx and usize.
 pub trait PrimitiveUnsigned:

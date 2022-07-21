@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use std::cmp::Ordering;
-use Rational;
+use crate::Rational;
 
 impl PartialOrd for Rational {
     /// Compares two [`Rational`]s.

@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
-use Rational;
+use crate::Rational;
 
 impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
     type Output = i64;

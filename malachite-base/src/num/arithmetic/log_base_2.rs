@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::SciMantissaAndExponent;
-use num::logic::traits::{LeadingZeros, TrailingZeros};
+use crate::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::SciMantissaAndExponent;
+use crate::num::logic::traits::{LeadingZeros, TrailingZeros};
 
 fn floor_log_base_2<T: PrimitiveUnsigned>(x: T) -> u64 {
     if x == T::ZERO {

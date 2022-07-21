@@ -1,8 +1,8 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::test_util::generators::common::It;
-use natural::Natural;
+use crate::natural::Natural;
 use num::{BigInt, BigUint};
-use test_util::common::{
+use crate::test_util::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
 

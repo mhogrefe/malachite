@@ -1,4 +1,4 @@
-use num::logic::traits::TrailingZeros;
+use crate::num::logic::traits::TrailingZeros;
 
 macro_rules! impl_trailing_zeros {
     ($t:ident) => {

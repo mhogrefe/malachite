@@ -8,42 +8,42 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::poly_eval::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mul::poly_eval::{
     limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2, limbs_mul_toom_evaluate_poly_in_1_and_neg_1,
     limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
     limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
     limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
-use natural::arithmetic::mul::poly_interpolate::{
+use crate::natural::arithmetic::mul::poly_interpolate::{
     limbs_mul_toom_interpolate_12_points, limbs_mul_toom_interpolate_16_points,
     limbs_mul_toom_interpolate_5_points, limbs_mul_toom_interpolate_6_points,
     limbs_mul_toom_interpolate_7_points, limbs_mul_toom_interpolate_8_points,
 };
-use natural::arithmetic::mul::{
+use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
     limbs_mul_to_out,
 };
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::square::{
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::square::{
     limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8_scratch_len,
 };
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_same_length_with_borrow_in_in_place_left,
     limbs_sub_same_length_with_borrow_in_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use platform::{
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };

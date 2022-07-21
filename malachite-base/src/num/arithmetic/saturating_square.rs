@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{SaturatingMulAssign, SaturatingSquare, SaturatingSquareAssign};
+use crate::num::arithmetic::traits::{SaturatingMulAssign, SaturatingSquare, SaturatingSquareAssign};
 
 macro_rules! impl_saturating_square {
     ($t:ident) => {

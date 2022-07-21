@@ -6,10 +6,10 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
-use natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
 
 // m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 //

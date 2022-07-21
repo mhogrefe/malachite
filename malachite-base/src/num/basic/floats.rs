@@ -1,18 +1,18 @@
-use comparison::traits::{Max, Min};
-use named::Named;
-use num::arithmetic::traits::{
+use crate::comparison::traits::{Max, Min};
+use crate::named::Named;
+use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
     FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
     Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
-use num::basic::traits::{Iverson, NegativeOne, One, OneHalf, Two, Zero};
-use num::conversion::traits::{
+use crate::num::basic::traits::{Iverson, NegativeOne, One, OneHalf, Two, Zero};
+use crate::num::conversion::traits::{
     CheckedFrom, CheckedInto, ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger,
     RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
 };
-use num::float::FmtRyuString;
-use num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
+use crate::num::float::FmtRyuString;
+use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
 use std::cmp::Ordering;
 use std::fmt::{Debug, Display, LowerExp, UpperExp};
 use std::iter::{Product, Sum};

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{ModSub, ModSubAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{ModSub, ModSubAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_sub<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
     let diff = x.wrapping_sub(other);

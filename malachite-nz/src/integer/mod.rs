@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
-use natural::InnerNatural::Small;
-use natural::Natural;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 
 /// An integer.
 ///

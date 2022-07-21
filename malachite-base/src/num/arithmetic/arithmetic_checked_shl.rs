@@ -1,7 +1,7 @@
-use num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use std::ops::{Shl, Shr};
 
 fn arithmetic_checked_shl_unsigned_unsigned<

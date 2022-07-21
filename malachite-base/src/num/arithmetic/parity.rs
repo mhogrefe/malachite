@@ -1,4 +1,4 @@
-use num::arithmetic::traits::Parity;
+use crate::num::arithmetic::traits::Parity;
 
 macro_rules! impl_parity {
     ($t:ident) => {

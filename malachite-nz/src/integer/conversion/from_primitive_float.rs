@@ -1,7 +1,7 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
+use crate::natural::Natural;
 
 macro_rules! float_impls {
     ($f: ident) => {

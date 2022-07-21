@@ -6,15 +6,15 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::mod_pow::{get_bits, get_window_size};
-use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use natural::arithmetic::mod_power_of_2_square::limbs_square_low;
-use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
-use natural::logic::bit_access::limbs_get_bit;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::mod_pow::{get_bits, get_window_size};
+use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
+use crate::natural::arithmetic::mod_power_of_2_square::limbs_square_low;
+use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
 //

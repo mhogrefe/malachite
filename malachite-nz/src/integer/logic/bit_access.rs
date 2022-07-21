@@ -1,14 +1,14 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
-use natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use natural::arithmetic::sub::limbs_sub_limb_in_place;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an

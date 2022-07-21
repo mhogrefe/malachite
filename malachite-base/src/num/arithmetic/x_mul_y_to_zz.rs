@@ -1,8 +1,8 @@
-use num::arithmetic::traits::XMulYToZZ;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
-use num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};
+use crate::num::arithmetic::traits::XMulYToZZ;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
+use crate::num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};
 
 fn implicit_x_mul_y_to_zz<T, DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf>(
     x: T,

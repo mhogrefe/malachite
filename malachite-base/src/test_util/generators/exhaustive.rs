@@ -1,28 +1,28 @@
-use bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
-use chars::constants::NUMBER_OF_CHARS;
-use chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
-use comparison::traits::Min;
-use iterators::bit_distributor::BitDistributorOutputType;
-use iterators::iter_windows;
+use crate::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
+use crate::chars::constants::NUMBER_OF_CHARS;
+use crate::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
+use crate::comparison::traits::Min;
+use crate::iterators::bit_distributor::BitDistributorOutputType;
+use crate::iterators::iter_windows;
 use itertools::{repeat_n, Itertools};
-use max;
-use num::arithmetic::traits::CoprimeWith;
-use num::arithmetic::traits::{
+use crate::max;
+use crate::num::arithmetic::traits::CoprimeWith;
+use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, CheckedNeg, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::string::options::exhaustive::{
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::string::options::exhaustive::{
     exhaustive_from_sci_string_options, exhaustive_sci_size_options, exhaustive_to_sci_options,
 };
-use num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
-use num::conversion::traits::{
+use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
+use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom,
 };
-use num::exhaustive::{
+use crate::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
     exhaustive_nonzero_finite_primitive_floats, exhaustive_nonzero_signeds,
     exhaustive_positive_finite_primitive_floats, exhaustive_positive_primitive_ints,
@@ -31,21 +31,21 @@ use num::exhaustive::{
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange, PrimitiveIntUpDown,
 };
-use num::float::NiceFloat;
-use num::iterators::{bit_distributor_sequence, ruler_sequence};
-use num::logic::traits::{BitBlockAccess, LeadingZeros};
-use rational_sequences::exhaustive::exhaustive_rational_sequences;
-use rational_sequences::RationalSequence;
-use rounding_modes::exhaustive::exhaustive_rounding_modes;
-use rounding_modes::RoundingMode;
-use slices::slice_test_zero;
+use crate::num::float::NiceFloat;
+use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
+use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::rational_sequences::exhaustive::exhaustive_rational_sequences;
+use crate::rational_sequences::RationalSequence;
+use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use crate::rounding_modes::RoundingMode;
+use crate::slices::slice_test_zero;
 use std::cmp::{max, min};
 use std::iter::{once, Chain, Once};
 use std::marker::PhantomData;
 use std::vec::IntoIter;
-use strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
-use strings::{strings_from_char_vecs, StringsFromCharVecs};
-use test_util::extra_variadic::{
+use crate::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
+use crate::strings::{strings_from_char_vecs, StringsFromCharVecs};
+use crate::test_util::extra_variadic::{
     exhaustive_duodecuples_from_single, exhaustive_octuples_from_single,
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
     exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyx,
@@ -56,26 +56,26 @@ use test_util::extra_variadic::{
     exhaustive_triples_xyx_custom_output, lex_triples_from_single, lex_triples_xyy, lex_union3s,
     ExhaustiveTriples1Input, ExhaustiveTriplesXXY, Union3,
 };
-use test_util::generators::common::{
+use crate::test_util::generators::common::{
     permute_1_3_2, permute_2_1, permute_3_1_4_2, reshape_1_2_to_3, reshape_2_1_1_to_4,
     reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, It,
 };
-use test_util::generators::{
+use crate::test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
     signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
 };
-use test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
-use test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
-use test_util::num::float::PRIMITIVE_FLOAT_CHARS;
-use test_util::rounding_modes::ROUNDING_MODE_CHARS;
-use tuples::exhaustive::{
+use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
+use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
+use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
+use crate::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_ordered_unique_pairs, exhaustive_pairs,
     exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
     lex_pairs, lex_pairs_from_single, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
     ExhaustivePairs1Input, ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriplesXYY,
 };
-use vecs::exhaustive::{
+use crate::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
     exhaustive_vecs_length_inclusive_range, exhaustive_vecs_min_length,
     lex_vecs_fixed_length_from_single, shortlex_vecs, shortlex_vecs_length_inclusive_range,

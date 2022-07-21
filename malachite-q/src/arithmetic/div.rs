@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Reciprocal};
 use malachite_base::num::basic::traits::Zero;
 use std::ops::{Div, DivAssign};
-use Rational;
+use crate::Rational;
 
 impl Div<Rational> for Rational {
     type Output = Rational;

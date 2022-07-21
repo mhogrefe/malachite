@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{Parity, Pow, PowAssign};
-use num::conversion::traits::ExactFrom;
+use crate::num::arithmetic::traits::{Parity, Pow, PowAssign};
+use crate::num::conversion::traits::ExactFrom;
 
 macro_rules! impl_pow_unsigned {
     ($t:ident) => {

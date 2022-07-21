@@ -1,5 +1,5 @@
 use malachite_base::num::basic::traits::Zero;
-use Rational;
+use crate::Rational;
 
 pub fn div_naive(x: Rational, y: Rational) -> Rational {
     if x == 0u32 {

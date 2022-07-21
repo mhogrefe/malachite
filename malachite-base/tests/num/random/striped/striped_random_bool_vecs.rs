@@ -3,7 +3,7 @@ use malachite_base::num::random::striped::striped_random_bool_vecs;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base::test_util::stats::median;
-use num::random::striped::get_striped_bool_vec::bool_slice_to_string;
+use crate::num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 
 fn striped_random_bool_vecs_helper(
     mean_stripe_numerator: u64,

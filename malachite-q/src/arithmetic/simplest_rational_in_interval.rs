@@ -1,13 +1,13 @@
-use arithmetic::traits::SimplestRationalInInterval;
-use conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
-use conversion::traits::ContinuedFraction;
+use crate::arithmetic::traits::SimplestRationalInInterval;
+use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
+use crate::conversion::traits::ContinuedFraction;
 use malachite_base::num::arithmetic::traits::{AddMul, Ceiling, Floor, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_nz::natural::Natural;
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 fn min_helper_oo<'a>(ox: &'a Option<Natural>, oy: &'a Option<Natural>) -> &'a Natural {
     if let Some(x) = ox.as_ref() {

@@ -1,6 +1,6 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::logic::traits::{BitIterable, HammingDistance};
-use platform::Limb;
+use crate::platform::Limb;
 use std::iter::repeat;
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {

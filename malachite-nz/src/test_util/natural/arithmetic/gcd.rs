@@ -3,12 +3,12 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_test_zero;
-use natural::arithmetic::gcd::half_gcd::{
+use crate::natural::arithmetic::gcd::half_gcd::{
     limbs_half_gcd_matrix_mul_matrix_1, limbs_half_gcd_matrix_update_q, HalfGcdMatrix,
     HalfGcdMatrix1,
 };
-use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
 
 pub fn gcd_euclidean_nz(x: Natural, y: Natural) -> Natural {
     if y == 0 {

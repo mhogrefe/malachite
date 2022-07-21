@@ -1,5 +1,5 @@
-use num::arithmetic::traits::CoprimeWith;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::CoprimeWith;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 pub_test! {coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == T::ONE

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::UnsignedAbs;
-use num::comparison::traits::EqAbs;
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::comparison::traits::EqAbs;
 
 macro_rules! impl_eq_abs_unsigned {
     ($t:ident) => {

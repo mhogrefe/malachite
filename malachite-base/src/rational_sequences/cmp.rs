@@ -1,4 +1,4 @@
-use rational_sequences::RationalSequence;
+use crate::rational_sequences::RationalSequence;
 use std::cmp::Ordering;
 
 impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::CheckedMul;
+use crate::num::arithmetic::traits::CheckedMul;
 
 macro_rules! impl_checked_mul {
     ($t:ident) => {

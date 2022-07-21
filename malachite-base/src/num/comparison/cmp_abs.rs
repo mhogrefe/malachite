@@ -1,5 +1,5 @@
-use num::arithmetic::traits::UnsignedAbs;
-use num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
 
 macro_rules! impl_partial_ord_abs {

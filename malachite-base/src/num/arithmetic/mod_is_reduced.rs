@@ -1,4 +1,4 @@
-use num::arithmetic::traits::ModIsReduced;
+use crate::num::arithmetic::traits::ModIsReduced;
 
 macro_rules! impl_mod_is_reduced {
     ($t:ident) => {

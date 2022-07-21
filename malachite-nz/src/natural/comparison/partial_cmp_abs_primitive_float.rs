@@ -1,7 +1,7 @@
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
 use malachite_base::num::logic::traits::SignificantBits;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 macro_rules! impl_float {

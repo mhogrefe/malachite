@@ -1,11 +1,11 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
-use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
-use natural::arithmetic::mul::toom::{
+use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
+use crate::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
     limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_33,
     limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_42,
@@ -16,10 +16,10 @@ use natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_same_length_to_out_toom_6h_scratch_len,
     limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
-use natural::arithmetic::square::limbs_square_to_out;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD,
     MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM42_TO_TOOM53_THRESHOLD,
     MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,

@@ -1,8 +1,8 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, UnsignedAbs,
 };
-use natural::Natural;
+use crate::natural::Natural;
 use std::ops::Neg;
 
 impl FloorRoot<u64> for Integer {

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::NegAssign;
+use crate::num::arithmetic::traits::NegAssign;
 
 macro_rules! impl_neg_signed {
     ($t:ident) => {

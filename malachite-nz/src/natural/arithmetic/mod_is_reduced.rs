@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::basic::traits::Zero;
-use natural::Natural;
+use crate::natural::Natural;
 
 impl ModIsReduced for Natural {
     /// Returns whether a [`Natural`] is reduced modulo another [`Natural`] $m$; in other words,

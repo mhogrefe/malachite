@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
-use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
 
 pub fn limbs_precompute_mod_mul_two_limbs_alt(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let out_limbs = (Natural::power_of_2(Limb::WIDTH << 2)

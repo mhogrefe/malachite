@@ -1,9 +1,9 @@
-use num::arithmetic::traits::ExtendedGcd;
-use num::arithmetic::traits::UnsignedAbs;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::ExtendedGcd;
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::rounding_modes::RoundingMode;
 use std::mem::swap;
 
 fn extended_gcd_signed<

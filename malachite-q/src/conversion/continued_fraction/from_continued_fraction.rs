@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 impl Rational {
     /// Converts a finite continued fraction to a [`Rational`], taking the inputs by value.

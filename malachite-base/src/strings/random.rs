@@ -1,8 +1,8 @@
-use chars::random::{random_chars, RandomCharRange};
-use num::random::geometric::GeometricRandomNaturalValues;
-use random::Seed;
-use strings::StringsFromCharVecs;
-use vecs::random::{
+use crate::chars::random::{random_chars, RandomCharRange};
+use crate::num::random::geometric::GeometricRandomNaturalValues;
+use crate::random::Seed;
+use crate::strings::StringsFromCharVecs;
+use crate::vecs::random::{
     random_vecs, random_vecs_fixed_length_from_single, RandomFixedLengthVecsFromSingle, RandomVecs,
 };
 

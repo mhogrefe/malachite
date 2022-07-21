@@ -1,6 +1,6 @@
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 impl From<Natural> for Rational {
     /// Converts a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`], taking the

@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign,
@@ -7,26 +7,26 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div_exact::limbs_div_exact_to_out;
-use natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns};
-use natural::arithmetic::gcd::half_gcd::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::div_exact::limbs_div_exact_to_out;
+use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns};
+use crate::natural::arithmetic::gcd::half_gcd::{
     extract_number, limbs_gcd_subdivide_step, limbs_half_gcd, limbs_half_gcd_2,
     limbs_half_gcd_matrix_1_mul_inverse_vector, limbs_half_gcd_matrix_1_mul_vector,
     limbs_half_gcd_matrix_adjust, limbs_half_gcd_matrix_init_scratch_len,
     limbs_half_gcd_scratch_len, GcdSubdivideStepContext, HalfGcdMatrix, HalfGcdMatrix1,
 };
-use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use natural::arithmetic::mul::limbs_mul_to_out;
-use natural::arithmetic::sub::limbs_sub_greater_in_place_left;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::Small;
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::mul::limbs_mul_to_out;
+use crate::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::{max, Ordering};
 use std::mem::swap;
 

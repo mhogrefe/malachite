@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::BitIterable;
-use natural::Natural;
+use crate::natural::Natural;
 
 pub fn natural_trailing_zeros_alt(n: &Natural) -> Option<u64> {
     if *n == 0 {

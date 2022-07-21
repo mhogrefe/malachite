@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{WrappingMulAssign, WrappingSquare, WrappingSquareAssign};
+use crate::num::arithmetic::traits::{WrappingMulAssign, WrappingSquare, WrappingSquareAssign};
 
 macro_rules! impl_wrapping_square {
     ($t:ident) => {

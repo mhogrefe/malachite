@@ -1,7 +1,7 @@
-use num::arithmetic::traits::PowerOf2;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::IntegerMantissaAndExponent;
+use crate::num::arithmetic::traits::PowerOf2;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::IntegerMantissaAndExponent;
 
 fn power_of_2_unsigned<T: PrimitiveUnsigned>(pow: u64) -> T {
     assert!(pow < T::WIDTH);

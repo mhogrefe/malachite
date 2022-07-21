@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{ModPowerOf2Sub, ModPowerOf2SubAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{ModPowerOf2Sub, ModPowerOf2SubAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_power_of_2_sub<T: PrimitiveUnsigned>(x: T, other: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);

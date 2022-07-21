@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use std::cmp::Ordering;
 

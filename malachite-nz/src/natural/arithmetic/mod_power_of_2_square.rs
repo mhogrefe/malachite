@@ -5,24 +5,24 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
-use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
-use natural::arithmetic::mul::mul_low::{
+use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
+use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use crate::natural::arithmetic::mul::mul_low::{
     limbs_mul_low_same_length, limbs_mul_low_same_length_basecase,
 };
-use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::square::{
+use crate::natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::natural::arithmetic::square::{
     limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
     SQR_FFT_THRESHOLD,
 };
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQRLO_DC_THRESHOLD,
     SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };

@@ -3,6 +3,7 @@ name = "malachite-criterion-bench"
 version = "0.2.5"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 autobenches = false
+edition = "2018"
 
 [dependencies]
 malachite-base = "0.2.5"

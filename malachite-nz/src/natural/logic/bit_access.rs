@@ -1,9 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, gets a bit of
 // the `Natural` at a specified index. Sufficiently high indices will return `false`.

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{AddMul, AddMulAssign, WrappingAddMul, WrappingAddMulAssign};
+use crate::num::arithmetic::traits::{AddMul, AddMulAssign, WrappingAddMul, WrappingAddMulAssign};
 
 macro_rules! impl_add_mul_primitive_int {
     ($t:ident) => {

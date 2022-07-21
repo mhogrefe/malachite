@@ -1,4 +1,4 @@
-use num::arithmetic::traits::CheckedSub;
+use crate::num::arithmetic::traits::CheckedSub;
 
 macro_rules! impl_checked_sub {
     ($t:ident) => {

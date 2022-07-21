@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use itertools::{Interleave, Itertools};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use std::iter::{once, Chain, Once, Rev};

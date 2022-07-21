@@ -9,37 +9,37 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div_exact::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert, limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
-use natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
-use natural::arithmetic::mod_op::limbs_mod_to_out;
-use natural::arithmetic::mod_power_of_2_pow::limbs_pow_low;
-use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
-use natural::arithmetic::mul::mul_mod::{
+use crate::natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
+use crate::natural::arithmetic::mod_op::limbs_mod_to_out;
+use crate::natural::arithmetic::mod_power_of_2_pow::limbs_pow_low;
+use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::mul::{
+use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
-use natural::arithmetic::shr::limbs_shr_to_out;
-use natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_basecase};
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::shr::limbs_shr_to_out;
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_basecase};
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::logic::bit_access::limbs_get_bit;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::Small;
-use natural::Natural;
-use platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
+use crate::platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
 use std::cmp::{max, min, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]

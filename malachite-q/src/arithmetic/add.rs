@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_nz::integer::Integer;
 use std::ops::{Add, AddAssign};
-use Rational;
+use crate::Rational;
 
 impl Add<Rational> for Rational {
     type Output = Rational;

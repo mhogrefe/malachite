@@ -1,31 +1,31 @@
-use bools::random::{random_bools, RandomBools};
-use iterators::{
+use crate::bools::random::{random_bools, RandomBools};
+use crate::iterators::{
     nonzero_values, with_special_value, with_special_values, NonzeroValues, WithSpecialValue,
     WithSpecialValues,
 };
 use itertools::Itertools;
-use num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use num::float::NiceFloat;
-use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
-use num::logic::traits::{BitAccess, SignificantBits};
-use num::random::geometric::{
+use crate::num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::float::NiceFloat;
+use crate::num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
+use crate::num::logic::traits::{BitAccess, SignificantBits};
+use crate::num::random::geometric::{
     geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
 };
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
-use random::{Seed, EXAMPLE_SEED};
-use rounding_modes::RoundingMode;
+use crate::random::{Seed, EXAMPLE_SEED};
+use crate::rounding_modes::RoundingMode;
 use std::collections::HashMap;
 use std::convert::identity;
 use std::fmt::Debug;
 use std::marker::PhantomData;
-use vecs::{random_values_from_vec, RandomValuesFromVec};
+use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 
 // Uniformly generates random primitive integers.
 #[doc(hidden)]

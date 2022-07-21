@@ -1,5 +1,5 @@
 use malachite_base::num::logic::traits::SignificantBits;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 pub fn natural_cmp_normalized_naive(x: &Natural, y: &Natural) -> Ordering {

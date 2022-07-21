@@ -10,20 +10,20 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_trailing_zeros};
-use natural::arithmetic::div::{limbs_div_limb_to_out, limbs_div_to_out};
-use natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
-use natural::arithmetic::mul::limbs_mul_greater_to_out;
-use natural::arithmetic::pow::limbs_pow;
-use natural::arithmetic::shl::limbs_slice_shl_in_place;
-use natural::arithmetic::shr::limbs_shr_to_out;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::div::{limbs_div_limb_to_out, limbs_div_to_out};
+use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::pow::limbs_pow;
+use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
+use crate::natural::arithmetic::shr::limbs_shr_to_out;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::Ordering;
 
 // # Worst-case complexity

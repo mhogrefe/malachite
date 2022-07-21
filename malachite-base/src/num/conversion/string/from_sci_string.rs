@@ -1,9 +1,9 @@
-use num::arithmetic::traits::Parity;
-use num::basic::integers::PrimitiveInt;
-use num::conversion::string::from_string::digit_from_display_byte;
-use num::conversion::string::options::FromSciStringOptions;
-use num::conversion::traits::{CheckedFrom, FromSciString};
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::Parity;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::conversion::string::from_string::digit_from_display_byte;
+use crate::num::conversion::string::options::FromSciStringOptions;
+use crate::num::conversion::traits::{CheckedFrom, FromSciString};
+use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 use std::str::FromStr;
 

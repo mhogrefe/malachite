@@ -7,10 +7,10 @@ use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::div_mod::{
+use crate::natural::arithmetic::div_mod::{
     limbs_div_barrett_large_product, limbs_div_mod_balanced, limbs_div_mod_barrett_helper,
     limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len,
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer_helper,
@@ -18,23 +18,23 @@ use natural::arithmetic::div_mod::{
     limbs_invert_limb, limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
     MUPI_DIV_QR_THRESHOLD,
 };
-use natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
-use natural::arithmetic::mul::{
+use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
+use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
-use natural::arithmetic::shl::limbs_shl_to_out;
-use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::shl::limbs_shl_to_out;
+use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
     limbs_sub_same_length_with_borrow_in_in_place_left,
     limbs_sub_same_length_with_borrow_in_in_place_right,
 };
-use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     DoubleLimb, Limb, DC_DIV_QR_THRESHOLD, MOD_1N_TO_MOD_1_1_THRESHOLD,
     MOD_1U_TO_MOD_1_1_THRESHOLD, MOD_1_1P_METHOD, MOD_1_1_TO_MOD_1_2_THRESHOLD,
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,

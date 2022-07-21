@@ -1,8 +1,8 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{ExtendedGcd, ModInverse};
 use malachite_base::num::conversion::traits::ExactFrom;
-use natural::InnerNatural::Small;
-use natural::Natural;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 
 fn mod_inverse_simple_helper(x: Natural, m: Natural) -> Option<Natural> {
     let (gcd, _, inverse) = (&m).extended_gcd(x);

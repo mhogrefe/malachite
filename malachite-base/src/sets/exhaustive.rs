@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashSet};
 use std::hash::Hash;
-use vecs::exhaustive::{
+use crate::vecs::exhaustive::{
     ExhaustiveOrderedUniqueCollections, LexFixedLengthOrderedUniqueCollections,
     LexOrderedUniqueCollections, ShortlexOrderedUniqueCollections,
 };

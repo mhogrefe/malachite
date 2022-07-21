@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{OverflowingNeg, OverflowingNegAssign};
+use crate::num::arithmetic::traits::{OverflowingNeg, OverflowingNegAssign};
 
 macro_rules! impl_overflowing_neg {
     ($t:ident) => {

@@ -1,4 +1,4 @@
-use num::logic::traits::NotAssign;
+use crate::num::logic::traits::NotAssign;
 
 macro_rules! impl_not {
     ($t:ident) => {

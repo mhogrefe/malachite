@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{Square, SquareAssign};
+use crate::num::arithmetic::traits::{Square, SquareAssign};
 
 macro_rules! impl_square {
     ($t:ident) => {

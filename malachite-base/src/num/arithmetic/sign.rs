@@ -1,4 +1,4 @@
-use num::arithmetic::traits::Sign;
+use crate::num::arithmetic::traits::Sign;
 use std::cmp::Ordering;
 
 macro_rules! impl_sign_primitive_int {

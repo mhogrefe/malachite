@@ -1,7 +1,7 @@
-use num::arithmetic::traits::XXAddYYToZZ;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
+use crate::num::arithmetic::traits::XXAddYYToZZ;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 
 fn implicit_xx_add_yy_to_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
     x_1: DT::Half,

@@ -1,9 +1,9 @@
-use conversion::traits::ContinuedFraction;
+use crate::conversion::traits::ContinuedFraction;
 use malachite_base::num::arithmetic::traits::{DivMod, Floor};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 /// An iterator that produces the continued fraction of a [`Rational`].
 ///

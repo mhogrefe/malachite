@@ -1,6 +1,6 @@
-use num::arithmetic::traits::{ModPowerOf2Pow, ModPowerOf2PowAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::BitIterable;
+use crate::num::arithmetic::traits::{ModPowerOf2Pow, ModPowerOf2PowAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::BitIterable;
 
 fn mod_power_of_2_pow<T: PrimitiveUnsigned>(x: T, exp: u64, pow: u64) -> T {
     assert!(pow <= T::WIDTH);

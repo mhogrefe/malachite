@@ -1,24 +1,24 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::mod_power_of_2::{
+use crate::natural::arithmetic::mod_power_of_2::{
     limbs_neg_mod_power_of_2, limbs_neg_mod_power_of_2_in_place,
     limbs_slice_mod_power_of_2_in_place,
 };
-use natural::arithmetic::mod_power_of_2_add::limbs_vec_mod_power_of_2_add_limb_in_place;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mod_power_of_2_add::limbs_vec_mod_power_of_2_add_limb_in_place;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_right, limbs_vec_sub_in_place_right,
 };
-use natural::logic::low_mask::limbs_low_mask;
-use natural::logic::not::limbs_not_in_place;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::logic::low_mask::limbs_low_mask;
+use crate::natural::logic::not::limbs_not_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::mem::swap;
 
 // # Worst-case complexity

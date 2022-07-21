@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::IsInteger;
-use natural::Natural;
+use crate::natural::Natural;
 
 impl<'a> IsInteger for &'a Natural {
     /// Determines whether a [`Natural`] is an integer. It always returns `true`.

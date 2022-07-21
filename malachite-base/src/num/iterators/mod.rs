@@ -1,7 +1,7 @@
-use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use num::arithmetic::traits::{DivMod, DivisibleBy};
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+use crate::num::arithmetic::traits::{DivMod, DivisibleBy};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::cmp::Ordering;
 use std::marker::PhantomData;
 

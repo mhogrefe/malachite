@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{Floor, FloorAssign};
+use crate::num::arithmetic::traits::{Floor, FloorAssign};
 
 macro_rules! impl_floor {
     ($f:ident) => {

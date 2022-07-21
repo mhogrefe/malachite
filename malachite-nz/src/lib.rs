@@ -158,7 +158,7 @@ extern crate rug;
 pub use platform_32 as platform;
 #[doc(hidden)]
 #[cfg(not(feature = "32_bit_limbs"))]
-pub use platform_64 as platform;
+pub use crate::platform_64 as platform;
 
 #[doc(hidden)]
 #[cfg(feature = "32_bit_limbs")]

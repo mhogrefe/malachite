@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::Parity;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
 
 impl<'a> Parity for &'a Natural {
     /// Tests whether a [`Natural`] is even.

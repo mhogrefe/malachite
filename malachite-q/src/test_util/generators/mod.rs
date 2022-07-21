@@ -10,14 +10,14 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::BigRational;
 use std::ops::Shr;
-use test_util::generators::common::{
+use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
     rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm,
 };
-use test_util::generators::exhaustive::*;
-use test_util::generators::random::*;
-use test_util::generators::special_random::*;
-use Rational;
+use crate::test_util::generators::exhaustive::*;
+use crate::test_util::generators::random::*;
+use crate::test_util::generators::special_random::*;
+use crate::Rational;
 
 // -- Rational --
 

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
-use Rational;
+use crate::Rational;
 
 impl IsPowerOf2 for Rational {
     /// Determines whether a [`Rational`] is an integer power of 2.

@@ -1,4 +1,4 @@
-use strings::ToDebugString;
+use crate::strings::ToDebugString;
 
 #[cfg(feature = "test_build")]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

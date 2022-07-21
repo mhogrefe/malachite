@@ -1,4 +1,4 @@
-use extra_variadic::{lex_unique_quadruples, lex_unique_quintuples, lex_unique_triples};
+use crate::extra_variadic::{lex_unique_quadruples, lex_unique_quintuples, lex_unique_triples};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{CheckedLcm, Lcm, LcmAssign};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{CheckedLcm, Lcm, LcmAssign};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[inline]
 fn lcm<T: PrimitiveUnsigned>(x: T, y: T) -> T {

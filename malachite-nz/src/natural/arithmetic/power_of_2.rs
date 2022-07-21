@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
-use natural::Natural;
+use crate::natural::Natural;
 
 impl PowerOf2<u64> for Natural {
     /// Raises 2 to an integer power.

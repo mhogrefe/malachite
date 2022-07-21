@@ -1,10 +1,10 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignRem, DivMod, DivRem, UnsignedAbs,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 fn div_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> (T, T) {
     let q = x / other;

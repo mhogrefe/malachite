@@ -1,19 +1,19 @@
-use iterators::{nonzero_values, NonzeroValues};
+use crate::iterators::{nonzero_values, NonzeroValues};
 use itertools::{Interleave, Itertools};
-use num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::float::NiceFloat;
-use num::iterators::{ruler_sequence, RulerSequence};
-use num::logic::traits::{BitAccess, NotAssign, SignificantBits};
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::float::NiceFloat;
+use crate::num::iterators::{ruler_sequence, RulerSequence};
+use crate::num::logic::traits::{BitAccess, NotAssign, SignificantBits};
+use crate::rounding_modes::RoundingMode;
 use std::iter::{once, Chain, Once, Rev};
 use std::marker::PhantomData;
 use std::vec::IntoIter;
-use tuples::exhaustive::{
+use crate::tuples::exhaustive::{
     exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
     ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };

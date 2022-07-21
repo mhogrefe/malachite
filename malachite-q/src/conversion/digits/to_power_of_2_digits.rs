@@ -3,7 +3,7 @@ use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 use std::collections::HashMap;
-use Rational;
+use crate::Rational;
 
 pub(crate) fn to_power_of_2_digits_helper(
     x: Rational,

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::CheckedNextPowerOf2;
+use crate::num::arithmetic::traits::CheckedNextPowerOf2;
 
 macro_rules! impl_checked_next_power_of_2 {
     ($t:ident) => {

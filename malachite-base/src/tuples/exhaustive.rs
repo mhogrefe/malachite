@@ -1,14 +1,14 @@
-use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use iterators::iterator_cache::IteratorCache;
-use num::arithmetic::traits::CheckedPow;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::SignificantBits;
+use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+use crate::iterators::iterator_cache::IteratorCache;
+use crate::num::arithmetic::traits::CheckedPow;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::logic::traits::SignificantBits;
 use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
 use std::mem::swap;
-use vecs::exhaustive::{
+use crate::vecs::exhaustive::{
     fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
 };
 

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::ModPowerOf2Inverse;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::ModPowerOf2Inverse;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 // Uses Newton's method, as described by Colin Plumb in
 // https://groups.google.com/g/sci.crypt/c/UI-UMbUnYGk/m/hX2-wQVyE3oJ.

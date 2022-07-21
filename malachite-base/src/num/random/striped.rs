@@ -1,18 +1,18 @@
-use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
-use iterators::{nonzero_values, NonzeroValues};
+use crate::bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
+use crate::iterators::{nonzero_values, NonzeroValues};
 use itertools::Itertools;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::random::geometric::{
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds, mean_to_p_with_min,
     GeometricRandomNaturalValues,
 };
-use num::random::{
+use crate::num::random::{
     random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
     RandomUnsignedRange,
 };
-use random::Seed;
+use crate::random::Seed;
 use std::iter::{repeat, Repeat};
 use std::marker::PhantomData;
 

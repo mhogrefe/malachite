@@ -1,8 +1,8 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable};
-use natural::logic::bit_iterable::NaturalBitIterator;
-use natural::Natural;
+use crate::natural::logic::bit_iterable::NaturalBitIterator;
+use crate::natural::Natural;
 use std::ops::Index;
 
 /// A double-ended iterator over the two's complement bits of the negative of an [`Integer`].

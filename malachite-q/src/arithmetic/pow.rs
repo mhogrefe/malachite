@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     Parity, Pow, PowAssign, Reciprocal, ReciprocalAssign,
 };
-use Rational;
+use crate::Rational;
 
 impl Pow<u64> for Rational {
     type Output = Rational;

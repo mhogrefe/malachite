@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 /// Represents the base-$2^k$ digits of the fractional portion of a [`Rational`] number.
 ///

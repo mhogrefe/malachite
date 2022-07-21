@@ -1,6 +1,6 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::LowMask;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::LowMask;
 
 fn low_mask_unsigned<T: PrimitiveUnsigned>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);

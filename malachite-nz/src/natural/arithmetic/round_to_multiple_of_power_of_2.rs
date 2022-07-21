@@ -7,12 +7,12 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
-use natural::logic::bit_access::limbs_get_bit;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
+use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` rounded down to a multiple of 2<sup>`pow`</sup>.

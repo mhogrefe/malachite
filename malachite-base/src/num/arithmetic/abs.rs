@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
+use crate::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 
 macro_rules! impl_abs_primitive_int {
     ($u:ident, $s:ident) => {

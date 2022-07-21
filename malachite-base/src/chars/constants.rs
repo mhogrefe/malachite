@@ -1,5 +1,5 @@
-use comparison::traits::{Max, Min};
-use named::Named;
+use crate::comparison::traits::{Max, Min};
+use crate::named::Named;
 
 /// The number of [Unicode scalar values](https://www.unicode.org/glossary/#unicode_scalar_value).
 ///

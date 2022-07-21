@@ -1,7 +1,7 @@
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 use std::str::FromStr;
-use Rational;
+use crate::Rational;
 
 impl FromStr for Rational {
     type Err = ();

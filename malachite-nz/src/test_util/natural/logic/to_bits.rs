@@ -1,5 +1,5 @@
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use natural::Natural;
+use crate::natural::Natural;
 
 pub fn to_bits_asc_naive(n: &Natural) -> Vec<bool> {
     let mut bits = Vec::new();

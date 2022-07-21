@@ -1,5 +1,5 @@
 use malachite_nz::integer::Integer;
-use Rational;
+use crate::Rational;
 
 impl PartialEq<Integer> for Rational {
     /// Determines whether a [`Rational`] is equal to an

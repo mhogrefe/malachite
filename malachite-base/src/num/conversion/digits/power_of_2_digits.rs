@@ -1,5 +1,5 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, PowerOf2Digits, WrappingFrom};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{CheckedFrom, PowerOf2Digits, WrappingFrom};
 
 fn to_power_of_2_digits_asc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     x: &T,

@@ -1,6 +1,6 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::{BitScan, TrailingZeros};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::{BitScan, TrailingZeros};
 
 fn index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(x: T, start: u64) -> u64 {
     if start >= T::WIDTH {

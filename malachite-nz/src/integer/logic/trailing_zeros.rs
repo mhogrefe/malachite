@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 
 impl Integer {
     /// Returns the number of trailing zeros in the binary expansion of an [`Integer`]

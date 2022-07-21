@@ -1,5 +1,5 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, HasHalf};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{CheckedFrom, HasHalf};
 
 pub fn limbs_invert_limb_naive<
     T: CheckedFrom<DT> + PrimitiveUnsigned,

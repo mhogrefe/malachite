@@ -4,15 +4,15 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::sub::limbs_sub_same_length_to_out;
-use natural::comparison::cmp::limbs_cmp_same_length;
-use platform::Limb;
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::natural::arithmetic::sub::limbs_sub_same_length_to_out;
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::platform::Limb;
 use std::cmp::Ordering;
 
 // Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except

@@ -9,13 +9,13 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use natural::arithmetic::shl::limbs_slice_shl_in_place;
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::logic::bit_access::limbs_get_bit;
-use natural::logic::bit_scan::limbs_index_of_next_true_bit;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::cmp::Ordering;
 
 impl Natural {

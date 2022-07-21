@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::num::arithmetic::traits::{PowerOf2, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
@@ -14,12 +14,12 @@ use malachite_base::num::random::geometric::{
 use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
-use natural::random::{
+use crate::natural::random::{
     get_random_natural_with_bits, get_striped_random_natural_with_bits, random_naturals_less_than,
     striped_random_natural_inclusive_range, RandomNaturalsLessThan,
     StripedRandomNaturalInclusiveRange,
 };
-use natural::Natural;
+use crate::natural::Natural;
 
 /// Generates random [`Integer`]s, given an iterator of random signed bit lengths.
 ///

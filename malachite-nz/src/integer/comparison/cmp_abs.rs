@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
 

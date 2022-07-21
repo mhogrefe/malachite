@@ -1,13 +1,13 @@
-use num::conversion::traits::ExactFrom;
-use num::random::geometric::{
+use crate::num::conversion::traits::ExactFrom;
+use crate::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
     GeometricRandomNaturalValues,
 };
-use num::random::{
+use crate::num::random::{
     random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
     RandomUnsignedRange,
 };
-use random::Seed;
+use crate::random::Seed;
 use std::collections::{BTreeSet, HashSet};
 use std::hash::Hash;
 

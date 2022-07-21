@@ -1,4 +1,4 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     lex_ordered_unique_quadruples, lex_ordered_unique_quintuples, lex_ordered_unique_triples,
 };
 use itertools::Itertools;

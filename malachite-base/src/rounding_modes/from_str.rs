@@ -1,4 +1,4 @@
-use rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode;
 use std::str::FromStr;
 
 impl FromStr for RoundingMode {

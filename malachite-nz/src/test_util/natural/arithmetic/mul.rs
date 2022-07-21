@@ -1,6 +1,6 @@
-use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
-use platform::{Limb, MUL_TOOM22_THRESHOLD};
+use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use crate::platform::{Limb, MUL_TOOM22_THRESHOLD};
 
 // In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;

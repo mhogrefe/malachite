@@ -4,22 +4,22 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_test_zero;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k, SQR_FFT_MODF_THRESHOLD};
-use natural::arithmetic::mul::mul_mod::{
+use crate::natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k, SQR_FFT_MODF_THRESHOLD};
+use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper,
     limbs_mul_mod_base_pow_n_plus_1_basecase_helper, FFT_FIRST_K, MUL_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::square::limbs_square_to_out;
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
     limbs_sub_same_length_to_out, limbs_sub_same_length_with_borrow_in_in_place_right,
 };
-use platform::Limb;
+use crate::platform::Limb;
 use std::cmp::min;
 
 //TODO tune

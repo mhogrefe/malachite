@@ -1,6 +1,6 @@
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use test_util::stats::moments::CheckedToF64;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::test_util::stats::moments::CheckedToF64;
 
 pub const fn uniform_bool_median(min: bool, max: bool) -> (bool, Option<bool>) {
     if min == max {

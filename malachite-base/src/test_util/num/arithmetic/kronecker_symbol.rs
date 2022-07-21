@@ -1,7 +1,7 @@
-use num::arithmetic::traits::{NegAssign, Parity};
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{HasHalf, JoinHalves};
-use num::logic::traits::NotAssign;
+use crate::num::arithmetic::traits::{NegAssign, Parity};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{HasHalf, JoinHalves};
+use crate::num::logic::traits::NotAssign;
 use std::mem::swap;
 
 // This is equivalent to `n_jacobi_unsigned` from `ulong_extras/jacobi.c`, FLINT 2.7.1.

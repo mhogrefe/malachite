@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{SaturatingNeg, SaturatingNegAssign};
+use crate::num::arithmetic::traits::{SaturatingNeg, SaturatingNegAssign};
 
 macro_rules! impl_saturating_neg {
     ($t:ident) => {

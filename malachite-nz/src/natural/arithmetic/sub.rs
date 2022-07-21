@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 

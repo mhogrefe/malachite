@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{WrappingAdd, WrappingAddAssign};
+use crate::num::arithmetic::traits::{WrappingAdd, WrappingAddAssign};
 
 macro_rules! impl_wrapping_add {
     ($t:ident) => {

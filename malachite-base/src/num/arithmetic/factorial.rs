@@ -1,10 +1,10 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CheckedDoubleFactorial, CheckedFactorial, CheckedMultifactorial, CheckedSubfactorial,
     DoubleFactorial, Factorial, Multifactorial, Parity, Subfactorial,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 pub_test! {checked_multifactorial_naive<T: PrimitiveUnsigned>(n: u64, m: u64) -> Option<T> {
     assert_ne!(m, 0);

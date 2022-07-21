@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign};
 
 impl Pow<u64> for Integer {

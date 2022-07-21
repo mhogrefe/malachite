@@ -1,4 +1,4 @@
-use rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode;
 
 /// A `struct` determining how much "detail" should be used when creating a scientific-notation
 /// string.

@@ -2,17 +2,17 @@ use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
-use natural::arithmetic::div_exact::{
+use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_mod_barrett, limbs_modular_div_mod_barrett_scratch_len,
     limbs_modular_div_mod_divide_and_conquer, limbs_modular_div_mod_schoolbook,
     limbs_modular_invert_limb,
 };
-use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
-use natural::arithmetic::mod_op::limbs_mod_limb;
-use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
+use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
+use crate::natural::arithmetic::mod_op::limbs_mod_limb;
+use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 // whether that `Natural` is divisible by a given limb.

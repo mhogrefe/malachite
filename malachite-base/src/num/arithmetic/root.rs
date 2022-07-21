@@ -1,17 +1,17 @@
 #[cfg(feature = "test_build")]
-use num::arithmetic::sqrt::floor_inverse_checked_binary;
+use crate::num::arithmetic::sqrt::floor_inverse_checked_binary;
 #[cfg(feature = "test_build")]
-use num::arithmetic::traits::DivRound;
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::DivRound;
+use crate::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, DivMod, FloorRoot,
     FloorRootAssign, FloorSqrt, Parity, Pow, PowerOf2, RootAssignRem, RootRem, SqrtRem, XMulYToZZ,
 };
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom};
-use num::logic::traits::{LowMask, SignificantBits};
-use rounding_modes::RoundingMode;
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom};
+use crate::num::logic::traits::{LowMask, SignificantBits};
+use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
 const U8_CUBES: [u8; 7] = [0, 1, 8, 27, 64, 125, 216];

@@ -1,6 +1,6 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{ExtendedGcd, NegAssign, UnsignedAbs};
-use natural::Natural;
+use crate::natural::Natural;
 
 impl ExtendedGcd for Integer {
     type Gcd = Natural;

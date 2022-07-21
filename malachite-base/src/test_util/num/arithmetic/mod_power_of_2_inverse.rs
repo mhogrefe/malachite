@@ -1,7 +1,7 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use test_util::num::arithmetic::extended_gcd::extended_gcd_unsigned_euclidean;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::test_util::num::arithmetic::extended_gcd::extended_gcd_unsigned_euclidean;
 
 pub fn mod_power_of_2_inverse_euclidean<
     U: PrimitiveUnsigned + WrappingFrom<S>,

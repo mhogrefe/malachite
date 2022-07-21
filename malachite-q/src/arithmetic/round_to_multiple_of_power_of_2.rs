@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use Rational;
+use crate::Rational;
 
 impl RoundToMultipleOfPowerOf2<i64> for Rational {
     type Output = Rational;

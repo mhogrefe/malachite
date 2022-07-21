@@ -11,7 +11,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::ops::Neg;
-use Rational;
+use crate::Rational;
 
 fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(x: &'a Rational) -> Option<T> {
     if x.sign && x.denominator == 1u32 {

@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 impl Rational {
     /// Converts base-$b$ digits to a [`Rational`]. The inputs are taken by value.

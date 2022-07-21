@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, NegAssign, Parity};
 use malachite_base::num::conversion::traits::WrappingInto;
 use malachite_base::num::logic::traits::BitAccess;
-use natural::Natural;
+use crate::natural::Natural;
 use std::mem::swap;
 
 pub fn jacobi_symbol_simple(mut a: Natural, mut n: Natural) -> i8 {

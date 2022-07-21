@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
-use Rational;
+use crate::Rational;
 
 impl Abs for Rational {
     type Output = Rational;

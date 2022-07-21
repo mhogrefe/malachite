@@ -3,8 +3,8 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use num::BigRational;
-use test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use Rational;
+use crate::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use crate::Rational;
 
 pub fn rational_rm(xs: It<Rational>) -> It<(rug::Rational, Rational)> {
     Box::new(xs.map(|x| (rational_to_rug_rational(&x), x)))

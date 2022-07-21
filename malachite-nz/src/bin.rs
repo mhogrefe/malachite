@@ -15,9 +15,9 @@ extern crate serde;
 extern crate serde_json;
 
 #[cfg(feature = "bin_build")]
-use bin_util::demo_and_bench::register;
+use crate::bin_util::demo_and_bench::register;
 #[cfg(feature = "bin_build")]
-use bin_util::generate::digits_data::generate_string_data;
+use crate::bin_util::generate::digits_data::generate_string_data;
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
 #[cfg(feature = "bin_build")]

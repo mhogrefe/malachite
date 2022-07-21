@@ -1,4 +1,4 @@
-use exhaustive::RationalsWithDenominator;
+use crate::exhaustive::RationalsWithDenominator;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
@@ -15,7 +15,7 @@ use malachite_nz::natural::random::{
     striped_random_positive_naturals, RandomNaturals, StripedRandomNaturals,
 };
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 /// Generates random non-negative [`Rational`]s, given an iterator of random
 /// [`Natural`](malachite_nz::natural::Natural) numerators and denominators.

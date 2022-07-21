@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::slices::slice_test_zero;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 // whether that `Natural` is an integer power of 2.

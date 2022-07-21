@@ -1,5 +1,5 @@
-use extra_variadic::exhaustive_triples_from_single;
-use get_sample_output_types;
+use crate::extra_variadic::exhaustive_triples_from_single;
+use crate::get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;

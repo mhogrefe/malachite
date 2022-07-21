@@ -1,13 +1,13 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign,
     CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedAbs, ExtendedGcd, NegAssign,
     OverflowingAbs, OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg,
     SaturatingNegAssign, UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::NegativeOne;
-use num::logic::traits::CheckedHammingDistance;
-use num::random::{HasRandomSignedRange, RandomSignedChunkable};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::traits::NegativeOne;
+use crate::num::logic::traits::CheckedHammingDistance;
+use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use std::ops::Neg;
 
 /// Defines functions on primitive signed integer types: ixx and isize.

@@ -1,5 +1,5 @@
 use malachite_base::num::basic::traits::{One, Zero};
-use natural::Natural;
+use crate::natural::Natural;
 
 pub fn ceiling_log_base_power_of_2_naive_nz(x: &Natural, pow: u64) -> u64 {
     assert_ne!(*x, Natural::ZERO);

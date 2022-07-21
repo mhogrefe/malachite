@@ -1,6 +1,6 @@
-use num::basic::floats::PrimitiveFloat;
-use num::conversion::traits::{IsInteger, WrappingFrom};
-use num::logic::traits::TrailingZeros;
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::conversion::traits::{IsInteger, WrappingFrom};
+use crate::num::logic::traits::TrailingZeros;
 
 fn is_integer_float<T: PrimitiveFloat>(x: T) -> bool {
     if x.is_nan() || x.is_infinite() {

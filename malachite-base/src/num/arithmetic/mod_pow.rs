@@ -1,10 +1,10 @@
-use num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
-use num::arithmetic::traits::{ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign};
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
-use num::logic::traits::{BitIterable, LeadingZeros};
+use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
+use crate::num::arithmetic::traits::{ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
+use crate::num::logic::traits::{BitIterable, LeadingZeros};
 
 pub_test! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
     if m == T::ONE {

@@ -1,21 +1,21 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use integer::Integer;
+use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::vecs::vec_delete_left;
-use natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::arithmetic::sub::limbs_sub_limb_in_place;
-use natural::logic::bit_block_access::limbs_assign_bits_helper;
-use natural::logic::not::limbs_not_in_place;
-use natural::logic::trailing_zeros::limbs_trailing_zeros;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
+use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
+use crate::natural::logic::bit_block_access::limbs_assign_bits_helper;
+use crate::natural::logic::not::limbs_not_in_place;
+use crate::natural::logic::trailing_zeros::limbs_trailing_zeros;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Returns the limbs obtained by taking a slice of bits beginning at index `start` of the negative
 // of `limb` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart

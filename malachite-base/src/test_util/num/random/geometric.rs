@@ -1,6 +1,6 @@
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::logic::traits::BitAccess;
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::logic::traits::BitAccess;
 use std::cmp::Ordering;
 
 pub fn unadjusted_mean_to_adjusted_mean(unadjusted_mean: f64, limit: f64) -> f64 {

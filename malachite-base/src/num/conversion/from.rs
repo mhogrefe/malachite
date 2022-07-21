@@ -1,14 +1,14 @@
-use num::arithmetic::traits::{ShrRoundAssign, UnsignedAbs};
-use num::basic::floats::PrimitiveFloat;
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
-use num::conversion::traits::{
+use crate::num::arithmetic::traits::{ShrRoundAssign, UnsignedAbs};
+use crate::num::basic::floats::PrimitiveFloat;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
+use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, RoundingFrom, SaturatingFrom,
     SciMantissaAndExponent, WrappingFrom,
 };
-use rounding_modes::RoundingMode;
+use crate::rounding_modes::RoundingMode;
 use std::ops::Neg;
 
 // This macro defines conversions from a type to itself.

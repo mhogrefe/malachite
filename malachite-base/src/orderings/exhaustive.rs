@@ -1,4 +1,4 @@
-use orderings::ORDERINGS;
+use crate::orderings::ORDERINGS;
 use std::cmp::Ordering;
 use std::iter::Cloned;
 use std::slice::Iter;

@@ -1,5 +1,5 @@
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::NotAssign;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::NotAssign;
 
 pub fn checked_factorial_naive<T: PrimitiveUnsigned>(n: u64) -> Option<T> {
     let mut f = T::ONE;

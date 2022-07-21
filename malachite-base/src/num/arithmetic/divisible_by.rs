@@ -1,6 +1,6 @@
-use num::arithmetic::traits::DivisibleBy;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::DivisibleBy;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn divisible_by_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> bool {
     x == T::ZERO || other != T::ZERO && x % other == T::ZERO

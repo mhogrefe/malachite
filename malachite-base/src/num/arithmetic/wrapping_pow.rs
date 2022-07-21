@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{Parity, UnsignedAbs, WrappingPow, WrappingPowAssign};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
-use num::logic::traits::BitIterable;
+use crate::num::arithmetic::traits::{Parity, UnsignedAbs, WrappingPow, WrappingPowAssign};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::logic::traits::BitIterable;
 
 fn wrapping_pow_unsigned<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
     if exp == 0 {

@@ -1,10 +1,10 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
-use natural::conversion::string::to_string::BaseFmtWrapper;
+use crate::natural::conversion::string::to_string::BaseFmtWrapper;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 
 impl<'a> Display for BaseFmtWrapper<&'a Integer> {

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{WrappingAddMul, WrappingAddMulAssign};
-use num::basic::integers::PrimitiveInt;
+use crate::num::arithmetic::traits::{WrappingAddMul, WrappingAddMulAssign};
+use crate::num::basic::integers::PrimitiveInt;
 
 fn wrapping_add_mul<T: PrimitiveInt>(x: T, y: T, z: T) -> T {
     x.wrapping_add(y.wrapping_mul(z))

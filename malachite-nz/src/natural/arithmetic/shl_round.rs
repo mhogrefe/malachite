@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
+use crate::natural::Natural;
 use std::ops::{Shl, ShlAssign};
 
 fn shl_round_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(

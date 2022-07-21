@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::IsInteger;
-use Rational;
+use crate::Rational;
 
 impl<'a> IsInteger for &'a Rational {
     /// Determines whether a [`Rational`] is an integer.

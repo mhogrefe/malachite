@@ -1,7 +1,7 @@
-use chars::exhaustive::{exhaustive_chars, ExhaustiveChars};
-use num::exhaustive::PrimitiveIntIncreasingRange;
-use strings::{strings_from_char_vecs, StringsFromCharVecs};
-use vecs::exhaustive::{
+use crate::chars::exhaustive::{exhaustive_chars, ExhaustiveChars};
+use crate::num::exhaustive::PrimitiveIntIncreasingRange;
+use crate::strings::{strings_from_char_vecs, StringsFromCharVecs};
+use crate::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, lex_vecs_fixed_length_from_single,
     shortlex_vecs, ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle,
     ShortlexVecs,

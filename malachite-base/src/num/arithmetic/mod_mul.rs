@@ -1,11 +1,11 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOf2,
     WrappingSubAssign,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
-use num::logic::traits::LeadingZeros;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
+use crate::num::logic::traits::LeadingZeros;
 
 pub_test! {naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     let (product_1, product_0) = T::x_mul_y_to_zz(x, y);

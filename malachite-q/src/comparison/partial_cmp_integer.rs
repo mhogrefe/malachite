@@ -5,7 +5,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
-use Rational;
+use crate::Rational;
 
 impl PartialOrd<Integer> for Rational {
     /// Compares a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer).

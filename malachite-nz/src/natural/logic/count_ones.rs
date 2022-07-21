@@ -1,7 +1,7 @@
 use malachite_base::num::logic::traits::CountOnes;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
 // number of ones in the binary expansion of the `Natural`.

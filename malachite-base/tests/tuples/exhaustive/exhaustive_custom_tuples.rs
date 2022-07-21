@@ -1,8 +1,8 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
     exhaustive_triples_xyx, exhaustive_triples_xyx_custom_output,
 };
-use get_sample_output_types;
+use crate::get_sample_output_types;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;

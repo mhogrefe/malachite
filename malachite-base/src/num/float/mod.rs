@@ -1,4 +1,4 @@
-use num::basic::floats::PrimitiveFloat;
+use crate::num::basic::floats::PrimitiveFloat;
 use std::cmp::Ordering;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};

@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::{Square, WrappingSquare};
 use malachite_base::num::conversion::traits::SplitInHalf;
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mod_power_of_2_square::limbs_square_diagonal_shl_add;
-use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mod_power_of_2_square::limbs_square_diagonal_shl_add;
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::platform::{DoubleLimb, Limb};
 
 pub fn limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModSquare, ModSquareAssign,
     ModSquarePrecomputed, ModSquarePrecomputedAssign,
 };

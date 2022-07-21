@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use std::ops::{Div, DivAssign};
 
 impl Div<Integer> for Integer {

@@ -1,7 +1,7 @@
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::BitIterable;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::logic::traits::BitIterable;
 use std::cmp::min;
 use std::cmp::Ordering;
 use std::marker::PhantomData;

@@ -2,11 +2,11 @@ use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
-use natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 
 // Given the limbs of a `Natural`, returns the floor of its base-2 logarithm.
 //

@@ -1,5 +1,5 @@
-use num::arithmetic::traits::IsPowerOf2;
-use num::conversion::traits::IntegerMantissaAndExponent;
+use crate::num::arithmetic::traits::IsPowerOf2;
+use crate::num::conversion::traits::IntegerMantissaAndExponent;
 
 macro_rules! impl_is_power_of_2_unsigned {
     ($t:ident) => {

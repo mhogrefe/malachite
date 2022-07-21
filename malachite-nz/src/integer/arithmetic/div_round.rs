@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::rounding_modes::RoundingMode;
 

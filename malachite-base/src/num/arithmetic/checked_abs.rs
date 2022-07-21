@@ -1,4 +1,4 @@
-use num::arithmetic::traits::CheckedAbs;
+use crate::num::arithmetic::traits::CheckedAbs;
 
 macro_rules! impl_checked_abs {
     ($t:ident) => {

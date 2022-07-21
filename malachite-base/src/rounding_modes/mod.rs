@@ -1,4 +1,4 @@
-use named::Named;
+use crate::named::Named;
 
 /// An enum that specifies how a value should be rounded.
 ///

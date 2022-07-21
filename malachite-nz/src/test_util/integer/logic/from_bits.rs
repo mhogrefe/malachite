@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use itertools::Itertools;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;

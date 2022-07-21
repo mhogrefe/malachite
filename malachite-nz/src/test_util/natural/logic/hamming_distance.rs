@@ -1,6 +1,6 @@
 use malachite_base::num::logic::traits::{BitIterable, HammingDistance, SignificantBits};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::iter::repeat;
 
 pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {

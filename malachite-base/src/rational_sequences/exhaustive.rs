@@ -1,7 +1,7 @@
-use num::exhaustive::PrimitiveIntIncreasingRange;
-use rational_sequences::{rational_sequence_is_reduced, RationalSequence};
-use tuples::exhaustive::{exhaustive_pairs_from_single, ExhaustivePairs1Input};
-use vecs::exhaustive::{exhaustive_vecs, ExhaustiveVecs};
+use crate::num::exhaustive::PrimitiveIntIncreasingRange;
+use crate::rational_sequences::{rational_sequence_is_reduced, RationalSequence};
+use crate::tuples::exhaustive::{exhaustive_pairs_from_single, ExhaustivePairs1Input};
+use crate::vecs::exhaustive::{exhaustive_vecs, ExhaustiveVecs};
 
 /// Generates all [`RationalSequence`]s containing elements from an iterator.
 ///

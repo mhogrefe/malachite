@@ -1,12 +1,12 @@
-use conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
-use conversion::traits::ContinuedFraction;
-use conversion::traits::Convergents;
+use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
+use crate::conversion::traits::ContinuedFraction;
+use crate::conversion::traits::Convergents;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 /// An iterator that produces the convergents of a [`Rational`].
 ///

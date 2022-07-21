@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{DivisibleByPowerOf2, ModPowerOf2};
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::{DivisibleByPowerOf2, ModPowerOf2};
+use crate::num::conversion::traits::WrappingFrom;
 
 macro_rules! impl_divisible_by_power_of_2_unsigned {
     ($t:ident) => {

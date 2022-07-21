@@ -1,7 +1,7 @@
-use num::arithmetic::traits::UnsignedAbs;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::{LeadingZeros, SignificantBits};
+use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::logic::traits::{LeadingZeros, SignificantBits};
 
 fn significant_bits_unsigned<T: PrimitiveUnsigned>(x: T) -> u64 {
     T::WIDTH - LeadingZeros::leading_zeros(x)

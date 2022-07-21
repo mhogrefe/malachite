@@ -1,15 +1,15 @@
-use num::arithmetic::traits::{CheckedLogBase2, NegAssign, Pow, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::string::options::{SciSizeOptions, ToSciOptions};
-use num::conversion::string::to_string::BaseFmtWrapper;
-use num::conversion::string::to_string::{
+use crate::num::arithmetic::traits::{CheckedLogBase2, NegAssign, Pow, UnsignedAbs};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
+use crate::num::conversion::string::to_string::BaseFmtWrapper;
+use crate::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use num::conversion::traits::{ExactFrom, ToSci};
-use rounding_modes::RoundingMode;
-use slices::slice_trailing_zeros;
+use crate::num::conversion::traits::{ExactFrom, ToSci};
+use crate::rounding_modes::RoundingMode;
+use crate::slices::slice_trailing_zeros;
 use std::fmt::{Display, Formatter, Write};
 
 /// A `struct` that can be used to format a number in scientific notation.

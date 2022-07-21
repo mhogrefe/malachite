@@ -1,4 +1,4 @@
-use extra_variadic::{
+use crate::extra_variadic::{
     exhaustive_octuples_from_single, exhaustive_quadruples_from_single,
     exhaustive_quintuples_from_single, exhaustive_triples_from_single,
 };

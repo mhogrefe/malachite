@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::{BitIterable, CountOnes};
 

@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use Rational;
+use crate::Rational;
 
 impl RoundToMultiple<Rational> for Rational {
     type Output = Rational;

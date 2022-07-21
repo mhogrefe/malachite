@@ -1,4 +1,4 @@
-use num::arithmetic::traits::CheckedDiv;
+use crate::num::arithmetic::traits::CheckedDiv;
 
 macro_rules! impl_checked_div {
     ($t:ident) => {

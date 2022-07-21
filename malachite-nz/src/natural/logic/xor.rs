@@ -1,6 +1,6 @@
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::Limb;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use std::mem::swap;
 use std::ops::{BitXor, BitXorAssign};
 

@@ -1,7 +1,7 @@
-use num::arithmetic::traits::XXXXAddYYYYToZZZZ;
-use num::basic::integers::PrimitiveInt;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
+use crate::num::arithmetic::traits::XXXXAddYYYYToZZZZ;
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::WrappingFrom;
 
 #[allow(clippy::too_many_arguments)]
 fn xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(

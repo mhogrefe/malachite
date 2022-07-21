@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::ExactFrom;
-use rounding_modes::RoundingMode;
+use crate::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
+use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
 fn round_to_multiple_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> T {

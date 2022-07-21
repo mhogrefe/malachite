@@ -1,5 +1,5 @@
-use num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 pub_test! {floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);

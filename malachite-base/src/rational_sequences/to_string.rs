@@ -1,4 +1,4 @@
-use rational_sequences::RationalSequence;
+use crate::rational_sequences::RationalSequence;
 use std::fmt::{Debug, Display, Formatter, Result, Write};
 
 impl<T: Display + Eq> Display for RationalSequence<T> {

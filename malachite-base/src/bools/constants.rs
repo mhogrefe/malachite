@@ -1,5 +1,5 @@
-use comparison::traits::{Max, Min};
-use named::Named;
+use crate::comparison::traits::{Max, Min};
+use crate::named::Named;
 
 impl Min for bool {
     /// The minimum value of a [`bool`]: `false`.

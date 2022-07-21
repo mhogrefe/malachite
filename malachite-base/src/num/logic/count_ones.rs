@@ -1,4 +1,4 @@
-use num::logic::traits::CountOnes;
+use crate::num::logic::traits::CountOnes;
 
 macro_rules! impl_count_ones {
     ($t:ident) => {

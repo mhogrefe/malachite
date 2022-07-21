@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
-use Rational;
+use crate::Rational;
 
 fn shr_unsigned_assign<T>(x: &mut Rational, bits: T)
 where

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{DivExact, DivExactAssign};
+use crate::num::arithmetic::traits::{DivExact, DivExactAssign};
 
 macro_rules! impl_div_exact {
     ($t:ident) => {

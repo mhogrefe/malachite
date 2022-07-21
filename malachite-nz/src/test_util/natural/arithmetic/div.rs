@@ -4,11 +4,11 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
-use natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use natural::arithmetic::div::div_by_preinversion;
-use natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use platform::{DoubleLimb, Limb};
+use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use crate::natural::arithmetic::div::div_by_preinversion;
+use crate::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::platform::{DoubleLimb, Limb};
 
 // The high bit of `d` must be set.
 //

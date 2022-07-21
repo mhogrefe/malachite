@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::ReciprocalAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 pub fn from_continued_fraction_alt(floor: Integer, xs: Vec<Natural>) -> Rational {
     if xs.is_empty() {

@@ -1,5 +1,5 @@
-use natural::Natural;
-use test_util::natural::logic::{natural_op_bits, natural_op_limbs};
+use crate::natural::Natural;
+use crate::test_util::natural::logic::{natural_op_bits, natural_op_limbs};
 
 pub fn natural_and_alt_1(x: &Natural, y: &Natural) -> Natural {
     natural_op_bits(&|a, b| a && b, x, y)

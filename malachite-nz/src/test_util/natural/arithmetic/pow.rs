@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::SquareAssign;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::BitIterable;
-use natural::Natural;
+use crate::natural::Natural;
 
 pub fn natural_pow_naive(n: &Natural, exp: u64) -> Natural {
     let mut result = Natural::ONE;

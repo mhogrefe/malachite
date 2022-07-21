@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,
 };
@@ -6,16 +6,16 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-use natural::arithmetic::div_mod::limbs_div_mod_to_out;
-use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
-use natural::arithmetic::kronecker_symbol::{
+use crate::natural::arithmetic::div_mod::limbs_div_mod_to_out;
+use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
+use crate::natural::arithmetic::kronecker_symbol::{
     limbs_jacobi_symbol_init, limbs_jacobi_symbol_same_length,
 };
-use natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
-use natural::arithmetic::shr::limbs_shr_to_out;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
+use crate::natural::arithmetic::shr::limbs_shr_to_out;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use std::mem::swap;
 
 // # Worst-case complexity

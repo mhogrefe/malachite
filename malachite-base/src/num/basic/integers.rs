@@ -1,6 +1,6 @@
-use comparison::traits::{Max, Min};
-use named::Named;
-use num::arithmetic::traits::{
+use crate::comparison::traits::{Max, Min};
+use crate::named::Named;
+use crate::num::arithmetic::traits::{
     AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CeilingRoot,
     CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul, CheckedDiv,
     CheckedMul, CheckedNeg, CheckedPow, CheckedRoot, CheckedSqrt, CheckedSquare, CheckedSub,
@@ -23,18 +23,18 @@ use num::arithmetic::traits::{
     WrappingSquare, WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
     WrappingSubMulAssign,
 };
-use num::basic::traits::{Iverson, One, Two, Zero};
-use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
-use num::conversion::traits::{
+use crate::num::basic::traits::{Iverson, One, Two, Zero};
+use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
+use crate::num::conversion::traits::{
     CheckedFrom, CheckedInto, ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase,
     IsInteger, OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom,
     SaturatingInto, ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
-use num::logic::traits::{
+use crate::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
     LeadingZeros, LowMask, NotAssign, SignificantBits, TrailingZeros,
 };
-use num::random::HasRandomPrimitiveInts;
+use crate::num::random::HasRandomPrimitiveInts;
 use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
 use std::hash::Hash;
 use std::iter::{Product, Sum};

@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{OverflowingAbs, OverflowingAbsAssign};
+use crate::num::arithmetic::traits::{OverflowingAbs, OverflowingAbsAssign};
 
 macro_rules! impl_overflowing_abs {
     ($t:ident) => {

@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign, UnsignedAbs,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn overflowing_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, bool) {
     let (product, overflow_1) = y.overflowing_mul(z);

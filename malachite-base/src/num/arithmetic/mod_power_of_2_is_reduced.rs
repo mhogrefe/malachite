@@ -1,5 +1,5 @@
-use num::arithmetic::traits::ModPowerOf2IsReduced;
-use num::logic::traits::SignificantBits;
+use crate::num::arithmetic::traits::ModPowerOf2IsReduced;
+use crate::num::logic::traits::SignificantBits;
 
 macro_rules! impl_mod_power_of_2_is_reduced {
     ($t:ident) => {

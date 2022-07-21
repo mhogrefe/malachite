@@ -1,10 +1,10 @@
-use num::arithmetic::traits::{
+use crate::num::arithmetic::traits::{
     CeilingModPowerOf2, CeilingModPowerOf2Assign, ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2,
     NegModPowerOf2Assign, RemPowerOf2, RemPowerOf2Assign,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 

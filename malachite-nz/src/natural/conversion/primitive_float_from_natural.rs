@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::{
     SciMantissaAndExponent, WrappingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
+use crate::natural::Natural;
 
 macro_rules! float_impls {
     ($f: ident) => {

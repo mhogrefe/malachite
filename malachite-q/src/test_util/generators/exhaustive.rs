@@ -1,4 +1,4 @@
-use exhaustive::{
+use crate::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
 };
@@ -37,12 +37,12 @@ use malachite_nz::natural::exhaustive::{
 };
 use malachite_nz::natural::Natural;
 use std::ops::Shr;
-use test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use test_util::extra_variadic::{
+use crate::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_xxyz, exhaustive_triples_from_single,
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
-use Rational;
+use crate::Rational;
 
 // -- Rational --
 

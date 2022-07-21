@@ -1,5 +1,5 @@
-use integer::Integer;
-use natural::Natural;
+use crate::integer::Integer;
+use crate::natural::Natural;
 
 impl Integer {
     /// Converts a sign and a [`Natural`] to an [`Integer`], taking the [`Natural`] by value. The

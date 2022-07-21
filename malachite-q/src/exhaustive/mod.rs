@@ -11,7 +11,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::iter::{once, Chain, Once};
 use std::mem::swap;
-use Rational;
+use crate::Rational;
 
 /// Generates all positive [`Rational`]s.
 ///

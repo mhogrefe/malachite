@@ -1,6 +1,6 @@
-use orderings::ORDERINGS;
-use random::Seed;
-use slices::{random_values_from_slice, RandomValuesFromSlice};
+use crate::orderings::ORDERINGS;
+use crate::random::Seed;
+use crate::slices::{random_values_from_slice, RandomValuesFromSlice};
 use std::cmp::Ordering;
 use std::iter::Cloned;
 

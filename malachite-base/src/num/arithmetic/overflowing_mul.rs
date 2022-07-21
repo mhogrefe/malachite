@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{OverflowingMul, OverflowingMulAssign};
+use crate::num::arithmetic::traits::{OverflowingMul, OverflowingMulAssign};
 
 macro_rules! impl_overflowing_mul {
     ($t:ident) => {

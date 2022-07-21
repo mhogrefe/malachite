@@ -1,4 +1,4 @@
-use extra_variadic::exhaustive_vecs_length_3;
+use crate::extra_variadic::exhaustive_vecs_length_3;
 use itertools::Itertools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;

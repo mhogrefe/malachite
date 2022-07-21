@@ -1,10 +1,10 @@
-use num::arithmetic::traits::DivisibleBy;
-use num::basic::traits::Zero;
-use num::conversion::traits::ExactFrom;
-use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::num::arithmetic::traits::DivisibleBy;
+use crate::num::basic::traits::Zero;
+use crate::num::conversion::traits::ExactFrom;
+use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use rand::prelude::SliceRandom;
 use rand_chacha::ChaCha20Rng;
-use random::Seed;
+use crate::random::Seed;
 
 /// Sets all values in a slice to 0.
 ///

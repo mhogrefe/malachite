@@ -1,5 +1,5 @@
-use bools::random::{weighted_random_bools, WeightedRandomBools};
-use random::Seed;
+use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::random::Seed;
 
 /// Generates random [`Option`]s except `None`, with values from a given random iterator.
 ///

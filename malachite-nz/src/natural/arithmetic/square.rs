@@ -7,37 +7,37 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::{limbs_mul_greater_to_out_fft, SQR_FFT_MODF_THRESHOLD};
-use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
-use natural::arithmetic::mul::poly_eval::{
+use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use crate::natural::arithmetic::mul::fft::{limbs_mul_greater_to_out_fft, SQR_FFT_MODF_THRESHOLD};
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use crate::natural::arithmetic::mul::poly_eval::{
     limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2, limbs_mul_toom_evaluate_poly_in_1_and_neg_1,
     limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
     limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
     limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
-use natural::arithmetic::mul::poly_interpolate::{
+use crate::natural::arithmetic::mul::poly_interpolate::{
     limbs_mul_toom_interpolate_12_points, limbs_mul_toom_interpolate_16_points,
     limbs_mul_toom_interpolate_5_points, limbs_mul_toom_interpolate_7_points,
 };
-use natural::arithmetic::mul::toom::{
+use crate::natural::arithmetic::mul::toom::{
     limbs_toom_couple_handling, BIT_CORRECTION, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY,
 };
-use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
-use platform::{
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::{
     DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };

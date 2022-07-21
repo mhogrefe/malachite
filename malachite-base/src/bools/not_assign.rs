@@ -1,4 +1,4 @@
-use num::logic::traits::NotAssign;
+use crate::num::logic::traits::NotAssign;
 
 impl NotAssign for bool {
     /// Replaces a [`bool`] by its opposite.

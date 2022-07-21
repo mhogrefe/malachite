@@ -1,5 +1,5 @@
-use integer::Integer;
-use natural::Natural;
+use crate::integer::Integer;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrd<Natural> for Integer {

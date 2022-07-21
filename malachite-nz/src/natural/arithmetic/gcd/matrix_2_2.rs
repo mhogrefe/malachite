@@ -1,14 +1,14 @@
 use malachite_base::num::basic::traits::Iverson;
-use natural::arithmetic::add::{
+use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::sub::{
+use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out,
 };
-use natural::comparison::cmp::limbs_cmp_same_length;
-use platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
+use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
 use std::cmp::Ordering;
 
 // # Worst-case complexity

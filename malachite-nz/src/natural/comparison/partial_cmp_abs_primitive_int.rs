@@ -1,5 +1,5 @@
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use natural::Natural;
+use crate::natural::Natural;
 use std::cmp::Ordering;
 
 macro_rules! impl_unsigned {

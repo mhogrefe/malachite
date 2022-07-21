@@ -1,4 +1,4 @@
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::num::logic::traits::SignificantBits;
 
 impl<'a> SignificantBits for &'a Integer {

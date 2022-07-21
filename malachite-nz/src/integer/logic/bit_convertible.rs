@@ -1,13 +1,13 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use integer::Integer;
+use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::integer::Integer;
 use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitConvertible, LowMask, NotAssign};
-use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::Natural;
-use platform::{Limb, SignedLimb};
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::Natural;
+use crate::platform::{Limb, SignedLimb};
 
 // Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
 // significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s

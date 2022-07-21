@@ -1,9 +1,9 @@
-use integer::logic::bit_access::limbs_vec_clear_bit_neg;
-use integer::random::{
+use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use crate::integer::random::{
     striped_random_integers, striped_random_natural_integers, striped_random_negative_integers,
     striped_random_nonzero_integers, StripedRandomIntegers,
 };
-use integer::Integer;
+use crate::integer::Integer;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
@@ -61,20 +61,20 @@ use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
 use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
-use natural::arithmetic::div_exact::{limbs_modular_invert_limb, limbs_modular_invert_scratch_len};
-use natural::arithmetic::div_mod::{
+use crate::natural::arithmetic::div_exact::{limbs_modular_invert_limb, limbs_modular_invert_scratch_len};
+use crate::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
     limbs_two_limb_inverse_helper,
 };
-use natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
-use natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
-use natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use natural::arithmetic::mul::fft::*;
-use natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
-use natural::arithmetic::mul::limbs_mul;
-use natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
-use natural::arithmetic::mul::toom::{
+use crate::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
+use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
+use crate::natural::arithmetic::mul::fft::*;
+use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
+use crate::natural::arithmetic::mul::limbs_mul;
+use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
+use crate::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
     limbs_mul_greater_to_out_toom_33_input_sizes_valid,
@@ -89,43 +89,43 @@ use natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
-use natural::arithmetic::square::{
+use crate::natural::arithmetic::square::{
     limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_4_input_size_valid,
     limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_8_input_size_valid,
 };
-use natural::conversion::digits::general_digits::{
+use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
-use natural::random::{
+use crate::natural::random::{
     get_striped_random_natural_with_up_to_bits, striped_random_natural_range,
     striped_random_natural_range_to_infinity, striped_random_naturals,
     striped_random_positive_naturals, StripedRandomNaturalInclusiveRange,
     StripedRandomNaturalRangeToInfinity, StripedRandomNaturals,
 };
-use natural::Natural;
-use platform::{Limb, SQR_TOOM2_THRESHOLD};
+use crate::natural::Natural;
+use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use std::cmp::{max, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
-use test_util::common::{
+use crate::test_util::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
-use test_util::extra_variadic::{
+use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
     random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
     random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
     random_triples_xyx, random_triples_xyy,
 };
-use test_util::generators::exhaustive::{
+use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
     gcd_input_filter, large_type_filter_map_1, limbs_eq_mod_map, limbs_significant_bits_helper,
     map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
     round_to_multiple_natural_filter_map,
 };
-use test_util::generators::{factors_of_limb_max, T8};
-use test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
+use crate::test_util::generators::{factors_of_limb_max, T8};
+use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 
 // -- Integer --
 

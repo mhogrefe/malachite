@@ -1,11 +1,11 @@
-use bools::random::{weighted_random_bools, WeightedRandomBools};
+use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
 use itertools::Itertools;
-use num::basic::traits::Zero;
-use random::Seed;
+use crate::num::basic::traits::Zero;
+use crate::random::Seed;
 use std::collections::{HashSet, VecDeque};
 use std::fmt::Display;
 use std::hash::Hash;
-use vecs::{random_values_from_vec, RandomValuesFromVec};
+use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Generates all the nonzero values of a provided iterator.
 ///

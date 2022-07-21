@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
-use Rational;
+use crate::Rational;
 
 impl PowerOf2<u64> for Rational {
     /// Raises 2 to an integer power.

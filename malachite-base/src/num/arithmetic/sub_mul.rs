@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{SubMul, SubMulAssign, WrappingSubMul, WrappingSubMulAssign};
+use crate::num::arithmetic::traits::{SubMul, SubMulAssign, WrappingSubMul, WrappingSubMulAssign};
 
 macro_rules! impl_sub_mul_primitive_int {
     ($t:ident) => {

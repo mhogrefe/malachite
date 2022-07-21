@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use itertools::Itertools;
 use std::str::FromStr;
-use test_util::generators::common::{GenConfig, GenMode};
+use crate::test_util::generators::common::{GenConfig, GenMode};
 
 #[derive(Clone, Debug)]
 pub struct CommandLineArguments {
