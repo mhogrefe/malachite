@@ -1,5 +1,5 @@
-use malachite_nz::natural::Natural;
 use crate::Rational;
+use malachite_nz::natural::Natural;
 
 /// Replaces a number with the closest [`Rational`] whose denominator does not exceed the specified
 /// maximum.
@@ -29,4 +29,12 @@ pub trait SimplestRationalInInterval {
     /// the one whose numerator is closer to zero is simpler. Finally, if $q > 0$, then $q$ is
     /// simpler than $-q$.
     fn simplest_rational_in_closed_interval(x: &Self, y: &Self) -> Rational;
+}
+
+// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a closed
+// interval.
+pub trait DenominatorsInClosedInterval<'a, 'b> {
+    type Denominators: Iterator<Item=Natural>;
+
+    fn denominators_in_closed_interval(a: &'a Rational, b: &'b Rational) -> Self::Denominators;
 }
