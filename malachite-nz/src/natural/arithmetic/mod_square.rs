@@ -1,6 +1,6 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign, ModSquare, ModSquareAssign};
 use malachite_base::num::basic::traits::Two;
-use crate::natural::Natural;
 
 impl ModSquare<Natural> for Natural {
     type Output = Natural;

@@ -1,3 +1,6 @@
+use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use crate::natural::logic::bit_access::limbs_slice_set_bit;
+use crate::natural::Natural;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, PowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
@@ -16,9 +19,6 @@ use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitS
 use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
-use crate::natural::logic::bit_access::limbs_slice_set_bit;
-use crate::natural::Natural;
 
 /// Generates a random [`Natural`] with a given maximum bit length.
 ///

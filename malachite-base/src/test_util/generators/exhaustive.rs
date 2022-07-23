@@ -4,7 +4,6 @@ use crate::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
 use crate::comparison::traits::Min;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
-use itertools::{repeat_n, Itertools};
 use crate::max;
 use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
@@ -39,10 +38,6 @@ use crate::rational_sequences::RationalSequence;
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::rounding_modes::RoundingMode;
 use crate::slices::slice_test_zero;
-use std::cmp::{max, min};
-use std::iter::{once, Chain, Once};
-use std::marker::PhantomData;
-use std::vec::IntoIter;
 use crate::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use crate::strings::{strings_from_char_vecs, StringsFromCharVecs};
 use crate::test_util::extra_variadic::{
@@ -82,6 +77,11 @@ use crate::vecs::exhaustive::{
     shortlex_vecs_min_length, ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs,
     LexFixedLengthVecsFromSingle, ShortlexVecs,
 };
+use itertools::{repeat_n, Itertools};
+use std::cmp::{max, min};
+use std::iter::{once, Chain, Once};
+use std::marker::PhantomData;
+use std::vec::IntoIter;
 
 // general
 

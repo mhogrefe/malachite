@@ -1,3 +1,4 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
@@ -6,7 +7,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
-use crate::Rational;
 
 impl Rational {
     /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by

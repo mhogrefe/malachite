@@ -1,8 +1,8 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 impl From<Integer> for Rational {
     /// Converts an [`Integer`](malachite_nz::integer::Integer) to a [`Rational`], taking the

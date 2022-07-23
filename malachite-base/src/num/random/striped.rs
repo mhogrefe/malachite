@@ -1,6 +1,5 @@
 use crate::bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
 use crate::iterators::{nonzero_values, NonzeroValues};
-use itertools::Itertools;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -13,6 +12,7 @@ use crate::num::random::{
     RandomUnsignedRange,
 };
 use crate::random::Seed;
+use itertools::Itertools;
 use std::iter::{repeat, Repeat};
 use std::marker::PhantomData;
 

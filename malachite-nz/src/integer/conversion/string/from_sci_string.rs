@@ -1,10 +1,10 @@
 use crate::integer::Integer;
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::string::options::FromSciStringOptions;
-use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 use crate::natural::conversion::string::from_sci_string::{
     from_sci_string_with_options_helper, FromSciStringHelper,
 };
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::string::options::FromSciStringOptions;
+use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 
 impl FromSciStringHelper for Integer {
     fn parse_int(mut cs: &[u8], base: u8) -> Option<Integer> {

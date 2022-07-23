@@ -1,5 +1,5 @@
-use malachite_nz::natural::Natural;
 use crate::Rational;
+use malachite_nz::natural::Natural;
 
 impl Rational {
     /// Extracts the numerator of a [`Rational`], taking the [`Rational`] by reference and cloning.

@@ -1,10 +1,3 @@
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::slice_set_zero;
-use malachite_base::vecs::vec_delete_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
@@ -12,6 +5,13 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_set_zero;
+use malachite_base::vecs::vec_delete_left;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs obtained by taking a slice of bits beginning at index `start` of the input slice and

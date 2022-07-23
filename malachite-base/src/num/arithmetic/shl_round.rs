@@ -1,4 +1,6 @@
-use crate::num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs};
+use crate::num::arithmetic::traits::{
+    ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
+};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::rounding_modes::RoundingMode;

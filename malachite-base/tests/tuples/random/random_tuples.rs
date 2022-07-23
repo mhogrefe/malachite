@@ -1,5 +1,5 @@
-use core::hash::Hash;
 use crate::extra_variadic::{random_triples, random_triples_from_single};
+use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::random::random_ascii_chars;

@@ -4,10 +4,10 @@ use crate::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul_limb_in_place_left,
 };
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 
 impl Natural {
     // self - b * c, returns sign (true means non-negative)

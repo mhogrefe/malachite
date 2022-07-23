@@ -1,8 +1,8 @@
-use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::slices::slice_set_zero;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::slices::slice_set_zero;
 use std::cmp::Ordering;
 use std::mem::swap;
 use std::ops::{BitAnd, BitAndAssign};

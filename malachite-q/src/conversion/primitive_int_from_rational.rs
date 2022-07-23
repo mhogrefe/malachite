@@ -1,3 +1,4 @@
+use crate::Rational;
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{DivRound, DivisibleByPowerOf2};
@@ -11,7 +12,6 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::ops::Neg;
-use crate::Rational;
 
 fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(x: &'a Rational) -> Option<T> {
     if x.sign && x.denominator == 1u32 {

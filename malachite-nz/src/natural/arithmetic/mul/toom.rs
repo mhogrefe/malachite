@@ -1,13 +1,3 @@
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::num::logic::traits::NotAssign;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::{slice_set_zero, slice_test_zero};
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_to_out, limbs_add_to_out_aliased,
@@ -47,6 +37,16 @@ use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::{slice_set_zero, slice_test_zero};
 use std::cmp::Ordering;
 
 //TODO tune

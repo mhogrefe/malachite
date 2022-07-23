@@ -1,7 +1,7 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::ModMulAssign;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitIterable;
-use crate::natural::Natural;
 
 pub fn simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
     if *m == 1 {

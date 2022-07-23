@@ -1,11 +1,3 @@
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::slices::slice_set_zero;
 use crate::natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -29,6 +21,14 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::logic::not::limbs_not_to_out;
 use crate::platform::{Limb, SQR_TOOM3_THRESHOLD};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_set_zero;
 use std::cmp::{max, Ordering};
 
 //TODO double check this

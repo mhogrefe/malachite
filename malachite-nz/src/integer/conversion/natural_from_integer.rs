@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
-use crate::natural::Natural;
 
 impl CheckedFrom<Integer> for Natural {
     /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by value. If the

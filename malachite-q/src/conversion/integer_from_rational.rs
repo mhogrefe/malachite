@@ -1,8 +1,8 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use crate::Rational;
 
 impl CheckedFrom<Rational> for Integer {
     /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), taking the

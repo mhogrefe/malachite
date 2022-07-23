@@ -1,10 +1,10 @@
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
 // lowest index greater than or equal to `start` at which the `Natural` has a `false` bit.

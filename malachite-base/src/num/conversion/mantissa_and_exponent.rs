@@ -1,4 +1,6 @@
-use crate::num::arithmetic::traits::{ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound};
+use crate::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound,
+};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;

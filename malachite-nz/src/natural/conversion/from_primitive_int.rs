@@ -1,10 +1,10 @@
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, SaturatingFrom, VecFromOtherType,
 };
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 macro_rules! impl_from_limb {
     ($t: ident) => {

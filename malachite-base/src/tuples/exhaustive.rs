@@ -3,14 +3,14 @@ use crate::iterators::iterator_cache::IteratorCache;
 use crate::num::arithmetic::traits::CheckedPow;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
+use crate::vecs::exhaustive::{
+    fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
+};
 use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
 use std::mem::swap;
-use crate::vecs::exhaustive::{
-    fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
-};
 
 /// Generates the only unit: `()`.
 ///

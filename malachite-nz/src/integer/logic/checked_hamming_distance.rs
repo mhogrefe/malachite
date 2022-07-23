@@ -1,14 +1,14 @@
 use crate::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use crate::integer::Integer;
-use malachite_base::num::logic::traits::{
-    CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
-};
-use malachite_base::slices::slice_leading_zeros;
 use crate::natural::logic::count_ones::limbs_count_ones;
 use crate::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::logic::traits::{
+    CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
+};
+use malachite_base::slices::slice_leading_zeros;
 use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the

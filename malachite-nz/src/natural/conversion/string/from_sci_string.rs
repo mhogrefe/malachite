@@ -1,3 +1,4 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{CheckedSub, Parity, Pow};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::string::from_sci_string::{
@@ -6,7 +7,6 @@ use malachite_base::num::conversion::string::from_sci_string::{
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{CheckedFrom, FromSciString, FromStringBase};
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::Natural;
 use std::cmp::Ordering;
 use std::ops::Mul;
 

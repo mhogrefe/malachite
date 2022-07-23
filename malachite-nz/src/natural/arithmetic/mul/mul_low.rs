@@ -1,4 +1,3 @@
-use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -6,12 +5,15 @@ use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in
 use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
-use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
+};
 use crate::platform::Limb;
 use crate::platform::{
     MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD, MUL_FFT_THRESHOLD,
     MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 
 // # Worst-case complexity
 // $T(n) = O(n^2)$

@@ -1,12 +1,12 @@
 use crate::integer::Integer;
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::slices::slice_leading_zeros;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_leading_zeros;
 
 // Given the limbs of the absolute value of an `Integer`, in ascending order, returns the two's
 // complement limbs. The input limbs should not be all zero.

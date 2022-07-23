@@ -2,10 +2,10 @@ use crate::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement, limbs_twos_complement_in_place,
 };
 use crate::integer::Integer;
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 
 impl Integer {
     /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that

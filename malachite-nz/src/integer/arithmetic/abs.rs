@@ -1,6 +1,6 @@
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use crate::natural::Natural;
+use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 
 impl Abs for Integer {
     type Output = Integer;

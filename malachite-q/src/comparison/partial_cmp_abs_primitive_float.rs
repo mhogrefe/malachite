@@ -1,7 +1,7 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
-use crate::Rational;
 
 macro_rules! impl_float {
     ($t: ident) => {

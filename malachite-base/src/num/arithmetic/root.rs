@@ -9,7 +9,9 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::{RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom};
+use crate::num::conversion::traits::{
+    RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom,
+};
 use crate::num::logic::traits::{LowMask, SignificantBits};
 use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;

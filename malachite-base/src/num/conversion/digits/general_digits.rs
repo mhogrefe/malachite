@@ -1,8 +1,8 @@
-use itertools::Itertools;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
 };
+use itertools::Itertools;
 
 pub_test! {unsigned_to_digits_asc_naive<
     T: ExactFrom<U> + PrimitiveUnsigned,

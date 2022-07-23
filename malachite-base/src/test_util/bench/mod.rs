@@ -1,10 +1,10 @@
-use gnuplot::{AxesCommon, Caption, Color, Figure};
-use itertools::Itertools;
 use crate::num::arithmetic::traits::Parity;
 use crate::num::conversion::traits::ExactFrom;
+use crate::test_util::bench::bucketers::Bucketer;
+use gnuplot::{AxesCommon, Caption, Color, Figure};
+use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap};
 use std::iter::Iterator;
-use crate::test_util::bench::bucketers::Bucketer;
 use time::precise_time_ns;
 
 fn escape_label_string(s: &str) -> String {

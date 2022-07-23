@@ -1,3 +1,12 @@
+use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
+use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
+use crate::natural::arithmetic::shr::{
+    limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
+};
+use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -6,13 +15,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
-use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
-use crate::natural::arithmetic::shr::{limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place};
-use crate::natural::logic::bit_access::limbs_get_bit;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 use std::ops::{Shl, ShlAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the

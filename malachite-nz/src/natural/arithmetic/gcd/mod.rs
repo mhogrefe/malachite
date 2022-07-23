@@ -1,8 +1,3 @@
-use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::slices::slice_leading_zeros;
 use crate::natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use crate::natural::arithmetic::gcd::half_gcd::limbs_gcd_reduced;
 use crate::natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
@@ -11,6 +6,11 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::slice_leading_zeros;
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 

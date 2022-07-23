@@ -1,9 +1,9 @@
 use crate::num::arithmetic::traits::Parity;
 use crate::num::random::geometric::SimpleRational;
 use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::random::Seed;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
-use crate::random::Seed;
 
 /// Uniformly generates random [`bool`]s.
 ///

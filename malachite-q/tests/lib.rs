@@ -50,6 +50,7 @@ pub mod arithmetic {
     pub mod add;
     pub mod approximate;
     pub mod ceiling;
+    pub mod denominators_in_closed_interval;
     pub mod div;
     pub mod floor;
     pub mod is_power_of_2;

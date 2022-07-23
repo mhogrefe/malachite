@@ -1,17 +1,10 @@
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
-use malachite_base::num::logic::traits::{LeadingZeros, NotAssign, TrailingZeros};
-use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns};
+use crate::natural::arithmetic::div_mod::{
+    limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns,
+};
 use crate::natural::arithmetic::gcd::matrix_2_2::limbs_matrix_2_2_mul;
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use crate::natural::arithmetic::mul::mul_mod::{
@@ -26,6 +19,15 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{DoubleLimb, Limb};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
+use malachite_base::num::logic::traits::{LeadingZeros, NotAssign, TrailingZeros};
+use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 

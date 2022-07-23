@@ -1,6 +1,6 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
-use crate::natural::Natural;
 
 impl SaturatingSub<Natural> for Natural {
     type Output = Natural;

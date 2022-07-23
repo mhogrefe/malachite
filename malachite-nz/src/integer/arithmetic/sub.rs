@@ -1,9 +1,9 @@
 use crate::integer::Integer;
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
 

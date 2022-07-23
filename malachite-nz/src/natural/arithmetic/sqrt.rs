@@ -1,14 +1,3 @@
-use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
-use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::slice_test_zero;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_limb_in_place,
@@ -25,12 +14,25 @@ use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::square::limbs_square_to_out;
-use crate::natural::arithmetic::sub::{limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left};
+use crate::natural::arithmetic::sub::{
+    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+};
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
+use malachite_base::num::arithmetic::traits::{
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
+    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_test_zero;
 use std::cmp::Ordering;
 
 // Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].

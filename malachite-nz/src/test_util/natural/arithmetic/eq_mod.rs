@@ -1,11 +1,13 @@
-use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::slices::slice_trailing_zeros;
-use crate::natural::arithmetic::divisible_by::{limbs_divisible_by_limb, limbs_divisible_by_val_ref};
+use crate::natural::arithmetic::divisible_by::{
+    limbs_divisible_by_limb, limbs_divisible_by_val_ref,
+};
 use crate::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
 use crate::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use crate::natural::arithmetic::sub::{limbs_sub, limbs_sub_limb};
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::slices::slice_trailing_zeros;
 use std::cmp::Ordering;
 
 pub fn limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {

@@ -1,5 +1,5 @@
-use malachite_base::num::basic::traits::Zero;
 use crate::natural::Natural;
+use malachite_base::num::basic::traits::Zero;
 
 pub fn from_string_base_naive(small_base: u8, s: &str) -> Option<Natural> {
     let mut x = Natural::ZERO;

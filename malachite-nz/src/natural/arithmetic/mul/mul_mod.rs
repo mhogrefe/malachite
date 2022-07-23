@@ -1,10 +1,3 @@
-use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2, ShrRound};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::slice_test_zero;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -18,6 +11,13 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_with_borrow_in_in_place_right,
 };
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2, ShrRound};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_test_zero;
 use std::cmp::min;
 
 //TODO tune

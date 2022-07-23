@@ -1,6 +1,6 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Reciprocal, ReciprocalAssign};
 use std::mem::swap;
-use crate::Rational;
 
 impl Reciprocal for Rational {
     type Output = Rational;

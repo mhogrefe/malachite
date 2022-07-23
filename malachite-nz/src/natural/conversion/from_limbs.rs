@@ -1,7 +1,7 @@
-use malachite_base::num::basic::traits::Zero;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::traits::Zero;
 
 // # Worst-case complexity
 // $T(n) = O(n)$

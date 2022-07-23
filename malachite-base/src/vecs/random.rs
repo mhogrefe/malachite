@@ -12,11 +12,11 @@ use crate::sets::random::{
     random_b_tree_sets_fixed_length, random_b_tree_sets_from_length_iterator, RandomBTreeSets,
     RandomBTreeSetsFixedLength,
 };
+use crate::vecs::exhaustive::validate_oi_map;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::{repeat, Repeat};
-use crate::vecs::exhaustive::validate_oi_map;
 
 /// Generates random [`Vec`]s of a given length using elements from a single iterator.
 ///

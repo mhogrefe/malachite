@@ -1,4 +1,5 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::comparison::traits::Min;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, WrappingNeg};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -7,7 +8,6 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use crate::natural::Natural;
 use std::ops::Neg;
 
 fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -> Option<T> {

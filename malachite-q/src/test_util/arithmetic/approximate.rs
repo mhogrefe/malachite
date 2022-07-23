@@ -1,10 +1,10 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 // Slow! Only use for small `max_denominator`s
 pub fn approximate_naive(x: &Rational, max_denominator: &Natural) -> Rational {

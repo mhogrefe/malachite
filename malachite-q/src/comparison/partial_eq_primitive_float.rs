@@ -1,5 +1,5 @@
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
 use crate::Rational;
+use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
 
 macro_rules! impl_float {
     ($t: ident) => {

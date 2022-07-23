@@ -1,10 +1,4 @@
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::mod_power_of_2::{
     limbs_neg_mod_power_of_2, limbs_neg_mod_power_of_2_in_place,
     limbs_slice_mod_power_of_2_in_place,
@@ -19,6 +13,12 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode;
 use std::mem::swap;
 
 // # Worst-case complexity

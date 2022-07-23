@@ -1,9 +1,9 @@
 use crate::integer::Integer;
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 
 // Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
 // number of zeros in the binary expansion of the negative (two's complement) of the `Natural`.

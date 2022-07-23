@@ -1,6 +1,6 @@
+use crate::Rational;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 /// Returns a number's continued fraction.
 ///

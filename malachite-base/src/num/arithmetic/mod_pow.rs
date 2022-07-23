@@ -1,5 +1,7 @@
 use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
-use crate::num::arithmetic::traits::{ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign};
+use crate::num::arithmetic::traits::{
+    ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
+};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;

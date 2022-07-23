@@ -1,10 +1,10 @@
+use crate::natural::conversion::to_limbs::LimbIterator;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
-use crate::natural::conversion::to_limbs::LimbIterator;
-use crate::natural::Natural;
-use crate::platform::Limb;
 use std::ops::Index;
 
 /// A double-ended iterator over the bits of a [`Natural`].

@@ -1,9 +1,9 @@
-use malachite_base::num::arithmetic::traits::ModInverse;
-use malachite_base::num::basic::traits::One;
 use crate::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
 use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
+use malachite_base::num::arithmetic::traits::ModInverse;
+use malachite_base::num::basic::traits::One;
 
 fn mod_inverse_helper(x: Natural, m: Natural) -> Option<Natural> {
     let mut xs = x.into_limbs_asc();

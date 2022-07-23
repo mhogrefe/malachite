@@ -1,10 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::SplitInHalf;
-use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::slices::slice_trailing_zeros;
 use crate::natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use crate::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
@@ -19,6 +12,13 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::slice_trailing_zeros;
 use std::cmp::Ordering;
 
 // See the description for `limbs_mod_exact_odd_limb`. divisor must be odd.

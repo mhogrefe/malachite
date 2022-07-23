@@ -1,9 +1,9 @@
+use crate::natural::Natural;
+use crate::test_util::natural::arithmetic::sqrt::floor_inverse_binary;
 use malachite_base::num::arithmetic::traits::{DivRound, Pow, PowerOf2};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::Natural;
-use crate::test_util::natural::arithmetic::sqrt::floor_inverse_binary;
 
 pub fn floor_root_binary(x: &Natural, exp: u64) -> Natural {
     if exp == 0 {

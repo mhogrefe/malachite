@@ -1,12 +1,3 @@
-use malachite_base::fail_on_untested_path;
-#[cfg(feature = "test_build")]
-use malachite_base::num::arithmetic::traits::DivRem;
-use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
-use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::{slice_move_left, slice_set_zero};
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -37,6 +28,15 @@ use crate::natural::Natural;
 use crate::platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
 };
+use malachite_base::fail_on_untested_path;
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::slices::{slice_move_left, slice_set_zero};
 use std::cmp::Ordering;
 use std::iter::once;
 use std::mem::swap;

@@ -1,5 +1,5 @@
-use core::hash::Hash;
 use crate::extra_variadic::random_unique_triples;
+use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;

@@ -1,8 +1,8 @@
+use crate::natural::Natural;
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use crate::natural::Natural;
 
 pub fn from_bits_asc_naive<I: Iterator<Item = bool>>(bits: I) -> Natural {
     let mut n = Natural::ZERO;

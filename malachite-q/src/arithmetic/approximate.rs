@@ -1,4 +1,5 @@
 use crate::arithmetic::traits::{Approximate, ApproximateAssign};
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivMod, Floor, Parity, Reciprocal, ShrRound, UnsignedAbs,
 };
@@ -9,7 +10,6 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use crate::Rational;
 
 fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
     let floor = q.floor();

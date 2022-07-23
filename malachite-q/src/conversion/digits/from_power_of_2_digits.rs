@@ -1,8 +1,8 @@
+use crate::Rational;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 impl Rational {
     /// Converts base-$2^k$ digits to a [`Rational`]. The inputs are taken by value.

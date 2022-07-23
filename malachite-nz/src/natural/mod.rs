@@ -1,11 +1,11 @@
+use crate::natural::InnerNatural::{Large, Small};
+use crate::platform::Limb;
 #[cfg(feature = "doc-images")]
 use embed_doc_image::embed_doc_image;
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::platform::Limb;
 
 /// A natural (non-negative) integer.
 ///

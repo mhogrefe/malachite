@@ -1,11 +1,11 @@
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2Assign, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 // Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
 //

@@ -1,19 +1,7 @@
 use crate::integer::Integer;
-use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
-use malachite_base::rational_sequences::RationalSequence;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::test_util::generators::common::Generator;
-use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::Natural;
-use num::{BigInt, BigUint};
 use crate::platform::Limb;
-use std::ops::{Shl, Shr};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
@@ -25,6 +13,18 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
+use malachite_base::rational_sequences::RationalSequence;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::test_util::generators::common::Generator;
+use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
+use num::{BigInt, BigUint};
+use std::ops::{Shl, Shr};
 
 // -- Integer --
 

@@ -1,3 +1,15 @@
+use crate::random::RandomRationalsFromDoubleAndSign;
+use crate::random::{
+    striped_random_negative_rationals, striped_random_non_negative_rationals,
+    striped_random_nonzero_rationals, striped_random_positive_rationals, striped_random_rationals,
+};
+use crate::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use crate::test_util::extra_variadic::{
+    random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyy,
+};
+use crate::test_util::generators::round_to_multiple_rational_filter;
+use crate::Rational;
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -35,19 +47,7 @@ use malachite_nz::natural::random::{
     striped_random_positive_naturals,
 };
 use malachite_nz::natural::Natural;
-use crate::random::RandomRationalsFromDoubleAndSign;
-use crate::random::{
-    striped_random_negative_rationals, striped_random_non_negative_rationals,
-    striped_random_nonzero_rationals, striped_random_positive_rationals, striped_random_rationals,
-};
 use std::ops::Shr;
-use crate::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use crate::test_util::extra_variadic::{
-    random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
-    random_triples_from_single, random_triples_xxy, random_triples_xyy,
-};
-use crate::test_util::generators::round_to_multiple_rational_filter;
-use crate::Rational;
 
 // -- Rational --
 

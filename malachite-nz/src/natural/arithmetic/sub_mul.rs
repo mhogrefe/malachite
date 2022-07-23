@@ -1,13 +1,13 @@
-use malachite_base::num::arithmetic::traits::{
-    CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
-};
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::SplitInHalf;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use malachite_base::num::arithmetic::traits::{
+    CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
+};
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::SplitInHalf;
 use std::cmp::Ordering;
 use std::fmt::Display;
 

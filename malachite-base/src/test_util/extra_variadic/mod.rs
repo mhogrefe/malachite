@@ -5,10 +5,6 @@ use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
 use crate::num::random::{random_unsigned_range, RandomUnsignedRange};
 use crate::random::Seed;
-use std::cmp::max;
-use std::fmt::{self, Display, Formatter};
-use std::marker::PhantomData;
-use std::str::FromStr;
 use crate::tuples::exhaustive::clone_helper;
 use crate::tuples::random::next_helper;
 use crate::unions::UnionFromStrError;
@@ -16,6 +12,10 @@ use crate::{
     custom_tuples, exhaustive_tuples_1_input, exhaustive_unions, lex_custom_tuples, lex_tuples,
     random_custom_tuples, random_tuples, random_unions, union_struct,
 };
+use std::cmp::max;
+use std::fmt::{self, Display, Formatter};
+use std::marker::PhantomData;
+use std::str::FromStr;
 
 fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y, Z) {
     (a.unwrap(), b.unwrap(), c.unwrap())

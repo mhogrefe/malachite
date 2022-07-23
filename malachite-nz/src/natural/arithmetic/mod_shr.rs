@@ -1,10 +1,10 @@
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShr, ModShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Two, Zero};
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 

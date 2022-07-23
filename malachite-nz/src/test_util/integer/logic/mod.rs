@@ -1,6 +1,6 @@
 use crate::integer::Integer;
-use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use crate::platform::Limb;
+use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use std::iter::repeat;
 
 pub fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer) -> Integer {

@@ -1,4 +1,3 @@
-use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 use crate::natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
     limbs_sub_mul_limb_greater_in_place_left,
@@ -6,6 +5,7 @@ use crate::natural::arithmetic::sub_mul::{
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 
 macro_rules! large_left {
     ($a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {

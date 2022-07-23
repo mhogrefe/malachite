@@ -1,6 +1,6 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ModNeg, ModNegAssign};
 use malachite_base::num::basic::traits::Zero;
-use crate::natural::Natural;
 
 impl ModNeg<Natural> for Natural {
     type Output = Natural;

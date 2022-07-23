@@ -1,11 +1,11 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, FloorLogBasePowerOf2,
-};
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, FloorLogBasePowerOf2,
+};
 
 // Given the limbs of a `Natural`, returns the floor of its base-$2^p$ logarithm.
 //

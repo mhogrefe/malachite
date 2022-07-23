@@ -1,10 +1,10 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Ceiling, CeilingAssign, DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::mem::swap;
-use crate::Rational;
 
 impl Ceiling for Rational {
     type Output = Integer;

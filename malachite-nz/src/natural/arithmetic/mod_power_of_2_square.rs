@@ -1,10 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Square, ModPowerOf2SquareAssign, Parity, ShrRound, Square, WrappingSquare,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
@@ -26,6 +19,13 @@ use crate::platform::{
     DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQRLO_DC_THRESHOLD,
     SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOf2Square, ModPowerOf2SquareAssign, Parity, ShrRound, Square, WrappingSquare,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::rounding_modes::RoundingMode;
 
 // # Worst-case complexity
 // $T(n) = O(n)$

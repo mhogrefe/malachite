@@ -1,4 +1,6 @@
-use crate::num::arithmetic::traits::{OverflowingMulAssign, OverflowingSquare, OverflowingSquareAssign};
+use crate::num::arithmetic::traits::{
+    OverflowingMulAssign, OverflowingSquare, OverflowingSquareAssign,
+};
 
 macro_rules! impl_overflowing_square {
     ($t:ident) => {

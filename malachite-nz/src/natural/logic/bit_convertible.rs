@@ -1,12 +1,12 @@
+use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
+use crate::natural::Natural;
+use crate::platform::Limb;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
-use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 impl BitConvertible for Natural {
     /// Returns a [`Vec`] containing the bits of a [`Natural`] in ascending order: least- to

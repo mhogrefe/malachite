@@ -1,9 +1,9 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, Gcd, GcdAssign, NegAssign, UnsignedAbs,
 };
 use malachite_nz::integer::Integer;
 use std::ops::{Sub, SubAssign};
-use crate::Rational;
 
 impl Sub<Rational> for Rational {
     type Output = Rational;

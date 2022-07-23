@@ -1,6 +1,5 @@
 use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use crate::iterators::iterator_cache::IteratorCache;
-use itertools::{repeat_n, Itertools};
 use crate::num::arithmetic::traits::CheckedPow;
 use crate::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use crate::num::exhaustive::{
@@ -9,17 +8,18 @@ use crate::num::exhaustive::{
 };
 use crate::num::iterators::{ruler_sequence, RulerSequence};
 use crate::num::logic::traits::SignificantBits;
-use std::cmp::{max, min, Ordering};
-use std::iter::{empty, once, FromIterator, Once, Zip};
-use std::marker::PhantomData;
-use std::mem::swap;
-use std::ops::RangeFrom;
 use crate::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
     lex_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairs,
     ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };
 use crate::vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
+use itertools::{repeat_n, Itertools};
+use std::cmp::{max, min, Ordering};
+use std::iter::{empty, once, FromIterator, Once, Zip};
+use std::marker::PhantomData;
+use std::mem::swap;
+use std::ops::RangeFrom;
 
 #[doc(hidden)]
 pub fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {

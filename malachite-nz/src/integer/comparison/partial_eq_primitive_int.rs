@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use crate::natural::Natural;
 
 macro_rules! impl_unsigned {
     ($t: ident) => {

@@ -1,9 +1,9 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 use std::collections::HashMap;
-use crate::Rational;
 
 pub(crate) fn to_power_of_2_digits_helper(
     x: Rational,

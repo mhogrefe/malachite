@@ -1,5 +1,5 @@
-use core::hash::Hash;
 use crate::extra_variadic::random_vecs_length_3;
+use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::num::random::{random_primitive_ints, random_unsigned_range};

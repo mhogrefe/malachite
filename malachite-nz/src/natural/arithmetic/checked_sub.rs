@@ -1,5 +1,3 @@
-use malachite_base::num::arithmetic::traits::CheckedSub;
-use malachite_base::num::basic::traits::Zero;
 use crate::natural::arithmetic::sub::{
     limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_vec_sub_in_place_right,
@@ -7,6 +5,8 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::basic::traits::Zero;
 
 impl Natural {
     pub(crate) fn checked_sub_limb(mut self, other: Limb) -> Option<Natural> {

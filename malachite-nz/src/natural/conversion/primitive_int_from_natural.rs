@@ -1,10 +1,10 @@
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, FromOtherTypeSlice, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 macro_rules! impl_from_limb {
     ($u: ident, $s: ident) => {

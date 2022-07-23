@@ -1,8 +1,8 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{PowerOf2, ShrRound, Square};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::Natural;
 use std::cmp::Ordering;
 
 pub(crate) fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(

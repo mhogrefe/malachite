@@ -1,3 +1,4 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs,
 };
@@ -5,7 +6,6 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use crate::natural::Natural;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shl_unsigned_nz<T: PrimitiveUnsigned>(x: &Natural, bits: T, pow: u64) -> Natural

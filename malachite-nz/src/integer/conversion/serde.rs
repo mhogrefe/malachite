@@ -1,6 +1,6 @@
 use crate::integer::{Integer, SerdeInteger};
-use malachite_base::num::conversion::traits::FromStringBase;
 use crate::natural::Natural;
+use malachite_base::num::conversion::traits::FromStringBase;
 use std::convert::TryFrom;
 
 impl From<Integer> for SerdeInteger {

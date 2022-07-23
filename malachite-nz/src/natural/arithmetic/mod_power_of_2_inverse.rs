@@ -1,16 +1,16 @@
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2Inverse, Parity, ShrRound};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2Inverse, Parity, ShrRound};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode;
 
 // out should be just long enough for `pow` bits.
 // xs should have the same length as out.

@@ -1,5 +1,5 @@
-use malachite_nz::natural::Natural;
 use crate::Rational;
+use malachite_nz::natural::Natural;
 
 impl PartialEq<Natural> for Rational {
     /// Determines whether a [`Rational`] is equal to a

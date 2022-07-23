@@ -5,8 +5,6 @@ use crate::chars::random::{
 };
 use crate::comparison::traits::Min;
 use crate::iterators::with_special_value;
-use itertools::repeat_n;
-use itertools::Itertools;
 use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
@@ -53,10 +51,6 @@ use crate::rational_sequences::RationalSequence;
 use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
 use crate::rounding_modes::RoundingMode;
 use crate::slices::slice_test_zero;
-use std::cmp::{max, min, Ordering};
-use std::collections::HashMap;
-use std::marker::PhantomData;
-use std::mem::swap;
 use crate::strings::random::{random_strings, random_strings_using_chars};
 use crate::strings::strings_from_char_vecs;
 use crate::test_util::extra_variadic::{
@@ -69,7 +63,9 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::common::{
     reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
 };
-use crate::test_util::generators::exhaustive::{float_rounding_mode_filter_var_1, valid_digit_chars};
+use crate::test_util::generators::exhaustive::{
+    float_rounding_mode_filter_var_1, valid_digit_chars,
+};
 use crate::test_util::generators::{
     digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
     round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
@@ -87,6 +83,12 @@ use crate::vecs::random::{
     random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
+use itertools::repeat_n;
+use itertools::Itertools;
+use std::cmp::{max, min, Ordering};
+use std::collections::HashMap;
+use std::marker::PhantomData;
+use std::mem::swap;
 
 // -- bool --
 

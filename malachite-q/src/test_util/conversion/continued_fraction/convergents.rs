@@ -1,8 +1,8 @@
 use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
 use crate::conversion::traits::ContinuedFraction;
+use crate::Rational;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 #[derive(Clone, Debug)]
 pub struct ConvergentsAlt {

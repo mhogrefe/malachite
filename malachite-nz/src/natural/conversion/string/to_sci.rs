@@ -1,3 +1,7 @@
+use crate::natural::arithmetic::log_base::log_base_helper_with_pow;
+use crate::natural::conversion::string::to_string::BaseFmtWrapper;
+use crate::natural::slice_trailing_zeros;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, DivExact, DivRound, DivisibleBy, DivisibleByPowerOf2, FloorLogBase,
     FloorLogBasePowerOf2, Pow, ShrRound,
@@ -10,10 +14,6 @@ use malachite_base::num::conversion::string::to_string::{
 };
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::arithmetic::log_base::log_base_helper_with_pow;
-use crate::natural::conversion::string::to_string::BaseFmtWrapper;
-use crate::natural::slice_trailing_zeros;
-use crate::natural::Natural;
 use std::fmt::{Display, Formatter, Write};
 
 fn write_helper<T>(x: &T, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result

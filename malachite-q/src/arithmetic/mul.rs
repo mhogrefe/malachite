@@ -1,7 +1,7 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd};
 use malachite_base::num::basic::traits::Zero;
 use std::ops::{Mul, MulAssign};
-use crate::Rational;
 
 impl Mul<Rational> for Rational {
     type Output = Rational;

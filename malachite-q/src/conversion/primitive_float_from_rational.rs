@@ -1,3 +1,4 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     DivRound, DivisibleByPowerOf2, IsPowerOf2, NegAssign,
 };
@@ -8,7 +9,6 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use crate::Rational;
 
 fn abs_is_neg_power_of_2(x: &Rational) -> bool {
     x.numerator == 1u32 && x.denominator.is_power_of_2()

@@ -1,6 +1,6 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_nz::integer::Integer;
-use crate::Rational;
 
 pub fn sub_naive(x: Rational, y: Rational) -> Rational {
     let x_sign = x >= 0u32;

@@ -1,9 +1,9 @@
-use std::collections::{BTreeSet, HashSet};
-use std::hash::Hash;
 use crate::vecs::exhaustive::{
     ExhaustiveOrderedUniqueCollections, LexFixedLengthOrderedUniqueCollections,
     LexOrderedUniqueCollections, ShortlexOrderedUniqueCollections,
 };
+use std::collections::{BTreeSet, HashSet};
+use std::hash::Hash;
 
 /// Generates [`HashSet`]s of a given size with elements from a single iterator.
 ///

@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::logic::traits::LeadingZeros;
 use crate::natural::arithmetic::div_mod::limbs_invert_limb;
 use crate::natural::arithmetic::mod_op::mod_by_preinversion;
 use crate::platform::Limb;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::logic::traits::LeadingZeros;
 use rug::ops::RemRounding;
 
 pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {

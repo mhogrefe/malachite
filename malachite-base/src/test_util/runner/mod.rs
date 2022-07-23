@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::test_util::generators::common::{GenConfig, GenMode};
+use std::collections::HashMap;
 
 pub type DemoFn = &'static dyn Fn(GenMode, GenConfig, usize);
 pub type BenchFn = &'static dyn Fn(GenMode, GenConfig, usize, &str);

@@ -1,8 +1,8 @@
+use crate::strings::ToDebugString;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
-use crate::strings::ToDebugString;
 
 macro_rules! impl_common_values_map {
     ($CommonOrdered: ident, $StringTrait: ident, $to_string: ident, $common_values_map: ident) => {

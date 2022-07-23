@@ -1,6 +1,8 @@
 use crate::bools::exhaustive::exhaustive_bools;
 use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
-use crate::num::exhaustive::{exhaustive_negative_signeds, primitive_int_increasing_inclusive_range};
+use crate::num::exhaustive::{
+    exhaustive_negative_signeds, primitive_int_increasing_inclusive_range,
+};
 use crate::num::logic::traits::NotAssign;
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::rounding_modes::RoundingMode;

@@ -1,8 +1,8 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, DivMod, DivRound, NegAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::Natural;
 use std::mem::swap;
 
 pub fn extended_gcd_euclidean_natural(

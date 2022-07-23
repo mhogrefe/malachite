@@ -4,6 +4,71 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::Integer;
+use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
+use crate::natural::arithmetic::div_exact::{
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
+use crate::natural::arithmetic::div_mod::{
+    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
+};
+use crate::natural::arithmetic::eq_mod::{
+    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_ref_ref_ref,
+};
+use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
+use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
+use crate::natural::arithmetic::mul::fft::*;
+use crate::natural::arithmetic::mul::limb::{
+    limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+};
+use crate::natural::arithmetic::mul::limbs_mul;
+use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
+use crate::natural::arithmetic::mul::toom::{
+    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+};
+use crate::natural::arithmetic::square::{
+    limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_4_input_size_valid,
+    limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_8_input_size_valid,
+};
+use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
+use crate::natural::comparison::cmp::limbs_cmp;
+use crate::natural::conversion::digits::general_digits::{
+    limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
+};
+use crate::natural::exhaustive::{
+    exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
+    exhaustive_positive_naturals, ExhaustiveNaturalRange,
+};
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::Natural;
+use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
+use crate::test_util::common::{
+    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
+use crate::test_util::extra_variadic::{
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
+    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
+    exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
+};
+use crate::test_util::generators::factors_of_limb_max;
+use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -60,71 +125,10 @@ use malachite_base::vecs::exhaustive::{
     exhaustive_vecs_min_length, lex_vecs_fixed_length_from_single, ExhaustiveVecs,
     LexFixedLengthVecsFromSingle,
 };
-use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
-use crate::natural::arithmetic::div_exact::{limbs_modular_invert_limb, limbs_modular_invert_scratch_len};
-use crate::natural::arithmetic::div_mod::{
-    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
-    limbs_two_limb_inverse_helper,
-};
-use crate::natural::arithmetic::eq_mod::{
-    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
-    limbs_eq_mod_ref_ref_ref,
-};
-use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use crate::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
-use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
-use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::*;
-use crate::natural::arithmetic::mul::limb::{limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place};
-use crate::natural::arithmetic::mul::limbs_mul;
-use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
-use crate::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_32_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_42_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_43_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_52_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_53_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_54_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_62_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-};
-use crate::natural::arithmetic::square::{
-    limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_4_input_size_valid,
-    limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_8_input_size_valid,
-};
-use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
-use crate::natural::comparison::cmp::limbs_cmp;
-use crate::natural::conversion::digits::general_digits::{
-    limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
-};
-use crate::natural::exhaustive::{
-    exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
-    exhaustive_positive_naturals, ExhaustiveNaturalRange,
-};
-use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::Natural;
-use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use std::cmp::{max, Ordering};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
-use crate::test_util::common::{
-    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
-};
-use crate::test_util::extra_variadic::{
-    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
-    exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
-    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
-};
-use crate::test_util::generators::factors_of_limb_max;
-use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 
 // -- Integer --
 

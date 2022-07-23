@@ -1,14 +1,4 @@
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
-use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 use crate::natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -39,6 +29,16 @@ use crate::platform::{
     DoubleLimb, Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD,
     MU_BDIV_Q_THRESHOLD,
 };
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 

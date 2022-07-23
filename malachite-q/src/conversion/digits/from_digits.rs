@@ -1,9 +1,9 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, Pow};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
-use crate::Rational;
 
 impl Rational {
     /// Converts base-$b$ digits to a [`Rational`]. The inputs are taken by value.

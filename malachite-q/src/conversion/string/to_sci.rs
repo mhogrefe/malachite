@@ -1,4 +1,5 @@
 use crate::arithmetic::log_base::log_base_helper;
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     Abs, CheckedLogBase2, DivExact, DivExactAssign, DivRound, DivisibleBy, Pow, Sign,
 };
@@ -12,7 +13,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::{max, Ordering};
 use std::fmt::{Formatter, Write};
-use crate::Rational;
 
 const BASE_PRIME_FACTORS: [[(u8, u8); 3]; 37] = [
     [(0, 0), (0, 0), (0, 0)],

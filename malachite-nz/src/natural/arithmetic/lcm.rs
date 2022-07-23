@@ -1,6 +1,6 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Lcm, LcmAssign};
 use malachite_base::num::basic::traits::Zero;
-use crate::natural::Natural;
 
 impl Lcm<Natural> for Natural {
     type Output = Natural;

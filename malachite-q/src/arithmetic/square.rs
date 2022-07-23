@@ -1,5 +1,5 @@
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use crate::Rational;
+use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 
 impl Square for Rational {
     type Output = Rational;

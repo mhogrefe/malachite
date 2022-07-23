@@ -1,3 +1,4 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::RoundingFrom;
@@ -11,7 +12,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::iter::{once, Chain, Once};
 use std::mem::swap;
-use crate::Rational;
 
 /// Generates all positive [`Rational`]s.
 ///

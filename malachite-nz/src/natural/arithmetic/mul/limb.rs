@@ -1,9 +1,9 @@
-use malachite_base::num::arithmetic::traits::XMulYToZZ;
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::SplitInHalf;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use malachite_base::num::arithmetic::traits::XMulYToZZ;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::SplitInHalf;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the product of the `Natural` and a `Limb`.

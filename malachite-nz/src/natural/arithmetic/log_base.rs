@@ -1,3 +1,4 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
@@ -6,7 +7,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::Natural;
 use std::cmp::Ordering;
 
 impl Natural {

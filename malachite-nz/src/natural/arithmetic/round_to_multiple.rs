@@ -1,8 +1,8 @@
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
 use std::cmp::Ordering;
 
 impl RoundToMultiple<Natural> for Natural {

@@ -2,9 +2,9 @@ use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::traits::Zero;
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use crate::random::Seed;
 use rand::prelude::SliceRandom;
 use rand_chacha::ChaCha20Rng;
-use crate::random::Seed;
 
 /// Sets all values in a slice to 0.
 ///

@@ -1,5 +1,5 @@
-use malachite_base::num::basic::traits::Zero;
 use crate::Rational;
+use malachite_base::num::basic::traits::Zero;
 
 pub fn mul_naive(x: Rational, y: Rational) -> Rational {
     if x == 0u32 || y == 0u32 {

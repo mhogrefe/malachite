@@ -1,8 +1,8 @@
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::traits::Zero;
 use crate::num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
-use std::fmt::{Debug, Display, Formatter, Result, Write};
 use crate::vecs::vec_pad_left;
+use std::fmt::{Debug, Display, Formatter, Result, Write};
 
 /// A `struct` that allows for formatting a numeric type and rendering its digits in a specified
 /// base.

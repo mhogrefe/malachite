@@ -1,14 +1,14 @@
-use malachite_base::num::arithmetic::traits::{DivMod, Parity, XXSubYYToZZ};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
-use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::slice_test_zero;
 use crate::natural::arithmetic::gcd::half_gcd::{
     limbs_half_gcd_matrix_mul_matrix_1, limbs_half_gcd_matrix_update_q, HalfGcdMatrix,
     HalfGcdMatrix1,
 };
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use malachite_base::num::arithmetic::traits::{DivMod, Parity, XXSubYYToZZ};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::slices::slice_test_zero;
 
 pub fn gcd_euclidean_nz(x: Natural, y: Natural) -> Natural {
     if y == 0 {

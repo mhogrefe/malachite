@@ -6,8 +6,6 @@ use crate::chars::random::{
 };
 use crate::comparison::traits::Min;
 use crate::iterators::{with_special_value, NonzeroValues};
-use itertools::repeat_n;
-use itertools::Itertools;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -57,9 +55,6 @@ use crate::rational_sequences::RationalSequence;
 use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
 use crate::rounding_modes::RoundingMode;
 use crate::slices::slice_test_zero;
-use std::cmp::{max, min, Ordering};
-use std::collections::HashMap;
-use std::marker::PhantomData;
 use crate::strings::random::random_strings_using_chars;
 use crate::test_util::extra_variadic::{
     random_duodecuples_from_single, random_octuples_from_single, random_quadruples_from_single,
@@ -83,6 +78,11 @@ use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
 use crate::unions::random::random_union2s;
 use crate::unions::Union2;
+use itertools::repeat_n;
+use itertools::Itertools;
+use std::cmp::{max, min, Ordering};
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 // -- char --
 

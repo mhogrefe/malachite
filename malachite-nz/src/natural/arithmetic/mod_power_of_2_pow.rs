@@ -1,11 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Pow, ModPowerOf2PowAssign, PowerOf2, ShrRound,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::mod_pow::{get_bits, get_window_size};
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::limbs_square_low;
@@ -15,6 +7,14 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOf2Pow, ModPowerOf2PowAssign, PowerOf2, ShrRound,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::rounding_modes::RoundingMode;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
 //

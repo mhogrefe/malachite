@@ -1,8 +1,8 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, UnsignedAbs,
 };
-use crate::natural::Natural;
 
 impl FloorSqrt for Integer {
     type Output = Integer;

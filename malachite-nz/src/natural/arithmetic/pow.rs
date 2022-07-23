@@ -1,3 +1,15 @@
+use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
+use crate::natural::arithmetic::shr::limbs_shr_to_out;
+use crate::natural::arithmetic::square::limbs_square_to_out;
+#[cfg(feature = "test_build")]
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+#[cfg(feature = "test_build")]
+use crate::platform::DoubleLimb;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
     EqModPowerOf2, Parity, Pow, PowAssign, Square, SquareAssign,
 };
@@ -16,18 +28,6 @@ use malachite_base::num::logic::traits::{
 #[cfg(feature = "test_build")]
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_leading_zeros;
-use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
-use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
-use crate::natural::arithmetic::shr::limbs_shr_to_out;
-use crate::natural::arithmetic::square::limbs_square_to_out;
-#[cfg(feature = "test_build")]
-use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-#[cfg(feature = "test_build")]
-use crate::platform::DoubleLimb;
-use crate::platform::Limb;
 use std::mem::swap;
 
 /// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.

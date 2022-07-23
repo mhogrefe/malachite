@@ -1,9 +1,4 @@
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::{
-    AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
-};
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::slices::slice_test_zero;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mul::limb::{
     limbs_mul_limb_with_carry_to_out, limbs_slice_mul_limb_with_carry_in_place,
@@ -19,6 +14,11 @@ use crate::natural::arithmetic::sub_mul::{
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::slices::slice_test_zero;
 use std::cmp::Ordering;
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, returning the

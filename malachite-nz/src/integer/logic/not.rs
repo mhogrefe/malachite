@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
-use crate::natural::Natural;
 use std::ops::Not;
 
 impl Not for Integer {

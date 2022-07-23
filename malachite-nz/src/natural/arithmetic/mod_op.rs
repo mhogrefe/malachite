@@ -1,12 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, OverflowingAddAssign, Parity, PowerOf2,
-    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, Zero};
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
-use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::{slice_move_left, slice_set_zero};
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -40,6 +31,15 @@ use crate::platform::{
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
     MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use malachite_base::num::arithmetic::traits::{
+    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, OverflowingAddAssign, Parity, PowerOf2,
+    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{Iverson, Zero};
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::slices::{slice_move_left, slice_set_zero};
 use std::cmp::Ordering;
 use std::mem::swap;
 use std::ops::{Rem, RemAssign};

@@ -1,3 +1,11 @@
+use crate::test_util::generators::common::{
+    rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
+    rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm,
+};
+use crate::test_util::generators::exhaustive::*;
+use crate::test_util::generators::random::*;
+use crate::test_util::generators::special_random::*;
+use crate::Rational;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -10,14 +18,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::BigRational;
 use std::ops::Shr;
-use crate::test_util::generators::common::{
-    rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
-    rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm,
-};
-use crate::test_util::generators::exhaustive::*;
-use crate::test_util::generators::random::*;
-use crate::test_util::generators::special_random::*;
-use crate::Rational;
 
 // -- Rational --
 

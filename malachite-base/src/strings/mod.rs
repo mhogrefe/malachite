@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use crate::named::Named;
+use itertools::Itertools;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
 

@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use crate::num::arithmetic::traits::{SaturatingAbs, UnsignedAbs};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
@@ -6,13 +5,14 @@ use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::float::NiceFloat;
-use std::fmt::{self, Debug, Formatter};
 use crate::test_util::stats::common_values_map::common_values_map;
 use crate::test_util::stats::median;
 use crate::test_util::stats::median::{
     deleted_uniform_primitive_int_median, double_geometric_median, double_nonzero_geometric_median,
     truncated_geometric_median, uniform_bool_median, uniform_primitive_int_median,
 };
+use itertools::Itertools;
+use std::fmt::{self, Debug, Formatter};
 
 // Panics if the input exceeds the finite range of f64.
 pub trait CheckedToF64 {

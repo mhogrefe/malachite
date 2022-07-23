@@ -1,7 +1,7 @@
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2NegAssign, NegModPowerOf2, NegModPowerOf2Assign,
 };
-use crate::natural::Natural;
 
 impl ModPowerOf2Neg for Natural {
     type Output = Natural;

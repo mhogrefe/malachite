@@ -1,3 +1,4 @@
+use crate::num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 use itertools::Itertools;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
 use malachite_base::num::random::striped::striped_random_bool_vecs_from_length_iterator;
@@ -5,7 +6,6 @@ use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base::test_util::stats::median;
 use malachite_base::vecs::random_values_from_vec;
-use crate::num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 use std::iter::repeat;
 
 fn striped_random_bool_vecs_from_length_iterator_helper<I: Clone + Iterator<Item = u64>>(

@@ -1,10 +1,10 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase2, FloorLogBase2, IsPowerOf2,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::Ordering;
-use crate::Rational;
 
 impl Rational {
     pub(crate) fn floor_log_base_2_of_abs(&self) -> i64 {

@@ -1,3 +1,10 @@
+use crate::natural::conversion::digits::general_digits::{
+    limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
+};
+use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 #[cfg(feature = "test_build")]
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
@@ -11,13 +18,6 @@ use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, W
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use crate::natural::conversion::digits::general_digits::{
-    limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
-};
-use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 #[cfg(feature = "test_build")]
 use std::fmt::Write;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};

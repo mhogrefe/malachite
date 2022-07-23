@@ -1,9 +1,9 @@
 use crate::integer::Integer;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOf2, CeilingModPowerOf2Assign, ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2,
     NegModPowerOf2Assign, RemPowerOf2, RemPowerOf2Assign,
 };
-use crate::natural::Natural;
 
 impl ModPowerOf2 for Integer {
     type Output = Natural;

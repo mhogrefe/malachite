@@ -1,12 +1,3 @@
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
-    WrappingSubAssign, XMulYToZZ,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -41,6 +32,15 @@ use crate::platform::{
     DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
+    WrappingSubAssign, XMulYToZZ,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::{max, Ordering};
 
 // # Worst-case complexity

@@ -1,6 +1,6 @@
-use core::hash::Hash;
 use crate::extra_variadic::random_union3s;
 use crate::extra_variadic::Union3;
+use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::random::random_char_inclusive_range;

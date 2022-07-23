@@ -1,10 +1,3 @@
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign, ShrRound,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::{
     limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
@@ -14,6 +7,13 @@ use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign, ShrRound,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode;
 
 // Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
 // `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs

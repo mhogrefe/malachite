@@ -1,19 +1,3 @@
-use itertools::Itertools;
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2, ModPowerOf2Assign,
-    Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom,
-    WrappingInto,
-};
-use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -32,6 +16,22 @@ use crate::platform::{
     Limb, BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
+use itertools::Itertools;
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2, ModPowerOf2Assign,
+    Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom,
+    WrappingInto,
+};
+use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use std::cmp::Ordering;
 
 //TODO tune

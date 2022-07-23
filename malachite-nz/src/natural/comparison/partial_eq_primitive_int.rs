@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::WrappingFrom;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 macro_rules! impl_partial_eq_limb {
     ($u: ident) => {

@@ -1,12 +1,14 @@
 use crate::integer::Integer;
+use crate::natural::logic::bit_scan::{
+    limbs_index_of_next_false_bit, limbs_index_of_next_true_bit,
+};
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-use crate::natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an

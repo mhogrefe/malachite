@@ -1,11 +1,11 @@
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::WrappingNegAssign;
-use malachite_base::num::logic::traits::NotAssign;
-use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use std::cmp::{max, Ordering};
 use std::ops::{BitAnd, BitAndAssign};
 

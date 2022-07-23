@@ -1,18 +1,11 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
-use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::{slice_move_left, slice_set_zero};
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_with_carry_in_to_out,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use crate::natural::arithmetic::div::{limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx};
+use crate::natural::arithmetic::div::{
+    limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
+};
 use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
@@ -38,6 +31,15 @@ use crate::platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
     INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::slices::{slice_move_left, slice_set_zero};
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 

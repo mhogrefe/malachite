@@ -1,10 +1,10 @@
+use crate::Rational;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::max;
-use crate::Rational;
 
 pub fn rational_bit_bucketer(var_name: &str) -> Bucketer<Rational> {
     Bucketer {

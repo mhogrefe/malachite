@@ -1,4 +1,3 @@
-use malachite_base::num::basic::traits::Iverson;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -9,6 +8,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
+use malachite_base::num::basic::traits::Iverson;
 use std::cmp::Ordering;
 
 // # Worst-case complexity

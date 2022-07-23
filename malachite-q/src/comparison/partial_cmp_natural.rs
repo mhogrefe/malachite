@@ -1,10 +1,10 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
-use crate::Rational;
 
 impl PartialOrd<Natural> for Rational {
     /// Compares a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural).

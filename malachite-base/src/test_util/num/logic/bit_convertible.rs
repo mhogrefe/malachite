@@ -1,8 +1,8 @@
-use itertools::Itertools;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::logic::traits::BitConvertible;
+use itertools::Itertools;
 
 pub fn to_bits_asc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
     let mut bits = n.to_bits_desc();

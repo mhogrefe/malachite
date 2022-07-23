@@ -3,7 +3,6 @@ use crate::iterators::{
     nonzero_values, with_special_value, with_special_values, NonzeroValues, WithSpecialValue,
     WithSpecialValues,
 };
-use itertools::Itertools;
 use crate::num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -17,15 +16,16 @@ use crate::num::random::geometric::{
     geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
 };
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
 use crate::random::{Seed, EXAMPLE_SEED};
 use crate::rounding_modes::RoundingMode;
+use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
+use itertools::Itertools;
+use rand::Rng;
+use rand_chacha::ChaCha20Rng;
 use std::collections::HashMap;
 use std::convert::identity;
 use std::fmt::Debug;
 use std::marker::PhantomData;
-use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 
 // Uniformly generates random primitive integers.
 #[doc(hidden)]

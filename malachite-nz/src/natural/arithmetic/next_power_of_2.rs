@@ -1,10 +1,10 @@
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, NextPowerOf2, NextPowerOf2Assign,
 };
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the smallest integer power of 2 greater than or equal to the `Natural`.

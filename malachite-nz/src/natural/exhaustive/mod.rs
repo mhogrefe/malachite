@@ -1,5 +1,5 @@
-use malachite_base::num::basic::traits::{One, Zero};
 use crate::natural::Natural;
+use malachite_base::num::basic::traits::{One, Zero};
 
 /// Generates all [`Natural`]s in a finite interval.
 ///

@@ -1,10 +1,4 @@
 use crate::integer::Integer;
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, EqMod, EqModPowerOf2, NegMod, PowerOf2,
-};
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::logic::traits::TrailingZeros;
 use crate::natural::arithmetic::add::{limbs_add, limbs_add_limb};
 use crate::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
@@ -14,6 +8,12 @@ use crate::natural::arithmetic::mod_op::limbs_mod_limb;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    DivisibleBy, EqMod, EqModPowerOf2, NegMod, PowerOf2,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::logic::traits::TrailingZeros;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 // whether that `Natural` is equal to the negative of a limb mod a given `Limb` m.

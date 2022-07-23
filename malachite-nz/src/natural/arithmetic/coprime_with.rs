@@ -1,7 +1,7 @@
+use crate::natural::Natural;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::arithmetic::traits::{CoprimeWith, Gcd, Parity};
-use crate::natural::Natural;
 
 pub_test! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1

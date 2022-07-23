@@ -1,4 +1,7 @@
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2, NegModPowerOf2Assign, RemPowerOf2,
     RemPowerOf2Assign, ShrRound,
@@ -8,9 +11,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_set_zero;
-use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::Natural;
-use crate::platform::Limb;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant

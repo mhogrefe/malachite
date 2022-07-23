@@ -1,6 +1,6 @@
 use crate::integer::Integer;
-use malachite_base::num::comparison::traits::PartialOrdAbs;
 use crate::natural::Natural;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use std::cmp::Ordering;
 
 impl PartialOrdAbs<Natural> for Integer {

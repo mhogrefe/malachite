@@ -1,7 +1,7 @@
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
-use crate::Rational;
 
 impl PartialOrdAbs for Rational {
     /// Compares the absolute values of two [`Rational`]s.

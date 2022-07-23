@@ -1,11 +1,11 @@
 use crate::arithmetic::traits::SimplestRationalInInterval;
+use crate::Rational;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::conversion::string::from_sci_string::preprocess_sci_string;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::FromSciString;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::string::from_sci_string::FromSciStringHelper;
-use crate::Rational;
 
 impl FromSciString for Rational {
     /// Converts a string, possibly in scientfic notation, to a [`Rational`].

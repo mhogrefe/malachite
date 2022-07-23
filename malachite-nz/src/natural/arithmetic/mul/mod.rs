@@ -1,5 +1,3 @@
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::WrappingFrom;
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
@@ -25,6 +23,8 @@ use crate::platform::{
     MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
     MUL_TOOM8H_THRESHOLD,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use std::ops::{Mul, MulAssign};
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns

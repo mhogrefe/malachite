@@ -1,8 +1,8 @@
+use crate::natural::arithmetic::div_exact::MAX_OVER_3;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
-use crate::natural::arithmetic::div_exact::MAX_OVER_3;
-use crate::platform::Limb;
 
 // This is equivalent to `MODLIMB_INVERSE_3` from `gmp-impl.h`, GMP 6.2.1.
 const MODLIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) | 1;

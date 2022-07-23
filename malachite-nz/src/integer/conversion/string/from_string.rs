@@ -1,6 +1,6 @@
 use crate::integer::Integer;
-use malachite_base::num::conversion::traits::FromStringBase;
 use crate::natural::Natural;
+use malachite_base::num::conversion::traits::FromStringBase;
 use std::ops::Neg;
 use std::str::FromStr;
 
