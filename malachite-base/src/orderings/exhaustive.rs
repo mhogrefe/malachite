@@ -14,8 +14,6 @@ pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::orderings::exhaustive::orderings_increasing;
 /// use std::cmp::Ordering;
@@ -41,8 +39,6 @@ pub fn orderings_increasing() -> ExhaustiveOrderings {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::orderings::exhaustive::exhaustive_orderings;
 /// use std::cmp::Ordering;

@@ -311,8 +311,6 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
     ///

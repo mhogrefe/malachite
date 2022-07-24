@@ -15,8 +15,6 @@ pub type ExhaustiveBools = Cloned<Iter<'static, bool>>;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 ///

@@ -75,8 +75,6 @@ pub mod general_digits;
 ///
 /// # power_of_2_digits
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
 /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;

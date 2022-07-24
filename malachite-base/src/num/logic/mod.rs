@@ -269,8 +269,6 @@ pub mod bit_convertible;
 ///
 /// # bits
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::logic::traits::BitIterable;
 ///

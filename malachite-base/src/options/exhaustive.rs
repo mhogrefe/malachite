@@ -24,8 +24,6 @@ impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::options::exhaustive::exhaustive_somes;
 ///
@@ -47,8 +45,6 @@ pub const fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::options::exhaustive::exhaustive_options;
 ///

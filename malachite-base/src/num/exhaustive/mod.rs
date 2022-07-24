@@ -255,8 +255,6 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntUpDown<T>
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::primitive_int_increasing_range;
 ///
@@ -296,8 +294,6 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::primitive_int_increasing_inclusive_range;
 ///
@@ -341,8 +337,6 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_signed_range;
 ///
@@ -389,8 +383,6 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_signed_inclusive_range;
 ///
@@ -1032,8 +1024,6 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::*;
 /// use malachite_base::num::float::NiceFloat;
@@ -1189,8 +1179,6 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_sci_exponent;

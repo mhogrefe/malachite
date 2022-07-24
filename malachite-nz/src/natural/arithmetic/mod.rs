@@ -54,6 +54,11 @@ pub mod eq_mod;
 /// Implementations of [`EqModPowerOf2`](malachite_base::num::arithmetic::traits::EqModPowerOf2),
 /// a trait for determining whether one number is equal to another modulo $2^k$.
 pub mod eq_mod_power_of_2;
+/// Implementations of [`Factorial`](malachite_base::num::arithmetic::traits::Factorial),
+/// [`DoubleFactorial`](malachite_base::num::arithmetic::traits::DoubleFactorial),
+/// [`Multifactorial`](malachite_base::num::arithmetic::traits::Multifactorial), and
+/// [`Subfactorial`](malachite_base::num::arithmetic::traits::Subfactorial).
+pub mod factorial;
 /// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.

@@ -34,7 +34,7 @@ pub trait SimplestRationalInInterval {
 // Returns an iterator of all denominators that appear in the [`Rational`]s contained in a closed
 // interval.
 pub trait DenominatorsInClosedInterval<'a, 'b> {
-    type Denominators: Iterator<Item=Natural>;
+    type Denominators: Iterator<Item = Natural>;
 
     fn denominators_in_closed_interval(a: &'a Rational, b: &'b Rational) -> Self::Denominators;
 }

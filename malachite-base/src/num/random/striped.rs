@@ -1101,8 +1101,6 @@ pub fn striped_random_bool_vecs_length_inclusive_range(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
 /// use malachite_base::random::EXAMPLE_SEED;

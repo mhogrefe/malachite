@@ -68,7 +68,7 @@ fn smallest_likely_denominator(interval_diameter: &Rational) -> Natural {
 
 /// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a
 /// closed interval.
-/// 
+///
 /// This `struct` is created by [`DenominatorsInClosedInterval::denominators_in_closed_interval`];
 /// see its documentation for more.
 #[derive(Clone, Debug)]
@@ -173,7 +173,7 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
 
     /// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a
     /// closed interval.
-    /// 
+    ///
     /// For example, consider the interval $[1/3, 1/2]$. It contains no integers, so no
     /// [`Rational`]s with denominator 1. It does contain [`Rational`]s with denominators 2 and 3
     /// (the endpoints). It contains none with denominator 4, but it does contain $2/5$. It
@@ -181,7 +181,7 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// representations are not reduced). It contains $3/7$, $3/8$, and $4/9$ but none with
     /// denominator 10 ($0.4$ does not count because it is $2/5$). It contains all denominators
     /// greater than 10, so the complete list is $2, 3, 5, 7, 8, 9, 11, 12, 13, \ldots$.
-    /// 
+    ///
     /// # Worst-case complexity per iteration
     /// $T(n, i) = O(n + \log i)$
     ///
@@ -189,10 +189,10 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     ///
     /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is
     /// `max(a.significant_bits(), b.significant_bits())`.
-    /// 
+    ///
     /// # Panics
     /// Panics if $a \geq b$.
-    /// 
+    ///
     /// ```
     /// extern crate malachite_base;
     ///

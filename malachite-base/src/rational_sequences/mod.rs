@@ -143,8 +143,6 @@ impl<T: Eq> RationalSequence<T> {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::rational_sequences::RationalSequence;
     ///

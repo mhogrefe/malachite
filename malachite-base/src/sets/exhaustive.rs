@@ -24,7 +24,6 @@ use std::hash::Hash;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -84,7 +83,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -145,7 +143,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -206,7 +203,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -273,7 +269,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -329,7 +324,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -388,7 +382,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -449,7 +442,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -516,7 +508,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -570,7 +561,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -627,7 +617,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -685,7 +674,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -743,7 +731,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -805,7 +792,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -862,7 +848,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -922,7 +907,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -983,7 +967,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1044,7 +1027,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1111,7 +1093,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1167,7 +1148,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1228,7 +1208,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1289,7 +1268,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1356,7 +1334,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1410,7 +1387,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1467,7 +1443,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1528,7 +1503,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1586,7 +1560,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1648,7 +1621,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///

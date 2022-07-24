@@ -54,8 +54,6 @@ impl FromStr for Never {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::nevers::nevers;
 ///

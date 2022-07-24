@@ -48,8 +48,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::comparison::delta_directions;
 /// use std::cmp::Ordering;

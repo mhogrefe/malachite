@@ -58,8 +58,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::nonzero_values;
 ///
@@ -279,8 +277,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::{prefix_to_string, with_special_value};
 /// use malachite_base::num::random::random_primitive_ints;
@@ -436,8 +432,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::iter_windows;
 ///
@@ -473,8 +467,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::prefix_to_string;
 ///

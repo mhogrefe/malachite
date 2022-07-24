@@ -13,8 +13,6 @@ pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 /// use malachite_base::rounding_modes::RoundingMode;

@@ -16,8 +16,6 @@ pub type RandomRoundingModes = Cloned<RandomValuesFromSlice<'static, RoundingMod
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::rounding_modes::random::random_rounding_modes;

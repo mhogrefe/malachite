@@ -18,8 +18,6 @@ pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::orderings::random::random_orderings;
 /// use malachite_base::random::EXAMPLE_SEED;

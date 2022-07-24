@@ -48,8 +48,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::rational_sequences::exhaustive::exhaustive_rational_sequences;
