@@ -2857,6 +2857,16 @@ pub fn random_unsigned_gen_var_24<T: PrimitiveUnsigned>(_config: &GenConfig) -> 
     Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
 }
 
+pub fn random_unsigned_gen_var_25<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
+    Box::new(geometric_random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        T::wrapping_from(5u8),
+        T::MAX,
+        config.get_or("mean_n", 128),
+        config.get_or("mean_d", 1),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(

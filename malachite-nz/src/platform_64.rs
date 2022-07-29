@@ -1820,3 +1820,13 @@ pub const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
     ), // 255
     (8, 0x1fffffffffffffff, 0xffffffffffffffff, 0x8, 0x0),  // 256
 ];
+
+pub const SIEVE_SEED: Limb = 0x3294C9E069128480;
+// 110bits pre-sieved mask for primes 5, 11
+pub const SIEVE_MASK1: Limb = 0x81214a1204892058;
+pub const SIEVE_MASKT: Limb = 0xc8130681244;
+// 182bits pre-sieved mask for primes 7, 13
+pub const SIEVE_2MSK1: Limb = 0x9402180c40230184;
+pub const SIEVE_2MSK2: Limb = 0x0285021088402120;
+pub const SIEVE_2MSKT: Limb = 0xa41210084421;
+pub const SEED_LIMIT: u64 = 210;

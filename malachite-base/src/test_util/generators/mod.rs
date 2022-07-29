@@ -1607,6 +1607,14 @@ pub fn unsigned_gen_var_25<T: PrimitiveUnsigned>() -> Generator<u64> {
     )
 }
 
+// All small unsigned `T`s greater than 4.
+pub fn unsigned_gen_var_26<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_6,
+        &random_unsigned_gen_var_25,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

@@ -143,7 +143,7 @@ impl Multifactorial for Natural {
     /// assert_eq!(Natural::multifactorial(3, 1), 6);
     /// assert_eq!(Natural::multifactorial(4, 1), 24);
     /// assert_eq!(Natural::multifactorial(5, 1), 120);
-    /// 
+    ///
     /// assert_eq!(Natural::multifactorial(0, 2), 1);
     /// assert_eq!(Natural::multifactorial(1, 2), 1);
     /// assert_eq!(Natural::multifactorial(2, 2), 2);
@@ -152,7 +152,7 @@ impl Multifactorial for Natural {
     /// assert_eq!(Natural::multifactorial(5, 2), 15);
     /// assert_eq!(Natural::multifactorial(6, 2), 48);
     /// assert_eq!(Natural::multifactorial(7, 2), 105);
-    /// 
+    ///
     /// assert_eq!(Natural::multifactorial(0, 3), 1);
     /// assert_eq!(Natural::multifactorial(1, 3), 1);
     /// assert_eq!(Natural::multifactorial(2, 3), 2);
@@ -163,7 +163,7 @@ impl Multifactorial for Natural {
     /// assert_eq!(Natural::multifactorial(7, 3), 28);
     /// assert_eq!(Natural::multifactorial(8, 3), 80);
     /// assert_eq!(Natural::multifactorial(9, 3), 162);
-    /// 
+    ///
     /// assert_eq!(
     ///     Natural::multifactorial(100, 3).to_string(),
     ///     "174548867015437739741494347897360069928419328000000000"

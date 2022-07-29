@@ -542,6 +542,13 @@ pub fn exhaustive_primitive_int_gen_var_5<T: PrimitiveInt>() -> It<T> {
     ))
 }
 
+pub fn exhaustive_primitive_int_gen_var_6<T: PrimitiveInt>() -> It<T> {
+    Box::new(primitive_int_increasing_inclusive_range(
+        T::wrapping_from(5u8),
+        T::MAX,
+    ))
+}
+
 // -- (PrimitiveInt, PrimitiveInt) --
 
 pub fn exhaustive_primitive_int_pair_gen_var_1<T: PrimitiveInt, U: ExactFrom<u8> + PrimitiveInt>(
