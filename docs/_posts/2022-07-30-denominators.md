@@ -8,8 +8,7 @@ author: Mikhail Hogrefe
 
 In this post I'm going to talk a bit about a problem that came up when I was figuring out how to generate rational numbers exhaustively. Malachite generates all positive rationals using the [Calkin-Wilf sequence](https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree#Breadth_first_traversal):
 
-$$1, \ 1/2, \ 2, \ 1/3, \ 3/2, \ 2/3, \ 3, \ 1/4, \ 4/3, \ 3/5,$$
-$$5/2, \ 2/5, \ 5/3, \ 3/4, \ 4, \ 1/5, \ 5/4, \ 4/7, \ 7/3, \ 3/8, \ldots$$,
+1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, 7/3, 3/8, ...,
 
 and by manipulating this sequence a bit it can also generate all rationals, all negative rationals, and so on. How about generating all rationals in a specified interval? This has many uses: for example, when testing conversion from rationals to floats, we might want to generate rationals that fall into the 64-bit subnormal float range.
 
@@ -72,11 +71,11 @@ What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must co
 The largest gap between sixths is $$2/3$$. Let's define $$f(d)$$ to be the largest gap between fractions with denominator is $$d$$:
 
 <p align="center">
-  <img width="500" src="/assets/denominators/gaps.svg" alt="The largest gap between rationals with denominators 1 through 10">
+  <img width="600" src="/assets/denominators/gaps.svg" alt="The largest gap between rationals with denominators 1 through 10">
 </p>
 
 <p align="center">
-  <img width="400" src="/assets/denominators/gap-graph.svg" alt="A graph of the largest-gap function">
+  <img width="600" src="/assets/denominators/gap-graph.svg" alt="A graph of the largest-gap function">
 </p>
 
 Any interval with $$s \geq f(d)$$ is, by definition, guaranteed to contain some rational with denominator $$d$$. If $$f$$ were monotonically decreasing, then we could use that to prove that $$D$$ exists. We'd simply need to find a $$D$$ such that $$f(D) \leq s$$, and then any $$f(d)$$ for $$d \geq D$$ would also be less than or equal to $$s$$. However, $$f$$ does not monotonically decrease since $$f(5) = 2/5$$ and $$f(6) = 2/3$$.
@@ -86,12 +85,12 @@ Any interval with $$s \geq f(d)$$ is, by definition, guaranteed to contain some 
 I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g(n) = n f(n)$$ has been studied: it's called the [Jacobsthal function](http://oeis.org/A048669) (not to be confused with the Jacobsthal numbers, which are something unrelated). $$g(n)$$ is the size of the maximal gap in the list of all integers relatively prime to $$n$$.
 
 <p align="center">
-  <img width="400" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
+  <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of a bound on $$g$$: $$g(n) \leq 2^w$, where $w$ is the number of distinct prime factors of $n$.
+We can make use of a bound on $$g$$: $$g(n) \leq 2^w$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
-| constraint            | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
+| constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
 |-----------------------|----------------|------------------|-------------------------------|
 | $$1 \leq n < 2$$      | $$w \leq 0$$   | $$g(n) \leq 1$$  | $$f(n) \leq 1/n \leq 1$$      |
 | $$2 \leq n < 6$$      | $$w \leq 1$$   | $$g(n) \leq 2$$  | $$f(n) \leq 2/n \leq 1$$      |
