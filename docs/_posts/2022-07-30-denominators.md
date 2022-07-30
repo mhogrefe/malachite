@@ -8,7 +8,8 @@ author: Mikhail Hogrefe
 
 In this post I'm going to talk a bit about a problem that came up when I was figuring out how to generate rational numbers exhaustively. Malachite generates all positive rationals using the [Calkin-Wilf sequence](https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree#Breadth_first_traversal):
 
-$$1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, 7/3, 3/8, \ldots$$,
+$$1, \ 1/2, \ 2, \ 1/3, \ 3/2, \ 2/3, \ 3, \ 1/4, \ 4/3, \ 3/5,$$
+$$5/2, \ 2/5, \ 5/3, \ 3/4, \ 4, \ 1/5, \ 5/4, \ 4/7, \ 7/3, \ 3/8, \ldots$$,
 
 and by manipulating this sequence a bit it can also generate all rationals, all negative rationals, and so on. How about generating all rationals in a specified interval? This has many uses: for example, when testing conversion from rationals to floats, we might want to generate rationals that fall into the 64-bit subnormal float range.
 
@@ -17,7 +18,7 @@ For the remainder of this post I'm going to consider closed intervals only.
 ## First try
 
 The most straightforward approach is this:
-1. Generate all rationals in $[0, 1]$.
+1. Generate all rationals in $$[0, 1]$$.
 2. Scale those rationals to bring them into the target interval.
 
 Step 1 is easy: we can generate 0 and 1, and then select every other rational from the above sequence:
@@ -65,13 +66,13 @@ Let $$s = b - a$$ be the diameter of $$[a, b]$$. If $$s \geq 1$$, then we can ta
 What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must contain some rational with denominator $$d$$, but this is not the case. For example, an interval with $$s < 2/3$$ might not contain any sixths:
 
 <p align="center">
-  <img width="400" src="/assets/denominators/sixths.svg" alt="The largest gap between sixths">
+  <img width="500" src="/assets/denominators/sixths.svg" alt="The largest gap between sixths">
 </p>
 
 The largest gap between sixths is $$2/3$$. Let's define $$f(d)$$ to be the largest gap between fractions with denominator is $$d$$:
 
 <p align="center">
-  <img width="400" src="/assets/denominators/gaps.svg" alt="The largest gap between rationals with denominators 1 through 10">
+  <img width="500" src="/assets/denominators/gaps.svg" alt="The largest gap between rationals with denominators 1 through 10">
 </p>
 
 <p align="center">
