@@ -88,20 +88,20 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of a bound^[^1] on $$g$$: $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of the bound<sup>[^1]</sup> $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
-| constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
-|-----------------------|----------------|------------------|-------------------------------|
-| $$1 \leq n < 2$$      | $$w \leq 0$$   | $$g(n) \leq 1$$  | $$f(n) \leq 1/n \leq 1$$      |
-| $$2 \leq n < 6$$      | $$w \leq 1$$   | $$g(n) \leq 2$$  | $$f(n) \leq 2/n \leq 1$$      |
-| $$6 \leq n < 30$$     | $$w \leq 2$$   | $$g(n) \leq 4$$  | $$f(n) \leq 4/n \leq 2/3$$    |
-| $$30 \leq n < 210$$   | $$w \leq 3$$   | $$g(n) \leq 8$$  | $$f(n) \leq 8/n \leq 4/15$$   |
-| $$210 \leq n < 2310$$ | $$w \leq 4$$   | $$g(n) \leq 16$$ | $$f(n) \leq 16/n \leq 8/105$$ |
-| $$\ldots$$            | $$\ldots$$     | $$\ldots$$       | $$\ldots$$                    |
+| constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$       |
+|-----------------------|----------------|------------------|----------------------|
+| $$1 \leq n < 2$$      | $$w \leq 0$$   | $$g(n) \leq 1$$  | $$f(n) \leq 1$$      |
+| $$2 \leq n < 6$$      | $$w \leq 1$$   | $$g(n) \leq 2$$  | $$f(n) \leq 1$$      |
+| $$6 \leq n < 30$$     | $$w \leq 2$$   | $$g(n) \leq 4$$  | $$f(n) \leq 2/3$$    |
+| $$30 \leq n < 210$$   | $$w \leq 3$$   | $$g(n) \leq 8$$  | $$f(n) \leq 4/15$$   |
+| $$210 \leq n < 2310$$ | $$w \leq 4$$   | $$g(n) \leq 16$$ | $$f(n)  \leq 8/105$$ |
+| $$\ldots$$            | $$\ldots$$     | $$\ldots$$       | $$\ldots$$           |
 
 The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n\#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n\#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
 
-$$h(n) = 2^k/p_k\# \text{where} p_k\# \leq n < p_{k+1}\#$$.
+$$h(n) = 2^k/p_k\# \ \text{where} \ p_k\# \leq n < p_{k+1}\#$$.
 
 Here are $$f$$ and $$h$$ plotted together:
 
@@ -109,12 +109,12 @@ Here are $$f$$ and $$h$$ plotted together:
   <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
-$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound $$g(h) \leq 2k^{2+2e\log k}$$.
+$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound<sup>[^1]</sup> $$g(h) \leq 2k^{2+2e\log k}$$.
 
-We now have an algorithm or determining a denominator threshold $$D$$ for an interval $$[a, b]$$:
+We now have an algorithm or determining a threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
 2. Compute the sequence $$2^n/p_n\#$$ until it is less than or equal to $$s$$: the sequence decreases as $$O((2/n)^n)$$, so this step doesn't take long.
-3. Let $$n$$ be the value at which $$2^n/p_n\#$$ is less than or equal to $$s$$. Then take $$D$$ to be $$p_n\#$$.
+3. Let $$n$$ be the value at which $$2^n/p_n\# \leq s$$. Then take $$D$$ to be $$p_n\#$$.
 
 ## Results
 
