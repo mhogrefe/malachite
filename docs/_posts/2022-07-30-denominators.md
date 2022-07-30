@@ -88,7 +88,7 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of the bound<sup>[^1]</sup> $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of the bound[^1] $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
 | constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$       |
 |-----------------------|----------------|------------------|----------------------|
@@ -109,7 +109,7 @@ Here are $$f$$ and $$h$$ plotted together:
   <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
-$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound<sup>[^1]</sup> $$g(h) \leq 2k^{2+2e\log k}$$.
+$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound[^1] $$g(h) \leq 2k^{2+2e\log k}$$.
 
 We now have an algorithm or determining a threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
