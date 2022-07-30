@@ -110,87 +110,81 @@ fn fill_bitpattern(bit_array: &mut [Limb], mut offset: u64) -> u64 {
     } else {
         // correctly handle offset == 0...
         let mut m21 = offset % 110;
-        (
-            if m21 != 0 {
-                if m21 < Limb::WIDTH {
-                    let mut m11 = (SIEVE_MASK1 >> m21) | (SIEVE_MASKT << (Limb::WIDTH - m21));
-                    if m21 <= 110 - Limb::WIDTH {
+        let (m11, m12) = if m21 != 0 {
+            if m21 < Limb::WIDTH {
+                let mut m11 = (SIEVE_MASK1 >> m21) | (SIEVE_MASKT << (Limb::WIDTH - m21));
+                if m21 <= 110 - Limb::WIDTH {
+                    (
+                        m11,
+                        SIEVE_MASK1 << (110 - Limb::WIDTH - m21) | SIEVE_MASKT >> m21,
+                    )
+                } else {
+                    m11 |= SIEVE_MASK1 << (110 - m21);
+                    (m11, SIEVE_MASK1 >> (m21 + Limb::WIDTH - 110))
+                }
+            } else {
+                (
+                    SIEVE_MASK1 << (110 - m21) | SIEVE_MASKT >> (m21 - Limb::WIDTH),
+                    SIEVE_MASKT << (110 - m21) | SIEVE_MASK1 >> (m21 + Limb::WIDTH - 110),
+                )
+            }
+        } else {
+            (SIEVE_MASK1, SIEVE_MASKT)
+        };
+        ((m11, m12), {
+            offset %= 182;
+            if offset != 0 {
+                if offset <= Limb::WIDTH {
+                    let mut m21 = SIEVE_2MSK2 << (Limb::WIDTH - offset);
+                    let mut m22 = SIEVE_2MSKT << (Limb::WIDTH - offset);
+                    if offset != Limb::WIDTH {
+                        m21 |= SIEVE_2MSK1 >> offset;
+                        m22 |= SIEVE_2MSK2 >> offset;
+                    }
+                    if offset <= 182 - 2 * Limb::WIDTH {
                         (
-                            m11,
-                            SIEVE_MASK1 << (110 - Limb::WIDTH - m21) | SIEVE_MASKT >> m21,
+                            m21,
+                            m22,
+                            SIEVE_2MSK1 << (182 - 2 * Limb::WIDTH - offset) | SIEVE_2MSKT >> offset,
                         )
                     } else {
-                        m11 |= SIEVE_MASK1 << (110 - m21);
-                        (m11, SIEVE_MASK1 >> (m21 + Limb::WIDTH - 110))
+                        m22 |= SIEVE_2MSK1 << (182 - Limb::WIDTH - offset);
+                        (m21, m22, SIEVE_2MSK1 >> (offset + 2 * Limb::WIDTH - 182))
+                    }
+                } else if offset < 2 * Limb::WIDTH {
+                    m21 = SIEVE_2MSK2 >> (offset - Limb::WIDTH)
+                        | SIEVE_2MSKT << (2 * Limb::WIDTH - offset);
+                    if offset <= 182 - Limb::WIDTH {
+                        let mut m23 = SIEVE_2MSK2 << (182 - Limb::WIDTH - offset);
+                        if offset != 182 - Limb::WIDTH {
+                            m23 |= SIEVE_2MSK1 >> (offset + 2 * Limb::WIDTH - 182);
+                        }
+                        (
+                            m21,
+                            SIEVE_2MSKT >> (offset - Limb::WIDTH)
+                                | SIEVE_2MSK1 << (182 - Limb::WIDTH - offset),
+                            m23,
+                        )
+                    } else {
+                        m21 |= SIEVE_2MSK1 << (182 - offset);
+                        (
+                            m21,
+                            SIEVE_2MSK2 << (182 - offset)
+                                | SIEVE_2MSK1 >> (Limb::WIDTH + offset - 182),
+                            SIEVE_2MSK2 >> (Limb::WIDTH + offset - 182),
+                        )
                     }
                 } else {
                     (
-                        SIEVE_MASK1 << (110 - m21) | SIEVE_MASKT >> (m21 - Limb::WIDTH),
-                        SIEVE_MASKT << (110 - m21) | SIEVE_MASK1 >> (m21 + Limb::WIDTH - 110),
+                        SIEVE_2MSK1 << (182 - offset) | SIEVE_2MSKT >> (offset - 2 * Limb::WIDTH),
+                        SIEVE_2MSK2 << (182 - offset) | SIEVE_2MSK1 >> (offset + Limb::WIDTH - 182),
+                        SIEVE_2MSKT << (182 - offset) | SIEVE_2MSK2 >> (offset + Limb::WIDTH - 182),
                     )
                 }
             } else {
-                (SIEVE_MASK1, SIEVE_MASKT)
-            },
-            {
-                offset %= 182;
-                if offset != 0 {
-                    if offset <= Limb::WIDTH {
-                        let mut m21 = SIEVE_2MSK2 << (Limb::WIDTH - offset);
-                        let mut m22 = SIEVE_2MSKT << (Limb::WIDTH - offset);
-                        if offset != Limb::WIDTH {
-                            m21 |= SIEVE_2MSK1 >> offset;
-                            m22 |= SIEVE_2MSK2 >> offset;
-                        }
-                        if offset <= 182 - 2 * Limb::WIDTH {
-                            (
-                                m21,
-                                m22,
-                                SIEVE_2MSK1 << (182 - 2 * Limb::WIDTH - offset)
-                                    | SIEVE_2MSKT >> offset,
-                            )
-                        } else {
-                            m22 |= SIEVE_2MSK1 << (182 - Limb::WIDTH - offset);
-                            (m21, m22, SIEVE_2MSK1 >> (offset + 2 * Limb::WIDTH - 182))
-                        }
-                    } else if offset < 2 * Limb::WIDTH {
-                        m21 = SIEVE_2MSK2 >> (offset - Limb::WIDTH)
-                            | SIEVE_2MSKT << (2 * Limb::WIDTH - offset);
-                        if offset <= 182 - Limb::WIDTH {
-                            let mut m23 = SIEVE_2MSK2 << (182 - Limb::WIDTH - offset);
-                            if offset != 182 - Limb::WIDTH {
-                                m23 |= SIEVE_2MSK1 >> (offset + 2 * Limb::WIDTH - 182);
-                            }
-                            (
-                                m21,
-                                SIEVE_2MSKT >> (offset - Limb::WIDTH)
-                                    | SIEVE_2MSK1 << (182 - Limb::WIDTH - offset),
-                                m23,
-                            )
-                        } else {
-                            m21 |= SIEVE_2MSK1 << (182 - offset);
-                            (
-                                m21,
-                                SIEVE_2MSK2 << (182 - offset)
-                                    | SIEVE_2MSK1 >> (Limb::WIDTH + offset - 182),
-                                SIEVE_2MSK2 >> (Limb::WIDTH + offset - 182),
-                            )
-                        }
-                    } else {
-                        (
-                            SIEVE_2MSK1 << (182 - offset)
-                                | SIEVE_2MSKT >> (offset - 2 * Limb::WIDTH),
-                            SIEVE_2MSK2 << (182 - offset)
-                                | SIEVE_2MSK1 >> (offset + Limb::WIDTH - 182),
-                            SIEVE_2MSKT << (182 - offset)
-                                | SIEVE_2MSK2 >> (offset + Limb::WIDTH - 182),
-                        )
-                    }
-                } else {
-                    (SIEVE_2MSK1, SIEVE_2MSK2, SIEVE_2MSKT)
-                }
-            },
-        )
+                (SIEVE_2MSK1, SIEVE_2MSK2, SIEVE_2MSKT)
+            }
+        })
     };
     for xs in bit_array.chunks_mut(2) {
         xs[0] = m11 | m21;
@@ -383,13 +377,9 @@ pub fn limbs_prime_sieve(bit_array: &mut [Limb], n: u64) -> u64 {
     if size > BLOCK_SIZE << 1 {
         let mut off = BLOCK_SIZE + (size % BLOCK_SIZE);
         first_block_primesieve(bit_array, id_to_n(u64::exact_from(off) << Limb::LOG_WIDTH));
-        loop {
-            let (bit_array_lo, bit_array_hi) = bit_array.split_at_mut(off);
-            block_resieve(
-                &mut bit_array_hi[..BLOCK_SIZE],
-                u64::exact_from(off) << Limb::LOG_WIDTH,
-                bit_array_lo,
-            );
+        let (sieve, bit_array) = bit_array.split_at_mut(off);
+        for xs in bit_array.chunks_mut(BLOCK_SIZE) {
+            block_resieve(xs, u64::exact_from(off) << Limb::LOG_WIDTH, sieve);
             off += BLOCK_SIZE;
             if off >= size {
                 break;

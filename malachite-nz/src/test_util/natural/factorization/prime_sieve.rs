@@ -1,4 +1,6 @@
-use crate::malachite_base::num::arithmetic::traits::{DivisibleBy, FloorSqrt, Parity};
+use crate::malachite_base::num::arithmetic::traits::{
+    CheckedSquare, DivisibleBy, FloorSqrt, Parity,
+};
 use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::malachite_base::num::logic::traits::{BitAccess, NotAssign};
@@ -58,7 +60,11 @@ pub fn limbs_prime_sieve_naive_2(bit_array: &mut [Limb], n: u64) -> u64 {
         } else {
             break;
         }
-        let mut m = p * 5;
+        let m = p.checked_square();
+        if m.is_none() {
+            break;
+        }
+        let mut m = m.unwrap();
         if m > n {
             break;
         }
