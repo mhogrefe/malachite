@@ -5808,8 +5808,6 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_59<T: PrimitiveUnsigned>(
     )
 }
 
-// QQQQ
-
 // -- large types --
 
 pub fn exhaustive_large_type_gen_var_1<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>, T, T)> {

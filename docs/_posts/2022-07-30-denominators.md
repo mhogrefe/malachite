@@ -46,9 +46,9 @@ Number 2 is easy to do and not very interesting. You can see the details [here](
 
 ## Finding all denominators in an interval
 
-Let me define the problem more explicitly.
+Let's define the problem more explicitly.
 
-**Problem:** Given a closed interval $$[a, b]$$ with $$a, b \in \Q$$ and $$a < b$$, for which $$d$$ in $$\N^+$$ is it the case that there exists an $$n \in \Z$$ with $$\gcd(n, d) = 1$$ and $$n/d \in [a, b]$$?
+**Problem:** Given a closed interval $$[a, b]$$ with $$a, b \in \mathbb{Q}$$ and $$a < b$$, for which $$d \in \N^+$$ does there exist an $$n \in \Z$$ with $$\gcd(n, d) = 1$$ and $$n/d \in [a, b]$$?
 
 The simplest algorithm is to consider each denominator 1, 2, 3, ... in turn and determine whether some rational with the denominator exists in the interval. This works fine unless the diameter $$b - a$$ is very small. If the interval is $$[0, 2^{-100}]$$, it would take a very long time to find an admissible denominator greater than 1.
 
@@ -78,7 +78,7 @@ The largest gap between sixths is $$2/3$$. Let's define $$f(d)$$ to be the large
   <img width="600" src="/assets/denominators/gap-graph.svg" alt="A graph of the largest-gap function">
 </p>
 
-Any interval with $$s \geq f(d)$$ is, by definition, guaranteed to contain some rational with denominator $$d$$. If $$f$$ were monotonically decreasing, then we could use that to prove that $$D$$ exists. We'd simply need to find a $$D$$ such that $$f(D) \leq s$$, and then any $$f(d)$$ for $$d \geq D$$ would also be less than or equal to $$s$$. However, $$f$$ does not monotonically decrease since $$f(5) = 2/5$$ and $$f(6) = 2/3$$.
+Any interval with $$s \geq f(d)$$ is, by definition, guaranteed to contain some rational with denominator $$d$$. If $$f$$ were monotonically decreasing, then we could use that to prove that $$D$$ exists. We'd simply need to find a $$D$$ such that $$f(D) \leq s$$, and then any $$f(d)$$ for $$d \geq D$$ would also be less than or equal to $$s$$. But $$f$$ does not monotonically decrease.
 
 ## The Jacobsthal function and primorials
 
@@ -88,7 +88,7 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$[^1], where $$w$$ is the number of distinct prime factors of $$n$$.
 
 | constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
 |-----------------------|----------------|------------------|-------------------------------|
@@ -99,7 +99,7 @@ We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$, where $$w$$ is the numbe
 | $$210 \leq n < 2310$$ | $$w \leq 4$$   | $$g(n) \leq 16$$ | $$f(n) \leq 16/n \leq 8/105$$ |
 | $$\ldots$$            | $$\ldots$$     | $$\ldots$$       | $$\ldots$$                    |
 
-The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
+The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n\#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
 
 $$h(n) = 2^k/p_k# \text{where} p_k# \leq n < p_{k+1}#$$.
 
@@ -118,8 +118,10 @@ We now have an algorithm or determining a denominator threshold $$D$$ for an int
 
 ## Results
 
-Let's go back to our example interval, $$[268876667/98914198, 245850922/78256779]$$. Its diameter is about 0.42, so its $$D$$ is 30, meaning that it's guaranteed to contain all denominators greater than or equal to 30. This threshold is low enough that we can just test all the denominators 1 through 29, and we conclude that the denominators 1, 4, and all denominators greater than 4 are present.
+Let's go back to our example interval, $$[268876667/98914198, 245850922/78256779]$$. Its diameter is about 0.42, so its $$D$$ is 30, meaning that it's guaranteed to contain all denominators greater than or equal to 30. This threshold is low enough that we can just test all the denominators 1 through 29, and after doing this we find that the denominators 1, 4, and all denominators greater than 4 are present.
 
 Malachite generates the rationals contained in the interval in this order:
 
 3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, ... .
+
+[^1]: Test footnote
