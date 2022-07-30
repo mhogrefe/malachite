@@ -22,17 +22,17 @@ The most straightforward approach is this:
 
 Step 1 is easy: we can generate 0 and 1, and then select every other rational from the above sequence:
 
-$$0, 1, 1/2, 1/3, 2/3, 1/4, 3/5, 2/5, 3/4, 1/5, 4/7, 3/8, 5/7, 2/7, 5/8, 3/7, 4/5, 1/6, 5/9, 4/11, \ldots$$.
+0, 1, 1/2, 1/3, 2/3, 1/4, 3/5, 2/5, 3/4, 1/5, 4/7, 3/8, 5/7, 2/7, 5/8, 3/7, 4/5, 1/6, 5/9, 4/11, ... .
 
 Step 2 is also easy. If our target interval is $[a, b]$, we transform each rational using x \to (b - a)x + a$. For example, here are the rationals in $[1/3, 1/2]$:
 
-$$1/3, 1/2, 5/12, 7/18, 4/9, 3/8, 13/30, 2/5, 11/24, 11/30, 3/7, 19/48, 19/42, 8/21, 7/16, 17/42, 7/15, 13/36, 23/54, 13/33, \ldots$$.
+1/3, 1/2, 5/12, 7/18, 4/9, 3/8, 13/30, 2/5, 11/24, 11/30, 3/7, 19/48, 19/42, 8/21, 7/16, 17/42, 7/15, 13/36, 23/54, 13/33, ... .
 
 For a simple interval this approach works fine. But what if we generate intervals in $$[268876667/98914198, 245850922/78256779]$$? The endpoints of this interval are the simplest rationals that round to the best 64-bit float representations of $$e$$ and $$\pi$$, respectively. Our algorithm gives us
 
-$$268876667/98914198, 245850922/78256779, 45359568684866149/15481413065696484, 33200495296270871/11611059799272363, 69677715462056705/23222119598544726, 87442412500217335/30962826131392968, 19172880691153809/6450588777373535, 111760559277407891/38703532664241210, 31331954079749087/10320942043797656, 54241917203946464/19351766332120605, \ldots$$.
+268876667/98914198, 245850922/78256779, 45359568684866149/15481413065696484, 33200495296270871/11611059799272363, 69677715462056705/23222119598544726, 87442412500217335/30962826131392968, 19172880691153809/6450588777373535, 111760559277407891/38703532664241210, 31331954079749087/10320942043797656, 54241917203946464/19351766332120605, ... .
 
-This is not so nice. Our interval contains nice rationals like $$3$$, $$11/4$$, $$14/5$$, and $$17/6$$, but they are nowhere to be seen (they will appear eventually, but much later in the sequence). We want an algorithm that gives preferential treatment to rationals with small denominators. Here's what Malachite does:
+This is not so nice. Our interval contains nice rationals like 3, 11/4, 14/5, and 17/6, but they are nowhere to be seen (they will appear eventually, but much later in the sequence). We want an algorithm that gives preferential treatment to rationals with small denominators. Here's what Malachite does:
 
 An improved algorithm
 ---------------------
@@ -50,7 +50,7 @@ Let me define the problem more explicitly.
 
 *Problem:* Given a closed interval $$[a, b]$$ with $$a, b \in \Q$$ and $$a < b$$, for which $$d$$ in $$\N^+$$ is it the case that there exists an $$n \in \Z$$ with $$\gcd(n, d) = 1$$ and $$n/d \in [a, b]$$?
 
-The simplest algorithm is to consider each denominator $$1, 2, 3, \ldots$$ in turn and determine whether some rational with the denominator exists in the interval. This works fine unless the diameter $$b - a$$ is very small. If the interval is $$[0, 2^{-100}]$$, it would take a very long time to find an admissible denominator greater than 1.
+The simplest algorithm is to consider each denominator 1, 2, 3, ... in turn and determine whether some rational with the denominator exists in the interval. This works fine unless the diameter $$b - a$$ is very small. If the interval is $$[0, 2^{-100}]$$, it would take a very long time to find an admissible denominator greater than 1.
 
 Luckily, Malachite knows how to find the simplest rational in an interval, ("simplest" meaning "having the lowest denominator"). It uses the continued fractions of the endpoints and follows the algorithm sketched out [here](https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations). This gives us the lowest denominator in the interval in $$O(n^2 \log n \log\log n)$$ time, $$n$$ being the maximum bit-length of the numerators and denominators of both endpoints. Once we've found the lowest denominator $$d$$, we can find the m rationals with that denominator in $$[a, b]$$ and then partition $$[a, b]$$ into $$m + 1$$ smaller intervals. Then we can repeat the process to get the second-lowest denominator, and so on.
 
@@ -88,7 +88,7 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of a bound on $$g$$: $$g(n) \leq 2^w$, where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
 | constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
 |-----------------------|----------------|------------------|-------------------------------|
@@ -99,14 +99,14 @@ We can make use of a bound on $$g$$: $$g(n) \leq 2^w$, where $$w$$ is the number
 | $$210 \leq n < 2310$$ | $$w \leq 4$$   | $$g(n) \leq 16$$ | $$f(n) \leq 16/n \leq 8/105$$ |
 | $$\ldots$$            | $$\ldots$$     | $$\ldots$$       | $$\ldots$$                    |
 
-The sequence in the leftmost column, $$1, 2, 6, 30, 210, \ldots$$, is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first $$0, 1, 2, \ldots$$ primes and therefore the smallest integers with $$0, 1, 2, \ldots$$ distinct prime factors. The $$n$$th primorial is denoted $$p_n#$$. The sequence of bounds in the rightmost column, $$1, 1, 2/3, 4/15, 8/105, \ldots$$ is $$2^n/p_n#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
+The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
 
 $$h(n) = 2^k/p_k# \text{where} p_k# \leq n < p_{k+1}#$$.
 
 Here are $$f$$ and $$h$$ plotted together:
 
 <p align="center">
-  <img width="400" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
+  <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
 $h$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound $$g(h) \leq 2k^{2+2e\log k}$$.
@@ -122,4 +122,4 @@ Let's go back to our example interval, $$[268876667/98914198, 245850922/78256779
 
 Malachite generates the rationals contained in the interval in this order:
 
-$$3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, \ldots$$.
+3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, ... .
