@@ -24,7 +24,7 @@ Step 1 is easy: we can generate 0 and 1, and then select every other rational fr
 
 0, 1, 1/2, 1/3, 2/3, 1/4, 3/5, 2/5, 3/4, 1/5, 4/7, 3/8, 5/7, 2/7, 5/8, 3/7, 4/5, 1/6, 5/9, 4/11, ... .
 
-Step 2 is also easy. If our target interval is $[a, b]$, we transform each rational using x \to (b - a)x + a$. For example, here are the rationals in $[1/3, 1/2]$:
+Step 2 is also easy. If our target interval is $$[a, b]$$, we transform each rational using $$x \to (b - a)x + a$$. For example, here are the rationals in $$[1/3, 1/2]$$:
 
 1/3, 1/2, 5/12, 7/18, 4/9, 3/8, 13/30, 2/5, 11/24, 11/30, 3/7, 19/48, 19/42, 8/21, 7/16, 17/42, 7/15, 13/36, 23/54, 13/33, ... .
 
@@ -37,10 +37,10 @@ This is not so nice. Our interval contains nice rationals like 3, 11/4, 14/5, an
 An improved algorithm
 ---------------------
 
-Malachite's algorithm needs three things:
-1. To be able to determine which denominators occur in an interval;
-2. To be able to generate all rationals with a given denominator in an interval;
-3. Given infinitely many iterators, each generating rationals with different denominators, to be able to interleave the iterators into a single iterator.
+Malachite's algorithm needs to be able to do three things:
+1. Determine which denominators occur in an interval;
+2. Generate all rationals with a given denominator in an interval;
+3. Given infinitely many iterators, each generating rationals with different denominators, interleave the iterators into a single iterator.
 
 Number 2 is easy to do and not very interesting. You can see the details [here](https://docs.rs/malachite-q/latest/malachite_q/exhaustive/fn.exhaustive_rationals_with_denominator_inclusive_range.html). Number 3 is more interesting, but already solved. I'll post about it in the future, but for now I'll just leave a link to the relevant function [here](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_dependent_pairs.html). That leaves number 1.
 
@@ -48,7 +48,7 @@ Number 2 is easy to do and not very interesting. You can see the details [here](
 
 Let me define the problem more explicitly.
 
-*Problem:* Given a closed interval $$[a, b]$$ with $$a, b \in \Q$$ and $$a < b$$, for which $$d$$ in $$\N^+$$ is it the case that there exists an $$n \in \Z$$ with $$\gcd(n, d) = 1$$ and $$n/d \in [a, b]$$?
+**Problem:** Given a closed interval $$[a, b]$$ with $$a, b \in \Q$$ and $$a < b$$, for which $$d$$ in $$\N^+$$ is it the case that there exists an $$n \in \Z$$ with $$\gcd(n, d) = 1$$ and $$n/d \in [a, b]$$?
 
 The simplest algorithm is to consider each denominator 1, 2, 3, ... in turn and determine whether some rational with the denominator exists in the interval. This works fine unless the diameter $$b - a$$ is very small. If the interval is $$[0, 2^{-100}]$$, it would take a very long time to find an admissible denominator greater than 1.
 
@@ -60,7 +60,7 @@ For the remainder of this post, I'll prove that a $$D$$ exists for any interval 
 
 ## The relationship between an interval's diameter and the denominators it contains
 
-Let $$s = b - a$$ be the diameter of $$[a, b]$$. If $$s \geq 1$$, then we can take $$D = 1$$: $$[a, b]$$ contains all denominators in $$N^+$$. (For any denominator $$d$$, $$k + 1/d$$ is in $$[a, b]$$ for some integer $$k$$.)
+Let $$s = b - a$$ be the diameter of $$[a, b]$$. If $$s \geq 1$$, then we can take $$D = 1$$: $$[a, b]$$ contains all denominators in $$\N^+$$. (For any denominator $$d$$, $$k + 1/d$$ is in $$[a, b]$$ for some integer $$k$$.)
 
 What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must contain some rational with denominator $$d$$, but this is not the case. For example, an interval with $$s < 2/3$$ might not contain any sixths:
 
@@ -109,7 +109,7 @@ Here are $$f$$ and $$h$$ plotted together:
   <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
-$h$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound $$g(h) \leq 2k^{2+2e\log k}$$.
+$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the bound $$g(h) \leq 2k^{2+2e\log k}$$.
 
 We now have an algorithm or determining a denominator threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
