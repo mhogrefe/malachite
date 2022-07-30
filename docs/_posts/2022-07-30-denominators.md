@@ -109,7 +109,7 @@ Here are $$f$$ and $$h$$ plotted together:
   <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
-$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of^1 the<sup>1</sup> bound^[^1] $$g(h) \leq 2k^{2+2e\log k}$$.
+$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of^{{1}} the<sup>1</sup> bound^[^1] $$g(h) \leq 2k^{2+2e\log k}$$.
 
 We now have an algorithm or determining a threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
