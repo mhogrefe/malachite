@@ -68,7 +68,7 @@ What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must co
   <img width="500" src="/assets/denominators/sixths.svg" alt="The largest gap between sixths">
 </p>
 
-The largest gap between sixths is $$2/3$$. Let's define $$f(d)$$ to be the largest gap between fractions with denominator is $$d$$:
+The largest gap between sixths is $$2/3$$. Let's define $$f(d)$$ to be the largest gap between fractions with denominator $$d$$:
 
 <p align="center">
   <img width="600" src="/assets/denominators/gaps.svg" alt="The largest gap between rationals with denominators 1 through 10">
@@ -88,7 +88,7 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of the bound[^1] $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of the [^bound] $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
 | constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$       |
 |-----------------------|----------------|------------------|----------------------|
@@ -109,7 +109,7 @@ Here are $$f$$ and $$h$$ plotted together:
   <img width="600" src="/assets/denominators/gap-and-bound-graph.svg" alt="A graph of the largest-gap function and an upper bound">
 </p>
 
-$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of^{{1}} the<sup>1</sup> bound^[^1] $$g(h) \leq 2k^{2+2e\log k}$$.
+$$h$$ is not a very tight bound. With more careful analysis, we could come up with a better one, perhaps by interpolating between the primorials or by making use of the [^bound] $$g(h) \leq 2k^{2+2e\log k}$$.
 
 We now have an algorithm or determining a threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
@@ -124,4 +124,4 @@ Malachite generates the rationals contained in the interval in this order:
 
 3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, ... .
 
-[^1]: Hans-Joachim Kanold, *Über eine zahlentheoretische Funktion von Jacobsthal*, Mathematische Annalen 170.4 (1967): 314-326
+[^bound]: Hans-Joachim Kanold, *Über eine zahlentheoretische Funktion von Jacobsthal*, Mathematische Annalen 170.4 (1967): 314-326
