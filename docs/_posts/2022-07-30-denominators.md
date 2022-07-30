@@ -52,7 +52,7 @@ Let's define the problem more explicitly.
 
 The simplest algorithm is to consider each denominator 1, 2, 3, ... in turn and determine whether some rational with the denominator exists in the interval. This works fine unless the diameter $$b - a$$ is very small. If the interval is $$[0, 2^{-100}]$$, it would take a very long time to find an admissible denominator greater than 1.
 
-Luckily, Malachite knows how to find the simplest rational in an interval, ("simplest" meaning "having the lowest denominator"). It uses the continued fractions of the endpoints and follows the algorithm sketched out [here](https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations). This gives us the lowest denominator in the interval in $$O(n^2 \log n \log\log n)$$ time, $$n$$ being the maximum bit-length of the numerators and denominators of both endpoints. Once we've found the lowest denominator $$d$$, we can find the m rationals with that denominator in $$[a, b]$$ and then partition $$[a, b]$$ into $$m + 1$$ smaller intervals. Then we can repeat the process to get the second-lowest denominator, and so on.
+Luckily, Malachite knows how to find the simplest rational in an interval ("simplest" meaning "having the lowest denominator"). It uses the continued fractions of the endpoints and follows the algorithm sketched out [here](https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations). This gives us the lowest denominator in the interval in $$O(n^2 \log n \log\log n)$$ time, $$n$$ being the maximum bit-length of the numerators and denominators of both endpoints. Once we've found the lowest denominator $$d$$, we can find the m rationals with that denominator in $$[a, b]$$ and then partition $$[a, b]$$ into $$m + 1$$ smaller intervals. Then we can repeat the process to get the second-lowest denominator, and so on.
 
 This algorithm is efficient enough to be useful, but it's still a bit cumbersome. Our intuition suggests that $$[a, b]$$ contains every denominator in $$\N^+$$ except for finitely many exceptions: in other words, that for every interval $$[a, b]$$ there exists a threshold $$D$$ such that for all $$d >= D$$, $$[a, b]$$ contains a rational with denominator $$d$$. If we knew what $$D$$ was, then we could find start finding denominators using our cumbersome continued-fraction method, but once we reached $$D$$ we could simply generate $$D, D + 1, D + 2, \ldots$$ forever.
 
@@ -88,7 +88,7 @@ I couldn't find any reference to $$f(n)$$ in the literature, but fortunately $$g
   <img width="600" src="/assets/denominators/j-graph.svg" alt="A graph of the Jacobsthal function">
 </p>
 
-We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$[^1], where $$w$$ is the number of distinct prime factors of $$n$$.
+We can make use of a bound^[^1] on $$g$$: $$g(n) \leq 2^w$$, where $$w$$ is the number of distinct prime factors of $$n$$.
 
 | constraint on $$n$$   | bound on $$w$$ | bound on $$g$$   | bound on $$f$$                |
 |-----------------------|----------------|------------------|-------------------------------|
@@ -99,9 +99,9 @@ We can make use of a bound on $$g$$: $$g(n) \leq 2^w$$[^1], where $$w$$ is the n
 | $$210 \leq n < 2310$$ | $$w \leq 4$$   | $$g(n) \leq 16$$ | $$f(n) \leq 16/n \leq 8/105$$ |
 | $$\ldots$$            | $$\ldots$$     | $$\ldots$$       | $$\ldots$$                    |
 
-The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n\#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
+The sequence in the leftmost column, 1, 2, 6, 30, 210, ..., is the sequence of [primorials](https://en.wikipedia.org/wiki/Primorial): they are the products of the first 0, 1, 2, ... primes and therefore the smallest integers with 0, 1, 2, ... distinct prime factors. The $$n$$th primorial is denoted $$p_n\#$$. The sequence of bounds in the rightmost column, 1, 1, 2/3, 4/15, 8/105, ... is $$2^n/p_n\#$$ and is weakly monotonically decreasing. This allows us to construct a weakly monotonically decreasing function $$h$$ that bounds $$f$$ from above:
 
-$$h(n) = 2^k/p_k# \text{where} p_k# \leq n < p_{k+1}#$$.
+$$h(n) = 2^k/p_k\# \text{where} p_k\# \leq n < p_{k+1}\#$$.
 
 Here are $$f$$ and $$h$$ plotted together:
 
@@ -113,8 +113,8 @@ $$h$$ is not a very tight bound. With more careful analysis, we could come up wi
 
 We now have an algorithm or determining a denominator threshold $$D$$ for an interval $$[a, b]$$:
 1. Find the diameter $$s = b - a$$.
-2. Compute the sequence $$2^n/p_n#$$ until it is less than or equal to $$s$$: the sequence decreases as $$O((2/n)^n)$$, so this step doesn't take long.
-3. Let $$n$$ be the value at which $$2^n/p_n#$$ is less than or equal to $$s$$. Then take $$D$$ to be $$p_n#$$.
+2. Compute the sequence $$2^n/p_n\#$$ until it is less than or equal to $$s$$: the sequence decreases as $$O((2/n)^n)$$, so this step doesn't take long.
+3. Let $$n$$ be the value at which $$2^n/p_n\#$$ is less than or equal to $$s$$. Then take $$D$$ to be $$p_n\#$$.
 
 ## Results
 
@@ -124,4 +124,4 @@ Malachite generates the rationals contained in the interval in this order:
 
 3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, ... .
 
-[^1]: Test footnote
+[^1]: Hans-Joachim Kanold, *Über eine zahlentheoretische Funktion von Jacobsthal*, Mathematische Annalen 170.4 (1967): 314-326

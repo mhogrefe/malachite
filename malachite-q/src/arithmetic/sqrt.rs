@@ -11,7 +11,7 @@ impl CheckedSqrt for Rational {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -68,7 +68,7 @@ impl<'a> CheckedSqrt for &'a Rational {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt{x}) & \text{if} \\quad \sqrt{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$

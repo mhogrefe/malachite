@@ -1,5 +1,5 @@
 //! This crate defines [`Rational`]s. The name of this crate refers to the mathematical symbol for
-//! rational numbers, ℚ.
+//! rational numbers, $$\mathbb{Q}$$.
 //! - There are many functions defined on [`Rational`]s.
 //!   These include
 //!   - All the ones you'd expect, like addition, subtraction, multiplication, and division;

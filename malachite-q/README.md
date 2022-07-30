@@ -4,7 +4,7 @@
 # malachite-q
 This crate defines
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The name of
-this crate refers to the mathematical symbol for rational numbers, ℚ.
+this crate refers to the mathematical symbol for rational numbers, $$\mathbb{Q}$$.
 - There are many functions defined on
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. These include
   - All the ones you'd expect, like addition, subtraction, multiplication, and division;

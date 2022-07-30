@@ -11,7 +11,7 @@ impl CheckedRoot<u64> for Rational {
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -76,7 +76,7 @@ impl<'a> CheckedRoot<u64> for &'a Rational {
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -140,7 +140,7 @@ impl CheckedRoot<i64> for Rational {
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
@@ -202,7 +202,7 @@ impl<'a> CheckedRoot<i64> for &'a Rational {
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in ℚ, \\\\
+    ///     \operatorname{Some}(sqrt\[n\]{x}) & \text{if} \\quad \sqrt\[n\]{x} \in \mathbb{Q}, \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \\end{cases}
     /// $$
