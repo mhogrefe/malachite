@@ -3,17 +3,18 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::bucketers::{
-    pair_1_bucketer, unsigned_direct_bucketer, usize_convertible_pair_max_bucketer,
+    pair_1_bucketer, unsigned_direct_bucketer, usize_convertible_pair_ratio_bucketer,
 };
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_pair_gen_var_18};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::factorial::{
-    double_factorial_naive, factorial_naive, limbs_odd_factorial, multifactorial_naive,
-};
+use malachite_nz::natural::arithmetic::factorial::limbs_odd_factorial;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;
+use malachite_nz::test_util::natural::arithmetic::factorial::{
+    double_factorial_naive, factorial_naive, multifactorial_naive,
+};
 use rug::Complete;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -187,7 +188,7 @@ fn benchmark_multifactorial_algorithms(
         gm.name(),
         limit,
         file_name,
-        &usize_convertible_pair_max_bucketer("n", "m"),
+        &usize_convertible_pair_ratio_bucketer("n", "m"),
         &mut [
             ("default", &mut |(n, m)| {
                 no_out!(Natural::multifactorial(n, m))
@@ -210,7 +211,7 @@ fn benchmark_multifactorial_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &usize_convertible_pair_max_bucketer("n", "m"),
+        &usize_convertible_pair_ratio_bucketer("n", "m"),
         &mut [
             ("Malachite", &mut |(m, n)| {
                 no_out!(Natural::multifactorial(m, n))

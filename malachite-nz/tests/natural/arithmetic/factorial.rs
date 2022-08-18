@@ -6,15 +6,15 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_pair_gen_var_18};
-use malachite_nz::natural::arithmetic::factorial::{
-    double_factorial_naive, factorial_naive, limbs_odd_factorial, multifactorial_naive,
-    subfactorial_naive,
-};
+use malachite_nz::natural::arithmetic::factorial::{limbs_odd_factorial, subfactorial_naive};
 use malachite_nz::natural::Natural;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::common::rug_integer_to_natural;
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;
+use malachite_nz::test_util::natural::arithmetic::factorial::{
+    double_factorial_naive, factorial_naive, multifactorial_naive,
+};
 use rug::Complete;
 
 #[cfg(not(feature = "32_bit_limbs"))]

@@ -128,6 +128,19 @@ where
     }
 }
 
+pub fn usize_convertible_pair_ratio_bucketer<'a, T: Copy>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, T)>
+where
+    usize: ExactFrom<T>,
+{
+    Bucketer {
+        bucketing_function: &|&(x, y)| usize::exact_from(x) / usize::exact_from(y),
+        bucketing_label: format!("{} / {}", x_name, y_name),
+    }
+}
+
 pub fn signed_abs_bucketer<T: PrimitiveSigned>(var_name: &str) -> Bucketer<T>
 where
     usize: ExactFrom<<T as UnsignedAbs>::Output>,

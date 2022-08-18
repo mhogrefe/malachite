@@ -14,41 +14,13 @@ use crate::platform::{
 };
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, SaturatingSubAssign,
-    Square, Subfactorial, XMulYToZZ,
+    DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square, Subfactorial,
+    XMulYToZZ,
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitAccess, CountOnes, NotAssign, SignificantBits};
 
-pub fn factorial_naive(mut n: u64) -> Natural {
-    let mut f = Natural::ONE;
-    while n != 0 {
-        f *= Natural::from(n);
-        n -= 1;
-    }
-    f
-}
-
-pub fn double_factorial_naive(mut n: u64) -> Natural {
-    let mut f = Natural::ONE;
-    while n != 0 {
-        f *= Natural::from(n);
-        n.saturating_sub_assign(2);
-    }
-    f
-}
-
-pub fn multifactorial_naive(mut n: u64, m: u64) -> Natural {
-    assert_ne!(m, 0);
-    let mut f = Natural::ONE;
-    while n != 0 {
-        f *= Natural::from(n);
-        n.saturating_sub_assign(m);
-    }
-    f
-}
-
-pub fn subfactorial_naive(n: u64) -> Natural {
+pub_test! {subfactorial_naive(n: u64) -> Natural {
     let mut f = Natural::ONE;
     let mut b = true;
     for i in 1..=n {
@@ -61,7 +33,7 @@ pub fn subfactorial_naive(n: u64) -> Natural {
         b.not_assign();
     }
     f
-}
+}}
 
 // Returns an approximation of the square root of x.
 //
@@ -212,7 +184,7 @@ fn limbs_2_multiswing_odd(
 
 pub(crate) const FAC_DSC_THRESHOLD: usize = 236;
 
-pub const FACTORS_PER_LIMB: usize =
+const FACTORS_PER_LIMB: usize =
     (Limb::WIDTH / ((usize::WIDTH - (FAC_DSC_THRESHOLD - 1).leading_zeros() as u64) + 1)) as usize;
 
 // n ^ log <= Limb::MAX: a limb can store log factors less than n.
@@ -250,7 +222,7 @@ fn log_n_max(n: Limb) -> u64 {
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1, where the output buffer
 // is supplied and the size is returned.
-pub fn limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
+pub_test! {limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
         assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);
@@ -357,7 +329,7 @@ pub fn limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
         }
         out
     }
-}
+}}
 
 const FAC_ODD_THRESHOLD: Limb = 24;
 
