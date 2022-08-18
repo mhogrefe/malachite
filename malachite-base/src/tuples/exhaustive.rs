@@ -161,6 +161,7 @@ macro_rules! lex_tuples {
         $single_out: tt,
         $([$i: expr, $t: ident, $it: ident, $xs: ident, $x:ident]),*
     ) => {
+        #[allow(rustdoc::broken_intra_doc_links)]
         /// This documentation applies not only to `LexPairs`, but also to `LexTriples`,
         /// `LexQuadruples`, and so on. See [`lex_tuples`] for more information.
         ///

@@ -1,11 +1,11 @@
+use crate::malachite_base::num::basic::traits::One;
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD};
 
 // In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;
-
-// T
 
 // We must have 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len().
 fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -35,8 +35,6 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
     }
 }
 
-// T
-
 /// A version of `limbs_mul_greater_to_out_basecase` that attempts to be more efficient by
 /// increasing cache locality. It is currently not measurably better than ordinary basecase.
 pub fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -48,4 +46,15 @@ pub fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], 
     } else {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     }
+}
+
+pub fn limbs_product_naive(out: &mut [Limb], factors: &[Limb]) -> usize {
+    let mut n = Natural::ONE;
+    for &f in factors {
+        n *= Natural::from(f);
+    }
+    let xs = n.into_limbs_asc();
+    let size = xs.len();
+    out[..size].copy_from_slice(&xs);
+    size
 }

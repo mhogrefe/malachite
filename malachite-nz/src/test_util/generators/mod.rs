@@ -1,7 +1,8 @@
 use crate::integer::Integer;
+use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::Natural;
-use crate::platform::Limb;
+use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
@@ -2240,6 +2241,20 @@ pub fn natural_bool_vec_pair_gen_var_2() -> Generator<(Natural, Vec<bool>)> {
     )
 }
 
+// -- (PrimitiveUnsigned, bool) --
+
+pub(crate) const fn limbs_odd_factorial_valid(n: usize, b: bool) -> bool {
+    !b || n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD
+}
+
+// All `(T, u63>)` that are valid arguments to `limbs_odd_factorial`.
+pub fn unsigned_bool_pair_gen_var_1() -> Generator<(usize, bool)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_bool_pair_gen_var_1,
+        &random_unsigned_bool_pair_gen_var_1,
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 // var 2 is in malachite-base.
@@ -2363,6 +2378,8 @@ pub fn unsigned_vec_gen_var_5() -> Generator<Vec<Limb>> {
         &special_random_unsigned_vec_gen_var_5,
     )
 }
+
+// var 6 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 

@@ -21,7 +21,7 @@ impl FromSciStringHelper for Natural {
     fn parse_int(mut cs: &[u8], base: u8) -> Option<Natural> {
         // if T is unsigned, from_string_base won't handle -0
         let mut test_neg_zero = false;
-        if let Some(&b'-') = cs.get(0) {
+        if let Some(&b'-') = cs.first() {
             test_neg_zero = true;
         }
         if test_neg_zero {
@@ -35,7 +35,7 @@ impl FromSciStringHelper for Natural {
             }
             Some(Natural::ZERO)
         } else {
-            if let Some(b'+') = cs.get(0) {
+            if let Some(b'+') = cs.first() {
                 cs = &cs[1..];
                 // If the string begins with a '+', the second character cannot be '+' or '-'
                 match cs {

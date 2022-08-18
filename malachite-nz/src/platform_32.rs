@@ -393,3 +393,44 @@ pub const SIEVE_MASK1: Limb = 0x12148960;
 pub const SIEVE_MASK2: Limb = 0x44a120cc;
 pub const SIEVE_MASKT: Limb = 0x1a;
 pub const SEED_LIMIT: u64 = 120;
+
+// This section is created by factorial_data.rs.
+
+// This is equivalent to `__gmp_oddfac_table` in `mpn/comb_tables.c`, GMP 6.2.1, which is the
+// combination of `ONE_LIMB_ODD_FACTORIAL_TABLE` and `ONE_LIMB_ODD_FACTORIAL_EXTTABLE` in
+// `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_FACTORIAL_TABLE: [Limb; 35] = [
+    0x1, 0x1, 0x1, 0x3, 0x3, 0xf, 0x2d, 0x13b, 0x13b, 0xb13, 0x375f, 0x26115, 0x7233f, 0x5cca33,
+    0x2898765, 0x260eeeeb, 0x260eeeeb, 0x86fddd9b, 0xbeecca73, 0x2b930689, 0xd9df20ad, 0xdf4dae31,
+    0x98567c1b, 0xafc5266d, 0xf4f7347, 0x7ec241ef, 0x6fdd5923, 0xcc5866b1, 0x966aced7, 0xa196e5b,
+    0x977d7755, 0x5831734b, 0x5831734b, 0x5e5fdcab, 0x445da75b,
+];
+// This is equivalent to `ODD_FACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_TABLE_LIMIT: usize = 16;
+// This is equivalent to `ODD_FACTORIAL_EXTTABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = 34;
+// This is equivalent to `ODD_FACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_TABLE_MAX: Limb = 0x260eeeeb;
+
+// This is equivalent to `__gmp_odd2fac_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE: [Limb; 10] =
+    [0x1, 0x3, 0xf, 0x69, 0x3b1, 0x289b, 0x20fdf, 0x1eee11, 0x20dcf21, 0x27065f73];
+// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = 19;
+// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x27065f73;
+
+// This is equivalent to `__gmp_limbroots_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `NTH_ROOT_NUMB_MASK_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
+    [Limb::MAX, 0xffff, 0x659, 0xff, 0x54, 0x28, 0x17, 0xf];
+
+// https://oeis.org/A005187, skipping the initial 0
+//
+// This is equivalent to `__gmp_fac2cnt_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `TABLE_2N_MINUS_POPC_2N` from `fac_table.h`, GMP 6.2.1.
+pub const TABLE_2N_MINUS_POPC_2N: [u8; 24] =
+    [1, 3, 4, 7, 8, 10, 11, 15, 16, 18, 19, 22, 23, 25, 26, 31, 32, 34, 35, 38, 39, 41, 42, 46];
+
+pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 49;

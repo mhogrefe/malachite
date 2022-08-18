@@ -3175,6 +3175,15 @@ pub fn unsigned_vec_gen_var_4<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
 
 // var 5 is in malachite-nz.
 
+// All `Vec`s of unsigneds with lengths at least 2.
+pub fn unsigned_vec_gen_var_6<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
+    Generator::new(
+        &exhaustive_unsigned_vec_gen_var_6,
+        &random_primitive_int_vec_gen_var_5,
+        &special_random_unsigned_vec_gen_var_6,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 pub fn unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(

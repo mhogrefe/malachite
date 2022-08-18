@@ -217,7 +217,7 @@ pub_test! {limbs_mod_power_of_2_add_in_place_either(
 
 impl Natural {
     fn mod_power_of_2_add_limb_ref(&self, y: Limb, pow: u64) -> Natural {
-        match (&*self, y, pow) {
+        match (self, y, pow) {
             (_, 0, _) => self.clone(),
             (&natural_zero!(), _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {

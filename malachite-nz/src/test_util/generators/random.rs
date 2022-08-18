@@ -64,7 +64,7 @@ use crate::test_util::generators::exhaustive::{
     map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
     round_to_multiple_natural_filter_map,
 };
-use crate::test_util::generators::{factors_of_limb_max, T8};
+use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_valid, T8};
 use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 use itertools::Itertools;
 use malachite_base::bools::random::{random_bools, RandomBools};
@@ -3539,6 +3539,25 @@ pub fn random_natural_bool_vec_pair_gen_var_2(config: &GenConfig) -> It<(Natural
         ),
         bs: random_bools(EXAMPLE_SEED.fork("bs")),
     })
+}
+
+// -- (Vec<PrimitiveUnsigned>, bool) --
+
+pub fn random_unsigned_bool_pair_gen_var_1(config: &GenConfig) -> It<(usize, bool)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_n", 16),
+                    config.get_or("mean_d", 1),
+                )
+            },
+            &random_bools,
+        )
+        .filter(|&(n, b)| limbs_odd_factorial_valid(n, b)),
+    )
 }
 
 // -- (PrimitiveUnsigned * 6) --

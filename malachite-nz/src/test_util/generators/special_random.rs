@@ -4629,6 +4629,8 @@ pub fn special_random_unsigned_vec_gen_var_5(config: &GenConfig) -> It<Vec<Limb>
     )
 }
 
+// var 6 is in malachite-base.
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 3 are in malachite-base

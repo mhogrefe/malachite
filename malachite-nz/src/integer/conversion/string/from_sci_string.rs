@@ -8,7 +8,7 @@ use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 
 impl FromSciStringHelper for Integer {
     fn parse_int(mut cs: &[u8], base: u8) -> Option<Integer> {
-        if let Some(b'+') = cs.get(0) {
+        if let Some(b'+') = cs.first() {
             cs = &cs[1..];
             // If the string begins with a '+', the second character cannot be '+' or '-'
             match cs {

@@ -1830,3 +1830,127 @@ pub const SIEVE_2MSK1: Limb = 0x9402180c40230184;
 pub const SIEVE_2MSK2: Limb = 0x0285021088402120;
 pub const SIEVE_2MSKT: Limb = 0xa41210084421;
 pub const SEED_LIMIT: u64 = 210;
+
+// This section is created by factorial_data.rs.
+
+// This is equivalent to `__gmp_oddfac_table` in `mpn/comb_tables.c`, GMP 6.2.1, which is the
+// combination of `ONE_LIMB_ODD_FACTORIAL_TABLE` and `ONE_LIMB_ODD_FACTORIAL_EXTTABLE` in
+// `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_FACTORIAL_TABLE: [Limb; 68] = [
+    0x1,
+    0x1,
+    0x1,
+    0x3,
+    0x3,
+    0xf,
+    0x2d,
+    0x13b,
+    0x13b,
+    0xb13,
+    0x375f,
+    0x26115,
+    0x7233f,
+    0x5cca33,
+    0x2898765,
+    0x260eeeeb,
+    0x260eeeeb,
+    0x286fddd9b,
+    0x16beecca73,
+    0x1b02b930689,
+    0x870d9df20ad,
+    0xb141df4dae31,
+    0x79dd498567c1b,
+    0xaf2e19afc5266d,
+    0x20d8a4d0f4f7347,
+    0x335281867ec241ef,
+    0x9b3093d46fdd5923,
+    0x5e1f9767cc5866b1,
+    0x92dd23d6966aced7,
+    0xa30d0f4f0a196e5b,
+    0x8dc3e5a1977d7755,
+    0x2ab8ce915831734b,
+    0x2ab8ce915831734b,
+    0x81d2a0bc5e5fdcab,
+    0x9efcac82445da75b,
+    0xbc8b95cf58cde171,
+    0xa0e8444a1f3cecf9,
+    0x4191deb683ce3ffd,
+    0xddd3878bc84ebfc7,
+    0xcb39a64b83ff3751,
+    0xf8203f7993fc1495,
+    0xbd2a2a78b35f4bdd,
+    0x84757be6b6d13921,
+    0x3fbbcfc0b524988b,
+    0xbd11ed47c8928df9,
+    0x3c26b59e41c2f4c5,
+    0x677a5137e883fdb3,
+    0xff74e943b03b93dd,
+    0xfe5ebbcb10b2bb97,
+    0xb021f1de3235e7e7,
+    0x33509eb2e743a58f,
+    0x390f9da41279fb7d,
+    0xe5cb0154f031c559,
+    0x93074695ba4ddb6d,
+    0x81c471caa636247f,
+    0xe1347289b5a1d749,
+    0x286f21c3f76ce2ff,
+    0xbe84a2173e8ac7,
+    0x1595065ca215b88b,
+    0xf95877595b018809,
+    0x9c2efe3c5516f887,
+    0x373294604679382b,
+    0xaf1ff7a888adcd35,
+    0x18ddf279a2c5800b,
+    0x18ddf279a2c5800b,
+    0x505a90e2542582cb,
+    0x5bacad2cd8d5dc2b,
+    0xfe3152bcbff89f41,
+];
+// This is equivalent to `ODD_FACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_TABLE_LIMIT: usize = 25;
+// This is equivalent to `ODD_FACTORIAL_EXTTABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = 67;
+// This is equivalent to `ODD_FACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_FACTORIAL_TABLE_MAX: Limb = 0x335281867ec241ef;
+
+// This is equivalent to `__gmp_odd2fac_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE: [Limb; 17] = [
+    0x1,
+    0x3,
+    0xf,
+    0x69,
+    0x3b1,
+    0x289b,
+    0x20fdf,
+    0x1eee11,
+    0x20dcf21,
+    0x27065f73,
+    0x33385d46f,
+    0x49a10615f9,
+    0x730b9982551,
+    0xc223930bef8b,
+    0x15fe07a85a22bf,
+    0x2a9c2ed62ea3521,
+    0x57e22099c030d941,
+];
+// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = 33;
+// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.
+pub const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x57e22099c030d941;
+
+// This is equivalent to `__gmp_limbroots_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `NTH_ROOT_NUMB_MASK_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
+    [Limb::MAX, 0xffffffff, 0x285145, 0xffff, 0x1bdb, 0x659, 0x235, 0xff];
+
+// https://oeis.org/A005187, skipping the initial 0
+//
+// This is equivalent to `__gmp_fac2cnt_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
+// `TABLE_2N_MINUS_POPC_2N` from `fac_table.h`, GMP 6.2.1.
+pub const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
+    1, 3, 4, 7, 8, 10, 11, 15, 16, 18, 19, 22, 23, 25, 26, 31, 32, 34, 35, 38, 39, 41, 42, 46, 47,
+    49, 50, 53, 54, 56, 57, 63, 64, 66, 67, 70, 71, 73, 74, 78,
+];
+
+pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;

@@ -6,11 +6,11 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_1,
-    unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
-    unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3,
-    unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
-    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_gen_var_6,
+    unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1,
+    unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25,
+    unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
+    unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -29,6 +29,7 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
 };
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1;
+use malachite_nz::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
     limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
@@ -61,7 +62,9 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
     unsigned_vec_triple_gen_var_9,
 };
-use malachite_nz::test_util::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase_mem_opt;
+use malachite_nz::test_util::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
+};
 use num::BigUint;
 use rug;
 use std::str::FromStr;
@@ -20085,6 +20088,244 @@ fn limbs_mul_low_same_length_fail_3() {
 }
 
 #[test]
+fn test_limbs_product() {
+    fn test(xs: &[Limb], out: &[Limb]) {
+        let xs_old = xs;
+        let mut xs = xs_old.to_vec();
+        let mut product = vec![0; xs.len()];
+        let out_len = limbs_product(&mut product, &mut xs);
+        product.truncate(out_len);
+        assert_eq!(product, out);
+
+        let xs = xs_old;
+        let mut product_alt = vec![0; xs.len()];
+        let out_len = limbs_product_naive(&mut product_alt, xs);
+        product_alt.truncate(out_len);
+
+        assert_eq!(
+            Natural::from_owned_limbs_asc(product),
+            Natural::from_owned_limbs_asc(product_alt)
+        );
+    }
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test(&[0, 0], &[0]);
+        test(&[0, 1], &[0]);
+        test(&[1, 1], &[1]);
+        test(&[1, 2, 3, 0], &[0]);
+        test(&[1, 1, 1, 6], &[6]);
+        // factor_len < RECURSIVE_PROD_THRESHOLD
+        // factor_len < RECURSIVE_PROD_THRESHOLD && carry == 0
+        test(&[2, 2], &[4]);
+        // 1 < factor_len < RECURSIVE_PROD_THRESHOLD
+        test(&[2, 2, 2], &[8]);
+        // factor_len < RECURSIVE_PROD_THRESHOLD && carry != 0
+        test(
+            &[
+                3364358997, 3754657515, 2983848742, 3936755874, 1784338974, 2546784265, 1325228501,
+                2948540251,
+            ],
+            &[
+                2931171496, 2374327460, 1603352486, 1643105815, 3729295616, 3598234472, 675706642,
+                97731883,
+            ],
+        );
+    }
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        test(&[0, 0], &[0]);
+        // factor_len >= RECURSIVE_PROD_THRESHOLD
+        // factor_len >= RECURSIVE_PROD_THRESHOLD && carry != 0
+        test(
+            &[
+                10008125746032292648,
+                18321114734333840332,
+                17920212203847604612,
+                11217657766511696793,
+                11281083380440747080,
+                7892713234117558634,
+                8902471323128328235,
+                11892365124252837749,
+                12611508814807140936,
+                11815551321438701427,
+                18110749687253320811,
+                11715728409437156086,
+                3339319126985623378,
+                6325617411041006209,
+                14096883611650388622,
+                17687808067973538964,
+                168019485471086672,
+                15693590891786235960,
+                2786725115760255375,
+                9052512570921605652,
+                14177547685319586247,
+                15370386165587184937,
+                5970865523433924174,
+            ],
+            &[
+                11912117198576943104,
+                13014631084302689641,
+                13412132452197408442,
+                2451810739915146054,
+                11634661136866399370,
+                4370855263334042992,
+                15668998660816175865,
+                12986191105652374961,
+                13086723724779814479,
+                11723085021234472016,
+                11995103430870542887,
+                9025449360203176092,
+                2596804721077076476,
+                17187504964195613394,
+                3993660956642255072,
+                14652834649000131068,
+                115931129580828916,
+                5908166419484799210,
+                5266332857336541018,
+                10618265378208305889,
+                15818414605397825971,
+                1340104142930176609,
+                707009434669,
+            ],
+        );
+        // factor_len >= RECURSIVE_PROD_THRESHOLD && carry == 0
+        test(
+            &[
+                0,
+                0,
+                18446743798831644672,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                18446744073709551615,
+                131071,
+                0,
+                18446181123756130304,
+                18446744073709551615,
+                0,
+                0,
+                0,
+                18446744073709289472,
+                18446744069414584323,
+                18446744073709551615,
+                18446744073709551615,
+                1048575,
+            ],
+            &[0],
+        );
+        test(
+            &[
+                10985406156730349404,
+                16998073653641921623,
+                17457059674168741173,
+                7286565767689019192,
+                18125356898477139174,
+                16492808515310020304,
+                3477958611236241232,
+                16292175871113024008,
+                5585730561604558759,
+                6236295300549613743,
+                10319623255002503349,
+                9463751064224151456,
+                591089135516199459,
+                2252218169318269834,
+                862892606080353458,
+                5048725452063866206,
+                8818325570889918907,
+                8659485206830156469,
+                13423243087758132387,
+                5931638651683836702,
+                726189598260086702,
+                17552568882310631283,
+                16362554893644374308,
+                2407211671412641092,
+                1658933737262819201,
+                8531670718492391711,
+                7551068411167036177,
+                1219676338169570619,
+                3249808943561478386,
+                8240095392791493806,
+                18379760227315341655,
+                15217742262236663404,
+                17914601533857880122,
+                6316977119306097487,
+                15466746727219811764,
+                3809403759956883034,
+                7752635439402559334,
+                18006879800705758675,
+                10224737295140518487,
+                8383030445894670697,
+                7272423850473130597,
+                9751703358656322718,
+                5778325638584493526,
+                8175215950976649646,
+                8581067395248196883,
+                4729909244293992358,
+                7626677144783852491,
+                15620921255634335582,
+                17768397379068248272,
+                7127187304413875110,
+            ],
+            &[
+                3631027199567462400,
+                1271721650030716672,
+                2994855603235436973,
+                17610775060915408482,
+                5067312238234780182,
+                17332419541318968246,
+                16256455013715596255,
+                8446753555477097340,
+                6176580983302425584,
+                4478791418516115226,
+                4543632153902351949,
+                8389257049215340154,
+                7312665208898130485,
+                7684632819757707617,
+                3755281952906934158,
+                13259632617670669038,
+                8815229384280433597,
+                18114656906332551194,
+                8751551051855969605,
+                3831140942508279269,
+                3191248804852725269,
+                2021644817234089610,
+                17966341018397783935,
+                17567823138927086650,
+                7667876961419931279,
+                14788070825593093177,
+                18150799194320967018,
+                10911257712565360499,
+                17179583904099919127,
+                13486844951716301158,
+                10333473285718288690,
+                11178175053564016056,
+                7882508656916287058,
+                10989425714502087490,
+                6829028223894926894,
+                810375652491815426,
+                17216794810099974028,
+                590650088582786587,
+                4701269004129928787,
+                3119542545671269984,
+                14375368104481453295,
+                124160740720125385,
+                1360655591798967164,
+                17850602821256829937,
+                6139583463573727145,
+                14578358562855390329,
+                14560675482255305936,
+                16662995492200800253,
+                666535375735877288,
+            ],
+        );
+    }
+}
+
+#[test]
 fn limbs_mul_low_same_length_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 512);
@@ -20179,6 +20420,28 @@ fn test_mul() {
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
     );
+}
+
+#[test]
+fn limbs_product_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 64);
+    config.insert("mean_stripe_n", 16);
+    unsigned_vec_gen_var_6().test_properties_with_config(&config, |mut xs| {
+        let xs_old = xs.clone();
+        let mut out = vec![0; xs.len()];
+        let out_len = limbs_product(&mut out, &mut xs);
+        out.truncate(out_len);
+
+        let xs = xs_old;
+        let mut out_alt = vec![0; xs.len()];
+        let out_len = limbs_product_naive(&mut out_alt, &xs);
+        out_alt.truncate(out_len);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(out),
+            Natural::from_owned_limbs_asc(out_alt)
+        );
+    });
 }
 
 #[test]

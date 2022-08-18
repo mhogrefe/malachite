@@ -3774,6 +3774,10 @@ pub fn exhaustive_unsigned_vec_gen_var_4<T: PrimitiveUnsigned>() -> It<Vec<T>> {
 
 // var 5 is in malachite-nz.
 
+pub fn exhaustive_unsigned_vec_gen_var_6<T: PrimitiveUnsigned>() -> It<Vec<T>> {
+    Box::new(exhaustive_vecs_min_length(2, exhaustive_unsigneds()))
+}
+
 // --(Vec<PrimitiveUnsigned>, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_vec_primitive_int_pair_gen_var_1<

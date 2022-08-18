@@ -62,15 +62,15 @@ line_length_exceptions = set((
     ('./malachite-base/src/lib.rs', 57),
     ('./malachite-base/src/num/arithmetic/mod.rs', 267),
     ('./malachite-base/src/num/arithmetic/mod.rs', 268),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1088),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1328),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1329),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1330),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1331),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1266),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1506),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1507),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1508),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1509),
     ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 102),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 156),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 158),
-    ('./malachite-base/src/num/exhaustive/mod.rs', 1031),
+    ('./malachite-base/src/num/exhaustive/mod.rs', 1023),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 23),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 24),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 25),
@@ -86,13 +86,13 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 30),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 31),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 32),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 126),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 127),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 150),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 151),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 152),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 534),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 536),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 131),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 132),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 155),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 156),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 157),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 539),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 541),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 540),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 542),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 854),
@@ -101,8 +101,8 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 486),
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 516),
     ('./malachite-nz/src/natural/conversion/mod.rs', 189),
-    ('./malachite-q/src/arithmetic/mod.rs', 70),
     ('./malachite-q/src/arithmetic/mod.rs', 72),
+    ('./malachite-q/src/arithmetic/mod.rs', 74),
     ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 187),
     ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 213),
     ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 290),
@@ -134,12 +134,7 @@ filename_list = []
 for root, directories, filenames in os.walk('.'):
     for filename in filenames: 
         filename = os.path.join(root, filename) 
-        if '/target/' not in filename and filename.endswith('.rs'):
-            filename_list.append(filename)
-for root, directories, filenames in os.walk('../rust-wheels'):
-    for filename in filenames: 
-        filename = os.path.join(root, filename) 
-        if '/target/' not in filename and filename.endswith('.rs'):
+        if '/target/' not in filename and '.history' not in filename and filename.endswith('.rs'):
             filename_list.append(filename)
 filename_list.sort()
 

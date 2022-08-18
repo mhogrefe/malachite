@@ -5011,6 +5011,16 @@ pub fn random_primitive_int_vec_gen_var_4<T: PrimitiveInt>(config: &GenConfig) -
     ))
 }
 
+pub fn random_primitive_int_vec_gen_var_5<T: PrimitiveInt>(config: &GenConfig) -> It<Vec<T>> {
+    Box::new(random_vecs_min_length(
+        EXAMPLE_SEED,
+        2,
+        &random_primitive_ints,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
 // --(Vec<PrimitiveInt>, PrimitiveInt) --
 
 pub fn random_primitive_int_vec_primitive_int_pair_gen<T: PrimitiveInt, U: PrimitiveInt>(

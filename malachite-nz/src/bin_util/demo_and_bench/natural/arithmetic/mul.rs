@@ -1,16 +1,17 @@
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_sum_vec_len_bucketer, quadruple_2_vec_len_bucketer,
     triple_1_vec_len_bucketer, triple_2_3_sum_vec_len_bucketer, triple_2_vec_len_bucketer,
-    triple_3_vec_len_bucketer,
+    triple_3_vec_len_bucketer, vec_len_bucketer,
 };
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
-    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_1,
-    unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
-    unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_26,
-    unsigned_vec_triple_gen_var_27, unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
-    unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_gen_var_6,
+    unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1,
+    unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25,
+    unsigned_vec_triple_gen_var_26, unsigned_vec_triple_gen_var_27, unsigned_vec_triple_gen_var_3,
+    unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::mul::fft::*;
@@ -25,6 +26,7 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
     limbs_mul_low_same_length_divide_and_conquer_scratch_len,
     limbs_mul_low_same_length_divide_and_conquer_shared_scratch, limbs_mul_low_same_length_large,
 };
+use malachite_nz::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_32,
@@ -71,7 +73,9 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
     unsigned_vec_triple_gen_var_9,
 };
-use malachite_nz::test_util::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase_mem_opt;
+use malachite_nz::test_util::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_mul_limb);
@@ -152,6 +156,7 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(runner, demo_limbs_mul_low_same_length_divide_and_conquer);
     register_demo!(runner, demo_limbs_mul_low_same_length);
+    register_demo!(runner, demo_limbs_product);
     register_demo!(runner, demo_natural_mul);
     register_demo!(runner, demo_natural_mul_val_ref);
     register_demo!(runner, demo_natural_mul_ref_val);
@@ -273,6 +278,7 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_bench!(runner, benchmark_limbs_mul_low_same_length_large_algorithms);
     register_bench!(runner, benchmark_limbs_mul_low_same_length_algorithms);
+    register_bench!(runner, benchmark_limbs_product_algorithms);
     register_bench!(runner, benchmark_natural_mul_library_comparison);
     register_bench!(runner, benchmark_natural_mul_evaluation_strategy);
     register_bench!(runner, benchmark_natural_mul_assign_library_comparison);
@@ -556,6 +562,16 @@ fn demo_limbs_mul_low_same_length(gm: GenMode, config: GenConfig, limit: usize) 
             "out := {:?}; limbs_mul_low_same_length(&mut out, {:?}, {:?}); out = {:?}",
             out_old, xs, ys, out
         );
+    }
+}
+
+fn demo_limbs_product(gm: GenMode, config: GenConfig, limit: usize) {
+    for mut xs in unsigned_vec_gen_var_6().get(gm, &config).take(limit) {
+        let xs_old = xs.clone();
+        let mut out = vec![0; xs.len() + 1];
+        let out_len = limbs_product(&mut out, &mut xs);
+        out.truncate(out_len);
+        println!("product_of_limbs({:?}) = {:?}", xs_old, out);
     }
 }
 
@@ -1406,6 +1422,35 @@ fn benchmark_limbs_mul_low_same_length_algorithms(
             }),
             ("mul", &mut |(mut out, xs, ys)| {
                 limbs_mul_same_length_to_out(&mut out, &xs, &ys)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_product_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_product(&mut [Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_gen_var_6().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_len_bucketer(),
+        &mut [
+            ("default", &mut |mut xs| {
+                let mut out = vec![0; xs.len()];
+                let out_len = limbs_product(&mut out, &mut xs);
+                out.truncate(out_len);
+            }),
+            ("naive", &mut |xs| {
+                let mut out = vec![0; xs.len()];
+                let out_len = limbs_product_naive(&mut out, &xs);
+                out.truncate(out_len);
             }),
         ],
     );

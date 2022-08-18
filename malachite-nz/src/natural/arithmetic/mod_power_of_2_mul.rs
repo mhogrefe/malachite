@@ -170,7 +170,7 @@ pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) 
 
 impl Natural {
     fn mod_power_of_2_mul_limb_ref(&self, y: Limb, pow: u64) -> Natural {
-        match (&*self, y, pow) {
+        match (self, y, pow) {
             (_, 0, _) | (&natural_zero!(), _, _) => Natural::ZERO,
             (_, 1, _) => self.clone(),
             (&natural_one!(), _, _) => Natural(Small(y)),

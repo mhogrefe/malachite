@@ -234,8 +234,7 @@ fn select_fns(
             (
                 &limbs_mul_greater_to_out_basecase,
                 if REDC_1_TO_REDC_N_THRESHOLD < SQR_BASECASE_THRESHOLD
-                    || ms_len < SQR_BASECASE_THRESHOLD
-                    || ms_len > SQR_TOOM2_THRESHOLD
+                    || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
                 {
                     &square_using_basecase_mul
                 } else {
@@ -247,8 +246,7 @@ fn select_fns(
             (
                 &limbs_mul_greater_to_out_basecase,
                 if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
-                    || ms_len < SQR_BASECASE_THRESHOLD
-                    || ms_len > SQR_TOOM2_THRESHOLD
+                    || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
                 {
                     &square_using_basecase_mul
                 } else {
@@ -267,8 +265,7 @@ fn select_fns(
         (
             &limbs_mul_greater_to_out_basecase,
             if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
-                || ms_len < SQR_BASECASE_THRESHOLD
-                || ms_len > SQR_TOOM2_THRESHOLD
+                || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
             {
                 &square_using_basecase_mul
             } else {

@@ -6141,6 +6141,19 @@ pub fn special_random_unsigned_vec_gen_var_4<T: PrimitiveUnsigned>(
 
 // var 5 is in malachite-nz.
 
+pub fn special_random_unsigned_vec_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<Vec<T>> {
+    Box::new(striped_random_unsigned_vecs_min_length(
+        EXAMPLE_SEED,
+        2,
+        config.get_or("mean_stripe_n", T::WIDTH << 1),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 pub fn special_random_unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(

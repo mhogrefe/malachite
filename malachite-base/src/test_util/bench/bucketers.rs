@@ -415,6 +415,16 @@ pub fn triple_2_3_product_bit_bucketer<
     }
 }
 
+pub fn pair_1_bucketer<T: Copy, U>(x_name: &str) -> Bucketer<(T, U)>
+where
+    usize: ExactFrom<T>,
+{
+    Bucketer {
+        bucketing_function: &|&(x, _)| usize::exact_from(x),
+        bucketing_label: x_name.to_string(),
+    }
+}
+
 pub fn pair_2_bucketer<T, U: Copy>(y_name: &str) -> Bucketer<(T, U)>
 where
     usize: ExactFrom<U>,

@@ -1,13 +1,13 @@
 [package]
 name = "malachite-criterion-bench"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 autobenches = false
 edition = "2021"
 
 [dependencies]
-malachite-base = "0.2.5"
-malachite-nz = { version = "0.2.5", default-features = false }
+malachite-base = "0.2.6"
+malachite-nz = { version = "0.2.6", default-features = false }
 num = "0.4.0"
 rug = { version = "1.14.1", default-features = false, features = ["integer", "serde"] }
 

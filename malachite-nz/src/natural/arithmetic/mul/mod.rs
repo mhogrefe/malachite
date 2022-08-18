@@ -613,6 +613,7 @@ pub mod poly_eval;
 /// Code for reconstructing polynomials from their values at various points; used in Toom-Cook
 /// multiplication.
 pub mod poly_interpolate;
+pub mod product_of_limbs;
 /// Code for computing only the lowest [limbs](crate#limbs) of the square of a [`Natural`].
 pub mod square_mod;
 /// Code for Toom-Cook multiplication.

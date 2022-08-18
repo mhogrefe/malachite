@@ -231,7 +231,7 @@ macro_rules! float_impls {
                         value.sci_mantissa_and_exponent_with_rounding::<$f>(RoundingMode::Exact)
                     {
                         let exponent = i64::exact_from(exponent);
-                        if exponent < $f::MIN_EXPONENT || exponent > $f::MAX_EXPONENT {
+                        if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {
                             return false;
                         }
                         let (orig_mantissa, orig_exponent) = mantissa.raw_mantissa_and_exponent();
@@ -460,7 +460,7 @@ macro_rules! float_impls {
                         value.sci_mantissa_and_exponent_with_rounding_ref::<$f>(RoundingMode::Exact)
                     {
                         let exponent = i64::exact_from(exponent);
-                        if exponent < $f::MIN_EXPONENT || exponent > $f::MAX_EXPONENT {
+                        if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {
                             return false;
                         }
                         let (orig_mantissa, orig_exponent) = mantissa.raw_mantissa_and_exponent();

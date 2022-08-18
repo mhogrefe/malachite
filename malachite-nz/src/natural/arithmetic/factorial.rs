@@ -1,9 +1,24 @@
+use crate::malachite_base::num::basic::integers::PrimitiveInt;
+use crate::malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
+use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
+use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::factorization::prime_sieve::{
+    id_to_n, limbs_prime_sieve, limbs_prime_sieve_size, n_to_bit,
+};
 use crate::natural::Natural;
+use crate::platform::{
+    Limb, NTH_ROOT_NUMB_MASK_TABLE, ODD_DOUBLEFACTORIAL_TABLE_LIMIT, ODD_DOUBLEFACTORIAL_TABLE_MAX,
+    ODD_FACTORIAL_TABLE_LIMIT, ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_TABLE,
+    TABLE_2N_MINUS_POPC_2N, TABLE_LIMIT_2N_MINUS_POPC_2N,
+};
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DoubleFactorial, Factorial, Multifactorial, SaturatingSubAssign, Subfactorial,
+    DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, SaturatingSubAssign,
+    Square, Subfactorial, XMulYToZZ,
 };
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::num::logic::traits::{BitAccess, CountOnes, NotAssign, SignificantBits};
 
 pub fn factorial_naive(mut n: u64) -> Natural {
     let mut f = Natural::ONE;
@@ -48,6 +63,309 @@ pub fn subfactorial_naive(n: u64) -> Natural {
     f
 }
 
+// Returns an approximation of the square root of x.
+//
+// It gives:
+//   limb_apprsqrt(x) ^ 2 <= x < (limb_apprsqrt(x) + 1) ^ 2
+// or
+//   x <= limb_apprsqrt(x) ^ 2 <= x * 9 / 8
+//
+// This is equivalent to `limb_apprsqrt` in `mpz/oddfac_1.c`, GMP 6.2.1.
+fn limbs_approx_sqrt(x: u64) -> u64 {
+    assert!(x > 2);
+    let s = x.significant_bits() >> 1;
+    (u64::power_of_2(s) + (x >> s)) >> 1
+}
+
+const fn bit_to_n(bit: u64) -> u64 {
+    (bit * 3 + 4) | 1
+}
+
+// `limbs_2_multiswing_odd` computes the odd part of the 2-multiswing factorial of the parameter n.
+// The result x is an odd positive integer so that multiswing(n, 2) = x * 2 ^ a.
+//
+// The algorithm is described by Peter Luschny in "Divide, Swing and Conquer the Factorial!".
+//
+// The pointer sieve points to `limbs_prime_sieve_size(n)` limbs containing a bit array where
+// primes are marked as 0. Enough limbs must be pointed by `factors`.
+//
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpz_2multiswing_1` from `mpz/oddfac_1.c`, GMP 6.2.1, where `x_and_sieve`
+// is provided as a single slice, allowing the sieve to be overwritten.
+#[allow(clippy::useless_conversion)]
+fn limbs_2_multiswing_odd(
+    x_and_sieve: &mut [Limb],
+    x_len: usize,
+    mut n: Limb,
+    factors: &mut [Limb],
+) -> usize {
+    assert!(n > 25);
+    let mut prod = if n.odd() { n } else { 1 };
+    n.clear_bit(0);
+    let max_prod = Limb::MAX / (n - 1);
+    // Handle prime = 3 separately
+    let mut j = 0;
+    if prod > max_prod {
+        // not triggered by the first billion inputs
+        fail_on_untested_path("limbs_2_multiswing_odd, prod > max_prod for prime == 3");
+        factors[j] = prod;
+        j += 1;
+        prod = 1;
+    }
+    let mut q = n;
+    while q >= 3 {
+        q /= 3;
+        if q.odd() {
+            prod *= 3;
+        }
+    }
+    let limb_n = n;
+    let n = u64::exact_from(n);
+    // Swing primes from 5 to n / 3
+    let mut s = limbs_approx_sqrt(n);
+    assert!(s >= 5);
+    s = n_to_bit(s);
+    assert!(bit_to_n(s + 1).square() > n);
+    assert!(s < n_to_bit(n / 3));
+    let start = n_to_bit(5);
+    let mut index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let mut mask = Limb::power_of_2(start & Limb::WIDTH_MASK);
+    let sieve = &mut x_and_sieve[x_len..];
+    for i in start + 1..=s + 1 {
+        if sieve[index] & mask == 0 {
+            let prime = Limb::exact_from(id_to_n(i));
+            if prod > max_prod {
+                factors[j] = prod;
+                j += 1;
+                prod = 1;
+            }
+            let mut q = limb_n;
+            while q >= prime {
+                q /= prime;
+                if q.odd() {
+                    prod *= prime;
+                }
+            }
+        }
+        mask = mask.rotate_left(1);
+        if mask == 1 {
+            index += 1;
+        }
+    }
+    assert!(max_prod <= Limb::MAX / 3);
+    let l_max_prod = max_prod * 3;
+    for i in s + 2..=n_to_bit(n / 3) + 1 {
+        if sieve[index] & mask == 0 {
+            let prime = Limb::exact_from(id_to_n(i));
+            if (limb_n / prime).odd() {
+                if prod > l_max_prod {
+                    factors[j] = prod;
+                    j += 1;
+                    prod = prime;
+                } else {
+                    prod *= prime;
+                }
+            }
+        }
+        mask = mask.rotate_left(1);
+        if mask == 1 {
+            index += 1;
+        }
+    }
+    // Store primes from (n + 1) / 2 to n
+    let start = n_to_bit(n >> 1) + 1;
+    let mut index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let mut mask = Limb::power_of_2(start & Limb::WIDTH_MASK);
+    for i in start + 1..=n_to_bit(n) + 1 {
+        if sieve[index] & mask == 0 {
+            let prime = Limb::exact_from(id_to_n(i));
+            if prod > max_prod {
+                factors[j] = prod;
+                j += 1;
+                prod = prime;
+            } else {
+                prod *= prime;
+            }
+        }
+        mask = mask.rotate_left(1);
+        if mask == 1 {
+            index += 1;
+        }
+    }
+    if j != 0 {
+        factors[j] = prod;
+        j += 1;
+        limbs_product(x_and_sieve, &mut factors[..j])
+    } else {
+        // not triggered by the first billion inputs
+        fail_on_untested_path("limbs_2_multiswing_odd, j == 0");
+        x_and_sieve[0] = prod;
+        1
+    }
+}
+
+pub(crate) const FAC_DSC_THRESHOLD: usize = 236;
+
+pub const FACTORS_PER_LIMB: usize =
+    (Limb::WIDTH / ((usize::WIDTH - (FAC_DSC_THRESHOLD - 1).leading_zeros() as u64) + 1)) as usize;
+
+// n ^ log <= Limb::MAX: a limb can store log factors less than n.
+//
+// This is equivalent to log_n_max, `gmp-impl.h`, GMP 6.2.1.
+fn log_n_max(n: Limb) -> u64 {
+    // NTH_ROOT_NUMB_MASK_TABLE[0] is Limb::MAX, so a match will always be found
+    u64::wrapping_from(
+        NTH_ROOT_NUMB_MASK_TABLE
+            .iter()
+            .rposition(|&x| n <= x)
+            .unwrap(),
+    ) + 1
+}
+
+// `limbs_odd_factorial` computes the odd part of the factorial of the parameter n, i.e.
+// n! = x * 2 ^ a, where x is the returned value: an odd positive integer.
+//
+// If `double` is `true`, a square is skipped in the DSC part, e.g. if n is odd,
+// n > FAC_DSC_THRESHOLD and `double` is true, x is set to n!!.
+//
+// If n is too small, `double` is ignored, and an assert can be triggered.
+//
+// TODO: FAC_DSC_THRESHOLD is used here with two different roles:
+// - to decide when prime factorisation is needed,
+// - to stop the recursion, once sieving is done.
+// Maybe two thresholds can do a better job.
+//
+// # Worst-case complexity
+// $T(n) = O(n (\log n)^2 \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+//
+// This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1, where the output buffer
+// is supplied and the size is returned.
+pub fn limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
+    assert!(Limb::convertible_from(n));
+    if double {
+        assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);
+    }
+    if n <= ODD_FACTORIAL_TABLE_LIMIT {
+        vec![ONE_LIMB_ODD_FACTORIAL_TABLE[n]]
+    } else if n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 {
+        let (hi, lo) = Limb::x_mul_y_to_zz(
+            ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[(n - 1) >> 1],
+            ONE_LIMB_ODD_FACTORIAL_TABLE[n >> 1],
+        );
+        vec![lo, hi]
+    } else {
+        // Compute the number of recursive steps for the DSC algorithm
+        let mut m = n;
+        let mut s = 0;
+        while m >= FAC_DSC_THRESHOLD {
+            m >>= 1;
+            s += 1;
+        }
+        let mut factors = vec![0; m / FACTORS_PER_LIMB + 1];
+        assert!(m >= FACTORS_PER_LIMB);
+        assert!(m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1);
+        let mut j = 0;
+        let mut prod = 1;
+        let mut max_prod = Limb::MAX / Limb::wrapping_from(FAC_DSC_THRESHOLD);
+        while m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 {
+            let mut i = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 2;
+            factors[j] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
+            j += 1;
+            while i <= m {
+                if prod > max_prod {
+                    factors[j] = prod;
+                    j += 1;
+                    prod = Limb::wrapping_from(i);
+                } else {
+                    prod *= Limb::wrapping_from(i);
+                }
+                i += 2;
+            }
+            max_prod <<= 1;
+            m >>= 1;
+        }
+        factors[j] = prod;
+        j += 1;
+        factors[j] = ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[(m - 1) >> 1];
+        j += 1;
+        factors[j] = ONE_LIMB_ODD_FACTORIAL_TABLE[m >> 1];
+        j += 1;
+        let mut out = vec![0; j];
+        let size = limbs_product(&mut out, &mut factors[..j]);
+        out.truncate(size);
+        if s != 0 {
+            // Use the algorithm described by Peter Luschny in "Divide, Swing and Conquer the
+            // Factorial!".
+            let mut size = (n >> Limb::LOG_WIDTH) + 4;
+            let n_m_1 = u64::exact_from(n - 1);
+            assert!(limbs_prime_sieve_size(n_m_1) < size - (size >> 1));
+            // 2-multiswing(n) < 2^(n - 1) * sqrt(n / pi) < 2 ^ (n + Limb::WIDTH);
+            // One more can be overwritten by mul, another for the sieve.
+            let mut swing_and_sieve = vec![0; size];
+            // Put the sieve on the second half; it will be overwritten by the last
+            // `limbs_2_multiswing_odd`.
+            let sieve_offset = (size >> 1) + 1;
+            size = usize::exact_from(
+                (limbs_prime_sieve(&mut swing_and_sieve[sieve_offset..], n_m_1) + 1)
+                    / log_n_max(Limb::exact_from(n))
+                    + 1,
+            );
+            let mut factors = vec![0; size];
+            let mut out_len = out.len();
+            for i in (0..s).rev() {
+                let ns = limbs_2_multiswing_odd(
+                    &mut swing_and_sieve,
+                    sieve_offset,
+                    Limb::exact_from(n >> i),
+                    &mut factors,
+                );
+                let mut square;
+                if double && i == 0 {
+                    size = out_len;
+                    square = vec![0; size];
+                    square[..out_len].copy_from_slice(&out[..out_len]);
+                } else {
+                    size = out_len << 1;
+                    square = vec![0; size];
+                    limbs_square_to_out(&mut square, &out[..out_len]);
+                    if square[size - 1] == 0 {
+                        size -= 1;
+                    }
+                }
+                out_len = size + ns;
+                out.resize(out_len, 0);
+                assert!(ns <= size);
+                // n != n$ * floor(n / 2)! ^ 2
+                if limbs_mul_greater_to_out(&mut out, &square[..size], &swing_and_sieve[..ns]) == 0
+                {
+                    out_len -= 1;
+                }
+            }
+        }
+        if *out.last().unwrap() == 0 {
+            out.pop();
+        }
+        out
+    }
+}
+
+const FAC_ODD_THRESHOLD: Limb = 24;
+
+#[cfg(feature = "32_bit_limbs")]
+const SMALL_FACTORIAL_LIMIT: u64 = 13;
+#[cfg(not(feature = "32_bit_limbs"))]
+const SMALL_FACTORIAL_LIMIT: u64 = 21;
+
 impl Factorial for Natural {
     /// Computes the factorial of a number.
     ///
@@ -75,11 +393,49 @@ impl Factorial for Natural {
     ///     1463976156518286253697920827223758251185210916864000000000000000000000000"
     /// );
     /// ```
-    #[inline]
+    ///
+    /// This is equivalent to `mpz_fac_ui` from `mpz/fac_ui.c`, GMP 6.2.1.
+    #[allow(clippy::useless_conversion)]
     fn factorial(n: u64) -> Natural {
-        factorial_naive(n)
+        assert!(Limb::convertible_from(n));
+        if n < SMALL_FACTORIAL_LIMIT {
+            Natural::from(Limb::factorial(n))
+        } else if n < u64::from(FAC_ODD_THRESHOLD) {
+            let mut factors =
+                vec![0; usize::wrapping_from(n - SMALL_FACTORIAL_LIMIT) / FACTORS_PER_LIMB + 2];
+            factors[0] = Limb::factorial(SMALL_FACTORIAL_LIMIT - 1);
+            let mut j = 1;
+            let n = Limb::wrapping_from(n);
+            let mut prod = n;
+            const MAX_PROD: Limb = Limb::MAX / (FAC_ODD_THRESHOLD | 1);
+            const LIMB_SMALL_FACTORIAL_LIMIT: Limb = SMALL_FACTORIAL_LIMIT as Limb;
+            for i in (LIMB_SMALL_FACTORIAL_LIMIT..n).rev() {
+                if prod > MAX_PROD {
+                    factors[j] = prod;
+                    j += 1;
+                    prod = i;
+                } else {
+                    prod *= i;
+                }
+            }
+            factors[j] = prod;
+            j += 1;
+            let mut xs = vec![0; j];
+            let size = limbs_product(&mut xs, &mut factors[..j]);
+            xs.truncate(size);
+            Natural::from_owned_limbs_asc(xs)
+        } else {
+            let count = if n <= TABLE_LIMIT_2N_MINUS_POPC_2N {
+                u64::from(TABLE_2N_MINUS_POPC_2N[usize::exact_from((n >> 1) - 1)])
+            } else {
+                n - CountOnes::count_ones(n)
+            };
+            Natural::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), false)) << count
+        }
     }
 }
+
+const FAC_2DSC_THRESHOLD: Limb = ((FAC_DSC_THRESHOLD << 1) | (FAC_DSC_THRESHOLD & 1)) as Limb;
 
 impl DoubleFactorial for Natural {
     /// Computes the double factorial of a number.
@@ -114,9 +470,48 @@ impl DoubleFactorial for Natural {
     ///     "34243224702511976248246432895208185975118675053719198827915654463488000000000000"
     /// );
     /// ```
-    #[inline]
+    ///
+    /// This is equivalent to `mpz_2fac_ui` from `mpz/2fac_ui.c`, GMP 6.2.1.
     fn double_factorial(n: u64) -> Natural {
-        double_factorial_naive(n)
+        assert!(Limb::convertible_from(n));
+        if n.even() {
+            // n is even, n = 2k, (2k)!! = k! 2^k
+            let half_n = usize::wrapping_from(n >> 1);
+            let count = if n <= TABLE_LIMIT_2N_MINUS_POPC_2N && n != 0 {
+                u64::from(TABLE_2N_MINUS_POPC_2N[half_n - 1])
+            } else {
+                n - CountOnes::count_ones(n)
+            };
+            Natural::from_owned_limbs_asc(limbs_odd_factorial(half_n, false)) << count
+        } else if n <= u64::wrapping_from(ODD_DOUBLEFACTORIAL_TABLE_LIMIT) {
+            Natural::from(ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[usize::wrapping_from(n >> 1)])
+        } else if n < u64::wrapping_from(FAC_2DSC_THRESHOLD) {
+            let mut factors = vec![0; usize::exact_from(n) / (FACTORS_PER_LIMB << 1) + 1];
+            factors[0] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
+            let mut j = 1;
+            let mut n = Limb::wrapping_from(n);
+            let mut prod = n;
+            let max_prod = Limb::MAX / FAC_2DSC_THRESHOLD;
+            const LIMIT: Limb = ODD_DOUBLEFACTORIAL_TABLE_LIMIT as Limb + 2;
+            while n > LIMIT {
+                n -= 2;
+                if prod > max_prod {
+                    factors[j] = prod;
+                    j += 1;
+                    prod = n;
+                } else {
+                    prod *= n;
+                }
+            }
+            factors[j] = prod;
+            j += 1;
+            let mut xs = vec![0; j];
+            let size = limbs_product(&mut xs, &mut factors[..j]);
+            xs.truncate(size);
+            Natural::from_owned_limbs_asc(xs)
+        } else {
+            Natural::from_owned_limbs_asc(limbs_odd_factorial(usize::exact_from(n), true))
+        }
     }
 }
 
@@ -169,9 +564,73 @@ impl Multifactorial for Natural {
     ///     "174548867015437739741494347897360069928419328000000000"
     /// );
     /// ```
-    #[inline]
-    fn multifactorial(n: u64, m: u64) -> Natural {
-        multifactorial_naive(n, m)
+    fn multifactorial(mut n: u64, mut m: u64) -> Natural {
+        assert_ne!(m, 0);
+        assert!(Limb::convertible_from(n));
+        assert!(Limb::convertible_from(m));
+        if n < 3 || n - 3 < m - 1 {
+            // n < 3 || n - 1 <= m
+            if n == 0 {
+                Natural::ONE
+            } else {
+                Natural::from(n)
+            }
+        } else {
+            // 0 < m < n - 1 < Limb::MAX
+            let gcd = n.gcd(m);
+            if gcd > 1 {
+                n /= gcd;
+                m /= gcd;
+            }
+            if m <= 2 {
+                // fac or 2fac
+                if m == 1 {
+                    match gcd {
+                        gcd if gcd > 2 => Natural::from(gcd).pow(n) * Natural::factorial(n),
+                        2 => Natural::double_factorial(n << 1),
+                        _ => Natural::factorial(n),
+                    }
+                } else if gcd > 1 {
+                    // m == 2
+                    Natural::from(gcd).pow((n >> 1) + 1) * Natural::double_factorial(n)
+                } else {
+                    Natural::double_factorial(n)
+                }
+            } else {
+                // m >= 3, gcd(n,m) = 1
+                let reduced_n = n / m + 1;
+                let mut n = Limb::exact_from(n);
+                let m = Limb::exact_from(m);
+                let mut j = 0;
+                let mut prod = n;
+                n -= m;
+                let max_prod = Limb::MAX / n;
+                let mut factors = vec![0; usize::exact_from(reduced_n / log_n_max(n) + 2)];
+                while n > m {
+                    if prod > max_prod {
+                        factors[j] = prod;
+                        j += 1;
+                        prod = n;
+                    } else {
+                        prod *= n;
+                    }
+                    n -= m;
+                }
+                factors[j] = n;
+                j += 1;
+                factors[j] = prod;
+                j += 1;
+                let mut xs = vec![0; j];
+                let size = limbs_product(&mut xs, &mut factors[..j]);
+                xs.truncate(size);
+                let x = Natural::from_owned_limbs_asc(xs);
+                if gcd == 1 {
+                    x
+                } else {
+                    Natural::from(gcd).pow(reduced_n) * x
+                }
+            }
+        }
     }
 }
 

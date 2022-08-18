@@ -67,7 +67,7 @@ use crate::test_util::extra_variadic::{
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
-use crate::test_util::generators::factors_of_limb_max;
+use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_valid};
 use crate::test_util::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
@@ -1953,6 +1953,15 @@ pub fn exhaustive_natural_bool_vec_pair_gen_var_2() -> It<(Natural, Vec<bool>)> 
     ))
 }
 
+// -- (PrimitiveUnsigned, bool)
+
+pub fn exhaustive_unsigned_bool_pair_gen_var_1() -> It<(usize, bool)> {
+    Box::new(
+        lex_pairs(exhaustive_unsigneds(), exhaustive_bools())
+            .filter(|&(n, b)| limbs_odd_factorial_valid(n, b)),
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 // var 1 is in malachite-base.
@@ -2121,6 +2130,8 @@ pub fn exhaustive_unsigned_vec_gen_var_5() -> It<Vec<Limb>> {
         }),
     )
 }
+
+// var 6 is in malachite-base
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 
@@ -2429,7 +2440,7 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
 
 pub(crate) fn filter_helper_4(t: &(Vec<Limb>, Limb, Vec<Limb>)) -> bool {
     let (xs, y, m) = t;
-    !limbs_eq_limb_mod_ref_ref(&*xs, *y, &*m)
+    !limbs_eq_limb_mod_ref_ref(xs, *y, m)
 }
 
 pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
@@ -2892,7 +2903,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
 
 pub(crate) fn filter_helper_5(t: &(Vec<Limb>, Vec<Limb>, Limb)) -> bool {
     let (xs, ys, m) = t;
-    !limbs_eq_mod_limb_ref_ref(&*xs, &*ys, *m)
+    !limbs_eq_mod_limb_ref_ref(xs, ys, *m)
 }
 
 pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16(

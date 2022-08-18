@@ -5,4 +5,5 @@ target
 src/integer_old.rs
 *.DS_Store
 */.vscode/*
+*/.history/*
 

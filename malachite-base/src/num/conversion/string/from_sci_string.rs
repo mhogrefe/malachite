@@ -91,7 +91,7 @@ fn parse_int<T: PrimitiveInt>(cs: &[u8], base: u8) -> Option<T> {
     // if T is unsigned, from_string_base won't handle -0
     let mut test_neg_zero = false;
     if T::MIN == T::ZERO {
-        if let Some(&b'-') = cs.get(0) {
+        if let Some(&b'-') = cs.first() {
             test_neg_zero = true;
         }
     }
