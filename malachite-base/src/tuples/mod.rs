@@ -38,12 +38,11 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
     Singletons { xs }
 }
 
-#[allow(rustdoc::broken_intra_doc_links)]
 /// Iterators that generate tuples without repetition.
 ///
 /// To reduce binary size and lower compilation time, many of the functions described here are not
 /// actually defined in Malachite, but may be created in your program using macros exported from
-/// Malachite. To do this, see the documentation for [`lex_tuples`] and [`lex_custom_tuples`].
+/// Malachite. To do this, see the documentation for `lex_tuples` and `lex_custom_tuples`.
 ///
 /// # lex_pairs
 /// ```

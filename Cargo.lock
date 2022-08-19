@@ -357,22 +357,6 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51e2956001e36f6f48f3793c841eb68100fc6d6a75b9c691cfc01b2fa198d449"
-dependencies = [
- "clap",
- "gnuplot",
- "itertools 0.9.0",
- "rand",
- "rand_chacha",
- "ryu",
- "sha3",
- "time",
-]
-
-[[package]]
-name = "malachite-base"
 version = "0.2.6"
 dependencies = [
  "clap",
@@ -388,23 +372,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "malachite-base"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cf52f2a985fb8bec407608a90774592403d99a6f7b04c582641af7b5ce2871a"
+dependencies = [
+ "clap",
+ "gnuplot",
+ "itertools 0.9.0",
+ "rand",
+ "rand_chacha",
+ "ryu",
+ "sha3",
+ "time",
+]
+
+[[package]]
 name = "malachite-criterion-bench"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "criterion",
- "malachite-base 0.2.5",
- "malachite-nz 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num",
  "rug",
 ]
 
 [[package]]
 name = "malachite-nz"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "embed-doc-image",
  "itertools 0.9.0",
- "malachite-base 0.2.6",
+ "malachite-base 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num",
  "rug",
  "serde",
@@ -413,13 +413,13 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "445b2daf9ce4582cacccca7317f71fc6519527453c4dd9ff5f86362bacf8e472"
+checksum = "13fbcc7b8c1e9eba761569be611543330fdb2ff38d63b4ff08f35648e2bad3d9"
 dependencies = [
  "embed-doc-image",
  "itertools 0.9.0",
- "malachite-base 0.2.5",
+ "malachite-base 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num",
  "rug",
  "serde",
@@ -431,8 +431,8 @@ name = "malachite-q"
 version = "0.2.6"
 dependencies = [
  "itertools 0.9.0",
- "malachite-base 0.2.5",
- "malachite-nz 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num",
  "rug",
  "serde",
