@@ -14,7 +14,10 @@ use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_to_out,
+    limbs_mul_to_out_scratch_len,
+};
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
@@ -595,7 +598,8 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
     let (ds_lo, ds_hi) = ds.split_at(lo);
     let carry = limbs_modular_div_mod_helper(qs, ns, lo, ds_lo, d_inv, scratch);
     let (qs_lo, qs_hi) = qs.split_at_mut(lo);
-    limbs_mul_greater_to_out(scratch, ds_hi, qs_lo);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds_hi.len(), qs_lo.len())];
+    limbs_mul_greater_to_out(scratch, ds_hi, qs_lo, &mut mul_scratch);
     if carry {
         assert!(!limbs_slice_add_limb_in_place(&mut scratch[lo..], 1));
     }
@@ -603,7 +607,8 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
     let highest_r = limbs_sub_greater_in_place_left(ns, scratch);
     let (ds_lo, ds_hi) = ds.split_at(hi);
     let carry = limbs_modular_div_mod_helper(qs_hi, ns, hi, ds_lo, d_inv, scratch);
-    limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_hi);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(hi, ds_hi.len())];
+    limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_hi, &mut mul_scratch);
     if carry {
         assert!(!limbs_slice_add_limb_in_place(&mut scratch[hi..], 1));
     }
@@ -662,7 +667,14 @@ pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
         // Perform the typically smaller block first.
         carry = limbs_modular_div_mod_helper(qs, ns, q_len_mod_d_len, ds_lo, d_inv, &mut scratch);
         if q_len_mod_d_len != d_len {
-            limbs_mul_to_out(&mut scratch, ds_hi, &qs[..q_len_mod_d_len]);
+            let mut mul_scratch =
+                vec![0; limbs_mul_to_out_scratch_len(ds_hi.len(), q_len_mod_d_len)];
+            limbs_mul_to_out(
+                &mut scratch,
+                ds_hi,
+                &qs[..q_len_mod_d_len],
+                &mut mul_scratch,
+            );
             if carry {
                 assert!(!limbs_slice_add_limb_in_place(
                     &mut scratch[q_len_mod_d_len..],
@@ -693,7 +705,8 @@ pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
         let (ds_lo, ds_hi) = ds.split_at(q_len);
         carry = limbs_modular_div_mod_helper(qs, ns, q_len, ds_lo, d_inv, &mut scratch);
         if q_len != d_len {
-            limbs_mul_to_out(&mut scratch, ds_hi, qs);
+            let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ds_hi.len(), qs.len())];
+            limbs_mul_to_out(&mut scratch, ds_hi, qs, &mut mul_scratch);
             if carry {
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch[q_len..], 1));
             }
@@ -777,7 +790,8 @@ fn limbs_modular_div_mod_barrett_unbalanced(
         let ns = &ns[n_len - q_len_s..];
         limbs_mul_low_same_length(qs, &rs[..i_len], is);
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-            limbs_mul_greater_to_out(scratch, ds, qs);
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
+            limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
             let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -822,7 +836,8 @@ fn limbs_modular_div_mod_barrett_unbalanced(
     let qs = &mut qs[q_len - q_len_s..];
     limbs_mul_low_same_length(qs, &rs[..q_len_s], &is[..q_len_s]);
     if q_len_s < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-        limbs_mul_greater_to_out(scratch, ds, qs);
+        let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
+        limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
     } else {
         let tn = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(tn);
@@ -883,7 +898,8 @@ fn limbs_modular_div_mod_barrett_balanced(
     limbs_modular_invert(is, &ds[..i_len], scratch);
     limbs_mul_low_same_length(qs_lo, &ns[..i_len], is); // low i_len quotient limbs
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-        limbs_mul_greater_to_out(scratch, ds, qs_lo);
+        let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs_lo.len())];
+        limbs_mul_greater_to_out(scratch, ds, qs_lo, &mut mul_scratch);
     } else {
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -908,7 +924,8 @@ fn limbs_modular_div_mod_barrett_balanced(
     // high q_len quotient limbs
     limbs_mul_low_same_length(qs_hi, &rs[..q_len_s], &is[..q_len_s]);
     if q_len_s < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-        limbs_mul_greater_to_out(scratch, ds, qs_hi);
+        let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs_hi.len())];
+        limbs_mul_greater_to_out(scratch, ds, qs_hi, &mut mul_scratch);
     } else {
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -1129,7 +1146,14 @@ pub_test! {limbs_modular_div_divide_and_conquer(
             limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
         };
         if n_len_mod_d_len != d_len {
-            limbs_mul_to_out(&mut scratch, ds_hi, &qs[..n_len_mod_d_len]);
+            let mut mul_scratch =
+                vec![0; limbs_mul_to_out_scratch_len(ds_hi.len(), n_len_mod_d_len)];
+            limbs_mul_to_out(
+                &mut scratch,
+                ds_hi,
+                &qs[..n_len_mod_d_len],
+                &mut mul_scratch,
+            );
             if carry {
                 assert!(!limbs_slice_add_limb_in_place(
                     &mut scratch[n_len_mod_d_len..],
@@ -1237,7 +1261,9 @@ fn limbs_modular_div_barrett_greater(
         let diff = n_len - n_len_s;
         let (qs_lo, qs_hi) = qs[diff..].split_at_mut(i_len);
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-            limbs_mul_greater_to_out(scratch, ds, qs_lo);
+            let mut mul_scratch =
+                vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs_lo.len())];
+            limbs_mul_greater_to_out(scratch, ds, qs_lo, &mut mul_scratch);
         } else {
             let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -1283,7 +1309,8 @@ fn limbs_modular_div_barrett_greater(
     let (qs_lo, qs_hi) = qs[diff..].split_at_mut(i_len);
     // Generate last q_len limbs.
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-        limbs_mul_greater_to_out(scratch, ds, qs_lo);
+        let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs_lo.len())];
+        limbs_mul_greater_to_out(scratch, ds, qs_lo, &mut mul_scratch);
     } else {
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -1345,7 +1372,8 @@ fn limbs_modular_div_barrett_same_length(
     limbs_mul_low_same_length(qs, ns_lo, is); // low i_len quotient limbs
     let (qs_lo, qs_hi) = qs.split_at_mut(i_len);
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-        limbs_mul_greater_to_out(scratch, ds, qs_lo);
+        let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs_lo.len())];
+        limbs_mul_greater_to_out(scratch, ds, qs_lo, &mut mul_scratch);
     } else {
         let mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(n_len);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);

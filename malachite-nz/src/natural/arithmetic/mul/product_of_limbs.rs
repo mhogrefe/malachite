@@ -1,6 +1,6 @@
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use crate::natural::arithmetic::mul::{
-    limbs_mul_limb_to_out, limbs_mul_to_out, MUL_TOOM22_THRESHOLD,
+    limbs_mul_limb_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len, MUL_TOOM22_THRESHOLD,
 };
 use crate::platform::Limb;
 
@@ -45,7 +45,8 @@ pub fn limbs_product(out: &mut [Limb], factors: &mut [Limb]) -> usize {
         let xs_len = limbs_product(xs, &mut factors[..half_len]);
         let size = xs_len + ys_len;
         assert!(out.len() >= size);
-        if limbs_mul_to_out(out, &xs[..xs_len], &ys[..ys_len]) == 0 {
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(xs_len, ys_len)];
+        if limbs_mul_to_out(out, &xs[..xs_len], &ys[..ys_len], &mut mul_scratch) == 0 {
             size - 1
         } else {
             size

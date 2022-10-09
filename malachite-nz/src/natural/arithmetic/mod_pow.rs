@@ -15,10 +15,13 @@ use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use crate::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
+    limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
-use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_basecase};
+use crate::natural::arithmetic::square::{
+    limbs_square_to_out, limbs_square_to_out_basecase, limbs_square_to_out_scratch_len,
+};
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
@@ -256,8 +259,15 @@ fn select_fns(
             )
         } else {
             (
-                &limbs_mul_same_length_to_out,
-                &limbs_square_to_out,
+                &|out, xs, ys| {
+                    let mut mul_scratch =
+                        vec![0; limbs_mul_same_length_to_out_scratch_len(xs.len())];
+                    limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch)
+                },
+                &|out, xs| {
+                    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
+                    limbs_square_to_out(out, xs, &mut square_scratch)
+                },
                 &limbs_redc_helper,
             )
         }
@@ -275,8 +285,14 @@ fn select_fns(
         )
     } else {
         (
-            &limbs_mul_same_length_to_out,
-            &limbs_square_to_out,
+            &|out, xs, ys| {
+                let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(xs.len())];
+                limbs_mul_same_length_to_out(out, xs, ys, &mut mul_scratch)
+            },
+            &|out, xs| {
+                let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
+                limbs_square_to_out(out, xs, &mut square_scratch)
+            },
             if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
                 &limbs_redc_limb_helper
             } else {
@@ -342,12 +358,14 @@ pub_test! {limbs_mod_pow_odd(
     let mut powers: Vec<&mut [Limb]> = powers.chunks_mut(ms_len).collect();
     to_redc(powers[0], xs, ms);
     // Store x ^ 2 at `out`.
-    limbs_square_to_out(scratch, powers[0]);
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(powers[0].len())];
+    limbs_square_to_out(scratch, powers[0], &mut square_scratch);
     redc_fn(out, scratch, ms, is);
     // Precompute odd powers of x and put them in `powers`.
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(out.len())];
     for i in 1..usize::power_of_2(window_size - 1) {
         let (powers_lo, powers_hi) = powers.split_at_mut(i);
-        limbs_mul_same_length_to_out(scratch, powers_lo[i - 1], out);
+        limbs_mul_same_length_to_out(scratch, powers_lo[i - 1], out, &mut mul_scratch);
         redc_fn(powers_hi[0], scratch, ms, is);
     }
     let exp_bits = get_bits(es, width, window_size);
@@ -500,10 +518,11 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
         if ms_twos != 0 {
             scratch_2[ms_zero_len - 1].mod_power_of_2_assign(ms_twos);
         }
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ms_zero_len, ms_nonzero_len)];
         limbs_mul_to_out(
             scratch_0_1,
             &scratch_2[..ms_zero_len],
-            &ms[..ms_nonzero_len],
+            &ms[..ms_nonzero_len], &mut mul_scratch
         );
         limbs_add_to_out_aliased(out, ms_nonzero_len, &scratch_0_1[..ms_len]);
     }

@@ -1884,7 +1884,7 @@ where
             self.xs.get(last_index + 1);
         }
         Some(
-            (&self.indices)
+            self.indices
                 .iter()
                 .map(|&i| self.xs.assert_get(i).clone())
                 .collect(),
@@ -2361,7 +2361,7 @@ where
             self.xs.get(last_index + 1);
         }
         Some(
-            (&self.indices)
+            self.indices
                 .iter()
                 .map(|&i| self.xs.assert_get(i).clone())
                 .collect(),

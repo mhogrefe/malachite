@@ -1,8 +1,10 @@
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
-use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 #[cfg(feature = "test_build")]
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
@@ -183,7 +185,8 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
             out_len = 1;
             for bit in exp.bits().rev().skip(1) {
                 assert!(out_len << 1 <= scratch_len);
-                limbs_square_to_out(scratch, &out[..out_len]);
+                let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
+                limbs_square_to_out(scratch, &out[..out_len], &mut square_scratch);
                 out_len <<= 1;
                 if scratch[out_len - 1] == 0 {
                     out_len -= 1;
@@ -217,7 +220,8 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
             out_len = len;
             for bit in exp.bits().rev().skip(1) {
                 assert!(out_len << 1 <= scratch_len);
-                limbs_square_to_out(scratch, &out[..out_len]);
+                let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
+                limbs_square_to_out(scratch, &out[..out_len], &mut square_scratch);
                 out_len <<= 1;
                 if scratch[out_len - 1] == 0 {
                     out_len -= 1;
@@ -226,7 +230,10 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
                 swap(&mut out_alloc, &mut scratch_len);
                 if bit {
                     assert!(out_len + len <= scratch_len);
-                    let carry = limbs_mul_greater_to_out(scratch, &out[..out_len], xs);
+                    let mut mul_scratch =
+                        vec![0; limbs_mul_greater_to_out_scratch_len(out_len, len)];
+                    let carry =
+                        limbs_mul_greater_to_out(scratch, &out[..out_len], xs, &mut mul_scratch);
                     out_len += len;
                     if carry == 0 {
                         out_len -= 1;
@@ -335,7 +342,8 @@ fn limb_pow_to_out_alt<'a>(
         if i == 0 {
             break;
         }
-        limbs_square_to_out(scratch, &out[..out_len]);
+        let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
+        limbs_square_to_out(scratch, &out[..out_len], &mut square_scratch);
         out_len <<= 1;
         if scratch[out_len - 1] == 0 {
             out_len -= 1;
@@ -420,14 +428,16 @@ fn limbs_pow_to_out_alt<'a>(
     if bits.eq_mod_power_of_2(CountOnes::count_ones(exp), 1) {
         swap(&mut out, &mut scratch);
     }
-    limbs_square_to_out(out, xs);
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
+    limbs_square_to_out(out, xs, &mut square_scratch);
     let mut out_len = len << 1;
     if out[out_len - 1] == 0 {
         out_len -= 1;
     }
     for i in (0..bits - 1).rev() {
         if exp.get_bit(i) {
-            if limbs_mul_greater_to_out(scratch, &out[..out_len], xs) == 0 {
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(out_len, len)];
+            if limbs_mul_greater_to_out(scratch, &out[..out_len], xs, &mut mul_scratch) == 0 {
                 out_len -= 1;
             }
             out_len += len;
@@ -436,7 +446,8 @@ fn limbs_pow_to_out_alt<'a>(
         if i == 0 {
             break;
         }
-        limbs_square_to_out(scratch, &out[..out_len]);
+        let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
+        limbs_square_to_out(scratch, &out[..out_len], &mut square_scratch);
         out_len <<= 1;
         if scratch[out_len - 1] == 0 {
             out_len -= 1;

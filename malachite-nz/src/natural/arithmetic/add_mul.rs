@@ -2,7 +2,7 @@ use crate::natural::arithmetic::add::{
     limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
-use crate::natural::arithmetic::mul::limbs_mul_to_out;
+use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
@@ -241,7 +241,8 @@ pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
     let mut out = vec![0; out_len];
-    if limbs_mul_to_out(&mut out, ys, zs) == 0 {
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
+    if limbs_mul_to_out(&mut out, ys, zs, &mut mul_scratch) == 0 {
         out_len -= 1;
         out.pop();
     }
@@ -278,7 +279,8 @@ pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Li
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
     let mut out = vec![0; out_len];
-    if limbs_mul_to_out(&mut out, ys, zs) == 0 {
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
+    if limbs_mul_to_out(&mut out, ys, zs, &mut mul_scratch) == 0 {
         out_len -= 1;
         out.pop();
     }

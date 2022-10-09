@@ -3860,6 +3860,8 @@ pub fn unsigned_vec_pair_gen_var_32<T: PrimitiveUnsigned>() -> Generator<(Vec<T>
     )
 }
 
+// var 33 is in malachite-nz.
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, bool) --
 
 // All `(Vec<T>, Vec<T>, bool)` where `T` is unsigned and both `Vec`s have the same length.
@@ -4311,6 +4313,8 @@ pub fn unsigned_vec_triple_gen_var_59<T: PrimitiveUnsigned>() -> Generator<(Vec<
         &special_random_unsigned_vec_triple_gen_var_59,
     )
 }
+
+// var 60 is in malachite-nz.
 
 // -- large types --
 

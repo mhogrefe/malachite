@@ -11,6 +11,8 @@ use crate::bin_util::demo_and_bench::register;
 #[cfg(feature = "bin_build")]
 use crate::bin_util::generate::max_base::generate_max_base;
 #[cfg(feature = "bin_build")]
+use crate::bin_util::generate::rle::generate_rle_encoding;
+#[cfg(feature = "bin_build")]
 use crate::bin_util::generate::tuning_manager::{build_reference_data, test};
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
@@ -40,6 +42,7 @@ fn main() {
         let codegen_key = args.codegen_key.unwrap();
         match codegen_key.as_str() {
             "max_base" => generate_max_base(),
+            "rle_encode" => generate_rle_encoding(),
             "tm_build_reference_data" => build_reference_data(),
             "tm_test" => test(),
             _ => panic!("Invalid codegen key: {}", codegen_key),

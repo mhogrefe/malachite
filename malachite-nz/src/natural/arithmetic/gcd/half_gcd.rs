@@ -11,7 +11,10 @@ use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_to_out,
+    limbs_mul_to_out_scratch_len,
+};
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
@@ -333,8 +336,14 @@ pub_crate_test! {limbs_half_gcd_matrix_update_q(
         }
         assert!(qs_len + n <= m.s);
         if n != 0 {
+            let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(n, qs_len)];
             for row in 0..2 {
-                limbs_mul_to_out(scratch, &m.get(row, 1 - column)[..n], &qs[..qs_len]);
+                limbs_mul_to_out(
+                    scratch,
+                    &m.get(row, 1 - column)[..n],
+                    &qs[..qs_len],
+                    &mut mul_scratch,
+                );
                 assert!(n + qs_len >= m.n);
                 let m_n = m.n;
                 if limbs_add_to_out_aliased(m.get_mut(row, column), m_n, &scratch[..n + qs_len]) {
@@ -381,20 +390,21 @@ pub(crate) fn limbs_half_gcd_matrix_adjust(
     assert!(p + m.n < n);
     let (xs_lo, xs_hi) = xs_init.split_at_mut(p);
     // First compute the two values depending on X, before overwriting X
-    limbs_mul_to_out(scratch_lo, &m.get(1, 1)[..m.n], xs_lo);
-    limbs_mul_to_out(scratch_hi, &m.get(1, 0)[..m.n], xs_lo);
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(m.n, p)];
+    limbs_mul_to_out(scratch_lo, &m.get(1, 1)[..m.n], xs_lo, &mut mul_scratch);
+    limbs_mul_to_out(scratch_hi, &m.get(1, 0)[..m.n], xs_lo, &mut mul_scratch);
     // Update X
     let (scratch_lo_lo, scratch_lo_hi) = scratch_lo.split_at(p);
     xs_lo.copy_from_slice(scratch_lo_lo);
     let mut x_high = limbs_slice_add_greater_in_place_left(xs_hi, scratch_lo_hi);
     let (ys_lo, ys_hi) = ys_init.split_at_mut(p);
-    limbs_mul_to_out(scratch_lo, &m.get(0, 1)[..m.n], ys_lo);
+    limbs_mul_to_out(scratch_lo, &m.get(0, 1)[..m.n], ys_lo, &mut mul_scratch);
     if limbs_sub_greater_in_place_left(xs_init, scratch_lo) {
         assert!(x_high);
         x_high = false;
     }
     // Update Y
-    limbs_mul_to_out(scratch_lo, &m.get(0, 0)[..m.n], ys_lo);
+    limbs_mul_to_out(scratch_lo, &m.get(0, 0)[..m.n], ys_lo, &mut mul_scratch);
     let (scratch_lo_lo, scratch_lo_hi) = scratch_lo.split_at(p);
     ys_lo.copy_from_slice(scratch_lo_lo);
     let mut y_high = limbs_slice_add_greater_in_place_left(ys_hi, scratch_lo_hi);
@@ -598,7 +608,8 @@ fn limbs_gcd_sub_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> usize {
     let sum_len = xs_len + ys_len;
     assert!(sum_len <= out_len + 1);
     let mut scratch = vec![0; sum_len];
-    limbs_mul_greater_to_out(&mut scratch, xs, ys);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
+    limbs_mul_greater_to_out(&mut scratch, xs, ys, &mut mul_scratch);
     assert!(sum_len <= out_len || scratch[out_len] == 0);
     let mut scratch_len = sum_len;
     if scratch_len > out_len {

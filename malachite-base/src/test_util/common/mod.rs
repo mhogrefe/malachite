@@ -76,3 +76,13 @@ macro_rules! triple_significant_bits_fn {
 
 pub const TRIPLE_SIGNIFICANT_BITS_LABEL: &str =
     "max(a.significant_bits(), b.significant_bits(), c.significant_bits())";
+
+pub fn rle_decode<T: Clone>(ps: &[(T, usize)]) -> Vec<T> {
+    let mut out = Vec::new();
+    for (x, count) in ps.iter() {
+        for _ in 0..*count {
+            out.push(x.clone());
+        }
+    }
+    out
+}

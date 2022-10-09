@@ -3,7 +3,9 @@ use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mul::limb::{
     limbs_mul_limb_with_carry_to_out, limbs_slice_mul_limb_with_carry_in_place,
 };
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use crate::natural::arithmetic::sub::{
     limbs_slice_sub_in_place_right, limbs_sub_greater_in_place_left, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out,
@@ -315,7 +317,8 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
     let xs_len = xs.len();
     let product_len = ys.len() + zs.len();
     let mut product = vec![0; product_len];
-    if limbs_mul_greater_to_out(&mut product, ys, zs) == 0 {
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ys.len(), zs.len())];
+    if limbs_mul_greater_to_out(&mut product, ys, zs, &mut mul_scratch) == 0 {
         product.pop();
     }
     assert_ne!(*product.last().unwrap(), 0);

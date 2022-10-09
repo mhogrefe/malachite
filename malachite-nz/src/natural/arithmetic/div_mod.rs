@@ -11,7 +11,8 @@ use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use crate::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
+    limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
@@ -624,7 +625,8 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
         limbs_div_mod_divide_and_conquer_helper(qs_hi, &mut ns[lo << 1..], ds_hi, d_inv, scratch)
     };
     let qs_hi = &mut qs_hi[..hi];
-    limbs_mul_greater_to_out(scratch, qs_hi, ds_lo);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(qs_hi.len(), ds_lo.len())];
+    limbs_mul_greater_to_out(scratch, qs_hi, ds_lo, &mut mul_scratch);
     let ns_lo = &mut ns[..n + lo];
     let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
         &mut ns_lo[lo..],
@@ -650,7 +652,8 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     };
     let qs_lo = &mut qs[..lo];
     let ns_lo = &mut ns[..n];
-    limbs_mul_greater_to_out(scratch, ds_lo, qs_lo);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds_lo.len(), lo)];
+    limbs_mul_greater_to_out(scratch, ds_lo, qs_lo, &mut mul_scratch);
     let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns_lo, &scratch[..n]));
     if q_lo && limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], ds_lo) {
         carry += 1;
@@ -788,7 +791,9 @@ pub_test! {limbs_div_mod_divide_and_conquer(
                 }
             };
             if q_len_mod_d_len != d_len {
-                limbs_mul_to_out(&mut scratch, qs_alt, ds_lo);
+                let mut mul_scratch =
+                    vec![0; limbs_mul_to_out_scratch_len(qs_alt.len(), ds_lo.len())];
+                limbs_mul_to_out(&mut scratch, qs_alt, ds_lo, &mut mul_scratch);
                 let ns = &mut ns[q_len - q_len_mod_d_len..n_len - q_len_mod_d_len];
                 let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns, &scratch));
                 if highest_q
@@ -830,7 +835,8 @@ pub_test! {limbs_div_mod_divide_and_conquer(
         if m != 0 {
             let qs = &mut qs[..q_len];
             let ns = &mut ns[..d_len];
-            limbs_mul_to_out(&mut scratch, qs, ds_lo);
+            let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(q_len, ds_lo.len())];
+            limbs_mul_to_out(&mut scratch, qs, ds_lo, &mut mul_scratch);
             let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns, &scratch));
             if highest_q && limbs_sub_same_length_in_place_left(&mut ns[q_len..], ds_lo) {
                 carry += 1;
@@ -981,7 +987,9 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
         let diff = size - previous_size;
         let is_hi = &mut is[d_len - previous_size..];
         if condition {
-            limbs_mul_greater_to_out(scratch, ds_hi, is_hi);
+            let mut mul_scratch =
+                vec![0; limbs_mul_greater_to_out_scratch_len(ds_hi.len(), is_hi.len())];
+            limbs_mul_greater_to_out(scratch, ds_hi, is_hi, &mut mul_scratch);
             limbs_slice_add_same_length_in_place_left(
                 &mut scratch[previous_size..size + 1],
                 &ds_hi[..diff + 1],
@@ -1055,7 +1063,13 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
         }
         // Compute x_j * u_j
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(size + diff);
-        limbs_mul_same_length_to_out(scratch_lo, &scratch_hi[..previous_size], is_hi);
+        let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(is_hi.len())];
+        limbs_mul_same_length_to_out(
+            scratch_lo,
+            &scratch_hi[..previous_size],
+            is_hi,
+            &mut mul_scratch,
+        );
         a = (previous_size << 1) - diff;
         let carry = {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(a);
@@ -1203,7 +1217,8 @@ fn limbs_div_mod_barrett_preinverted(
         let (rs_lo, rs_hi) = rs.split_at_mut(n);
         // Compute the next block of quotient limbs by multiplying the inverse by the upper part of
         // the partial remainder.
-        limbs_mul_same_length_to_out(scratch, rs_hi, is);
+        let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(is.len())];
+        limbs_mul_same_length_to_out(scratch, rs_hi, is, &mut mul_scratch);
         // The inverse's most significant bit is implicit.
         assert!(!limbs_add_same_length_to_out(
             qs,
@@ -1214,7 +1229,8 @@ fn limbs_div_mod_barrett_preinverted(
         // partial remainder combined with new limbs from the dividend. We only really need the low
         // d_len + 1 limbs.
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-            limbs_mul_greater_to_out(scratch, ds, qs);
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
+            limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
             limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
         }
@@ -1392,7 +1408,8 @@ pub_test! {limbs_div_mod_barrett_large_helper(
     let mut highest_q = limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
     // Multiply the quotient by the divisor limbs ignored above.
     // The product is d_len - 1 limbs long.
-    limbs_mul_to_out(scratch, ds_lo, qs);
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ds_lo.len(), qs.len())];
+    limbs_mul_to_out(scratch, ds_lo, qs, &mut mul_scratch);
     let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
     *scratch_last = Limb::iverson(
         highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo),
@@ -1739,7 +1756,8 @@ pub(crate) fn limbs_div_mod_balanced(
         rs.copy_from_slice(&ns_shifted[..r_len]);
         do_extra_cleanup = false;
     } else {
-        limbs_mul_to_out(&mut scratch, qs_lo, &ds[..i_len_alt]);
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(qs_lo.len(), i_len_alt)];
+        limbs_mul_to_out(&mut scratch, qs_lo, &ds[..i_len_alt], &mut mul_scratch);
     }
     if do_extra_cleanup {
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_alt);

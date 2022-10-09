@@ -2,8 +2,10 @@ use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use crate::natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k};
-use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
+    limbs_mul_same_length_to_out_scratch_len,
+};
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
@@ -11,27 +13,22 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_with_borrow_in_in_place_right,
 };
 use crate::platform::Limb;
-use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
-use std::cmp::min;
 
 //TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
-//TODO tune
-pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 40;
 
 // # Worst-case complexity
 // Constant time and additional memory.
 pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     n: usize,
     low_threshold: usize,
-    high_threshold: usize,
-    square: bool,
 ) -> usize {
     if n < low_threshold {
         n
@@ -40,15 +37,7 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     } else if n <= (low_threshold - 1) << 3 {
         n.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
     } else {
-        let ceiling_half_n: usize = n.shr_round(1, RoundingMode::Ceiling);
-        if ceiling_half_n < high_threshold {
-            n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
-        } else {
-            ceiling_half_n.round_to_multiple_of_power_of_2(
-                u64::exact_from(limbs_mul_fft_best_k(ceiling_half_n, square)),
-                RoundingMode::Ceiling,
-            ) << 1
-        }
+        n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
     }
 }
 
@@ -62,8 +51,6 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n,
         MULMOD_BNM1_THRESHOLD,
-        MUL_FFT_MODF_THRESHOLD,
-        false,
     )
 }}
 
@@ -116,7 +103,8 @@ fn limbs_mul_mod_base_pow_n_minus_1_basecase(
 ) {
     let n = xs.len();
     assert_ne!(n, 0);
-    limbs_mul_same_length_to_out(scratch, xs, ys);
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(n)];
+    limbs_mul_same_length_to_out(scratch, xs, ys, &mut mul_scratch);
     split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
     if limbs_add_same_length_to_out(out, scratch_lo, scratch_hi) {
         // If carry == 1, then the value of out is at most B ^ n - 2, so there can be no overflow
@@ -162,14 +150,10 @@ pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], 
 fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     let m = n + 1;
-    limbs_mul_same_length_to_out(out, &xs[..m], &ys[..m]);
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(m)];
+    limbs_mul_same_length_to_out(out, &xs[..m], &ys[..m], &mut mul_scratch);
     limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
 }
-
-// First k to use for an FFT mod-F multiply. A mod-F FFT is an order log(2 ^ k) / log(2 ^ (k - 1))
-// algorithm, so k = 3 is merely 1.5 like Karatsuba, whereas k = 4 is 1.33 which is faster than
-// Toom3 at 1.485.
-pub(crate) const FFT_FIRST_K: usize = 4;
 
 // Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 // multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are
@@ -216,10 +200,11 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
     let sum = xs_len + ys_len;
     if n < MULMOD_BNM1_THRESHOLD || n.odd() {
         if ys_len < n {
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
             if sum <= n {
-                limbs_mul_greater_to_out(out, xs, ys);
+                limbs_mul_greater_to_out(out, xs, ys, &mut mul_scratch);
             } else {
-                limbs_mul_greater_to_out(scratch, xs, ys);
+                limbs_mul_greater_to_out(scratch, xs, ys, &mut mul_scratch);
                 if limbs_add_to_out(out, &scratch[..n], &scratch[n..sum]) {
                     assert!(!limbs_slice_add_limb_in_place(&mut out[..n], 1));
                 }
@@ -239,22 +224,12 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
         // as
         // x = -xp * 2 ^ (Limb::WIDTH * half_n) + (2 ^ (Limb::WIDTH * half_n) + 1) *
         // ((xp + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1))
-        let k = if half_n < MUL_FFT_MODF_THRESHOLD {
-            0
-        } else {
-            min(
-                limbs_mul_fft_best_k(half_n, false),
-                usize::wrapping_from(half_n.trailing_zeros()),
-            )
-        };
         let m = half_n + 1;
         if xs_len <= half_n {
             limbs_mul_mod_base_pow_n_minus_1(out, half_n, xs, ys, scratch);
-            if k >= FFT_FIRST_K {
-                scratch[half_n] = Limb::iverson(limbs_mul_fft(scratch, half_n, xs, ys, k));
-            } else {
                 assert!(sum <= (half_n << 1) | 1);
-                limbs_mul_greater_to_out(scratch, xs, ys);
+                let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
+                limbs_mul_greater_to_out(scratch, xs, ys, &mut mul_scratch);
                 let mut limit = sum - half_n;
                 assert!(limit <= half_n || scratch[half_n << 1] == 0);
                 if limit > half_n {
@@ -268,7 +243,6 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(&mut scratch[..m], 1));
                 }
-            }
         } else {
             let (xs_0, xs_1) = xs.split_at(half_n);
             let carry = limbs_add_to_out(scratch, xs_0, xs_1);
@@ -285,17 +259,13 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
                 }
                 let a = half_n + usize::exact_from(*scratch_2.last_mut().unwrap());
-                if k >= FFT_FIRST_K {
-                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
-                    scratch_lo[half_n] =
-                        Limb::iverson(limbs_mul_fft(scratch_lo, half_n, &scratch_hi[..a], ys, k));
-                } else {
                     let sum_2 = a + ys_len;
                     assert!(sum_2 <= (half_n << 1) + 1);
                     assert!(sum_2 > half_n);
                     assert!(a >= ys_len);
                     let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
-                    limbs_mul_greater_to_out(scratch_lo, &scratch_hi[..a], ys);
+                    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(a, ys_len)];
+                    limbs_mul_greater_to_out(scratch_lo, &scratch_hi[..a], ys, &mut mul_scratch);
                     let mut a = sum_2 - half_n;
                     assert!(a <= half_n || scratch[half_n << 1] == 0);
                     if a > half_n {
@@ -309,7 +279,6 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
                     if carry {
                         assert!(!limbs_slice_add_limb_in_place(&mut scratch[..m], 1));
                     }
-                }
             } else {
                 let (ys_0, ys_1) = ys.split_at(half_n);
                 let carry = limbs_add_to_out(scratch_hi, ys_0, ys_1);
@@ -324,7 +293,6 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
                 }
-                let limit_1 = half_n + usize::exact_from(*scratch_2.last_mut().unwrap());
                 let scratch_3 = &mut scratch_3[..m];
                 let (ys_0, ys_1) = ys.split_at(half_n);
                 let carry = limbs_sub_greater_to_out(scratch_3, ys_0, ys_1);
@@ -332,24 +300,13 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_3, 1));
                 }
-                let limit_2 = half_n + usize::exact_from(*scratch_3.last_mut().unwrap());
                 let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
-                if k >= FFT_FIRST_K {
-                    scratch_lo[half_n] = Limb::iverson(limbs_mul_fft(
-                        scratch_lo,
-                        half_n,
-                        &scratch_hi[..limit_1],
-                        &scratch_hi[m..limit_2 + m],
-                        k,
-                    ));
-                } else {
                     limbs_mul_mod_base_pow_n_plus_1_basecase(
                         scratch_lo,
                         scratch_hi,
                         &scratch_hi[m..],
                         half_n,
                     );
-                }
             }
         }
         // Here the Chinese Remainder Theorem recomposition begins.

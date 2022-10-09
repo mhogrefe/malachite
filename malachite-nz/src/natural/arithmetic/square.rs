@@ -4,7 +4,9 @@ use crate::natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::mul::fft::{limbs_mul_greater_to_out_fft, SQR_FFT_MODF_THRESHOLD};
+use crate::natural::arithmetic::mul::fft::{
+    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
+};
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use crate::natural::arithmetic::mul::poly_eval::{
@@ -42,6 +44,8 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::{max, Ordering};
+
+const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -933,8 +937,25 @@ pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &m
     limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }}
 
-//TODO tune
-const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
+pub_crate_test! {
+#[allow(clippy::absurd_extreme_comparisons)]
+limbs_square_to_out_scratch_len(n: usize) -> usize {
+    if n < SQR_BASECASE_THRESHOLD || n < SQR_TOOM2_THRESHOLD {
+        0
+    } else if n < SQR_TOOM3_THRESHOLD {
+        limbs_square_to_out_toom_2_scratch_len(n)
+    } else if n < SQR_TOOM4_THRESHOLD {
+        limbs_square_to_out_toom_3_scratch_len(n)
+    } else if n < SQR_TOOM6_THRESHOLD {
+        limbs_square_to_out_toom_4_scratch_len(n)
+    } else if n < SQR_TOOM8_THRESHOLD {
+        limbs_square_to_out_toom_6_scratch_len(n)
+    } else if n < SQR_FFT_THRESHOLD {
+        limbs_square_to_out_toom_8_scratch_len(n)
+    } else {
+        limbs_square_to_out_fft_scratch_len(n)
+    }
+}}
 
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -946,7 +967,7 @@ const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
 // This is equivalent to `mpn_sqr` from `mpn/generic/sqr.c`, GMP 6.2.1.
 pub_crate_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
-limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
+limbs_square_to_out(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     assert!(n >= 1);
     if n < SQR_BASECASE_THRESHOLD {
@@ -956,32 +977,24 @@ limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
     } else if n < SQR_TOOM2_THRESHOLD {
         limbs_square_to_out_basecase(out, xs);
     } else if n < SQR_TOOM3_THRESHOLD {
-        // Allocate workspace of fixed size on stack: fast!
-        let mut scratch =
-            [0; limbs_square_to_out_toom_2_scratch_len(SQR_TOOM3_THRESHOLD_LIMIT - 1)];
-        assert!(SQR_TOOM3_THRESHOLD <= SQR_TOOM3_THRESHOLD_LIMIT);
-        limbs_square_to_out_toom_2(out, xs, &mut scratch);
+        limbs_square_to_out_toom_2(out, xs, scratch);
     } else if n < SQR_TOOM4_THRESHOLD {
-        let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(n)];
-        limbs_square_to_out_toom_3(out, xs, &mut scratch);
+        limbs_square_to_out_toom_3(out, xs, scratch);
     } else if n < SQR_TOOM6_THRESHOLD {
-        let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(n)];
-        limbs_square_to_out_toom_4(out, xs, &mut scratch);
+        limbs_square_to_out_toom_4(out, xs, scratch);
     } else if n < SQR_TOOM8_THRESHOLD {
-        let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(n)];
-        limbs_square_to_out_toom_6(out, xs, &mut scratch);
+        limbs_square_to_out_toom_6(out, xs, scratch);
     } else if n < SQR_FFT_THRESHOLD {
-        let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(n)];
-        limbs_square_to_out_toom_8(out, xs, &mut scratch);
+        limbs_square_to_out_toom_8(out, xs, scratch);
     } else {
-        // The current FFT code allocates its own space. That should probably change.
-        limbs_mul_greater_to_out_fft(out, xs, xs);
+        limbs_square_to_out_fft(out, xs, scratch);
     }
 }}
 
 pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len() << 1];
-    limbs_square_to_out(&mut out, xs);
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
+    limbs_square_to_out(&mut out, xs, &mut square_scratch);
     out
 }}
 

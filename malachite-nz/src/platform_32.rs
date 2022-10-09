@@ -434,3 +434,9 @@ pub const TABLE_2N_MINUS_POPC_2N: [u8; 24] =
     [1, 3, 4, 7, 8, 10, 11, 15, 16, 18, 19, 22, 23, 25, 26, 31, 32, 34, 35, 38, 39, 41, 42, 46];
 
 pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 49;
+
+// end of auto-generated code
+
+pub const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
+
+pub const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];

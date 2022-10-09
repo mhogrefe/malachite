@@ -929,8 +929,8 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     assert_eq!(r3.len(), m);
     assert_eq!(r5.len(), m);
     let (out_lo, remainder) = out.split_at_mut(3 * n);
-    let out_lo = &mut out_lo[..2 * n];
-    let (r4, r2) = remainder.split_at_mut(4 * n);
+    let out_lo = &mut out_lo[..n << 1];
+    let (r4, r2) = remainder.split_at_mut(n << 2);
     let r4 = &mut r4[..m];
     // Interpolation
     if half {
@@ -1137,7 +1137,6 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     assert_eq!(r3.len(), m);
     assert_eq!(r5.len(), m);
     assert_eq!(r7.len(), m);
-    assert_eq!(scratch.len(), m);
     let (pp_lo, remainder) = out.split_at_mut(3 * n);
     let pp_lo = &mut pp_lo[..n << 1];
     split_into_chunks_mut!(remainder, n << 2, [r6, r4], r2);

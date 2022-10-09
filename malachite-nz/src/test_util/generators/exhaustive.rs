@@ -20,7 +20,9 @@ use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::*;
+use crate::natural::arithmetic::mul::fft::{
+    limbs_mul_greater_to_out_fft_is_valid, limbs_square_to_out_fft_is_valid,
+};
 use crate::natural::arithmetic::mul::limb::{
     limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
 };
@@ -2692,18 +2694,15 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_29<T: PrimitiveUnsigned>() -> It<(Ve
     exhaustive_square_helper(&limbs_square_to_out_toom_8_input_size_valid, 40)
 }
 
-pub fn exhaustive_unsigned_vec_pair_gen_var_30<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
-    exhaustive_square_helper(&|_| true, 1)
-}
+// vars 32 to 33 are in malachite-base.
 
-pub fn exhaustive_unsigned_vec_pair_gen_var_31<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
-    exhaustive_square_helper(
-        &|x| limbs_mul_greater_to_out_fft_input_sizes_threshold(x, x),
-        15,
-    )
+pub fn exhaustive_unsigned_vec_pair_gen_var_34<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
+    #[cfg(feature = "32_bit_limbs")]
+    let limit = 56;
+    #[cfg(not(feature = "32_bit_limbs"))]
+    let limit = 28;
+    exhaustive_square_helper(&limbs_square_to_out_fft_is_valid, limit)
 }
-
-// var 32 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -3145,11 +3144,6 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_16<T: PrimitiveUnsigned>(
     exhaustive_mul_helper(&limbs_mul_greater_to_out_toom_8h_input_sizes_valid, 86, 86)
 }
 
-pub fn exhaustive_unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>(
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    exhaustive_mul_helper(&limbs_mul_greater_to_out_fft_input_sizes_threshold, 15, 15)
-}
-
 fn exhaustive_mul_same_length_helper<T: PrimitiveUnsigned, F: Fn(usize, usize) -> bool>(
     valid: &'static F,
     min_x: u64,
@@ -3189,17 +3183,6 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_19<T: PrimitiveUnsigned>(
 pub fn exhaustive_unsigned_vec_triple_gen_var_20<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     exhaustive_mul_same_length_helper(&limbs_mul_greater_to_out_toom_8h_input_sizes_valid, 86)
-}
-
-pub fn exhaustive_unsigned_vec_triple_gen_var_21<T: PrimitiveUnsigned>(
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    exhaustive_mul_same_length_helper(
-        &|xs_len, ys_len| {
-            limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
-                && limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
-        },
-        86,
-    )
 }
 
 pub fn exhaustive_unsigned_vec_triple_gen_var_22<T: PrimitiveUnsigned>(
@@ -3612,6 +3595,11 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_58<T: PrimitiveUnsigned>(
 }
 
 // var 59 is in malachite-base.
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_helper(&limbs_mul_greater_to_out_fft_is_valid, 1, 1)
+}
 
 // -- (Vec<PrimitiveUnsigned> * 4) --
 

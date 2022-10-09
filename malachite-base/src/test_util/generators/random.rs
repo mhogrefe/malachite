@@ -6188,6 +6188,8 @@ pub fn random_primitive_int_vec_pair_gen_var_27<T: PrimitiveInt>(
     )
 }
 
+// var 28 is in malachite-nz.
+
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, bool) --
 
 pub fn random_primitive_int_vec_primitive_int_vec_bool_triple_gen_var_1<T: PrimitiveInt>(
@@ -7109,6 +7111,8 @@ pub fn random_primitive_int_vec_triple_gen_var_46<T: PrimitiveInt>(
         }),
     )
 }
+
+// var 47 is in malachite-nz.
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 

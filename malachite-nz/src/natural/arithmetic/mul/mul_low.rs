@@ -2,16 +2,16 @@ use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
+    limbs_mul_same_length_to_out_scratch_len,
 };
 use crate::platform::Limb;
 use crate::platform::{
-    MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD, MUL_FFT_THRESHOLD,
-    MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+    MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD, MUL_TOOM22_THRESHOLD,
+    MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
 use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 
@@ -114,7 +114,8 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     // Split as x = x_1 *  2 ^ (n_hi * Limb::WIDTH) + x_0, y = y_1 * 2 ^ (n_hi * Limb::WIDTH) + y_0
     let (xs_lo, xs_hi) = xs.split_at(n_hi);
     // x_0 * y_0
-    limbs_mul_same_length_to_out(out, xs_lo, &ys[..n_hi]);
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(n_hi)];
+    limbs_mul_same_length_to_out(out, xs_lo, &ys[..n_hi], &mut mul_scratch);
     let ys_lo = &ys[..n_lo];
     let (out_lo, out_hi) = out.split_at_mut(n);
     // x_1 * y_0 * 2 ^ (n_hi * Limb::WIDTH)
@@ -230,7 +231,8 @@ limbs_mul_low_same_length_divide_and_conquer(
     // Split as x = x_1 *  2 ^ (n_hi * Limb::WIDTH) + x_0, y = y_1 * 2 ^ (n_hi * Limb::WIDTH) + y_0
     let (xs_lo, xs_hi) = xs.split_at(n_hi);
     // x_0 * y_0
-    limbs_mul_same_length_to_out(scratch, xs_lo, &ys[..n_hi]);
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(n_hi)];
+    limbs_mul_same_length_to_out(scratch, xs_lo, &ys[..n_hi], &mut mul_scratch);
     out_lo.copy_from_slice(&scratch[..n_hi]);
     let ys_lo = &ys[..n_lo];
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
@@ -276,11 +278,8 @@ pub_test! {limbs_mul_low_same_length_large(
     let n = xs.len();
     // For really large operands, use plain limbs_mul_same_length_to_out but throw away
     // the upper n limbs of the result.
-    if !TUNE_PROGRAM_BUILD && MULLO_MUL_N_THRESHOLD > MUL_FFT_THRESHOLD {
-        limbs_mul_greater_to_out_fft(scratch, xs, ys);
-    } else {
-        limbs_mul_same_length_to_out(scratch, xs, ys);
-    }
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(n)];
+    limbs_mul_same_length_to_out(scratch, xs, ys, &mut mul_scratch);
     out.copy_from_slice(&scratch[..n]);
 }}
 

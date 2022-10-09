@@ -1,7 +1,9 @@
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
-use crate::natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
+};
 use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out,
@@ -157,21 +159,22 @@ pub_test! {limbs_matrix_2_2_mul_small(
     split_into_chunks_mut!(remainder, out_len, [p0, p1], _unused);
     let mut t0 = &mut *xs00;
     let mut t1 = &mut *xs01;
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(xs_len, ys_len)];
     for _ in 0..2 {
         let t0_0 = &t0[..xs_len];
         scratch.copy_from_slice(t0_0);
         if xs_len >= ys_len {
-            limbs_mul_greater_to_out(p0, t0_0, ys00);
+            limbs_mul_greater_to_out(p0, t0_0, ys00, &mut mul_scratch);
             let t1_0 = &t1[..xs_len];
-            limbs_mul_greater_to_out(p1, t1_0, ys11);
-            limbs_mul_greater_to_out(t0, t1_0, ys10);
-            limbs_mul_greater_to_out(t1, scratch, ys01);
+            limbs_mul_greater_to_out(p1, t1_0, ys11, &mut mul_scratch);
+            limbs_mul_greater_to_out(t0, t1_0, ys10, &mut mul_scratch);
+            limbs_mul_greater_to_out(t1, scratch, ys01, &mut mul_scratch);
         } else {
-            limbs_mul_greater_to_out(p0, ys00, t0_0);
+            limbs_mul_greater_to_out(p0, ys00, t0_0, &mut mul_scratch);
             let t1_0 = &t1[..xs_len];
-            limbs_mul_greater_to_out(p1, ys11, t1_0);
-            limbs_mul_greater_to_out(t0, ys10, t1_0);
-            limbs_mul_greater_to_out(t1, ys01, scratch);
+            limbs_mul_greater_to_out(p1, ys11, t1_0, &mut mul_scratch);
+            limbs_mul_greater_to_out(t0, ys10, t1_0, &mut mul_scratch);
+            limbs_mul_greater_to_out(t1, ys01, scratch, &mut mul_scratch);
         }
         let (t0_last, t0_init) = t0[..out_len + 1].split_last_mut().unwrap();
         *t0_last = Limb::iverson(limbs_slice_add_same_length_in_place_left(t0_init, p0));
@@ -256,9 +259,19 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     let xs10_lo = &xs10[..xs_len];
     let xs11 = &mut xs11[..sum_len + 1];
     let xs11_lo = &mut xs11[..xs_len];
-
     // u5 = s5 * t6
-    limbs_mul_to_out(u0, xs01_lo_init, ys10);
+    let mut mul_scratch = vec![
+        0;
+        max!(
+            limbs_mul_to_out_scratch_len(sum_len + 1, ys_len + 1),
+            limbs_mul_to_out_scratch_len(xs_len + 1, ys_len),
+            limbs_mul_to_out_scratch_len(xs_len, ys_len + 1),
+            limbs_mul_to_out_scratch_len(xs_len + 1, ys_len + 1)
+        )
+    ];
+    assert!(xs01_lo_init.len() <= sum_len + 1);
+    assert!(ys10.len() <= ys_len + 1);
+    limbs_mul_to_out(u0, xs01_lo_init, ys10, &mut mul_scratch);
     // xs11 - xs10
     let mut x11_sign = limbs_sub_abs_same_length_in_place_left(xs11_lo, xs10_lo);
     let x01_sign = if x11_sign {
@@ -287,7 +300,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         limbs_sub_abs_same_length_to_out(s0_init, xs00_lo, xs01_lo_init)
     };
     // u0 = s0 * t0
-    limbs_mul_to_out(u1, xs00_lo, ys00);
+    limbs_mul_to_out(u1, xs00_lo, ys00, &mut mul_scratch);
     let (u0_last, u0_init) = u0.split_last_mut().unwrap();
     xs00[sum_len] = Limb::iverson(limbs_add_same_length_to_out(xs00, u0_init, &u1[..sum_len]));
     // u0 + u5
@@ -296,7 +309,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // Reverse sign!
     let u1_sign = x11_sign == t0_sign;
     // u2 = s2 * t2
-    limbs_mul_to_out(u1, xs11_lo, t0_init);
+    limbs_mul_to_out(u1, xs11_lo, t0_init, &mut mul_scratch);
     u1[sum_len] = 0;
     *t0_last = if t0_sign {
         t0_sign = limbs_sub_abs_same_length_in_place_right(ys01, t0_init);
@@ -306,13 +319,13 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     };
     if *t0_last != 0 {
         // u3 = s3 * t3
-        limbs_mul_to_out(xs11, xs01_lo_init, t0);
+        limbs_mul_to_out(xs11, xs01_lo_init, t0, &mut mul_scratch);
         assert!(*xs01_lo_last < 2);
         if *xs01_lo_last != 0 {
             limbs_slice_add_same_length_in_place_left(&mut xs11[xs_len..], t0);
         }
     } else {
-        limbs_mul_to_out(xs11, xs01_lo, t0_init);
+        limbs_mul_to_out(xs11, xs01_lo, t0_init, &mut mul_scratch);
     }
     assert!(xs11[sum_len] < 4);
     *u0_last = 0;
@@ -334,7 +347,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         t0_sign = limbs_sub_abs_same_length_in_place_left(t0_init, ys00);
     }
     // u6 = s6 * t4
-    limbs_mul_to_out(u0, xs10_lo, t0);
+    limbs_mul_to_out(u0, xs10_lo, t0, &mut mul_scratch);
     assert!(u0[sum_len] < 2);
     let (xs01_lo_last, xs01_lo_init) = xs01_lo.split_last_mut().unwrap();
     if x01_sign {
@@ -350,11 +363,11 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // -u2 + u3 + u5
     assert!(xs11[sum_len] < 3);
     // u4 = s4 * t5
-    limbs_mul_to_out(u0, s0, ys01);
+    limbs_mul_to_out(u0, s0, ys01, &mut mul_scratch);
     assert!(u0[sum_len] < 2);
     t0[ys_len] = Limb::iverson(limbs_add_same_length_to_out(t0, ys11, ys01));
     // u1 = s1 * t1
-    limbs_mul_to_out(u1, xs01_lo, t0);
+    limbs_mul_to_out(u1, xs01_lo, t0, &mut mul_scratch);
     assert!(u1[sum_len] < 4);
     let (u1_last, u1_init) = u1.split_last_mut().unwrap();
     assert_eq!(*u1_last, 0);

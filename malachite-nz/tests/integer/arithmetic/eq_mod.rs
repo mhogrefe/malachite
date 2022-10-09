@@ -714,7 +714,7 @@ fn eq_mod_properties() {
         assert_eq!((&x).eq_mod(&y, m.clone()), equal);
         assert_eq!((&x).eq_mod(y.clone(), &m), equal);
         assert_eq!((&x).eq_mod(y.clone(), m.clone()), equal);
-        assert_eq!((&x).clone().eq_mod(&y, &m), equal);
+        assert_eq!(x.clone().eq_mod(&y, &m), equal);
         assert_eq!(x.clone().eq_mod(&y, m.clone()), equal);
         assert_eq!(x.clone().eq_mod(y.clone(), &m), equal);
         assert_eq!(x.clone().eq_mod(y.clone(), m.clone()), equal);

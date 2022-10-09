@@ -6,9 +6,9 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns,
 };
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
-use crate::natural::arithmetic::mul::limbs_mul_to_out;
 use crate::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
-use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
@@ -420,7 +420,8 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
     let start_index = if exponents[0] == digits_per_limb << power_len {
         let power;
         (power, remainder) = remainder[shift..].split_at_mut(len);
-        limbs_square_to_out(remainder, power);
+        let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
+        limbs_square_to_out(remainder, power, &mut square_scratch);
         start = 3;
         isize::exact_from(power_len) - 2
     } else {
@@ -448,7 +449,8 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
             });
             let power;
             (power, remainder) = remainder[start - 3..].split_at_mut(7 - start);
-            limbs_square_to_out(remainder, &power[..len]);
+            let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
+            limbs_square_to_out(remainder, &power[..len], &mut square_scratch);
             start = 7;
         } else {
             remainder[2] = remainder[start - 1];
@@ -462,7 +464,8 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
             });
             let power;
             (power, remainder) = remainder.split_at_mut(3);
-            limbs_square_to_out(remainder, &power[..len]);
+            let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
+            limbs_square_to_out(remainder, &power[..len], &mut square_scratch);
             start = 6;
         }
         isize::exact_from(power_len) - 3
@@ -508,7 +511,8 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
             let power;
             (power, remainder) = remainder.split_at_mut(increment - adjust);
             if i != 0 {
-                limbs_square_to_out(remainder, &power[..len]);
+                let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
+                limbs_square_to_out(remainder, &power[..len], &mut square_scratch);
             }
         }
         for (&exponent, row) in exponents[1..usize::exact_from(start_index + 2)]
@@ -582,7 +586,8 @@ pub_test! {limbs_compute_power_table_using_div<'a>(
     let mut shift = 0;
     for &exp in exponents[..power_len].iter().rev() {
         let two_n = len << 1;
-        limbs_square_to_out(remainder, power);
+        let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(power.len())];
+        limbs_square_to_out(remainder, power, &mut square_scratch);
         len = two_n - 1;
         if remainder[len] != 0 {
             len += 1;
@@ -1405,7 +1410,8 @@ where
         slice_set_zero(&mut out[..adjusted_power_len + 1]);
     } else {
         let (out_lo, out_hi) = out.split_at_mut(shift);
-        limbs_mul_to_out(out_hi, power.power, &scratch[..out_len_hi]);
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(power.power.len(), out_len_hi)];
+        limbs_mul_to_out(out_hi, power.power, &scratch[..out_len_hi], &mut mul_scratch);
         slice_set_zero(out_lo);
     }
     let out_len_lo = if len_lo < SET_STR_DC_THRESHOLD {

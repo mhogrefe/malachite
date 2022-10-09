@@ -13,7 +13,8 @@ use crate::natural::arithmetic::mul::mul_mod::{
     limbs_mul_mod_base_pow_n_minus_1_next_size, limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use crate::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
+    limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::sub::{
@@ -555,7 +556,8 @@ pub_test! {limbs_div_divide_and_conquer(
     let highest_q = limbs_div_divide_and_conquer_approx(&mut scratch_2, &mut scratch, ds, d_inv);
     let (scratch_2_head, scratch_2_tail) = scratch_2.split_first_mut().unwrap();
     if *scratch_2_head == 0 {
-        limbs_mul_to_out(&mut scratch, scratch_2_tail, ds);
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(q_len, d_len)];
+        limbs_mul_to_out(&mut scratch, scratch_2_tail, ds, &mut mul_scratch);
         let scratch_init = &mut scratch[..n_len];
         // At most is wrong by one, no cycle.
         if highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
@@ -631,7 +633,9 @@ pub_test! {limbs_div_barrett(
             qs.copy_from_slice(scratch_2_tail);
         } else {
             let rs = &mut rs[..n_len];
-            limbs_mul_greater_to_out(rs, scratch_2_tail, ds);
+            let mut mul_scratch =
+                vec![0; limbs_mul_greater_to_out_scratch_len(scratch_2_tail.len(), ds.len())];
+            limbs_mul_greater_to_out(rs, scratch_2_tail, ds, &mut mul_scratch);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
                 || limbs_cmp_same_length(rs, ns) == Ordering::Greater
             {
@@ -667,7 +671,9 @@ pub_test! {limbs_div_barrett(
             qs.copy_from_slice(scratch_2_tail);
         } else {
             let mut rs = vec![0; n_len];
-            limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail);
+            let mut mul_scratch =
+                vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
+            limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
                 || limbs_cmp_same_length(&rs, ns) == Ordering::Greater
             {
@@ -878,7 +884,8 @@ fn limbs_div_divide_and_conquer_approx_helper(
     } else {
         limbs_div_mod_divide_and_conquer_helper(qs_hi, ns_hi, ds_hi, d_inv, scratch)
     };
-    limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_lo);
+    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(hi, ds_lo.len())];
+    limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_lo, &mut mul_scratch);
     let ns_lo = &mut ns[..d_len];
     let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
         ns_lo,
@@ -1029,7 +1036,8 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
             };
             let qs = &mut qs_hi[..q_len_mod_d_len];
             if q_len_mod_d_len != d_len {
-                limbs_mul_to_out(&mut scratch, qs, ds_lo);
+                let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(qs.len(), ds_lo.len())];
+                limbs_mul_to_out(&mut scratch, qs, ds_lo, &mut mul_scratch);
                 let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
                     &mut ns_hi[..d_len],
                     &scratch[..d_len],
@@ -1221,6 +1229,7 @@ fn limbs_div_barrett_approx_preinverted(
     } else {
         Box::new(ns_lo.rchunks(i_len))
     };
+    let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(i_len)];
     for (ns, qs) in ns_iter.zip(qs.rchunks_mut(i_len)) {
         let chunk_len = qs.len();
         if i_len != chunk_len {
@@ -1232,7 +1241,7 @@ fn limbs_div_barrett_approx_preinverted(
         let (rs_lo, rs_hi) = rs.split_at_mut(n);
         // Compute the next block of quotient limbs by multiplying the inverse I by the upper part
         // of the partial remainder R.
-        limbs_mul_same_length_to_out(scratch, rs_hi, is);
+        limbs_mul_same_length_to_out(scratch, rs_hi, is, &mut mul_scratch);
         // i's highest bit is implicit
         carry = limbs_add_same_length_to_out(qs, &scratch[i_len..i_len << 1], rs_hi);
         assert!(!carry);
@@ -1244,7 +1253,8 @@ fn limbs_div_barrett_approx_preinverted(
         // partial remainder combined with new limbs from the dividend N. We only really need the
         // low d_len limbs.
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
-            limbs_mul_greater_to_out(scratch, ds, qs);
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
+            limbs_mul_greater_to_out(scratch, ds, qs, &mut mul_scratch);
         } else {
             limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
         }
@@ -1680,7 +1690,9 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
     qs[..q_len].copy_from_slice(scratch_2_tail);
     if *scratch_2_head <= 4 {
         let mut rs = vec![0; n_len + 1];
-        limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail);
+        let mut mul_scratch =
+            vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
+        limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
         let r_len = if rs[n_len] == 0 { n_len } else { n_len + 1 };
         if r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less {
             assert!(!limbs_sub_limb_in_place(qs, 1));

@@ -1,6 +1,8 @@
 use crate::natural::arithmetic::div::{limbs_div_limb_to_out, limbs_div_to_out};
 use crate::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use crate::natural::arithmetic::pow::limbs_pow;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
@@ -298,7 +300,8 @@ fn limbs_root_to_out_internal(
             let pow_xs = limbs_pow(ss_trimmed, exp - 1);
             ws[..pow_xs.len()].copy_from_slice(&pow_xs);
             ws_len = pow_xs.len();
-            limbs_mul_greater_to_out(qs, &ws[..ws_len], ss_trimmed);
+            let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ws_len, ss_len)];
+            limbs_mul_greater_to_out(qs, &ws[..ws_len], ss_trimmed, &mut mul_scratch);
             qs_len = ws_len + ss_len;
             if qs[qs_len - 1] == 0 {
                 qs_len -= 1;

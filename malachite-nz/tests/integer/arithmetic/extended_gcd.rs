@@ -216,8 +216,8 @@ fn extended_gcd_properties() {
 
         // uniqueness
         if a != 0u32 && b != 0u32 && &gcd != min(a.unsigned_abs_ref(), b.unsigned_abs_ref()) {
-            assert!((&x).le_abs(&((&b).div_exact(Integer::from(&gcd)) >> 1u32)));
-            assert!((&y).le_abs(&((&a).div_exact(Integer::from(&gcd)) >> 1u32)));
+            assert!(x.le_abs(&((&b).div_exact(Integer::from(&gcd)) >> 1u32)));
+            assert!(y.le_abs(&((&a).div_exact(Integer::from(&gcd)) >> 1u32)));
         }
 
         let reverse = (&b).extended_gcd(&a);

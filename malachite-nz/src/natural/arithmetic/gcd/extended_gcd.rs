@@ -15,7 +15,7 @@ use crate::natural::arithmetic::gcd::half_gcd::{
     limbs_half_gcd_scratch_len, GcdSubdivideStepContext, HalfGcdMatrix, HalfGcdMatrix1,
 };
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use crate::natural::arithmetic::mul::limbs_mul_to_out;
+use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::Small;
@@ -137,7 +137,8 @@ impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
                 // and b - a), and we can get a large quotient only just after a swscratch_len,
                 // which means that we'll add (a multiple of) the larger u to the smaller.
                 let scratch = &mut *self.scratch;
-                limbs_mul_to_out(scratch, &qs[..qs_len], &us1[..us1_len]);
+                let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(qs_len, us1_len)];
+                limbs_mul_to_out(scratch, &qs[..qs_len], &us1[..us1_len], &mut mul_scratch);
                 us1_len += qs_len;
                 if scratch[us1_len - 1] == 0 {
                     us1_len -= 1;
@@ -328,11 +329,12 @@ fn limbs_half_gcd_matrix_mul_vector<'a>(
     let mut big_n = n + m_n;
     let scratch = &mut scratch[..big_n];
     let (m00, m01, m10, m11) = m.get_four();
-    limbs_mul_to_out(scratch, &m00[..m_n], xs);
-    limbs_mul_to_out(&mut rp[..big_n], &m10[..m_n], ys_lo);
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(m_n, n)];
+    limbs_mul_to_out(scratch, &m00[..m_n], xs, &mut mul_scratch);
+    limbs_mul_to_out(&mut rp[..big_n], &m10[..m_n], ys_lo, &mut mul_scratch);
     let a_high = limbs_slice_add_same_length_in_place_left(&mut rp[..big_n], scratch);
-    limbs_mul_to_out(scratch, &m11[..m_n], ys_lo);
-    limbs_mul_to_out(ys, &m01[..m_n], xs);
+    limbs_mul_to_out(scratch, &m11[..m_n], ys_lo, &mut mul_scratch);
+    limbs_mul_to_out(ys, &m01[..m_n], xs, &mut mul_scratch);
     let b_high = limbs_slice_add_same_length_in_place_left(&mut ys[..big_n], scratch);
     if a_high || b_high {
         rp[big_n] = Limb::iverson(a_high);
@@ -381,7 +383,8 @@ fn limbs_extended_gcd_cofactor(
     assert_ne!(ss[size - 1], 0);
     let xs_len = n - slice_trailing_zeros(xs);
     assert!(gs_len <= xs_len);
-    limbs_mul_to_out(scratch, &xs[..xs_len], &ss[..size]);
+    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(xs_len, size)];
+    limbs_mul_to_out(scratch, &xs[..xs_len], &ss[..size], &mut mul_scratch);
     size += xs_len;
     let scratch = &mut scratch[..size];
     if ss_len != 0 && ss_sign {
@@ -672,7 +675,8 @@ pub fn limbs_extended_gcd(
         assert!(lehmer_vs_len + us0_len <= scratch_len);
         // We may still have v == 0
         // Compute u us0
-        limbs_mul_to_out(ss, &us1[..us1_len], lehmer_ss);
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(us1_len, lehmer_ss.len())];
+        limbs_mul_to_out(ss, &us1[..us1_len], lehmer_ss, &mut mul_scratch);
         us_len = us1_len + lehmer_us_len;
         assert!(us_len <= scratch_len);
         if ss[us_len - 1] == 0 {
@@ -680,7 +684,8 @@ pub fn limbs_extended_gcd(
         }
         if lehmer_vs_len != 0 {
             // Overwrites old us1 value
-            limbs_mul_to_out(us1, us0, &lehmer_vs[..lehmer_vs_len]);
+            let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(us0.len(), lehmer_vs_len)];
+            limbs_mul_to_out(us1, us0, &lehmer_vs[..lehmer_vs_len], &mut mul_scratch);
             us1_len = us0_len + lehmer_vs_len;
             if us1[us1_len - 1] == 0 {
                 us1_len -= 1;

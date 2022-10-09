@@ -137,7 +137,6 @@ pub trait PrimitiveFloat:
     + Display
     + Div<Output = Self>
     + DivAssign
-    + Display
     + Floor<Output = Self>
     + FloorAssign
     + FloorLogBase2<Output = i64>

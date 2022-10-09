@@ -15,7 +15,9 @@ use crate::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
-use crate::natural::arithmetic::mul::fft::*;
+use crate::natural::arithmetic::mul::fft::{
+    limbs_mul_greater_to_out_fft_is_valid, limbs_square_to_out_fft_is_valid,
+};
 use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
@@ -4108,23 +4110,17 @@ pub fn random_primitive_int_vec_pair_gen_var_23<T: PrimitiveInt>(
     random_square_helper(config, &limbs_square_to_out_toom_8_input_size_valid, 40)
 }
 
-pub fn random_primitive_int_vec_pair_gen_var_24<T: PrimitiveInt>(
+// vars 26 to 27 are in malachite-base.
+
+pub fn random_primitive_int_vec_pair_gen_var_28<T: PrimitiveInt>(
     config: &GenConfig,
 ) -> It<(Vec<T>, Vec<T>)> {
-    random_square_helper(config, &|_| true, 1)
+    #[cfg(feature = "32_bit_limbs")]
+    let limit = 56;
+    #[cfg(not(feature = "32_bit_limbs"))]
+    let limit = 28;
+    random_square_helper(config, &limbs_square_to_out_fft_is_valid, limit)
 }
-
-pub fn random_primitive_int_vec_pair_gen_var_25<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>)> {
-    random_square_helper(
-        config,
-        &|x| limbs_mul_greater_to_out_fft_input_sizes_threshold(x, x),
-        15,
-    )
-}
-
-// var 26 is in malachite-base.
 
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
 
@@ -4300,17 +4296,6 @@ pub fn random_primitive_int_vec_triple_gen_var_16<T: PrimitiveInt>(
     )
 }
 
-pub fn random_primitive_int_vec_triple_gen_var_17<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    random_mul_helper(
-        config,
-        &limbs_mul_greater_to_out_fft_input_sizes_threshold,
-        15,
-        15,
-    )
-}
-
 fn random_mul_same_length_helper<T: PrimitiveInt, F: Fn(usize, usize) -> bool>(
     config: &GenConfig,
     valid: &'static F,
@@ -4363,19 +4348,6 @@ pub fn random_primitive_int_vec_triple_gen_var_20<T: PrimitiveInt>(
     random_mul_same_length_helper(
         config,
         &limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-        86,
-    )
-}
-
-pub fn random_primitive_int_vec_triple_gen_var_21<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    random_mul_same_length_helper(
-        config,
-        &|xs_len, ys_len| {
-            limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
-                && limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
-        },
         86,
     )
 }
@@ -4463,6 +4435,40 @@ pub fn random_primitive_int_vec_triple_gen_var_45<T: PrimitiveInt>(
 }
 
 // var 46 is in malachite-base.
+
+pub fn random_primitive_int_vec_triple_gen_var_47<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    #[cfg(feature = "32_bit_limbs")]
+    let limit = 112;
+    #[cfg(not(feature = "32_bit_limbs"))]
+    let limit = 56;
+    Box::new(PrimitiveIntVecTripleLenGenerator1 {
+        phantom: PhantomData,
+        lengths: random_triples_from_single(geometric_random_positive_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(move |(o, mut x, mut y)| {
+            let sum = x + y;
+            if sum <= limit {
+                if o.odd() {
+                    x += limit - sum + 1;
+                } else {
+                    y += limit - sum + 1;
+                }
+            }
+            if limbs_mul_greater_to_out_fft_is_valid(usize::exact_from(x), usize::exact_from(y)) {
+                let o = x.checked_add(y)?.checked_add(o)?;
+                Some((o, x, y))
+            } else {
+                None
+            }
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
 
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 

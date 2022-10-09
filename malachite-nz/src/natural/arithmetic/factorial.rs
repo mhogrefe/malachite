@@ -1,8 +1,10 @@
 use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use crate::malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
-use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::factorization::prime_sieve::{
     id_to_n, limbs_prime_sieve, limbs_prime_sieve_size, n_to_bit,
 };
@@ -222,7 +224,7 @@ fn log_n_max(n: Limb) -> u64 {
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1, where the output buffer
 // is supplied and the size is returned.
-pub_test! {limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
+pub_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
         assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);
@@ -309,7 +311,8 @@ pub_test! {limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                 } else {
                     size = out_len << 1;
                     square = vec![0; size];
-                    limbs_square_to_out(&mut square, &out[..out_len]);
+                    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
+                    limbs_square_to_out(&mut square, &out[..out_len], &mut square_scratch);
                     if square[size - 1] == 0 {
                         size -= 1;
                     }
@@ -318,7 +321,13 @@ pub_test! {limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                 out.resize(out_len, 0);
                 assert!(ns <= size);
                 // n != n$ * floor(n / 2)! ^ 2
-                if limbs_mul_greater_to_out(&mut out, &square[..size], &swing_and_sieve[..ns]) == 0
+                let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(size, ns)];
+                if limbs_mul_greater_to_out(
+                    &mut out,
+                    &square[..size],
+                    &swing_and_sieve[..ns],
+                    &mut mul_scratch,
+                ) == 0
                 {
                     out_len -= 1;
                 }

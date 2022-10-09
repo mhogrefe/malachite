@@ -2717,27 +2717,17 @@ pub fn unsigned_vec_pair_gen_var_28<T: PrimitiveUnsigned>() -> Generator<(Vec<T>
     )
 }
 
-// All `(Vec<T>, Vec<T>)` where `T` is unsigned, neither `Vec` is empty, and the first `Vec` is at
-// least twice as long as the second.
-pub fn unsigned_vec_pair_gen_var_29<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+// vars 31 to 32 are in malachite-base.
+
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned and `out` and `xs` are valid inputs to
+// `limbs_square_fft_alt`.
+pub fn unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
     Generator::new(
-        &exhaustive_unsigned_vec_pair_gen_var_30,
-        &random_primitive_int_vec_pair_gen_var_24,
-        &special_random_unsigned_vec_pair_gen_var_30,
+        &exhaustive_unsigned_vec_pair_gen_var_34,
+        &random_primitive_int_vec_pair_gen_var_28,
+        &special_random_unsigned_vec_pair_gen_var_34,
     )
 }
-
-// All `(Vec<T>, Vec<T>)` where `T` is unsigned and `out`, `xs`, and `xs` would trigger the actual
-// FFT code of `limbs_mul_greater_to_out_fft`.
-pub fn unsigned_vec_pair_gen_var_30<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
-    Generator::new(
-        &exhaustive_unsigned_vec_pair_gen_var_31,
-        &random_primitive_int_vec_pair_gen_var_25,
-        &special_random_unsigned_vec_pair_gen_var_31,
-    )
-}
-
-// var 31 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -3020,17 +3010,6 @@ pub fn unsigned_vec_triple_gen_var_16<T: PrimitiveUnsigned>() -> Generator<(Vec<
     )
 }
 
-// All `(Vec<T>, Vec<T>, Vec<T>)` that would trigger the actual FFT code of
-// `limbs_mul_greater_to_out_fft`.
-pub fn unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
-{
-    Generator::new(
-        &exhaustive_unsigned_vec_triple_gen_var_17,
-        &random_primitive_int_vec_triple_gen_var_17,
-        &special_random_unsigned_vec_triple_gen_var_17,
-    )
-}
-
 // All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `limbs_mul_greater_to_out_toom_33`, and
 // where the second and third `Vec`s have the same length.
 pub fn unsigned_vec_triple_gen_var_18<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
@@ -3061,18 +3040,6 @@ pub fn unsigned_vec_triple_gen_var_20<T: PrimitiveUnsigned>() -> Generator<(Vec<
         &exhaustive_unsigned_vec_triple_gen_var_20,
         &random_primitive_int_vec_triple_gen_var_20,
         &special_random_unsigned_vec_triple_gen_var_20,
-    )
-}
-
-// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `limbs_mul_greater_to_out_toom_8h`,
-// where the `Vec`s would trigger the actual FFT code of `limbs_mul_greater_to_out_fft`, and where
-// the second and third `Vec`s have the same length.
-pub fn unsigned_vec_triple_gen_var_21<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
-{
-    Generator::new(
-        &exhaustive_unsigned_vec_triple_gen_var_21,
-        &random_primitive_int_vec_triple_gen_var_21,
-        &special_random_unsigned_vec_triple_gen_var_21,
     )
 }
 
@@ -3243,6 +3210,16 @@ pub fn unsigned_vec_triple_gen_var_58<T: PrimitiveUnsigned>() -> Generator<(Vec<
 }
 
 // var 59 is in malachite-base.
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to both `limbs_mul_fft_alt`.
+pub fn unsigned_vec_triple_gen_var_60<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_60,
+        &random_primitive_int_vec_triple_gen_var_47,
+        &special_random_unsigned_vec_triple_gen_var_60,
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned> * 4) --
 

@@ -7938,6 +7938,8 @@ pub fn special_random_unsigned_vec_pair_gen_var_33<T: PrimitiveUnsigned>(
     )
 }
 
+// var 34 is in malachite-nz.
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, bool) --
 
 pub fn special_random_unsigned_vec_unsigned_vec_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -9145,6 +9147,8 @@ pub fn special_random_unsigned_vec_triple_gen_var_59<T: PrimitiveUnsigned>(
         }),
     )
 }
+
+// var 60 is in malachite-nz.
 
 // -- large types --
 

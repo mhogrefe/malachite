@@ -12420,7 +12420,7 @@ fn test_mod() {
         let num_u = BigUint::from_str(s).unwrap();
         let num_v = BigUint::from_str(t).unwrap();
 
-        let r = (&num_u).mod_floor(&num_v);
+        let r = num_u.mod_floor(&num_v);
         assert_eq!(r.to_string(), remainder);
 
         let r = num_u % num_v;

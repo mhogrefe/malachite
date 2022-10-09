@@ -220,7 +220,7 @@ fn limbs_mod_power_of_2_pow_properties() {
 #[test]
 fn mod_power_of_2_pow_properties() {
     natural_natural_unsigned_triple_gen_var_5().test_properties(|(x, exp, pow)| {
-        assert!((&x).mod_power_of_2_is_reduced(pow));
+        assert!(x.mod_power_of_2_is_reduced(pow));
         let power_val_val = x.clone().mod_power_of_2_pow(exp.clone(), pow);
         let power_val_ref = x.clone().mod_power_of_2_pow(&exp, pow);
         let power_ref_val = (&x).mod_power_of_2_pow(exp.clone(), pow);

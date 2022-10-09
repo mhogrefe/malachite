@@ -348,8 +348,8 @@ fn limbs_mod_power_of_2_sub_in_place_either_properties() {
 #[test]
 fn mod_power_of_2_sub_properties() {
     natural_natural_unsigned_triple_gen_var_4().test_properties(|(x, y, pow)| {
-        assert!((&x).mod_power_of_2_is_reduced(pow));
-        assert!((&y).mod_power_of_2_is_reduced(pow));
+        assert!(x.mod_power_of_2_is_reduced(pow));
+        assert!(y.mod_power_of_2_is_reduced(pow));
         let diff_val_val = x.clone().mod_power_of_2_sub(y.clone(), pow);
         let diff_val_ref = x.clone().mod_power_of_2_sub(&y, pow);
         let diff_ref_val = (&x).mod_power_of_2_sub(y.clone(), pow);

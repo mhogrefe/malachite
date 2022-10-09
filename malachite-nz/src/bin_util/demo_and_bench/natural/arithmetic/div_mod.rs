@@ -28,7 +28,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_to_out, limbs_invert_approx, limbs_invert_basecase_approx, limbs_invert_limb,
     limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
-use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use malachite_nz::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     limbs_div_mod_barrett_helper_bucketer, limbs_div_mod_barrett_product_bucketer,
@@ -922,7 +924,14 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
                 _,
                 _,
             )| {
-                no_out!(limbs_mul_greater_to_out(&mut scratch, &ds, &qs))
+                let mut mul_scratch =
+                    vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), qs.len())];
+                no_out!(limbs_mul_greater_to_out(
+                    &mut scratch,
+                    &ds,
+                    &qs,
+                    &mut mul_scratch
+                ))
             }),
             ("limbs_div_barrett_large_product", &mut |(
                 mut scratch,

@@ -416,7 +416,7 @@ impl EqMod<Integer, Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod(&other.abs, m)
+            self.abs.pos_eq_neg_mod(&other.abs, m)
         }
     }
 }
@@ -472,7 +472,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref(&other.abs, m)
+            self.abs.pos_eq_neg_mod_ref(&other.abs, m)
         }
     }
 }
@@ -528,7 +528,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod(&other.abs, m)
+            self.abs.pos_eq_neg_mod(&other.abs, m)
         }
     }
 }
@@ -584,7 +584,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref(&other.abs, m)
+            self.abs.pos_eq_neg_mod_ref(&other.abs, m)
         }
     }
 }
@@ -640,7 +640,7 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod(&other.abs, m)
+            self.abs.pos_eq_neg_mod(&other.abs, m)
         }
     }
 }
@@ -696,7 +696,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref(&other.abs, m)
+            self.abs.pos_eq_neg_mod_ref(&other.abs, m)
         }
     }
 }
@@ -752,7 +752,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod(&other.abs, m)
+            self.abs.pos_eq_neg_mod(&other.abs, m)
         }
     }
 }
@@ -808,7 +808,7 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, m)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref(&other.abs, m)
+            self.abs.pos_eq_neg_mod_ref(&other.abs, m)
         }
     }
 }

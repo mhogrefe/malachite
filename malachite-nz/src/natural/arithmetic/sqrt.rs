@@ -10,10 +10,12 @@ use crate::natural::arithmetic::div::{
 use crate::natural::arithmetic::div_mod::{
     limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns, limbs_two_limb_inverse_helper,
 };
-use crate::natural::arithmetic::mul::limbs_mul_greater_to_out;
+use crate::natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
+};
 use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use crate::natural::arithmetic::square::limbs_square_to_out;
+use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
@@ -150,7 +152,8 @@ pub_test! {limbs_sqrt_rem_helper(
     }
     let (xs, xs_hi_hi) = xs.split_at_mut(n);
     let (xs_lo, xs_hi) = xs.split_at_mut(two_h1);
-    limbs_square_to_out(xs_hi_hi, out_lo);
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(h1)];
+    limbs_square_to_out(xs_hi_hi, out_lo, &mut square_scratch);
     let mut b = q;
     if limbs_sub_same_length_in_place_left(xs_lo, &xs_hi_hi[..two_h1]) {
         b += 1;
@@ -221,7 +224,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_sqrt` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
-pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
+pub_test!{ limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
     assert_eq!(xs.len(), (n << 1) - odd);
@@ -277,7 +280,12 @@ pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: boo
             // Approximation is not good enough, the extra limb(+ shift bits)
             // is smaller than needed to absorb the possible error.
             // {qs + 1, h1 + 1} equals 2*{out, h1}
-            assert_eq!(limbs_mul_greater_to_out(scratch_lo, out_hi, qs_tail), 0);
+            let mut mul_scratch =
+                vec![0; limbs_mul_greater_to_out_scratch_len(out_hi.len(), qs_tail.len())];
+            assert_eq!(
+                limbs_mul_greater_to_out(scratch_lo, out_hi, qs_tail, &mut mul_scratch),
+                0
+            );
             // scratch_hi_1 len is n + h1 + 2
             let scratch_hi_1 = &mut scratch_hi[1..];
             // scratch_lo_hi len is h1 + 1
@@ -303,7 +311,8 @@ pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: boo
             // scratch_hi_1_hi len is 2 * h1 + 2
             let (scratch_hi_1_lo, scratch_hi_1_hi) = scratch_hi_1.split_at_mut(h1);
             if slice_test_zero(&scratch_hi_1_hi[..h2 - h1]) {
-                limbs_square_to_out(scratch_lo, out_lo);
+                let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_lo.len())];
+                limbs_square_to_out(scratch_lo, out_lo, &mut square_scratch);
                 // scratch_lo_hi len is h2 + 1
                 let (scratch_lo_lo, scratch_lo_hi) = scratch_lo.split_at(h1);
                 let mut cmp = limbs_cmp_same_length(scratch_hi_1_lo, &scratch_lo_hi[..h1]);

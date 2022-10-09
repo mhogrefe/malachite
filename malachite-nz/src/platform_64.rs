@@ -22,7 +22,7 @@ pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
 pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
-pub const MUL_FFT_THRESHOLD: usize = 3000;
+pub const MUL_FFT_THRESHOLD: usize = 1500;
 
 pub const DC_DIV_QR_THRESHOLD: usize = 85;
 pub const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
@@ -1954,3 +1954,9 @@ pub const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
 ];
 
 pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
+
+// end of auto-generated code
+
+pub const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
+
+pub const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];

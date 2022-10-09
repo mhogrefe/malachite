@@ -3,7 +3,9 @@ use malachite_base::test_util::bench::bucketers::pair_2_vec_len_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
+use malachite_nz::natural::arithmetic::mul::fft::{
+    limbs_square_to_out_fft, limbs_square_to_out_fft_scratch_len,
+};
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
@@ -250,7 +252,8 @@ fn benchmark_limbs_square_to_out_fft_algorithms(
                 limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
             }),
             ("FFT", &mut |(mut out, xs)| {
-                limbs_mul_greater_to_out_fft(&mut out, &xs, &xs)
+                let mut scratch = vec![0; limbs_square_to_out_fft_scratch_len(xs.len())];
+                limbs_square_to_out_fft(&mut out, &xs, &mut scratch)
             }),
         ],
     );

@@ -25,18 +25,7 @@ fn bench_mul(c: &mut Criterion) {
     let plot_config = PlotConfiguration::default().summary_scale(AxisScale::Logarithmic);
     group.plot_config(plot_config);
     let sizes = [
-        1u64,
-        10,
-        100,
-        1000,
-        10000,
-        100000,
-        1000000,
-        10000000,
-        100000000,
-        1000000000,
-        10000000000,
-        100000000000,
+        1u64, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000,
     ];
     for &i in sizes.iter() {
         let x = get_random_natural_with_bits(&mut random_primitive_ints(EXAMPLE_SEED.fork("a")), i);

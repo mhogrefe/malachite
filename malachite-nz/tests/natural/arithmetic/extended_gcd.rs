@@ -31104,8 +31104,8 @@ fn extended_gcd_properties_helper(a: Natural, b: Natural) {
 
     // uniqueness
     if a != 0u32 && b != 0u32 && &gcd != min(&a, &b) {
-        assert!((&x).le_abs(&((&b).div_exact(&gcd) >> 1)));
-        assert!((&y).le_abs(&((&a).div_exact(&gcd) >> 1)));
+        assert!(x.le_abs(&((&b).div_exact(&gcd) >> 1)));
+        assert!(y.le_abs(&((&a).div_exact(&gcd) >> 1)));
     }
 
     let result = extended_gcd_euclidean_natural(a.clone(), b.clone());

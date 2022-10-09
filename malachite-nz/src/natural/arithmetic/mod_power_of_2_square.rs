@@ -1,7 +1,6 @@
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use crate::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use crate::natural::arithmetic::mul::mul_low::{
@@ -11,7 +10,7 @@ use crate::natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY}
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::square::{
     limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
-    SQR_FFT_THRESHOLD,
+    limbs_square_to_out_scratch_len,
 };
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
@@ -189,7 +188,8 @@ limbs_square_low_divide_and_conquer(
     let len_big = len - len_small;
     // x0 ^ 2
     let (xs_lo, xs_hi) = xs.split_at(len_big);
-    limbs_square_to_out(scratch, xs_lo);
+    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs_lo.len())];
+    limbs_square_to_out(scratch, xs_lo, &mut square_scratch);
     let xs_lo = &xs_lo[..len_small];
     let (out_lo, out_hi) = out.split_at_mut(len_big);
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(len);
@@ -250,11 +250,8 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
         } else {
             // For really large operands, use plain mpn_mul_n but throw away upper n limbs of the
             // result.
-            if !TUNE_PROGRAM_BUILD && SQRLO_SQR_THRESHOLD > SQR_FFT_THRESHOLD {
-                limbs_mul_greater_to_out_fft(&mut scratch, xs, xs);
-            } else {
-                limbs_square_to_out(&mut scratch, xs);
-            }
+            let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
+            limbs_square_to_out(&mut scratch, xs, &mut square_scratch);
             out.copy_from_slice(&scratch[..len]);
         }
     }

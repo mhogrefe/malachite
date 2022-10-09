@@ -164,9 +164,9 @@ impl<T: Eq> RationalSequence<T> {
     /// );
     /// ```
     pub fn iter(&self) -> Chain<std::slice::Iter<T>, Cycle<std::slice::Iter<T>>> {
-        (&self.non_repeating)
+        self.non_repeating
             .iter()
-            .chain((&self.repeating).iter().cycle())
+            .chain(self.repeating.iter().cycle())
     }
 }
 
