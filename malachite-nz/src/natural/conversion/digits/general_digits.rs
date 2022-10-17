@@ -26,8 +26,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom,
-    WrappingInto,
+    ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
@@ -1503,7 +1502,7 @@ where
     Limb: WrappingFrom<T>,
 {
     assert!(base >= 2);
-    let t_base = T::checked_from(base)?;
+    let t_base = T::try_from(base).ok()?;
     let mut digits_per_limb = 0;
     let mut big_base = 1;
     while let Some(next) = big_base.checked_mul(base) {
@@ -1533,8 +1532,7 @@ where
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `digits`.
 fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural> {
-    if u64::checked_from(digits).unwrap() * base.significant_bits()
-        < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    if u64::exact_from(digits) * base.significant_bits() < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     {
         return Vec::new();
     }
@@ -1570,7 +1568,7 @@ where
     Natural: From<T>,
 {
     let xs_len = xs.len();
-    let b = u64::checked_from(xs_len).unwrap() * base.significant_bits();
+    let b = u64::exact_from(xs_len) * base.significant_bits();
     if power_index == 0 || b < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         if base <= SQRT_MAX_LIMB {
             from_digits_desc_basecase(xs, base)
@@ -1630,7 +1628,7 @@ pub_test! {from_digits_desc_divide_and_conquer(
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {from_digits_asc_limb<I: Iterator<Item = T>, T: CheckedFrom<Limb> + PrimitiveUnsigned>(
+pub_test! {from_digits_asc_limb<I: Iterator<Item = T>, T: TryFrom<Limb> + PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -1643,7 +1641,7 @@ where
         Natural::from_power_of_2_digits_asc(log_base, xs)
     } else {
         let mut xs = xs.collect_vec();
-        T::checked_from(base)?;
+        T::try_from(base).ok()?;
         if xs.is_empty() {
             return Some(Natural::ZERO);
         }
@@ -1676,7 +1674,7 @@ where
 #[allow(clippy::trait_duplication_in_bounds)]
 fn from_digits_asc_limb_from_natural<
     I: Iterator<Item = Natural>,
-    T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: TryFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     xs: I,
     base: Limb,
@@ -1691,9 +1689,9 @@ where
     } else {
         let large_xs = xs;
         let mut xs = Vec::new();
-        T::checked_from(base)?;
+        T::try_from(base).ok()?;
         for x in large_xs {
-            xs.push(T::checked_from(&x)?);
+            xs.push(T::try_from(&x).ok()?);
         }
         if xs.is_empty() {
             return Some(Natural::ZERO);
@@ -1737,7 +1735,7 @@ where
         Natural::from_power_of_2_digits_desc(log_base, xs)
     } else {
         let xs = xs.collect_vec();
-        T::checked_from(base)?;
+        T::try_from(base).ok()?;
         if xs.is_empty() {
             return Some(Natural::ZERO);
         }
@@ -1769,7 +1767,7 @@ where
 #[allow(clippy::trait_duplication_in_bounds)]
 fn from_digits_desc_limb_from_natural<
     I: Iterator<Item = Natural>,
-    T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: TryFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     xs: I,
     base: Limb,
@@ -1784,9 +1782,9 @@ where
     } else {
         let large_xs = xs;
         let mut xs = Vec::new();
-        T::checked_from(base)?;
+        T::try_from(base).ok()?;
         for x in large_xs {
-            xs.push(T::checked_from(&x)?);
+            xs.push(T::try_from(&x).ok()?);
         }
         if xs.is_empty() {
             return Some(Natural::ZERO);
@@ -2022,7 +2020,7 @@ impl Digits<u8> for Natural {
 }
 
 fn to_digits_asc_unsigned<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural>
         + ConvertibleFrom<Limb>
         + PrimitiveUnsigned
         + for<'a> WrappingFrom<&'a Natural>,
@@ -2031,10 +2029,10 @@ fn to_digits_asc_unsigned<
     base: &T,
 ) -> Vec<T>
 where
-    Limb: CheckedFrom<T> + Digits<T>,
+    Limb: TryFrom<T> + Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    if let Some(base) = Limb::checked_from(*base) {
+    if let Ok(base) = Limb::try_from(*base) {
         to_digits_asc_limb(x, base)
     } else {
         to_digits_asc_large(x, &Natural::from(*base))
@@ -2045,7 +2043,7 @@ where
 }
 
 fn to_digits_desc_unsigned<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural>
         + ConvertibleFrom<Limb>
         + PrimitiveUnsigned
         + for<'a> WrappingFrom<&'a Natural>,
@@ -2054,10 +2052,10 @@ fn to_digits_desc_unsigned<
     base: &T,
 ) -> Vec<T>
 where
-    Limb: CheckedFrom<T> + Digits<T>,
+    Limb: TryFrom<T> + Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    if let Some(base) = Limb::checked_from(*base) {
+    if let Ok(base) = Limb::try_from(*base) {
         to_digits_desc_limb(x, base)
     } else {
         to_digits_desc_large(x, &Natural::from(*base))
@@ -2072,10 +2070,10 @@ fn from_digits_asc_unsigned<T: ConvertibleFrom<Limb> + PrimitiveUnsigned, I: Ite
     digits: I,
 ) -> Option<Natural>
 where
-    Limb: CheckedFrom<T> + WrappingFrom<T>,
+    Limb: TryFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    if let Some(base) = Limb::checked_from(*base) {
+    if let Ok(base) = Limb::try_from(*base) {
         from_digits_asc_limb(digits, base)
     } else {
         from_digits_asc_large(digits.map(Natural::from), &Natural::from(*base))
@@ -2087,10 +2085,10 @@ fn from_digits_desc_unsigned<T: ConvertibleFrom<Limb> + PrimitiveUnsigned, I: It
     digits: I,
 ) -> Option<Natural>
 where
-    Limb: CheckedFrom<T> + WrappingFrom<T>,
+    Limb: TryFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    if let Some(base) = Limb::checked_from(*base) {
+    if let Ok(base) = Limb::try_from(*base) {
         from_digits_desc_limb(digits, base)
     } else {
         from_digits_desc_large(digits.map(Natural::from), &Natural::from(*base))

@@ -4,20 +4,23 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{DivRound, DivisibleByPowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::ops::Neg;
 
-fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(x: &'a Rational) -> Option<T> {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct UnsignedFromRationalError;
+
+fn try_from_unsigned<'a, T: TryFrom<&'a Natural>>(
+    x: &'a Rational,
+) -> Result<T, UnsignedFromRationalError> {
     if x.sign && x.denominator == 1u32 {
-        T::checked_from(&x.numerator)
+        T::try_from(&x.numerator).map_err(|_| UnsignedFromRationalError)
     } else {
-        None
+        Err(UnsignedFromRationalError)
     }
 }
 
@@ -25,12 +28,12 @@ fn convertible_from_unsigned<T: for<'a> ConvertibleFrom<&'a Natural>>(x: &Ration
     x.sign && x.denominator == 1u32 && T::convertible_from(&x.numerator)
 }
 
-fn rounding_from_unsigned<'a, T: for<'b> CheckedFrom<&'b Natural> + Max + Named + Zero>(
+fn rounding_from_unsigned<'a, T: for<'b> TryFrom<&'b Natural> + Max + Named + Zero>(
     x: &'a Rational,
     rm: RoundingMode,
 ) -> T {
     if x.sign {
-        if let Some(q) = T::checked_from(&(&x.numerator).div_round(&x.denominator, rm)) {
+        if let Ok(q) = T::try_from(&(&x.numerator).div_round(&x.denominator, rm)) {
             q
         } else if rm == RoundingMode::Down
             || rm == RoundingMode::Floor
@@ -56,16 +59,19 @@ fn rounding_from_unsigned<'a, T: for<'b> CheckedFrom<&'b Natural> + Max + Named 
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct SignedFromRationalError;
+
 #[allow(clippy::trait_duplication_in_bounds)]
-fn checked_from_signed<
+fn try_from_signed<
     'a,
     U: WrappingFrom<&'a Natural>,
     S: Neg<Output = S> + PrimitiveInt + WrappingFrom<U> + WrappingFrom<&'a Natural>,
 >(
     x: &'a Rational,
-) -> Option<S> {
+) -> Result<S, SignedFromRationalError> {
     if x.denominator != 1u32 {
-        return None;
+        return Err(SignedFromRationalError);
     }
     match *x {
         Rational {
@@ -74,9 +80,9 @@ fn checked_from_signed<
             ..
         } => {
             if numerator.significant_bits() < S::WIDTH {
-                Some(S::wrapping_from(numerator))
+                Ok(S::wrapping_from(numerator))
             } else {
-                None
+                Err(SignedFromRationalError)
             }
         }
         Rational {
@@ -88,9 +94,9 @@ fn checked_from_signed<
             if significant_bits < S::WIDTH
                 || significant_bits == S::WIDTH && numerator.divisible_by_power_of_2(S::WIDTH - 1)
             {
-                Some(-S::wrapping_from(U::wrapping_from(numerator)))
+                Ok(-S::wrapping_from(U::wrapping_from(numerator)))
             } else {
-                None
+                Err(SignedFromRationalError)
             }
         }
     }
@@ -153,18 +159,20 @@ where
 
 macro_rules! impl_from_unsigned {
     ($u: ident) => {
-        impl<'a> CheckedFrom<&'a Rational> for $u {
-            /// Converts a [`Rational`] to an unsigned primitive integer, returning `None` if the
+        impl<'a> TryFrom<&'a Rational> for $u {
+            type Error = UnsignedFromRationalError;
+
+            /// Converts a [`Rational`] to an unsigned primitive integer, returning an error if the
             /// [`Rational`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_rational#checked_from).
+            /// See [here](super::primitive_int_from_rational#try_from).
             #[inline]
-            fn checked_from(value: &Rational) -> Option<$u> {
-                checked_from_unsigned(value)
+            fn try_from(value: &Rational) -> Result<$u, UnsignedFromRationalError> {
+                try_from_unsigned(value)
             }
         }
 
@@ -220,18 +228,20 @@ apply_to_unsigneds!(impl_from_unsigned);
 
 macro_rules! impl_from_signed {
     ($u: ident, $s: ident) => {
-        impl<'a> CheckedFrom<&'a Rational> for $s {
-            /// Converts a [`Rational`] to a signed primitive integer, returning `None` if the
+        impl<'a> TryFrom<&'a Rational> for $s {
+            type Error = SignedFromRationalError;
+
+            /// Converts a [`Rational`] to a signed primitive integer, returning an error if the
             /// [`Rational`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_rational#checked_from).
+            /// See [here](super::primitive_int_from_rational#try_from).
             #[inline]
-            fn checked_from(value: &Rational) -> Option<$s> {
-                checked_from_signed::<$u, $s>(value)
+            fn try_from(value: &Rational) -> Result<$s, SignedFromRationalError> {
+                try_from_signed::<$u, $s>(value)
             }
         }
 

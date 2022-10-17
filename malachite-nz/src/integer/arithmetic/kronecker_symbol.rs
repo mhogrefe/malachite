@@ -215,8 +215,6 @@ impl LegendreSymbol<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -259,8 +257,6 @@ impl<'a> LegendreSymbol<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -303,8 +299,6 @@ impl<'a> LegendreSymbol<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -346,8 +340,6 @@ impl<'a, 'b> LegendreSymbol<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -385,8 +377,6 @@ impl JacobiSymbol<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -427,8 +417,6 @@ impl<'a> JacobiSymbol<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -469,8 +457,6 @@ impl<'a> JacobiSymbol<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -510,8 +496,6 @@ impl<'a, 'b> JacobiSymbol<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -548,8 +532,6 @@ impl KroneckerSymbol<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -588,8 +570,6 @@ impl<'a> KroneckerSymbol<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -628,8 +608,6 @@ impl<'a> KroneckerSymbol<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::integer::Integer;
     ///
@@ -667,8 +645,6 @@ impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::integer::Integer;
     ///

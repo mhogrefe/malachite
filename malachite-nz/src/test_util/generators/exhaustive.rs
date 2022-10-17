@@ -52,6 +52,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
+use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
     exhaustive_positive_naturals, ExhaustiveNaturalRange,
@@ -140,7 +141,7 @@ pub fn exhaustive_integer_gen() -> It<Integer> {
 
 pub fn exhaustive_integer_gen_var_1<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Box::new(
         once(Integer::ZERO).chain(
@@ -163,7 +164,7 @@ pub fn exhaustive_integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_integer_gen_var_3<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Box::new(
         lex_pairs(exhaustive_natural_gen_var_5::<T>(), exhaustive_bools())
@@ -863,10 +864,7 @@ pub fn exhaustive_natural_gen_var_2() -> It<Natural> {
     Box::new(exhaustive_positive_naturals())
 }
 
-struct ExhaustivePositiveFloatNaturals<T: PrimitiveFloat>
-where
-    Natural: From<T>,
-{
+struct ExhaustivePositiveFloatNaturals<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
     done: bool,
     exponent: i64,
@@ -877,7 +875,7 @@ where
 
 impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFloatNaturals<T>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T>,
 {
     type Item = Natural;
 
@@ -885,7 +883,7 @@ where
         if self.done {
             None
         } else {
-            let n: Natural = From::from(self.mantissa);
+            let n: Natural = ExactFrom::exact_from(self.mantissa);
             let n = n << self.exponent;
             if n == self.max_finite {
                 self.done = true;
@@ -906,7 +904,7 @@ fn exhaustive_positive_float_naturals<T: PrimitiveFloat>(
     start_exponent: i64,
 ) -> ExhaustivePositiveFloatNaturals<T>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     ExhaustivePositiveFloatNaturals {
         phantom: PhantomData,
@@ -918,13 +916,13 @@ where
         } else {
             u64::power_of_2(T::MANTISSA_WIDTH)
         },
-        max_finite: Natural::from(T::MAX_FINITE),
+        max_finite: Natural::exact_from(T::MAX_FINITE),
     }
 }
 
 pub fn exhaustive_natural_gen_var_3<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Box::new(once(Natural::ZERO).chain(exhaustive_positive_float_naturals::<T>(0)))
 }
@@ -941,7 +939,7 @@ pub fn exhaustive_natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_natural_gen_var_5<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Box::new(
         iter_windows(2, exhaustive_positive_float_naturals::<T>(1)).filter_map(|xs| {

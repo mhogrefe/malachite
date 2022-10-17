@@ -47,7 +47,7 @@ macro_rules! impl_float {
                             ord_cmp.reverse()
                         }
                     } else {
-                        self.cmp(&Rational::from(*other))
+                        self.cmp(&Rational::try_from(*other).unwrap())
                     })
                 }
             }

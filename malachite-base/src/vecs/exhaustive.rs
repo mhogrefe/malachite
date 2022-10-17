@@ -440,8 +440,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_from_single;
 ///
@@ -928,8 +926,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -1004,8 +1000,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_from_single;
 ///
@@ -1117,8 +1111,6 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
@@ -1176,8 +1168,6 @@ pub const fn shortlex_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs;
@@ -1236,8 +1226,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
@@ -1305,8 +1293,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_range;
@@ -1365,8 +1351,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_inclusive_range;
@@ -1495,8 +1479,6 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
@@ -1548,8 +1530,6 @@ pub const fn exhaustive_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs;
@@ -1602,8 +1582,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
@@ -1666,8 +1644,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
@@ -1734,8 +1710,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
@@ -1912,8 +1886,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_fixed_length;
 ///
@@ -2035,8 +2007,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs;
 ///
@@ -2094,8 +2064,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_min_length;
 ///
@@ -2153,8 +2121,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_range;
 ///
@@ -2218,8 +2184,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_inclusive_range;
 ///
@@ -2388,8 +2352,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 ///
@@ -2446,8 +2408,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_min_length;
 ///
@@ -2504,8 +2464,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_range;
 ///
@@ -2568,8 +2526,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_inclusive_range;
 ///
@@ -2626,8 +2582,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use malachite_base::vecs::exhaustive::next_bit_pattern;
 ///
 /// // Suppose we are generating all bit patterns with 2 to 4 true bits, inclusive. Suppose our
@@ -2856,8 +2810,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_fixed_length;
 ///
@@ -2911,8 +2863,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs;
 ///
@@ -2967,8 +2917,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_min_length;
 ///
@@ -3023,8 +2971,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_range;
 ///
@@ -3085,8 +3031,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_inclusive_range;
 ///
@@ -3255,8 +3199,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_fixed_length;
 ///
@@ -3389,8 +3331,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs;
 ///
@@ -3449,8 +3389,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_min_length;
 ///
@@ -3516,8 +3454,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_range;
 ///
@@ -3590,8 +3526,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::shortlex_unique_vecs_length_inclusive_range;
 ///
@@ -3765,8 +3699,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs;
 ///
@@ -3824,8 +3756,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_min_length;
 ///
@@ -3887,8 +3817,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_length_range;
 ///
@@ -3956,8 +3884,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_unique_vecs_min_length;
 ///
@@ -4148,8 +4074,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_fixed_length;
 ///
@@ -4253,8 +4177,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs;
 ///
@@ -4313,8 +4235,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_min_length;
 ///
@@ -4380,8 +4300,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_range;
 ///
@@ -4448,8 +4366,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_inclusive_range;
 ///
@@ -4548,8 +4464,6 @@ impl Iterator for LexKCompositions {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_k_compositions;
 ///
@@ -4629,8 +4543,6 @@ impl Iterator for ExhaustiveCombinedKCompositions {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_combined_k_compositions;
 ///

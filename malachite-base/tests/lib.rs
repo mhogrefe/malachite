@@ -295,12 +295,12 @@ pub mod num {
             }
         }
         pub mod froms {
-            pub mod checked_from_and_exact_from;
             pub mod convertible_from;
             pub mod from;
             pub mod overflowing_from;
             pub mod rounding_from;
             pub mod saturating_from;
+            pub mod try_from_and_exact_from;
             pub mod wrapping_from;
         }
         pub mod half {

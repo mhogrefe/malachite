@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
@@ -37,15 +37,15 @@ pub fn test_saturating_from() {
 }
 
 fn saturating_from_helper_primitive_int_unsigned<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + SaturatingFrom<U> + PrimitiveInt,
-    U: CheckedFrom<T> + PrimitiveUnsigned,
+    T: TryFrom<U> + ConvertibleFrom<U> + SaturatingFrom<U> + PrimitiveInt,
+    U: TryFrom<T> + PrimitiveUnsigned,
 >() {
     unsigned_gen::<U>().test_properties(|u| {
         let result = T::saturating_from(u);
-        if let Some(u_u) = T::checked_from(u) {
+        if let Ok(u_u) = T::try_from(u) {
             assert_eq!(result, u_u);
         }
-        if let Some(result_t) = U::checked_from(result) {
+        if let Ok(result_t) = U::try_from(result) {
             assert!(result_t.le_abs(&u));
             assert_eq!(result_t == u, T::convertible_from(u));
         }
@@ -53,15 +53,15 @@ fn saturating_from_helper_primitive_int_unsigned<
 }
 
 fn saturating_from_helper_primitive_int_signed<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + SaturatingFrom<U> + PrimitiveInt,
-    U: CheckedFrom<T> + PrimitiveSigned,
+    T: TryFrom<U> + ConvertibleFrom<U> + SaturatingFrom<U> + PrimitiveInt,
+    U: TryFrom<T> + PrimitiveSigned,
 >() {
     signed_gen::<U>().test_properties(|i| {
         let result = T::saturating_from(i);
-        if let Some(i_u) = T::checked_from(i) {
+        if let Ok(i_u) = T::try_from(i) {
             assert_eq!(result, i_u);
         }
-        if let Some(result_t) = U::checked_from(result) {
+        if let Ok(result_t) = U::try_from(result) {
             assert!(result_t.le_abs(&i));
             assert_eq!(result_t == i, T::convertible_from(i));
         }

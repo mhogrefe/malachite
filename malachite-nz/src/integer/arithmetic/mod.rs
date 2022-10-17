@@ -111,8 +111,6 @@ pub mod round_to_multiple_of_power_of_2;
 ///
 /// # shl
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
@@ -148,8 +146,6 @@ pub mod round_to_multiple_of_power_of_2;
 ///
 /// # shl_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{NegativeOne, One};
 /// use malachite_nz::integer::Integer;
 ///
@@ -194,8 +190,6 @@ pub mod shl;
 ///
 /// # shl_round
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRound;
 /// use malachite_base::num::basic::traits::Zero;
@@ -240,8 +234,6 @@ pub mod shl;
 ///
 /// # shl_round_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
 /// use malachite_base::num::basic::traits::One;
@@ -291,8 +283,6 @@ pub mod shl_round;
 ///
 /// # shr
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
@@ -324,8 +314,6 @@ pub mod shl_round;
 ///
 /// # shr_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{NegativeOne, One};
 /// use malachite_nz::integer::Integer;
 ///
@@ -365,8 +353,6 @@ pub mod shr;
 ///
 /// # shr_round
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_base::num::arithmetic::traits::ShrRound;
 /// use malachite_base::rounding_modes::RoundingMode;
@@ -433,8 +419,6 @@ pub mod shr;
 ///
 /// # shr_round_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
 /// use malachite_base::rounding_modes::RoundingMode;

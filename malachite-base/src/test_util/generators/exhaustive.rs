@@ -18,8 +18,8 @@ use crate::num::conversion::string::options::exhaustive::{
 };
 use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
 use crate::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
-    SaturatingFrom, SplitInHalf, WrappingFrom,
+    ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
+    SplitInHalf, WrappingFrom,
 };
 use crate::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
@@ -273,18 +273,22 @@ pub fn exhaustive_primitive_float_gen_var_12<T: PrimitiveFloat>() -> It<T> {
     Box::new(exhaustive_nonzero_finite_primitive_floats())
 }
 
-pub fn exhaustive_primitive_float_gen_var_13<
-    T: CheckedFrom<U> + PrimitiveFloat,
-    U: PrimitiveUnsigned,
->() -> It<T> {
-    Box::new(exhaustive_unsigneds::<U>().filter_map(T::checked_from))
+pub fn exhaustive_primitive_float_gen_var_13<T: PrimitiveFloat, U: PrimitiveUnsigned>() -> It<T>
+where
+    NiceFloat<T>: TryFrom<U>,
+{
+    Box::new(
+        exhaustive_unsigneds::<U>().filter_map(|x| NiceFloat::<T>::try_from(x).ok().map(|x| x.0)),
+    )
 }
 
-pub fn exhaustive_primitive_float_gen_var_14<
-    T: CheckedFrom<U> + PrimitiveFloat,
-    U: PrimitiveSigned,
->() -> It<T> {
-    Box::new(exhaustive_signeds::<U>().filter_map(T::checked_from))
+pub fn exhaustive_primitive_float_gen_var_14<T: PrimitiveFloat, U: PrimitiveSigned>() -> It<T>
+where
+    NiceFloat<T>: TryFrom<U>,
+{
+    Box::new(
+        exhaustive_signeds::<U>().filter_map(|x| NiceFloat::<T>::try_from(x).ok().map(|x| x.0)),
+    )
 }
 
 pub fn exhaustive_primitive_float_gen_var_15<
@@ -1162,7 +1166,7 @@ fn round_to_multiple_unsigned_helper<T: PrimitiveUnsigned>(x: T, y: T, rm: Round
 
 fn round_to_multiple_signed_helper<
     U: PrimitiveUnsigned,
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: S,
     y: S,
@@ -1178,7 +1182,8 @@ fn round_to_multiple_signed_helper<
     } else {
         let abs_result = x_abs.round_to_multiple(y_abs, -rm);
         abs_result == S::MIN.unsigned_abs()
-            || S::checked_from(abs_result)
+            || S::try_from(abs_result)
+                .ok()
                 .and_then(CheckedNeg::checked_neg)
                 .is_some()
     }
@@ -1186,7 +1191,7 @@ fn round_to_multiple_signed_helper<
 
 pub(crate) fn round_to_multiple_signed_filter_map<
     U: PrimitiveUnsigned,
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: S,
     y: S,
@@ -1205,7 +1210,7 @@ pub(crate) fn round_to_multiple_signed_filter_map<
 
 pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_2<
     U: PrimitiveUnsigned,
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >() -> It<(S, S, RoundingMode)> {
     Box::new(
         lex_pairs(
@@ -2829,7 +2834,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> It<(T,
 }
 
 pub fn exhaustive_unsigned_quadruple_gen_var_5<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() -> It<(T, T, T, T)> {
     Box::new(

@@ -180,7 +180,7 @@ fn test_limbs_div_schoolbook() {
     {
         // q_len < d_len_m_1
         // !highest_q first time
-        // !(!flag || n_1 < Limb::checked_from(d_len).unwrap())
+        // !(!flag || n_1 < Limb::try_from(d_len).unwrap())
         test(&[10], &[1, 2, 3], &[3, 4, 0x80000000], false, &[10]);
         // q_len >= d_len_m_1
         // !(n_1 == d_1 && ns[d_len_s_m_1] == d_2)
@@ -196,7 +196,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[4294967207, 9, 12, 10],
         );
-        // !flag || n_1 < Limb::checked_from(d_len).unwrap()
+        // !flag || n_1 < Limb::try_from(d_len).unwrap()
         // !highest_q second time
         // q_len != 0
         // limbs_sub_limb_in_place(

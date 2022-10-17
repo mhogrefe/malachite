@@ -1,3 +1,4 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
 use malachite_q::test_util::common::rational_to_rug_rational;
@@ -47,7 +48,7 @@ fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Rational> + PartialEq<Natural> + PartialEq<rug::Rational> + PrimitiveFloat,
 >()
 where
-    Rational: From<T> + PartialEq<T> + PartialOrd<T>,
+    Rational: TryFrom<T> + PartialEq<T> + PartialOrd<T>,
     Natural: PartialEq<T>,
     rug::Rational: PartialEq<T>,
 {
@@ -58,7 +59,7 @@ where
         assert_eq!(f == rational_to_rug_rational(&n), eq);
         assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
         if f.is_finite() {
-            assert_eq!(PartialEq::<Rational>::eq(&n, &Rational::from(f)), eq);
+            assert_eq!(PartialEq::<Rational>::eq(&n, &Rational::exact_from(f)), eq);
         }
     });
 }

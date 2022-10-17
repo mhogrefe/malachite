@@ -1,4 +1,6 @@
 use crate::arithmetic::traits::SimplestRationalInInterval;
+use crate::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::Rational;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 
@@ -14,7 +16,7 @@ impl Rational {
     /// For example, `0.1f32` is converted to $1/10$ rather than to the exact value of the float,
     /// which is $13421773/134217728$. If you want the exact value, use `Rational::from` instead.
     ///
-    /// The floating point value cannot be NaN or infinite.
+    /// If the floating point value cannot be NaN or infinite, and error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
@@ -23,32 +25,37 @@ impl Rational {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `x.sci_exponent()`.
     ///
-    /// # Panics
-    /// Panics if `x` is NaN or infinite.
-    ///
     /// # Examples
     /// ```
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_float_simplest(0.0), 0);
-    /// assert_eq!(Rational::from_float_simplest(1.5).to_string(), "3/2");
-    /// assert_eq!(Rational::from_float_simplest(-1.5).to_string(), "-3/2");
-    /// assert_eq!(Rational::from_float_simplest(0.1f32).to_string(), "1/10");
-    /// assert_eq!(Rational::from_float_simplest(0.33333334f32).to_string(), "1/3");
+    /// assert_eq!(Rational::try_from_float_simplest(0.0).to_debug_string(), "Ok(0)");
+    /// assert_eq!(Rational::try_from_float_simplest(1.5).to_debug_string(), "Ok(3/2)");
+    /// assert_eq!(Rational::try_from_float_simplest(-1.5).to_debug_string(), "Ok(-3/2)");
+    /// assert_eq!(Rational::try_from_float_simplest(0.1f32).to_debug_string(), "Ok(1/10)");
+    /// assert_eq!(Rational::try_from_float_simplest(0.33333334f32).to_debug_string(), "Ok(1/3)");
+    /// assert_eq!(
+    ///     Rational::try_from_float_simplest(f32::NAN),
+    ///     Err(RationalFromPrimitiveFloatError)
+    /// );
     /// ```
-    pub fn from_float_simplest<T: PrimitiveFloat>(x: T) -> Rational
+    pub fn try_from_float_simplest<T: PrimitiveFloat>(
+        x: T,
+    ) -> Result<Rational, RationalFromPrimitiveFloatError>
     where
-        Rational: From<T>,
+        Rational: TryFrom<T, Error = RationalFromPrimitiveFloatError>,
     {
-        let q = Rational::from(x);
-        if *q.denominator_ref() <= 2u32 {
+        let q = Rational::try_from(x)?;
+        Ok(if *q.denominator_ref() <= 2u32 {
             q
         } else {
-            let succ_q = Rational::from(x.next_higher());
-            let pred_q = Rational::from(x.next_lower());
+            let succ_q = Rational::exact_from(x.next_higher());
+            let pred_q = Rational::exact_from(x.next_lower());
             let x = (pred_q + &q) >> 1;
             let y = (succ_q + q) >> 1;
             Rational::simplest_rational_in_open_interval(&x, &y)
-        }
+        })
     }
 }

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{Ceiling, Floor, Parity};
 use malachite_base::num::basic::traits::{One, OneHalf, Two};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
+    ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
@@ -13,25 +13,25 @@ use malachite_q::Rational;
 use std::str::FromStr;
 
 #[test]
-fn test_checked_from_rational() {
+fn test_try_from_rational() {
     let test = |s, out| {
         let u = Rational::from_str(s).unwrap();
 
-        let on = Integer::checked_from(u.clone());
+        let on = Integer::try_from(u.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Integer::checked_from(&u);
+        let on = Integer::try_from(&u);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
-    test("0", "Some(0)");
-    test("123", "Some(123)");
-    test("-123", "Some(-123)");
-    test("1000000000000", "Some(1000000000000)");
-    test("-1000000000000", "Some(-1000000000000)");
-    test("22/7", "None");
-    test("-22/7", "None");
+    test("0", "Ok(0)");
+    test("123", "Ok(123)");
+    test("-123", "Ok(-123)");
+    test("1000000000000", "Ok(1000000000000)");
+    test("-1000000000000", "Ok(-1000000000000)");
+    test("22/7", "Err(IntegerFromRationalError)");
+    test("-22/7", "Err(IntegerFromRationalError)");
 }
 
 #[test]
@@ -146,18 +146,18 @@ fn integer_rounding_from_rational_ref_fail() {
 }
 
 #[test]
-fn checked_from_rational_properties() {
+fn try_from_rational_properties() {
     rational_gen().test_properties(|x| {
-        let integer_x = Integer::checked_from(x.clone());
+        let integer_x = Integer::try_from(x.clone());
         assert!(integer_x.as_ref().map_or(true, Integer::is_valid));
 
-        let integer_x_alt = Integer::checked_from(&x);
+        let integer_x_alt = Integer::try_from(&x);
         assert!(integer_x_alt.as_ref().map_or(true, Integer::is_valid));
         assert_eq!(integer_x, integer_x_alt);
 
-        assert_eq!(integer_x.is_some(), x.is_integer());
-        assert_eq!(integer_x.is_some(), Integer::convertible_from(&x));
-        if let Some(n) = integer_x {
+        assert_eq!(integer_x.is_ok(), x.is_integer());
+        assert_eq!(integer_x.is_ok(), Integer::convertible_from(&x));
+        if let Ok(n) = integer_x {
             assert_eq!(n.to_string(), x.to_string());
             assert_eq!(Integer::exact_from(&x), n);
             assert_eq!(Rational::from(&n), x);

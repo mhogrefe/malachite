@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -9,15 +9,15 @@ use malachite_q::test_util::bench::bucketers::{
 use malachite_q::test_util::generators::{rational_gen, rational_rounding_mode_pair_gen_var_1};
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_natural_checked_from_rational);
-    register_demo!(runner, demo_natural_checked_from_rational_ref);
+    register_demo!(runner, demo_natural_try_from_rational);
+    register_demo!(runner, demo_natural_try_from_rational_ref);
     register_demo!(runner, demo_natural_convertible_from_rational);
     register_demo!(runner, demo_natural_rounding_from_rational);
     register_demo!(runner, demo_natural_rounding_from_rational_ref);
 
     register_bench!(
         runner,
-        benchmark_natural_checked_from_rational_evaluation_strategy
+        benchmark_natural_try_from_rational_evaluation_strategy
     );
     register_bench!(runner, benchmark_natural_convertible_from_rational);
     register_bench!(
@@ -26,24 +26,20 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_checked_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
     for x in rational_gen().get(gm, &config).take(limit) {
         let x_clone = x.clone();
         println!(
-            "Natural::checked_from({}) = {:?}",
+            "Natural::try_from({}) = {:?}",
             x_clone,
-            Natural::checked_from(x)
+            Natural::try_from(x)
         );
     }
 }
 
-fn demo_natural_checked_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_try_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for x in rational_gen().get(gm, &config).take(limit) {
-        println!(
-            "Natural::checked_from(&{}) = {:?}",
-            x,
-            Natural::checked_from(&x)
-        );
+        println!("Natural::try_from(&{}) = {:?}", x, Natural::try_from(&x));
     }
 }
 
@@ -90,14 +86,14 @@ fn demo_natural_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn benchmark_natural_checked_from_rational_evaluation_strategy(
+fn benchmark_natural_try_from_rational_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural::checked_from(Rational)",
+        "Natural::try_from(Rational)",
         BenchmarkType::EvaluationStrategy,
         rational_gen().get(gm, &config),
         gm.name(),
@@ -105,11 +101,11 @@ fn benchmark_natural_checked_from_rational_evaluation_strategy(
         file_name,
         &rational_bit_bucketer("x"),
         &mut [
-            ("Natural::checked_from(Rational)", &mut |x| {
-                no_out!(Natural::checked_from(x))
+            ("Natural::try_from(Rational)", &mut |x| {
+                no_out!(Natural::try_from(x).ok())
             }),
-            ("Natural::checked_from(&Rational)", &mut |x| {
-                no_out!(Natural::checked_from(&x))
+            ("Natural::try_from(&Rational)", &mut |x| {
+                no_out!(Natural::try_from(&x).ok())
             }),
         ],
     );

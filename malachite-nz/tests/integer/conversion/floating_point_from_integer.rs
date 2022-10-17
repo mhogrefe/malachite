@@ -1,14 +1,14 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_7, signed_rounding_mode_pair_gen_var_4,
 };
+use malachite_nz::integer::conversion::primitive_float_from_integer::PrimitiveFloatFromIntegerError;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz::test_util::generators::{
@@ -580,221 +580,124 @@ fn f64_rounding_from_integer_fail_3() {
 }
 
 #[test]
-fn test_f32_from_integer() {
-    let test = |s: &str, out| {
+fn test_f32_try_from_integer() {
+    let test = |s: &str, out: Result<f32, PrimitiveFloatFromIntegerError>| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(NiceFloat(f32::from(&u)), NiceFloat(out));
+        assert_eq!(f32::try_from(&u).map(NiceFloat), out.map(NiceFloat));
     };
-    test("3", 3.0);
-    test("-3", -3.0);
-    test("123", 123.0);
-    test("-123", -123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("-1000000000", -1.0e9);
-    test("16777216", 1.6777216e7);
-    test("-16777216", -1.6777216e7);
-    test("16777218", 1.6777218e7);
-    test("-16777218", -1.6777218e7);
-    test("16777217", 1.6777216e7);
-    test("-16777217", -1.6777216e7);
-    test("33554432", 3.3554432e7);
-    test("-33554432", -3.3554432e7);
-    test("33554436", 3.3554436e7);
-    test("-33554436", -3.3554436e7);
-    test("33554433", 3.3554432e7);
-    test("-33554433", -3.3554432e7);
-    test("33554434", 3.3554432e7);
-    test("-33554434", -3.3554432e7);
-    test("33554435", 3.3554436e7);
-    test("-33554435", -3.3554436e7);
-    test("340282346638528859811704183484516925439", 3.4028235e38);
-    test("-340282346638528859811704183484516925439", -3.4028235e38);
-    test("340282346638528859811704183484516925440", 3.4028235e38);
-    test("-340282346638528859811704183484516925440", -3.4028235e38);
-    test("340282346638528859811704183484516925441", 3.4028235e38);
-    test("-340282346638528859811704183484516925441", -3.4028235e38);
+    test("3", Ok(3.0));
+    test("-3", Ok(-3.0));
+    test("123", Ok(123.0));
+    test("-123", Ok(-123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("-1000000000", Ok(-1.0e9));
+    test("16777216", Ok(1.6777216e7));
+    test("-16777216", Ok(-1.6777216e7));
+    test("16777218", Ok(1.6777218e7));
+    test("-16777218", Ok(-1.6777218e7));
+    test("16777217", Err(PrimitiveFloatFromIntegerError));
+    test("-16777217", Err(PrimitiveFloatFromIntegerError));
+    test("33554432", Ok(3.3554432e7));
+    test("-33554432", Ok(-3.3554432e7));
+    test("33554436", Ok(3.3554436e7));
+    test("-33554436", Ok(-3.3554436e7));
+    test("33554433", Err(PrimitiveFloatFromIntegerError));
+    test("-33554433", Err(PrimitiveFloatFromIntegerError));
+    test("33554434", Err(PrimitiveFloatFromIntegerError));
+    test("-33554434", Err(PrimitiveFloatFromIntegerError));
+    test("33554435", Err(PrimitiveFloatFromIntegerError));
+    test("-33554435", Err(PrimitiveFloatFromIntegerError));
     test(
-        "10000000000000000000000000000000000000000000000000000",
-        3.4028235e38,
+        "340282346638528859811704183484516925439",
+        Err(PrimitiveFloatFromIntegerError),
     );
     test(
-        "-10000000000000000000000000000000000000000000000000000",
-        -3.4028235e38,
+        "-340282346638528859811704183484516925439",
+        Err(PrimitiveFloatFromIntegerError),
     );
-}
-
-#[test]
-fn test_f64_from_integer() {
-    let test = |s: &str, out| {
-        let u = Integer::from_str(s).unwrap();
-        assert_eq!(NiceFloat(f64::from(&u)), NiceFloat(out));
-    };
-    test("3", 3.0);
-    test("-3", -3.0);
-    test("123", 123.0);
-    test("-123", -123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("-1000000000", -1.0e9);
-    test("9007199254740992", 9.007199254740992e15);
-    test("-9007199254740992", -9.007199254740992e15);
-    test("9007199254740994", 9.007199254740994e15);
-    test("-9007199254740994", -9.007199254740994e15);
-    test("9007199254740993", 9.007199254740992e15);
-    test("-9007199254740993", -9.007199254740992e15);
-    test("18014398509481984", 1.8014398509481984e16);
-    test("-18014398509481984", -1.8014398509481984e16);
-    test("18014398509481988", 1.8014398509481988e16);
-    test("-18014398509481988", -1.8014398509481988e16);
-    test("18014398509481985", 1.8014398509481984e16);
-    test("-18014398509481985", -1.8014398509481984e16);
-    test("18014398509481986", 1.8014398509481984e16);
-    test("-18014398509481986", -1.8014398509481984e16);
-    test("18014398509481987", 1.8014398509481988e16);
-    test("-18014398509481987", -1.8014398509481988e16);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367", -1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858368", -1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369", -1.7976931348623157e308);
-}
-
-#[test]
-fn test_f32_checked_from_integer() {
-    let test = |s: &str, out: Option<f32>| {
-        let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
-    };
-    test("3", Some(3.0));
-    test("-3", Some(-3.0));
-    test("123", Some(123.0));
-    test("-123", Some(-123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("-1000000000", Some(-1.0e9));
-    test("16777216", Some(1.6777216e7));
-    test("-16777216", Some(-1.6777216e7));
-    test("16777218", Some(1.6777218e7));
-    test("-16777218", Some(-1.6777218e7));
-    test("16777217", None);
-    test("-16777217", None);
-    test("33554432", Some(3.3554432e7));
-    test("-33554432", Some(-3.3554432e7));
-    test("33554436", Some(3.3554436e7));
-    test("-33554436", Some(-3.3554436e7));
-    test("33554433", None);
-    test("-33554433", None);
-    test("33554434", None);
-    test("-33554434", None);
-    test("33554435", None);
-    test("-33554435", None);
-    test("340282346638528859811704183484516925439", None);
-    test("-340282346638528859811704183484516925439", None);
-    test(
-        "340282346638528859811704183484516925440",
-        Some(3.4028235e38),
-    );
+    test("340282346638528859811704183484516925440", Ok(3.4028235e38));
     test(
         "-340282346638528859811704183484516925440",
-        Some(-3.4028235e38),
+        Ok(-3.4028235e38),
     );
-    test("340282346638528859811704183484516925441", None);
-    test("-340282346638528859811704183484516925441", None);
+    test(
+        "340282346638528859811704183484516925441",
+        Err(PrimitiveFloatFromIntegerError),
+    );
+    test(
+        "-340282346638528859811704183484516925441",
+        Err(PrimitiveFloatFromIntegerError),
+    );
     test(
         "10000000000000000000000000000000000000000000000000000",
-        None,
+        Err(PrimitiveFloatFromIntegerError),
     );
     test(
         "-10000000000000000000000000000000000000000000000000000",
-        None,
+        Err(PrimitiveFloatFromIntegerError),
     );
 }
 
 #[test]
-fn test_f64_checked_from_integer() {
-    let test = |s: &str, out: Option<f64>| {
+fn test_f64_try_from_integer() {
+    let test = |s: &str, out: Result<f64, PrimitiveFloatFromIntegerError>| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
+        assert_eq!(f64::try_from(&u).map(NiceFloat), out.map(NiceFloat));
     };
-    test("3", Some(3.0));
-    test("-3", Some(-3.0));
-    test("123", Some(123.0));
-    test("-123", Some(-123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("-1000000000", Some(-1.0e9));
-    test("9007199254740992", Some(9.007199254740992e15));
-    test("-9007199254740992", Some(-9.007199254740992e15));
-    test("9007199254740994", Some(9.007199254740994e15));
-    test("-9007199254740994", Some(-9.007199254740994e15));
-    test("9007199254740993", None);
-    test("-9007199254740993", None);
-    test("18014398509481984", Some(1.8014398509481984e16));
-    test("-18014398509481984", Some(-1.8014398509481984e16));
-    test("18014398509481988", Some(1.8014398509481988e16));
-    test("-18014398509481988", Some(-1.8014398509481988e16));
-    test("18014398509481985", None);
-    test("-18014398509481985", None);
-    test("18014398509481986", None);
-    test("-18014398509481986", None);
-    test("18014398509481987", None);
-    test("-18014398509481987", None);
+    test("3", Ok(3.0));
+    test("-3", Ok(-3.0));
+    test("123", Ok(123.0));
+    test("-123", Ok(-123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("-1000000000", Ok(-1.0e9));
+    test("9007199254740992", Ok(9.007199254740992e15));
+    test("-9007199254740992", Ok(-9.007199254740992e15));
+    test("9007199254740994", Ok(9.007199254740994e15));
+    test("-9007199254740994", Ok(-9.007199254740994e15));
+    test("9007199254740993", Err(PrimitiveFloatFromIntegerError));
+    test("-9007199254740993", Err(PrimitiveFloatFromIntegerError));
+    test("18014398509481984", Ok(1.8014398509481984e16));
+    test("-18014398509481984", Ok(-1.8014398509481984e16));
+    test("18014398509481988", Ok(1.8014398509481988e16));
+    test("-18014398509481988", Ok(-1.8014398509481988e16));
+    test("18014398509481985", Err(PrimitiveFloatFromIntegerError));
+    test("-18014398509481985", Err(PrimitiveFloatFromIntegerError));
+    test("18014398509481986", Err(PrimitiveFloatFromIntegerError));
+    test("-18014398509481986", Err(PrimitiveFloatFromIntegerError));
+    test("18014398509481987", Err(PrimitiveFloatFromIntegerError));
+    test("-18014398509481987", Err(PrimitiveFloatFromIntegerError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", None);
+        8177180919299881250404026184124858367", Err(PrimitiveFloatFromIntegerError));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367", None);
+        38177180919299881250404026184124858367", Err(PrimitiveFloatFromIntegerError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", Some(1.7976931348623157e308));
+        8177180919299881250404026184124858368", Ok(1.7976931348623157e308));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858368", Some(-1.7976931348623157e308));
+        38177180919299881250404026184124858368", Ok(-1.7976931348623157e308));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", None);
+        8177180919299881250404026184124858369", Err(PrimitiveFloatFromIntegerError));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369", None);
+        38177180919299881250404026184124858369", Err(PrimitiveFloatFromIntegerError));
 }
 
 #[test]
@@ -1151,15 +1054,15 @@ fn test_f64_convertible_from_integer() {
 
 #[allow(clippy::trait_duplication_in_bounds)]
 fn float_rounding_from_integer_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Integer>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Integer>,
 >()
 where
-    Integer: From<T> + RoundingFrom<T>,
-    Natural: CheckedFrom<T> + From<T>,
+    Integer: RoundingFrom<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     integer_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
         let f = T::rounding_from(&n, rm);
@@ -1229,7 +1132,6 @@ where
             NiceFloat(f_nearest) == NiceFloat(f_below)
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
         );
-        assert_ne!(Integer::from(f_nearest), n);
     });
 
     integer_gen_var_3::<T>().test_properties(|n| {
@@ -1260,79 +1162,24 @@ fn float_rounding_from_integer_properties() {
     apply_fn_to_primitive_floats!(float_rounding_from_integer_properties_helper);
 }
 
-fn float_from_integer_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
-        + for<'a> ConvertibleFrom<&'a Natural>
-        + for<'a> From<&'a Integer>
-        + PrimitiveFloat
-        + for<'a> RoundingFrom<&'a Integer>,
->()
-where
-    Integer: From<T>,
-    Natural: CheckedFrom<T> + From<T>,
-{
-    integer_gen().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
-            NiceFloat(f)
-        );
-        assert_eq!(NiceFloat(T::from(&-n)), NiceFloat((-f).abs_negative_zero()));
-    });
-
-    integer_gen_var_1::<T>().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(Integer::from(f), n);
-    });
-
-    integer_gen_var_2::<T>().test_properties(|n| {
-        let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        let f_above = f_below.next_higher();
-        let f_nearest = T::from(&n);
-        assert!(
-            NiceFloat(f_nearest) == NiceFloat(f_below)
-                || NiceFloat(f_nearest) == NiceFloat(f_above)
-        );
-        assert_ne!(Integer::from(f_nearest), n);
-    });
-
-    integer_gen_var_3::<T>().test_properties(|n| {
-        let floor = T::rounding_from(&n, RoundingMode::Floor);
-        let ceiling = floor.next_higher();
-        let nearest = T::from(&n);
-        assert_eq!(
-            NiceFloat(nearest),
-            NiceFloat(if floor.to_bits().even() {
-                floor
-            } else {
-                ceiling
-            })
-        );
-    });
-}
-
-#[test]
-fn float_from_integer_properties() {
-    apply_fn_to_primitive_floats!(float_from_integer_properties_helper);
-}
-
 #[allow(clippy::trait_duplication_in_bounds)]
-fn float_checked_from_integer_properties_helper<
-    T: for<'a> CheckedFrom<&'a Integer>
-        + for<'a> CheckedFrom<&'a Natural>
+fn float_try_from_integer_properties_helper<
+    T: for<'a> TryFrom<&'a Integer, Error = PrimitiveFloatFromIntegerError>
+        + for<'a> TryFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Integer>,
 >()
 where
     Integer: RoundingFrom<T>,
-    Natural: CheckedFrom<T> + From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
     SignedLimb: RoundingFrom<T>,
+    NiceFloat<T>: TryFrom<SignedLimb>,
 {
     integer_gen().test_properties(|n| {
-        let of = T::checked_from(&n);
+        let of = T::try_from(&n);
         assert_eq!(
-            T::checked_from(&-n).map(NiceFloat),
+            T::try_from(&-n).map(NiceFloat),
             of.map(|f| NiceFloat((-f).abs_negative_zero()))
         );
     });
@@ -1347,41 +1194,41 @@ where
     });
 
     integer_gen_var_2::<T>().test_properties(|n| {
-        assert!(T::checked_from(&n).is_none());
+        assert!(T::try_from(&n).is_err());
     });
 
     integer_gen_var_3::<T>().test_properties(|n| {
-        assert!(T::checked_from(&n).is_none());
+        assert!(T::try_from(&n).is_err());
     });
 
     signed_gen::<SignedLimb>().test_properties(|i| {
-        if let Some(f) = T::checked_from(i) {
-            assert_eq!(NiceFloat(f), NiceFloat(T::exact_from(&Integer::from(i))));
+        if let Ok(f) = NiceFloat::<T>::try_from(i) {
+            assert_eq!(f, NiceFloat(T::exact_from(&Integer::from(i))));
         }
     });
 
     signed_gen_var_7::<SignedLimb, T>().test_properties(|i| {
         assert_eq!(
-            NiceFloat(T::exact_from(i)),
+            NiceFloat::<T>::exact_from(i),
             NiceFloat(T::exact_from(&Integer::from(i)))
         );
     });
 }
 
 #[test]
-fn float_checked_from_integer_properties() {
-    apply_fn_to_primitive_floats!(float_checked_from_integer_properties_helper);
+fn float_try_from_integer_properties() {
+    apply_fn_to_primitive_floats!(float_try_from_integer_properties_helper);
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
 fn float_convertible_from_integer_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Integer>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat,
 >()
 where
-    Natural: CheckedFrom<T> + From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     integer_gen().test_properties(|n| {
         assert_eq!(T::convertible_from(&n), T::convertible_from(&-n));

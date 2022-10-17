@@ -1,6 +1,9 @@
 use crate::integer::Integer;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PrimitiveFloatFromIntegerError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -46,36 +49,12 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> From<&'a Integer> for $f {
-            /// Converts an [`Integer`] to a primitive float.
-            ///
-            /// If there are two nearest floats, the one whose least-significant bit is zero is
-            /// chosen. If the [`Integer`] is larger than the maximum finite float, then the result
-            /// is the maximum finite float.
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
-            ///
-            /// # Examples
-            /// See [here](super::primitive_float_from_integer#from).
-            fn from(value: &'a Integer) -> $f {
-                let abs = $f::from(&value.abs);
-                if value.sign {
-                    abs
-                } else {
-                    -abs
-                }
-            }
-        }
+        impl<'a> TryFrom<&'a Integer> for $f {
+            type Error = PrimitiveFloatFromIntegerError;
 
-        impl<'a> CheckedFrom<&'a Integer> for $f {
             /// Converts an [`Integer`] to a primitive float.
             ///
-            /// If the input isn't exactly equal to some float, `None` is returned.
+            /// If the input isn't exactly equal to some float, an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -85,9 +64,11 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Examples
-            /// See [here](super::primitive_float_from_integer#checked_from).
-            fn checked_from(value: &'a Integer) -> Option<$f> {
-                $f::checked_from(&value.abs).map(|f| if value.sign { f } else { -f })
+            /// See [here](super::primitive_float_from_integer#try_from).
+            fn try_from(value: &'a Integer) -> Result<$f, Self::Error> {
+                $f::try_from(&value.abs)
+                    .map(|f| if value.sign { f } else { -f })
+                    .map_err(|_| PrimitiveFloatFromIntegerError)
             }
         }
 

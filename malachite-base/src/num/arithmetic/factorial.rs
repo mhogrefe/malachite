@@ -4,12 +4,12 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::conversion::traits::WrappingFrom;
 
 pub_test! {checked_multifactorial_naive<T: PrimitiveUnsigned>(n: u64, m: u64) -> Option<T> {
     assert_ne!(m, 0);
     let mut f = T::ONE;
-    let mut n = T::checked_from(n)?;
+    let mut n = T::try_from(n).ok()?;
     let m = T::saturating_from(m);
     while n != T::ZERO {
         f = f.checked_mul(n)?;
@@ -224,7 +224,7 @@ macro_rules! impl_factorials_a {
             /// See [here](super::factorial#checked_factorial).
             #[inline]
             fn checked_factorial(n: u64) -> Option<$t> {
-                $fs.get(usize::checked_from(n)?).copied()
+                $fs.get(usize::try_from(n).ok()?).copied()
             }
         }
 
@@ -251,10 +251,10 @@ macro_rules! impl_factorials_a {
                 if n > $df_limit {
                     None
                 } else if n.odd() {
-                    $odfs.get(usize::checked_from(n >> 1)?).copied()
+                    $odfs.get(usize::try_from(n >> 1).ok()?).copied()
                 } else {
                     let half = n >> 1;
-                    $fs.get(usize::checked_from(half)?).map(|&f| f << half)
+                    $fs.get(usize::try_from(half).ok()?).map(|&f| f << half)
                 }
             }
         }
@@ -282,7 +282,7 @@ macro_rules! impl_factorials_a {
             /// See [here](super::factorial#checked_subfactorial).
             #[inline]
             fn checked_subfactorial(n: u64) -> Option<$t> {
-                $sfs.get(usize::checked_from(n)?).copied()
+                $sfs.get(usize::try_from(n).ok()?).copied()
             }
         }
     };
@@ -344,8 +344,8 @@ impl CheckedFactorial for usize {
     #[inline]
     fn checked_factorial(n: u64) -> Option<usize> {
         FACTORIALS_U64
-            .get(usize::checked_from(n)?)
-            .and_then(|&f| usize::checked_from(f))
+            .get(usize::try_from(n).ok()?)
+            .and_then(|&f| usize::try_from(f).ok())
     }
 }
 
@@ -373,8 +373,8 @@ impl CheckedSubfactorial for usize {
     #[inline]
     fn checked_subfactorial(n: u64) -> Option<usize> {
         SUBFACTORIALS_U64
-            .get(usize::checked_from(n)?)
-            .and_then(|&f| usize::checked_from(f))
+            .get(usize::try_from(n).ok()?)
+            .and_then(|&f| usize::try_from(f).ok())
     }
 }
 

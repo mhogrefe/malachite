@@ -52,13 +52,12 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
     ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_string(),
     ///     "25/8"
@@ -133,13 +132,12 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
     ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_string(),
     ///     "25/8"
@@ -187,13 +185,12 @@ impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     ///
     /// let mut x = q.clone();
     /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Floor);

@@ -6,9 +6,7 @@ use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivRound, PowerOf
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ExactFrom, PowerOf2Digits, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits, WrappingFrom};
 use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
@@ -17,7 +15,7 @@ use std::cmp::{min, Ordering};
 
 impl Natural {
     pub_test! {to_power_of_2_digits_asc_naive<
-        T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+        T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
     >(
         &self,
         log_base: u64,

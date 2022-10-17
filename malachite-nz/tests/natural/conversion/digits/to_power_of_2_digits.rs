@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{FloorLogBasePowerOf2, Pow};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, PowerOf2Digits};
+use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
@@ -243,9 +243,7 @@ fn to_power_of_2_digits_desc_natural_fail() {
     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::from(10u32).pow(12), 0);
 }
 
-fn to_power_of_2_digits_asc_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
->()
+fn to_power_of_2_digits_asc_properties_helper<T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned>()
 where
     Limb: PowerOf2Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
@@ -319,7 +317,7 @@ fn to_power_of_2_digits_asc_properties() {
 }
 
 fn to_power_of_2_digits_desc_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >()
 where
     Limb: PowerOf2Digits<T>,

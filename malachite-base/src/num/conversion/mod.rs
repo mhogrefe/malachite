@@ -1,33 +1,43 @@
 /// Traits for working with the digits of numbers.
 pub mod digits;
 /// Traits for converting between different number types. The traits are
-/// [`CheckedFrom`](traits::CheckedFrom), [`WrappingFrom`](traits::WrappingFrom),
-/// [`SaturatingFrom`](traits::SaturatingFrom), [`OverflowingFrom`](traits::OverflowingFrom),
-/// [`ConvertibleFrom`](traits::ConvertibleFrom), and [`RoundingFrom`](traits::RoundingFrom).
+/// [`WrappingFrom`](traits::WrappingFrom), [`SaturatingFrom`](traits::SaturatingFrom),
+/// [`OverflowingFrom`](traits::OverflowingFrom), [`ConvertibleFrom`](traits::ConvertibleFrom), and
+/// [`RoundingFrom`](traits::RoundingFrom).
 ///
-/// # checked_from
+/// # try_from
 /// ```
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_base::num::conversion::from::{
+///     PrimitiveFloatFromomUnsignedError,
+///     PrimitiveFloatFromomSignedError,
+///     SignedFromFloatError,
+///     UnsignedFromFloatError
+/// };
+/// use malachite_base::num::float::NiceFloat;
 ///
-/// assert_eq!(u8::checked_from(123u8), Some(123));
-/// assert_eq!(i32::checked_from(-5i32), Some(-5));
+/// assert_eq!(NiceFloat::<f32>::try_from(100u8), Ok(NiceFloat(100.0)));
+/// assert_eq!(NiceFloat::<f32>::try_from(u32::MAX), Err(PrimitiveFloatFromomUnsignedError));
+/// assert_eq!(NiceFloat::<f32>::try_from(100i8), Ok(NiceFloat(100.0)));
+/// assert_eq!(NiceFloat::<f32>::try_from(i32::MAX), Err(PrimitiveFloatFromomSignedError));
 ///
-/// assert_eq!(u16::checked_from(123u8), Some(123));
-/// assert_eq!(i64::checked_from(-5i32), Some(-5));
-/// assert_eq!(u32::checked_from(5u64), Some(5));
-///
-/// assert_eq!(u8::checked_from(1000u16), None);
-/// assert_eq!(u32::checked_from(-5i32), None);
-/// assert_eq!(i32::checked_from(3000000000u32), None);
-/// assert_eq!(i8::checked_from(-1000i16), None);
-///
-/// assert_eq!(f32::checked_from(100u8), Some(100.0));
-/// assert_eq!(f32::checked_from(u32::MAX), None);
-///
-/// assert_eq!(u8::checked_from(100.0f32), Some(100));
-/// assert_eq!(u8::checked_from(100.1f32), None);
-/// assert_eq!(u8::checked_from(300.0f32), None);
-/// assert_eq!(u8::checked_from(-100.0f32), None);
+/// assert_eq!(u8::try_from(NiceFloat(100.0f32)), Ok(100));
+/// assert_eq!(
+///     u8::try_from(NiceFloat(100.1f32)),
+///     Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
+/// );
+/// assert_eq!(
+///     u8::try_from(NiceFloat(300.0f32)),
+///     Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
+/// );
+/// assert_eq!(
+///     u8::try_from(NiceFloat(-100.0f32)),
+///     Err(UnsignedFromFloatError::FloatNegative)
+/// );
+/// assert_eq!(i8::try_from(NiceFloat(-100.0f32)), Ok(-100));
+/// assert_eq!(
+///     i8::try_from(NiceFloat(-200.0f32)),
+///     Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
+/// );
 /// ```
 ///
 /// # wrapping_from

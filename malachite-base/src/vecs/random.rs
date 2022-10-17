@@ -48,8 +48,6 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -317,8 +315,6 @@ impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for RandomVecs<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -386,8 +382,6 @@ pub fn random_vecs_from_length_iterator<T, I: Iterator<Item = u64>, J: Iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -460,8 +454,6 @@ pub fn random_vecs<I: Iterator>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -537,8 +529,6 @@ pub fn random_vecs_min_length<I: Iterator>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -601,8 +591,6 @@ pub fn random_vecs_length_range<I: Iterator>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -763,8 +751,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -848,8 +834,6 @@ impl<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -928,8 +912,6 @@ pub fn random_ordered_unique_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1007,8 +989,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1093,8 +1073,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1169,8 +1147,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1302,8 +1278,6 @@ impl<T: Eq + Hash, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1400,8 +1374,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1468,8 +1440,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1540,8 +1510,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1622,8 +1590,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1694,8 +1660,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;

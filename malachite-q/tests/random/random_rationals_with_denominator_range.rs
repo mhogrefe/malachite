@@ -1,8 +1,10 @@
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
@@ -41,7 +43,10 @@ fn random_rationals_with_denominator_range_helper(
                 .to_debug_string()
                 .as_str(),
             median(xs.clone().take(1000000)).to_debug_string().as_str(),
-            moment_stats(xs.take(1000000).map(f64::from))
+            moment_stats(
+                xs.take(1000000)
+                    .map(|x| f64::rounding_from(x, RoundingMode::Nearest))
+            )
         ),
         (
             expected_values,

@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, DivAssignMod, UnsignedAbs};
 use malachite_base::num::basic::traits::Two;
-use malachite_base::num::conversion::traits::CheckedInto;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -93,11 +92,11 @@ fn abs_properties() {
 
         let abs_alt = x.clone().unsigned_abs();
         assert!(abs_alt.is_valid());
-        assert_eq!(Some(abs_alt), (&abs).checked_into());
+        assert_eq!(Ok(abs_alt), (&abs).try_into());
 
         let abs_alt = (&x).unsigned_abs();
         assert!(abs_alt.is_valid());
-        assert_eq!(Some(&abs_alt), abs.checked_into().as_ref());
+        assert_eq!(Ok(&abs_alt), abs.try_into().as_ref());
 
         let internal_abs = x.unsigned_abs_ref();
         assert!(internal_abs.is_valid());

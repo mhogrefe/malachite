@@ -5,30 +5,16 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
 use crate::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, RoundingFrom, SaturatingFrom,
-    SciMantissaAndExponent, WrappingFrom,
+    ConvertibleFrom, OverflowingFrom, RoundingFrom, SaturatingFrom, SciMantissaAndExponent,
+    WrappingFrom,
 };
+use crate::num::float::NiceFloat;
 use crate::rounding_modes::RoundingMode;
 use std::ops::Neg;
 
 // This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
     ($t:ty) => {
-        impl CheckedFrom<$t> for $t {
-            /// Converts a value to its own type. Since this conversion is always valid and always
-            /// leaves the value unchanged, `None` is never returned.
-            ///
-            /// # Worst-case complexity
-            /// Constant time and additional memory.
-            ///
-            /// # Examples
-            /// See [here](super::from#checked_from).
-            #[inline]
-            fn checked_from(value: $t) -> Option<$t> {
-                Some(value)
-            }
-        }
-
         impl WrappingFrom<$t> for $t {
             /// Converts a value to its own type. This conversion is always valid and always leaves
             /// the value unchanged.
@@ -95,21 +81,6 @@ macro_rules! identity_conversion {
 // representable by a value of type $b.
 macro_rules! lossless_conversion {
     ($a:ty, $b:ident) => {
-        impl CheckedFrom<$a> for $b {
-            /// Converts a value to another type. Since this conversion is always lossless and
-            /// leaves the value unchanged, `None` is never returned.
-            ///
-            /// # Worst-case complexity
-            /// Constant time and additional memory.
-            ///
-            /// # Examples
-            /// See [here](super::from#checked_from).
-            #[inline]
-            fn checked_from(value: $a) -> Option<$b> {
-                Some($b::from(value))
-            }
-        }
-
         impl WrappingFrom<$a> for $b {
             /// Converts a value to another type. This conversion is always valid and always leaves
             /// the value unchanged.
@@ -173,26 +144,15 @@ macro_rules! lossless_conversion {
     };
 }
 
-fn checked_from_lossy<A: PrimitiveInt + WrappingFrom<B>, B: PrimitiveInt + WrappingFrom<A>>(
-    value: A,
-) -> Option<B> {
-    let result = B::wrapping_from(value);
-    if (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value {
-        Some(result)
-    } else {
-        None
-    }
-}
-
-fn saturating_from_lossy<A: CheckedFrom<B> + PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+fn saturating_from_lossy<A: TryFrom<B> + PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     value: A,
 ) -> B {
-    if let Some(b_max) = A::checked_from(B::MAX) {
+    if let Ok(b_max) = A::try_from(B::MAX) {
         if value >= b_max {
             return B::MAX;
         }
     }
-    if let Some(b_min) = A::checked_from(B::MIN) {
+    if let Ok(b_min) = A::try_from(B::MIN) {
         if value <= b_min {
             return B::MIN;
         }
@@ -221,39 +181,6 @@ fn convertible_from_lossy<A: PrimitiveInt + WrappingFrom<B>, B: PrimitiveInt + W
 // representable by a value of type $b.
 macro_rules! lossy_conversion {
     ($a:ident, $b:ident) => {
-        impl CheckedFrom<$a> for $b {
-            /// Converts a value to another type. If the value cannot be represented in the new
-            /// type, `None` is returned.
-            ///
-            /// Let $W$ be the width of the target type.
-            ///
-            /// If the target type is unsigned, then
-            /// $$
-            /// f_W(n) = \\begin{cases}
-            ///     \operatorname{Some}(n) & \text{if} \\quad 0 \leq n < 2^W, \\\\
-            ///     \operatorname{None} & \\text{otherwise}.
-            /// \\end{cases}
-            /// $$
-            ///
-            /// If the target type is signed, then
-            /// $$
-            /// f_W(n) = \\begin{cases}
-            ///     \operatorname{Some}(n) & \text{if} \\quad -2^{W-1} \leq n < 2^{W-1}-1, \\\\
-            ///     \operatorname{None} & \\text{otherwise}.
-            /// \\end{cases}
-            /// $$
-            ///
-            /// # Worst-case complexity
-            /// Constant time and additional memory.
-            ///
-            /// # Examples
-            /// See [here](super::from#checked_from).
-            #[inline]
-            fn checked_from(value: $a) -> Option<$b> {
-                checked_from_lossy(value)
-            }
-        }
-
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
             /// Converts a value to another type. If the value cannot be represented in the new
@@ -509,9 +436,11 @@ fn unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloa
     let (mut mantissa, exponent) = value.integer_mantissa_and_exponent();
     let result = if exponent <= 0 {
         mantissa.shr_round_assign(-exponent, rm);
-        T::checked_from(mantissa)
+        T::try_from(mantissa).ok()
     } else {
-        T::checked_from(mantissa).and_then(|n| n.arithmetic_checked_shl(exponent))
+        T::try_from(mantissa)
+            .ok()
+            .and_then(|n| n.arithmetic_checked_shl(exponent))
     };
     if let Some(n) = result {
         n
@@ -530,31 +459,48 @@ fn unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloa
     }
 }
 
-fn primitive_float_checked_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PrimitiveFloatFromUnsignedError;
+
+fn primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     value: U,
-) -> Option<T> {
+) -> Result<T, PrimitiveFloatFromUnsignedError> {
     if value == U::ZERO {
-        return Some(T::ZERO);
+        return Ok(T::ZERO);
     }
-    let (mantissa, exponent) = sci_mantissa_and_exponent_with_rounding(value, RoundingMode::Exact)?;
+    let (mantissa, exponent) = sci_mantissa_and_exponent_with_rounding(value, RoundingMode::Exact)
+        .ok_or(PrimitiveFloatFromUnsignedError)?;
     T::from_sci_mantissa_and_exponent(mantissa, i64::wrapping_from(exponent))
+        .ok_or(PrimitiveFloatFromUnsignedError)
 }
 
-fn unsigned_checked_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum UnsignedFromFloatError {
+    FloatInfiniteOrNan,
+    FloatNegative,
+    FloatNonIntegerOrOutOfRange,
+}
+
+fn unsigned_try_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     value: U,
-) -> Option<T> {
+) -> Result<T, UnsignedFromFloatError> {
     if !value.is_finite() {
-        None
+        Err(UnsignedFromFloatError::FloatInfiniteOrNan)
     } else if value == U::ZERO {
-        Some(T::ZERO)
+        Ok(T::ZERO)
     } else if value < U::ZERO {
-        None
+        Err(UnsignedFromFloatError::FloatNegative)
     } else {
         let (mantissa, exponent) = value.integer_mantissa_and_exponent();
         if exponent < 0 {
-            None
+            Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
         } else {
-            T::checked_from(mantissa).and_then(|n| n.arithmetic_checked_shl(exponent))
+            T::try_from(mantissa)
+                .or(Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange))
+                .and_then(|n| {
+                    n.arithmetic_checked_shl(exponent)
+                        .ok_or(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
+                })
         }
     }
 }
@@ -661,9 +607,11 @@ macro_rules! impl_from_float_unsigned {
                     }
                 }
 
-                impl CheckedFrom<$u> for $f {
+                impl TryFrom<$u> for NiceFloat<$f> {
+                    type Error = PrimitiveFloatFromUnsignedError;
+
                     /// Converts a value of an unsigned type to a value of a floating point type,
-                    /// returning `None` if an exact conversion is not possible.
+                    /// returning an error if an exact conversion is not possible.
                     ///
                     /// The conversion succeeds if the unsigned value is not too large to represent
                     /// (which can only happen when converting a [`u128`] to an [`f32`]) and the
@@ -673,16 +621,18 @@ macro_rules! impl_from_float_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See [here](super::from#checked_from).
+                    /// See [here](super::from#try_from).
                     #[inline]
-                    fn checked_from(value: $u) -> Option<$f> {
-                        primitive_float_checked_from_unsigned(value)
+                    fn try_from(value: $u) -> Result<NiceFloat<$f>, Self::Error> {
+                        primitive_float_try_from_unsigned(value).map(NiceFloat)
                     }
                 }
 
-                impl CheckedFrom<$f> for $u {
+                impl TryFrom<NiceFloat<$f>> for $u {
+                    type Error = UnsignedFromFloatError;
+
                     /// Converts a value of a floating point type to a value of an unsigned type,
-                    /// returning `None` if an exact conversion is not possible.
+                    /// returning an error if an exact conversion is not possible.
                     ///
                     /// The conversion succeeds if the floating point value is an integer, not
                     /// negative (negative zero is ok), and not too large.
@@ -691,10 +641,10 @@ macro_rules! impl_from_float_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See [here](super::from#checked_from).
+                    /// See [here](super::from#try_from).
                     #[inline]
-                    fn checked_from(value: $f) -> Option<$u> {
-                        unsigned_checked_from_primitive_float(value)
+                    fn try_from(value: NiceFloat<$f>) -> Result<$u, Self::Error> {
+                        unsigned_try_from_primitive_float(value.0)
                     }
                 }
 
@@ -760,7 +710,7 @@ fn primitive_float_rounding_from_signed<
 
 fn signed_rounding_from_primitive_float<
     U: PrimitiveUnsigned + RoundingFrom<F>,
-    S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     F: PrimitiveFloat,
 >(
     value: F,
@@ -780,7 +730,7 @@ fn signed_rounding_from_primitive_float<
     }
     if value >= F::ZERO {
         let abs = U::rounding_from(value, rm);
-        if let Some(n) = S::checked_from(abs) {
+        if let Ok(n) = S::try_from(abs) {
             n
         } else {
             match rm {
@@ -800,7 +750,7 @@ fn signed_rounding_from_primitive_float<
         let n = if abs == S::MIN.unsigned_abs() {
             Some(S::MIN)
         } else {
-            S::checked_from(abs).map(Neg::neg)
+            S::try_from(abs).ok().map(Neg::neg)
         };
         if let Some(n) = n {
             n
@@ -820,40 +770,63 @@ fn signed_rounding_from_primitive_float<
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PrimitiveFloatFromSignedError;
+
 #[inline]
-fn primitive_float_checked_from_signed<
+fn primitive_float_try_from_signed<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U>,
-    F: CheckedFrom<U> + PrimitiveFloat,
+    F: PrimitiveFloat,
 >(
     value: S,
-) -> Option<F> {
+) -> Result<F, PrimitiveFloatFromSignedError>
+where
+    NiceFloat<F>: TryFrom<U>,
+{
     let abs = value.unsigned_abs();
     if value >= S::ZERO {
-        F::checked_from(abs)
+        NiceFloat::<F>::try_from(abs)
+            .map(|f| f.0)
+            .map_err(|_| PrimitiveFloatFromSignedError)
     } else {
-        F::checked_from(abs).map(Neg::neg)
+        NiceFloat::<F>::try_from(abs)
+            .map(|f| -f.0)
+            .map_err(|_| PrimitiveFloatFromSignedError)
     }
 }
 
-fn signed_checked_from_primitive_float<
-    U: CheckedFrom<F> + PrimitiveUnsigned,
-    S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SignedFromFloatError {
+    FloatInfiniteOrNan,
+    FloatNonIntegerOrOutOfRange,
+}
+
+fn signed_try_from_primitive_float<
+    U: TryFrom<NiceFloat<F>> + PrimitiveUnsigned,
+    S: TryFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     F: PrimitiveFloat,
 >(
     value: F,
-) -> Option<S> {
+) -> Result<S, SignedFromFloatError> {
     if !value.is_finite() {
-        return None;
+        return Err(SignedFromFloatError::FloatInfiniteOrNan);
     }
     if value >= F::ZERO {
-        S::checked_from(U::checked_from(value)?)
+        S::try_from(
+            U::try_from(NiceFloat(value))
+                .or(Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange))?,
+        )
+        .or(Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange))
     } else {
-        let abs = U::checked_from(-value)?;
+        let abs = U::try_from(NiceFloat(-value))
+            .or(Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange))?;
         if abs == S::MIN.unsigned_abs() {
-            Some(S::MIN)
+            Ok(S::MIN)
         } else {
-            S::checked_from(abs).map(Neg::neg)
+            S::try_from(abs)
+                .map(Neg::neg)
+                .or(Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange))
         }
     }
 }
@@ -976,9 +949,11 @@ macro_rules! impl_from_float_signed {
                     }
                 }
 
-                impl CheckedFrom<$i> for $f {
+                impl TryFrom<$i> for NiceFloat<$f> {
+                    type Error = PrimitiveFloatFromSignedError;
+
                     /// Converts a value of a signed type to a value of a floating point type,
-                    /// returning `None` if an exact conversion is not possible.
+                    /// returning an error if an exact conversion is not possible.
                     ///
                     /// The conversion succeeds if the precision of the signed value is not too
                     /// high.
@@ -987,16 +962,18 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See [here](super::from#checked_from).
+                    /// See [here](super::from#try_from).
                     #[inline]
-                    fn checked_from(value: $i) -> Option<$f> {
-                        primitive_float_checked_from_signed(value)
+                    fn try_from(value: $i) -> Result<NiceFloat<$f>, Self::Error> {
+                        primitive_float_try_from_signed(value).map(NiceFloat)
                     }
                 }
 
-                impl CheckedFrom<$f> for $i {
+                impl TryFrom<NiceFloat<$f>> for $i {
+                    type Error = SignedFromFloatError;
+
                     /// Converts a value of a floating point type to a value of a signed type,
-                    /// returning `None` if an exact conversion is not possible.
+                    /// returning an error if an exact conversion is not possible.
                     ///
                     /// The conversion succeeds if the floating point value is an integer and not
                     /// too large or too small.
@@ -1005,10 +982,10 @@ macro_rules! impl_from_float_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// See [here](super::from#checked_from).
+                    /// See [here](super::from#try_from).
                     #[inline]
-                    fn checked_from(value: $f) -> Option<$i> {
-                        signed_checked_from_primitive_float::<$u, $i, $f>(value)
+                    fn try_from(value: NiceFloat<$f>) -> Result<$i, Self::Error> {
+                        signed_try_from_primitive_float::<$u, $i, $f>(value.0)
                     }
                 }
 

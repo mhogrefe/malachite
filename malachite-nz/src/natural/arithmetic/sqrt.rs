@@ -224,7 +224,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_sqrt` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
-pub_test!{ limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
+pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
     assert_eq!(xs.len(), (n << 1) - odd);

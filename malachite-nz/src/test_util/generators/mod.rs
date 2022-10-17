@@ -1,6 +1,7 @@
 use crate::integer::Integer;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
@@ -56,7 +57,7 @@ pub fn integer_gen_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
 // All `Integer`s that are exactly equal to a floating point value of type `T`.
 pub fn integer_gen_var_1<T: PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_1::<T>,
@@ -78,7 +79,7 @@ pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloa
 // All `Integer`s that are exactly between two adjacent floats of type `T`.
 pub fn integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: ExactFrom<T> + From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_3::<T>,
@@ -987,7 +988,7 @@ pub fn natural_gen_var_2() -> Generator<Natural> {
 // All `Natural`s that are exactly equal to a floating point value of type `T`.
 pub fn natural_gen_var_3<T: PrimitiveFloat>() -> Generator<Natural>
 where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_3::<T>,
@@ -1011,7 +1012,7 @@ type GN = Generator<Natural>;
 // All `Natural`s that are exactly between two adjacent floats of type `T`.
 pub fn natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> GN
 where
-    Natural: ExactFrom<T> + From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_5::<T>,

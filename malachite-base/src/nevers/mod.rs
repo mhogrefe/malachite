@@ -22,8 +22,11 @@ impl Display for Never {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NeverError;
+
 impl FromStr for Never {
-    type Err = &'static str;
+    type Err = NeverError;
 
     /// Would convert a [`String`] to a [`Never`].
     ///
@@ -34,14 +37,14 @@ impl FromStr for Never {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::nevers::Never;
+    /// use malachite_base::nevers::{Never, NeverError};
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Never::from_str("abc"), Err("Never has no possible values"));
+    /// assert_eq!(Never::from_str("abc"), Err(NeverError));
     /// ```
     #[inline]
-    fn from_str(_: &str) -> Result<Never, &'static str> {
-        Err("Never has no possible values")
+    fn from_str(_: &str) -> Result<Never, NeverError> {
+        Err(NeverError)
     }
 }
 

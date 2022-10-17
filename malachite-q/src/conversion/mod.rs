@@ -15,17 +15,20 @@ pub mod from_natural;
 /// Functions for constructing a [`Rational`](crate::Rational) from a numerator and denominator,
 /// or from a sign, numerator, and denominator.
 pub mod from_numerator_and_denominator;
-/// Implementations of the [`From`] trait for converting a primitive float to a
+/// An implementation of the [`TryFrom`] trait for converting a primitive float to a
 /// [`Rational`](crate::Rational).
 ///
-/// # from
+/// # try_from
 /// ```
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
 /// use malachite_q::Rational;
 ///
-/// assert_eq!(Rational::from(0.0), 0);
-/// assert_eq!(Rational::from(1.5).to_string(), "3/2");
-/// assert_eq!(Rational::from(-1.5).to_string(), "-3/2");
-/// assert_eq!(Rational::from(0.1f32).to_string(), "13421773/134217728");
+/// assert_eq!(Rational::try_from(0.0).to_debug_string(), "Ok(0)");
+/// assert_eq!(Rational::try_from(1.5).to_debug_string(), "Ok(3/2)");
+/// assert_eq!(Rational::try_from(-1.5).to_debug_string(), "Ok(-3/2)");
+/// assert_eq!(Rational::try_from(0.1f32).to_debug_string(), "Ok(13421773/134217728)");
+/// assert_eq!(Rational::try_from(f32::NAN), Err(RationalFromPrimitiveFloatError));
 /// ```
 pub mod from_primitive_float;
 /// Implementations of the [`From`] trait for converting a primitive integer to a
@@ -42,7 +45,7 @@ pub mod from_primitive_int;
 /// Implementations of traits for converting a [`Rational`](crate::Rational) to an
 /// [`Integer`](malachite_nz::integer::Integer).
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 pub mod integer_from_rational;
@@ -116,14 +119,14 @@ pub mod mutate_numerator_and_denominator;
 /// Implementations of traits for converting a [`Rational`](crate::Rational) to a
 /// [`Natural`](malachite_nz::natural::Natural).
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 pub mod natural_from_rational;
 /// Functions and implementations of traits for converting a [`Rational`](crate::Rational) to a
 /// primitive float.
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 ///
@@ -166,49 +169,39 @@ pub mod natural_from_rational;
 /// assert_eq!(f32::rounding_from(&-small, RoundingMode::Up), -f32::MIN_POSITIVE_SUBNORMAL);
 /// ```
 ///
-/// # from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_base::num::float::NiceFloat;
+/// use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
 /// use malachite_q::Rational;
 ///
-/// assert_eq!(f32::from(Rational::from_signeds(1i8, 3)), 0.33333334);
-/// assert_eq!(f32::from(Rational::ONE_HALF), 0.5);
-/// assert_eq!(f32::from(Rational::power_of_2(200u64)), f32::MAX_FINITE);
-/// assert_eq!(NiceFloat(f32::from(Rational::power_of_2(-200i64))), NiceFloat(0.0));
-/// assert_eq!(NiceFloat(f32::from(-Rational::power_of_2(-200i64))), NiceFloat(-0.0));
+/// assert_eq!(
+///     f32::try_from(Rational::from_signeds(1i8, 3)),
+///     Err(PrimitiveFloatFromRationalError)
+/// );
+/// assert_eq!(f32::try_from(Rational::ONE_HALF), Ok(0.5));
+/// assert_eq!(f32::try_from(Rational::power_of_2(200u64)), Err(PrimitiveFloatFromRationalError));
+/// assert_eq!(f32::try_from(Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError));
+/// assert_eq!(
+///     f32::try_from(-Rational::power_of_2(-200i64)),
+///     Err(PrimitiveFloatFromRationalError)
+/// );
 ///
-/// assert_eq!(f32::from(&Rational::from_signeds(1i8, 3)), 0.33333334);
-/// assert_eq!(f32::from(&Rational::ONE_HALF), 0.5);
-/// assert_eq!(f32::from(&Rational::power_of_2(200u64)), f32::MAX_FINITE);
-/// assert_eq!(NiceFloat(f32::from(&Rational::power_of_2(-200i64))), NiceFloat(0.0));
-/// assert_eq!(NiceFloat(f32::from(&-Rational::power_of_2(-200i64))), NiceFloat(-0.0));
-/// ```
-///
-/// # checked_from
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::num::arithmetic::traits::PowerOf2;
-/// use malachite_base::num::conversion::traits::CheckedFrom;
-/// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_q::Rational;
-///
-/// assert_eq!(f32::checked_from(Rational::from_signeds(1i8, 3)), None);
-/// assert_eq!(f32::checked_from(Rational::ONE_HALF), Some(0.5));
-/// assert_eq!(f32::checked_from(Rational::power_of_2(200u64)), None);
-/// assert_eq!(f32::checked_from(Rational::power_of_2(-200i64)), None);
-/// assert_eq!(f32::checked_from(-Rational::power_of_2(-200i64)), None);
-///
-/// assert_eq!(f32::checked_from(&Rational::from_signeds(1i8, 3)), None);
-/// assert_eq!(f32::checked_from(&Rational::ONE_HALF), Some(0.5));
-/// assert_eq!(f32::checked_from(&Rational::power_of_2(200u64)), None);
-/// assert_eq!(f32::checked_from(&Rational::power_of_2(-200i64)), None);
-/// assert_eq!(f32::checked_from(&-Rational::power_of_2(-200i64)), None);
+/// assert_eq!(
+///     f32::try_from(&Rational::from_signeds(1i8, 3)),
+///     Err(PrimitiveFloatFromRationalError)
+/// );
+/// assert_eq!(f32::try_from(&Rational::ONE_HALF), Ok(0.5));
+/// assert_eq!(f32::try_from(&Rational::power_of_2(200u64)), Err(PrimitiveFloatFromRationalError));
+/// assert_eq!(
+///     f32::try_from(&Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError)
+/// );
+/// assert_eq!(
+///     f32::try_from(&-Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError)
+/// );
 /// ```
 ///
 /// # convertible_from
@@ -236,28 +229,38 @@ pub mod primitive_float_from_rational;
 /// Implementations of traits for converting a [`Rational`](crate::Rational) to a primitive
 /// integer.
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 ///
-/// # checked_from
+/// # try_from
 /// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_q::conversion::primitive_int_from_rational::{
+///     SignedFromRationalError,
+///     UnsignedFromRationalError
+/// };
 /// use malachite_q::Rational;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(u32::checked_from(&Rational::from(123)).unwrap(), 123);
-/// assert_eq!(u32::checked_from(&Rational::from(-123)), None);
-/// assert_eq!(u32::checked_from(&Rational::from_str("1000000000000").unwrap()), None);
-/// assert_eq!(u32::checked_from(&Rational::from_signeds(22, 7)), None);
+/// assert_eq!(u32::try_from(&Rational::from(123)).unwrap(), 123);
+/// assert_eq!(u32::try_from(&Rational::from(-123)), Err(UnsignedFromRationalError));
+/// assert_eq!(
+///     u32::try_from(&Rational::from_str("1000000000000").unwrap()),
+///     Err(UnsignedFromRationalError)
+/// );
+/// assert_eq!(u32::try_from(&Rational::from_signeds(22, 7)), Err(UnsignedFromRationalError));
 ///
-/// assert_eq!(i32::checked_from(&Rational::from(123)).unwrap(), 123);
-/// assert_eq!(i32::checked_from(&Rational::from(-123)).unwrap(), -123);
-/// assert_eq!(i32::checked_from(&Rational::from_str("-1000000000000").unwrap()), None);
-/// assert_eq!(i32::checked_from(&Rational::from_str("1000000000000").unwrap()), None);
-/// assert_eq!(i32::checked_from(&Rational::from_signeds(22, 7)), None);
+/// assert_eq!(i32::try_from(&Rational::from(123)).unwrap(), 123);
+/// assert_eq!(i32::try_from(&Rational::from(-123)).unwrap(), -123);
+/// assert_eq!(
+///     i32::try_from(&Rational::from_str("-1000000000000").unwrap()),
+///     Err(SignedFromRationalError)
+/// );
+/// assert_eq!(
+///     i32::try_from(&Rational::from_str("1000000000000").unwrap()),
+///     Err(SignedFromRationalError)
+/// );
+/// assert_eq!(i32::try_from(&Rational::from_signeds(22, 7)), Err(SignedFromRationalError));
 /// ```
 ///
 /// # convertible_from

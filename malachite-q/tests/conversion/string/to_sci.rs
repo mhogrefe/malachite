@@ -817,39 +817,39 @@ pub fn test_to_sci_with_options() {
     options = ToSciOptions::default();
     options.set_size_complete();
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.401298464324817070923729583289916131280261941876515771757068283889791082685860601486638\
         18836212158203125e-45",
     );
     options.set_base(2);
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1e-149",
     );
     options.set_base(32);
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "2e-30",
     );
     options.set_base(36);
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.whin9rvdkphvrmxkdwtoq8t963n428tj1p07aaum2yy14ie-29",
     );
     options.set_uppercase();
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "1.WHIN9RVDKPHVRMXKDWTOQ8T963N428TJ1P07AAUM2YY14Ie-29",
     );
     options.set_base(10);
     options.set_neg_exp_threshold(-200);
     test_i(
-        &Rational::from(f32::MIN_POSITIVE_SUBNORMAL),
+        &Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         options,
         "0.000000000000000000000000000000000000000000001401298464324817070923729583289916131280261\
         94187651577175706828388979108268586060148663818836212158203125",

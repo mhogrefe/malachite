@@ -1,9 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ExactFrom, FromSciString, ToStringBase,
-};
+use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToStringBase};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
@@ -108,7 +106,7 @@ pub fn test_from_sci_string_with_options() {
     }
     fn test_i<T: PrimitiveSigned>(s: &str, options: FromSciStringOptions, out: Option<T>)
     where
-        Natural: CheckedFrom<T>,
+        Natural: TryFrom<T>,
     {
         let out = out.map(Natural::exact_from);
         assert_eq!(Natural::from_sci_string_with_options(s, options), out);

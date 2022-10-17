@@ -386,8 +386,6 @@ impl EqMod<Integer, Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -442,8 +440,6 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -498,8 +494,6 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -554,8 +548,6 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -610,8 +602,6 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -666,8 +656,6 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -722,8 +710,6 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -778,8 +764,6 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;

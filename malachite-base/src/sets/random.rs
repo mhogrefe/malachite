@@ -55,7 +55,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -135,7 +134,6 @@ impl<T: Eq + Hash, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -220,7 +218,6 @@ pub fn random_hash_sets_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -302,7 +299,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -393,7 +389,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -472,7 +467,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -577,7 +571,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -658,7 +651,6 @@ impl<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for Random
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -743,7 +735,6 @@ pub fn random_b_tree_sets_from_length_iterator<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -825,7 +816,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -916,7 +906,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -995,7 +984,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///

@@ -23,8 +23,6 @@ impl<I: Iterator> Iterator for Singletons<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::singletons;
 ///
@@ -46,8 +44,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_pairs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::lex_pairs;
 ///
@@ -75,8 +71,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_pairs_from_single
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::lex_pairs_from_single;
 ///
@@ -88,8 +82,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_triples_xyx
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
@@ -131,8 +123,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_pairs_from_single
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs_from_single;
 ///
@@ -161,8 +151,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_pairs_1_input
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::exhaustive_tuples_1_input;
@@ -223,8 +211,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_pairs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs;
 ///
@@ -237,8 +223,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_pairs_custom_output
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs_custom_output;
@@ -258,8 +242,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_triples_xyx
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::custom_tuples;
@@ -321,8 +303,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_triples_xyx_custom_output
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::custom_tuples;
@@ -393,8 +373,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_ordered_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_ordered_unique_tuples;
@@ -435,8 +413,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_ordered_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::exhaustive_ordered_unique_tuples;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
@@ -476,8 +452,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_unique_tuples;
@@ -522,8 +496,6 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::exhaustive_unique_tuples;
 /// use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
@@ -576,8 +548,6 @@ pub mod exhaustive;
 ///
 /// # random_pairs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
@@ -618,8 +588,6 @@ pub mod exhaustive;
 ///
 /// # random_pairs_from_single
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
@@ -656,8 +624,6 @@ pub mod exhaustive;
 ///
 /// # random_triples_xyx
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
@@ -712,8 +678,6 @@ pub mod exhaustive;
 ///
 /// # random_ordered_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -748,8 +712,6 @@ pub mod exhaustive;
 ///
 /// # random_unique_quadruples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;

@@ -1,5 +1,5 @@
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::{CheckedFrom, PowerOf2Digits, WrappingFrom};
+use crate::num::conversion::traits::{PowerOf2Digits, WrappingFrom};
 
 fn to_power_of_2_digits_asc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     x: &T,
@@ -38,7 +38,7 @@ fn to_power_of_2_digits_desc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappi
 }
 
 fn from_power_of_2_digits_asc<
-    T: CheckedFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
+    T: TryFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
     U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
@@ -59,7 +59,9 @@ fn from_power_of_2_digits_asc<
         if digit.significant_bits() > log_base {
             return None;
         }
-        n |= T::checked_from(digit).and_then(|d| d.arithmetic_checked_shl(shift))?;
+        n |= T::try_from(digit)
+            .ok()
+            .and_then(|d| d.arithmetic_checked_shl(shift))?;
         shift += log_base;
     }
     Some(n)

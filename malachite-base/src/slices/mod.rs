@@ -263,8 +263,6 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_values_from_slice;
@@ -364,8 +362,6 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::slices::exhaustive_slice_permutations;
 ///
@@ -427,8 +423,6 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_slice_permutations;

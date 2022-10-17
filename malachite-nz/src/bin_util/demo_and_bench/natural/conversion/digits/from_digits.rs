@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_1_vec_len_times_pair_2_bits_bucketer, triple_2_vec_len_bucketer,
@@ -329,9 +329,7 @@ fn demo_from_digits_desc_large_targeted(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_from_digits_asc_unsigned<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
->(
+fn demo_from_digits_asc_unsigned<T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -352,9 +350,7 @@ fn demo_from_digits_asc_unsigned<
     }
 }
 
-fn demo_from_digits_desc_unsigned<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
->(
+fn demo_from_digits_desc_unsigned<T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -376,7 +372,7 @@ fn demo_from_digits_desc_unsigned<
 }
 
 fn demo_from_digits_asc_unsigned_targeted<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+    T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -399,7 +395,7 @@ fn demo_from_digits_asc_unsigned_targeted<
 }
 
 fn demo_from_digits_desc_unsigned_targeted<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+    T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -662,9 +658,7 @@ fn benchmark_from_digits_desc_large_algorithms(
     );
 }
 
-fn benchmark_from_digits_asc_unsigned<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
->(
+fn benchmark_from_digits_asc_unsigned<T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -691,7 +685,7 @@ fn benchmark_from_digits_asc_unsigned<
 }
 
 fn benchmark_from_digits_desc_unsigned_algorithms<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+    T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >(
     gm: GenMode,
     config: GenConfig,

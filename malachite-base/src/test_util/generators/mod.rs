@@ -6,9 +6,10 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::string::options::{FromSciStringOptions, SciSizeOptions, ToSciOptions};
 use crate::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
-    SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
+    ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
+    SplitInHalf, WrappingFrom, WrappingInto,
 };
+use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::rational_sequences::RationalSequence;
 use crate::rounding_modes::RoundingMode;
@@ -297,10 +298,11 @@ pub fn primitive_float_gen_var_12<T: PrimitiveFloat>() -> Generator<T> {
 }
 
 // All primitive floats `T` that are equal to an unsigned value of type `U`.
-pub fn primitive_float_gen_var_13<
-    T: CheckedFrom<U> + PrimitiveFloat + RoundingFrom<U>,
-    U: PrimitiveUnsigned,
->() -> Generator<T> {
+pub fn primitive_float_gen_var_13<T: PrimitiveFloat + RoundingFrom<U>, U: PrimitiveUnsigned>(
+) -> Generator<T>
+where
+    NiceFloat<T>: TryFrom<U>,
+{
     Generator::new(
         &exhaustive_primitive_float_gen_var_13::<T, U>,
         &random_primitive_float_gen_var_13::<T, U>,
@@ -309,10 +311,11 @@ pub fn primitive_float_gen_var_13<
 }
 
 // All primitive floats `T` that are equal to a signed value of type `U`.
-pub fn primitive_float_gen_var_14<
-    T: CheckedFrom<U> + PrimitiveFloat + RoundingFrom<U>,
-    U: PrimitiveSigned,
->() -> Generator<T> {
+pub fn primitive_float_gen_var_14<T: PrimitiveFloat + RoundingFrom<U>, U: PrimitiveSigned>(
+) -> Generator<T>
+where
+    NiceFloat<T>: TryFrom<U>,
+{
     Generator::new(
         &exhaustive_primitive_float_gen_var_14::<T, U>,
         &random_primitive_float_gen_var_13::<T, U>,
@@ -621,7 +624,7 @@ pub fn signed_gen_var_8<
 // Acceptable `(S, V)` pairs are those where `S::WIDTH` > `V::MANTISSA_WIDTH`.
 pub fn signed_gen_var_9<
     U: PrimitiveUnsigned + WrappingFrom<S>,
-    S: CheckedFrom<V> + PrimitiveSigned + WrappingFrom<U>,
+    S: TryFrom<NiceFloat<V>> + PrimitiveSigned + WrappingFrom<U>,
     V: ConvertibleFrom<S> + PrimitiveFloat + RoundingFrom<S>,
 >() -> Generator<S> {
     Generator::new(
@@ -939,7 +942,7 @@ pub fn signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
 // `T::round_to_multiple`.
 pub fn signed_signed_rounding_mode_triple_gen_var_2<
     U: PrimitiveUnsigned,
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >() -> Generator<(S, S, RoundingMode)> {
     Generator::new(
         &exhaustive_signed_signed_rounding_mode_triple_gen_var_2,
@@ -1543,7 +1546,7 @@ pub fn unsigned_gen_var_19<T: PrimitiveUnsigned, U: ConvertibleFrom<T> + Primiti
 //
 // Acceptable `(T, U)` pairs are those where `T::WIDTH` > `U::MANTISSA_WIDTH`.
 pub fn unsigned_gen_var_20<
-    T: CheckedFrom<U> + PrimitiveUnsigned,
+    T: TryFrom<NiceFloat<U>> + PrimitiveUnsigned,
     U: ConvertibleFrom<T> + PrimitiveFloat + RoundingFrom<T>,
 >() -> Generator<T> {
     Generator::new(
@@ -2431,7 +2434,7 @@ pub fn unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(T, T, 
 
 // All `(T, T, T, T)` that are valid inputs to `limbs_mod_preinverted`.
 pub fn unsigned_quadruple_gen_var_5<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() -> Generator<(T, T, T, T)> {
     Generator::new(
@@ -3235,7 +3238,7 @@ pub fn unsigned_vec_unsigned_pair_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUn
 // malachite-nz.
 pub fn unsigned_vec_unsigned_pair_gen_var_5<
     T: ExactFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
-    U: PrimitiveUnsigned + SaturatingFrom<T>,
+    U: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >() -> Generator<(Vec<T>, U)> {
     Generator::new_no_special(
         &exhaustive_unsigned_vec_unsigned_pair_gen_var_5::<T, U>,

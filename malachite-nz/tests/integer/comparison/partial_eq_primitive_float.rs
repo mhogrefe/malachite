@@ -64,7 +64,7 @@ fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Integer> + PartialEq<Natural> + PartialEq<rug::Integer> + PrimitiveFloat,
 >()
 where
-    Integer: From<T> + PartialEq<T> + PartialOrd<T>,
+    Integer: PartialEq<T> + PartialOrd<T>,
     Natural: PartialEq<T>,
     rug::Integer: PartialEq<T>,
 {

@@ -113,7 +113,7 @@ fn partial_cmp_primitive_float_properties_helper<
     T: PartialOrd<Integer> + PartialOrd<rug::Integer> + PrimitiveFloat,
 >()
 where
-    Integer: From<T> + PartialOrd<T>,
+    Integer: PartialOrd<T>,
     rug::Integer: PartialOrd<T>,
 {
     integer_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {

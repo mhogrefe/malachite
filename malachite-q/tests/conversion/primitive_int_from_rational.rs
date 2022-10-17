@@ -6,11 +6,14 @@ use malachite_base::num::basic::traits::OneHalf;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, IsInteger, RoundingFrom,
+    ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::integer::Integer;
+use malachite_q::conversion::primitive_int_from_rational::{
+    SignedFromRationalError, UnsignedFromRationalError,
+};
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_3, rational_rounding_mode_pair_gen_var_3,
 };
@@ -19,33 +22,33 @@ use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
-fn test_u32_checked_from_rational() {
-    let test = |s, out: Option<u32>| {
+fn test_u32_try_from_rational() {
+    let test = |s, out: Result<u32, UnsignedFromRationalError>| {
         let u = Rational::from_str(s).unwrap();
-        assert_eq!(u32::checked_from(&u), out);
+        assert_eq!(u32::try_from(&u), out);
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("-123", None);
-    test("1000000000000", None);
-    test("-1000000000000", None);
-    test("22/7", None);
-    test("-22/7", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("-123", Err(UnsignedFromRationalError));
+    test("1000000000000", Err(UnsignedFromRationalError));
+    test("-1000000000000", Err(UnsignedFromRationalError));
+    test("22/7", Err(UnsignedFromRationalError));
+    test("-22/7", Err(UnsignedFromRationalError));
 }
 
 #[test]
-fn test_i32_checked_from_rational() {
-    let test = |s, out: Option<i32>| {
+fn test_i32_try_from_rational() {
+    let test = |s, out: Result<i32, SignedFromRationalError>| {
         let u = Rational::from_str(s).unwrap();
-        assert_eq!(i32::checked_from(&u), out);
+        assert_eq!(i32::try_from(&u), out);
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("-123", Some(-123));
-    test("1000000000000", None);
-    test("-1000000000000", None);
-    test("22/7", None);
-    test("-22/7", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("-123", Ok(-123));
+    test("1000000000000", Err(SignedFromRationalError));
+    test("-1000000000000", Err(SignedFromRationalError));
+    test("22/7", Err(SignedFromRationalError));
+    test("-22/7", Err(SignedFromRationalError));
 }
 
 #[test]
@@ -193,27 +196,27 @@ fn rounding_from_rational_fail() {
     assert_panic!(i32::rounding_from(&x, RoundingMode::Exact));
 }
 
-fn checked_from_rational_properties_helper<
-    T: for<'a> CheckedFrom<&'a Rational> + for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt,
+fn try_from_rational_properties_helper<
+    T: for<'a> TryFrom<&'a Rational> + for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt,
 >()
 where
-    Rational: From<T> + PartialOrd<T>,
+    Rational: TryFrom<T> + PartialOrd<T>,
 {
     rational_gen().test_properties(|x| {
-        let p_x = T::checked_from(&x);
-        assert_eq!(p_x.is_some(), x >= T::MIN && x <= T::MAX && x.is_integer());
-        assert_eq!(p_x.is_some(), T::convertible_from(&x));
-        if let Some(n) = p_x {
+        let p_x = T::try_from(&x);
+        assert_eq!(p_x.is_ok(), x >= T::MIN && x <= T::MAX && x.is_integer());
+        assert_eq!(p_x.is_ok(), T::convertible_from(&x));
+        if let Ok(n) = p_x {
             assert_eq!(n.to_string(), x.to_string());
             assert_eq!(T::exact_from(&x), n);
-            assert!(PartialEq::<Rational>::eq(&Rational::from(n), &x));
+            assert!(PartialEq::<Rational>::eq(&Rational::exact_from(n), &x));
         }
     });
 }
 
 #[test]
-fn checked_from_rational_properties() {
-    apply_fn_to_primitive_ints!(checked_from_rational_properties_helper);
+fn try_from_rational_properties() {
+    apply_fn_to_primitive_ints!(try_from_rational_properties_helper);
 }
 
 fn convertible_from_rational_properties_helper<

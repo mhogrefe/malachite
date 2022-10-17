@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom,
-    SciMantissaAndExponent, WrappingFrom,
+    ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom, SciMantissaAndExponent,
+    WrappingFrom,
 };
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
@@ -13,6 +13,9 @@ use malachite_base::rounding_modes::RoundingMode;
 fn abs_is_neg_power_of_2(x: &Rational) -> bool {
     x.numerator == 1u32 && x.denominator.is_power_of_2()
 }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PrimitiveFloatFromRationalError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -151,38 +154,11 @@ macro_rules! float_impls {
             }
         }
 
-        impl From<Rational> for $f {
-            /// Converts a [`Rational`] to the nearest primitive float, taking the [`Rational`] by
-            /// value. If there are two nearest floats, the one whose least-significant bit is zero
-            /// is chosen.
-            ///
-            /// If the input is larger than the maximum finite value representable by the
-            /// floating-point type, the result is the maximum finite float. If the input is
-            /// smaller than the minimum (most negative) finite value, the result is the minimum
-            /// finite float.
-            ///
-            /// If the absolute value of the [`Rational`] is half of the smallest positive float or
-            /// smaller, zero is returned. The sign of the zero is the same as the sign of the
-            /// [`Rational`].
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n \log n \log\log n)$
-            ///
-            /// $M(n) = O(n \log n)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
-            ///
-            /// # Examples
-            /// See [here](super::primitive_float_from_rational#from).
-            #[inline]
-            fn from(value: Rational) -> $f {
-                $f::rounding_from(value, RoundingMode::Nearest)
-            }
-        }
+        impl TryFrom<Rational> for $f {
+            type Error = PrimitiveFloatFromRationalError;
 
-        impl CheckedFrom<Rational> for $f {
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by value. If
-            /// the input isn't exactly equal to any float, `None` is returned.
+            /// the input isn't exactly equal to any float, an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -192,15 +168,17 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Examples
-            /// See [here](super::primitive_float_from_rational#checked_from).
-            fn checked_from(value: Rational) -> Option<$f> {
+            /// See [here](super::primitive_float_from_rational#try_from).
+            fn try_from(value: Rational) -> Result<$f, Self::Error> {
                 if value == 0 {
-                    Some(0.0)
+                    Ok(0.0)
                 } else {
                     let sign = value.sign;
-                    let (mantissa, exponent) =
-                        value.sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)?;
-                    let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent));
+                    let (mantissa, exponent) = value
+                        .sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)
+                        .ok_or(PrimitiveFloatFromRationalError)?;
+                    let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
+                        .ok_or(PrimitiveFloatFromRationalError);
                     if sign {
                         f
                     } else {
@@ -381,38 +359,11 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> From<&'a Rational> for $f {
-            /// Converts a [`Rational`] to the nearest primitive float, taking the [`Rational`] by
-            /// reference. If there are two nearest floats, the one whose least-significant bit is
-            /// zero is chosen.
-            ///
-            /// If the input is larger than the maximum finite value representable by the
-            /// floating-point type, the result is the maximum finite float. If the input is
-            /// smaller than the minimum (most negative) finite value, the result is the minimum
-            /// finite float.
-            ///
-            /// If the absolute value of the [`Rational`] is half of the smallest positive float or
-            /// smaller, zero is returned. The sign of the zero is the same as the sign of the
-            /// [`Rational`].
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n \log n \log\log n)$
-            ///
-            /// $M(n) = O(n \log n)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
-            ///
-            /// # Examples
-            /// See [here](super::primitive_float_from_rational#from).
-            #[inline]
-            fn from(value: &'a Rational) -> $f {
-                $f::rounding_from(value, RoundingMode::Nearest)
-            }
-        }
+        impl<'a> TryFrom<&'a Rational> for $f {
+            type Error = PrimitiveFloatFromRationalError;
 
-        impl<'a> CheckedFrom<&'a Rational> for $f {
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by reference.
-            /// If the input isn't exactly equal to any float, `None` is returned.
+            /// If the input isn't exactly equal to any float, an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -422,14 +373,16 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Examples
-            /// See [here](super::primitive_float_from_rational#checked_from).
-            fn checked_from(value: &'a Rational) -> Option<$f> {
+            /// See [here](super::primitive_float_from_rational#try_from).
+            fn try_from(value: &'a Rational) -> Result<$f, Self::Error> {
                 if *value == 0 {
-                    Some(0.0)
+                    Ok(0.0)
                 } else {
-                    let (mantissa, exponent) =
-                        value.sci_mantissa_and_exponent_with_rounding_ref(RoundingMode::Exact)?;
-                    let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent));
+                    let (mantissa, exponent) = value
+                        .sci_mantissa_and_exponent_with_rounding_ref(RoundingMode::Exact)
+                        .ok_or(PrimitiveFloatFromRationalError)?;
+                    let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
+                        .ok_or(PrimitiveFloatFromRationalError);
                     if value.sign {
                         f
                     } else {

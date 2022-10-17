@@ -194,8 +194,6 @@ impl AddMul<Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -231,8 +229,6 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -268,8 +264,6 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -305,8 +299,6 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -342,8 +334,6 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -389,8 +379,6 @@ impl AddMulAssign<Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -428,8 +416,6 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -467,8 +453,6 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///
@@ -506,8 +490,6 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::integer::Integer;
     ///

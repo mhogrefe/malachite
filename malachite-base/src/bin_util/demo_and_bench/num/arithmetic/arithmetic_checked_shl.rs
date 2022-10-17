@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::test_util::bench::bucketers::{pair_2_bucketer, pair_2_unsigned_abs_bucketer};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -112,7 +111,7 @@ fn benchmark_arithmetic_checked_shl_unsigned_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.arithmetic_checked_shl({})", T::NAME, U::NAME),
@@ -137,7 +136,7 @@ fn benchmark_arithmetic_checked_shl_unsigned_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.arithmetic_checked_shl({})", T::NAME, U::NAME),
@@ -162,7 +161,7 @@ fn benchmark_arithmetic_checked_shl_signed_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.arithmetic_checked_shl({})", T::NAME, U::NAME),
@@ -187,7 +186,7 @@ fn benchmark_arithmetic_checked_shl_signed_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.arithmetic_checked_shl({})", T::NAME, U::NAME),

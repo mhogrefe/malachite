@@ -48,7 +48,7 @@ fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Natural> + PartialEq<rug::Integer> + PrimitiveFloat,
 >()
 where
-    Natural: From<T> + PartialEq<T> + PartialOrd<T>,
+    Natural: TryFrom<T> + PartialEq<T> + PartialOrd<T>,
     rug::Integer: PartialEq<T>,
 {
     natural_primitive_float_pair_gen::<T>().test_properties(|(n, f)| {

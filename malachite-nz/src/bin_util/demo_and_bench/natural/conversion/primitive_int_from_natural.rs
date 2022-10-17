@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -14,9 +14,10 @@ use malachite_nz::test_util::bench::bucketers::{
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_rm, natural_gen_var_6, natural_gen_var_7,
 };
+use std::fmt::Debug;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_primitive_int_demos!(runner, demo_primitive_int_checked_from_natural);
+    register_primitive_int_demos!(runner, demo_primitive_int_try_from_natural);
     register_unsigned_demos!(runner, demo_unsigned_exact_from_natural);
     register_signed_demos!(runner, demo_signed_exact_from_natural);
     register_primitive_int_demos!(runner, demo_primitive_int_wrapping_from_natural);
@@ -24,10 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_int_demos!(runner, demo_primitive_int_overflowing_from_natural);
     register_primitive_int_demos!(runner, demo_primitive_int_convertible_from_natural);
 
-    register_primitive_int_benches!(
-        runner,
-        benchmark_primitive_int_checked_from_natural_algorithms
-    );
+    register_primitive_int_benches!(runner, benchmark_primitive_int_try_from_natural_algorithms);
     register_unsigned_benches!(runner, benchmark_unsigned_exact_from_natural);
     register_signed_benches!(runner, benchmark_signed_exact_from_natural);
     register_primitive_int_benches!(
@@ -44,52 +42,37 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_primitive_int_convertible_from_natural_algorithms
     );
 
-    register_bench!(
-        runner,
-        benchmark_u32_checked_from_natural_library_comparison
-    );
+    register_bench!(runner, benchmark_u32_try_from_natural_library_comparison);
     register_bench!(
         runner,
         benchmark_u32_wrapping_from_natural_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_u64_checked_from_natural_library_comparison
-    );
+    register_bench!(runner, benchmark_u64_try_from_natural_library_comparison);
     register_bench!(
         runner,
         benchmark_u64_wrapping_from_natural_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_i32_checked_from_natural_library_comparison
-    );
+    register_bench!(runner, benchmark_i32_try_from_natural_library_comparison);
     register_bench!(
         runner,
         benchmark_i32_wrapping_from_natural_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_i64_checked_from_natural_library_comparison
-    );
+    register_bench!(runner, benchmark_i64_try_from_natural_library_comparison);
     register_bench!(
         runner,
         benchmark_i64_wrapping_from_natural_library_comparison
     );
 }
 
-fn demo_primitive_int_checked_from_natural<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveInt>(
+fn demo_primitive_int_try_from_natural<T: for<'a> TryFrom<&'a Natural> + PrimitiveInt>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
-) {
+) where
+    for<'a> <T as TryFrom<&'a Natural>>::Error: Debug,
+{
     for n in natural_gen().get(gm, &config).take(limit) {
-        println!(
-            "{}::checked_from(&{}) = {:?}",
-            T::NAME,
-            n,
-            T::checked_from(&n)
-        );
+        println!("{}::try_from(&{}) = {:?}", T::NAME, n, T::try_from(&n));
     }
 }
 
@@ -183,8 +166,8 @@ fn demo_primitive_int_convertible_from_natural<
     }
 }
 
-fn benchmark_primitive_int_checked_from_natural_algorithms<
-    T: for<'a> CheckedFrom<&'a Natural> + for<'a> OverflowingFrom<&'a Natural> + PrimitiveInt,
+fn benchmark_primitive_int_try_from_natural_algorithms<
+    T: for<'a> TryFrom<&'a Natural> + for<'a> OverflowingFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -192,7 +175,7 @@ fn benchmark_primitive_int_checked_from_natural_algorithms<
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::checked_from(&Natural)", T::NAME),
+        &format!("{}::try_from(&Natural)", T::NAME),
         BenchmarkType::Algorithms,
         natural_gen().get(gm, &config),
         gm.name(),
@@ -200,7 +183,7 @@ fn benchmark_primitive_int_checked_from_natural_algorithms<
         file_name,
         &natural_bit_bucketer("n"),
         &mut [
-            ("standard", &mut |n| no_out!(T::checked_from(&n))),
+            ("standard", &mut |n| no_out!(T::try_from(&n).ok())),
             ("using overflowing_from", &mut |n| {
                 let (value, overflow) = T::overflowing_from(&n);
                 if overflow {
@@ -330,7 +313,7 @@ fn benchmark_primitive_int_overflowing_from_natural_algorithms<
 
 #[allow(unused_must_use)]
 fn benchmark_primitive_int_convertible_from_natural_algorithms<
-    T: for<'a> CheckedFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveInt,
+    T: for<'a> TryFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -347,21 +330,19 @@ fn benchmark_primitive_int_convertible_from_natural_algorithms<
         &natural_bit_bucketer("n"),
         &mut [
             ("standard", &mut |n| no_out!(T::convertible_from(&n))),
-            ("using checked_from", &mut |n| {
-                no_out!(T::checked_from(&n).is_some())
-            }),
+            ("using try_from", &mut |n| no_out!(T::try_from(&n).is_ok())),
         ],
     );
 }
 
-fn benchmark_u32_checked_from_natural_library_comparison(
+fn benchmark_u32_try_from_natural_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "u32::checked_from(&Natural)",
+        "u32::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
         natural_gen_rm().get(gm, &config),
         gm.name(),
@@ -369,7 +350,7 @@ fn benchmark_u32_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(u32::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(u32::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_u32())),
         ],
     );
@@ -396,14 +377,14 @@ fn benchmark_u32_wrapping_from_natural_library_comparison(
     );
 }
 
-fn benchmark_u64_checked_from_natural_library_comparison(
+fn benchmark_u64_try_from_natural_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "u64::checked_from(&Natural)",
+        "u64::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
         natural_gen_rm().get(gm, &config),
         gm.name(),
@@ -411,7 +392,7 @@ fn benchmark_u64_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(u64::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(u64::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_u64())),
         ],
     );
@@ -438,14 +419,14 @@ fn benchmark_u64_wrapping_from_natural_library_comparison(
     );
 }
 
-fn benchmark_i32_checked_from_natural_library_comparison(
+fn benchmark_i32_try_from_natural_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "i32::checked_from(&Natural)",
+        "i32::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
         natural_gen_rm().get(gm, &config),
         gm.name(),
@@ -453,7 +434,7 @@ fn benchmark_i32_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(i32::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(i32::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_i32())),
         ],
     );
@@ -480,14 +461,14 @@ fn benchmark_i32_wrapping_from_natural_library_comparison(
     );
 }
 
-fn benchmark_i64_checked_from_natural_library_comparison(
+fn benchmark_i64_try_from_natural_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "i64::checked_from(&Natural)",
+        "i64::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
         natural_gen_rm().get(gm, &config),
         gm.name(),
@@ -495,7 +476,7 @@ fn benchmark_i64_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(i64::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(i64::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_i64())),
         ],
     );

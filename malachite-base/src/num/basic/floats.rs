@@ -8,8 +8,8 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::traits::{Iverson, NegativeOne, One, OneHalf, Two, Zero};
 use crate::num::conversion::traits::{
-    CheckedFrom, CheckedInto, ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger,
-    RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
+    ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger, RawMantissaAndExponent,
+    RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
 };
 use crate::num::float::FmtRyuString;
 use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
@@ -93,30 +93,6 @@ pub trait PrimitiveFloat:
     + CeilingAssign
     + CeilingLogBase2<Output = i64>
     + CeilingLogBasePowerOf2<u64, Output = i64>
-    + CheckedFrom<u8>
-    + CheckedFrom<u16>
-    + CheckedFrom<u32>
-    + CheckedFrom<u64>
-    + CheckedFrom<u128>
-    + CheckedFrom<usize>
-    + CheckedFrom<i8>
-    + CheckedFrom<i16>
-    + CheckedFrom<i32>
-    + CheckedFrom<i64>
-    + CheckedFrom<i128>
-    + CheckedFrom<isize>
-    + CheckedInto<u8>
-    + CheckedInto<u16>
-    + CheckedInto<u32>
-    + CheckedInto<u64>
-    + CheckedInto<u128>
-    + CheckedInto<usize>
-    + CheckedInto<i8>
-    + CheckedInto<i16>
-    + CheckedInto<i32>
-    + CheckedInto<i64>
-    + CheckedInto<i128>
-    + CheckedInto<isize>
     + CheckedLogBase2<Output = i64>
     + CheckedLogBasePowerOf2<u64, Output = i64>
     + ConvertibleFrom<u8>

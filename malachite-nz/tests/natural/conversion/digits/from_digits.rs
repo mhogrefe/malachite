@@ -3,7 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::test_util::generators::common::GenConfig;
@@ -1066,7 +1066,7 @@ fn test_from_digits_asc_limb() {
 
 fn from_digits_asc_limb_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
-    Limb: CheckedFrom<T> + WrappingFrom<T>,
+    Limb: TryFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(from_digits_asc_limb::<_, T>(empty(), 0));
@@ -1184,7 +1184,7 @@ fn test_from_digits_desc_limb() {
 
 fn from_digits_desc_limb_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
-    Limb: CheckedFrom<T> + WrappingFrom<T>,
+    Limb: TryFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(from_digits_desc_limb::<_, T>(empty(), 0));
@@ -1459,9 +1459,7 @@ fn from_digits_asc_unsigned_fail() {
     apply_fn_to_unsigneds!(from_digits_asc_unsigned_fail_helper);
 }
 
-fn from_digits_asc_unsigned_helper<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
->()
+fn from_digits_asc_unsigned_helper<T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>>()
 where
     Natural: Digits<T>,
 {
@@ -1575,9 +1573,7 @@ fn from_digits_desc_unsigned_fail() {
     apply_fn_to_unsigneds!(from_digits_desc_unsigned_fail_helper);
 }
 
-fn from_digits_desc_unsigned_helper<
-    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
->()
+fn from_digits_desc_unsigned_helper<T: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>>()
 where
     Natural: Digits<T> + From<T>,
 {

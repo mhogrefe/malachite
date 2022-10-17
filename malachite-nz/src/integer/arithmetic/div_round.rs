@@ -53,8 +53,6 @@ impl DivRound<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -149,8 +147,6 @@ impl<'a> DivRound<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -245,8 +241,6 @@ impl<'a> DivRound<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -343,8 +337,6 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -409,8 +401,6 @@ impl DivRoundAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -514,8 +504,6 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;

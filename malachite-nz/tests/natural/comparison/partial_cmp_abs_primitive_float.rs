@@ -66,7 +66,7 @@ fn test_partial_cmp_abs_primitive_float() {
 
 fn partial_cmp_abs_primitive_float_properties_helper<T: PartialOrdAbs<Natural> + PrimitiveFloat>()
 where
-    Natural: From<T> + PartialOrd<T> + PartialOrdAbs<T>,
+    Natural: TryFrom<T> + PartialOrd<T> + PartialOrdAbs<T>,
 {
     natural_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp_abs = n.partial_cmp_abs(&u);

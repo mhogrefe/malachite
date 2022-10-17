@@ -31,8 +31,6 @@ impl DivMod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -83,8 +81,6 @@ impl<'a> DivMod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -135,8 +131,6 @@ impl<'a> DivMod<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -194,8 +188,6 @@ impl<'a, 'b> DivMod<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -260,8 +252,6 @@ impl DivAssignMod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -328,8 +318,6 @@ impl<'a> DivAssignMod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -397,8 +385,6 @@ impl DivRem<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -451,8 +437,6 @@ impl<'a> DivRem<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -505,8 +489,6 @@ impl<'a> DivRem<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -562,8 +544,6 @@ impl<'a, 'b> DivRem<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -626,8 +606,6 @@ impl DivAssignRem<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -690,8 +668,6 @@ impl<'a> DivAssignRem<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::integer::Integer;
     ///
@@ -750,8 +726,6 @@ impl CeilingDivMod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -814,8 +788,6 @@ impl<'a> CeilingDivMod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -878,8 +850,6 @@ impl<'a> CeilingDivMod<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -949,8 +919,6 @@ impl<'a, 'b> CeilingDivMod<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -1021,8 +989,6 @@ impl CeilingDivAssignMod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -1087,8 +1053,6 @@ impl<'a> CeilingDivAssignMod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignMod;
     /// use malachite_nz::integer::Integer;
     ///

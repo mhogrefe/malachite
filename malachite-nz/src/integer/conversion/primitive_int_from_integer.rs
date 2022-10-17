@@ -5,18 +5,23 @@ use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, WrappingNeg};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use std::ops::Neg;
 
-fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -> Option<T> {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct UnsignedFromIntegerError;
+
+fn try_from_unsigned<'a, T: TryFrom<&'a Natural>>(
+    value: &'a Integer,
+) -> Result<T, UnsignedFromIntegerError> {
     match *value {
-        Integer { sign: false, .. } => None,
+        Integer { sign: false, .. } => Err(UnsignedFromIntegerError),
         Integer {
             sign: true,
             ref abs,
-        } => T::checked_from(abs),
+        } => T::try_from(abs).map_err(|_| UnsignedFromIntegerError),
     }
 }
 
@@ -65,13 +70,16 @@ fn overflowing_from_unsigned<
     }
 }
 
-fn checked_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a Integer>>(
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct SignedFromIntegerError;
+
+fn try_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a Integer>>(
     value: &'a Integer,
-) -> Option<T> {
+) -> Result<T, SignedFromIntegerError> {
     if T::convertible_from(value) {
-        Some(T::wrapping_from(value))
+        Ok(T::wrapping_from(value))
     } else {
-        None
+        Err(SignedFromIntegerError)
     }
 }
 
@@ -120,18 +128,20 @@ fn convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
 
 macro_rules! impl_from {
     ($u: ident, $s: ident) => {
-        impl<'a> CheckedFrom<&'a Integer> for $u {
-            /// Converts an [`Integer`] to an unsigned primitive integer, returning `None` if the
+        impl<'a> TryFrom<&'a Integer> for $u {
+            type Error = UnsignedFromIntegerError;
+
+            /// Converts an [`Integer`] to an unsigned primitive integer, returning an error if the
             /// [`Integer`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_integer#checked_from).
+            /// See [here](super::primitive_int_from_integer#try_from).
             #[inline]
-            fn checked_from(value: &Integer) -> Option<$u> {
-                checked_from_unsigned(value)
+            fn try_from(value: &Integer) -> Result<$u, Self::Error> {
+                try_from_unsigned(value)
             }
         }
 
@@ -198,18 +208,20 @@ macro_rules! impl_from {
             }
         }
 
-        impl<'a> CheckedFrom<&'a Integer> for $s {
-            /// Converts an [`Integer`] to a signed primitive integer, returning `None` if the
+        impl<'a> TryFrom<&'a Integer> for $s {
+            type Error = SignedFromIntegerError;
+
+            /// Converts an [`Integer`] to a signed primitive integer, returning an error if the
             /// [`Integer`] cannot be represented.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_integer#checked_from).
+            /// See [here](super::primitive_int_from_integer#try_from).
             #[inline]
-            fn checked_from(value: &Integer) -> Option<$s> {
-                checked_from_signed(value)
+            fn try_from(value: &Integer) -> Result<$s, Self::Error> {
+                try_from_signed(value)
             }
         }
 

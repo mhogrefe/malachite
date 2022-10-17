@@ -1,6 +1,6 @@
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
+    ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
 };
 use itertools::Itertools;
 
@@ -75,7 +75,7 @@ fn from_digits_asc<
 }
 
 fn from_digits_desc<
-    T: Digits<U> + CheckedFrom<U> + PrimitiveUnsigned + PowerOf2Digits<U>,
+    T: Digits<U> + TryFrom<U> + PrimitiveUnsigned + PowerOf2Digits<U>,
     U: PrimitiveUnsigned,
     I: Iterator<Item = U>,
 >(
@@ -86,10 +86,10 @@ fn from_digits_desc<
     if let Some(log_base) = base.checked_log_base_2() {
         T::from_power_of_2_digits_desc(log_base, digits)
     } else {
-        let base = T::checked_from(*base)?;
+        let base = T::try_from(*base).ok()?;
         let mut x = T::ZERO;
         for digit in digits {
-            let digit = T::checked_from(digit)?;
+            let digit = T::try_from(digit).ok()?;
             if digit >= base {
                 return None;
             }

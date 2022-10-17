@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, PowerOf2DigitIterable, PowerOf2Digits};
+use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2Digits};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -98,7 +98,7 @@ fn demo_natural_to_power_of_2_digits_desc_natural(gm: GenMode, config: GenConfig
 }
 
 fn benchmark_to_power_of_2_digits_asc_algorithms<
-    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -135,7 +135,7 @@ fn benchmark_to_power_of_2_digits_asc_algorithms<
 }
 
 fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
-    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -173,7 +173,7 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
 }
 
 fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
-    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,

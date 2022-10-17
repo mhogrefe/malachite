@@ -5,7 +5,7 @@ use malachite_base::num::conversion::string::from_sci_string::{
     cmp_half_helper, is_zero_helper, preprocess_sci_string, validate_helper,
 };
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
-use malachite_base::num::conversion::traits::{CheckedFrom, FromSciString, FromStringBase};
+use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 use std::ops::Mul;
@@ -70,7 +70,7 @@ where
         let x = T::parse_int(&s, options.get_base())?;
         Some(x * T::from(options.get_base()).pow(exponent.unsigned_abs()))
     } else {
-        let neg_exponent = usize::checked_from(exponent.unsigned_abs())?;
+        let neg_exponent = usize::try_from(exponent.unsigned_abs()).ok()?;
         let len = s.len();
         if len == 0 {
             return None;

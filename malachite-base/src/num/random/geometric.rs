@@ -3,8 +3,9 @@ use crate::num::arithmetic::traits::Gcd;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::CheckedInto;
+use crate::num::conversion::traits::ExactInto;
 use crate::random::Seed;
+use std::fmt::Debug;
 
 /// Generates random unsigned integers from a truncated geometric distribution.
 #[derive(Clone, Debug)]
@@ -74,9 +75,7 @@ pub(crate) fn mean_to_p_with_min<T: PrimitiveInt>(
     um_denominator: u64,
 ) -> (u64, u64) {
     let um = SimpleRational::new(um_numerator, um_denominator);
-    let p = um
-        .sub_u64(CheckedInto::<u64>::checked_into(min).unwrap())
-        .inverse();
+    let p = um.sub_u64(ExactInto::<u64>::exact_into(min)).inverse();
     (p.n, p.d)
 }
 

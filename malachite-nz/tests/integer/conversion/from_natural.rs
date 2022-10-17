@@ -1,4 +1,3 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
@@ -35,7 +34,7 @@ fn from_natural_properties() {
         assert!(integer_x_alt.is_valid());
         assert_eq!(integer_x_alt, integer_x);
 
-        assert_eq!(Natural::checked_from(&integer_x).as_ref(), Some(&x));
-        assert_eq!(Natural::checked_from(integer_x), Some(x));
+        assert_eq!(Natural::try_from(&integer_x).as_ref(), Ok(&x));
+        assert_eq!(Natural::try_from(integer_x), Ok(x));
     });
 }

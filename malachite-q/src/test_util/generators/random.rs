@@ -19,7 +19,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, IsInteger, ToSci};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_signeds, geometric_random_unsigneds,
@@ -82,7 +82,7 @@ pub fn random_rational_gen_var_3(config: &GenConfig) -> It<Rational> {
 
 pub fn random_rational_gen_var_4<T: PrimitiveFloat>(config: &GenConfig) -> It<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Box::new(
         special_random_finite_primitive_floats(
@@ -94,7 +94,7 @@ where
             config.get_or("special_p_mean_n", 1),
             config.get_or("special_p_mean_d", 64),
         )
-        .map(Rational::from),
+        .map(Rational::exact_from),
     )
 }
 
@@ -113,7 +113,7 @@ pub fn random_rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + Prim
 
 pub fn random_rational_gen_var_6<T: PrimitiveFloat>(config: &GenConfig) -> It<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Box::new(
         special_random_nonzero_finite_primitive_floats(
@@ -124,8 +124,8 @@ where
             config.get_or("precision_mean_d", 1),
         )
         .map(|f| {
-            let x = Rational::from(f);
-            let y = Rational::from(if f > T::ZERO {
+            let x = Rational::exact_from(f);
+            let y = Rational::exact_from(if f > T::ZERO {
                 f.next_lower()
             } else {
                 f.next_higher()
@@ -1385,9 +1385,9 @@ pub fn random_rational_rounding_mode_pair_gen_var_5<
     config: &GenConfig,
 ) -> It<(Rational, RoundingMode)>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
-    let max = Rational::from(T::MAX_FINITE);
+    let max = Rational::exact_from(T::MAX_FINITE);
     let min = -&max;
     Box::new(
         random_pairs(

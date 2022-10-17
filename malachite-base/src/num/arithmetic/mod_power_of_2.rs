@@ -4,7 +4,8 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::conversion::traits::WrappingFrom;
+use std::fmt::Debug;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
@@ -187,14 +188,13 @@ fn mod_power_of_2_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSig
     U::wrapping_from(x).mod_power_of_2(pow)
 }
 
-fn mod_power_of_2_assign_signed<
-    U,
-    S: CheckedFrom<U> + ModPowerOf2<Output = U> + PrimitiveSigned,
->(
+fn mod_power_of_2_assign_signed<U, S: TryFrom<U> + ModPowerOf2<Output = U> + PrimitiveSigned>(
     x: &mut S,
     pow: u64,
-) {
-    *x = S::checked_from(x.mod_power_of_2(pow)).expect(ERROR_MESSAGE);
+) where
+    <S as TryFrom<U>>::Error: Debug,
+{
+    *x = S::try_from(x.mod_power_of_2(pow)).expect(ERROR_MESSAGE);
 }
 
 fn rem_power_of_2_signed<
@@ -213,17 +213,20 @@ fn rem_power_of_2_signed<
 
 fn ceiling_mod_power_of_2_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
-    S: CheckedFrom<U> + PrimitiveSigned,
+    S: TryFrom<U> + PrimitiveSigned,
 >(
     x: S,
     pow: u64,
-) -> S {
+) -> S
+where
+    <S as TryFrom<U>>::Error: Debug,
+{
     let abs_result = if x >= S::ZERO {
         U::wrapping_from(x).neg_mod_power_of_2(pow)
     } else {
         U::wrapping_from(x.wrapping_neg()).mod_power_of_2(pow)
     };
-    S::checked_from(abs_result)
+    S::try_from(abs_result)
         .expect(ERROR_MESSAGE)
         .checked_neg()
         .expect(ERROR_MESSAGE)

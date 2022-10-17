@@ -221,8 +221,6 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::strings_from_char_vecs;
 ///

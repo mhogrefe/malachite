@@ -3,10 +3,13 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom,
-    SciMantissaAndExponent, WrappingFrom,
+    ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom, SciMantissaAndExponent,
+    WrappingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PrimitiveFloatFromNaturalError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -63,32 +66,12 @@ macro_rules! float_impls {
             }
         }
 
-        impl<'a> From<&'a Natural> for $f {
-            /// Converts a [`Natural`] to a primitive float.
-            ///
-            /// If there are two nearest floats, the one whose least-significant bit is zero is
-            /// chosen. If the [`Natural`] is larger than the maximum finite float, then the result
-            /// is the maximum finite float.
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
-            ///
-            /// # Examples
-            /// See [here](super::primitive_float_from_natural#from).
-            #[inline]
-            fn from(value: &'a Natural) -> $f {
-                $f::rounding_from(value, RoundingMode::Nearest)
-            }
-        }
+        impl<'a> TryFrom<&'a Natural> for $f {
+            type Error = PrimitiveFloatFromNaturalError;
 
-        impl<'a> CheckedFrom<&'a Natural> for $f {
             /// Converts a [`Natural`] to a primitive float.
             ///
-            /// If the input isn't exactly equal to some float, `None` is returned.
+            /// If the input isn't exactly equal to some float, an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -98,14 +81,16 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
             ///
             /// # Examples
-            /// See [here](super::primitive_float_from_natural#checked_from).
-            fn checked_from(value: &'a Natural) -> Option<$f> {
+            /// See [here](super::primitive_float_from_natural#try_from).
+            fn try_from(value: &'a Natural) -> Result<$f, Self::Error> {
                 if *value == 0 {
-                    Some(0.0)
+                    Ok(0.0)
                 } else {
-                    let (mantissa, exponent) =
-                        value.sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)?;
+                    let (mantissa, exponent) = value
+                        .sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)
+                        .ok_or(PrimitiveFloatFromNaturalError)?;
                     $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
+                        .ok_or(PrimitiveFloatFromNaturalError)
                 }
             }
         }

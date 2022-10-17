@@ -472,8 +472,8 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_range(
 ///         &Natural::from(10u32),
-///         Rational::from_float_simplest(std::f64::consts::E),
-///         Rational::from_float_simplest(std::f64::consts::PI),
+///         Rational::try_from_float_simplest(std::f64::consts::E).unwrap(),
+///         Rational::try_from_float_simplest(std::f64::consts::PI).unwrap(),
 ///     ).collect_vec().to_debug_string(),
 ///     "[29/10, 31/10]"
 /// );
@@ -550,8 +550,8 @@ pub fn exhaustive_rationals_with_denominator_range(
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_inclusive_range(
 ///         &Natural::from(10u32),
-///         Rational::from_float_simplest(std::f64::consts::E),
-///         Rational::from_float_simplest(std::f64::consts::PI),
+///         Rational::try_from_float_simplest(std::f64::consts::E).unwrap(),
+///         Rational::try_from_float_simplest(std::f64::consts::PI).unwrap(),
 ///     ).collect_vec().to_debug_string(),
 ///     "[29/10, 31/10]"
 /// );

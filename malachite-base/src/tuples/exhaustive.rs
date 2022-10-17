@@ -21,8 +21,6 @@ use std::mem::swap;
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::exhaustive_units;
 ///
@@ -1579,7 +1577,6 @@ impl<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1698,7 +1695,6 @@ pub const fn lex_dependent_pairs<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -1864,7 +1860,6 @@ impl<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -2049,7 +2044,6 @@ pub const fn exhaustive_dependent_pairs<
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
 ///
@@ -2717,8 +2711,6 @@ where
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::exhaustive_unique_pairs;
 ///

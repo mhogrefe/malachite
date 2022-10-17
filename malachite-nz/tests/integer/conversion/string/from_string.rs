@@ -1,6 +1,4 @@
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ExactFrom, FromStringBase, ToStringBase,
-};
+use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase, ToStringBase};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::exhaustive::valid_digit_chars;
 use malachite_base::test_util::generators::{
@@ -201,13 +199,13 @@ fn from_string_base_properties() {
         }
         assert_eq!(Integer::from_string_base(base, &with_zero).unwrap(), n);
 
-        if let Some(base) = u32::checked_from(base) {
+        if let Ok(base) = u32::try_from(base) {
             assert_eq!(
                 BigInt::from_str_radix(&s, base).unwrap(),
                 integer_to_bigint(&n)
             );
         }
-        if let Some(base) = i32::checked_from(base) {
+        if let Ok(base) = i32::try_from(base) {
             assert_eq!(
                 rug::Integer::from_str_radix(&s, base).unwrap(),
                 integer_to_rug_integer(&n)

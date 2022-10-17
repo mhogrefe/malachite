@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::test_util::bench::bucketers::triple_2_unsigned_abs_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -105,7 +104,7 @@ fn benchmark_shl_round_unsigned_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shl_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -128,7 +127,7 @@ fn benchmark_shl_round_signed_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shl_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -151,7 +150,7 @@ fn benchmark_shl_round_assign_unsigned_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shl_round_assign({}, RoundingMode)", T::NAME, U::NAME),
@@ -174,7 +173,7 @@ fn benchmark_shl_round_assign_signed_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shl_round_assign({}, RoundingMode)", T::NAME, U::NAME),

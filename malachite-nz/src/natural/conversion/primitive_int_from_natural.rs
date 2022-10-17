@@ -3,24 +3,32 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, FromOtherTypeSlice, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, FromOtherTypeSlice, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct UnsignedFromNaturalError;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct SignedFromNaturalError;
 
 macro_rules! impl_from_limb {
     ($u: ident, $s: ident) => {
-        impl<'a> CheckedFrom<&'a Natural> for $u {
-            /// Converts a [`Natural`] to a [`Limb`](crate#limbs), returning `None` if the
+        impl<'a> TryFrom<&'a Natural> for $u {
+            type Error = UnsignedFromNaturalError;
+
+            /// Converts a [`Natural`] to a [`Limb`](crate#limbs), returning an error if the
             /// [`Natural`] is too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
-            fn checked_from(value: &Natural) -> Option<$u> {
+            /// See [here](super::primitive_int_from_natural#try_from).
+            fn try_from(value: &Natural) -> Result<$u, Self::Error> {
                 match *value {
-                    Natural(Small(small)) => Some(small),
-                    Natural(Large(_)) => None,
+                    Natural(Small(small)) => Ok(small),
+                    Natural(Large(_)) => Err(UnsignedFromNaturalError),
                 }
             }
         }
@@ -96,19 +104,23 @@ macro_rules! impl_from_limb {
             }
         }
 
-        impl<'a> CheckedFrom<&'a Natural> for $s {
+        impl<'a> TryFrom<&'a Natural> for $s {
+            type Error = SignedFromNaturalError;
+
             /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same
-            /// as a [limb](crate#limbs)'s), returning `None` if the [`Natural`] is too large.
+            /// as a [limb](crate#limbs)'s), returning an error if the [`Natural`] is too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
-            fn checked_from(value: &Natural) -> Option<$s> {
+            /// See [here](super::primitive_int_from_natural#try_from).
+            fn try_from(value: &Natural) -> Result<$s, Self::Error> {
                 match *value {
-                    Natural(Small(small)) => $s::checked_from(small),
-                    Natural(Large(_)) => None,
+                    Natural(Small(small)) => {
+                        $s::try_from(small).map_err(|_| SignedFromNaturalError)
+                    }
+                    Natural(Large(_)) => Err(SignedFromNaturalError),
                 }
             }
         }
@@ -187,19 +199,23 @@ macro_rules! impl_from_limb {
 
 macro_rules! impl_from_smaller_than_limb {
     ($u: ident, $s: ident) => {
-        impl<'a> CheckedFrom<&'a Natural> for $u {
+        impl<'a> TryFrom<&'a Natural> for $u {
+            type Error = UnsignedFromNaturalError;
+
             /// Converts a [`Natural`] to a value of an unsigned primitive integer type that's
-            /// smaller than a [`Limb`](crate#limbs), returning `None` if the [`Natural`] is too
+            /// smaller than a [`Limb`](crate#limbs), returning an error if the [`Natural`] is too
             /// large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
+            /// See [here](super::primitive_int_from_natural#try_from).
             #[inline]
-            fn checked_from(value: &Natural) -> Option<$u> {
-                Limb::checked_from(value).and_then($u::checked_from)
+            fn try_from(value: &Natural) -> Result<$u, Self::Error> {
+                Limb::try_from(value)
+                    .map_err(|_| UnsignedFromNaturalError)
+                    .and_then(|x| $u::try_from(x).map_err(|_| UnsignedFromNaturalError))
             }
         }
 
@@ -272,18 +288,22 @@ macro_rules! impl_from_smaller_than_limb {
             }
         }
 
-        impl<'a> CheckedFrom<&'a Natural> for $s {
+        impl<'a> TryFrom<&'a Natural> for $s {
+            type Error = SignedFromNaturalError;
+
             /// Converts a [`Natural`] to a value of a signed primitive integer type that's smaller
-            /// than a [`Limb`](crate#limbs), returning `None` if the [`Natural`] is too large.
+            /// than a [`Limb`](crate#limbs), returning an error if the [`Natural`] is too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
+            /// See [here](super::primitive_int_from_natural#try_from).
             #[inline]
-            fn checked_from(value: &Natural) -> Option<$s> {
-                Limb::checked_from(value).and_then($s::checked_from)
+            fn try_from(value: &Natural) -> Result<$s, Self::Error> {
+                Limb::try_from(value)
+                    .map_err(|_| SignedFromNaturalError)
+                    .and_then(|x| $s::try_from(x).map_err(|_| SignedFromNaturalError))
             }
         }
 
@@ -378,19 +398,23 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             }
         }
 
-        impl<'a> CheckedFrom<&'a Natural> for $s {
+        impl<'a> TryFrom<&'a Natural> for $s {
+            type Error = SignedFromNaturalError;
+
             /// Converts a [`Natural`] to an [`isize`] or value of a signed primitive integer type
-            /// that's larger than a [`Limb`](crate#limbs), returning `None` if the [`Natural`] is
-            /// too large.
+            /// that's larger than a [`Limb`](crate#limbs), returning an error if the [`Natural`]
+            /// is too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
+            /// See [here](super::primitive_int_from_natural#try_from).
             #[inline]
-            fn checked_from(value: &Natural) -> Option<$s> {
-                $u::checked_from(value).and_then($s::checked_from)
+            fn try_from(value: &Natural) -> Result<$s, Self::Error> {
+                $u::try_from(value)
+                    .map_err(|_| SignedFromNaturalError)
+                    .and_then(|x| $s::try_from(x).map_err(|_| SignedFromNaturalError))
             }
         }
 
@@ -451,24 +475,26 @@ macro_rules! impl_from_larger_than_limb {
     ($u: ident, $s: ident) => {
         impl_from_larger_than_limb_or_xsize!($u, $s);
 
-        impl<'a> CheckedFrom<&'a Natural> for $u {
+        impl<'a> TryFrom<&'a Natural> for $u {
+            type Error = UnsignedFromNaturalError;
+
             /// Converts a [`Natural`] to a value of an unsigned primitive integer type that's
-            /// larger than a [`Limb`](crate#limbs), returning `None` if the [`Natural`] is too
+            /// larger than a [`Limb`](crate#limbs), returning an error if the [`Natural`] is too
             /// large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::primitive_int_from_natural#checked_from).
-            fn checked_from(value: &Natural) -> Option<$u> {
+            /// See [here](super::primitive_int_from_natural#try_from).
+            fn try_from(value: &Natural) -> Result<$u, Self::Error> {
                 const SIZE_RATIO: usize = 1 << ($u::LOG_WIDTH - Limb::LOG_WIDTH);
                 match *value {
-                    Natural(Small(small)) => Some($u::from(small)),
+                    Natural(Small(small)) => Ok($u::from(small)),
                     Natural(Large(ref limbs)) if limbs.len() <= SIZE_RATIO => {
-                        Some($u::from_other_type_slice(limbs))
+                        Ok($u::from_other_type_slice(limbs))
                     }
-                    Natural(Large(_)) => None,
+                    Natural(Large(_)) => Err(UnsignedFromNaturalError),
                 }
             }
         }
@@ -559,20 +585,22 @@ macro_rules! impl_from_larger_than_limb {
     };
 }
 
-impl<'a> CheckedFrom<&'a Natural> for usize {
-    /// Converts a [`Natural`] to a [`usize`], returning `None` if the [`Natural`] is too large.
+impl<'a> TryFrom<&'a Natural> for usize {
+    type Error = UnsignedFromNaturalError;
+
+    /// Converts a [`Natural`] to a [`usize`], returning an error if the [`Natural`] is too large.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::primitive_int_from_natural#checked_from).
-    fn checked_from(value: &Natural) -> Option<usize> {
+    /// See [here](super::primitive_int_from_natural#try_from).
+    fn try_from(value: &Natural) -> Result<usize, Self::Error> {
         if usize::WIDTH == u32::WIDTH {
-            u32::checked_from(value).map(usize::wrapping_from)
+            u32::try_from(value).map(usize::wrapping_from)
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            u64::checked_from(value).map(usize::wrapping_from)
+            u64::try_from(value).map(usize::wrapping_from)
         }
     }
 }

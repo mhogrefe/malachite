@@ -2,7 +2,7 @@ use crate::num::arithmetic::traits::Parity;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::string::from_string::digit_from_display_byte;
 use crate::num::conversion::string::options::FromSciStringOptions;
-use crate::num::conversion::traits::{CheckedFrom, FromSciString};
+use crate::num::conversion::traits::FromSciString;
 use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -166,7 +166,7 @@ pub fn preprocess_sci_string(s: &str, options: FromSciStringOptions) -> Option<(
             if next_char == b'+' || next_char == b'-' {
                 return None;
             }
-            exponent = exponent.checked_sub(i64::checked_from(len - point_index - 1)?)?;
+            exponent = exponent.checked_sub(i64::try_from(len - point_index - 1).ok()?)?;
             s.copy_within(point_index + 1..len, point_index);
         }
         s.pop();
@@ -183,7 +183,7 @@ fn from_sci_string_with_options_primitive_int<T: PrimitiveInt>(
         let x = parse_int::<T>(&s, options.base)?;
         x.checked_mul(T::wrapping_from(options.base).checked_pow(exponent.unsigned_abs())?)
     } else {
-        let neg_exponent = usize::checked_from(exponent.unsigned_abs())?;
+        let neg_exponent = usize::try_from(exponent.unsigned_abs()).ok()?;
         let len = s.len();
         if len == 0 {
             return None;

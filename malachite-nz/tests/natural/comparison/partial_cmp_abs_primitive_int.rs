@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -327,7 +327,7 @@ fn partial_cmp_abs_primitive_int_properties_helper_signed<
 >()
 where
     Integer: From<T>,
-    Natural: CheckedFrom<T> + PartialOrdAbs<T>,
+    Natural: TryFrom<T> + PartialOrdAbs<T>,
 {
     natural_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let cmp = n.partial_cmp_abs(&i);

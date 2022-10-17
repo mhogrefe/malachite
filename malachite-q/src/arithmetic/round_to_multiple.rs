@@ -45,16 +45,15 @@ impl RoundToMultiple<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from(-5).round_to_multiple(Rational::ZERO, RoundingMode::Down), 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
     ///     q.clone().round_to_multiple(hundredth.clone(), RoundingMode::Down).to_string(),
@@ -125,16 +124,15 @@ impl<'a> RoundToMultiple<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from(-5).round_to_multiple(&Rational::ZERO, RoundingMode::Down), 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
     ///     q.clone().round_to_multiple(&hundredth, RoundingMode::Down).to_string(),
@@ -205,16 +203,15 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from(-5).round_to_multiple(Rational::ZERO, RoundingMode::Down), 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!(
     ///     (&q).round_to_multiple(hundredth.clone(), RoundingMode::Down).to_string(),
@@ -303,16 +300,15 @@ impl<'a, 'b> RoundToMultiple<&'b Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::from(-5).round_to_multiple(Rational::ZERO, RoundingMode::Down), 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     /// assert_eq!((&q).round_to_multiple(&hundredth, RoundingMode::Down).to_string(), "157/50");
     /// assert_eq!((&q).round_to_multiple(&hundredth, RoundingMode::Floor).to_string(), "157/50");
@@ -369,10 +365,9 @@ impl RoundToMultipleAssign<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
@@ -380,7 +375,7 @@ impl RoundToMultipleAssign<Rational> for Rational {
     /// x.round_to_multiple_assign(Rational::ZERO, RoundingMode::Down);
     /// assert_eq!(x, 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     ///
     /// let mut x = q.clone();
@@ -451,10 +446,9 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
     ///
@@ -462,7 +456,7 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// x.round_to_multiple_assign(Rational::ZERO, RoundingMode::Down);
     /// assert_eq!(x, 0);
     ///
-    /// let q = Rational::from(std::f64::consts::PI);
+    /// let q = Rational::exact_from(std::f64::consts::PI);
     /// let hundredth = Rational::from_signeds(1, 100);
     ///
     /// let mut x = q.clone();

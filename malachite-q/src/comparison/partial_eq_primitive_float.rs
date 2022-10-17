@@ -1,3 +1,4 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
 
@@ -28,7 +29,7 @@ macro_rules! impl_float {
                         && self.sign == (*other > 0.0)
                         && self.denominator.is_power_of_2()
                         && self.floor_log_base_2_of_abs() == other.abs().floor_log_base_2()
-                        && *self == Rational::from(*other)
+                        && *self == Rational::exact_from(*other)
                 }
             }
         }

@@ -1,5 +1,4 @@
 use crate::num::arithmetic::traits::{CheckedPow, Parity};
-use crate::num::conversion::traits::CheckedFrom;
 
 macro_rules! impl_checked_pow_unsigned {
     ($t:ident) => {
@@ -15,7 +14,7 @@ macro_rules! impl_checked_pow_unsigned {
                 } else if self < 2 {
                     Some(self)
                 } else {
-                    self.checked_pow(u32::checked_from(exp)?)
+                    self.checked_pow(u32::try_from(exp).ok()?)
                 }
             }
         }
@@ -39,7 +38,7 @@ macro_rules! impl_checked_pow_signed {
                 } else if self == -1 {
                     Some(if exp.even() { 1 } else { -1 })
                 } else {
-                    self.checked_pow(u32::checked_from(exp)?)
+                    self.checked_pow(u32::try_from(exp).ok()?)
                 }
             }
         }

@@ -4,7 +4,7 @@ pub mod from_natural;
 /// Implementations of traits for converting a primitive float to an
 /// [`Integer`](crate::integer::Integer).
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 ///
@@ -41,59 +41,44 @@ pub mod from_natural;
 /// assert_eq!(Integer::rounding_from(-0.5, RoundingMode::Nearest), 0);
 /// ```
 ///
-/// # from
-/// ```
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(Integer::from(0.0), 0);
-/// assert_eq!(Integer::from(-0.0), 0);
-/// assert_eq!(Integer::from(123.0), 123);
-/// assert_eq!(Integer::from(1.0e9), 1000000000);
-/// assert_eq!(Integer::from(4294967295.0), 4294967295u32);
-/// assert_eq!(Integer::from(4294967296.0), 4294967296u64);
-/// assert_eq!(
-///     Integer::from(1.0e100).to_string(),
-///     "10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469\
-///     985856815104"
-/// );
-/// assert_eq!(Integer::from(123.1), 123);
-/// assert_eq!(Integer::from(123.9), 124);
-/// assert_eq!(Integer::from(123.5), 124);
-/// assert_eq!(Integer::from(124.5), 124);
-/// assert_eq!(Integer::from(-0.499), 0);
-/// assert_eq!(Integer::from(-0.5), 0);
-/// ```
-///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
-/// use malachite_base::num::conversion::traits::CheckedFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!(Integer::checked_from(f64::NAN).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(f64::POSITIVE_INFINITY).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(f64::NEGATIVE_INFINITY).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(0.0).to_debug_string(), "Some(0)");
-/// assert_eq!(Integer::checked_from(-0.0).to_debug_string(), "Some(0)");
-/// assert_eq!(Integer::checked_from(123.0).to_debug_string(), "Some(123)");
-/// assert_eq!(Integer::checked_from(-123.0).to_debug_string(), "Some(-123)");
-/// assert_eq!(Integer::checked_from(1.0e9).to_debug_string(), "Some(1000000000)");
-/// assert_eq!(Integer::checked_from(4294967295.0).to_debug_string(), "Some(4294967295)");
-/// assert_eq!(Integer::checked_from(4294967296.0).to_debug_string(), "Some(4294967296)");
 /// assert_eq!(
-///     Integer::checked_from(1.0e100).to_debug_string(),
-///     "Some(1000000000000000015902891109759918046836080856394528138978132755774783877\
-///     2170381060813469985856815104)"
+///     Integer::try_from(f64::NAN).to_debug_string(),
+///     "Err(IntegerFromPrimitiveFloatError)"
 /// );
-/// assert_eq!(Integer::checked_from(123.1).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(123.9).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(123.5).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(124.5).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(-0.499).to_debug_string(), "None");
-/// assert_eq!(Integer::checked_from(-0.5).to_debug_string(), "None");
+/// assert_eq!(
+///     Integer::try_from(f64::POSITIVE_INFINITY).to_debug_string(),
+///     "Err(IntegerFromPrimitiveFloatError)"
+/// );
+/// assert_eq!(
+///     Integer::try_from(f64::NEGATIVE_INFINITY).to_debug_string(),
+///     "Err(IntegerFromPrimitiveFloatError)"
+/// );
+/// assert_eq!(Integer::try_from(0.0).to_debug_string(), "Ok(0)");
+/// assert_eq!(Integer::try_from(-0.0).to_debug_string(), "Ok(0)");
+/// assert_eq!(Integer::try_from(123.0).to_debug_string(), "Ok(123)");
+/// assert_eq!(Integer::try_from(-123.0).to_debug_string(), "Ok(-123)");
+/// assert_eq!(Integer::try_from(1.0e9).to_debug_string(), "Ok(1000000000)");
+/// assert_eq!(Integer::try_from(4294967295.0).to_debug_string(), "Ok(4294967295)");
+/// assert_eq!(Integer::try_from(4294967296.0).to_debug_string(), "Ok(4294967296)");
+/// assert_eq!(
+///     Integer::try_from(1.0e100).to_debug_string(),
+///     "Ok(10000000000000000159028911097599180468360808563945281389781327557747838772170381060813\
+///     469985856815104)"
+/// );
+/// assert_eq!(Integer::try_from(123.1).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(123.9).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(123.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(124.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(-0.499).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(-0.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
 /// ```
 ///
 /// # convertible_from
@@ -126,7 +111,7 @@ pub mod from_primitive_float;
 /// Implementations of traits for converting a primitive integer to an
 /// [`Integer`](crate::integer::Integer).
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`From`], [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`SaturatingFrom`](malachite_base::num::conversion::traits::SaturatingFrom).
 ///
@@ -149,14 +134,14 @@ pub mod is_integer;
 /// Implementations of traits for converting an [`Integer`](crate::integer::Integer) to a
 /// [`Natural`](crate::natural::Natural).
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`SaturatingFrom`](malachite_base::num::conversion::traits::SaturatingFrom).
 pub mod natural_from_integer;
 /// Implementations of traits for converting an [`Integer`](crate::integer::Integer) to a primitive
 /// float.
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`]
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 ///
@@ -198,37 +183,25 @@ pub mod natural_from_integer;
 /// );
 /// ```
 ///
-/// # from
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use std::str::FromStr;
-///
-/// assert_eq!(f32::from(&Integer::from_str("123").unwrap()), 123.0);
-/// assert_eq!(f32::from(&Integer::from_str("-1000000001").unwrap()), -1.0e9);
-/// assert_eq!(
-///     f32::from(
-///         &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap()
-///     ),
-///     3.4028235e38
-/// );
-/// ```
-///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_nz::integer::conversion::primitive_float_from_integer::*;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(f32::checked_from(&Integer::from_str("123").unwrap()), Some(123.0));
-/// assert_eq!(f32::checked_from(&Integer::from_str("-1000000000").unwrap()), Some(-1.0e9));
-/// assert_eq!(f32::checked_from(&Integer::from_str("1000000001").unwrap()), None);
+/// assert_eq!(f32::try_from(&Integer::from_str("123").unwrap()), Ok(123.0));
+/// assert_eq!(f32::try_from(&Integer::from_str("-1000000000").unwrap()), Ok(-1.0e9));
 /// assert_eq!(
-///     f32::checked_from(
+///     f32::try_from(&Integer::from_str("1000000001").unwrap()),
+///     Err(PrimitiveFloatFromIntegerError)
+/// );
+/// assert_eq!(
+///     f32::try_from(
 ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000").unwrap()
 ///     ),
-///     None
+///     Err(PrimitiveFloatFromIntegerError)
 /// );
 /// ```
 ///
@@ -254,29 +227,32 @@ pub mod primitive_float_from_integer;
 /// Implementations of traits for converting an [`Integer`](crate::integer::Integer) to a primitive
 /// integer.
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom),
 /// [`OverflowingFrom`](malachite_base::num::conversion::traits::OverflowingFrom),
 /// [`SaturatingFrom`](malachite_base::num::conversion::traits::SaturatingFrom), and
 /// [`WrappingFrom`](malachite_base::num::conversion::traits::WrappingFrom).
 ///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
 /// use malachite_base::num::arithmetic::traits::Pow;
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_nz::integer::conversion::primitive_int_from_integer::{
+///     SignedFromIntegerError,
+///     UnsignedFromIntegerError
+/// };
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!(u32::checked_from(&Integer::from(123)), Some(123));
-/// assert_eq!(u32::checked_from(&Integer::from(-123)), None);
-/// assert_eq!(u32::checked_from(&Integer::from(10u32).pow(12)), None);
-/// assert_eq!(u32::checked_from(&-Integer::from(10u32).pow(12)), None);
+/// assert_eq!(u32::try_from(&Integer::from(123)), Ok(123));
+/// assert_eq!(u32::try_from(&Integer::from(-123)), Err(UnsignedFromIntegerError));
+/// assert_eq!(u32::try_from(&Integer::from(10u32).pow(12)), Err(UnsignedFromIntegerError));
+/// assert_eq!(u32::try_from(&-Integer::from(10u32).pow(12)), Err(UnsignedFromIntegerError));
 ///
-/// assert_eq!(i32::checked_from(&Integer::from(123)), Some(123));
-/// assert_eq!(i32::checked_from(&Integer::from(-123)), Some(-123));
-/// assert_eq!(i32::checked_from(&Integer::from(10u32).pow(12)), None);
-/// assert_eq!(i32::checked_from(&-Integer::from(10u32).pow(12)), None);
+/// assert_eq!(i32::try_from(&Integer::from(123)), Ok(123));
+/// assert_eq!(i32::try_from(&Integer::from(-123)), Ok(-123));
+/// assert_eq!(i32::try_from(&Integer::from(10u32).pow(12)), Err(SignedFromIntegerError));
+/// assert_eq!(i32::try_from(&-Integer::from(10u32).pow(12)), Err(SignedFromIntegerError));
 /// ```
 ///
 /// # wrapping_from

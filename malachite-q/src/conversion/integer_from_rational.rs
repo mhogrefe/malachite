@@ -1,41 +1,50 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::DivRound;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 
-impl CheckedFrom<Rational> for Integer {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IntegerFromRationalError;
+
+impl TryFrom<Rational> for Integer {
+    type Error = IntegerFromRationalError;
+
     /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), taking the
-    /// [`Rational`] by value. If the [`Rational`] is not an integer, `None` is returned.
+    /// [`Rational`] by value. If the [`Rational`] is not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_q::conversion::integer_from_rational::IntegerFromRationalError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Integer::checked_from(Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Integer::checked_from(Rational::from(-123)).unwrap(), -123);
-    /// assert_eq!(Integer::checked_from(Rational::from_signeds(22, 7)), None);
+    /// assert_eq!(Integer::try_from(Rational::from(123)).unwrap(), 123);
+    /// assert_eq!(Integer::try_from(Rational::from(-123)).unwrap(), -123);
+    /// assert_eq!(
+    ///     Integer::try_from(Rational::from_signeds(22, 7)),
+    ///     Err(IntegerFromRationalError)
+    /// );
     /// ```
-    fn checked_from(x: Rational) -> Option<Integer> {
+    fn try_from(x: Rational) -> Result<Integer, Self::Error> {
         if x.denominator == 1u32 {
-            Some(Integer::from_sign_and_abs(x.sign, x.numerator))
+            Ok(Integer::from_sign_and_abs(x.sign, x.numerator))
         } else {
-            None
+            Err(IntegerFromRationalError)
         }
     }
 }
 
-impl<'a> CheckedFrom<&'a Rational> for Integer {
+impl<'a> TryFrom<&'a Rational> for Integer {
+    type Error = IntegerFromRationalError;
+
     /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), taking the
-    /// [`Rational`] by reference. If the [`Rational`] is not an integer, `None` is returned.
+    /// [`Rational`] by reference. If the [`Rational`] is not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -46,22 +55,22 @@ impl<'a> CheckedFrom<&'a Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_q::conversion::integer_from_rational::IntegerFromRationalError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Integer::checked_from(&Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Integer::checked_from(&Rational::from(-123)).unwrap(), -123);
-    /// assert_eq!(Integer::checked_from(&Rational::from_signeds(22, 7)), None);
+    /// assert_eq!(Integer::try_from(&Rational::from(123)).unwrap(), 123);
+    /// assert_eq!(Integer::try_from(&Rational::from(-123)).unwrap(), -123);
+    /// assert_eq!(
+    ///     Integer::try_from(&Rational::from_signeds(22, 7)),
+    ///     Err(IntegerFromRationalError)
+    /// );
     /// ```
-    fn checked_from(x: &Rational) -> Option<Integer> {
+    fn try_from(x: &Rational) -> Result<Integer, Self::Error> {
         if x.denominator == 1u32 {
-            Some(Integer::from_sign_and_abs_ref(x.sign, &x.numerator))
+            Ok(Integer::from_sign_and_abs_ref(x.sign, &x.numerator))
         } else {
-            None
+            Err(IntegerFromRationalError)
         }
     }
 }

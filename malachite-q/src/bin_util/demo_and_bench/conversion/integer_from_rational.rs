@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -9,15 +9,15 @@ use malachite_q::test_util::bench::bucketers::{
 use malachite_q::test_util::generators::{rational_gen, rational_rounding_mode_pair_gen_var_2};
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_integer_checked_from_rational);
-    register_demo!(runner, demo_integer_checked_from_rational_ref);
+    register_demo!(runner, demo_integer_try_from_rational);
+    register_demo!(runner, demo_integer_try_from_rational_ref);
     register_demo!(runner, demo_integer_convertible_from_rational);
     register_demo!(runner, demo_integer_rounding_from_rational);
     register_demo!(runner, demo_integer_rounding_from_rational_ref);
 
     register_bench!(
         runner,
-        benchmark_integer_checked_from_rational_evaluation_strategy
+        benchmark_integer_try_from_rational_evaluation_strategy
     );
     register_bench!(runner, benchmark_integer_convertible_from_rational);
     register_bench!(
@@ -26,24 +26,20 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_checked_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
     for x in rational_gen().get(gm, &config).take(limit) {
         let x_clone = x.clone();
         println!(
-            "Integer::checked_from({}) = {:?}",
+            "Integer::try_from({}) = {:?}",
             x_clone,
-            Integer::checked_from(x)
+            Integer::try_from(x)
         );
     }
 }
 
-fn demo_integer_checked_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_try_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for x in rational_gen().get(gm, &config).take(limit) {
-        println!(
-            "Integer::checked_from(&{}) = {:?}",
-            x,
-            Integer::checked_from(&x)
-        );
+        println!("Integer::try_from(&{}) = {:?}", x, Integer::try_from(&x));
     }
 }
 
@@ -90,14 +86,14 @@ fn demo_integer_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn benchmark_integer_checked_from_rational_evaluation_strategy(
+fn benchmark_integer_try_from_rational_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer::checked_from(Rational)",
+        "Integer::try_from(Rational)",
         BenchmarkType::EvaluationStrategy,
         rational_gen().get(gm, &config),
         gm.name(),
@@ -105,11 +101,11 @@ fn benchmark_integer_checked_from_rational_evaluation_strategy(
         file_name,
         &rational_bit_bucketer("x"),
         &mut [
-            ("Integer::checked_from(Rational)", &mut |x| {
-                no_out!(Integer::checked_from(x))
+            ("Integer::try_from(Rational)", &mut |x| {
+                no_out!(Integer::try_from(x).ok())
             }),
-            ("Integer::checked_from(&Rational)", &mut |x| {
-                no_out!(Integer::checked_from(&x))
+            ("Integer::try_from(&Rational)", &mut |x| {
+                no_out!(Integer::try_from(&x).ok())
             }),
         ],
     );

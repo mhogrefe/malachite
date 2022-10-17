@@ -1,6 +1,4 @@
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -8,27 +6,27 @@ use malachite_nz::test_util::generators::integer_gen;
 use std::str::FromStr;
 
 #[test]
-fn test_checked_from_integer() {
+fn test_try_from_integer() {
     let test = |s, out| {
         let u = Integer::from_str(s).unwrap();
 
-        let on = Natural::checked_from(u.clone());
+        let on = Natural::try_from(u.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::checked_from(&u);
+        let on = Natural::try_from(&u);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
-    test("0", "Some(0)");
-    test("123", "Some(123)");
-    test("-123", "None");
-    test("1000000000000", "Some(1000000000000)");
-    test("-1000000000000", "None");
-    test("2147483647", "Some(2147483647)");
-    test("2147483648", "Some(2147483648)");
-    test("-2147483648", "None");
-    test("-2147483649", "None");
+    test("0", "Ok(0)");
+    test("123", "Ok(123)");
+    test("-123", "Err(NaturalFromIntegerError)");
+    test("1000000000000", "Ok(1000000000000)");
+    test("-1000000000000", "Err(NaturalFromIntegerError)");
+    test("2147483647", "Ok(2147483647)");
+    test("2147483648", "Ok(2147483648)");
+    test("-2147483648", "Err(NaturalFromIntegerError)");
+    test("-2147483649", "Err(NaturalFromIntegerError)");
 }
 
 #[test]
@@ -143,18 +141,18 @@ fn test_convertible_from_integer() {
 }
 
 #[test]
-fn checked_from_integer_properties() {
+fn try_from_integer_properties() {
     integer_gen().test_properties(|x| {
-        let natural_x = Natural::checked_from(x.clone());
+        let natural_x = Natural::try_from(x.clone());
         assert!(natural_x.as_ref().map_or(true, Natural::is_valid));
 
-        let natural_x_alt = Natural::checked_from(&x);
+        let natural_x_alt = Natural::try_from(&x);
         assert!(natural_x_alt.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(natural_x, natural_x_alt);
 
-        assert_eq!(natural_x.is_some(), x >= 0);
-        assert_eq!(natural_x.is_some(), Natural::convertible_from(&x));
-        if let Some(n) = natural_x {
+        assert_eq!(natural_x.is_ok(), x >= 0);
+        assert_eq!(natural_x.is_ok(), Natural::convertible_from(&x));
+        if let Ok(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
             assert_eq!(Natural::exact_from(&x), n);
             assert_eq!(Integer::from(&n), x);

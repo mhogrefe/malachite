@@ -109,14 +109,14 @@ impl Approximate for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::arithmetic::traits::Approximate;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from(std::f64::consts::PI).approximate(&Natural::from(1000u32)).to_string(),
+    ///     Rational::exact_from(std::f64::consts::PI).approximate(&Natural::from(1000u32))
+    ///         .to_string(),
     ///     "355/113"
     /// );
     /// assert_eq!(
@@ -166,14 +166,13 @@ impl<'a> Approximate for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::arithmetic::traits::Approximate;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from(std::f64::consts::PI)).approximate(&Natural::from(1000u32))
+    ///     (&Rational::exact_from(std::f64::consts::PI)).approximate(&Natural::from(1000u32))
     ///             .to_string(),
     ///     "355/113"
     /// );
@@ -221,13 +220,12 @@ impl ApproximateAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
+    /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::arithmetic::traits::ApproximateAssign;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from(std::f64::consts::PI);
+    /// let mut x = Rational::exact_from(std::f64::consts::PI);
     /// x.approximate_assign(&Natural::from(1000u32));
     /// assert_eq!(x.to_string(), "355/113");
     ///

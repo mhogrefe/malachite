@@ -160,8 +160,6 @@ impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqModPowerOf2;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;

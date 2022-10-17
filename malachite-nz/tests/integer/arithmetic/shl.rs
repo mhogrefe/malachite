@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
@@ -277,7 +277,7 @@ where
     Integer: Shl<T, Output = Integer> + ShlAssign<T> + Shr<T, Output = Integer>,
     for<'a> &'a Integer: Shl<T, Output = Integer>,
     for<'a> &'a Natural: Shl<T, Output = Natural>,
-    u64: CheckedFrom<T>,
+    u64: TryFrom<T>,
 {
     integer_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
         let mut mut_n = n.clone();

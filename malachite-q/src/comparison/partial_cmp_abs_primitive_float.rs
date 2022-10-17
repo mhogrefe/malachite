@@ -1,3 +1,4 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -32,7 +33,7 @@ macro_rules! impl_float {
                     Some(if ord_cmp != Ordering::Equal {
                         ord_cmp
                     } else {
-                        self.cmp_abs(&Rational::from(*other))
+                        self.cmp_abs(&Rational::exact_from(*other))
                     })
                 }
             }

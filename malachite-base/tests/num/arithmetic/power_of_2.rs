@@ -2,7 +2,6 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::test_util::generators::{
     signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16,
 };
@@ -76,10 +75,7 @@ fn power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
-fn power_of_2_properties_helper_signed<
-    U: CheckedFrom<S> + PrimitiveUnsigned,
-    S: PrimitiveSigned,
->() {
+fn power_of_2_properties_helper_signed<U: TryFrom<S> + PrimitiveUnsigned, S: PrimitiveSigned>() {
     unsigned_gen_var_16::<S>().test_properties(|pow| {
         let mut n = S::power_of_2(pow);
         assert_eq!(U::exact_from(n), U::power_of_2(pow));

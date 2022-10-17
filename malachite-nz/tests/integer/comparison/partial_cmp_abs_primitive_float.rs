@@ -104,7 +104,7 @@ fn test_partial_cmp_abs_primitive_float() {
 
 fn partial_cmp_abs_primitive_float_properties_helper<T: PartialOrdAbs<Integer> + PrimitiveFloat>()
 where
-    Integer: From<T> + PartialOrd<T> + PartialOrdAbs<T>,
+    Integer: PartialOrd<T> + PartialOrdAbs<T>,
 {
     integer_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp_abs = n.partial_cmp_abs(&u);

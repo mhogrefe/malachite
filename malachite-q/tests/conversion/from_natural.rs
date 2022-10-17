@@ -1,4 +1,3 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
 use malachite_q::Rational;
@@ -33,7 +32,7 @@ fn from_natural_properties() {
         assert!(rational_x_alt.is_valid());
         assert_eq!(rational_x_alt, rational_x);
 
-        assert_eq!(Natural::checked_from(&rational_x).as_ref(), Some(&x));
-        assert_eq!(Natural::checked_from(rational_x), Some(x));
+        assert_eq!(Natural::try_from(&rational_x).as_ref(), Ok(&x));
+        assert_eq!(Natural::try_from(rational_x), Ok(x));
     });
 }

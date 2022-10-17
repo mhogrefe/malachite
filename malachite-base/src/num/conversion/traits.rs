@@ -124,33 +124,10 @@ pub trait FromSciString: Sized {
     }
 }
 
-/// Converts a value from one type to another. If the conversion fails, `None` is returned.
-///
-/// If `CheckedFrom` is implemented, it usually makes sense to implement [`ConvertibleFrom`] as
-/// well.
-pub trait CheckedFrom<T>: Sized {
-    fn checked_from(value: T) -> Option<Self>;
-}
-
-/// Converts a value from one type to another. If the conversion fails, `None` is returned.
-///
-/// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when [`CheckedFrom`] is implemented.
-pub trait CheckedInto<T> {
-    fn checked_into(self) -> Option<T>;
-}
-
-impl<T, U: CheckedFrom<T>> CheckedInto<U> for T {
-    #[inline]
-    fn checked_into(self) -> Option<U> {
-        U::checked_from(self)
-    }
-}
-
 /// Converts a value from one type to another. If the conversion fails, the function panics.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when [`CheckedFrom` ]is implemented.
+/// when [`TryFrom`] is implemented.
 pub trait ExactFrom<T>: Sized {
     fn exact_from(value: T) -> Self;
 }
@@ -163,10 +140,10 @@ pub trait ExactInto<T> {
     fn exact_into(self) -> T;
 }
 
-impl<T, U: CheckedFrom<T>> ExactFrom<T> for U {
+impl<T, U: TryFrom<T>> ExactFrom<T> for U {
     #[inline]
     fn exact_from(value: T) -> U {
-        U::checked_from(value).unwrap()
+        U::try_from(value).ok().unwrap()
     }
 }
 
@@ -276,7 +253,7 @@ impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
 /// Tests whether a value of one type is convertible into a value of another.
 ///
 /// If `ConvertibleFrom<T>` for `Self` is implemented, it usually makes sense to implement
-/// [`CheckedFrom`] for `T` as well.
+/// [`TryFrom`] for `T` as well.
 pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
 }

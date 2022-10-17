@@ -190,8 +190,6 @@ pub mod mod_power_of_2_pow;
 ///
 /// # mod_power_of_2_shl
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
 /// use malachite_nz::natural::Natural;
 ///
@@ -210,8 +208,6 @@ pub mod mod_power_of_2_pow;
 ///
 /// # mod_power_of_2_shl_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
 /// use malachite_nz::natural::Natural;
 ///
@@ -242,8 +238,6 @@ pub mod mod_power_of_2_shl;
 ///
 /// # mod_power_of_2_shr
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shr;
 /// use malachite_nz::natural::Natural;
 ///
@@ -257,8 +251,6 @@ pub mod mod_power_of_2_shl;
 ///
 /// # mod_power_of_2_shr_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::ModPowerOf2ShrAssign;
 /// use malachite_nz::natural::Natural;
 ///
@@ -290,8 +282,6 @@ pub mod mod_power_of_2_sub;
 ///
 /// # mod_shl
 /// ```
-/// extern crate malachite_base;
-///
 /// use std::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShl;
 /// use malachite_nz::natural::Natural;
@@ -360,8 +350,6 @@ pub mod mod_power_of_2_sub;
 ///
 /// # mod_shl_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use std::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShlAssign;
 /// use malachite_nz::natural::Natural;
@@ -413,8 +401,6 @@ pub mod mod_shl;
 ///
 /// # mod_shr
 /// ```
-/// extern crate malachite_base;
-///
 /// use std::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShr;
 /// use malachite_nz::natural::Natural;
@@ -459,8 +445,6 @@ pub mod mod_shl;
 ///
 /// # mod_shr_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use std::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShrAssign;
 /// use malachite_nz::natural::Natural;
@@ -555,8 +539,6 @@ pub mod saturating_sub_mul;
 ///
 /// # shl
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
@@ -589,8 +571,6 @@ pub mod saturating_sub_mul;
 ///
 /// # shl_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
@@ -623,8 +603,6 @@ pub mod shl;
 ///
 /// # shl_round
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRound;
 /// use malachite_base::num::basic::traits::Zero;
@@ -663,8 +641,6 @@ pub mod shl;
 ///
 /// # shl_round_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
 /// use malachite_base::num::basic::traits::One;
@@ -714,8 +690,6 @@ pub mod shl_round;
 ///
 /// # shr
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
@@ -749,8 +723,6 @@ pub mod shl_round;
 ///
 /// # shr_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
@@ -783,8 +755,6 @@ pub mod shr;
 ///
 /// # shr_round
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShrRound;
@@ -839,8 +809,6 @@ pub mod shr;
 ///
 /// # shr_round_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::rounding_modes::RoundingMode;

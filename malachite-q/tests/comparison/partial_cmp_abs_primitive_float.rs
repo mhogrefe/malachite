@@ -1,6 +1,8 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
 use malachite_q::test_util::generators::{
     rational_gen, rational_primitive_float_pair_gen,
     rational_primitive_float_primitive_float_triple_gen,
@@ -51,7 +53,8 @@ fn test_partial_cmp_abs_primitive_float() {
 
 fn partial_cmp_abs_primitive_float_properties_helper<T: PartialOrdAbs<Rational> + PrimitiveFloat>()
 where
-    Rational: From<T> + PartialOrd<T> + PartialOrdAbs<T>,
+    Rational:
+        TryFrom<T, Error = RationalFromPrimitiveFloatError> + PartialOrd<T> + PartialOrdAbs<T>,
 {
     rational_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp_abs = n.partial_cmp_abs(&u);
@@ -61,7 +64,7 @@ where
         assert_eq!((&n).abs().partial_cmp(&u.abs()), cmp_abs);
 
         if u.is_finite() {
-            assert_eq!(n.cmp_abs(&Rational::from(u)), cmp_abs.unwrap());
+            assert_eq!(n.cmp_abs(&Rational::exact_from(u)), cmp_abs.unwrap());
         }
     });
 

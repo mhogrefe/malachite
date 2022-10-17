@@ -1,12 +1,12 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_unsigned_assign<T>(x: &mut Rational, bits: T)
 where
-    u64: CheckedFrom<T>,
+    u64: TryFrom<T>,
 {
     if *x == 0u32 {
         return;
@@ -23,7 +23,7 @@ where
 
 fn shr_unsigned_ref<T>(x: &Rational, bits: T) -> Rational
 where
-    u64: CheckedFrom<T>,
+    u64: TryFrom<T>,
 {
     if *x == 0u32 {
         return x.clone();

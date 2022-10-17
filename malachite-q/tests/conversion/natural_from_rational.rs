@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{Ceiling, Floor, Parity};
 use malachite_base::num::basic::traits::{One, OneHalf, Two};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
+    ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
@@ -18,25 +18,25 @@ use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
-fn test_checked_from_rational() {
+fn test_try_from_rational() {
     let test = |s, out| {
         let u = Rational::from_str(s).unwrap();
 
-        let on = Natural::checked_from(u.clone());
+        let on = Natural::try_from(u.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::checked_from(&u);
+        let on = Natural::try_from(&u);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
-    test("0", "Some(0)");
-    test("123", "Some(123)");
-    test("-123", "None");
-    test("1000000000000", "Some(1000000000000)");
-    test("-1000000000000", "None");
-    test("22/7", "None");
-    test("-22/7", "None");
+    test("0", "Ok(0)");
+    test("123", "Ok(123)");
+    test("-123", "Err(NaturalFromRationalError)");
+    test("1000000000000", "Ok(1000000000000)");
+    test("-1000000000000", "Err(NaturalFromRationalError)");
+    test("22/7", "Err(NaturalFromRationalError)");
+    test("-22/7", "Err(NaturalFromRationalError)");
 }
 
 #[test]
@@ -162,18 +162,18 @@ fn natural_rounding_from_rational_ref_fail() {
 }
 
 #[test]
-fn checked_from_rational_properties() {
+fn try_from_rational_properties() {
     rational_gen().test_properties(|x| {
-        let natural_x = Natural::checked_from(x.clone());
+        let natural_x = Natural::try_from(x.clone());
         assert!(natural_x.as_ref().map_or(true, Natural::is_valid));
 
-        let natural_x_alt = Natural::checked_from(&x);
+        let natural_x_alt = Natural::try_from(&x);
         assert!(natural_x_alt.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(natural_x, natural_x_alt);
 
-        assert_eq!(natural_x.is_some(), x >= 0 && x.is_integer());
-        assert_eq!(natural_x.is_some(), Natural::convertible_from(&x));
-        if let Some(n) = natural_x {
+        assert_eq!(natural_x.is_ok(), x >= 0 && x.is_integer());
+        assert_eq!(natural_x.is_ok(), Natural::convertible_from(&x));
+        if let Ok(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
             assert_eq!(Natural::exact_from(&x), n);
             assert_eq!(Rational::from(&n), x);

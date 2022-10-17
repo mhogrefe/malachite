@@ -2,9 +2,7 @@ use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, SaturatingFrom, VecFromOtherType,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom, VecFromOtherType};
 
 macro_rules! impl_from_limb {
     ($t: ident) => {
@@ -65,23 +63,28 @@ macro_rules! impl_from_larger_than_limb_or_usize {
     };
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NaturalFromSignedError;
+
 macro_rules! impl_signed {
     ($t: ident) => {
-        impl CheckedFrom<$t> for Natural {
+        impl TryFrom<$t> for Natural {
+            type Error = NaturalFromSignedError;
+
             /// Converts a signed primitive integer to a [`Natural`]. If the integer is negative,
-            /// `None` is returned.
+            /// an error is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// See [here](super::from_primitive_int#checked_from).
+            /// See [here](super::from_primitive_int#try_from).
             #[inline]
-            fn checked_from(i: $t) -> Option<Natural> {
+            fn try_from(i: $t) -> Result<Natural, Self::Error> {
                 if i >= 0 {
-                    Some(Natural::from(i.unsigned_abs()))
+                    Ok(Natural::from(i.unsigned_abs()))
                 } else {
-                    None
+                    Err(NaturalFromSignedError)
                 }
             }
         }

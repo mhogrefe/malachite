@@ -1,5 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -8,29 +8,27 @@ use malachite_q::test_util::bench::bucketers::{
 };
 use malachite_q::test_util::generators::{rational_gen, rational_rounding_mode_pair_gen_var_3};
 use malachite_q::Rational;
+use std::fmt::Debug;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_primitive_int_demos!(runner, demo_primitive_int_checked_from_rational);
+    register_primitive_int_demos!(runner, demo_primitive_int_try_from_rational);
     register_primitive_int_demos!(runner, demo_primitive_int_convertible_from_rational);
     register_primitive_int_demos!(runner, demo_primitive_int_rounding_from_rational);
 
-    register_primitive_int_benches!(runner, benchmark_primitive_int_checked_from_rational);
+    register_primitive_int_benches!(runner, benchmark_primitive_int_try_from_rational);
     register_primitive_int_benches!(runner, benchmark_primitive_int_convertible_from_rational);
     register_primitive_int_benches!(runner, benchmark_primitive_int_rounding_from_rational);
 }
 
-fn demo_primitive_int_checked_from_rational<T: for<'a> CheckedFrom<&'a Rational> + PrimitiveInt>(
+fn demo_primitive_int_try_from_rational<T: for<'a> TryFrom<&'a Rational> + PrimitiveInt>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
-) {
+) where
+    for<'a> <T as TryFrom<&'a Rational>>::Error: Debug,
+{
     for x in rational_gen().get(gm, &config).take(limit) {
-        println!(
-            "{}::checked_from({}) = {:?}",
-            T::NAME,
-            x,
-            T::checked_from(&x)
-        );
+        println!("{}::try_from({}) = {:?}", T::NAME, x, T::try_from(&x));
     }
 }
 
@@ -74,23 +72,21 @@ fn demo_primitive_int_rounding_from_rational<
     }
 }
 
-fn benchmark_primitive_int_checked_from_rational<
-    T: for<'a> CheckedFrom<&'a Rational> + PrimitiveInt,
->(
+fn benchmark_primitive_int_try_from_rational<T: for<'a> TryFrom<&'a Rational> + PrimitiveInt>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::checked_from(Rational)", T::NAME),
+        &format!("{}::try_from(Rational)", T::NAME),
         BenchmarkType::Single,
         rational_gen().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &rational_bit_bucketer("x"),
-        &mut [("Malachite", &mut |x| no_out!(T::checked_from(&x)))],
+        &mut [("Malachite", &mut |x| no_out!(T::try_from(&x).ok()))],
     );
 }
 

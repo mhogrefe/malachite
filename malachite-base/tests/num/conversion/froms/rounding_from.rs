@@ -3,9 +3,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, WrappingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{
@@ -220,8 +218,11 @@ fn exact_from_fail() {
 
 fn rounding_from_helper_unsigned_primitive_float<
     T: ConvertibleFrom<U> + PrimitiveUnsigned + RoundingFrom<U>,
-    U: CheckedFrom<T> + PrimitiveFloat + RoundingFrom<T>,
->() {
+    U: PrimitiveFloat + RoundingFrom<T>,
+>()
+where
+    NiceFloat<U>: TryFrom<T>,
+{
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
         T::rounding_from(f, rm);
     });
@@ -259,8 +260,11 @@ fn rounding_from_helper_unsigned_primitive_float<
 
 fn rounding_from_helper_signed_primitive_float<
     T: ConvertibleFrom<U> + PrimitiveSigned + RoundingFrom<U>,
-    U: CheckedFrom<T> + PrimitiveFloat + RoundingFrom<T>,
->() {
+    U: PrimitiveFloat + RoundingFrom<T>,
+>()
+where
+    NiceFloat<U>: TryFrom<T>,
+{
     primitive_float_rounding_mode_pair_gen_var_3::<U, T>().test_properties(|(f, rm)| {
         T::rounding_from(f, rm);
     });
@@ -304,7 +308,7 @@ fn rounding_from_helper_signed_primitive_float<
 
 fn rounding_from_helper_primitive_float_unsigned<
     T: ConvertibleFrom<U> + PrimitiveFloat + RoundingFrom<U>,
-    U: CheckedFrom<T> + PrimitiveUnsigned + RoundingFrom<T>,
+    U: TryFrom<NiceFloat<T>> + PrimitiveUnsigned + RoundingFrom<T>,
 >() {
     unsigned_rounding_mode_pair_gen_var_2::<U, T>().test_properties(|(u, rm)| {
         T::rounding_from(u, rm);
@@ -377,7 +381,7 @@ fn rounding_from_helper_primitive_float_unsigned<
 fn rounding_from_helper_primitive_float_signed<
     T: ConvertibleFrom<S> + PrimitiveFloat + RoundingFrom<S>,
     U: PrimitiveUnsigned + WrappingFrom<S>,
-    S: CheckedFrom<T> + PrimitiveSigned + RoundingFrom<T> + WrappingFrom<U>,
+    S: TryFrom<NiceFloat<T>> + PrimitiveSigned + RoundingFrom<T> + WrappingFrom<U>,
 >() {
     signed_rounding_mode_pair_gen_var_4::<S, T>().test_properties(|(i, rm)| {
         T::rounding_from(i, rm);

@@ -19,7 +19,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, IsInteger, ToSci};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_nonzero_finite_primitive_floats,
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
@@ -64,12 +64,12 @@ pub fn exhaustive_rational_gen_var_3() -> It<Rational> {
 
 pub fn exhaustive_rational_gen_var_4<T: PrimitiveFloat>() -> It<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Box::new(
         exhaustive_finite_primitive_floats()
             .skip(1)
-            .map(Rational::from),
+            .map(Rational::exact_from),
     )
 }
 
@@ -80,11 +80,11 @@ pub fn exhaustive_rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + 
 
 pub fn exhaustive_rational_gen_var_6<T: PrimitiveFloat>() -> It<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Box::new(exhaustive_nonzero_finite_primitive_floats().map(|f| {
-        let x = Rational::from(f);
-        let y = Rational::from(if f > T::ZERO {
+        let x = Rational::exact_from(f);
+        let y = Rational::exact_from(if f > T::ZERO {
             f.next_lower()
         } else {
             f.next_higher()
@@ -595,9 +595,9 @@ pub fn exhaustive_rational_rounding_mode_pair_gen_var_5<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat,
 >() -> It<(Rational, RoundingMode)>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
-    let max = Rational::from(T::MAX_FINITE);
+    let max = Rational::exact_from(T::MAX_FINITE);
     let min = -&max;
     Box::new(
         lex_pairs(exhaustive_rationals(), exhaustive_rounding_modes()).filter(move |(x, rm)| {

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::natural::Natural;
 use malachite_q::test_util::common::rug_rational_to_rational;
@@ -63,11 +63,11 @@ fn test_from_i64() {
     test(i64::MAX, "9223372036854775807");
 }
 
-fn from_unsigned_properties_helper<T: for<'a> CheckedFrom<&'a Rational> + PrimitiveUnsigned>()
+fn from_unsigned_properties_helper<T: for<'a> TryFrom<&'a Rational> + PrimitiveUnsigned>()
 where
     Rational: From<T>,
     Natural: From<T>,
-    u128: CheckedFrom<T>,
+    u128: TryFrom<T>,
     rug::Integer: From<T>,
 {
     unsigned_gen::<T>().test_properties(|u| {
@@ -82,11 +82,11 @@ where
     });
 }
 
-fn from_signed_properties_helper<T: for<'a> CheckedFrom<&'a Rational> + PrimitiveSigned>()
+fn from_signed_properties_helper<T: for<'a> TryFrom<&'a Rational> + PrimitiveSigned>()
 where
     Rational: From<T>,
-    Natural: CheckedFrom<T>,
-    i128: CheckedFrom<T>,
+    Natural: TryFrom<T>,
+    i128: TryFrom<T>,
     rug::Integer: From<T>,
 {
     signed_gen::<T>().test_properties(|i| {

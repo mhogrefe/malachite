@@ -2,7 +2,8 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
@@ -65,52 +66,58 @@ pub fn test_convertible_from() {
 }
 
 fn convertible_from_helper_primitive_int_unsigned<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
+    T: TryFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
     U: PrimitiveUnsigned,
 >() {
     unsigned_gen::<U>().test_properties(|u| {
         let convertible = T::convertible_from(u);
-        assert_eq!(convertible, T::checked_from(u).is_some())
+        assert_eq!(convertible, T::try_from(u).is_ok())
     });
 }
 
 fn convertible_from_helper_primitive_int_signed<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
+    T: TryFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
     U: PrimitiveSigned,
 >() {
     signed_gen::<U>().test_properties(|i| {
         let convertible = T::convertible_from(i);
-        assert_eq!(convertible, T::checked_from(i).is_some())
+        assert_eq!(convertible, T::try_from(i).is_ok())
     });
 }
 
 fn convertible_from_helper_primitive_int_primitive_float<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
+    T: TryFrom<NiceFloat<U>> + ConvertibleFrom<U> + PrimitiveInt,
     U: PrimitiveFloat,
 >() {
     primitive_float_gen::<U>().test_properties(|f| {
         let convertible = T::convertible_from(f);
-        assert_eq!(convertible, T::checked_from(f).is_some())
+        assert_eq!(convertible, T::try_from(NiceFloat(f)).is_ok())
     });
 }
 
 fn convertible_from_helper_primitive_float_unsigned<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat,
+    T: ConvertibleFrom<U> + PrimitiveFloat,
     U: PrimitiveUnsigned,
->() {
+>()
+where
+    NiceFloat<T>: TryFrom<U>,
+{
     unsigned_gen::<U>().test_properties(|u| {
         let convertible = T::convertible_from(u);
-        assert_eq!(convertible, T::checked_from(u).is_some())
+        assert_eq!(convertible, NiceFloat::<T>::try_from(u).is_ok())
     });
 }
 
 fn convertible_from_helper_primitive_float_signed<
-    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat,
+    T: ConvertibleFrom<U> + PrimitiveFloat,
     U: PrimitiveSigned,
->() {
+>()
+where
+    NiceFloat<T>: TryFrom<U>,
+{
     signed_gen::<U>().test_properties(|i| {
         let convertible = T::convertible_from(i);
-        assert_eq!(convertible, T::checked_from(i).is_some())
+        assert_eq!(convertible, NiceFloat::<T>::try_from(i).is_ok())
     });
 }
 

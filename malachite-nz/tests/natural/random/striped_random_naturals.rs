@@ -1,7 +1,9 @@
 use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
 use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
@@ -46,7 +48,10 @@ fn striped_random_naturals_helper(
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     // Note that the population moments do not exist.
-    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(|x| f64::from(&x)));
+    let actual_sample_moment_stats = moment_stats(
+        xs.take(1000000)
+            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest)),
+    );
     assert_eq!(
         (
             actual_values.as_slice(),

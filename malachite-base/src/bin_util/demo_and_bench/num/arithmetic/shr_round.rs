@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::test_util::bench::bucketers::{
     triple_2_bucketer, triple_2_unsigned_abs_bucketer,
 };
@@ -191,7 +190,7 @@ fn benchmark_shr_round_unsigned_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.shr_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -214,7 +213,7 @@ fn benchmark_shr_round_unsigned_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shr_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -237,7 +236,7 @@ fn benchmark_shr_round_signed_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.shr_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -260,7 +259,7 @@ fn benchmark_shr_round_signed_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shr_round({}, RoundingMode)", T::NAME, U::NAME),
@@ -283,7 +282,7 @@ fn benchmark_shr_round_assign_unsigned_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.shr_round_assign({}, RoundingMode)", T::NAME, U::NAME),
@@ -306,7 +305,7 @@ fn benchmark_shr_round_assign_unsigned_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shr_round_assign({}, RoundingMode)", T::NAME, U::NAME),
@@ -329,7 +328,7 @@ fn benchmark_shr_round_assign_signed_unsigned<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<U>,
+    usize: TryFrom<U>,
 {
     run_benchmark(
         &format!("{}.shr_round_assign({}, RoundingMode)", T::NAME, U::NAME),
@@ -352,7 +351,7 @@ fn benchmark_shr_round_assign_signed_signed<
     limit: usize,
     file_name: &str,
 ) where
-    usize: CheckedFrom<<U as UnsignedAbs>::Output>,
+    usize: TryFrom<<U as UnsignedAbs>::Output>,
 {
     run_benchmark(
         &format!("{}.shr_round_assign({}, RoundingMode)", T::NAME, U::NAME),

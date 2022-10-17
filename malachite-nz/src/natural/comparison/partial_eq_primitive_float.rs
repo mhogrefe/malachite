@@ -1,5 +1,5 @@
 use crate::natural::Natural;
-use malachite_base::num::conversion::traits::{CheckedFrom, IntegerMantissaAndExponent};
+use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::Ordering;
 
@@ -26,7 +26,7 @@ macro_rules! impl_float {
                     false
                 } else {
                     let (m, e) = other.integer_mantissa_and_exponent();
-                    if let Some(e) = u64::checked_from(e) {
+                    if let Ok(e) = u64::try_from(e) {
                         self.significant_bits() == m.significant_bits() + e
                             && self.cmp_normalized(&Natural::from(m)) == Ordering::Equal
                     } else {

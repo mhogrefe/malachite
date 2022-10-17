@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_1;
@@ -192,7 +192,7 @@ where
     for<'a> &'a Integer: Shl<T, Output = Integer>,
     Rational: Shl<T, Output = Rational> + ShlAssign<T> + Shr<T, Output = Rational>,
     for<'a> &'a Rational: Shl<T, Output = Rational>,
-    u64: CheckedFrom<T>,
+    u64: TryFrom<T>,
 {
     rational_unsigned_pair_gen_var_1::<T>().test_properties(|(n, u)| {
         let mut mut_n = n.clone();
@@ -234,7 +234,7 @@ where
     Rational: Shl<T, Output = Rational> + ShlAssign<T> + Shr<T, Output = Rational>,
     for<'a> &'a Rational:
         Shl<T, Output = Rational> + Shl<<T as UnsignedAbs>::Output, Output = Rational>,
-    i64: CheckedFrom<T>,
+    i64: TryFrom<T>,
 {
     rational_signed_pair_gen_var_1::<T>().test_properties(|(n, i)| {
         let mut mut_n = n.clone();

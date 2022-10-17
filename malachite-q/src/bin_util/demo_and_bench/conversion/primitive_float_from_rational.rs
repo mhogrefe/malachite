@@ -1,12 +1,11 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
 use malachite_q::test_util::bench::bucketers::{
     pair_1_rational_bit_bucketer, pair_2_rational_bit_bucketer, rational_bit_bucketer,
 };
@@ -18,10 +17,8 @@ use malachite_q::Rational;
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_float_rounding_from_rational);
     register_primitive_float_demos!(runner, demo_float_rounding_from_rational_ref);
-    register_primitive_float_demos!(runner, demo_float_from_rational);
-    register_primitive_float_demos!(runner, demo_float_from_rational_ref);
-    register_primitive_float_demos!(runner, demo_float_checked_from_rational);
-    register_primitive_float_demos!(runner, demo_float_checked_from_rational_ref);
+    register_primitive_float_demos!(runner, demo_float_try_from_rational);
+    register_primitive_float_demos!(runner, demo_float_try_from_rational_ref);
     register_primitive_float_demos!(runner, demo_float_exact_from_rational);
     register_primitive_float_demos!(runner, demo_float_exact_from_rational_ref);
     register_primitive_float_demos!(runner, demo_float_convertible_from_rational);
@@ -39,10 +36,9 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_f64_rounding_from_down_rational_library_comparison
     );
-    register_primitive_float_benches!(runner, benchmark_float_from_rational_evaluation_strategy);
     register_primitive_float_benches!(
         runner,
-        benchmark_float_checked_from_rational_evaluation_strategy
+        benchmark_float_try_from_rational_evaluation_strategy
     );
     register_primitive_float_benches!(
         runner,
@@ -61,7 +57,7 @@ fn demo_float_rounding_from_rational<
     config: GenConfig,
     limit: usize,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     for (n, rm) in rational_rounding_mode_pair_gen_var_5::<T>()
         .get(gm, &config)
@@ -84,7 +80,7 @@ fn demo_float_rounding_from_rational_ref<
     config: GenConfig,
     limit: usize,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     for (n, rm) in rational_rounding_mode_pair_gen_var_5::<T>()
         .get(gm, &config)
@@ -100,57 +96,36 @@ fn demo_float_rounding_from_rational_ref<
     }
 }
 
-fn demo_float_from_rational<T: From<Rational> + PrimitiveFloat>(
+fn demo_float_try_from_rational<
+    T: TryFrom<Rational, Error = PrimitiveFloatFromRationalError> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
     for n in rational_gen().get(gm, &config).take(limit) {
         println!(
-            "{}::from({}) = {}",
+            "{}::try_from({}) = {:?}",
             T::NAME,
             n.clone(),
-            NiceFloat(T::from(n))
+            T::try_from(n).map(NiceFloat)
         );
     }
 }
 
-fn demo_float_from_rational_ref<T: for<'a> From<&'a Rational> + PrimitiveFloat>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) {
-    for n in rational_gen().get(gm, &config).take(limit) {
-        println!("{}::from(&{}) = {}", T::NAME, n, NiceFloat(T::from(&n)));
-    }
-}
-
-fn demo_float_checked_from_rational<T: CheckedFrom<Rational> + PrimitiveFloat>(
+fn demo_float_try_from_rational_ref<
+    T: for<'a> TryFrom<&'a Rational, Error = PrimitiveFloatFromRationalError> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
     for n in rational_gen().get(gm, &config).take(limit) {
         println!(
-            "{}::checked_from({}) = {:?}",
-            T::NAME,
-            n.clone(),
-            T::checked_from(n).map(NiceFloat)
-        );
-    }
-}
-
-fn demo_float_checked_from_rational_ref<T: for<'a> CheckedFrom<&'a Rational> + PrimitiveFloat>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) {
-    for n in rational_gen().get(gm, &config).take(limit) {
-        println!(
-            "{}::checked_from(&{}) = {:?}",
+            "{}::try_from(&{}) = {:?}",
             T::NAME,
             n,
-            T::checked_from(&n).map(NiceFloat)
+            T::try_from(&n).map(NiceFloat)
         );
     }
 }
@@ -160,7 +135,7 @@ fn demo_float_exact_from_rational<T: ExactFrom<Rational> + PrimitiveFloat>(
     config: GenConfig,
     limit: usize,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     for n in rational_gen_var_4::<T>().get(gm, &config).take(limit) {
         println!(
@@ -177,7 +152,7 @@ fn demo_float_exact_from_rational_ref<T: for<'a> ExactFrom<&'a Rational> + Primi
     config: GenConfig,
     limit: usize,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     for n in rational_gen_var_4::<T>().get(gm, &config).take(limit) {
         println!(
@@ -231,7 +206,7 @@ fn benchmark_float_rounding_from_rational_evaluation_strategy<
     limit: usize,
     file_name: &str,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     run_benchmark(
         &format!("{}::rounding_from(Rational, RoundingMode)", T::NAME),
@@ -300,9 +275,8 @@ fn benchmark_f64_rounding_from_down_rational_library_comparison(
     );
 }
 
-#[allow(unused_must_use)]
-fn benchmark_float_from_rational_evaluation_strategy<
-    T: From<Rational> + for<'a> From<&'a Rational> + PrimitiveFloat,
+fn benchmark_float_try_from_rational_evaluation_strategy<
+    T: TryFrom<Rational> + for<'a> TryFrom<&'a Rational> + PrimitiveFloat,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -310,7 +284,7 @@ fn benchmark_float_from_rational_evaluation_strategy<
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::from(Rational)", T::NAME),
+        &format!("{}::try_from(Rational)", T::NAME),
         BenchmarkType::EvaluationStrategy,
         rational_gen().get(gm, &config),
         gm.name(),
@@ -318,38 +292,11 @@ fn benchmark_float_from_rational_evaluation_strategy<
         file_name,
         &rational_bit_bucketer("n"),
         &mut [
-            (&format!("{}::from(Rational)", T::NAME), &mut |n| {
-                no_out!(T::from(n))
+            (&format!("{}::try_from(Rational)", T::NAME), &mut |n| {
+                no_out!(T::try_from(n).ok())
             }),
-            (&format!("{}::from(&Rational)", T::NAME), &mut |n| {
-                no_out!(T::from(&n))
-            }),
-        ],
-    );
-}
-
-fn benchmark_float_checked_from_rational_evaluation_strategy<
-    T: CheckedFrom<Rational> + for<'a> CheckedFrom<&'a Rational> + PrimitiveFloat,
->(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        &format!("{}::checked_from(Rational)", T::NAME),
-        BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
-        gm.name(),
-        limit,
-        file_name,
-        &rational_bit_bucketer("n"),
-        &mut [
-            (&format!("{}::checked_from(Rational)", T::NAME), &mut |n| {
-                no_out!(T::checked_from(n))
-            }),
-            (&format!("{}::checked_from(&Rational)", T::NAME), &mut |n| {
-                no_out!(T::checked_from(&n))
+            (&format!("{}::try_from(&Rational)", T::NAME), &mut |n| {
+                no_out!(T::try_from(&n).ok())
             }),
         ],
     );
@@ -363,7 +310,7 @@ fn benchmark_float_exact_from_rational_evaluation_strategy<
     limit: usize,
     file_name: &str,
 ) where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     run_benchmark(
         &format!("{}::exact_from(Rational)", T::NAME),

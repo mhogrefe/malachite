@@ -83,7 +83,7 @@ pub fn rational_gen_var_3() -> Generator<Rational> {
 // All `Rational`s that are equal to a primitive float of type `T`.
 pub fn rational_gen_var_4<T: PrimitiveFloat>() -> Generator<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Generator::new(
         &exhaustive_rational_gen_var_4::<T>,
@@ -105,7 +105,7 @@ pub fn rational_gen_var_5<T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFl
 // All `Rational`s that are halfway between two adjacent floats of type `T`.
 pub fn rational_gen_var_6<T: PrimitiveFloat>() -> Generator<Rational>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Generator::new(
         &exhaustive_rational_gen_var_6::<T>,
@@ -818,7 +818,7 @@ pub fn rational_rounding_mode_pair_gen_var_5<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat,
 >() -> Generator<(Rational, RoundingMode)>
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     Generator::new(
         &exhaustive_rational_rounding_mode_pair_gen_var_5::<T>,

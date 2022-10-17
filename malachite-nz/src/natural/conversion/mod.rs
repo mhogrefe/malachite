@@ -5,7 +5,7 @@ pub mod from_limbs;
 /// Implementations of traits for converting a primitive float to a
 /// [`Natural`](crate::natural::Natural).
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 ///
@@ -42,59 +42,41 @@ pub mod from_limbs;
 /// assert_eq!(Natural::rounding_from(-0.5, RoundingMode::Nearest), 0);
 /// ```
 ///
-/// # from
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(0.0), 0);
-/// assert_eq!(Natural::from(-0.0), 0);
-/// assert_eq!(Natural::from(123.0), 123);
-/// assert_eq!(Natural::from(1.0e9), 1000000000);
-/// assert_eq!(Natural::from(4294967295.0), 4294967295u32);
-/// assert_eq!(Natural::from(4294967296.0), 4294967296u64);
-/// assert_eq!(
-///     Natural::from(1.0e100).to_string(),
-///     "10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469\
-///     985856815104"
-/// );
-/// assert_eq!(Natural::from(123.1), 123);
-/// assert_eq!(Natural::from(123.9), 124);
-/// assert_eq!(Natural::from(123.5), 124);
-/// assert_eq!(Natural::from(124.5), 124);
-/// assert_eq!(Natural::from(-0.499), 0);
-/// assert_eq!(Natural::from(-0.5), 0);
-/// ```
-///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
-/// use malachite_base::num::conversion::traits::CheckedFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!(Natural::checked_from(f64::NAN).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(f64::POSITIVE_INFINITY).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(f64::NEGATIVE_INFINITY).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(0.0).to_debug_string(), "Some(0)");
-/// assert_eq!(Natural::checked_from(-0.0).to_debug_string(), "Some(0)");
-/// assert_eq!(Natural::checked_from(123.0).to_debug_string(), "Some(123)");
-/// assert_eq!(Natural::checked_from(1.0e9).to_debug_string(), "Some(1000000000)");
-/// assert_eq!(Natural::checked_from(4294967295.0).to_debug_string(), "Some(4294967295)");
-/// assert_eq!(Natural::checked_from(4294967296.0).to_debug_string(), "Some(4294967296)");
+/// assert_eq!(Natural::try_from(f64::NAN).to_debug_string(), "Err(FloatInfiniteOrNan)");
 /// assert_eq!(
-///     Natural::checked_from(1.0e100).to_debug_string(),
-///     "Some(100000000000000001590289110975991804683608085639452813897813275577478387721703810608\
-///     13469985856815104)"
+///     Natural::try_from(f64::POSITIVE_INFINITY).to_debug_string(),
+///     "Err(FloatInfiniteOrNan)"
 /// );
-/// assert_eq!(Natural::checked_from(123.1).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(123.9).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(123.5).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(124.5).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(-0.499).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(-0.5).to_debug_string(), "None");
-/// assert_eq!(Natural::checked_from(-123.0).to_debug_string(), "None");
+/// assert_eq!(
+///     Natural::try_from(f64::NEGATIVE_INFINITY).to_debug_string(),
+///     "Err(FloatInfiniteOrNan)"
+/// );
+/// assert_eq!(Natural::try_from(0.0).to_debug_string(), "Ok(0)");
+/// assert_eq!(Natural::try_from(-0.0).to_debug_string(), "Ok(0)");
+/// assert_eq!(Natural::try_from(123.0).to_debug_string(), "Ok(123)");
+/// assert_eq!(Natural::try_from(1.0e9).to_debug_string(), "Ok(1000000000)");
+/// assert_eq!(Natural::try_from(4294967295.0).to_debug_string(), "Ok(4294967295)");
+/// assert_eq!(Natural::try_from(4294967296.0).to_debug_string(), "Ok(4294967296)");
+/// assert_eq!(
+///     Natural::try_from(1.0e100).to_debug_string(),
+///     "Ok(10000000000000000159028911097599180468360808563945281389781327557747838772170381060813\
+///     469985856815104)"
+/// );
+/// assert_eq!(Natural::try_from(123.1).to_debug_string(), "Err(FloatNonInteger)");
+/// assert_eq!(Natural::try_from(123.9).to_debug_string(), "Err(FloatNonInteger)");
+/// assert_eq!(Natural::try_from(123.5).to_debug_string(), "Err(FloatNonInteger)");
+/// assert_eq!(Natural::try_from(124.5).to_debug_string(), "Err(FloatNonInteger)");
+/// assert_eq!(Natural::try_from(-0.499).to_debug_string(), "Err(FloatNegative)");
+/// assert_eq!(Natural::try_from(-0.5).to_debug_string(), "Err(FloatNegative)");
+/// assert_eq!(Natural::try_from(-123.0).to_debug_string(), "Err(FloatNegative)");
 /// ```
 ///
 /// # convertible_from
@@ -127,7 +109,7 @@ pub mod from_primitive_float;
 /// Implementations of traits for converting a primitive integer to a
 /// [`Natural`](crate::natural::Natural).
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`From`], [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`SaturatingFrom`](malachite_base::num::conversion::traits::SaturatingFrom).
 ///
@@ -140,16 +122,15 @@ pub mod from_primitive_float;
 /// assert_eq!(Natural::from(123u128), 123);
 /// ```
 ///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
-/// use malachite_base::num::conversion::traits::CheckedFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!(Natural::checked_from(123i32).to_debug_string(), "Some(123)");
-/// assert_eq!(Natural::checked_from(-123i32).to_debug_string(), "None");
+/// assert_eq!(Natural::try_from(123i32).to_debug_string(), "Ok(123)");
+/// assert_eq!(Natural::try_from(-123i32).to_debug_string(), "Err(NaturalFromSignedError)");
 /// ```
 ///
 /// # convertible_from
@@ -245,24 +226,9 @@ pub mod mantissa_and_exponent;
 /// Implementations of traits for converting a [`Natural`](crate::natural::Natural) to a primitive
 /// float.
 ///
-/// The traits are [`From`], [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
-///
-/// # from
-/// ```
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// assert_eq!(f32::from(&Natural::from_str("123").unwrap()), 123.0);
-/// assert_eq!(f32::from(&Natural::from_str("1000000001").unwrap()), 1.0e9);
-/// assert_eq!(
-///     f32::from(
-///         &Natural::from_str("10000000000000000000000000000000000000000000000000000").unwrap()
-///     ),
-///     3.4028235e38
-/// );
-/// ```
 ///
 /// # rounding_from
 /// ```
@@ -291,22 +257,25 @@ pub mod mantissa_and_exponent;
 /// );
 /// ```
 ///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_nz::natural::conversion::primitive_float_from_natural::*;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// assert_eq!(f32::checked_from(&Natural::from_str("123").unwrap()), Some(123.0));
-/// assert_eq!(f32::checked_from(&Natural::from_str("1000000000").unwrap()), Some(1.0e9));
-/// assert_eq!(f32::checked_from(&Natural::from_str("1000000001").unwrap()), None);
+/// assert_eq!(f32::try_from(&Natural::from_str("123").unwrap()), Ok(123.0));
+/// assert_eq!(f32::try_from(&Natural::from_str("1000000000").unwrap()), Ok(1.0e9));
 /// assert_eq!(
-///     f32::checked_from(
+///     f32::try_from(&Natural::from_str("1000000001").unwrap()),
+///     Err(PrimitiveFloatFromNaturalError)
+/// );
+/// assert_eq!(
+///     f32::try_from(
 ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000").unwrap()
 ///     ),
-///     None
+///     Err(PrimitiveFloatFromNaturalError)
 /// );
 /// ```
 ///
@@ -332,34 +301,37 @@ pub mod primitive_float_from_natural;
 /// Implementations of traits for converting a [`Natural`](crate::natural::Natural) to a primitive
 /// integer.
 ///
-/// The traits are [`CheckedFrom`](malachite_base::num::conversion::traits::CheckedFrom),
+/// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom),
 /// [`OverflowingFrom`](malachite_base::num::conversion::traits::OverflowingFrom),
 /// [`SaturatingFrom`](malachite_base::num::conversion::traits::SaturatingFrom), and
 /// [`WrappingFrom`](malachite_base::num::conversion::traits::WrappingFrom).
 ///
-/// # checked_from
+/// # try_from
 /// ```
 /// extern crate malachite_base;
 ///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
-/// use malachite_base::num::conversion::traits::CheckedFrom;
+/// use malachite_nz::natural::conversion::primitive_int_from_natural::{
+///     SignedFromNaturalError,
+///     UnsignedFromNaturalError
+/// };
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!(u32::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(u32::checked_from(&Natural::from(10u32).pow(12)), None);
-/// assert_eq!(u8::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(u8::checked_from(&Natural::from(10u32).pow(12)), None);
-/// assert_eq!(u64::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(u64::checked_from(&(Natural::ONE << 100)), None);
+/// assert_eq!(u32::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(u32::try_from(&Natural::from(10u32).pow(12)), Err(UnsignedFromNaturalError));
+/// assert_eq!(u8::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(u8::try_from(&Natural::from(10u32).pow(12)), Err(UnsignedFromNaturalError));
+/// assert_eq!(u64::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(u64::try_from(&(Natural::ONE << 100)), Err(UnsignedFromNaturalError));
 ///
-/// assert_eq!(i32::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(i32::checked_from(&Natural::from(10u32).pow(12)), None);
-/// assert_eq!(i8::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(i8::checked_from(&Natural::from(10u32).pow(12)), None);
-/// assert_eq!(i64::checked_from(&Natural::from(123u32)), Some(123));
-/// assert_eq!(i64::checked_from(&(Natural::ONE << 100)), None);
+/// assert_eq!(i32::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(i32::try_from(&Natural::from(10u32).pow(12)), Err(SignedFromNaturalError));
+/// assert_eq!(i8::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(i8::try_from(&Natural::from(10u32).pow(12)), Err(SignedFromNaturalError));
+/// assert_eq!(i64::try_from(&Natural::from(123u32)), Ok(123));
+/// assert_eq!(i64::try_from(&(Natural::ONE << 100)), Err(SignedFromNaturalError));
 /// ```
 ///
 /// # wrapping_from

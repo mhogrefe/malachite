@@ -20,8 +20,6 @@ impl DivisibleBy<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -61,8 +59,6 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -102,8 +98,6 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -142,8 +136,6 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;

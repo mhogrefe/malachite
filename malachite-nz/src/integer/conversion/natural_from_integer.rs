@@ -1,11 +1,16 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
 
-impl CheckedFrom<Integer> for Natural {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NaturalFromIntegerError;
+
+impl TryFrom<Integer> for Natural {
+    type Error = NaturalFromIntegerError;
+
     /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by value. If the
-    /// [`Integer`] is negative, `None` is returned.
+    /// [`Integer`] is negative, an error is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -15,30 +20,37 @@ impl CheckedFrom<Integer> for Natural {
     /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::checked_from(Integer::from(123)).to_debug_string(), "Some(123)");
-    /// assert_eq!(Natural::checked_from(Integer::from(-123)).to_debug_string(), "None");
+    /// assert_eq!(Natural::try_from(Integer::from(123)).to_debug_string(), "Ok(123)");
     /// assert_eq!(
-    ///     Natural::checked_from(Integer::from(10u32).pow(12)).to_debug_string(),
-    ///     "Some(1000000000000)"
+    ///     Natural::try_from(Integer::from(-123)).to_debug_string(),
+    ///     "Err(NaturalFromIntegerError)"
     /// );
-    /// assert_eq!(Natural::checked_from(-Integer::from(10u32).pow(12)).to_debug_string(), "None");
+    /// assert_eq!(
+    ///     Natural::try_from(Integer::from(10u32).pow(12)).to_debug_string(),
+    ///     "Ok(1000000000000)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::try_from(-Integer::from(10u32).pow(12)).to_debug_string(),
+    ///     "Err(NaturalFromIntegerError)"
+    /// );
     /// ```
-    fn checked_from(value: Integer) -> Option<Natural> {
+    fn try_from(value: Integer) -> Result<Natural, Self::Error> {
         match value {
-            Integer { sign: false, .. } => None,
-            Integer { sign: true, abs } => Some(abs),
+            Integer { sign: false, .. } => Err(NaturalFromIntegerError),
+            Integer { sign: true, abs } => Ok(abs),
         }
     }
 }
 
-impl<'a> CheckedFrom<&'a Integer> for Natural {
+impl<'a> TryFrom<&'a Integer> for Natural {
+    type Error = NaturalFromIntegerError;
+
     /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by reference. If the
-    /// [`Integer`] is negative, `None` is returned.
+    /// [`Integer`] is negative, an error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -52,29 +64,31 @@ impl<'a> CheckedFrom<&'a Integer> for Natural {
     /// extern crate malachite_base;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::checked_from(&Integer::from(123)).to_debug_string(), "Some(123)");
-    /// assert_eq!(Natural::checked_from(&Integer::from(-123)).to_debug_string(), "None");
+    /// assert_eq!(Natural::try_from(&Integer::from(123)).to_debug_string(), "Ok(123)");
     /// assert_eq!(
-    ///     Natural::checked_from(&Integer::from(10u32).pow(12)).to_debug_string(),
-    ///     "Some(1000000000000)"
+    ///     Natural::try_from(&Integer::from(-123)).to_debug_string(),
+    ///     "Err(NaturalFromIntegerError)"
     /// );
     /// assert_eq!(
-    ///     Natural::checked_from(&(-Integer::from(10u32).pow(12))).to_debug_string(),
-    ///     "None"
+    ///     Natural::try_from(&Integer::from(10u32).pow(12)).to_debug_string(),
+    ///     "Ok(1000000000000)"
+    /// );
+    /// assert_eq!(
+    ///     Natural::try_from(&(-Integer::from(10u32).pow(12))).to_debug_string(),
+    ///     "Err(NaturalFromIntegerError)"
     /// );
     /// ```
-    fn checked_from(value: &'a Integer) -> Option<Natural> {
+    fn try_from(value: &'a Integer) -> Result<Natural, Self::Error> {
         match *value {
-            Integer { sign: false, .. } => None,
+            Integer { sign: false, .. } => Err(NaturalFromIntegerError),
             Integer {
                 sign: true,
                 ref abs,
-            } => Some(abs.clone()),
+            } => Ok(abs.clone()),
         }
     }
 }

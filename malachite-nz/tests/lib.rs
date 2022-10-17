@@ -104,8 +104,8 @@ pub mod integer {
     pub mod conversion {
         pub mod clone;
         pub mod floating_point_from_integer;
-        pub mod from_floating_point;
         pub mod from_natural;
+        pub mod from_primitive_float;
         pub mod from_primitive_int;
         pub mod from_twos_complement_limbs;
         pub mod is_integer;

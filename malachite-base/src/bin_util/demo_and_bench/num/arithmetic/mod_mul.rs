@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::mod_mul::{
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::test_util::bench::bucketers::{
     ignore_highest_bit_unsigned_bit_bucketer, quadruple_1_2_bit_bucketer, triple_3_bit_bucketer,
 };
@@ -72,7 +72,7 @@ fn demo_limbs_invert_limb_u64(gm: GenMode, config: GenConfig, limit: usize) {
 }
 
 fn demo_limbs_mod_preinverted<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     gm: GenMode,
@@ -161,7 +161,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(
 }
 
 fn benchmark_limbs_mod_preinverted_algorithms<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     gm: GenMode,

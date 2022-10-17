@@ -1,3 +1,4 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
@@ -57,7 +58,7 @@ fn demo_rational_approximate_2(gm: GenMode, config: GenConfig, limit: usize) {
         println!("{}", x);
         for d in exhaustive_natural_inclusive_range(Natural::ONE, x.to_denominator()) {
             let a = (&x).approximate(&d);
-            println!("    {}: {} ≈ {}", d, a, NiceFloat(f64::from(&a)));
+            println!("    {}: {} ≈ {}", d, a, NiceFloat(f64::exact_from(&a)));
         }
     }
 }

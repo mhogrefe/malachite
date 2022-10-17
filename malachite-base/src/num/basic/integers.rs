@@ -26,10 +26,11 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::traits::{Iverson, One, Two, Zero};
 use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
-    CheckedFrom, CheckedInto, ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase,
-    IsInteger, OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom,
-    SaturatingInto, ToSci, ToStringBase, WrappingFrom, WrappingInto,
+    ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase, IsInteger,
+    OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
+    ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
+use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
     LeadingZeros, LowMask, NotAssign, SignificantBits, TrailingZeros,
@@ -95,32 +96,6 @@ pub trait PrimitiveInt:
     + CheckedAdd<Self, Output = Self>
     + CheckedAddMul<Self, Self, Output = Self>
     + CheckedDiv<Self, Output = Self>
-    + CheckedFrom<f32>
-    + CheckedFrom<f64>
-    + CheckedFrom<u8>
-    + CheckedFrom<u16>
-    + CheckedFrom<u32>
-    + CheckedFrom<u64>
-    + CheckedFrom<u128>
-    + CheckedFrom<usize>
-    + CheckedFrom<i8>
-    + CheckedFrom<i16>
-    + CheckedFrom<i32>
-    + CheckedFrom<i64>
-    + CheckedFrom<i128>
-    + CheckedFrom<isize>
-    + CheckedInto<u8>
-    + CheckedInto<u16>
-    + CheckedInto<u32>
-    + CheckedInto<u64>
-    + CheckedInto<u128>
-    + CheckedInto<usize>
-    + CheckedInto<i8>
-    + CheckedInto<i16>
-    + CheckedInto<i32>
-    + CheckedInto<i64>
-    + CheckedInto<i128>
-    + CheckedInto<isize>
     + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedPow<u64, Output = Self>
@@ -418,6 +393,34 @@ pub trait PrimitiveInt:
     + ToSci
     + ToStringBase
     + TrailingZeros
+    + TryFrom<NiceFloat<f32>>
+    + TryFrom<NiceFloat<f64>>
+    + TryFrom<u8>
+    + TryFrom<u16>
+    + TryFrom<u32>
+    + TryFrom<u64>
+    + TryFrom<u128>
+    + TryFrom<usize>
+    + TryFrom<i8>
+    + TryFrom<i16>
+    + TryFrom<i32>
+    + TryFrom<i64>
+    + TryFrom<i128>
+    + TryFrom<isize>
+    + TryInto<NiceFloat<f32>>
+    + TryInto<NiceFloat<f64>>
+    + TryInto<u8>
+    + TryInto<u16>
+    + TryInto<u32>
+    + TryInto<u64>
+    + TryInto<u128>
+    + TryInto<usize>
+    + TryInto<i8>
+    + TryInto<i16>
+    + TryInto<i32>
+    + TryInto<i64>
+    + TryInto<i128>
+    + TryInto<isize>
     + Two
     + UpperHex
     + WrappingAdd<Self, Output = Self>

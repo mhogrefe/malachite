@@ -1,7 +1,10 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IntegerFromPrimitiveFloatError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -35,37 +38,12 @@ macro_rules! float_impls {
             }
         }
 
-        impl From<$f> for Integer {
-            /// Converts a primitive float to the nearest [`Integer`].
-            ///
-            /// Floating-point values exactly between two [`Integer`]s are rounded to the even one.
-            /// The floating point value cannot be NaN or infinite.
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(n)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.sci_exponent()`.
-            ///
-            /// # Panics
-            /// Panics if `value` is NaN or infinite.
-            ///
-            /// # Examples
-            /// See [here](super::from_primitive_float#from).
-            fn from(value: $f) -> Integer {
-                let abs = Natural::from(value.abs());
-                Integer {
-                    sign: value >= 0.0 || abs == 0,
-                    abs,
-                }
-            }
-        }
+        impl TryFrom<$f> for Integer {
+            type Error = IntegerFromPrimitiveFloatError;
 
-        impl CheckedFrom<$f> for Integer {
             /// Converts a primitive float to an [`Integer`].
             ///
-            /// If the input isn't exactly equal to some [`Integer`], `None` is returned.
+            /// If the input isn't exactly equal to some [`Integer`], an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -75,12 +53,14 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.sci_exponent()`.
             ///
             /// # Examples
-            /// See [here](super::from_primitive_float#checked_from).
-            fn checked_from(value: $f) -> Option<Integer> {
-                Natural::checked_from(value.abs()).map(|n| Integer {
-                    sign: value >= 0.0,
-                    abs: n,
-                })
+            /// See [here](super::from_primitive_float#try_from).
+            fn try_from(value: $f) -> Result<Integer, Self::Error> {
+                Natural::try_from(value.abs())
+                    .map(|n| Integer {
+                        sign: value >= 0.0,
+                        abs: n,
+                    })
+                    .map_err(|_| IntegerFromPrimitiveFloatError)
             }
         }
 

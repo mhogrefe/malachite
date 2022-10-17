@@ -3,9 +3,16 @@ use malachite_base::num::arithmetic::traits::ShlRound;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
+    ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NaturalFromPrimitiveFloatError {
+    FloatInfiniteOrNan,
+    FloatNegative,
+    FloatNonInteger,
+}
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -50,34 +57,12 @@ macro_rules! float_impls {
             }
         }
 
-        impl From<$f> for Natural {
-            /// Converts a floating-point value to the nearest [`Natural`].
-            ///
-            /// Floating-point values exactly between two [`Natural`]s are rounded to the even one.
-            /// The floating point value cannot be NaN or infinite, and it cannot round to a
-            /// negative integer (so it must be greater than or equal to -0.5).
-            ///
-            /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(n)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `value.sci_exponent()`.
-            ///
-            /// # Panics
-            /// Panics if `value` is NaN or infinite, or if it would round to a negative integer.
-            ///
-            /// # Examples
-            /// See [here](super::from_primitive_float#from).
-            fn from(value: $f) -> Natural {
-                Natural::rounding_from(value, RoundingMode::Nearest)
-            }
-        }
+        impl TryFrom<$f> for Natural {
+            type Error = NaturalFromPrimitiveFloatError;
 
-        impl CheckedFrom<$f> for Natural {
-            /// Converts a floating-point value to a [`Natural`] type.
+            /// Converts a floating-point value to a [`Natural`].
             ///
-            /// If the input isn't exactly equal to some [`Natural`], `None` is returned.
+            /// If the input isn't exactly equal to some [`Natural`], an error is returned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -87,18 +72,20 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.sci_exponent()`.
             ///
             /// # Examples
-            /// See [here](super::from_primitive_float#checked_from).
-            fn checked_from(value: $f) -> Option<Natural> {
-                if value.is_nan() || value.is_infinite() || value < 0.0 {
-                    None
+            /// See [here](super::from_primitive_float#try_from).
+            fn try_from(value: $f) -> Result<Natural, Self::Error> {
+                if value.is_nan() || value.is_infinite() {
+                    Err(NaturalFromPrimitiveFloatError::FloatInfiniteOrNan)
+                } else if value < 0.0 {
+                    Err(NaturalFromPrimitiveFloatError::FloatNegative)
                 } else if value == 0.0 {
-                    Some(Natural::ZERO)
+                    Ok(Natural::ZERO)
                 } else {
                     let (mantissa, exponent) = value.integer_mantissa_and_exponent();
                     if exponent >= 0 {
-                        Some(Natural::from(mantissa) << exponent)
+                        Ok(Natural::from(mantissa) << exponent)
                     } else {
-                        None
+                        Err(NaturalFromPrimitiveFloatError::FloatNonInteger)
                     }
                 }
             }

@@ -29,8 +29,6 @@ impl DivExact<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -80,8 +78,6 @@ impl<'a> DivExact<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -131,8 +127,6 @@ impl<'a> DivExact<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -177,8 +171,6 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -228,8 +220,6 @@ impl DivExactAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -276,8 +266,6 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;

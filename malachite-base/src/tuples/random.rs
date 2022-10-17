@@ -13,8 +13,6 @@ use std::iter::{repeat, Repeat};
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::tuples::random::random_units;
 ///

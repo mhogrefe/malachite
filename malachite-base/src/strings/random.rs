@@ -17,8 +17,6 @@ use crate::vecs::random::{
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -61,8 +59,6 @@ pub const fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_fixed_length_strings;
@@ -111,8 +107,6 @@ pub fn random_fixed_length_strings(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -166,8 +160,6 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_strings;

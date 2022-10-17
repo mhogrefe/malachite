@@ -1,13 +1,18 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 
-impl CheckedFrom<Rational> for Natural {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NaturalFromRationalError;
+
+impl TryFrom<Rational> for Natural {
+    type Error = NaturalFromRationalError;
+
     /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
-    /// [`Rational`] by value. If the [`Rational`] is negative or not an integer, `None` is
+    /// [`Rational`] by value. If the [`Rational`] is negative or not an integer, an error is
     /// returned.
     ///
     /// # Worst-case complexity
@@ -15,29 +20,31 @@ impl CheckedFrom<Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_q::conversion::natural_from_rational::NaturalFromRationalError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Natural::checked_from(Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Natural::checked_from(Rational::from(-123)), None);
-    /// assert_eq!(Natural::checked_from(Rational::from_signeds(22, 7)), None);
+    /// assert_eq!(Natural::try_from(Rational::from(123)).unwrap(), 123);
+    /// assert_eq!(Natural::try_from(Rational::from(-123)), Err(NaturalFromRationalError));
+    /// assert_eq!(
+    ///     Natural::try_from(Rational::from_signeds(22, 7)),
+    ///     Err(NaturalFromRationalError)
+    /// );
     /// ```
-    fn checked_from(x: Rational) -> Option<Natural> {
+    fn try_from(x: Rational) -> Result<Natural, Self::Error> {
         if x.sign && x.denominator == 1u32 {
-            Some(x.numerator)
+            Ok(x.numerator)
         } else {
-            None
+            Err(NaturalFromRationalError)
         }
     }
 }
 
-impl<'a> CheckedFrom<&'a Rational> for Natural {
+impl<'a> TryFrom<&'a Rational> for Natural {
+    type Error = NaturalFromRationalError;
+
     /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
-    /// [`Rational`] by reference. If the [`Rational`] is negative or not an integer, `None` is
+    /// [`Rational`] by reference. If the [`Rational`] is negative or not an integer, an error is
     /// returned.
     ///
     /// # Worst-case complexity
@@ -49,22 +56,22 @@ impl<'a> CheckedFrom<&'a Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::conversion::traits::CheckedFrom;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_q::conversion::natural_from_rational::NaturalFromRationalError;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Natural::checked_from(&Rational::from(123)).unwrap(), 123);
-    /// assert_eq!(Natural::checked_from(&Rational::from(-123)), None);
-    /// assert_eq!(Natural::checked_from(&Rational::from_signeds(22, 7)), None);
+    /// assert_eq!(Natural::try_from(&Rational::from(123)).unwrap(), 123);
+    /// assert_eq!(Natural::try_from(&Rational::from(-123)), Err(NaturalFromRationalError));
+    /// assert_eq!(
+    ///     Natural::try_from(&Rational::from_signeds(22, 7)),
+    ///     Err(NaturalFromRationalError)
+    /// );
     /// ```
-    fn checked_from(x: &Rational) -> Option<Natural> {
+    fn try_from(x: &Rational) -> Result<Natural, Self::Error> {
         if x.sign && x.denominator == 1u32 {
-            Some(x.numerator.clone())
+            Ok(x.numerator.clone())
         } else {
-            None
+            Err(NaturalFromRationalError)
         }
     }
 }

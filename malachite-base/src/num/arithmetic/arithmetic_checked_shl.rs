@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use crate::num::conversion::traits::WrappingFrom;
 use std::ops::{Shl, Shr};
 
 fn arithmetic_checked_shl_unsigned_unsigned<
@@ -127,7 +127,7 @@ apply_to_unsigneds!(impl_arithmetic_checked_shl_unsigned_signed);
 
 fn arithmetic_checked_shl_signed_unsigned<
     U: ArithmeticCheckedShl<B, Output = U> + PrimitiveUnsigned,
-    S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     B,
 >(
     x: S,
@@ -135,13 +135,14 @@ fn arithmetic_checked_shl_signed_unsigned<
 ) -> Option<S> {
     let abs = x.unsigned_abs();
     if x >= S::ZERO {
-        abs.arithmetic_checked_shl(bits).and_then(S::checked_from)
+        abs.arithmetic_checked_shl(bits)
+            .and_then(|x| S::try_from(x).ok())
     } else {
         abs.arithmetic_checked_shl(bits).and_then(|x| {
             if x == S::MIN.unsigned_abs() {
                 Some(S::MIN)
             } else {
-                S::checked_from(x).map(|y| -y)
+                S::try_from(x).ok().map(|y| -y)
             }
         })
     }

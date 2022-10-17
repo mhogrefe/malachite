@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::mod_mul::{
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_4,
@@ -63,7 +63,7 @@ fn limbs_invert_limb_u64_fail() {
 #[test]
 fn test_limbs_mod_preinverted() {
     fn test<
-        T: CheckedFrom<DT> + PrimitiveUnsigned,
+        T: TryFrom<DT> + PrimitiveUnsigned,
         DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
     >(
         x_1: T,
@@ -141,7 +141,7 @@ fn invert_limb_u64_properties() {
 }
 
 fn mod_mul_preinverted_properties_helper<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() {
     unsigned_quadruple_gen_var_5::<T, DT>().test_properties(|(x_1, x_0, d, d_inv)| {
@@ -208,7 +208,7 @@ fn mod_mul_properties_helper<T: PrimitiveUnsigned>() {
 }
 
 fn mod_mul_properties_fast_helper<
-    T: CheckedFrom<DT> + ModMulPrecomputed<Data = T> + PrimitiveUnsigned,
+    T: TryFrom<DT> + ModMulPrecomputed<Data = T> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() {
     unsigned_triple_gen_var_12::<T>().test_properties(|(x, y, m)| {

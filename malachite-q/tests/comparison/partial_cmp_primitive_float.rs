@@ -1,3 +1,4 @@
+use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
@@ -60,7 +61,7 @@ fn partial_cmp_primitive_float_properties_helper<
     T: PartialOrd<Rational> + PartialOrd<rug::Rational> + PrimitiveFloat,
 >()
 where
-    Rational: From<T> + PartialOrd<T>,
+    Rational: TryFrom<T> + PartialOrd<T>,
     rug::Rational: PartialOrd<T>,
 {
     rational_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
@@ -72,7 +73,7 @@ where
         assert_eq!(u.partial_cmp(&rational_to_rug_rational(&n)), cmp_rev);
 
         if u.is_finite() {
-            assert_eq!(n.cmp(&Rational::from(u)), cmp.unwrap());
+            assert_eq!(n.cmp(&Rational::exact_from(u)), cmp.unwrap());
         }
     });
 

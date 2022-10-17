@@ -32,8 +32,6 @@ impl ExtendedGcd for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -95,8 +93,6 @@ impl<'a> ExtendedGcd<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -157,8 +153,6 @@ impl<'a> ExtendedGcd<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -219,8 +213,6 @@ impl<'a, 'b> ExtendedGcd<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;

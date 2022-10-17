@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -14,9 +14,10 @@ use malachite_nz::test_util::bench::bucketers::{
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_rm, integer_gen_var_5, integer_gen_var_6,
 };
+use std::fmt::Debug;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_primitive_int_demos!(runner, demo_primitive_int_checked_from_integer);
+    register_primitive_int_demos!(runner, demo_primitive_int_try_from_integer);
     register_unsigned_demos!(runner, demo_unsigned_exact_from_integer);
     register_signed_demos!(runner, demo_signed_exact_from_integer);
     register_primitive_int_demos!(runner, demo_primitive_int_wrapping_from_integer);
@@ -24,10 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_int_demos!(runner, demo_primitive_int_overflowing_from_integer);
     register_primitive_int_demos!(runner, demo_primitive_int_convertible_from_integer);
 
-    register_primitive_int_benches!(
-        runner,
-        benchmark_primitive_int_checked_from_integer_algorithms
-    );
+    register_primitive_int_benches!(runner, benchmark_primitive_int_try_from_integer_algorithms);
     register_unsigned_benches!(runner, benchmark_unsigned_exact_from_integer);
     register_signed_benches!(runner, benchmark_signed_exact_from_integer);
     register_primitive_int_benches!(
@@ -43,56 +41,41 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_primitive_int_convertible_from_integer_algorithms
     );
-    register_bench!(
-        runner,
-        benchmark_u32_checked_from_integer_library_comparison
-    );
+    register_bench!(runner, benchmark_u32_try_from_integer_library_comparison);
     register_bench!(
         runner,
         benchmark_u32_wrapping_from_integer_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_u64_checked_from_integer_library_comparison
-    );
+    register_bench!(runner, benchmark_u64_try_from_integer_library_comparison);
     register_bench!(
         runner,
         benchmark_u64_wrapping_from_integer_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_i32_checked_from_integer_library_comparison
-    );
+    register_bench!(runner, benchmark_i32_try_from_integer_library_comparison);
     register_bench!(
         runner,
         benchmark_i32_wrapping_from_integer_library_comparison
     );
-    register_bench!(
-        runner,
-        benchmark_i64_checked_from_integer_library_comparison
-    );
+    register_bench!(runner, benchmark_i64_try_from_integer_library_comparison);
     register_bench!(
         runner,
         benchmark_i64_wrapping_from_integer_library_comparison
     );
 }
 
-fn demo_primitive_int_checked_from_integer<T: for<'a> CheckedFrom<&'a Integer> + PrimitiveInt>(
+fn demo_primitive_int_try_from_integer<T: for<'a> TryFrom<&'a Integer> + PrimitiveInt>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
-) {
+) where
+    for<'a> <T as TryFrom<&'a Integer>>::Error: Debug,
+{
     for n in integer_gen().get(gm, &config).take(limit) {
-        println!(
-            "{}::checked_from(&{}) = {:?}",
-            T::NAME,
-            n,
-            T::checked_from(&n)
-        );
+        println!("{}::try_from(&{}) = {:?}", T::NAME, n, T::try_from(&n));
     }
 }
 
-fn demo_unsigned_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + PrimitiveUnsigned>(
+fn demo_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -104,7 +87,7 @@ fn demo_unsigned_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + Primit
     }
 }
 
-fn demo_signed_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + PrimitiveSigned>(
+fn demo_signed_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -182,8 +165,8 @@ fn demo_primitive_int_convertible_from_integer<
     }
 }
 
-fn benchmark_primitive_int_checked_from_integer_algorithms<
-    T: for<'a> CheckedFrom<&'a Integer> + for<'a> OverflowingFrom<&'a Integer> + PrimitiveInt,
+fn benchmark_primitive_int_try_from_integer_algorithms<
+    T: for<'a> TryFrom<&'a Integer> + for<'a> OverflowingFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -191,7 +174,7 @@ fn benchmark_primitive_int_checked_from_integer_algorithms<
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::checked_from(&Integer)", T::NAME),
+        &format!("{}::try_from(&Integer)", T::NAME),
         BenchmarkType::Algorithms,
         integer_gen().get(gm, &config),
         gm.name(),
@@ -199,7 +182,7 @@ fn benchmark_primitive_int_checked_from_integer_algorithms<
         file_name,
         &integer_bit_bucketer("x"),
         &mut [
-            ("standard", &mut |n| no_out!(T::checked_from(&n))),
+            ("standard", &mut |n| no_out!(T::try_from(&n).ok())),
             ("using overflowing_from", &mut |n| {
                 let (value, overflow) = T::overflowing_from(&n);
                 if overflow {
@@ -212,7 +195,7 @@ fn benchmark_primitive_int_checked_from_integer_algorithms<
     );
 }
 
-fn benchmark_unsigned_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + PrimitiveUnsigned>(
+fn benchmark_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -232,7 +215,7 @@ fn benchmark_unsigned_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + P
     );
 }
 
-fn benchmark_signed_exact_from_integer<T: for<'a> CheckedFrom<&'a Integer> + PrimitiveSigned>(
+fn benchmark_signed_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -329,7 +312,7 @@ fn benchmark_primitive_int_overflowing_from_integer_algorithms<
 
 #[allow(unused_must_use)]
 fn benchmark_primitive_int_convertible_from_integer_algorithms<
-    T: for<'a> CheckedFrom<&'a Integer> + for<'a> ConvertibleFrom<&'a Integer> + PrimitiveInt,
+    T: for<'a> TryFrom<&'a Integer> + for<'a> ConvertibleFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -346,21 +329,19 @@ fn benchmark_primitive_int_convertible_from_integer_algorithms<
         &integer_bit_bucketer("x"),
         &mut [
             ("standard", &mut |n| no_out!(T::convertible_from(&n))),
-            ("using checked_from", &mut |n| {
-                no_out!(T::checked_from(&n).is_some())
-            }),
+            ("using try_from", &mut |n| no_out!(T::try_from(&n).is_ok())),
         ],
     );
 }
 
-fn benchmark_u32_checked_from_integer_library_comparison(
+fn benchmark_u32_try_from_integer_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "u32::checked_from(&Integer)",
+        "u32::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
         integer_gen_rm().get(gm, &config),
         gm.name(),
@@ -368,7 +349,7 @@ fn benchmark_u32_checked_from_integer_library_comparison(
         file_name,
         &pair_2_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(u32::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(u32::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_u32())),
         ],
     );
@@ -395,14 +376,14 @@ fn benchmark_u32_wrapping_from_integer_library_comparison(
     );
 }
 
-fn benchmark_u64_checked_from_integer_library_comparison(
+fn benchmark_u64_try_from_integer_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "u64::checked_from(&Integer)",
+        "u64::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
         integer_gen_rm().get(gm, &config),
         gm.name(),
@@ -410,7 +391,7 @@ fn benchmark_u64_checked_from_integer_library_comparison(
         file_name,
         &pair_2_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(u64::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(u64::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_u64())),
         ],
     );
@@ -437,14 +418,14 @@ fn benchmark_u64_wrapping_from_integer_library_comparison(
     );
 }
 
-fn benchmark_i32_checked_from_integer_library_comparison(
+fn benchmark_i32_try_from_integer_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "i32::checked_from(&Integer)",
+        "i32::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
         integer_gen_rm().get(gm, &config),
         gm.name(),
@@ -452,7 +433,7 @@ fn benchmark_i32_checked_from_integer_library_comparison(
         file_name,
         &pair_2_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(i32::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(i32::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_i32())),
         ],
     );
@@ -479,14 +460,14 @@ fn benchmark_i32_wrapping_from_integer_library_comparison(
     );
 }
 
-fn benchmark_i64_checked_from_integer_library_comparison(
+fn benchmark_i64_try_from_integer_library_comparison(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "i64::checked_from(&Integer)",
+        "i64::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
         integer_gen_rm().get(gm, &config),
         gm.name(),
@@ -494,7 +475,7 @@ fn benchmark_i64_checked_from_integer_library_comparison(
         file_name,
         &pair_2_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut |(_, n)| no_out!(i64::checked_from(&n))),
+            ("Malachite", &mut |(_, n)| no_out!(i64::try_from(&n).ok())),
             ("rug", &mut |(n, _)| no_out!(n.to_i64())),
         ],
     );

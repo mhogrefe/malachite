@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, PowerOf2Digits, SaturatingFrom,
+    ConvertibleFrom, Digits, PowerOf2Digits, SaturatingFrom,
 };
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, triple_3_vec_len_bucketer,
@@ -113,7 +113,7 @@ fn demo_limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
 }
 
 fn demo_to_digits_asc_limb<
-    T: ConvertibleFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: ConvertibleFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -136,7 +136,7 @@ fn demo_to_digits_asc_limb<
 }
 
 fn demo_to_digits_desc_limb<
-    T: ConvertibleFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    T: ConvertibleFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -343,7 +343,7 @@ fn benchmark_limbs_to_digits_small_base_algorithms<T: PrimitiveUnsigned>(
 }
 
 fn benchmark_limbs_to_digits_basecase_algorithms<
-    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -374,7 +374,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
 }
 
 fn benchmark_to_digits_asc_limb<
-    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -399,7 +399,7 @@ fn benchmark_to_digits_asc_limb<
 }
 
 fn benchmark_to_digits_desc_limb<
-    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -453,7 +453,7 @@ fn benchmark_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize, 
     );
 }
 
-fn benchmark_to_digits_asc_algorithms<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>(
+fn benchmark_to_digits_asc_algorithms<T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

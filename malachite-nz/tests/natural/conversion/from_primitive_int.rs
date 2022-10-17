@@ -1,8 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::natural::Natural;
@@ -39,17 +37,17 @@ fn test_from_u64() {
 }
 
 #[test]
-fn test_checked_from_i32() {
+fn test_try_from_i32() {
     let test = |i: i32, out| {
-        let on = Natural::checked_from(i);
+        let on = Natural::try_from(i);
         assert!(on.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(on.to_debug_string(), out);
     };
-    test(0, "Some(0)");
-    test(123, "Some(123)");
-    test(-123, "None");
-    test(i32::MAX, "Some(2147483647)");
-    test(i32::MIN, "None");
+    test(0, "Ok(0)");
+    test(123, "Ok(123)");
+    test(-123, "Err(NaturalFromSignedError)");
+    test(i32::MAX, "Ok(2147483647)");
+    test(i32::MIN, "Err(NaturalFromSignedError)");
 }
 
 #[test]
@@ -103,17 +101,17 @@ fn test_convertible_from_i32() {
 }
 
 #[test]
-fn test_checked_from_i64() {
+fn test_try_from_i64() {
     let test = |i: i64, out| {
-        let on = Natural::checked_from(i);
+        let on = Natural::try_from(i);
         assert!(on.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(on.to_debug_string(), out);
     };
-    test(0, "Some(0)");
-    test(123, "Some(123)");
-    test(-123, "None");
-    test(i64::MAX, "Some(9223372036854775807)");
-    test(i64::MIN, "None");
+    test(0, "Ok(0)");
+    test(123, "Ok(123)");
+    test(-123, "Err(NaturalFromSignedError)");
+    test(i64::MAX, "Ok(9223372036854775807)");
+    test(i64::MIN, "Err(NaturalFromSignedError)");
 }
 
 #[test]
@@ -146,7 +144,7 @@ fn test_convertible_from_i64() {
 fn unsigned_properties<T: PrimitiveUnsigned>()
 where
     Natural: From<T>,
-    for<'a> T: CheckedFrom<&'a Natural>,
+    for<'a> T: TryFrom<&'a Natural>,
     u128: ExactFrom<T>,
 {
     unsigned_gen::<T>().test_properties(|u| {
@@ -161,19 +159,19 @@ where
 #[allow(clippy::type_repetition_in_bounds)]
 fn signed_properties<T: PrimitiveSigned>()
 where
-    Natural: CheckedFrom<T> + ConvertibleFrom<T> + SaturatingFrom<T>,
-    for<'a> T: CheckedFrom<&'a Natural>,
+    Natural: TryFrom<T> + ConvertibleFrom<T> + SaturatingFrom<T>,
+    for<'a> T: TryFrom<&'a Natural>,
     i128: ExactFrom<T>,
 {
     signed_gen::<T>().test_properties(|i| {
-        let on = Natural::checked_from(i);
+        let on = Natural::try_from(i);
         assert!(on.as_ref().map_or(true, Natural::is_valid));
-        assert_eq!(on.is_some(), i >= T::ZERO);
+        assert_eq!(on.is_ok(), i >= T::ZERO);
         assert_eq!(Natural::convertible_from(i), i >= T::ZERO);
         let n = Natural::saturating_from(i);
         assert!(n.is_valid());
         on.as_ref().map_or_else(
-            || {
+            |_| {
                 assert_eq!(n, 0);
             },
             |x| {

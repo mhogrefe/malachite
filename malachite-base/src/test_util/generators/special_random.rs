@@ -18,8 +18,8 @@ use crate::num::conversion::string::options::random::{
 };
 use crate::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use crate::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
-    SplitInHalf, WrappingFrom, WrappingInto,
+    ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom, SplitInHalf,
+    WrappingFrom, WrappingInto,
 };
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
@@ -758,7 +758,7 @@ pub fn special_random_signed_gen_var_6<
 
 pub fn special_random_signed_gen_var_7<
     U: PrimitiveUnsigned + WrappingFrom<S>,
-    S: CheckedFrom<V> + PrimitiveSigned + WrappingFrom<U>,
+    S: TryFrom<NiceFloat<V>> + PrimitiveSigned + WrappingFrom<U>,
     V: PrimitiveFloat + RoundingFrom<S>,
 >(
     config: &GenConfig,
@@ -776,8 +776,8 @@ pub fn special_random_signed_gen_var_7<
                 )
                 .filter_map(|a| {
                     let f = V::rounding_from(a, RoundingMode::Down);
-                    let a = S::checked_from(f)?;
-                    let b = S::checked_from(f.next_higher())?;
+                    let a = S::try_from(NiceFloat(f)).ok()?;
+                    let b = S::try_from(NiceFloat(f.next_higher())).ok()?;
                     let diff = b - a;
                     if diff.even() {
                         // This happens almost always
@@ -799,8 +799,8 @@ pub fn special_random_signed_gen_var_7<
                 )
                 .filter_map(|a| {
                     let f = V::rounding_from(a, RoundingMode::Down);
-                    let a = S::checked_from(f)?;
-                    let b = S::checked_from(f.next_lower())?;
+                    let a = S::try_from(NiceFloat(f)).ok()?;
+                    let b = S::try_from(NiceFloat(f.next_lower())).ok()?;
                     let diff = a - b;
                     if diff.even() {
                         // This happens almost always
@@ -1455,7 +1455,7 @@ pub fn special_random_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveS
 
 pub fn special_random_signed_signed_rounding_mode_triple_gen_var_2<
     U: PrimitiveUnsigned,
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     config: &GenConfig,
 ) -> It<(S, S, RoundingMode)> {
@@ -2749,7 +2749,7 @@ pub fn special_random_unsigned_gen_var_16<
 }
 
 pub fn special_random_unsigned_gen_var_17<
-    T: CheckedFrom<U> + PrimitiveUnsigned,
+    T: TryFrom<NiceFloat<U>> + PrimitiveUnsigned,
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     config: &GenConfig,
@@ -2764,8 +2764,8 @@ pub fn special_random_unsigned_gen_var_17<
         )
         .filter_map(|a| {
             let f = U::rounding_from(a, RoundingMode::Down);
-            let a = T::checked_from(f)?;
-            let b = T::checked_from(f.next_higher())?;
+            let a = T::try_from(NiceFloat(f)).ok()?;
+            let b = T::try_from(NiceFloat(f.next_higher())).ok()?;
             let diff = b - a;
             if diff.even() {
                 // This happens almost always
@@ -4888,7 +4888,7 @@ pub fn special_random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
 }
 
 pub fn special_random_unsigned_quadruple_gen_var_5<
-    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    T: TryFrom<DT> + PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     config: &GenConfig,

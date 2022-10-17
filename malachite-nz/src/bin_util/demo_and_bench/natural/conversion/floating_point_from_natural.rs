@@ -1,11 +1,11 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
+use malachite_nz::natural::conversion::primitive_float_from_natural::PrimitiveFloatFromNaturalError;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::{
     natural_bit_bucketer, pair_1_natural_bit_bucketer,
@@ -16,14 +16,12 @@ use malachite_nz::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_float_rounding_from_natural);
-    register_primitive_float_demos!(runner, demo_float_from_natural);
-    register_primitive_float_demos!(runner, demo_float_checked_from_natural);
+    register_primitive_float_demos!(runner, demo_float_try_from_natural);
     register_primitive_float_demos!(runner, demo_float_exact_from_natural);
     register_primitive_float_demos!(runner, demo_float_convertible_from_natural);
 
     register_primitive_float_benches!(runner, benchmark_float_rounding_from_natural);
-    register_primitive_float_benches!(runner, benchmark_float_from_natural);
-    register_primitive_float_benches!(runner, benchmark_float_checked_from_natural);
+    register_primitive_float_benches!(runner, benchmark_float_try_from_natural);
     register_primitive_float_benches!(runner, benchmark_float_exact_from_natural);
     register_primitive_float_benches!(runner, benchmark_float_convertible_from_natural);
 }
@@ -49,32 +47,19 @@ fn demo_float_rounding_from_natural<
     }
 }
 
-fn demo_float_from_natural<T: for<'a> From<&'a Natural> + PrimitiveFloat>(
+fn demo_float_try_from_natural<
+    T: for<'a> TryFrom<&'a Natural, Error = PrimitiveFloatFromNaturalError> + PrimitiveFloat,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
     for n in natural_gen().get(gm, &config).take(limit) {
         println!(
-            "{}::from(&{}) = {}",
+            "{}::try_from(&{}) = {:?}",
             T::NAME,
             n.clone(),
-            NiceFloat(T::from(&n))
-        );
-    }
-}
-
-fn demo_float_checked_from_natural<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveFloat>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!(
-            "{}::checked_from(&{}) = {:?}",
-            T::NAME,
-            n.clone(),
-            T::checked_from(&n).map(NiceFloat)
+            T::try_from(&n).map(NiceFloat)
         );
     }
 }
@@ -84,7 +69,7 @@ fn demo_float_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFl
     config: GenConfig,
     limit: usize,
 ) where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     for n in natural_gen_var_3::<T>().get(gm, &config).take(limit) {
         println!(
@@ -132,40 +117,21 @@ fn benchmark_float_rounding_from_natural<
     );
 }
 
-#[allow(unused_must_use)]
-fn benchmark_float_from_natural<T: for<'a> From<&'a Natural> + PrimitiveFloat>(
+fn benchmark_float_try_from_natural<T: for<'a> TryFrom<&'a Natural> + PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::from(Natural)", T::NAME),
+        &format!("{}::try_from(Natural)", T::NAME),
         BenchmarkType::Single,
         natural_gen().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &natural_bit_bucketer("n"),
-        &mut [("Malachite", &mut |n| no_out!(T::from(&n)))],
-    );
-}
-
-fn benchmark_float_checked_from_natural<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveFloat>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        &format!("{}::checked_from(Natural)", T::NAME),
-        BenchmarkType::Single,
-        natural_gen().get(gm, &config),
-        gm.name(),
-        limit,
-        file_name,
-        &natural_bit_bucketer("n"),
-        &mut [("Malachite", &mut |n| no_out!(T::checked_from(&n)))],
+        &mut [("Malachite", &mut |n| no_out!(T::try_from(&n).ok()))],
     );
 }
 
@@ -175,7 +141,7 @@ fn benchmark_float_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + Primit
     limit: usize,
     file_name: &str,
 ) where
-    Natural: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     run_benchmark(
         &format!("{}::exact_from(Natural)", T::NAME),

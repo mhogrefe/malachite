@@ -3,7 +3,7 @@ use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, PowerOf2Digits};
+use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::test_util::generators::common::GenConfig;
@@ -335,7 +335,7 @@ where
             let n = Limb::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
             assert_eq!(
                 Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
-                Natural::checked_from(Integer::from(n)).unwrap()
+                Natural::try_from(Integer::from(n)).unwrap()
             );
         },
     );

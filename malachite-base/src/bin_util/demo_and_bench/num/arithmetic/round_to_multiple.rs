@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::test_util::bench::bucketers::triple_1_2_max_bit_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -60,7 +60,7 @@ fn demo_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
 }
 
 fn demo_round_to_multiple_signed<
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
@@ -82,7 +82,7 @@ fn demo_round_to_multiple_signed<
 }
 
 fn demo_round_to_multiple_assign_signed<
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
@@ -147,7 +147,7 @@ fn benchmark_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
 }
 
 fn benchmark_round_to_multiple_signed<
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
@@ -170,7 +170,7 @@ fn benchmark_round_to_multiple_signed<
 }
 
 fn benchmark_round_to_multiple_assign_signed<
-    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+    S: TryFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,

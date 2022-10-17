@@ -1,13 +1,13 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_18, unsigned_rounding_mode_pair_gen_var_2,
 };
+use malachite_nz::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
+use malachite_nz::natural::conversion::primitive_float_from_natural::PrimitiveFloatFromNaturalError;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
@@ -333,138 +333,75 @@ fn f64_rounding_from_natural_fail_3() {
 }
 
 #[test]
-fn test_f32_from_natural() {
-    let test = |n: &str, out| {
+fn test_f32_try_from_natural() {
+    let test = |n: &str, out: Result<f32, PrimitiveFloatFromNaturalError>| {
         assert_eq!(
-            NiceFloat(f32::from(&Natural::from_str(n).unwrap())),
-            NiceFloat(out)
-        );
-    };
-    test("3", 3.0);
-    test("123", 123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("16777216", 1.6777216e7);
-    test("16777218", 1.6777218e7);
-    test("16777217", 1.6777216e7);
-    test("33554432", 3.3554432e7);
-    test("33554436", 3.3554436e7);
-    test("33554433", 3.3554432e7);
-    test("33554434", 3.3554432e7);
-    test("33554435", 3.3554436e7);
-    test("340282346638528859811704183484516925439", 3.4028235e38);
-    test("340282346638528859811704183484516925440", 3.4028235e38);
-    test("340282346638528859811704183484516925441", 3.4028235e38);
-    test(
-        "10000000000000000000000000000000000000000000000000000",
-        3.4028235e38,
-    );
-}
-
-#[test]
-fn test_f64_from_natural() {
-    let test = |n: &str, out| {
-        assert_eq!(
-            NiceFloat(f64::from(&Natural::from_str(n).unwrap())),
-            NiceFloat(out)
-        );
-    };
-    test("3", 3.0);
-    test("123", 123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("9007199254740992", 9.007199254740992e15);
-    test("9007199254740994", 9.007199254740994e15);
-    test("9007199254740993", 9.007199254740992e15);
-    test("18014398509481984", 1.8014398509481984e16);
-    test("18014398509481988", 1.8014398509481988e16);
-    test("18014398509481985", 1.8014398509481984e16);
-    test("18014398509481986", 1.8014398509481984e16);
-    test("18014398509481987", 1.8014398509481988e16);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", 1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", 1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", 1.7976931348623157e308);
-}
-
-#[test]
-fn test_f32_checked_from_natural() {
-    let test = |n: &str, out: Option<f32>| {
-        assert_eq!(
-            f32::checked_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
+            f32::try_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
             out.map(NiceFloat)
         );
     };
-    test("3", Some(3.0));
-    test("123", Some(123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("16777216", Some(1.6777216e7));
-    test("16777218", Some(1.6777218e7));
-    test("16777217", None);
-    test("33554432", Some(3.3554432e7));
-    test("33554436", Some(3.3554436e7));
-    test("33554433", None);
-    test("33554434", None);
-    test("33554435", None);
-    test("340282346638528859811704183484516925439", None);
+    test("3", Ok(3.0));
+    test("123", Ok(123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("16777216", Ok(1.6777216e7));
+    test("16777218", Ok(1.6777218e7));
+    test("16777217", Err(PrimitiveFloatFromNaturalError));
+    test("33554432", Ok(3.3554432e7));
+    test("33554436", Ok(3.3554436e7));
+    test("33554433", Err(PrimitiveFloatFromNaturalError));
+    test("33554434", Err(PrimitiveFloatFromNaturalError));
+    test("33554435", Err(PrimitiveFloatFromNaturalError));
     test(
-        "340282346638528859811704183484516925440",
-        Some(3.4028235e38),
+        "340282346638528859811704183484516925439",
+        Err(PrimitiveFloatFromNaturalError),
     );
-    test("340282346638528859811704183484516925441", None);
+    test("340282346638528859811704183484516925440", Ok(3.4028235e38));
+    test(
+        "340282346638528859811704183484516925441",
+        Err(PrimitiveFloatFromNaturalError),
+    );
     test(
         "10000000000000000000000000000000000000000000000000000",
-        None,
+        Err(PrimitiveFloatFromNaturalError),
     );
 }
 
 #[test]
-fn test_f64_checked_from_natural() {
-    let test = |n: &str, out: Option<f64>| {
+fn test_f64_try_from_natural() {
+    let test = |n: &str, out: Result<f64, PrimitiveFloatFromNaturalError>| {
         assert_eq!(
-            f64::checked_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
+            f64::try_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
             out.map(NiceFloat)
         );
     };
-    test("3", Some(3.0));
-    test("123", Some(123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("9007199254740992", Some(9.007199254740992e15));
-    test("9007199254740994", Some(9.007199254740994e15));
-    test("9007199254740993", None);
-    test("18014398509481984", Some(1.8014398509481984e16));
-    test("18014398509481988", Some(1.8014398509481988e16));
-    test("18014398509481985", None);
-    test("18014398509481986", None);
-    test("18014398509481987", None);
+    test("3", Ok(3.0));
+    test("123", Ok(123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("9007199254740992", Ok(9.007199254740992e15));
+    test("9007199254740994", Ok(9.007199254740994e15));
+    test("9007199254740993", Err(PrimitiveFloatFromNaturalError));
+    test("18014398509481984", Ok(1.8014398509481984e16));
+    test("18014398509481988", Ok(1.8014398509481988e16));
+    test("18014398509481985", Err(PrimitiveFloatFromNaturalError));
+    test("18014398509481986", Err(PrimitiveFloatFromNaturalError));
+    test("18014398509481987", Err(PrimitiveFloatFromNaturalError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", None);
+        8177180919299881250404026184124858367", Err(PrimitiveFloatFromNaturalError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", Some(1.7976931348623157e308));
+        8177180919299881250404026184124858368", Ok(1.7976931348623157e308));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", None);
+        8177180919299881250404026184124858369", Err(PrimitiveFloatFromNaturalError));
 }
 
 #[test]
@@ -658,13 +595,13 @@ fn test_f64_convertible_from_natural() {
 }
 
 fn float_rounding_from_natural_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + RoundingFrom<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError> + RoundingFrom<T>,
 {
     natural_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
         T::rounding_from(&n, rm);
@@ -715,7 +652,6 @@ where
             NiceFloat(f_nearest) == NiceFloat(f_below)
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
         );
-        assert_ne!(Natural::from(f_nearest), n);
     });
 
     natural_gen_var_5::<T>().test_properties(|n| {
@@ -746,72 +682,19 @@ fn float_rounding_from_natural_properties() {
     apply_fn_to_primitive_floats!(float_rounding_from_natural_properties_helper);
 }
 
-fn float_from_natural_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
-        + for<'a> ConvertibleFrom<&'a Natural>
-        + for<'a> From<&'a Natural>
-        + PrimitiveFloat
-        + for<'a> RoundingFrom<&'a Natural>,
->()
-where
-    Natural: CheckedFrom<T> + From<T>,
-{
-    natural_gen().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
-            NiceFloat(f)
-        );
-    });
-
-    natural_gen_var_3::<T>().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(Natural::from(f), n);
-    });
-
-    natural_gen_var_4::<T>().test_properties(|n| {
-        let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        let f_above = f_below.next_higher();
-        let f_nearest = T::from(&n);
-        assert!(
-            NiceFloat(f_nearest) == NiceFloat(f_below)
-                || NiceFloat(f_nearest) == NiceFloat(f_above)
-        );
-        assert_ne!(Natural::from(f_nearest), n);
-    });
-
-    natural_gen_var_5::<T>().test_properties(|n| {
-        let floor = T::rounding_from(&n, RoundingMode::Floor);
-        let ceiling = floor.next_higher();
-        let nearest = T::from(&n);
-        assert_eq!(
-            NiceFloat(nearest),
-            NiceFloat(if floor.to_bits().even() {
-                floor
-            } else {
-                ceiling
-            })
-        );
-    });
-}
-
-#[test]
-fn float_from_natural_properties() {
-    apply_fn_to_primitive_floats!(float_from_natural_properties_helper);
-}
-
-fn float_checked_from_natural_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
+fn float_try_from_natural_properties_helper<
+    T: for<'a> TryFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + RoundingFrom<T>,
     Limb: RoundingFrom<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError> + RoundingFrom<T>,
+    NiceFloat<T>: TryFrom<Limb>,
 {
     natural_gen().test_properties(|n| {
-        T::checked_from(&n);
+        T::try_from(&n).ok();
     });
 
     natural_gen_var_3::<T>().test_properties(|n| {
@@ -824,36 +707,36 @@ where
     });
 
     natural_gen_var_4::<T>().test_properties(|n| {
-        assert!(T::checked_from(&n).is_none());
+        assert!(T::try_from(&n).is_err());
     });
 
     natural_gen_var_5::<T>().test_properties(|n| {
-        assert!(T::checked_from(&n).is_none());
+        assert!(T::try_from(&n).is_err());
     });
 
     unsigned_gen::<Limb>().test_properties(|u| {
-        if let Some(f) = T::checked_from(u) {
+        if let Ok(f) = NiceFloat::<T>::try_from(u) {
             let n: Natural = From::from(u);
-            assert_eq!(NiceFloat(f), NiceFloat(T::exact_from(&n)));
+            assert_eq!(f, NiceFloat(T::exact_from(&n)));
         }
     });
 
     unsigned_gen_var_18::<Limb, T>().test_properties(|u| {
         let n: Natural = From::from(u);
-        assert_eq!(NiceFloat(T::exact_from(u)), NiceFloat(T::exact_from(&n)));
+        assert_eq!(NiceFloat::<T>::exact_from(u), NiceFloat(T::exact_from(&n)));
     });
 }
 
 #[test]
-fn float_checked_from_natural_properties() {
-    apply_fn_to_primitive_floats!(float_checked_from_natural_properties_helper);
+fn float_try_from_natural_properties() {
+    apply_fn_to_primitive_floats!(float_try_from_natural_properties_helper);
 }
 
 fn float_convertible_from_natural_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
+    T: for<'a> TryFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
 >()
 where
-    Natural: CheckedFrom<T> + From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
 {
     natural_gen().test_properties(|n| {
         T::convertible_from(&n);

@@ -1,4 +1,3 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
@@ -35,7 +34,7 @@ fn from_integer_properties() {
         assert!(rational_x_alt.is_valid());
         assert_eq!(rational_x_alt, rational_x);
 
-        assert_eq!(Integer::checked_from(&rational_x).as_ref(), Some(&x));
-        assert_eq!(Integer::checked_from(rational_x), Some(x));
+        assert_eq!(Integer::try_from(&rational_x).as_ref(), Ok(&x));
+        assert_eq!(Integer::try_from(rational_x), Ok(x));
     });
 }

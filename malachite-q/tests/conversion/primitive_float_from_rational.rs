@@ -1,16 +1,16 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_1, integer_rounding_mode_pair_gen_var_1,
 };
+use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
 use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_4, rational_gen_var_5, rational_gen_var_6,
@@ -22,7 +22,7 @@ use std::str::FromStr;
 
 #[test]
 fn test_f32_rounding_from_rational() {
-    let max = Rational::from(f32::MAX_FINITE);
+    let max = Rational::exact_from(f32::MAX_FINITE);
     let test = |s: &str, rm: RoundingMode, out| {
         let u = Rational::from_str(s).unwrap();
         assert_eq!(NiceFloat(f32::rounding_from(&u, rm)), NiceFloat(out));
@@ -811,357 +811,162 @@ fn f64_rounding_from_rational_ref_fail() {
 }
 
 #[test]
-fn test_f32_from_rational() {
-    let test = |s: &str, out| {
+fn test_f32_try_from_rational() {
+    let test = |s: &str, out: Result<f32, PrimitiveFloatFromRationalError>| {
         let u = Rational::from_str(s).unwrap();
-        assert_eq!(NiceFloat(f32::from(&u)), NiceFloat(out));
-        assert_eq!(NiceFloat(f32::from(u)), NiceFloat(out));
+        assert_eq!(f32::try_from(&u).map(NiceFloat), out.map(NiceFloat));
+        assert_eq!(f32::try_from(u.clone()).map(NiceFloat), out.map(NiceFloat));
+        assert_eq!(f32::convertible_from(u), out.is_ok());
     };
-    test("3", 3.0);
-    test("-3", -3.0);
-    test("123", 123.0);
-    test("-123", -123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("-1000000000", -1.0e9);
-    test("16777216", 1.6777216e7);
-    test("-16777216", -1.6777216e7);
-    test("16777218", 1.6777218e7);
-    test("-16777218", -1.6777218e7);
-    test("16777217", 1.6777216e7);
-    test("-16777217", -1.6777216e7);
-    test("33554432", 3.3554432e7);
-    test("-33554432", -3.3554432e7);
-    test("33554436", 3.3554436e7);
-    test("-33554436", -3.3554436e7);
-    test("33554433", 3.3554432e7);
-    test("-33554433", -3.3554432e7);
-    test("33554434", 3.3554432e7);
-    test("-33554434", -3.3554432e7);
-    test("33554435", 3.3554436e7);
-    test("-33554435", -3.3554436e7);
-    test("340282346638528859811704183484516925439", 3.4028235e38);
-    test("-340282346638528859811704183484516925439", -3.4028235e38);
-    test("340282346638528859811704183484516925440", 3.4028235e38);
-    test("-340282346638528859811704183484516925440", -3.4028235e38);
-    test("340282346638528859811704183484516925441", 3.4028235e38);
-    test("-340282346638528859811704183484516925441", -3.4028235e38);
+    test("3", Ok(3.0));
+    test("-3", Ok(-3.0));
+    test("123", Ok(123.0));
+    test("-123", Ok(-123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("-1000000000", Ok(-1.0e9));
+    test("16777216", Ok(1.6777216e7));
+    test("-16777216", Ok(-1.6777216e7));
+    test("16777218", Ok(1.6777218e7));
+    test("-16777218", Ok(-1.6777218e7));
+    test("16777217", Err(PrimitiveFloatFromRationalError));
+    test("-16777217", Err(PrimitiveFloatFromRationalError));
+    test("33554432", Ok(3.3554432e7));
+    test("-33554432", Ok(-3.3554432e7));
+    test("33554436", Ok(3.3554436e7));
+    test("-33554436", Ok(-3.3554436e7));
+    test("33554433", Err(PrimitiveFloatFromRationalError));
+    test("-33554433", Err(PrimitiveFloatFromRationalError));
+    test("33554434", Err(PrimitiveFloatFromRationalError));
+    test("-33554434", Err(PrimitiveFloatFromRationalError));
+    test("33554435", Err(PrimitiveFloatFromRationalError));
+    test("-33554435", Err(PrimitiveFloatFromRationalError));
     test(
-        "10000000000000000000000000000000000000000000000000000",
-        3.4028235e38,
+        "340282346638528859811704183484516925439",
+        Err(PrimitiveFloatFromRationalError),
     );
     test(
-        "-10000000000000000000000000000000000000000000000000000",
-        -3.4028235e38,
+        "-340282346638528859811704183484516925439",
+        Err(PrimitiveFloatFromRationalError),
     );
-
-    test("1/2", 0.5);
-    test("-1/2", -0.5);
-    test("1/3", 0.33333334);
-    test("-1/3", -0.33333334);
-
-    // subnormal
-    test("1/10000000000000000000000000000000000000000", 1.0e-40);
-    test("-1/10000000000000000000000000000000000000000", -1.0e-40);
-    // less than subnormal
-    test("1/100000000000000000000000000000000000000000000000000", 0.0);
-    test(
-        "-1/100000000000000000000000000000000000000000000000000",
-        -0.0,
-    );
-    // half of smallest positive
-    test("1/1427247692705959881058285969449495136382746624", 0.0);
-    test("-1/1427247692705959881058285969449495136382746624", -0.0);
-    // just over half of smallest positive; Nearest rounds up
-    test(
-        "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000",
-        1.0e-45
-    );
-    test(
-        "-88819109620612751463292030150471001/12676506002282294014967032053760000000000000000000000\
-        0000000000000000000000000000",
-        -1.0e-45
-    );
-    // halfway between max subnormal and min normal
-    test(
-        "16777215/1427247692705959881058285969449495136382746624",
-        1.1754944e-38,
-    );
-
-    test("1", 1.0);
-    test("10", 10.0);
-    test("100", 100.0);
-    test("1000", 1000.0);
-    test("10000", 10000.0);
-    test("100000", 100000.0);
-    test("1000000", 1000000.0);
-    test("10000000", 10000000.0);
-    test("100000000", 100000000.0);
-    test("1000000000", 1000000000.0);
-    test("10000000000", 10000000000.0);
-    test("100000000000", 100000000000.0);
-    test("1000000000000", 1000000000000.0);
-    test("10000000000000", 1.0e13);
-    test("100000000000000", 1.0e14);
-    test("1/10", 0.1);
-    test("1/100", 0.01);
-    test("1/1000", 0.001);
-    test("1/10000", 0.0001);
-    test("1/100000", 0.00001);
-    test("1/1000000", 0.000001);
-    test("1/10000000", 1.0e-7);
-    test("1/100000000", 1.0e-8);
-}
-
-#[test]
-fn test_f64_from_rational() {
-    let test = |s: &str, out| {
-        let u = Rational::from_str(s).unwrap();
-        assert_eq!(NiceFloat(f64::from(&u)), NiceFloat(out));
-        assert_eq!(NiceFloat(f64::from(u)), NiceFloat(out));
-    };
-    test("3", 3.0);
-    test("-3", -3.0);
-    test("123", 123.0);
-    test("-123", -123.0);
-    test("0", 0.0);
-    test("1000000000", 1.0e9);
-    test("-1000000000", -1.0e9);
-    test("9007199254740992", 9.007199254740992e15);
-    test("-9007199254740992", -9.007199254740992e15);
-    test("9007199254740994", 9.007199254740994e15);
-    test("-9007199254740994", -9.007199254740994e15);
-    test("9007199254740993", 9.007199254740992e15);
-    test("-9007199254740993", -9.007199254740992e15);
-    test("18014398509481984", 1.8014398509481984e16);
-    test("-18014398509481984", -1.8014398509481984e16);
-    test("18014398509481988", 1.8014398509481988e16);
-    test("-18014398509481988", -1.8014398509481988e16);
-    test("18014398509481985", 1.8014398509481984e16);
-    test("-18014398509481985", -1.8014398509481984e16);
-    test("18014398509481986", 1.8014398509481984e16);
-    test("-18014398509481986", -1.8014398509481984e16);
-    test("18014398509481987", 1.8014398509481988e16);
-    test("-18014398509481987", -1.8014398509481988e16);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367", -1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858368", -1.7976931348623157e308);
-    test(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", 1.7976931348623157e308);
-    test(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369", -1.7976931348623157e308);
-
-    test("1/2", 0.5);
-    test("-1/2", -0.5);
-    test("1/3", 0.3333333333333333);
-    test("-1/3", -0.3333333333333333);
-
-    test("1", 1.0);
-    test("10", 10.0);
-    test("100", 100.0);
-    test("1000", 1000.0);
-    test("10000", 10000.0);
-    test("100000", 100000.0);
-    test("1000000", 1000000.0);
-    test("10000000", 10000000.0);
-    test("100000000", 100000000.0);
-    test("1000000000", 1000000000.0);
-    test("10000000000", 10000000000.0);
-    test("100000000000", 100000000000.0);
-    test("1000000000000", 1000000000000.0);
-    test("10000000000000", 10000000000000.0);
-    test("100000000000000", 100000000000000.0);
-    test("1000000000000000", 1000000000000000.0);
-    test("10000000000000000", 1.0e16);
-    test("100000000000000000", 1.0e17);
-    test("1/10", 0.1);
-    test("1/100", 0.01);
-    test("1/1000", 0.001);
-    test("1/10000", 0.0001);
-    test("1/100000", 0.00001);
-    test("1/1000000", 1.0e-6);
-    test("1/10000000", 1.0e-7);
-    test("1/100000000", 1.0e-8);
-}
-
-#[test]
-fn test_f32_checked_from_rational() {
-    let test = |s: &str, out: Option<f32>| {
-        let u = Rational::from_str(s).unwrap();
-        assert_eq!(f32::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
-        assert_eq!(
-            f32::checked_from(u.clone()).map(NiceFloat),
-            out.map(NiceFloat)
-        );
-        assert_eq!(f32::convertible_from(u), out.is_some());
-    };
-    test("3", Some(3.0));
-    test("-3", Some(-3.0));
-    test("123", Some(123.0));
-    test("-123", Some(-123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("-1000000000", Some(-1.0e9));
-    test("16777216", Some(1.6777216e7));
-    test("-16777216", Some(-1.6777216e7));
-    test("16777218", Some(1.6777218e7));
-    test("-16777218", Some(-1.6777218e7));
-    test("16777217", None);
-    test("-16777217", None);
-    test("33554432", Some(3.3554432e7));
-    test("-33554432", Some(-3.3554432e7));
-    test("33554436", Some(3.3554436e7));
-    test("-33554436", Some(-3.3554436e7));
-    test("33554433", None);
-    test("-33554433", None);
-    test("33554434", None);
-    test("-33554434", None);
-    test("33554435", None);
-    test("-33554435", None);
-    test("340282346638528859811704183484516925439", None);
-    test("-340282346638528859811704183484516925439", None);
-    test(
-        "340282346638528859811704183484516925440",
-        Some(3.4028235e38),
-    );
+    test("340282346638528859811704183484516925440", Ok(3.4028235e38));
     test(
         "-340282346638528859811704183484516925440",
-        Some(-3.4028235e38),
+        Ok(-3.4028235e38),
     );
-    test("340282346638528859811704183484516925441", None);
-    test("-340282346638528859811704183484516925441", None);
+    test(
+        "340282346638528859811704183484516925441",
+        Err(PrimitiveFloatFromRationalError),
+    );
+    test(
+        "-340282346638528859811704183484516925441",
+        Err(PrimitiveFloatFromRationalError),
+    );
     test(
         "10000000000000000000000000000000000000000000000000000",
-        None,
+        Err(PrimitiveFloatFromRationalError),
     );
     test(
         "-10000000000000000000000000000000000000000000000000000",
-        None,
+        Err(PrimitiveFloatFromRationalError),
     );
 
-    test("1/2", Some(0.5));
-    test("-1/2", Some(-0.5));
-    test("1/3", None);
-    test("-1/3", None);
+    test("1/2", Ok(0.5));
+    test("-1/2", Ok(-0.5));
+    test("1/3", Err(PrimitiveFloatFromRationalError));
+    test("-1/3", Err(PrimitiveFloatFromRationalError));
     test(
         "1/713623846352979940529142984724747568191373312",
-        Some(f32::MIN_POSITIVE_SUBNORMAL),
+        Ok(f32::MIN_POSITIVE_SUBNORMAL),
     );
     test(
         "-1/713623846352979940529142984724747568191373312",
-        Some(-f32::MIN_POSITIVE_SUBNORMAL),
+        Ok(-f32::MIN_POSITIVE_SUBNORMAL),
     );
     test(
         "8388607/713623846352979940529142984724747568191373312",
-        Some(f32::MAX_SUBNORMAL),
+        Ok(f32::MAX_SUBNORMAL),
     );
     test(
         "-8388607/713623846352979940529142984724747568191373312",
-        Some(-f32::MAX_SUBNORMAL),
+        Ok(-f32::MAX_SUBNORMAL),
     );
     test(
         "1/85070591730234615865843651857942052864",
-        Some(f32::MIN_POSITIVE_NORMAL),
+        Ok(f32::MIN_POSITIVE_NORMAL),
     );
     test(
         "-1/85070591730234615865843651857942052864",
-        Some(-f32::MIN_POSITIVE_NORMAL),
+        Ok(-f32::MIN_POSITIVE_NORMAL),
     );
 }
 
 #[test]
-fn test_f64_checked_from_rational() {
-    let test = |s: &str, out: Option<f64>| {
+fn test_f64_try_from_rational() {
+    let test = |s: &str, out: Result<f64, PrimitiveFloatFromRationalError>| {
         let u = Rational::from_str(s).unwrap();
-        assert_eq!(f64::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
-        assert_eq!(
-            f64::checked_from(u.clone()).map(NiceFloat),
-            out.map(NiceFloat)
-        );
-        assert_eq!(f64::convertible_from(u), out.is_some());
+        assert_eq!(f64::try_from(&u).map(NiceFloat), out.map(NiceFloat));
+        assert_eq!(f64::try_from(u.clone()).map(NiceFloat), out.map(NiceFloat));
+        assert_eq!(f64::convertible_from(u), out.is_ok());
     };
-    test("3", Some(3.0));
-    test("-3", Some(-3.0));
-    test("123", Some(123.0));
-    test("-123", Some(-123.0));
-    test("0", Some(0.0));
-    test("1000000000", Some(1.0e9));
-    test("-1000000000", Some(-1.0e9));
-    test("9007199254740992", Some(9.007199254740992e15));
-    test("-9007199254740992", Some(-9.007199254740992e15));
-    test("9007199254740994", Some(9.007199254740994e15));
-    test("-9007199254740994", Some(-9.007199254740994e15));
-    test("9007199254740993", None);
-    test("-9007199254740993", None);
-    test("18014398509481984", Some(1.8014398509481984e16));
-    test("-18014398509481984", Some(-1.8014398509481984e16));
-    test("18014398509481988", Some(1.8014398509481988e16));
-    test("-18014398509481988", Some(-1.8014398509481988e16));
-    test("18014398509481985", None);
-    test("-18014398509481985", None);
-    test("18014398509481986", None);
-    test("-18014398509481986", None);
-    test("18014398509481987", None);
-    test("-18014398509481987", None);
+    test("3", Ok(3.0));
+    test("-3", Ok(-3.0));
+    test("123", Ok(123.0));
+    test("-123", Ok(-123.0));
+    test("0", Ok(0.0));
+    test("1000000000", Ok(1.0e9));
+    test("-1000000000", Ok(-1.0e9));
+    test("9007199254740992", Ok(9.007199254740992e15));
+    test("-9007199254740992", Ok(-9.007199254740992e15));
+    test("9007199254740994", Ok(9.007199254740994e15));
+    test("-9007199254740994", Ok(-9.007199254740994e15));
+    test("9007199254740993", Err(PrimitiveFloatFromRationalError));
+    test("-9007199254740993", Err(PrimitiveFloatFromRationalError));
+    test("18014398509481984", Ok(1.8014398509481984e16));
+    test("-18014398509481984", Ok(-1.8014398509481984e16));
+    test("18014398509481988", Ok(1.8014398509481988e16));
+    test("-18014398509481988", Ok(-1.8014398509481988e16));
+    test("18014398509481985", Err(PrimitiveFloatFromRationalError));
+    test("-18014398509481985", Err(PrimitiveFloatFromRationalError));
+    test("18014398509481986", Err(PrimitiveFloatFromRationalError));
+    test("-18014398509481986", Err(PrimitiveFloatFromRationalError));
+    test("18014398509481987", Err(PrimitiveFloatFromRationalError));
+    test("-18014398509481987", Err(PrimitiveFloatFromRationalError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367", None);
+        8177180919299881250404026184124858367", Err(PrimitiveFloatFromRationalError));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367", None);
+        38177180919299881250404026184124858367", Err(PrimitiveFloatFromRationalError));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858368", Some(1.7976931348623157e308));
+        8177180919299881250404026184124858368", Ok(1.7976931348623157e308));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858368", Some(-1.7976931348623157e308));
+        38177180919299881250404026184124858368", Ok(-1.7976931348623157e308));
     test(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369", None);
+        8177180919299881250404026184124858369", Err(PrimitiveFloatFromRationalError));
     test(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369", None);
+        38177180919299881250404026184124858369", Err(PrimitiveFloatFromRationalError));
 
-    test("1/2", Some(0.5));
-    test("-1/2", Some(-0.5));
-    test("1/3", None);
-    test("-1/3", None);
+    test("1/2", Ok(0.5));
+    test("-1/2", Ok(-0.5));
+    test("1/3", Err(PrimitiveFloatFromRationalError));
+    test("-1/3", Err(PrimitiveFloatFromRationalError));
 }
 
 #[test]
@@ -1523,7 +1328,7 @@ fn float_rounding_from_rational_properties_helper<
         + for<'a> RoundingFrom<&'a Rational>,
 >()
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     rational_rounding_mode_pair_gen_var_5::<T>().test_properties(|(n, rm)| {
         let f = T::rounding_from(&n, rm);
@@ -1554,17 +1359,17 @@ where
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Nearest))
         );
-        assert_eq!(Rational::from(f), n);
+        assert_eq!(Rational::exact_from(f), n);
     });
 
     rational_gen_var_5::<T>().test_properties(|n| {
         let f_below = T::rounding_from(&n, RoundingMode::Floor);
         let f_above = f_below.next_higher();
         if f_below.is_finite() {
-            assert!(Rational::from(f_below) < n);
+            assert!(Rational::exact_from(f_below) < n);
         }
         if f_above.is_finite() {
-            assert!(Rational::from(f_above) > n);
+            assert!(Rational::exact_from(f_above) > n);
         }
         assert_eq!(
             NiceFloat(f_above),
@@ -1599,8 +1404,8 @@ where
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
         );
         if f_below.is_finite() && f_above.is_finite() {
-            let below_diff = &n - Rational::from(f_below);
-            let above_diff = Rational::from(f_above) - &n;
+            let below_diff = &n - Rational::exact_from(f_below);
+            let above_diff = Rational::exact_from(f_above) - &n;
             if NiceFloat(f_nearest) == NiceFloat(f_below) {
                 assert!(below_diff <= above_diff);
             } else {
@@ -1624,7 +1429,7 @@ where
     });
 
     integer_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
-        let r: Rational = From::from(&n);
+        let r: Rational = ExactFrom::exact_from(&n);
         assert_eq!(
             NiceFloat(T::rounding_from(r, rm)),
             NiceFloat(T::rounding_from(&n, rm)),
@@ -1636,7 +1441,7 @@ where
 fn float_rounding_from_rational_properties() {
     apply_fn_to_primitive_floats!(float_rounding_from_rational_properties_helper);
 
-    let max = Rational::from(f32::MAX_FINITE);
+    let max = Rational::exact_from(f32::MAX_FINITE);
     rational_gen().test_properties(|x| {
         if x.lt_abs(&max) {
             let f = f32::rounding_from(&x, RoundingMode::Down);
@@ -1655,99 +1460,26 @@ fn float_rounding_from_rational_properties() {
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
-fn float_from_rational_properties_helper<
-    T: for<'a> ConvertibleFrom<&'a Rational>
-        + for<'a> From<&'a Rational>
-        + PrimitiveFloat
-        + for<'a> RoundingFrom<&'a Rational>
-        + RoundingFrom<Rational>,
->()
-where
-    Rational: From<T>,
-{
-    rational_gen().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
-            NiceFloat(f)
-        );
-        assert_eq!(
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Nearest)),
-            NiceFloat(f)
-        );
-        let neg_f = if n == 0 { T::ZERO } else { -f };
-        assert_eq!(NiceFloat(T::from(&-n)), NiceFloat(neg_f));
-    });
-
-    rational_gen_var_4::<T>().test_properties(|n| {
-        let f = T::from(&n);
-        assert_eq!(Rational::from(f), n);
-    });
-
-    rational_gen_var_5::<T>().test_properties(|n| {
-        let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        let f_above = f_below.next_higher();
-        let f_nearest = T::rounding_from(&n, RoundingMode::Nearest);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
-            NiceFloat(f_nearest)
-        );
-        assert!(
-            NiceFloat(f_nearest) == NiceFloat(f_below)
-                || NiceFloat(f_nearest) == NiceFloat(f_above)
-        );
-        if f_below.is_finite() && f_above.is_finite() {
-            let below_diff = &n - Rational::from(f_below);
-            let above_diff = Rational::from(f_above) - &n;
-            if NiceFloat(f_nearest) == NiceFloat(f_below) {
-                assert!(below_diff <= above_diff);
-            } else {
-                assert!(below_diff >= above_diff);
-            }
-        }
-    });
-
-    rational_gen_var_6::<T>().test_properties(|n| {
-        let floor = T::rounding_from(&n, RoundingMode::Floor);
-        let ceiling = floor.next_higher();
-        let nearest = T::from(&n);
-        assert_eq!(
-            NiceFloat(nearest),
-            NiceFloat(if floor.to_bits().even() {
-                floor
-            } else {
-                ceiling
-            })
-        );
-    });
-}
-
-#[test]
-fn float_from_rational_properties() {
-    apply_fn_to_primitive_floats!(float_from_rational_properties_helper);
-}
-
-#[allow(clippy::trait_duplication_in_bounds)]
-fn float_checked_from_rational_properties_helper<
-    T: CheckedFrom<Rational>
-        + for<'a> CheckedFrom<&'a Integer>
-        + for<'a> CheckedFrom<&'a Rational>
+fn float_try_from_rational_properties_helper<
+    T: TryFrom<Rational, Error = PrimitiveFloatFromRationalError>
+        + for<'a> TryFrom<&'a Integer>
+        + for<'a> TryFrom<&'a Rational, Error = PrimitiveFloatFromRationalError>
         + for<'a> ConvertibleFrom<&'a Rational>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Rational>,
 >()
 where
-    Natural: From<T>,
-    Rational: From<T>,
+    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Rational: TryFrom<T>,
 {
     rational_gen().test_properties(|n| {
-        let of = T::checked_from(&n);
+        let of = T::try_from(&n);
         assert_eq!(
-            T::checked_from(n.clone()).map(NiceFloat),
+            T::try_from(n.clone()).map(NiceFloat),
             of.map(|f| NiceFloat(f))
         );
         assert_eq!(
-            T::checked_from(-&n).map(NiceFloat),
+            T::try_from(-&n).map(NiceFloat),
             of.map(|f| NiceFloat(if n == 0 { T::ZERO } else { -f }))
         );
     });
@@ -1758,20 +1490,20 @@ where
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Exact))
         );
-        assert_eq!(Rational::from(f), n);
+        assert_eq!(Rational::exact_from(f), n);
     });
 
     rational_gen_var_5::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::try_from(n).is_err());
     });
 
     rational_gen_var_6::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::try_from(n).is_err());
     });
 
     integer_gen().test_properties(|n| {
-        if let Some(f) = T::checked_from(&n) {
-            let rn: Rational = From::from(n);
+        if let Ok(f) = T::try_from(&n) {
+            let rn: Rational = From::from(&n);
             assert_eq!(NiceFloat(f), NiceFloat(T::exact_from(rn)));
         }
     });
@@ -1783,8 +1515,8 @@ where
 }
 
 #[test]
-fn float_checked_from_rational_properties() {
-    apply_fn_to_primitive_floats!(float_checked_from_rational_properties_helper);
+fn float_try_from_rational_properties() {
+    apply_fn_to_primitive_floats!(float_try_from_rational_properties_helper);
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -1795,7 +1527,7 @@ fn float_convertible_from_rational_properties_helper<
         + PrimitiveFloat,
 >()
 where
-    Rational: From<T>,
+    Rational: TryFrom<T>,
 {
     rational_gen().test_properties(|n| {
         assert_eq!(T::convertible_from(&n), T::convertible_from(-n));
@@ -1814,7 +1546,7 @@ where
     });
 
     integer_gen().test_properties(|n| {
-        let rn: Rational = From::from(&n);
+        let rn: Rational = ExactFrom::exact_from(&n);
         assert_eq!(T::convertible_from(&n), T::convertible_from(&rn));
     });
 }

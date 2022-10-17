@@ -21,8 +21,6 @@ impl<'a> DivisibleByPowerOf2 for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;

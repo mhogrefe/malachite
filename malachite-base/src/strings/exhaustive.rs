@@ -22,8 +22,6 @@ use crate::vecs::exhaustive::{
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
 ///
@@ -62,8 +60,6 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings;
 ///
@@ -94,8 +90,6 @@ pub fn lex_fixed_length_strings(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings_using_chars;
 ///
@@ -122,8 +116,6 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings;
 ///
@@ -164,8 +156,6 @@ pub fn exhaustive_fixed_length_strings(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
 ///
@@ -209,8 +199,6 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::shortlex_strings;
 ///
@@ -244,8 +232,6 @@ pub fn shortlex_strings(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 ///
@@ -280,8 +266,6 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::exhaustive::exhaustive_strings;
 ///

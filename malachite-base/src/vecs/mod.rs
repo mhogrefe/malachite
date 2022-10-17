@@ -180,8 +180,6 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_values_from_vec;
@@ -239,8 +237,6 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive_vec_permutations;
 ///
@@ -296,8 +292,6 @@ impl<T: Clone> Iterator for RandomVecPermutations<T> {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_vec_permutations;
@@ -327,8 +321,6 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// # lex_vecs_length_2
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::lex_vecs_length_2;
 ///
@@ -355,8 +347,6 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// # lex_vecs_fixed_length_2_inputs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -406,8 +396,6 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// # exhaustive_vecs_length_2
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_2;
 ///
@@ -434,8 +422,6 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// # exhaustive_vecs_fixed_length_2_inputs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -493,8 +479,6 @@ pub mod exhaustive;
 ///
 /// # random_vecs_length_2
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -536,8 +520,6 @@ pub mod exhaustive;
 ///
 /// # random_vecs_fixed_length_2_inputs
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::random::EXAMPLE_SEED;

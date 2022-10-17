@@ -354,13 +354,15 @@ pub fn from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: Pri
     let mut raw_mantissa = sci_mantissa.raw_mantissa();
     raw_mantissa.set_bit(U::MANTISSA_WIDTH);
     if sci_exponent >= U::MANTISSA_WIDTH {
-        T::checked_from(raw_mantissa)?.arithmetic_checked_shl(sci_exponent - U::MANTISSA_WIDTH)
+        T::try_from(raw_mantissa)
+            .ok()?
+            .arithmetic_checked_shl(sci_exponent - U::MANTISSA_WIDTH)
     } else {
         let shift = U::MANTISSA_WIDTH - sci_exponent;
         if rm == RoundingMode::Exact && TrailingZeros::trailing_zeros(raw_mantissa) < shift {
             return None;
         }
-        T::checked_from(raw_mantissa.shr_round(shift, rm))
+        T::try_from(raw_mantissa.shr_round(shift, rm)).ok()
     }
 }
 

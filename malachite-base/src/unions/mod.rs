@@ -181,8 +181,6 @@ union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 ///
 /// # lex_union2s
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::unions::exhaustive::lex_union2s;
@@ -204,8 +202,6 @@ union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 ///
 /// # exhaustive_union2s
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::unions::exhaustive::exhaustive_union2s;
@@ -229,8 +225,6 @@ pub mod exhaustive;
 ///
 /// # random_union2s
 /// ```
-/// extern crate itertools;
-///
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;

@@ -3,25 +3,34 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::conversion::primitive_int_from_natural::{
+    SignedFromNaturalError, UnsignedFromNaturalError,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
 
 #[test]
-fn test_u32_checked_from_natural() {
+fn test_u32_try_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::checked_from(&Natural::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
+        assert_eq!(u32::try_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            rug::Integer::from_str(n)
+                .unwrap()
+                .to_u32()
+                .ok_or(UnsignedFromNaturalError),
+            out
+        );
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("1000000000000", None);
-    test("4294967295", Some(u32::MAX));
-    test("4294967296", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("1000000000000", Err(UnsignedFromNaturalError));
+    test("4294967295", Ok(u32::MAX));
+    test("4294967296", Err(UnsignedFromNaturalError));
 }
 
 #[test]
@@ -97,17 +106,23 @@ fn test_u32_convertible_from_natural() {
 }
 
 #[test]
-fn test_u64_checked_from_natural() {
+fn test_u64_try_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::checked_from(&Natural::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64(), out);
+        assert_eq!(u64::try_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            rug::Integer::from_str(n)
+                .unwrap()
+                .to_u64()
+                .ok_or(UnsignedFromNaturalError),
+            out
+        );
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("1000000000000", Some(1000000000000));
-    test("1000000000000000000000000", None);
-    test("18446744073709551615", Some(u64::MAX));
-    test("18446744073709551616", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("1000000000000", Ok(1000000000000));
+    test("1000000000000000000000000", Err(UnsignedFromNaturalError));
+    test("18446744073709551615", Ok(u64::MAX));
+    test("18446744073709551616", Err(UnsignedFromNaturalError));
 }
 
 #[test]
@@ -184,16 +199,22 @@ fn test_u64_convertible_from_natural() {
 }
 
 #[test]
-fn test_i32_checked_from_natural() {
+fn test_i32_try_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::checked_from(&Natural::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
+        assert_eq!(i32::try_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            rug::Integer::from_str(n)
+                .unwrap()
+                .to_i32()
+                .ok_or(SignedFromNaturalError),
+            out
+        );
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("1000000000000", None);
-    test("2147483647", Some(i32::MAX));
-    test("2147483648", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("1000000000000", Err(SignedFromNaturalError));
+    test("2147483647", Ok(i32::MAX));
+    test("2147483648", Err(SignedFromNaturalError));
 }
 
 #[test]
@@ -269,16 +290,22 @@ fn test_i32_convertible_from_natural() {
 }
 
 #[test]
-fn test_i64_checked_from_natural() {
-    let test = |n, out| {
-        assert_eq!(i64::checked_from(&Natural::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64(), out);
+fn test_i64_try_from_natural() {
+    let test = |n, out: Result<i64, SignedFromNaturalError>| {
+        assert_eq!(i64::try_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            rug::Integer::from_str(n)
+                .unwrap()
+                .to_i64()
+                .ok_or(SignedFromNaturalError),
+            out
+        );
     };
-    test("0", Some(0));
-    test("123", Some(123));
-    test("1000000000000000000000000", None);
-    test("9223372036854775807", Some(i64::MAX));
-    test("9223372036854775808", None);
+    test("0", Ok(0));
+    test("123", Ok(123));
+    test("1000000000000000000000000", Err(SignedFromNaturalError));
+    test("9223372036854775807", Ok(i64::MAX));
+    test("9223372036854775808", Err(SignedFromNaturalError));
 }
 
 #[test]
@@ -382,7 +409,7 @@ where
 }
 
 fn unsigned_properties<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural, Error = UnsignedFromNaturalError>
         + for<'a> OverflowingFrom<&'a Natural>
         + PartialEq<Natural>
         + PrimitiveUnsigned
@@ -392,15 +419,15 @@ where
     Natural: From<T>,
 {
     natural_gen().test_properties(|x| {
-        let result = T::checked_from(&x);
+        let result = T::try_from(&x);
         if x.significant_bits() <= T::WIDTH {
             assert_eq!(Natural::from(result.unwrap()), x);
-            assert_eq!(result, Some(T::wrapping_from(&x)));
-            assert_eq!(result, Some(T::exact_from(&x)));
+            assert_eq!(result, Ok(T::wrapping_from(&x)));
+            assert_eq!(result, Ok(T::exact_from(&x)));
         } else {
-            assert!(result.is_none());
+            assert!(result.is_err());
         }
-        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+        assert_eq!(result.is_err(), T::overflowing_from(&x).1);
 
         let result = T::wrapping_from(&x);
         assert_eq!(result, T::exact_from(&(&x).mod_power_of_2(T::WIDTH)));
@@ -408,7 +435,7 @@ where
 }
 
 fn signed_properties<
-    T: for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> TryFrom<&'a Natural, Error = SignedFromNaturalError>
         + for<'a> OverflowingFrom<&'a Natural>
         + PartialEq<Natural>
         + PrimitiveSigned
@@ -418,15 +445,15 @@ where
     Natural: ExactFrom<T>,
 {
     natural_gen().test_properties(|x| {
-        let result = T::checked_from(&x);
+        let result = T::try_from(&x);
         if x >= 0 && x.significant_bits() < T::WIDTH {
             assert_eq!(Natural::exact_from(result.unwrap()), x);
-            assert_eq!(result, Some(T::wrapping_from(&x)));
-            assert_eq!(result, Some(T::exact_from(&x)));
+            assert_eq!(result, Ok(T::wrapping_from(&x)));
+            assert_eq!(result, Ok(T::exact_from(&x)));
         } else {
-            assert!(result.is_none());
+            assert!(result.is_err());
         }
-        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+        assert_eq!(result.is_err(), T::overflowing_from(&x).1);
     });
 }
 

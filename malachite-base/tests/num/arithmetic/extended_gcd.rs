@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::extended_gcd::extended_gcd_unsigned_binary;
 use malachite_base::num::arithmetic::traits::{ExtendedGcd, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen, unsigned_gen, unsigned_pair_gen_var_27,
 };
@@ -102,7 +102,7 @@ fn test_extended_gcd() {
 
 fn extended_gcd_properties_helper_unsigned<
     U: ExtendedGcd<Cofactor = S> + PrimitiveUnsigned + WrappingFrom<S>,
-    S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+    S: TryFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >() {
     unsigned_pair_gen_var_27::<U>().test_properties(|(a, b)| {
         let (gcd, x, y) = a.extended_gcd(b);
@@ -113,9 +113,7 @@ fn extended_gcd_properties_helper_unsigned<
                 .wrapping_add(S::wrapping_from(b).wrapping_mul(y)),
             S::wrapping_from(gcd)
         );
-        if let (Some(a), Some(b), Some(gcd)) =
-            (S::checked_from(a), S::checked_from(b), S::checked_from(gcd))
-        {
+        if let (Ok(a), Ok(b), Ok(gcd)) = (S::try_from(a), S::try_from(b), S::try_from(gcd)) {
             if let (Some(ax), Some(by)) = (a.checked_mul(x), b.checked_mul(y)) {
                 assert_eq!(ax + by, gcd);
             }
@@ -152,7 +150,7 @@ fn extended_gcd_properties_helper_unsigned<
 }
 
 fn extended_gcd_properties_helper_signed<
-    U: CheckedFrom<S> + PrimitiveUnsigned,
+    U: TryFrom<S> + PrimitiveUnsigned,
     S: ExtendedGcd<Gcd = U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >() {
     signed_pair_gen::<S>().test_properties(|(a, b)| {
