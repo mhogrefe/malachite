@@ -15,6 +15,7 @@ use malachite_base::test_util::generators::{
 use std::fmt::Debug;
 use std::panic::catch_unwind;
 
+#[allow(clippy::needless_pass_by_value)]
 #[test]
 pub fn test_try_from() {
     fn test_double_primitive_int<

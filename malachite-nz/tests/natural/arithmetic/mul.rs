@@ -1492,10 +1492,10 @@ fn test_limbs_mul_greater_to_out_toom_22() {
     let test = |xs: &[Limb], ys: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut scratch = vec![0; limbs_mul_greater_to_out_toom_22_scratch_len(xs.len(), ys.len())];
         let mut out = out_before.to_vec();
-        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+        limbs_mul_greater_to_out_toom_22(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // s != n
@@ -2717,11 +2717,11 @@ fn limbs_mul_greater_to_out_toom_44_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_52() {
     let test = |xs: &[Limb], ys: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
-        limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+        limbs_mul_greater_to_out_toom_52(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // degree.even() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
@@ -3319,11 +3319,11 @@ fn limbs_mul_greater_to_out_toom_54_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_62() {
     let test = |xs: &[Limb], ys: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
-        limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
+        limbs_mul_greater_to_out_toom_62(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // degree.odd() in limbs_mul_toom_evaluate_poly_in_1and_neg_1

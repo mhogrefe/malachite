@@ -1,6 +1,17 @@
 - [crates.io](https://crates.io/crates/malachite-nz)
 - [docs.rs](https://docs.rs/malachite-base/latest/malachite_nz/)
 
+Rather than using this crate directly, use the
+[`malachite`](https://crates.io/crates/malachite) meta-crate. It re-exports all of this crate's
+public members.
+
+In `malachite-nz`'s doctests you will frequently see import paths beginning with
+`malachite_nz::`. When using the `malachite` crate, replace this part of the paths with
+`malachite::`.
+
+The import paths of the `Natural` and `Integer` types are shortened further, to
+`malachite::Natural` and `malachite::Integer`.
+
 # malachite-nz
 This crate defines
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s
@@ -129,6 +140,7 @@ browsing through
 
 # Features
 - `32_bit_limbs`: Sets the type of `Limb` to [`u32`](https://doc.rust-lang.org/nightly/std/primitive.u32.html) instead of the default, [`u64`](https://doc.rust-lang.org/nightly/std/primitive.u64.html).
+- `enable_serde`: Enables serialization and deserialization using [serde](`https://serde.rs/`).
 - `test_build`: A large proportion of the code in this crate is only used for testing. For a
   typical user, building this code would result in an unnecessarily long compilation time and
   an unnecessarily large binary. Some of it is also used for testing

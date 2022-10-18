@@ -1,6 +1,16 @@
 - [crates.io](https://crates.io/crates/malachite-q)
 - [docs.rs](https://docs.rs/malachite-base/latest/malachite_q/)
 
+Rather than using this crate directly, use the
+[`malachite`](https://crates.io/crates/malachite) meta-crate. It re-exports all of this crate's
+public members.
+
+In `malachite-q`'s doctests you will frequently see import paths beginning with
+`malachite_q::`. When using the `malachite` crate, replace this part of the paths with
+`malachite::`.
+
+The import path of the `Rational` type is shortened further, to `malachite::Rational`.
+
 # malachite-q
 This crate defines
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The name of
@@ -63,6 +73,7 @@ browsing through
 - `32_bit_limbs`: Sets the type of `Limb` to
   [`u32`](https://doc.rust-lang.org/nightly/std/primitive.u32.html) instead of the default,
   [`u64`](https://doc.rust-lang.org/nightly/std/primitive.u64.html).
+- `enable_serde`: Enables serialization and deserialization using [serde](`https://serde.rs/`).
 - `test_build`: A large proportion of the code in this crate is only used for testing. For a
   typical user, building this code would result in an unnecessarily long compilation time and
   an unnecessarily large binary. My solution is to only build this code when the `test_build`

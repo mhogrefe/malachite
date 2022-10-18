@@ -1,6 +1,6 @@
 [package]
 name = "malachite-q"
-version = "0.2.6"
+version = "0.3.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -22,8 +22,8 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = "0.9.0"
-malachite-base = {path = "../malachite-base"}
-malachite-nz = { path = "../malachite-nz", features = ["serde"] }
+malachite-base = "0.3.0"
+malachite-nz = "0.3.0"
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 serde_json = { version = "^1.0.32", optional = true }
@@ -31,13 +31,10 @@ num = { version = "0.4.0", optional = true, features = ["serde"] }
 rug = { version = "1.16.0", default-features = false, optional = true, features = ["rational", "serde"] }
 
 [features]
+enable_serde = ["serde", "malachite-nz/enable_serde"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs"]
 test_build = ["malachite-base/test_build", "malachite-nz/test_build", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
-
-[profile.release]
-lto = true
-strip = true
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]

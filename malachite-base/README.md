@@ -1,6 +1,14 @@
 - [crates.io](https://crates.io/crates/malachite-base)
 - [docs.rs](https://docs.rs/malachite-base/latest/malachite_base/)
 
+Rather than using this crate directly, use the
+[`malachite`](https://crates.io/crates/malachite) meta-crate. It re-exports all of this crate's
+public members.
+
+In `malachite-base`'s doctests you will frequently see import paths beginning with
+`malachite_base::`. When using the `malachite` crate, replace this part of the paths with
+`malachite::`.
+
 # malachite-base
 This crate contains many utilities that are used by the
 [`malachite-nz`](https://crates.io/crates/malachite-nz) and

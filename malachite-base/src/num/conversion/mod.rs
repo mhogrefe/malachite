@@ -8,17 +8,17 @@ pub mod digits;
 /// # try_from
 /// ```
 /// use malachite_base::num::conversion::from::{
-///     PrimitiveFloatFromomUnsignedError,
-///     PrimitiveFloatFromomSignedError,
+///     PrimitiveFloatFromUnsignedError,
+///     PrimitiveFloatFromSignedError,
 ///     SignedFromFloatError,
 ///     UnsignedFromFloatError
 /// };
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(NiceFloat::<f32>::try_from(100u8), Ok(NiceFloat(100.0)));
-/// assert_eq!(NiceFloat::<f32>::try_from(u32::MAX), Err(PrimitiveFloatFromomUnsignedError));
+/// assert_eq!(NiceFloat::<f32>::try_from(u32::MAX), Err(PrimitiveFloatFromUnsignedError));
 /// assert_eq!(NiceFloat::<f32>::try_from(100i8), Ok(NiceFloat(100.0)));
-/// assert_eq!(NiceFloat::<f32>::try_from(i32::MAX), Err(PrimitiveFloatFromomSignedError));
+/// assert_eq!(NiceFloat::<f32>::try_from(i32::MAX), Err(PrimitiveFloatFromSignedError));
 ///
 /// assert_eq!(u8::try_from(NiceFloat(100.0f32)), Ok(100));
 /// assert_eq!(

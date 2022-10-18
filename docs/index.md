@@ -6,9 +6,64 @@ Malachite is an arbitrary-precision arithmetic library for [Rust](https://www.ru
 achieves high performance in part by using algorithms derived from [GMP](https://gmplib.org/) and
 [FLINT](https://www.flintlib.org/).
 
-See [here](/performance) for a performance comparison against other libraries.
+```rust
+use malachite::num::arithmetic::traits::Factorial;
+use malachite::Natural;
 
-Malachite comes in three crates.
+fn main() {
+    println!("{}", Natural::factorial(100));
+}
+```
+The code above outputs the following:
+```
+93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000
+```
+You have to scroll to see the entire output.
+
+Here's a more complex example, calculating the negative-one-millionth power of 3 and displaying the
+result with 30 digits of precision.
+
+```rust
+use malachite::num::arithmetic::traits::Pow;
+use malachite::num::conversion::string::options::ToSciOptions;
+use malachite::num::conversion::traits::ToSci;
+use malachite::Rational;
+
+fn main() {
+    let mut options = ToSciOptions::default();
+    options.set_precision(30);
+    println!("{}", Rational::from(3).pow(-1_000_000i64).to_sci_with_options(options));
+}
+```
+The output is this:
+```
+5.56263209915712886588211486263e-477122
+```
+Every digit is correct, except that the least-significant digit was rounded up from 2. The default
+rounding mode,
+[`Nearest`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html#variant.Nearest),
+uses [bankers' rounding](https://en.wikipedia.org/wiki/Rounding#Round_half_to_even), but you may
+specify different rounding behavior via the options parameter.
+
+Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
+performance comparison against other libraries.
+
+To use Malachite, add the following to your project's `Cargo.toml` file:
+```yaml
+[dependencies.malachite]
+version = "0.3.0"
+```
+
+By default, all of Malachite's features are included, but you can opt out of some of them. For
+example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
+```yaml
+[dependencies.malachite]
+version = "0.3.0"
+default-features = false
+features = [ "naturals_and_integers" ]
+```
+
+The `malachite` crate re-exports three sub-crates.
 - **malachite-base** ([crates.io](https://crates.io/crates/malachite-base),
   [docs.rs](https://docs.rs/malachite-base/latest/malachite_base/)) is a collection of utilities
   supporting the other crates. It includes
@@ -45,6 +100,8 @@ Malachite comes in three crates.
   - Various functions for logic and bit manipulation, like
     [`BitAnd`](https://doc.rust-lang.org/nightly/core/ops/trait.BitAnd.html) and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
+  If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
+  `naturals_and_integers` or `malachite-nz` feature.
 - **malachite-q** ([crates.io](https://crates.io/crates/malachite-q),
   [docs.rs](https://docs.rs/malachite-q/latest/malachite_q/)) defines
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The
@@ -57,6 +114,8 @@ Malachite comes in three crates.
   - Functions for expressing
     [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s in
     scientific notation.
+  If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
+  `rationals` or `malachite-q` feature.
 
 Malachite is under active development, with many more types and features planned for the future.
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that

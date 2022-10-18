@@ -1,0 +1,16 @@
+[package]
+name = "malachite"
+version = "0.3.0"
+edition = "2021"
+
+[dependencies]
+malachite-base = "0.3.0"
+malachite-nz = { version = "0.3.0", optional = true }
+malachite-q = { version = "0.3.0", optional = true }
+serde = { version = "^1.0.0", optional = true, features = ["derive"] }
+
+[features]
+default = [ "naturals_and_integers", "rationals" ]
+enable_serde = [ "malachite-q/enable_serde", "malachite-nz/enable_serde" ]
+naturals_and_integers = [ "malachite-nz" ]
+rationals = [ "malachite-q" ]

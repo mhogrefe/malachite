@@ -1,5 +1,5 @@
 [workspace]
-members = ['malachite-base', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
+members = ['malachite', 'malachite-base', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
 
 [profile.release]
 lto = true
