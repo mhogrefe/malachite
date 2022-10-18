@@ -1,7 +1,16 @@
 [package]
 name = "malachite"
 version = "0.3.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+rust-version = "1.61.0"
 edition = "2021"
+description = "Arbitrary-precision arithmetic, with efficient algorithms partially derived from GMP and FLINT"
+readme = "../README.md"
+homepage = "https://malachite.rs/"
+repository = "https://github.com/mhogrefe/malachite"
+license = "LGPL-3.0-only"
+keywords = ["mathematics", "math", "numerics", "bignum"]
+categories = ["mathematics"]
 
 [dependencies]
 malachite-base = "0.3.0"
