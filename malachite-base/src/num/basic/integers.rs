@@ -12,16 +12,16 @@ use crate::num::arithmetic::traits::{
     OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
     OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
     OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowAssign,
-    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RoundToMultiple, RoundToMultipleAssign,
-    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign,
-    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
-    SaturatingPowAssign, SaturatingSquare, SaturatingSquareAssign, SaturatingSub,
-    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
-    ShrRound, ShrRoundAssign, Sign, Square, SquareAssign, SubMul, SubMulAssign, WrappingAdd,
-    WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign,
-    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign,
-    WrappingSquare, WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
-    WrappingSubMulAssign,
+    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RotateLeft, RotateLeftAssign, RotateRight,
+    RotateRightAssign, RoundToMultiple, RoundToMultipleAssign, RoundToMultipleOfPowerOf2,
+    RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
+    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingPowAssign,
+    SaturatingSquare, SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, Square,
+    SquareAssign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul,
+    WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
+    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign, WrappingSquare,
+    WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use crate::num::basic::traits::{Iverson, One, Two, Zero};
 use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
@@ -252,6 +252,10 @@ pub trait PrimitiveInt:
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>
     + RemPowerOf2Assign
+    + RotateLeft<Output = Self>
+    + RotateLeftAssign
+    + RotateRight<Output = Self>
+    + RotateRightAssign
     + RoundToMultiple<Self, Output = Self>
     + RoundToMultipleAssign<Self>
     + RoundToMultipleOfPowerOf2<u64, Output = Self>

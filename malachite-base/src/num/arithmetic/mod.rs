@@ -2523,6 +2523,44 @@ pub mod power_of_2;
 /// assert_eq!(x, 158);
 /// ```
 pub mod root;
+/// [`RotateLeft`](traits::RotateLeft), [`RotateLeftAssign`](traits::RotateLeftAssign),
+/// [`RotateRight`](traits::RotateRight), and [`RotateRightAssign`](traits::RotateRightAssign),
+/// traits for rotating a number's bits.
+///
+/// # rotate_left_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::RotateLeftAssign;
+///
+/// let mut x: u32 = 0xabcd6789;
+/// x.rotate_left_assign(4);
+/// assert_eq!(x, 0xbcd6789a);
+///
+/// x = 0xabcd6789;
+/// x.rotate_left_assign(32);
+/// assert_eq!(x, 0xabcd6789);
+///
+/// x = 0xabcd6789;
+/// x.rotate_left_assign(36);
+/// assert_eq!(x, 0xbcd6789a);
+/// ```
+///
+/// # rotate_right_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::RotateRightAssign;
+///
+/// let mut x: u32 = 0xabcd6789;
+/// x.rotate_right_assign(4);
+/// assert_eq!(x, 0x9abcd678);
+///
+/// x = 0xabcd6789;
+/// x.rotate_right_assign(32);
+/// assert_eq!(x, 0xabcd6789);
+///
+/// x = 0xabcd6789;
+/// x.rotate_right_assign(36);
+/// assert_eq!(x, 0x9abcd678);
+/// ```
+pub mod rotate;
 /// [`RoundToMultiple`](traits::RoundToMultiple) and
 /// [`RoundToMultipleAssign`](traits::RoundToMultipleAssign), traits for rounding a number to a
 /// multiple of another number.

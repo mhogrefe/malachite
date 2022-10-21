@@ -303,9 +303,6 @@ pub mod natural {
         pub mod exhaustive_naturals;
         pub mod exhaustive_positive_naturals;
     }
-    pub mod factorization {
-        pub mod prime_sieve;
-    }
     pub mod logic {
         pub mod and;
         pub mod assign_bit;

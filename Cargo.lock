@@ -412,7 +412,7 @@ version = "0.3.0"
 dependencies = [
  "embed-doc-image",
  "itertools 0.9.0",
- "malachite-base 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.3.0",
  "num",
  "rug",
  "serde",

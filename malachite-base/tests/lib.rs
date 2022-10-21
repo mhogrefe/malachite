@@ -239,6 +239,7 @@ pub mod num {
         pub mod pow;
         pub mod power_of_2;
         pub mod root;
+        pub mod rotate;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_2;
         pub mod saturating_abs;
@@ -368,6 +369,9 @@ pub mod num {
         pub mod primitive_floats_increasing;
         pub mod primitive_int_increasing_inclusive_range;
         pub mod primitive_int_increasing_range;
+    }
+    pub mod factorization {
+        pub mod prime_sieve;
     }
     pub mod float {
         pub mod basic {

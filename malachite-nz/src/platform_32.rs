@@ -387,13 +387,6 @@ pub const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
     (4, 0x1fffffff, 0xffffffff, 0x8, 0x0),                // 256
 ];
 
-pub const SIEVE_SEED: Limb = 0x69128480;
-// 70bits pre-sieved mask for primes 5, 7
-pub const SIEVE_MASK1: Limb = 0x12148960;
-pub const SIEVE_MASK2: Limb = 0x44a120cc;
-pub const SIEVE_MASKT: Limb = 0x1a;
-pub const SEED_LIMIT: u64 = 120;
-
 // This section is created by factorial_data.rs.
 
 // This is equivalent to `__gmp_oddfac_table` in `mpn/comb_tables.c`, GMP 6.2.1, which is the

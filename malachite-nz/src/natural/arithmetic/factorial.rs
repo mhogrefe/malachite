@@ -5,9 +5,6 @@ use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
-use crate::natural::factorization::prime_sieve::{
-    id_to_n, limbs_prime_sieve, limbs_prime_sieve_size, n_to_bit,
-};
 use crate::natural::Natural;
 use crate::platform::{
     Limb, NTH_ROOT_NUMB_MASK_TABLE, ODD_DOUBLEFACTORIAL_TABLE_LIMIT, ODD_DOUBLEFACTORIAL_TABLE_MAX,
@@ -20,6 +17,11 @@ use malachite_base::num::arithmetic::traits::{
     XMulYToZZ,
 };
 use malachite_base::num::basic::traits::One;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
+use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
 use malachite_base::num::logic::traits::{BitAccess, CountOnes, NotAssign, SignificantBits};
 
 pub_test! {subfactorial_naive(n: u64) -> Natural {
@@ -282,15 +284,19 @@ pub_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             // Factorial!".
             let mut size = (n >> Limb::LOG_WIDTH) + 4;
             let n_m_1 = u64::exact_from(n - 1);
-            assert!(limbs_prime_sieve_size(n_m_1) < size - (size >> 1));
+            assert!(limbs_prime_sieve_size::<Limb>(n_m_1) < size - (size >> 1));
             // 2-multiswing(n) < 2^(n - 1) * sqrt(n / pi) < 2 ^ (n + Limb::WIDTH);
             // One more can be overwritten by mul, another for the sieve.
             let mut swing_and_sieve = vec![0; size];
             // Put the sieve on the second half; it will be overwritten by the last
             // `limbs_2_multiswing_odd`.
             let sieve_offset = (size >> 1) + 1;
+            #[cfg(feature = "32_bit_limbs")]
+            let count = limbs_prime_sieve_u32(&mut swing_and_sieve[sieve_offset..], n_m_1);
+            #[cfg(not(feature = "32_bit_limbs"))]
+            let count = limbs_prime_sieve_u64(&mut swing_and_sieve[sieve_offset..], n_m_1);
             size = usize::exact_from(
-                (limbs_prime_sieve(&mut swing_and_sieve[sieve_offset..], n_m_1) + 1)
+                (count + 1)
                     / log_n_max(Limb::exact_from(n))
                     + 1,
             );

@@ -144,10 +144,6 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Natural`]s without repetition.
 pub mod exhaustive;
-#[cfg(feature = "test_build")]
-pub mod factorization;
-#[cfg(not(feature = "test_build"))]
-pub(crate) mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
 /// Iterators that generate [`Natural`]s randomly.

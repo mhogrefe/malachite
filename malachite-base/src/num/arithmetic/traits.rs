@@ -1206,6 +1206,30 @@ pub trait RootAssignRem<POW> {
     fn root_assign_rem(&mut self, exp: POW) -> Self::RemOutput;
 }
 
+/// Rotates a number left, inserting the leftmost bits into the right end.
+pub trait RotateLeft {
+    type Output;
+
+    fn rotate_left(self, n: u64) -> Self::Output;
+}
+
+/// Rotates a number left, inserting the leftmost bits into the right end, in place.
+pub trait RotateLeftAssign {
+    fn rotate_left_assign(&mut self, n: u64);
+}
+
+/// Rotates a number right, inserting the leftmost bits into the left end.
+pub trait RotateRight {
+    type Output;
+
+    fn rotate_right(self, n: u64) -> Self::Output;
+}
+
+/// Rotates a number right, inserting the leftmost bits into the left end, in place.
+pub trait RotateRightAssign {
+    fn rotate_right_assign(&mut self, n: u64);
+}
+
 /// Rounds a number to a multiple of another number, according to a specified rounding mode.
 pub trait RoundToMultiple<RHS = Self> {
     type Output;
