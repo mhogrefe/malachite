@@ -21,6 +21,8 @@ use crate::num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
 };
+use crate::num::factorization::primes::{PrimesIterator, PrimesLessThanIterator};
+use crate::num::factorization::traits::Primes;
 use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
 
 /// Defines functions on primitive unsigned integer types: uxx and usize.
@@ -154,6 +156,7 @@ pub trait PrimitiveUnsigned:
     + PowerOf2DigitIterable<u64>
     + PowerOf2DigitIterable<u128>
     + PowerOf2DigitIterable<usize>
+    + Primes<I = PrimesIterator<Self>, LI = PrimesLessThanIterator<Self>>
     + PrimitiveInt
     + RootRem<u64, RootOutput = Self, RemOutput = Self>
     + RootAssignRem<u64, RemOutput = Self>

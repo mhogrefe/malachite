@@ -376,6 +376,7 @@ fn block_resieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
 #[inline]
 // This is equivalent to `primesieve_size` from `primesieve.c`, GMP 6.2.1.
 pub fn limbs_prime_sieve_size<T: PrimitiveUnsigned>(n: u64) -> usize {
+    assert!(n >= 5);
     usize::exact_from((n_to_bit(n) >> T::LOG_WIDTH) + 1)
 }
 

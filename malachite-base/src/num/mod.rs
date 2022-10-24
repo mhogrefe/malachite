@@ -13,6 +13,7 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate numbers without repetition.
 pub mod exhaustive;
+/// Traits for generating primes, primality testing, and factorization (TODO!)
 pub mod factorization;
 /// [`NiceFloat`](float::NiceFloat), a wrapper around primitive floats.
 pub mod float;

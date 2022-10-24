@@ -372,6 +372,7 @@ pub mod num {
     }
     pub mod factorization {
         pub mod prime_sieve;
+        pub mod primes;
     }
     pub mod float {
         pub mod basic {

@@ -3,45 +3,13 @@ use crate::exhaustive::{
     exhaustive_rationals_with_denominator_inclusive_range,
     exhaustive_rationals_with_denominator_range,
 };
-use crate::malachite_base::num::arithmetic::traits::{
-    Ceiling, DivisibleBy, FloorSqrt, Reciprocal, UnsignedAbs,
-};
-use crate::malachite_base::num::basic::traits::{One, Two, Zero};
 use crate::Rational;
+use malachite_base::num::arithmetic::traits::{Ceiling, Reciprocal, UnsignedAbs};
+use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::factorization::traits::Primes;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use std::collections::BTreeSet;
-
-struct Primes(u64);
-
-// Replace with a good prime iterator when we have one. Typically we'll only need a few primes, so
-// it doesn't really need to be good.
-impl Iterator for Primes {
-    type Item = u64;
-
-    fn next(&mut self) -> Option<u64> {
-        if self.0 == 1 {
-            self.0 = 2;
-            return Some(2);
-        } else if self.0 == 2 {
-            self.0 = 3;
-            return Some(3);
-        }
-        'outer: loop {
-            self.0 += 2;
-            for f in 3..=self.0.floor_sqrt() {
-                if self.0.divisible_by(f) {
-                    continue 'outer;
-                }
-            }
-            return Some(self.0);
-        }
-    }
-}
-
-const fn primes() -> Primes {
-    // 1 will never actually be generated
-    Primes(1)
-}
 
 // Returns a k such that for all n >= k, any closed interval with the given diameter is guaranteed
 // to contain rationals with (reduced) denominator n.
@@ -51,7 +19,7 @@ fn smallest_guaranteed_denominator(interval_diameter: &Rational) -> Natural {
     }
     let mut primorial = Natural::TWO;
     let mut pow = Natural::TWO;
-    for p in primes().skip(1) {
+    for p in Limb::primes().skip(1) {
         primorial *= Natural::from(p);
         pow <<= 1;
         let limit = Rational::from_naturals_ref(&pow, &primorial);
