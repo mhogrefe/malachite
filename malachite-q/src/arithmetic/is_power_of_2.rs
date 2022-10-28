@@ -15,8 +15,6 @@ impl IsPowerOf2 for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::IsPowerOf2;
     /// use malachite_q::Rational;
     ///

@@ -20,8 +20,6 @@ impl Pow<u64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -54,8 +52,6 @@ impl<'a> Pow<u64> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -89,8 +85,6 @@ impl PowAssign<u64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -134,8 +128,6 @@ impl Pow<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -174,8 +166,6 @@ impl<'a> Pow<i64> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -216,8 +206,6 @@ impl PowAssign<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;

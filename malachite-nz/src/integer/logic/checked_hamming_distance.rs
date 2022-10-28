@@ -154,8 +154,6 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///

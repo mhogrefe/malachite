@@ -19,8 +19,6 @@ impl ModSquare<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
     ///
@@ -49,8 +47,6 @@ impl<'a> ModSquare<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
     ///
@@ -79,8 +75,6 @@ impl<'a> ModSquare<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
     ///
@@ -109,8 +103,6 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquare;
     /// use malachite_nz::natural::Natural;
     ///
@@ -137,8 +129,6 @@ impl ModSquareAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -171,8 +161,6 @@ impl<'a> ModSquareAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
     /// use malachite_nz::natural::Natural;
     ///

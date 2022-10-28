@@ -1016,8 +1016,6 @@ impl Square for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -1050,8 +1048,6 @@ impl<'a> Square for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -1092,8 +1088,6 @@ impl SquareAssign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;

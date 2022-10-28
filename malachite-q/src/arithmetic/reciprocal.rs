@@ -16,8 +16,6 @@ impl Reciprocal for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
     ///
@@ -49,8 +47,6 @@ impl<'a> Reciprocal for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
     /// use malachite_q::Rational;
     ///
@@ -79,8 +75,6 @@ impl ReciprocalAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ReciprocalAssign;
     /// use malachite_q::Rational;
     ///

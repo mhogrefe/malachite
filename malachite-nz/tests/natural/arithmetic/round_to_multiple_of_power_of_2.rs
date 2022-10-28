@@ -156,28 +156,23 @@ fn test_limbs_round_to_multiple_of_power_of_2() {
 
 #[test]
 fn test_round_to_multiple_of_power_of_2() {
-    let test = |u, v: u64, rm: RoundingMode, out| {
-        let mut n = Natural::from_str(u).unwrap();
+    let test = |s, v: u64, rm: RoundingMode, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.round_to_multiple_of_power_of_2_assign(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .round_to_multiple_of_power_of_2(v, rm);
+        let n = u.clone().round_to_multiple_of_power_of_2(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Natural::from_str(u)
-            .unwrap()
-            .round_to_multiple_of_power_of_2(v, rm);
+        let n = (&u).round_to_multiple_of_power_of_2(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        assert_eq!(
-            (Natural::from_str(u).unwrap().shr_round(v, rm) << v).to_string(),
-            out
-        );
+        assert_eq!((u.shr_round(v, rm) << v).to_string(), out);
     };
     test("0", 0, RoundingMode::Down, "0");
     test("0", 0, RoundingMode::Up, "0");

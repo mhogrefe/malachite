@@ -15,36 +15,33 @@ use std::str::FromStr;
 
 #[test]
 fn test_round_to_multiple() {
-    let test = |u, v, rm, quotient| {
-        let mut x = Natural::from_str(u).unwrap();
-        x.round_to_multiple_assign(Natural::from_str(v).unwrap(), rm);
+    let test = |s, t, rm, quotient| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.round_to_multiple_assign(v.clone(), rm);
         assert_eq!(x.to_string(), quotient);
         assert!(x.is_valid());
 
-        let mut x = Natural::from_str(u).unwrap();
-        x.round_to_multiple_assign(&Natural::from_str(v).unwrap(), rm);
+        let mut x = u.clone();
+        x.round_to_multiple_assign(&v, rm);
         assert_eq!(x.to_string(), quotient);
         assert!(x.is_valid());
 
-        let r = Natural::from_str(u)
-            .unwrap()
-            .round_to_multiple(Natural::from_str(v).unwrap(), rm);
+        let r = u.clone().round_to_multiple(v.clone(), rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r = Natural::from_str(u)
-            .unwrap()
-            .round_to_multiple(&Natural::from_str(v).unwrap(), rm);
+        let r = u.clone().round_to_multiple(&v, rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r =
-            (&Natural::from_str(u).unwrap()).round_to_multiple(Natural::from_str(v).unwrap(), rm);
+        let r = (&u).round_to_multiple(v.clone(), rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r =
-            (&Natural::from_str(u).unwrap()).round_to_multiple(&Natural::from_str(v).unwrap(), rm);
+        let r = (&u).round_to_multiple(&v, rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
     };

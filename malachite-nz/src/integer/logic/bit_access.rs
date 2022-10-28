@@ -212,8 +212,6 @@ impl Natural {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::logic::traits::BitAccess;
 /// use malachite_base::num::basic::traits::{NegativeOne, Zero};
 /// use malachite_nz::integer::Integer;
@@ -278,8 +276,6 @@ impl BitAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
@@ -336,8 +332,6 @@ impl BitAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -395,8 +389,6 @@ impl BitAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///

@@ -31,8 +31,6 @@ impl Mod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -83,8 +81,6 @@ impl<'a> Mod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -135,8 +131,6 @@ impl<'a> Mod<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -191,8 +185,6 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -244,8 +236,6 @@ impl ModAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -303,8 +293,6 @@ impl<'a> ModAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -659,8 +647,6 @@ impl CeilingMod<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -709,8 +695,6 @@ impl<'a> CeilingMod<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -759,8 +743,6 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -813,8 +795,6 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
@@ -866,8 +846,6 @@ impl CeilingModAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -925,8 +903,6 @@ impl<'a> CeilingModAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
     ///

@@ -658,8 +658,6 @@ impl FloorSqrt for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrt;
     /// use malachite_nz::natural::Natural;
     ///
@@ -691,8 +689,6 @@ impl<'a> FloorSqrt for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrt;
     /// use malachite_nz::natural::Natural;
     ///
@@ -724,8 +720,6 @@ impl FloorSqrtAssign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrtAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -771,8 +765,6 @@ impl CeilingSqrt for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::natural::Natural;
     ///
@@ -804,8 +796,6 @@ impl<'a> CeilingSqrt for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::natural::Natural;
     ///
@@ -837,8 +827,6 @@ impl CeilingSqrtAssign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrtAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -890,8 +878,6 @@ impl CheckedSqrt for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -930,8 +916,6 @@ impl<'a> CheckedSqrt for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -973,8 +957,6 @@ impl SqrtRem for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::SqrtRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -1010,8 +992,6 @@ impl<'a> SqrtRem for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::SqrtRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -1058,8 +1038,6 @@ impl SqrtAssignRem for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::SqrtAssignRem;
     /// use malachite_nz::natural::Natural;
     ///

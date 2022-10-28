@@ -99,8 +99,6 @@ impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -134,8 +132,6 @@ impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -175,8 +171,6 @@ impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

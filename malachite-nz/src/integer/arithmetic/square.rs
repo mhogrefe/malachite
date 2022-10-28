@@ -19,8 +19,6 @@ impl Square for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -54,8 +52,6 @@ impl<'a> Square for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -89,8 +85,6 @@ impl SquareAssign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;

@@ -1,17 +1,10 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_primitive_float_range;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 use std::panic::catch_unwind;
 
 fn exhaustive_primitive_float_range_helper<T: PrimitiveFloat>(a: T, b: T, out: &[T]) {
-    assert_eq!(
-        exhaustive_primitive_float_range::<T>(a, b)
-            .take(50)
-            .map(NiceFloat)
-            .collect_vec(),
-        out.iter().copied().map(NiceFloat).collect_vec()
-    );
+    exhaustive_primitive_floats_helper_helper(exhaustive_primitive_float_range::<T>(a, b), out);
 }
 
 #[allow(clippy::approx_constant)]

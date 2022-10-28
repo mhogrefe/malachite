@@ -183,8 +183,6 @@ impl<'a> Index<u64> for IntegerBitIterator<'a> {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
@@ -256,9 +254,6 @@ impl<'a> BitIterable for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    /// extern crate malachite_base;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitIterable;

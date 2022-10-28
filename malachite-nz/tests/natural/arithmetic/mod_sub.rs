@@ -11,94 +11,64 @@ use std::str::FromStr;
 
 #[test]
 fn test_mod_sub() {
-    let test = |u, v, m, out| {
-        assert!(Natural::from_str(u)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
-        assert!(Natural::from_str(v)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
+    let test = |r, s, t, out| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let m = Natural::from_str(t).unwrap();
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_sub_assign(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        assert!(u.mod_is_reduced(&m));
+        assert!(v.mod_is_reduced(&m));
+
+        let mut n = u.clone();
+        n.mod_sub_assign(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-        assert!(n.mod_is_reduced(&Natural::from_str(m).unwrap()));
+        assert!(n.mod_is_reduced(&m));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_sub_assign(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_sub_assign(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_sub_assign(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_sub_assign(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_sub_assign(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_sub_assign(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_sub(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        let n = u.clone().mod_sub(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap())
-            .mod_sub(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        let n = (&u).mod_sub(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_sub(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_sub(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_sub(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_sub(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_sub(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_sub(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_sub(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_sub(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_sub(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_sub(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_sub(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_sub(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

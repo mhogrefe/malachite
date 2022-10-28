@@ -1,8 +1,10 @@
-use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::sets::exhaustive::shortlex_b_tree_sets;
+use malachite_base::test_util::sets::exhaustive::{
+    exhaustive_b_tree_sets_helper_helper, exhaustive_b_tree_sets_small_helper_helper,
+};
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use std::collections::BTreeSet;
 use std::fmt::Debug;
@@ -11,8 +13,7 @@ fn shortlex_b_tree_sets_helper<I: Clone + Iterator>(xs: I, out: &[BTreeSet<I::It
 where
     I::Item: Clone + Debug + Eq + Ord,
 {
-    let xss = shortlex_b_tree_sets(xs).take(20).collect_vec();
-    assert_eq!(xss.into_iter().collect_vec().as_slice(), out);
+    exhaustive_b_tree_sets_helper_helper(shortlex_b_tree_sets(xs), out);
 }
 
 fn shortlex_b_tree_sets_small_helper<I: Clone + Iterator>(
@@ -22,10 +23,7 @@ fn shortlex_b_tree_sets_small_helper<I: Clone + Iterator>(
 ) where
     I::Item: Clone + Debug + Eq + Ord,
 {
-    let xss = shortlex_b_tree_sets(xs);
-    let xss_prefix = xss.clone().take(20).collect_vec();
-    assert_eq!(xss_prefix.into_iter().collect_vec().as_slice(), out);
-    assert_eq!(xss.count(), out_len);
+    exhaustive_b_tree_sets_small_helper_helper(shortlex_b_tree_sets(xs), out_len, out);
 }
 
 #[test]

@@ -1493,8 +1493,6 @@ impl Mod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1540,8 +1538,6 @@ impl<'a> Mod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1587,8 +1583,6 @@ impl<'a> Mod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1634,8 +1628,6 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1679,8 +1671,6 @@ impl ModAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1724,8 +1714,6 @@ impl<'a> ModAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1772,8 +1760,6 @@ impl Rem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -1821,8 +1807,6 @@ impl<'a> Rem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -1870,8 +1854,6 @@ impl<'a> Rem<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -1929,8 +1911,6 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -1987,8 +1967,6 @@ impl RemAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -2033,8 +2011,6 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -2091,8 +2067,6 @@ impl NegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2139,8 +2113,6 @@ impl<'a> NegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2187,8 +2159,6 @@ impl<'a> NegMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2238,8 +2208,6 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2287,8 +2255,6 @@ impl NegModAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2334,8 +2300,6 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

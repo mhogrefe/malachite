@@ -1,9 +1,11 @@
-use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::sets::exhaustive::exhaustive_hash_sets_fixed_length;
+use malachite_base::test_util::sets::exhaustive::{
+    exhaustive_hash_sets_helper_helper, exhaustive_hash_sets_small_helper_helper,
+};
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_fixed_length;
 use std::collections::HashSet;
@@ -17,10 +19,7 @@ fn exhaustive_hash_sets_fixed_length_helper<I: Clone + Iterator>(
 ) where
     I::Item: Clone + Debug + Eq + Hash,
 {
-    let xss = exhaustive_hash_sets_fixed_length(len, xs)
-        .take(20)
-        .collect_vec();
-    assert_eq!(xss.into_iter().collect_vec().as_slice(), out);
+    exhaustive_hash_sets_helper_helper(exhaustive_hash_sets_fixed_length(len, xs), out);
 }
 
 fn exhaustive_hash_sets_fixed_length_small_helper<I: Clone + Iterator>(
@@ -31,10 +30,11 @@ fn exhaustive_hash_sets_fixed_length_small_helper<I: Clone + Iterator>(
 ) where
     I::Item: Clone + Debug + Eq + Hash,
 {
-    let xss = exhaustive_hash_sets_fixed_length(len, xs);
-    let xss_prefix = xss.clone().take(20).collect_vec();
-    assert_eq!(xss_prefix.into_iter().collect_vec().as_slice(), out);
-    assert_eq!(xss.count(), out_len);
+    exhaustive_hash_sets_small_helper_helper(
+        exhaustive_hash_sets_fixed_length(len, xs),
+        out_len,
+        out,
+    );
 }
 
 #[test]

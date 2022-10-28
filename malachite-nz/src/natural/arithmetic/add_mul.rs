@@ -350,8 +350,6 @@ impl AddMul<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -387,8 +385,6 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -424,8 +420,6 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -461,8 +455,6 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -498,8 +490,6 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMul, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -538,8 +528,6 @@ impl AddMulAssign<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -579,8 +567,6 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -620,8 +606,6 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///
@@ -661,8 +645,6 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
     /// use malachite_nz::natural::Natural;
     ///

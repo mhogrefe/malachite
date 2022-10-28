@@ -10,67 +10,48 @@ use std::str::FromStr;
 
 #[test]
 fn test_saturating_sub_mul() {
-    let test = |u, v, w, out: &str| {
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_mul_assign(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
+    let test = |r, s, t, out: &str| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let w = Natural::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n.saturating_sub_mul_assign(v.clone(), w.clone());
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_mul_assign(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let mut n = u.clone();
+        n.saturating_sub_mul_assign(v.clone(), &w);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(w).unwrap(),
-        );
+        let mut n = u.clone();
+        n.saturating_sub_mul_assign(&v, w.clone());
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let mut n = u.clone();
+        n.saturating_sub_mul_assign(&v, &w);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .saturating_sub_mul(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
+        let n = u.clone().saturating_sub_mul(v.clone(), w.clone());
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let n = Natural::from_str(u).unwrap().saturating_sub_mul(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let n = u.clone().saturating_sub_mul(v.clone(), &w);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let n = Natural::from_str(u).unwrap().saturating_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(w).unwrap(),
-        );
+        let n = u.clone().saturating_sub_mul(&v, w.clone());
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let n = Natural::from_str(u).unwrap().saturating_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let n = u.clone().saturating_sub_mul(&v, &w);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let n = (&Natural::from_str(u).unwrap()).saturating_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let n = (&u).saturating_sub_mul(&v, &w);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
     };

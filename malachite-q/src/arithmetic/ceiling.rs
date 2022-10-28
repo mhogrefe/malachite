@@ -25,8 +25,6 @@ impl Ceiling for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Ceiling;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -66,8 +64,6 @@ impl<'a> Ceiling for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Ceiling;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -102,8 +98,6 @@ impl CeilingAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;

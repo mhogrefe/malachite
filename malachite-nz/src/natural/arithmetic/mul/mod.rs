@@ -46,10 +46,13 @@ use std::ops::{Mul, MulAssign};
 pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let mut out = vec![0; xs_len + ys_len];
-    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
-    limbs_mul_greater_to_out(&mut out, xs, ys, &mut mul_scratch);
-    out
+    let out_len = xs_len + ys_len;
+    let mut scratch = vec![0; out_len + limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
+    let (out, mul_scratch) = scratch.split_at_mut(out_len);
+    limbs_mul_greater_to_out(out, xs, ys, mul_scratch);
+    scratch.truncate(out_len);
+    scratch.shrink_to_fit();
+    scratch
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
@@ -481,8 +484,6 @@ impl Mul<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -522,8 +523,6 @@ impl<'a> Mul<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -563,8 +562,6 @@ impl<'a> Mul<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -604,8 +601,6 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -648,8 +643,6 @@ impl MulAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -694,8 +687,6 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

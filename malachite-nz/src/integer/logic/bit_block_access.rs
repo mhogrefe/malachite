@@ -269,8 +269,6 @@ impl BitBlockAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;
@@ -332,8 +330,6 @@ impl BitBlockAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;
@@ -408,8 +404,6 @@ impl BitBlockAccess for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;

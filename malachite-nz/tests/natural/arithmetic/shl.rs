@@ -251,17 +251,19 @@ fn test_shl_unsigned() {
     test_shl_unsigned_helper::<u8, _>(|_, _, _| {});
     test_shl_unsigned_helper::<u16, _>(|_, _, _| {});
     test_shl_unsigned_helper::<u32, _>(|u, v, out| {
-        let mut n = rug::Integer::from_str(u).unwrap();
+        let rug_u = rug::Integer::from_str(u).unwrap();
+        let mut n = rug_u.clone();
         n <<= v;
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() << v;
+        let n = rug_u << v;
         assert_eq!(n.to_string(), out);
 
-        let n = BigUint::from_str(u).unwrap() << usize::exact_from(v);
+        let num_u = BigUint::from_str(u).unwrap();
+        let n = num_u.clone() << usize::exact_from(v);
         assert_eq!(n.to_string(), out);
 
-        let n = &BigUint::from_str(u).unwrap() << usize::exact_from(v);
+        let n = &num_u << usize::exact_from(v);
         assert_eq!(n.to_string(), out);
     });
     test_shl_unsigned_helper::<u64, _>(|_, _, _| {});
@@ -361,11 +363,12 @@ fn test_shl_signed() {
     test_shl_signed_helper::<i8, _>(|_, _, _| {});
     test_shl_signed_helper::<i16, _>(|_, _, _| {});
     test_shl_signed_helper::<i32, _>(|u, v, out| {
-        let mut n = rug::Integer::from_str(u).unwrap();
+        let rug_u = rug::Integer::from_str(u).unwrap();
+        let mut n = rug_u.clone();
         n <<= v;
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() << v;
+        let n = rug_u << v;
         assert_eq!(n.to_string(), out);
     });
     test_shl_signed_helper::<i64, _>(|_, _, _| {});

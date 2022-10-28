@@ -17,8 +17,6 @@ impl TryFrom<Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -61,8 +59,6 @@ impl<'a> TryFrom<&'a Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -102,8 +98,6 @@ impl SaturatingFrom<Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
@@ -131,8 +125,6 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SaturatingFrom;
     /// use malachite_nz::integer::Integer;
@@ -163,8 +155,6 @@ impl ConvertibleFrom<Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
@@ -190,8 +180,6 @@ impl<'a> ConvertibleFrom<&'a Integer> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;

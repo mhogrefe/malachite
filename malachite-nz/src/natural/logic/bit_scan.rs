@@ -97,8 +97,6 @@ impl<'a> BitScan for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::natural::Natural;
     ///
@@ -133,8 +131,6 @@ impl<'a> BitScan for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::natural::Natural;
     ///

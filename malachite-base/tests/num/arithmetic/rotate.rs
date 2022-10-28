@@ -1,4 +1,4 @@
-use crate::malachite_base::num::arithmetic::traits::NegMod;
+use malachite_base::num::arithmetic::traits::NegMod;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;

@@ -594,8 +594,6 @@ impl FloorRoot<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::natural::Natural;
     ///
@@ -638,8 +636,6 @@ impl<'a> FloorRoot<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::natural::Natural;
     ///
@@ -680,8 +676,6 @@ impl FloorRootAssign<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRootAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -726,8 +720,6 @@ impl CeilingRoot<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::natural::Natural;
     ///
@@ -777,8 +769,6 @@ impl<'a> CeilingRoot<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::natural::Natural;
     ///
@@ -825,8 +815,6 @@ impl CeilingRootAssign<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -877,8 +865,6 @@ impl CheckedRoot<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -935,8 +921,6 @@ impl<'a> CheckedRoot<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -990,8 +974,6 @@ impl RootRem<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RootRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -1045,8 +1027,6 @@ impl<'a> RootRem<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RootRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -1100,8 +1080,6 @@ impl RootAssignRem<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RootAssignRem;
     /// use malachite_nz::natural::Natural;
     ///

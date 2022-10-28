@@ -24,8 +24,6 @@ impl Add<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
@@ -95,8 +93,6 @@ impl<'a> Add<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
@@ -131,8 +127,6 @@ impl<'a> Add<Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
@@ -202,8 +196,6 @@ impl<'a, 'b> Add<&'a Rational> for &'b Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
@@ -272,8 +264,6 @@ impl AddAssign<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
@@ -336,8 +326,6 @@ impl<'a> AddAssign<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///

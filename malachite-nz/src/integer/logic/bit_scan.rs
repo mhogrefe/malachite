@@ -152,8 +152,6 @@ impl<'a> BitScan for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::integer::Integer;
     ///
@@ -189,8 +187,6 @@ impl<'a> BitScan for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitScan;
     /// use malachite_nz::integer::Integer;
     ///

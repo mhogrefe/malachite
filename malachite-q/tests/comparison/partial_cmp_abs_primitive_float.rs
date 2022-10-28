@@ -1,7 +1,7 @@
-use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
 use malachite_q::test_util::generators::{
     rational_gen, rational_primitive_float_pair_gen,

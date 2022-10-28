@@ -40,8 +40,6 @@ impl LowMask for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_nz::natural::Natural;
     ///

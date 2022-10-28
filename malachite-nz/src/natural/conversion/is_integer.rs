@@ -11,8 +11,6 @@ impl<'a> IsInteger for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_base::num::conversion::traits::IsInteger;
     /// use malachite_nz::natural::Natural;

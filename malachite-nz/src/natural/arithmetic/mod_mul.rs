@@ -246,8 +246,6 @@ impl ModMulPrecomputed<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -319,8 +317,6 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -392,8 +388,6 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -465,8 +459,6 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -543,8 +535,6 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -630,8 +620,6 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -703,8 +691,6 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -789,8 +775,6 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     /// use malachite_nz::natural::Natural;
     ///
@@ -861,8 +845,6 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -924,8 +906,6 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -987,8 +967,6 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -1050,8 +1028,6 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -1117,8 +1093,6 @@ impl ModMul<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1153,8 +1127,6 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1188,8 +1160,6 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1224,8 +1194,6 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1259,8 +1227,6 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1295,8 +1261,6 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1330,8 +1294,6 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1365,8 +1327,6 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMul;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1401,8 +1361,6 @@ impl ModMulAssign<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1440,8 +1398,6 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1476,8 +1432,6 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1515,8 +1469,6 @@ impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModMulAssign;
     /// use malachite_nz::natural::Natural;
     ///

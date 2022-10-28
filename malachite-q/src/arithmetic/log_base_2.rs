@@ -47,8 +47,6 @@ impl<'a> FloorLogBase2 for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase2;
     /// use malachite_q::Rational;
     ///
@@ -83,8 +81,6 @@ impl<'a> CeilingLogBase2 for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase2;
     /// use malachite_q::Rational;
     ///
@@ -125,8 +121,6 @@ impl<'a> CheckedLogBase2 for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
     /// use malachite_q::Rational;
     ///

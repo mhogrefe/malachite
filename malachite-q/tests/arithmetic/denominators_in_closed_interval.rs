@@ -1,10 +1,10 @@
-use crate::malachite_q::arithmetic::traits::DenominatorsInClosedInterval;
 use itertools::Itertools;
 use malachite_base::iterators::comparison::is_strictly_ascending;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_nz::natural::Natural;
+use malachite_q::arithmetic::traits::DenominatorsInClosedInterval;
 use malachite_q::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen_var_3};
 use malachite_q::Rational;

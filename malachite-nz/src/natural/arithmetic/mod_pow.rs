@@ -544,8 +544,6 @@ impl ModPow<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -578,8 +576,6 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -612,8 +608,6 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -646,8 +640,6 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -683,8 +675,6 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -739,8 +729,6 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -795,8 +783,6 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -850,8 +836,6 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -904,8 +888,6 @@ impl ModPowAssign<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -960,8 +942,6 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1016,8 +996,6 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1067,8 +1045,6 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowAssign;
     /// use malachite_nz::natural::Natural;
     ///

@@ -474,8 +474,6 @@ impl DivisibleBy<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -521,8 +519,6 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -568,8 +564,6 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -614,8 +608,6 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;

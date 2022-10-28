@@ -38,6 +38,7 @@ fn limbs_index_of_next_false_bit<T: PrimitiveUnsigned>(xs: &[T], start: u64) -> 
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct PrimesLessThanIterator<T: PrimitiveUnsigned> {
     i: u8,
     j: u64,
@@ -94,6 +95,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct PrimesIterator<T: PrimitiveUnsigned> {
     limit: T,
     xs: PrimesLessThanIterator<T>,

@@ -1,7 +1,7 @@
-use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::sets::exhaustive::lex_hash_sets_length_range;
+use malachite_base::test_util::sets::exhaustive::exhaustive_hash_sets_small_helper_helper;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use std::collections::HashSet;
 use std::fmt::Debug;
@@ -16,10 +16,7 @@ fn lex_hash_sets_length_range_small_helper<I: Clone + Iterator>(
 ) where
     I::Item: Clone + Debug + Eq + Hash,
 {
-    let xss = lex_hash_sets_length_range(a, b, xs);
-    let xss_prefix = xss.clone().take(20).collect_vec();
-    assert_eq!(xss_prefix.into_iter().collect_vec().as_slice(), out);
-    assert_eq!(xss.count(), out_len);
+    exhaustive_hash_sets_small_helper_helper(lex_hash_sets_length_range(a, b, xs), out_len, out);
 }
 
 #[test]

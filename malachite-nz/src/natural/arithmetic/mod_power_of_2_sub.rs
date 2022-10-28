@@ -291,8 +291,6 @@ impl ModPowerOf2Sub<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Sub;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
@@ -323,8 +321,6 @@ impl<'a> ModPowerOf2Sub<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Sub;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
@@ -356,8 +352,6 @@ impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Sub;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
@@ -399,8 +393,6 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Sub;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
@@ -435,8 +427,6 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
@@ -481,8 +471,6 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign;
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;

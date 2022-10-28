@@ -20,8 +20,6 @@ impl Mul<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -59,8 +57,6 @@ impl<'a> Mul<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -98,8 +94,6 @@ impl<'a> Mul<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -137,8 +131,6 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -178,8 +170,6 @@ impl MulAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -215,8 +205,6 @@ impl<'a> MulAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;

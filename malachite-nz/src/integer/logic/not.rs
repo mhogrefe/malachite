@@ -22,8 +22,6 @@ impl Not for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
@@ -56,8 +54,6 @@ impl<'a> Not for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
@@ -101,8 +97,6 @@ impl NotAssign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::NotAssign;
     /// use malachite_nz::integer::Integer;

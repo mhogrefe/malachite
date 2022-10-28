@@ -171,8 +171,6 @@ pub type IntegerUpDown =
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_integers;
 ///
@@ -197,8 +195,6 @@ pub fn exhaustive_integers() -> Chain<Once<Integer>, IntegerUpDown> {
 ///
 /// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_natural_integers;
 ///
@@ -225,8 +221,6 @@ pub const fn exhaustive_natural_integers() -> IntegerIncreasingRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_positive_integers;
 ///
@@ -253,8 +247,6 @@ pub const fn exhaustive_positive_integers() -> IntegerIncreasingRangeToInfinity 
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_negative_integers;
 ///
@@ -282,8 +274,6 @@ pub const fn exhaustive_negative_integers() -> IntegerDecreasingRangeToNegativeI
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_nonzero_integers;
 ///
@@ -323,9 +313,6 @@ pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::exhaustive::integer_increasing_range;
@@ -372,9 +359,6 @@ pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRang
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::exhaustive::integer_increasing_inclusive_range;
@@ -416,8 +400,6 @@ pub fn integer_increasing_inclusive_range(a: Integer, b: Integer) -> IntegerIncr
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::integer_increasing_range_to_infinity;
 /// use malachite_nz::integer::Integer;
@@ -452,8 +434,6 @@ pub const fn integer_increasing_range_to_infinity(a: Integer) -> IntegerIncreasi
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::integer_decreasing_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;
@@ -499,9 +479,6 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::exhaustive::exhaustive_integer_range;
@@ -560,9 +537,6 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::exhaustive::exhaustive_integer_inclusive_range;
@@ -616,8 +590,6 @@ pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveI
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_infinity;
 /// use malachite_nz::integer::Integer;
@@ -665,8 +637,6 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;

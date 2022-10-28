@@ -11,8 +11,6 @@ pub mod from_limbs;
 ///
 /// # rounding_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::Natural;
@@ -44,8 +42,6 @@ pub mod from_limbs;
 ///
 /// # try_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
@@ -81,8 +77,6 @@ pub mod from_limbs;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_nz::natural::Natural;
@@ -124,8 +118,6 @@ pub mod from_primitive_float;
 ///
 /// # try_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
 ///
@@ -135,8 +127,6 @@ pub mod from_primitive_float;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_nz::natural::Natural;
 ///
@@ -146,8 +136,6 @@ pub mod from_primitive_float;
 ///
 /// # saturating_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::SaturatingFrom;
 /// use malachite_nz::natural::Natural;
 ///
@@ -175,8 +163,6 @@ pub mod limb_count;
 ///
 /// # sci_mantissa_and_exponent
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
@@ -195,8 +181,6 @@ pub mod limb_count;
 ///
 /// # from_sci_mantissa_and_exponent
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
@@ -232,8 +216,6 @@ pub mod mantissa_and_exponent;
 ///
 /// # rounding_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::Natural;
@@ -259,8 +241,6 @@ pub mod mantissa_and_exponent;
 ///
 /// # try_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_nz::natural::conversion::primitive_float_from_natural::*;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
@@ -281,8 +261,6 @@ pub mod mantissa_and_exponent;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
@@ -309,8 +287,6 @@ pub mod primitive_float_from_natural;
 ///
 /// # try_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::conversion::primitive_int_from_natural::{
@@ -336,8 +312,6 @@ pub mod primitive_float_from_natural;
 ///
 /// # wrapping_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::num::conversion::traits::WrappingFrom;
@@ -360,8 +334,6 @@ pub mod primitive_float_from_natural;
 ///
 /// # saturating_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::num::conversion::traits::SaturatingFrom;
@@ -383,11 +355,7 @@ pub mod primitive_float_from_natural;
 /// ```
 ///
 /// # overflowing_from
-/// extern crate malachite_base;
-///
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::num::conversion::traits::OverflowingFrom;
@@ -410,8 +378,6 @@ pub mod primitive_float_from_natural;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;

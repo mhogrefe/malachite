@@ -25,8 +25,6 @@ impl Div<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///
@@ -79,8 +77,6 @@ impl<'a> Div<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///
@@ -123,8 +119,6 @@ impl<'a> Div<Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///
@@ -176,8 +170,6 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///
@@ -228,8 +220,6 @@ impl DivAssign<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///
@@ -281,8 +271,6 @@ impl<'a> DivAssign<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Two;
     /// use malachite_q::Rational;
     ///

@@ -11,8 +11,6 @@ impl<'a> IsInteger for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
     /// use malachite_base::num::conversion::traits::IsInteger;
     /// use malachite_nz::integer::Integer;

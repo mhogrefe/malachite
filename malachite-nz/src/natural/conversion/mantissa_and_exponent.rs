@@ -39,8 +39,6 @@ impl Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::num::float::NiceFloat;
@@ -248,8 +246,6 @@ impl Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
@@ -342,8 +338,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
     ///
@@ -383,8 +377,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
     ///
@@ -417,8 +409,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
     ///
@@ -453,8 +443,6 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
     /// use malachite_nz::natural::Natural;
     ///

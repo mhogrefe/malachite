@@ -6,8 +6,6 @@ pub mod cmp;
 ///
 /// # partial_cmp_abs
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::natural::Natural;
@@ -24,8 +22,6 @@ pub mod partial_cmp_abs_primitive_float;
 ///
 /// # partial_cmp_abs
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::natural::Natural;
@@ -63,8 +59,6 @@ pub mod partial_cmp_abs_primitive_int;
 ///
 /// # partial_cmp
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_nz::natural::Natural;
 ///
@@ -78,8 +72,6 @@ pub mod partial_cmp_primitive_float;
 ///
 /// # partial_cmp
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_nz::natural::Natural;
 ///

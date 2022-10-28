@@ -1,8 +1,8 @@
-use crate::malachite_base::num::arithmetic::traits::{
+use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CheckedDoubleFactorial, DivExact, DivExactAssign, Factorial, FloorRoot,
     OverflowingMulAssign, WrappingMulAssign,
 };
-use crate::malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::CountOnes;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

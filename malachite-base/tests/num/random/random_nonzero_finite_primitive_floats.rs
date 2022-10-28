@@ -1,11 +1,9 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_nonzero_finite_primitive_floats;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::test_util::stats::common_values_map::common_values_map;
-use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
+use malachite_base::test_util::num::random::random_primitive_floats_helper_helper;
+use malachite_base::test_util::stats::moments::{CheckedToF64, MomentStats};
 
 fn random_nonzero_finite_primitive_floats_helper<T: CheckedToF64 + PrimitiveFloat>(
     expected_values: &[T],
@@ -13,30 +11,13 @@ fn random_nonzero_finite_primitive_floats_helper<T: CheckedToF64 + PrimitiveFloa
     expected_median: (T, Option<T>),
     expected_moment_stats: MomentStats,
 ) {
-    let xs = random_nonzero_finite_primitive_floats::<T>(EXAMPLE_SEED);
-    let actual_values = xs.clone().take(20).map(NiceFloat).collect_vec();
-    let actual_common_values = common_values_map(1000000, 10, xs.clone().map(NiceFloat));
-    let actual_median = median(xs.clone().map(NiceFloat).take(1000000));
-    let actual_moment_stats = moment_stats(xs.take(1000000));
-    let (lo, hi) = expected_median;
-    assert_eq!(
-        (
-            actual_values,
-            actual_common_values.as_slice(),
-            actual_median,
-            actual_moment_stats
-        ),
-        (
-            expected_values.iter().cloned().map(NiceFloat).collect_vec(),
-            expected_common_values
-                .iter()
-                .map(|&(x, freq)| (NiceFloat(x), freq))
-                .collect_vec()
-                .as_slice(),
-            (NiceFloat(lo), hi.map(NiceFloat)),
-            expected_moment_stats
-        )
-    );
+    random_primitive_floats_helper_helper(
+        random_nonzero_finite_primitive_floats::<T>(EXAMPLE_SEED),
+        expected_values,
+        expected_common_values,
+        expected_median,
+        expected_moment_stats,
+    )
 }
 
 #[test]

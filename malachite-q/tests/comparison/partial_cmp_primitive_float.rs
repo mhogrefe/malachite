@@ -1,5 +1,5 @@
-use crate::malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_primitive_float_pair_gen,

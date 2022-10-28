@@ -1,7 +1,6 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::primitive_float_increasing_inclusive_range;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::*;
 use std::panic::catch_unwind;
 
 fn primitive_float_increasing_inclusive_range_helper<T: PrimitiveFloat>(
@@ -10,16 +9,10 @@ fn primitive_float_increasing_inclusive_range_helper<T: PrimitiveFloat>(
     first_20: &[T],
     last_20: &[T],
 ) {
-    let xs = primitive_float_increasing_inclusive_range::<T>(a, b);
-    assert_eq!(
-        xs.clone().take(20).map(NiceFloat).collect_vec(),
-        first_20.iter().copied().map(NiceFloat).collect_vec()
-    );
-    let mut reversed = xs.rev().take(20).map(NiceFloat).collect_vec();
-    reversed.reverse();
-    assert_eq!(
-        reversed,
-        last_20.iter().copied().map(NiceFloat).collect_vec()
+    exhaustive_primitive_floats_helper_helper_with_reverse(
+        primitive_float_increasing_inclusive_range::<T>(a, b),
+        first_20,
+        last_20,
     );
 }
 

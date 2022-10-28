@@ -54,8 +54,6 @@ impl RoundToMultiple<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -164,8 +162,6 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -277,8 +273,6 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -400,8 +394,6 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -497,8 +489,6 @@ impl RoundToMultipleAssign<Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -600,8 +590,6 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;

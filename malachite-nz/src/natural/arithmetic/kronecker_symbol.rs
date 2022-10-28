@@ -682,8 +682,6 @@ impl LegendreSymbol<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -724,8 +722,6 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -766,8 +762,6 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -807,8 +801,6 @@ impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LegendreSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -844,8 +836,6 @@ impl JacobiSymbol<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -883,8 +873,6 @@ impl<'a> JacobiSymbol<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -922,8 +910,6 @@ impl<'a> JacobiSymbol<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -960,8 +946,6 @@ impl<'a, 'b> JacobiSymbol<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::JacobiSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -995,8 +979,6 @@ impl KroneckerSymbol<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1030,8 +1012,6 @@ impl<'a> KroneckerSymbol<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1065,8 +1045,6 @@ impl<'a> KroneckerSymbol<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///
@@ -1099,8 +1077,6 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::KroneckerSymbol;
     /// use malachite_nz::natural::Natural;
     ///

@@ -78,8 +78,6 @@ pub mod round_to_multiple_of_power_of_2;
 ///
 /// # shl
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_q::Rational;
 ///
@@ -106,8 +104,6 @@ pub mod round_to_multiple_of_power_of_2;
 ///
 /// # shl_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_q::Rational;
 ///
@@ -148,8 +144,6 @@ pub mod shl;
 ///
 /// # shr
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_q::Rational;
 ///
@@ -176,8 +170,6 @@ pub mod shl;
 ///
 /// # shr_assign
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_q::Rational;
 ///

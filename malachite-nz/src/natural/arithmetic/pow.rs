@@ -534,8 +534,6 @@ impl Pow<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -573,8 +571,6 @@ impl<'a> Pow<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -628,8 +624,6 @@ impl PowAssign<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

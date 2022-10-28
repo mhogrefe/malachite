@@ -120,8 +120,6 @@ impl NextPowerOf2 for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{NextPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -154,8 +152,6 @@ impl<'a> NextPowerOf2 for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{NextPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -192,8 +188,6 @@ impl NextPowerOf2Assign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{NextPowerOf2Assign, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;

@@ -100,8 +100,6 @@ impl<'a> Index<u64> for NaturalBitIterator<'a> {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
@@ -147,8 +145,6 @@ impl<'a> BitIterable for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;

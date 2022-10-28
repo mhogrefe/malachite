@@ -65,8 +65,6 @@ impl CoprimeWith<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///
@@ -99,8 +97,6 @@ impl<'a> CoprimeWith<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///
@@ -133,8 +129,6 @@ impl<'a> CoprimeWith<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///
@@ -167,8 +161,6 @@ impl<'a, 'b> CoprimeWith<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CoprimeWith;
     /// use malachite_nz::natural::Natural;
     ///

@@ -119,6 +119,13 @@ where
     }
 }
 
+pub const NAN_MOMENT_STATS: MomentStats = MomentStats {
+    mean: NiceFloat(f64::NAN),
+    standard_deviation: NiceFloat(f64::NAN),
+    skewness: NiceFloat(f64::NAN),
+    excess_kurtosis: NiceFloat(f64::NAN),
+};
+
 pub fn mean<I: Iterator>(xs: I) -> NiceFloat<f64>
 where
     I::Item: CheckedToF64,

@@ -8,34 +8,33 @@ use std::str::FromStr;
 
 #[test]
 fn test_saturating_sub_natural() {
-    let test = |u, v, out| {
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_assign(Natural::from_str(v).unwrap());
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n.saturating_sub_assign(v.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.saturating_sub_assign(&Natural::from_str(v).unwrap());
+        let mut n = u.clone();
+        n.saturating_sub_assign(&v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .saturating_sub(Natural::from_str(v).unwrap());
+        let n = u.clone().saturating_sub(v.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .saturating_sub(&Natural::from_str(v).unwrap());
+        let n = u.clone().saturating_sub(&v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).saturating_sub(Natural::from_str(v).unwrap());
+        let n = (&u).saturating_sub(v.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).saturating_sub(&Natural::from_str(v).unwrap());
+        let n = (&u).saturating_sub(&v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

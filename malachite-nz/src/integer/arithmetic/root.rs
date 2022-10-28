@@ -24,8 +24,6 @@ impl FloorRoot<u64> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::integer::Integer;
     ///
@@ -61,8 +59,6 @@ impl<'a> FloorRoot<u64> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRoot;
     /// use malachite_nz::integer::Integer;
     ///
@@ -101,8 +97,6 @@ impl FloorRootAssign<u64> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorRootAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -157,8 +151,6 @@ impl CeilingRoot<u64> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::integer::Integer;
     ///
@@ -195,8 +187,6 @@ impl<'a> CeilingRoot<u64> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRoot;
     /// use malachite_nz::integer::Integer;
     ///
@@ -235,8 +225,6 @@ impl CeilingRootAssign<u64> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -297,8 +285,6 @@ impl CheckedRoot<u64> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -348,8 +334,6 @@ impl<'a> CheckedRoot<u64> for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;

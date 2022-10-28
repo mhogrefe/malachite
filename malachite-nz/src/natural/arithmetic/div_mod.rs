@@ -1915,8 +1915,6 @@ impl DivMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -1966,8 +1964,6 @@ impl<'a> DivMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2020,8 +2016,6 @@ impl<'a> DivMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2092,8 +2086,6 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2167,8 +2159,6 @@ impl DivAssignMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2243,8 +2233,6 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2321,8 +2309,6 @@ impl DivRem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2373,8 +2359,6 @@ impl<'a> DivRem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2428,8 +2412,6 @@ impl<'a> DivRem<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2483,8 +2465,6 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2539,8 +2519,6 @@ impl DivAssignRem<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2592,8 +2570,6 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2644,8 +2620,6 @@ impl CeilingDivNegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2699,8 +2673,6 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2754,8 +2726,6 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2812,8 +2782,6 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -2871,8 +2839,6 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2929,8 +2895,6 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

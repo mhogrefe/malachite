@@ -148,8 +148,6 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{CheckedSubMul, Pow};
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -206,8 +204,6 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{CheckedSubMul, Pow};
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -264,8 +260,6 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{CheckedSubMul, Pow};
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -322,8 +316,6 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{CheckedSubMul, Pow};
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -377,8 +369,6 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{CheckedSubMul, Pow};
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;

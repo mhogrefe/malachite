@@ -1,11 +1,9 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::special_random_primitive_float_inclusive_range;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::test_util::stats::common_values_map::common_values_map;
-use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
+use malachite_base::test_util::num::random::special_random_primitive_floats_helper_helper;
+use malachite_base::test_util::stats::moments::{CheckedToF64, MomentStats};
 use std::panic::catch_unwind;
 
 fn special_random_primitive_float_inclusive_range_helper<T: CheckedToF64 + PrimitiveFloat>(
@@ -15,46 +13,29 @@ fn special_random_primitive_float_inclusive_range_helper<T: CheckedToF64 + Primi
     mean_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
-    mean_special_p_numerator: u64,
-    mean_special_p_denominator: u64,
+    mean_zero_p_numerator: u64,
+    mean_zero_p_denominator: u64,
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
     expected_median: (T, Option<T>),
     expected_moment_stats: MomentStats,
 ) {
-    let xs = special_random_primitive_float_inclusive_range::<T>(
-        EXAMPLE_SEED,
-        a,
-        b,
-        mean_exponent_numerator,
-        mean_exponent_denominator,
-        mean_precision_numerator,
-        mean_precision_denominator,
-        mean_special_p_numerator,
-        mean_special_p_denominator,
-    );
-    let actual_values = xs.clone().take(50).map(NiceFloat).collect_vec();
-    let actual_common_values = common_values_map(1000000, 20, xs.clone().map(NiceFloat));
-    let actual_median = median(xs.clone().map(NiceFloat).take(1000000));
-    let actual_moment_stats = moment_stats(xs.take(1000000));
-    let (lo, hi) = expected_median;
-    assert_eq!(
-        (
-            actual_values,
-            actual_common_values.as_slice(),
-            actual_median,
-            actual_moment_stats
+    special_random_primitive_floats_helper_helper(
+        special_random_primitive_float_inclusive_range::<T>(
+            EXAMPLE_SEED,
+            a,
+            b,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+            mean_zero_p_numerator,
+            mean_zero_p_denominator,
         ),
-        (
-            expected_values.iter().cloned().map(NiceFloat).collect_vec(),
-            expected_common_values
-                .iter()
-                .map(|&(x, freq)| (NiceFloat(x), freq))
-                .collect_vec()
-                .as_slice(),
-            (NiceFloat(lo), hi.map(NiceFloat)),
-            expected_moment_stats
-        )
+        expected_values,
+        expected_common_values,
+        expected_median,
+        expected_moment_stats,
     );
 }
 

@@ -17,8 +17,6 @@ impl PowerOf2<u64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_q::Rational;
     ///
@@ -45,8 +43,6 @@ impl PowerOf2<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
     /// use malachite_q::Rational;
     ///

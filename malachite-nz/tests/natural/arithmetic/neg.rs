@@ -12,11 +12,13 @@ use std::str::FromStr;
 #[test]
 fn test_neg() {
     let test = |s, out| {
-        let neg = -Natural::from_str(s).unwrap();
+        let u = Natural::from_str(s).unwrap();
+
+        let neg = -u.clone();
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
-        let neg = -&Natural::from_str(s).unwrap();
+        let neg = -&u;
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 

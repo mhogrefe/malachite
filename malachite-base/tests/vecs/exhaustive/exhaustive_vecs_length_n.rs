@@ -1,8 +1,10 @@
 use crate::extra_variadic::exhaustive_vecs_length_3;
-use itertools::Itertools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
+use malachite_base::test_util::vecs::exhaustive::{
+    exhaustive_vecs_helper_helper, exhaustive_vecs_small_helper_helper,
+};
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_2,
 };
@@ -17,8 +19,7 @@ fn exhaustive_vecs_length_2_helper<T, I: Iterator<Item = T>, J: Iterator<Item = 
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_vecs_length_2(xs, ys).take(20).collect_vec();
-    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
+    exhaustive_vecs_helper_helper(exhaustive_vecs_length_2(xs, ys), out);
 }
 
 fn exhaustive_vecs_length_2_finite_helper<
@@ -33,17 +34,7 @@ fn exhaustive_vecs_length_2_finite_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_vecs_length_2(xs, ys);
-    let xss_prefix = xss.clone().take(20).collect_vec();
-    assert_eq!(
-        xss_prefix
-            .iter()
-            .map(Vec::as_slice)
-            .collect_vec()
-            .as_slice(),
-        out
-    );
-    assert_eq!(xss.count(), out_len);
+    exhaustive_vecs_small_helper_helper(exhaustive_vecs_length_2(xs, ys), out_len, out);
 }
 
 #[test]
@@ -257,8 +248,7 @@ fn exhaustive_vecs_length_3_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_vecs_length_3(xs, ys, zs).take(20).collect_vec();
-    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
+    exhaustive_vecs_helper_helper(exhaustive_vecs_length_3(xs, ys, zs), out);
 }
 
 fn exhaustive_vecs_length_3_finite_helper<
@@ -275,17 +265,7 @@ fn exhaustive_vecs_length_3_finite_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_vecs_length_3(xs, ys, zs);
-    let xss_prefix = xss.clone().take(20).collect_vec();
-    assert_eq!(
-        xss_prefix
-            .iter()
-            .map(Vec::as_slice)
-            .collect_vec()
-            .as_slice(),
-        out
-    );
-    assert_eq!(xss.count(), out_len);
+    exhaustive_vecs_small_helper_helper(exhaustive_vecs_length_3(xs, ys, zs), out_len, out);
 }
 
 #[test]

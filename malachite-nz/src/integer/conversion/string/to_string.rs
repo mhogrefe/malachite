@@ -117,8 +117,6 @@ impl ToStringBase for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_nz::integer::Integer;
     ///
@@ -163,8 +161,6 @@ impl ToStringBase for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_nz::integer::Integer;
     ///
@@ -205,8 +201,6 @@ impl Display for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
@@ -257,8 +251,6 @@ impl Debug for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -304,8 +296,6 @@ impl Binary for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::integer::Integer;
@@ -382,8 +372,6 @@ impl Octal for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::integer::Integer;
@@ -460,8 +448,6 @@ impl LowerHex for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::integer::Integer;
@@ -538,8 +524,6 @@ impl UpperHex for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::integer::Integer;

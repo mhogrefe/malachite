@@ -22,8 +22,6 @@ impl Mul<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///
@@ -70,8 +68,6 @@ impl<'a> Mul<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///
@@ -106,8 +102,6 @@ impl<'a> Mul<Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///
@@ -154,8 +148,6 @@ impl<'a, 'b> Mul<&'a Rational> for &'b Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///
@@ -201,8 +193,6 @@ impl MulAssign<Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///
@@ -252,8 +242,6 @@ impl<'a> MulAssign<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_q::Rational;
     ///

@@ -1,7 +1,6 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_nonzero_finite_primitive_floats_in_range;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 use std::panic::catch_unwind;
 
 fn exhaustive_nonzero_finite_primitive_floats_in_range_helper<T: PrimitiveFloat>(
@@ -9,10 +8,9 @@ fn exhaustive_nonzero_finite_primitive_floats_in_range_helper<T: PrimitiveFloat>
     b: T,
     out: &[T],
 ) {
-    let xs = exhaustive_nonzero_finite_primitive_floats_in_range::<T>(a, b);
-    assert_eq!(
-        xs.take(50).map(NiceFloat).collect_vec(),
-        out.iter().copied().map(NiceFloat).collect_vec()
+    exhaustive_primitive_floats_helper_helper(
+        exhaustive_nonzero_finite_primitive_floats_in_range::<T>(a, b),
+        out,
     );
 }
 

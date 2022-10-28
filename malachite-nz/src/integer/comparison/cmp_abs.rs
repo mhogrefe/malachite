@@ -26,8 +26,6 @@ impl OrdAbs for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
     ///

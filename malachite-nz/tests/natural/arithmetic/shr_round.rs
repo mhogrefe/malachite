@@ -160,19 +160,22 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
 fn test_shr_round_unsigned_helper<T: PrimitiveUnsigned>()
 where
     Natural: ShrRound<T, Output = Natural> + ShrRoundAssign<T>,
+    for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
-    let test = |u, v: u8, rm: RoundingMode, out| {
+    let test = |s, v: u8, rm: RoundingMode, out| {
+        let u = Natural::from_str(s).unwrap();
         let v = T::from(v);
-        let mut n = Natural::from_str(u).unwrap();
+
+        let mut n = u.clone();
         n.shr_round_assign(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().shr_round(v, rm);
+        let n = u.clone().shr_round(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Natural::from_str(u).unwrap().shr_round(v, rm);
+        let n = (&u).shr_round(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -721,20 +724,22 @@ fn shr_round_unsigned_fail() {
 fn test_shr_round_signed_helper<T: PrimitiveSigned>()
 where
     Natural: ShrRound<T, Output = Natural> + ShrRoundAssign<T>,
+    for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
-    let test = |i, j: i8, rm: RoundingMode, out| {
+    let test = |s, j: i8, rm: RoundingMode, out| {
+        let u = Natural::from_str(s).unwrap();
         let j = T::from(j);
 
-        let mut n = Natural::from_str(i).unwrap();
+        let mut n = u.clone();
         n.shr_round_assign(j, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(i).unwrap().shr_round(j, rm);
+        let n = u.clone().shr_round(j, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Natural::from_str(i).unwrap().shr_round(j, rm);
+        let n = (&u).shr_round(j, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

@@ -66,8 +66,6 @@ impl ModPowerOf2Inverse for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
     /// use malachite_nz::natural::Natural;
     ///
@@ -117,8 +115,6 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
     /// use malachite_nz::natural::Natural;
     ///

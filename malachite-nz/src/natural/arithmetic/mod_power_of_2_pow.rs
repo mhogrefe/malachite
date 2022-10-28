@@ -129,8 +129,6 @@ impl ModPowerOf2Pow<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -165,8 +163,6 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -201,8 +197,6 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -234,8 +228,6 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
     /// use malachite_nz::natural::Natural;
     ///
@@ -286,8 +278,6 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -321,8 +311,6 @@ impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign;
     /// use malachite_nz::natural::Natural;
     ///

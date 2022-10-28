@@ -23,8 +23,6 @@ impl Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_nz::natural::Natural;
@@ -166,8 +164,6 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase;
     /// use malachite_nz::natural::Natural;
     ///
@@ -205,8 +201,6 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_nz::natural::Natural;
     ///
@@ -255,8 +249,6 @@ impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_nz::natural::Natural;
     ///

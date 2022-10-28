@@ -44,8 +44,6 @@ impl ToSci for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -102,8 +100,6 @@ impl ToSci for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::string::options::ToSciOptions;
     /// use malachite_base::num::conversion::traits::ToSci;
     /// use malachite_base::rounding_modes::RoundingMode;

@@ -3481,10 +3481,11 @@ fn limbs_square_to_out_toom_8_fail_2() {
 
 #[test]
 fn test_square() {
-    let test = |x, out| {
-        assert_eq!(Natural::from_str(x).unwrap().square().to_string(), out);
+    let test = |s, out| {
+        let x = Natural::from_str(s).unwrap();
+        assert_eq!(x.clone().square().to_string(), out);
 
-        let mut x = Natural::from_str(x).unwrap();
+        let mut x = x;
         x.square_assign();
         assert_eq!(x.to_string(), out);
     };

@@ -13,8 +13,6 @@ impl<'a> Parity for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Parity, Pow};
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
@@ -40,8 +38,6 @@ impl<'a> Parity for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Parity, Pow};
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;

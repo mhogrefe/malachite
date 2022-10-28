@@ -1,7 +1,7 @@
-use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
+use malachite_base::test_util::vecs::exhaustive::exhaustive_vecs_helper_helper;
 use malachite_base::vecs::exhaustive::shortlex_vecs_from_length_iterator;
 use std::fmt::Debug;
 use std::iter::empty;
@@ -13,10 +13,7 @@ fn shortlex_vecs_from_element_iterator_helper<I: Iterator<Item = u64>, J: Clone 
 ) where
     J::Item: Clone + Debug + Eq,
 {
-    let xss = shortlex_vecs_from_length_iterator(lengths, xs)
-        .take(20)
-        .collect_vec();
-    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
+    exhaustive_vecs_helper_helper(shortlex_vecs_from_length_iterator(lengths, xs), out);
 }
 
 #[test]

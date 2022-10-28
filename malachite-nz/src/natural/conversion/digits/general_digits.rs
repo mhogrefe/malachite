@@ -2243,8 +2243,6 @@ impl Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_base::num::conversion::traits::Digits;
     /// use malachite_base::strings::ToDebugString;
@@ -2292,8 +2290,6 @@ impl Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_base::num::conversion::traits::Digits;
     /// use malachite_base::strings::ToDebugString;
@@ -2339,8 +2335,6 @@ impl Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::Digits;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;
@@ -2406,8 +2400,6 @@ impl Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::Digits;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;

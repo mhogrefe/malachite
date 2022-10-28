@@ -136,38 +136,31 @@ fn limbs_pow_fail_4() {
 
 #[test]
 fn test_pow() {
-    let test = |u, exp, out| {
-        let mut x = Natural::from_str(u).unwrap();
+    let test = |s, exp, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        let mut x = u.clone();
         x.pow_assign(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = Natural::from_str(u).unwrap().pow(exp);
+        let x = u.clone().pow(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = (&Natural::from_str(u).unwrap()).pow(exp);
+        let x = (&u).pow(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = BigUint::from_str(u).unwrap().pow(exp);
+        let x = BigUint::from_str(s).unwrap().pow(exp);
         assert_eq!(x.to_string(), out);
 
-        let x = rug::Integer::from_str(u).unwrap().pow(u32::exact_from(exp));
+        let x = rug::Integer::from_str(s).unwrap().pow(u32::exact_from(exp));
         assert_eq!(x.to_string(), out);
 
-        assert_eq!(
-            natural_pow_naive(&Natural::from_str(u).unwrap(), exp).to_string(),
-            out
-        );
-        assert_eq!(
-            natural_pow_simple_binary(&Natural::from_str(u).unwrap(), exp).to_string(),
-            out
-        );
-        assert_eq!(
-            Natural::from_str(u).unwrap().pow_ref_alt(exp).to_string(),
-            out
-        );
+        assert_eq!(natural_pow_naive(&u, exp).to_string(), out);
+        assert_eq!(natural_pow_simple_binary(&u, exp).to_string(), out);
+        assert_eq!(u.pow_ref_alt(exp).to_string(), out);
     };
     test("0", 0, "1");
     test("1", 0, "1");

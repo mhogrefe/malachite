@@ -95,8 +95,6 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::num::logic::traits::HammingDistance;
     /// use malachite_nz::natural::Natural;

@@ -15,8 +15,6 @@ impl Abs for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -49,8 +47,6 @@ impl<'a> Abs for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Abs;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -77,8 +73,6 @@ impl AbsAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::AbsAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;

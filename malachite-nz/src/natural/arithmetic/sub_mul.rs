@@ -288,8 +288,6 @@ impl SubMul<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
@@ -329,8 +327,6 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
@@ -370,8 +366,6 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
@@ -411,8 +405,6 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
@@ -452,8 +444,6 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::natural::Natural;
     ///
@@ -492,8 +482,6 @@ impl SubMulAssign<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -533,8 +521,6 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -574,8 +560,6 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///
@@ -615,8 +599,6 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::natural::Natural;
     ///

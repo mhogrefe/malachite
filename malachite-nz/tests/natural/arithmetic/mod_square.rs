@@ -10,43 +10,38 @@ use malachite_nz::test_util::generators::{
 };
 use std::str::FromStr;
 
-// TODO improve from_str
-
 #[test]
 fn test_mod_square() {
-    let test = |u, m, out| {
-        assert!(Natural::from_str(u)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let m = Natural::from_str(t).unwrap();
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_square_assign(Natural::from_str(m).unwrap());
+        assert!(u.mod_is_reduced(&m));
+
+        let mut n = u.clone();
+        n.mod_square_assign(m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-        assert!(n.mod_is_reduced(&Natural::from_str(m).unwrap()));
+        assert!(n.mod_is_reduced(&m));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_square_assign(&Natural::from_str(m).unwrap());
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_square(Natural::from_str(m).unwrap());
+        let mut n = u.clone();
+        n.mod_square_assign(&m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_square(Natural::from_str(m).unwrap());
+        let n = u.clone().mod_square(m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_square(&Natural::from_str(m).unwrap());
+        let n = (&u).mod_square(m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_square(&Natural::from_str(m).unwrap());
+        let n = u.clone().mod_square(&m);
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = (&u).mod_square(&m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

@@ -1,13 +1,9 @@
-use itertools::Itertools;
-use malachite_base::num::conversion::traits::RoundingFrom;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::test_util::stats::common_values_map::common_values_map;
-use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
+use malachite_base::test_util::stats::moments::MomentStats;
 use malachite_nz::integer::random::striped_random_nonzero_integers;
-use malachite_nz::integer::Integer;
+use malachite_nz::test_util::integer::random::random_integers_helper_helper;
 
 fn striped_random_nonzero_integers_helper(
     mean_stripe_numerator: u64,
@@ -17,57 +13,20 @@ fn striped_random_nonzero_integers_helper(
     expected_values: &[&str],
     expected_common_values: &[(&str, usize)],
     expected_sample_median: (&str, Option<&str>),
-    expected_sample_moment_stats: Option<MomentStats>,
+    expected_sample_moment_stats: MomentStats,
 ) {
-    let xs = striped_random_nonzero_integers(
-        EXAMPLE_SEED,
-        mean_stripe_numerator,
-        mean_stripe_denominator,
-        mean_bits_numerator,
-        mean_bits_denominator,
-    );
-    let actual_values = xs
-        .clone()
-        .map(|x| Integer::to_string(&x))
-        .take(20)
-        .collect_vec();
-    let actual_values = actual_values.iter().map(String::as_str).collect_vec();
-    let actual_common_values = common_values_map(1000000, 10, xs.clone())
-        .into_iter()
-        .map(|(x, freq)| (x.to_string(), freq))
-        .collect_vec();
-    let actual_common_values = actual_common_values
-        .iter()
-        .map(|(x, freq)| (x.as_str(), *freq))
-        .collect_vec();
-    let (median_lo, median_hi) = median(xs.clone().take(1000000));
-    let (median_lo, median_hi) = (
-        median_lo.to_string(),
-        median_hi.map(|x| Integer::to_string(&x)),
-    );
-    let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
-    // Note that the population moments do not exist.
-    let actual_sample_moment_stats = if expected_sample_moment_stats.is_some() {
-        Some(moment_stats(
-            xs.take(1000000)
-                .map(|x| f64::rounding_from(&x, RoundingMode::Nearest)),
-        ))
-    } else {
-        None
-    };
-    assert_eq!(
-        (
-            actual_values.as_slice(),
-            actual_common_values.as_slice(),
-            actual_sample_median,
-            actual_sample_moment_stats
+    random_integers_helper_helper(
+        striped_random_nonzero_integers(
+            EXAMPLE_SEED,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
         ),
-        (
-            expected_values,
-            expected_common_values,
-            expected_sample_median,
-            expected_sample_moment_stats
-        )
+        expected_values,
+        expected_common_values,
+        expected_sample_median,
+        expected_sample_moment_stats,
     );
 }
 
@@ -105,7 +64,7 @@ fn test_striped_random_nonzero_integers() {
         values,
         common_values,
         sample_median,
-        Some(sample_moment_stats),
+        sample_moment_stats,
     );
     // mean bits = 2
     let values = &[
@@ -139,7 +98,7 @@ fn test_striped_random_nonzero_integers() {
         values,
         common_values,
         sample_median,
-        Some(sample_moment_stats),
+        sample_moment_stats,
     );
     // mean bits = 32
     let values = &[
@@ -191,7 +150,7 @@ fn test_striped_random_nonzero_integers() {
         values,
         common_values,
         sample_median,
-        Some(sample_moment_stats),
+        sample_moment_stats,
     );
     // mean bits = 64
     let values = &[
@@ -229,7 +188,12 @@ fn test_striped_random_nonzero_integers() {
         ("7", 3608),
     ];
     let sample_median = ("1", None);
-    // No moment calculation; abs of some generated `Integer`s exceed `f64::MAX`
+    let sample_moment_stats = MomentStats {
+        mean: NiceFloat(-1.7976931348623025e302),
+        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        skewness: NiceFloat(f64::NAN),
+        excess_kurtosis: NiceFloat(f64::NAN),
+    };
     striped_random_nonzero_integers_helper(
         32,
         1,
@@ -238,7 +202,7 @@ fn test_striped_random_nonzero_integers() {
         values,
         common_values,
         sample_median,
-        None,
+        sample_moment_stats,
     );
 }
 

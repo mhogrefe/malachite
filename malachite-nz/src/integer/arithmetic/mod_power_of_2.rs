@@ -31,8 +31,6 @@ impl ModPowerOf2 for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -77,8 +75,6 @@ impl<'a> ModPowerOf2 for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -119,8 +115,6 @@ impl ModPowerOf2Assign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -170,8 +164,6 @@ impl RemPowerOf2 for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -216,8 +208,6 @@ impl<'a> RemPowerOf2 for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -258,8 +248,6 @@ impl RemPowerOf2Assign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2Assign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -303,8 +291,6 @@ impl CeilingModPowerOf2 for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -349,8 +335,6 @@ impl<'a> CeilingModPowerOf2 for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOf2;
     /// use malachite_nz::integer::Integer;
     ///
@@ -392,8 +376,6 @@ impl CeilingModPowerOf2Assign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOf2Assign;
     /// use malachite_nz::integer::Integer;
     ///

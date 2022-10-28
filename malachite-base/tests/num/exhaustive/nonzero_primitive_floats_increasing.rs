@@ -1,19 +1,12 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::nonzero_primitive_floats_increasing;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::*;
 
 fn nonzero_primitive_floats_increasing_helper<T: PrimitiveFloat>(first_20: &[T], last_20: &[T]) {
-    let xs = nonzero_primitive_floats_increasing::<T>();
-    assert_eq!(
-        xs.clone().take(20).map(NiceFloat).collect_vec(),
-        first_20.iter().copied().map(NiceFloat).collect_vec()
-    );
-    let mut reversed = xs.rev().take(20).map(NiceFloat).collect_vec();
-    reversed.reverse();
-    assert_eq!(
-        reversed,
-        last_20.iter().copied().map(NiceFloat).collect_vec()
+    exhaustive_primitive_floats_helper_helper_with_reverse(
+        nonzero_primitive_floats_increasing::<T>(),
+        first_20,
+        last_20,
     );
 }
 

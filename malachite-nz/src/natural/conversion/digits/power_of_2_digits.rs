@@ -312,8 +312,6 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_base::num::conversion::traits::PowerOf2Digits;
     /// use malachite_base::strings::ToDebugString;
@@ -423,8 +421,6 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_base::num::conversion::traits::PowerOf2Digits;
     /// use malachite_base::strings::ToDebugString;
@@ -478,8 +474,6 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_base::num::conversion::traits::PowerOf2Digits;
     /// use malachite_base::strings::ToDebugString;
@@ -592,8 +586,6 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_base::num::conversion::traits::PowerOf2Digits;
     /// use malachite_base::strings::ToDebugString;

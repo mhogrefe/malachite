@@ -1,5 +1,5 @@
-use crate::malachite_base::num::arithmetic::traits::SaturatingSubAssign;
 use crate::natural::Natural;
+use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
 use malachite_base::num::basic::traits::One;
 
 pub fn factorial_naive(mut n: u64) -> Natural {

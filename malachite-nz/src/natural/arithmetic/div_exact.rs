@@ -1811,8 +1811,6 @@ impl DivExact<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1862,8 +1860,6 @@ impl<'a> DivExact<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1913,8 +1909,6 @@ impl<'a> DivExact<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1982,8 +1976,6 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2049,8 +2041,6 @@ impl DivExactAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2117,8 +2107,6 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

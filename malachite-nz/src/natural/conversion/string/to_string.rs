@@ -183,8 +183,6 @@ impl ToStringBase for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_nz::natural::Natural;
     ///
@@ -222,8 +220,6 @@ impl ToStringBase for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_nz::natural::Natural;
     ///
@@ -257,8 +253,6 @@ impl Display for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -302,8 +296,6 @@ impl Debug for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
@@ -402,8 +394,6 @@ impl Binary for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::natural::Natural;
@@ -586,8 +576,6 @@ impl Octal for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::natural::Natural;
@@ -742,8 +730,6 @@ impl LowerHex for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::natural::Natural;
@@ -808,8 +794,6 @@ impl UpperHex for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::natural::Natural;

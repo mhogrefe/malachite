@@ -196,8 +196,6 @@ impl BitBlockAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
@@ -243,8 +241,6 @@ impl BitBlockAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///
@@ -310,8 +306,6 @@ impl BitBlockAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::natural::Natural;
     ///

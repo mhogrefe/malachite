@@ -4,8 +4,6 @@
 ///
 /// # to_digits_asc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{Two, Zero};
 /// use malachite_base::num::conversion::traits::Digits;
 /// use malachite_nz::natural::Natural;
@@ -17,8 +15,6 @@
 ///
 /// # to_digits_desc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{Two, Zero};
 /// use malachite_base::num::conversion::traits::Digits;
 /// use malachite_nz::natural::Natural;
@@ -30,8 +26,6 @@
 ///
 /// # from_digits_asc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::Digits;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
@@ -57,8 +51,6 @@
 ///
 /// # from_digits_desc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::Digits;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
@@ -88,9 +80,6 @@ pub mod general_digits;
 ///
 /// # power_of_2_digits
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
@@ -123,8 +112,6 @@ pub mod power_of_2_digit_iterable;
 ///
 /// # to_power_of_2_digits_asc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{Two, Zero};
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 /// use malachite_nz::natural::Natural;
@@ -144,8 +131,6 @@ pub mod power_of_2_digit_iterable;
 ///
 /// # to_power_of_2_digits_desc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::{Two, Zero};
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 /// use malachite_nz::natural::Natural;
@@ -165,8 +150,6 @@ pub mod power_of_2_digit_iterable;
 ///
 /// # from_power_of_2_digits_asc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
@@ -191,8 +174,6 @@ pub mod power_of_2_digit_iterable;
 ///
 /// # from_power_of_2_digits_desc
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;

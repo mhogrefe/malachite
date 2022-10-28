@@ -61,8 +61,6 @@ impl From<Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -90,8 +88,6 @@ impl<'a> From<&'a Natural> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;

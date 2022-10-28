@@ -41,8 +41,6 @@ use malachite_base::rounding_modes::RoundingMode;
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_random_natural_with_up_to_bits;
@@ -98,8 +96,6 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_random_natural_with_bits;
@@ -150,8 +146,6 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::random::striped::StripedBitSource;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_striped_random_natural_with_up_to_bits;
@@ -185,8 +179,6 @@ pub fn get_striped_random_natural_with_up_to_bits(xs: &mut StripedBitSource, bit
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::random::striped::StripedBitSource;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_striped_random_natural_with_bits;
@@ -258,8 +250,6 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_naturals;
@@ -318,8 +308,6 @@ pub fn random_naturals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_positive_naturals;
@@ -392,8 +380,6 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::striped_random_naturals;
@@ -453,8 +439,6 @@ pub fn striped_random_naturals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::striped_random_positive_naturals;
@@ -532,8 +516,6 @@ impl Iterator for RandomNaturalsLessThan {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_naturals_less_than;
@@ -593,8 +575,6 @@ impl Iterator for UniformRandomNaturalRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::uniform_random_natural_range;
@@ -649,8 +629,6 @@ pub fn uniform_random_natural_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
@@ -741,8 +719,6 @@ impl Iterator for RandomNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_natural_range_to_infinity;
@@ -862,8 +838,6 @@ impl Iterator for RandomNaturalRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_natural_range;
@@ -959,8 +933,6 @@ pub fn random_natural_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::random_natural_inclusive_range;
@@ -1113,8 +1085,6 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1174,8 +1144,6 @@ pub fn striped_random_natural_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -1282,8 +1250,6 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::striped_random_natural_range_to_infinity;

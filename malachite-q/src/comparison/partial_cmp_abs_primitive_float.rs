@@ -1,7 +1,7 @@
-use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::conversion::traits::ExactFrom;
 use std::cmp::Ordering;
 
 macro_rules! impl_float {

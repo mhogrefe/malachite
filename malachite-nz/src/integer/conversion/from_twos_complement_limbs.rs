@@ -31,8 +31,6 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::platform::Limb;
@@ -83,8 +81,6 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::platform::Limb;
@@ -130,8 +126,6 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::platform::Limb;
@@ -186,8 +180,6 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::platform::Limb;

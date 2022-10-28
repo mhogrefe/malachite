@@ -23,8 +23,6 @@ impl FloorSqrt for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrt;
     /// use malachite_nz::integer::Integer;
     ///
@@ -60,8 +58,6 @@ impl<'a> FloorSqrt for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrt;
     /// use malachite_nz::integer::Integer;
     ///
@@ -98,8 +94,6 @@ impl FloorSqrtAssign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorSqrtAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -152,8 +146,6 @@ impl CeilingSqrt for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::integer::Integer;
     ///
@@ -189,8 +181,6 @@ impl<'a> CeilingSqrt for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrt;
     /// use malachite_nz::integer::Integer;
     ///
@@ -227,8 +217,6 @@ impl CeilingSqrtAssign for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingSqrtAssign;
     /// use malachite_nz::integer::Integer;
     ///
@@ -287,8 +275,6 @@ impl CheckedSqrt for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -334,8 +320,6 @@ impl<'a> CheckedSqrt for &'a Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;

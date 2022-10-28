@@ -1,16 +1,9 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 
 fn exhaustive_nonzero_primitive_floats_helper<T: PrimitiveFloat>(out: &[T]) {
-    assert_eq!(
-        exhaustive_nonzero_primitive_floats::<T>()
-            .take(50)
-            .map(NiceFloat)
-            .collect_vec(),
-        out.iter().copied().map(NiceFloat).collect_vec()
-    );
+    exhaustive_primitive_floats_helper_helper(exhaustive_nonzero_primitive_floats::<T>(), out);
 }
 
 #[test]

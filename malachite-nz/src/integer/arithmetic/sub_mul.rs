@@ -356,8 +356,6 @@ impl SubMul<Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
@@ -393,8 +391,6 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
@@ -430,8 +426,6 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
@@ -467,8 +461,6 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
@@ -504,8 +496,6 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMul};
     /// use malachite_nz::integer::Integer;
     ///
@@ -548,8 +538,6 @@ impl SubMulAssign<Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
@@ -582,8 +570,6 @@ impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
@@ -616,8 +602,6 @@ impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///
@@ -650,8 +634,6 @@ impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, SubMulAssign};
     /// use malachite_nz::integer::Integer;
     ///

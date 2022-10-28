@@ -119,8 +119,6 @@ impl Gcd<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
     ///
@@ -156,8 +154,6 @@ impl<'a> Gcd<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
     ///
@@ -194,8 +190,6 @@ impl<'a> Gcd<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
     ///
@@ -231,8 +225,6 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Gcd;
     /// use malachite_nz::natural::Natural;
     ///
@@ -284,8 +276,6 @@ impl GcdAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::GcdAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -343,8 +333,6 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::GcdAssign;
     /// use malachite_nz::natural::Natural;
     ///

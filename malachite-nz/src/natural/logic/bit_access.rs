@@ -78,8 +78,6 @@ pub_crate_test! {limbs_clear_bit(xs: &mut [Limb], index: u64) {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_base::num::logic::traits::BitAccess;
 /// use malachite_nz::natural::Natural;
@@ -119,8 +117,6 @@ impl BitAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
@@ -163,8 +159,6 @@ impl BitAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -222,8 +216,6 @@ impl BitAccess for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///

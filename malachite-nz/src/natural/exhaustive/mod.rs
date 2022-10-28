@@ -74,8 +74,6 @@ impl Iterator for ExhaustiveNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::natural::exhaustive::exhaustive_naturals;
 ///
@@ -105,8 +103,6 @@ pub const fn exhaustive_naturals() -> ExhaustiveNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 ///
@@ -146,9 +142,6 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_range;
@@ -194,9 +187,6 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
@@ -238,8 +228,6 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_range_to_infinity;
 /// use malachite_nz::natural::Natural;

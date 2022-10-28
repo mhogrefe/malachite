@@ -1,6 +1,6 @@
-use crate::malachite_base::num::conversion::traits::ExactFrom;
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
+use malachite_base::num::conversion::traits::ExactFrom;
 
 macro_rules! impl_float {
     ($t: ident) => {

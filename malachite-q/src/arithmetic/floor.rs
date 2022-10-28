@@ -25,8 +25,6 @@ impl Floor for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Floor;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -67,8 +65,6 @@ impl<'a> Floor for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Floor;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
@@ -107,8 +103,6 @@ impl FloorAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;

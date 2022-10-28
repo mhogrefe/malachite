@@ -724,8 +724,6 @@ impl EqMod<Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -794,8 +792,6 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -864,8 +860,6 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -934,8 +928,6 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1004,8 +996,6 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1074,8 +1064,6 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1144,8 +1132,6 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -1214,8 +1200,6 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;

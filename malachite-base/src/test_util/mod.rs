@@ -6,5 +6,7 @@ pub mod hash;
 pub mod num;
 pub mod rounding_modes;
 pub mod runner;
+pub mod sets;
 pub mod slices;
 pub mod stats;
+pub mod vecs;

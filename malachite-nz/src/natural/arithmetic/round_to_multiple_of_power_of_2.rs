@@ -354,8 +354,6 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
@@ -437,8 +435,6 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
@@ -508,8 +504,6 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;

@@ -179,8 +179,6 @@ impl FromSciString for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::num::conversion::traits::FromSciString;
     /// use malachite_base::rounding_modes::RoundingMode;

@@ -1,8 +1,8 @@
-use crate::malachite_q::arithmetic::traits::DenominatorsInClosedInterval;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::arithmetic::traits::DenominatorsInClosedInterval;
 use malachite_q::test_util::bench::bucketers::pair_2_rational_bit_bucketer;
 use malachite_q::test_util::generators::rational_pair_gen_var_3;
 use malachite_q::Rational;

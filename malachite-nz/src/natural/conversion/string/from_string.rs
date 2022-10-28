@@ -167,8 +167,6 @@ impl FromStringBase for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::traits::{Digits, FromStringBase};
     /// use malachite_nz::natural::Natural;
     ///

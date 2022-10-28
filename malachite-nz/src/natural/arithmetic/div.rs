@@ -1948,8 +1948,6 @@ impl Div<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -1989,8 +1987,6 @@ impl<'a> Div<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -2030,8 +2026,6 @@ impl<'a> Div<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2089,8 +2083,6 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
@@ -2142,8 +2134,6 @@ impl DivAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -2200,8 +2190,6 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

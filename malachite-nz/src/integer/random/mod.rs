@@ -75,8 +75,6 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_natural_integers;
@@ -135,8 +133,6 @@ pub fn random_natural_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_positive_integers;
@@ -195,8 +191,6 @@ pub fn random_positive_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_negative_integers;
@@ -256,8 +250,6 @@ pub fn random_negative_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_nonzero_integers;
@@ -317,8 +309,6 @@ pub fn random_nonzero_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integers;
@@ -394,8 +384,6 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_natural_integers;
@@ -455,8 +443,6 @@ pub fn striped_random_natural_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_positive_integers;
@@ -517,8 +503,6 @@ pub fn striped_random_positive_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_negative_integers;
@@ -582,8 +566,6 @@ pub fn striped_random_negative_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_nonzero_integers;
@@ -647,8 +629,6 @@ pub fn striped_random_nonzero_integers(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integers;
@@ -721,8 +701,6 @@ impl Iterator for UniformRandomIntegerRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::uniform_random_integer_range;
@@ -773,8 +751,6 @@ pub fn uniform_random_integer_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
@@ -890,8 +866,6 @@ impl Iterator for RandomIntegerRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range_to_infinity;
@@ -949,8 +923,6 @@ pub fn random_integer_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range_to_negative_infinity;
@@ -1067,8 +1039,6 @@ impl Iterator for RandomIntegerRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_range;
@@ -1140,8 +1110,6 @@ pub fn random_integer_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::random_integer_inclusive_range;
@@ -1248,8 +1216,6 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
@@ -1313,8 +1279,6 @@ pub fn striped_random_integer_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
@@ -1494,8 +1458,6 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integer_range_to_infinity;
@@ -1584,8 +1546,6 @@ pub fn striped_random_integer_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::striped_random_integer_range_to_negative_infinity;

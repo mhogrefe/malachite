@@ -18,8 +18,6 @@ impl Neg for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
@@ -53,8 +51,6 @@ impl<'a> Neg for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
     ///
@@ -87,8 +83,6 @@ impl NegAssign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;

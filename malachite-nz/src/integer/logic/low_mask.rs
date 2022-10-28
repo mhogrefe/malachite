@@ -17,8 +17,6 @@ impl LowMask for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_nz::integer::Integer;
     ///

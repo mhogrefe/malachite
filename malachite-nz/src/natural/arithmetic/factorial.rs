@@ -1,5 +1,3 @@
-use crate::malachite_base::num::basic::integers::PrimitiveInt;
-use crate::malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
@@ -16,7 +14,9 @@ use malachite_base::num::arithmetic::traits::{
     DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square, Subfactorial,
     XMulYToZZ,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
 #[cfg(not(feature = "32_bit_limbs"))]

@@ -1,13 +1,3 @@
-use crate::malachite_base::fail_on_untested_path;
-use crate::malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
-    XXAddYYToZZ, XXSubYYToZZ,
-};
-use crate::malachite_base::num::basic::integers::PrimitiveInt;
-use crate::malachite_base::num::basic::traits::Iverson;
-use crate::malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use crate::malachite_base::num::logic::traits::LowMask;
-use crate::malachite_base::slices::slice_leading_zeros;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -24,7 +14,16 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::platform::{Limb, SignedLimb, FFT_TAB, MULMOD_TAB};
-use malachite_base::slices::slice_set_zero;
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
+    XXAddYYToZZ, XXSubYYToZZ,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::logic::traits::LowMask;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 
@@ -791,9 +790,6 @@ fn limbs_fft_butterfly(
 ) {
     let n = ss.len();
     assert_ne!(n, 0);
-    assert_eq!(ts.len(), n);
-    assert_eq!(xs.len(), n);
-    assert_eq!(xs.len(), n);
     let b = i * w;
     let y = b >> Limb::LOG_WIDTH;
     limbs_butterfly_lsh_b(ss, ts, xs, ys, 0, y);

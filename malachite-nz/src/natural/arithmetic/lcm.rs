@@ -21,8 +21,6 @@ impl Lcm<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
     ///
@@ -55,8 +53,6 @@ impl<'a> Lcm<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
     ///
@@ -90,8 +86,6 @@ impl<'a> Lcm<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
     ///
@@ -124,8 +118,6 @@ impl<'a, 'b> Lcm<&'a Natural> for &'b Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Lcm;
     /// use malachite_nz::natural::Natural;
     ///
@@ -167,8 +159,6 @@ impl LcmAssign<Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LcmAssign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -211,8 +201,6 @@ impl<'a> LcmAssign<&'a Natural> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::LcmAssign;
     /// use malachite_nz::natural::Natural;
     ///

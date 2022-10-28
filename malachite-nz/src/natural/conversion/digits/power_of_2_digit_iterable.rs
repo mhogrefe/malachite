@@ -385,8 +385,6 @@ impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     /// use malachite_nz::natural::Natural;
@@ -736,8 +734,6 @@ impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
     /// use malachite_nz::natural::Natural;
@@ -788,8 +784,6 @@ impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     /// use malachite_nz::natural::Natural;
@@ -861,9 +855,6 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    /// extern crate malachite_base;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;

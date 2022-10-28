@@ -24,8 +24,6 @@ impl NextPowerOf2 for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
     /// use malachite_q::Rational;
     ///
@@ -66,8 +64,6 @@ impl<'a> NextPowerOf2 for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2;
     /// use malachite_q::Rational;
     ///
@@ -103,8 +99,6 @@ impl NextPowerOf2Assign for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;

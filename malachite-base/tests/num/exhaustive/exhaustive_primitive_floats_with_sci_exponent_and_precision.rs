@@ -1,7 +1,6 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_sci_exponent_and_precision;
-use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::num::exhaustive::*;
 use std::panic::catch_unwind;
 
 fn exhaustive_primitive_floats_with_sci_exponent_and_precision_helper<T: PrimitiveFloat>(
@@ -9,11 +8,10 @@ fn exhaustive_primitive_floats_with_sci_exponent_and_precision_helper<T: Primiti
     precision: u64,
     out: &[T],
 ) {
-    let xs =
-        exhaustive_primitive_floats_with_sci_exponent_and_precision::<T>(sci_exponent, precision);
-    assert_eq!(
-        xs.take(20).map(NiceFloat).collect_vec(),
-        out.iter().copied().map(NiceFloat).collect_vec()
+    exhaustive_primitive_floats_helper_helper_with_limit(
+        20,
+        exhaustive_primitive_floats_with_sci_exponent_and_precision::<T>(sci_exponent, precision),
+        out,
     );
 }
 

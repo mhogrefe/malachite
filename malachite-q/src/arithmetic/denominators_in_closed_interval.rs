@@ -162,8 +162,6 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// Panics if $a \geq b$.
     ///
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::iterators::prefix_to_string;
     /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_q::arithmetic::traits::DenominatorsInClosedInterval;

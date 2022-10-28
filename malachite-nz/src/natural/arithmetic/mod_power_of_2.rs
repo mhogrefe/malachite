@@ -153,8 +153,6 @@ impl ModPowerOf2 for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -189,8 +187,6 @@ impl<'a> ModPowerOf2 for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -220,8 +216,6 @@ impl ModPowerOf2Assign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -267,8 +261,6 @@ impl RemPowerOf2 for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -309,8 +301,6 @@ impl<'a> RemPowerOf2 for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -343,8 +333,6 @@ impl RemPowerOf2Assign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::RemPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
     ///
@@ -386,8 +374,6 @@ impl NegModPowerOf2 for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -426,8 +412,6 @@ impl<'a> NegModPowerOf2 for &'a Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2;
     /// use malachite_nz::natural::Natural;
     ///
@@ -471,8 +455,6 @@ impl NegModPowerOf2Assign for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::NegModPowerOf2Assign;
     /// use malachite_nz::natural::Natural;
     ///

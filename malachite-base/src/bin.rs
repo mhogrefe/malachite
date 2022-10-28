@@ -7,13 +7,13 @@ extern crate malachite_base;
 extern crate walkdir;
 
 #[cfg(feature = "bin_build")]
-use crate::bin_util::demo_and_bench::register;
+use bin_util::demo_and_bench::register;
 #[cfg(feature = "bin_build")]
-use crate::bin_util::generate::max_base::generate_max_base;
+use bin_util::generate::max_base::generate_max_base;
 #[cfg(feature = "bin_build")]
-use crate::bin_util::generate::rle::generate_rle_encoding;
+use bin_util::generate::rle::generate_rle_encoding;
 #[cfg(feature = "bin_build")]
-use crate::bin_util::generate::tuning_manager::{build_reference_data, test};
+use bin_util::generate::tuning_manager::{build_reference_data, test};
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
 #[cfg(feature = "bin_build")]

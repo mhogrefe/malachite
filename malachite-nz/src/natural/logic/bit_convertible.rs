@@ -23,8 +23,6 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -70,8 +68,6 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
@@ -106,8 +102,6 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
     /// use std::iter::empty;
@@ -145,8 +139,6 @@ impl BitConvertible for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
     /// use std::iter::empty;

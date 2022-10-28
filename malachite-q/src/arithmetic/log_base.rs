@@ -27,8 +27,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_q::Rational;
@@ -163,8 +161,6 @@ impl<'a, 'b> FloorLogBase<&'b Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::FloorLogBase;
     /// use malachite_q::Rational;
     ///
@@ -212,8 +208,6 @@ impl<'a, 'b> CeilingLogBase<&'b Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CeilingLogBase;
     /// use malachite_q::Rational;
     ///
@@ -273,8 +267,6 @@ impl<'a, 'b> CheckedLogBase<&'b Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase;
     /// use malachite_q::Rational;
     ///

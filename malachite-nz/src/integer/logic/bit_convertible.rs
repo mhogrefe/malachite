@@ -96,8 +96,6 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -145,8 +143,6 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
@@ -192,8 +188,6 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
     /// use std::iter::empty;
@@ -259,8 +253,6 @@ impl BitConvertible for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
     /// use std::iter::empty;
