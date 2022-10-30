@@ -334,7 +334,7 @@ impl CheckedFactorial for usize {
     ///     \operatorname{None} & \text{if} \\quad n! \geq 2^W,
     /// \\end{cases}
     /// $$
-    /// where $W$ is `Self::WIDTH`.
+    /// where $W$ is `usize::WIDTH`.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -363,7 +363,7 @@ impl CheckedSubfactorial for usize {
     ///     \operatorname{None} & \text{if} \\quad !n \geq 2^W,
     /// \\end{cases}
     /// $$
-    /// where $W$ is `Self::WIDTH`.
+    /// where $W$ is `usize::WIDTH`.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -389,7 +389,7 @@ impl CheckedDoubleFactorial for usize {
     ///     \operatorname{None} & \text{if} \\quad n!! \geq 2^W,
     /// \\end{cases}
     /// $$
-    /// where $W$ is `Self::WIDTH`.
+    /// where $W$ is `usize::WIDTH`.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -412,7 +412,7 @@ macro_rules! impl_factorials_b {
             /// Computes the factorial of a number.
             ///
             /// If the input is too large, the function panics. For a function that returns `None`
-            /// instead, try [`CheckedFactorial`].
+            /// instead, try [`checked_factorial`](CheckedFactorial::checked_factorial).
             ///
             /// $$
             /// f(n) = n! = 1 \times 2 \times 3 \times \cdots \times n.
@@ -420,6 +420,9 @@ macro_rules! impl_factorials_b {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            /// 
+            /// # Panics
+            /// Panics if the output is too large to be represented.
             ///
             /// # Examples
             /// See [here](super::factorial#factorial).
@@ -433,7 +436,8 @@ macro_rules! impl_factorials_b {
             /// Computes the double factorial of a number.
             ///
             /// If the input is too large, the function panics. For a function that returns `None`
-            /// instead, try [`CheckedDoubleFactorial`].
+            /// instead, try
+            /// [`checked_double_factorial`](CheckedDoubleFactorial::checked_double_factorial).
             ///
             /// $$
             /// f(n) = n!! = n \times (n - 2) \times (n - 4) \times \cdots \times i,
@@ -443,6 +447,9 @@ macro_rules! impl_factorials_b {
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if the output is too large to be represented.
+            /// 
             /// # Examples
             /// See [here](super::factorial#double_factorial).
             #[inline]
@@ -455,7 +462,8 @@ macro_rules! impl_factorials_b {
             /// Computes a multifactorial of a number.
             ///
             /// If the input is too large, the function panics. For a function that returns `None`
-            /// instead, try [`CheckedMultifactorial`].
+            /// instead, try
+            /// [`checked_multifactorial`](CheckedMultifactorial::checked_multifactorial).
             ///
             /// $$
             /// f(n, m) = n!^{(m)} = n \times (n - m) \times (n - 2m) \times \cdots \times i.
@@ -466,6 +474,9 @@ macro_rules! impl_factorials_b {
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if the output is too large to be represented.
+            /// 
             /// # Examples
             /// See [here](super::factorial#multifactorial).
             #[inline]
@@ -512,7 +523,7 @@ macro_rules! impl_factorials_b {
             /// derangement is a permutation with no fixed points.
             ///
             /// If the input is too large, the function panics. For a function that returns `None`
-            /// instead, try [`CheckedSubfactorial`].
+            /// instead, try [`checked_subfactorial`](CheckedSubfactorial::checked_subfactorial).
             ///
             /// $$
             /// f(n) = \\ !n = \lfloor n!/e \rfloor.
@@ -521,6 +532,9 @@ macro_rules! impl_factorials_b {
             /// # Worst-case complexity
             /// Constant time and additional memory.
             ///
+            /// # Panics
+            /// Panics if the output is too large to be represented.
+            /// 
             /// # Examples
             /// See [here](super::factorial#subfactorial).
             #[inline]

@@ -397,6 +397,7 @@ pub trait PrimitiveInt:
     + ToSci
     + ToStringBase
     + TrailingZeros
+    + TryFrom<NiceFloat<f32>>
     + TryFrom<NiceFloat<f64>>
     + TryFrom<i128>
     + TryFrom<i16>
@@ -410,6 +411,7 @@ pub trait PrimitiveInt:
     + TryFrom<u64>
     + TryFrom<u8>
     + TryFrom<usize>
+    + TryInto<NiceFloat<f32>>
     + TryInto<NiceFloat<f64>>
     + TryInto<i128>
     + TryInto<i16>

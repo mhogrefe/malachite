@@ -2,9 +2,9 @@ use crate::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial, CheckedLcm, CheckedLogBase,
     CheckedLogBase2, CheckedLogBasePowerOf2, CheckedMultifactorial, CheckedNextPowerOf2,
-    CheckedSubfactorial, CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial, FloorLogBase,
-    FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign, ModAdd,
-    ModAddAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed,
+    CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial,
+    FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign,
+    ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed,
     ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed,
     ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse,
     ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
@@ -13,8 +13,8 @@ use crate::num::arithmetic::traits::{
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
     ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod,
     NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
-    RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ, XXAddYYToZZ,
-    XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
+    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ,
+    XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::traits::{
@@ -36,6 +36,7 @@ pub trait PrimitiveUnsigned:
     + CheckedDoubleFactorial
     + CheckedFactorial
     + CheckedMultifactorial
+    + CheckedPrimorial
     + CheckedSubfactorial
     + CheckedLcm<Self, Output = Self>
     + CheckedLogBase<Output = u64>
@@ -158,6 +159,7 @@ pub trait PrimitiveUnsigned:
     + PowerOf2DigitIterable<usize>
     + Primes<I = PrimesIterator<Self>, LI = PrimesLessThanIterator<Self>>
     + PrimitiveInt
+    + Primorial
     + RootRem<u64, RootOutput = Self, RemOutput = Self>
     + RootAssignRem<u64, RemOutput = Self>
     + SciMantissaAndExponent<f32, u64>

@@ -238,6 +238,7 @@ pub mod num {
         pub mod parity;
         pub mod pow;
         pub mod power_of_2;
+        pub mod primorial;
         pub mod root;
         pub mod rotate;
         pub mod round_to_multiple;

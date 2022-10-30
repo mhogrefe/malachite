@@ -2867,6 +2867,16 @@ pub fn random_unsigned_gen_var_25<T: PrimitiveUnsigned>(config: &GenConfig) -> I
     ))
 }
 
+pub fn random_unsigned_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_primorial);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_27<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_product_of_first_n_primes);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(

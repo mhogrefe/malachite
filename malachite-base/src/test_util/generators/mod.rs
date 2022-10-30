@@ -1618,6 +1618,24 @@ pub fn unsigned_gen_var_26<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
+// All `u64`s whose primorial is representable as a `T`.
+pub fn unsigned_gen_var_27<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_26::<T>,
+        &random_unsigned_gen_var_26::<T>,
+        &special_random_unsigned_gen_var_23::<T>,
+    )
+}
+
+// All `u64`s `n` such that the product of the first `n` primes is representable as a `T`.
+pub fn unsigned_gen_var_28<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_27::<T>,
+        &random_unsigned_gen_var_27::<T>,
+        &special_random_unsigned_gen_var_24::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

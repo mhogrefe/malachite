@@ -2400,6 +2400,67 @@ pub mod pow;
 /// assert_eq!(f32::power_of_2(-3), 0.125);
 /// ```
 pub mod power_of_2;
+/// Traits for computing the primorial and the product of the first $n$ primes. There is a trait
+/// whose implementations panic if the result cannot be represented, and a checked trait whose
+/// implementations return `None` in that case: [`Primorial`](traits::Primorial) and
+/// [`CheckedPrimorial`](traits::CheckedPrimorial).
+///
+/// # primorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::Primorial;
+///
+/// assert_eq!(u8::primorial(0), 1);
+/// assert_eq!(u8::primorial(1), 1);
+/// assert_eq!(u8::primorial(2), 2);
+/// assert_eq!(u8::primorial(3), 6);
+/// assert_eq!(u8::primorial(4), 6);
+/// assert_eq!(u8::primorial(5), 30);
+/// assert_eq!(u32::primorial(20), 9699690);
+/// ```
+/// 
+/// # product_of_first_n_primes
+/// ```
+/// use malachite_base::num::arithmetic::traits::Primorial;
+///
+/// assert_eq!(u8::product_of_first_n_primes(0), 1);
+/// assert_eq!(u8::product_of_first_n_primes(1), 2);
+/// assert_eq!(u8::product_of_first_n_primes(2), 6);
+/// assert_eq!(u8::product_of_first_n_primes(3), 30);
+/// assert_eq!(u8::product_of_first_n_primes(4), 210);
+/// assert_eq!(u32::product_of_first_n_primes(9), 223092870);
+/// ```
+///
+/// # checked_primorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedPrimorial;
+///
+/// assert_eq!(u8::checked_primorial(0), Some(1));
+/// assert_eq!(u8::checked_primorial(1), Some(1));
+/// assert_eq!(u8::checked_primorial(2), Some(2));
+/// assert_eq!(u8::checked_primorial(3), Some(6));
+/// assert_eq!(u8::checked_primorial(4), Some(6));
+/// assert_eq!(u8::checked_primorial(5), Some(30));
+///
+/// assert_eq!(u8::checked_primorial(11), None);
+/// assert_eq!(u32::checked_primorial(20), Some(9699690));
+/// assert_eq!(u32::checked_primorial(100), None);
+/// ```
+/// 
+/// # checked_product_of_first_n_primes
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedPrimorial;
+///
+/// assert_eq!(u8::checked_product_of_first_n_primes(0), Some(1));
+/// assert_eq!(u8::checked_product_of_first_n_primes(1), Some(2));
+/// assert_eq!(u8::checked_product_of_first_n_primes(2), Some(6));
+/// assert_eq!(u8::checked_product_of_first_n_primes(3), Some(30));
+/// assert_eq!(u8::checked_product_of_first_n_primes(4), Some(210));
+/// assert_eq!(u32::checked_product_of_first_n_primes(9), Some(223092870));
+/// 
+/// assert_eq!(u8::checked_product_of_first_n_primes(5), None);
+/// assert_eq!(u32::checked_product_of_first_n_primes(100), None);
+/// ```
+pub mod primorial;
 /// Traits for taking the $n$th root of a number.
 ///
 /// The traits are [`FloorRoot`](traits::FloorRoot), [`FloorRootAssign`](traits::FloorRootAssign),

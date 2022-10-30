@@ -2833,6 +2833,28 @@ pub fn special_random_unsigned_gen_var_22<T: PrimitiveUnsigned>(config: &GenConf
     ))
 }
 
+pub fn special_random_unsigned_gen_var_23<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_primorial);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_24<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_product_of_first_n_primes);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn special_random_unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>(

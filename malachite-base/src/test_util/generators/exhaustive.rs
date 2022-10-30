@@ -1834,6 +1834,16 @@ pub fn exhaustive_unsigned_gen_var_25<T: PrimitiveUnsigned>() -> It<u64> {
     Box::new(primitive_int_increasing_range(0, limit))
 }
 
+pub fn exhaustive_unsigned_gen_var_26<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_primorial);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
+pub fn exhaustive_unsigned_gen_var_27<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_product_of_first_n_primes);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(

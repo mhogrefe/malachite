@@ -1148,6 +1148,18 @@ pub trait PowerOf2<POW> {
     fn power_of_2(pow: POW) -> Self;
 }
 
+pub trait Primorial {
+    fn primorial(n: u64) -> Self;
+
+    fn product_of_first_n_primes(n: u64) -> Self;
+}
+
+pub trait CheckedPrimorial: Sized {
+    fn checked_primorial(n: u64) -> Option<Self>;
+
+    fn checked_product_of_first_n_primes(n: u64) -> Option<Self>;
+}
+
 /// Finds the reciprocal (multiplicative inverse) of a number.
 pub trait Reciprocal {
     type Output;
