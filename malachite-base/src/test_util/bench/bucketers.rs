@@ -128,6 +128,20 @@ where
     }
 }
 
+pub fn abs_usize_convertible_pair_max_bucketer<'a, T: Copy + UnsignedAbs>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, T)>
+where
+    usize: ExactFrom<<T as UnsignedAbs>::Output>,
+    <T as UnsignedAbs>::Output: Ord,
+{
+    Bucketer {
+        bucketing_function: &|&(x, y)| usize::exact_from(max(x.unsigned_abs(), y.unsigned_abs())),
+        bucketing_label: format!("max({}, {})", x_name, y_name),
+    }
+}
+
 pub fn usize_convertible_pair_ratio_bucketer<'a, T: Copy>(
     x_name: &'a str,
     y_name: &'a str,

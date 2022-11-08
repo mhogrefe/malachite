@@ -1,3 +1,4 @@
+use crate::malachite_base::num::arithmetic::traits::BinomialCoefficient;
 use itertools::repeat_n;
 use malachite_base::vecs::exhaustive::next_bit_pattern;
 
@@ -31,7 +32,12 @@ fn next_bit_pattern_helper(
         patterns.push(pattern_to_string(&pattern));
         next_bit_pattern(&mut pattern, &mut bit_count, min_bits, max_bits);
     }
-    //TODO length is sum of binomial coefficients
+    assert_eq!(
+        patterns.len(),
+        (min_bits..=max_bits)
+            .map(|b| usize::binomial_coefficient(width, b))
+            .sum()
+    );
     assert_eq!(patterns, expected_patterns);
 }
 

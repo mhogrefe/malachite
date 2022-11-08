@@ -786,6 +786,22 @@ pub fn signed_pair_gen_var_10<
     )
 }
 
+// All `(T, U)` where `T` and `U` are signed and both the `T` and the `U` are small.
+pub fn signed_pair_gen_var_11<T: PrimitiveSigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_signed_pair_gen_var_12,
+        &random_signed_pair_gen_var_10,
+    )
+}
+
+// All `(T, T)` where the `T`s are small, signed, and valid inputs to `T::binomial_coefficient`.
+pub fn signed_pair_gen_var_12<T: PrimitiveSigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_signed_pair_gen_var_13,
+        &random_signed_pair_gen_var_11,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
@@ -2149,6 +2165,14 @@ pub fn unsigned_pair_gen_var_43<T: PrimitiveUnsigned>() -> Generator<(u64, u64)>
     Generator::new_no_special(
         &exhaustive_unsigned_pair_gen_var_30::<T>,
         &random_unsigned_pair_gen_var_31::<T>,
+    )
+}
+
+// All `(T, T)` where the `T`s are small, unsigned, and valid inputs to `T::binomial_coefficient`.
+pub fn unsigned_pair_gen_var_44<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_31,
+        &random_unsigned_pair_gen_var_32,
     )
 }
 

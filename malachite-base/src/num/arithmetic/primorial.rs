@@ -72,7 +72,7 @@ macro_rules! impl_primorials_a {
         impl CheckedPrimorial for $t {
             /// Computes the primorial of a number: the product of all primes less than or equal to
             /// it.
-            /// 
+            ///
             /// The
             /// [`checked_product_of_first_n_primes`](CheckedPrimorial::checked_product_of_first_n_primes)
             /// function is similar; it computes the primorial of the $n$th prime.
@@ -102,7 +102,7 @@ macro_rules! impl_primorials_a {
             }
 
             /// Computes the product of the first $n$ primes.
-            /// 
+            ///
             /// The [`checked_primorial`](CheckedPrimorial::checked_primorial) function is similar;
             /// it computes the product of all primes less than or equal to $n$.
             ///
@@ -136,7 +136,7 @@ impl_primorials_a!(u128, PRIMORIALS_U128, PRIMORIAL_PRIMES_U128);
 
 impl CheckedPrimorial for usize {
     /// Computes the primorial of a [`usize`]: the product of all primes less than or equal to it.
-    /// 
+    ///
     /// The
     /// [`checked_product_of_first_n_primes`](CheckedPrimorial::checked_product_of_first_n_primes)
     /// function is similar; it computes the primorial of the $n$th prime.
@@ -166,7 +166,7 @@ impl CheckedPrimorial for usize {
     }
 
     /// Computes the product of the first $n$ primes.
-    /// 
+    ///
     /// The [`checked_primorial`](CheckedPrimorial::checked_primorial) function is similar; it
     /// computes the product of all primes less than or equal to $n$.
     ///
@@ -200,7 +200,7 @@ macro_rules! impl_primorials_b {
         impl Primorial for $t {
             /// Computes the primorial of a number: the product of all primes less than or equal to
             /// it.
-            /// 
+            ///
             /// The [`product_of_first_n_primes`](Primorial::product_of_first_n_primes) function is
             /// similar; it computes the primorial of the $n$th prime.
             ///
@@ -216,7 +216,7 @@ macro_rules! impl_primorials_b {
             ///
             /// # Panics
             /// Panics if the output is too large to be represented.
-            /// 
+            ///
             /// # Examples
             /// See [here](super::primorial#primorial).
             #[inline]
@@ -225,7 +225,7 @@ macro_rules! impl_primorials_b {
             }
 
             /// Computes the product of the first $n$ primes.
-            /// 
+            ///
             /// The [`primorial`](Primorial::primorial) function is similar; it computes the
             /// product of all primes less than or equal to $n$.
             ///
@@ -243,7 +243,7 @@ macro_rules! impl_primorials_b {
             ///
             /// # Panics
             /// Panics if the output is too large to be represented.
-            /// 
+            ///
             /// # Examples
             /// See [here](super::primorial#product_of_first_n_primes).
             #[inline]

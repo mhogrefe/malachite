@@ -1,20 +1,10 @@
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CheckedDoubleFactorial, DivExact, DivExactAssign, Factorial, FloorRoot,
+    ArithmeticCheckedShl, BinomialCoefficient, CheckedDoubleFactorial, DivExactAssign, FloorRoot,
     OverflowingMulAssign, WrappingMulAssign,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::CountOnes;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-
-// TODO replace
-fn simple_binomial(n: Limb, k: Limb) -> Limb {
-    let n = u64::wrapping_from(n);
-    let k = u64::wrapping_from(k);
-    Limb::exact_from(
-        &Natural::factorial(n).div_exact(Natural::factorial(k) * Natural::factorial(n - k)),
-    )
-}
 
 #[allow(clippy::useless_conversion)]
 fn odd_factorial_table() -> Limb {
@@ -30,7 +20,7 @@ fn odd_factorial_table() -> Limb {
         }
     }
     xs.push(x);
-    let mut y = simple_binomial(limit, limit >> 1);
+    let mut y = Limb::binomial_coefficient(limit, limit >> 1);
     let mut ext_limit = 0;
     for b in limit + 1.. {
         let a = b >> b.trailing_zeros();

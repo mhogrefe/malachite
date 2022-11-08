@@ -132,6 +132,7 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
+pub mod binomial_coefficient;
 /// [`Ceiling`](traits::Ceiling) and [`CeilingAssign`](traits::CeilingAssign), traits for computing
 /// the ceiling of a number.
 ///
@@ -2417,7 +2418,7 @@ pub mod power_of_2;
 /// assert_eq!(u8::primorial(5), 30);
 /// assert_eq!(u32::primorial(20), 9699690);
 /// ```
-/// 
+///
 /// # product_of_first_n_primes
 /// ```
 /// use malachite_base::num::arithmetic::traits::Primorial;
@@ -2445,7 +2446,7 @@ pub mod power_of_2;
 /// assert_eq!(u32::checked_primorial(20), Some(9699690));
 /// assert_eq!(u32::checked_primorial(100), None);
 /// ```
-/// 
+///
 /// # checked_product_of_first_n_primes
 /// ```
 /// use malachite_base::num::arithmetic::traits::CheckedPrimorial;
@@ -2456,7 +2457,7 @@ pub mod power_of_2;
 /// assert_eq!(u8::checked_product_of_first_n_primes(3), Some(30));
 /// assert_eq!(u8::checked_product_of_first_n_primes(4), Some(210));
 /// assert_eq!(u32::checked_product_of_first_n_primes(9), Some(223092870));
-/// 
+///
 /// assert_eq!(u8::checked_product_of_first_n_primes(5), None);
 /// assert_eq!(u32::checked_product_of_first_n_primes(100), None);
 /// ```

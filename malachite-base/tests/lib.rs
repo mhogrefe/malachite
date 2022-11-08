@@ -176,6 +176,7 @@ pub mod num {
         pub mod add_mul;
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;
+        pub mod binomial_coefficient;
         pub mod ceiling;
         pub mod checked_abs;
         pub mod checked_add_mul;

@@ -420,7 +420,7 @@ macro_rules! impl_factorials_b {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
-            /// 
+            ///
             /// # Panics
             /// Panics if the output is too large to be represented.
             ///
@@ -449,7 +449,7 @@ macro_rules! impl_factorials_b {
             ///
             /// # Panics
             /// Panics if the output is too large to be represented.
-            /// 
+            ///
             /// # Examples
             /// See [here](super::factorial#double_factorial).
             #[inline]
@@ -476,7 +476,7 @@ macro_rules! impl_factorials_b {
             ///
             /// # Panics
             /// Panics if the output is too large to be represented.
-            /// 
+            ///
             /// # Examples
             /// See [here](super::factorial#multifactorial).
             #[inline]
@@ -534,7 +534,7 @@ macro_rules! impl_factorials_b {
             ///
             /// # Panics
             /// Panics if the output is too large to be represented.
-            /// 
+            ///
             /// # Examples
             /// See [here](super::factorial#subfactorial).
             #[inline]

@@ -112,7 +112,7 @@ fn benchmark_factorial_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.factorial(u64)", T::NAME),
+        &format!("{}::factorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_23::<T>().get(gm, &config),
         gm.name(),
@@ -135,7 +135,7 @@ fn benchmark_checked_factorial<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_factorial(u64)", T::NAME),
+        &format!("{}::checked_factorial(u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_gen().get(gm, &config),
         gm.name(),
@@ -153,7 +153,7 @@ fn benchmark_double_factorial_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.double_factorial(u64)", T::NAME),
+        &format!("{}::double_factorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_24::<T>().get(gm, &config),
         gm.name(),
@@ -176,7 +176,7 @@ fn benchmark_checked_double_factorial<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_double_factorial(u64)", T::NAME),
+        &format!("{}::checked_double_factorial(u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_gen().get(gm, &config),
         gm.name(),
@@ -196,7 +196,7 @@ fn benchmark_multifactorial_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.multifactorial(u64, u64)", T::NAME),
+        &format!("{}::multifactorial(u64, u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_pair_gen_var_43::<T>().get(gm, &config),
         gm.name(),
@@ -219,7 +219,7 @@ fn benchmark_checked_multifactorial<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_multifactorial(u64, u64)", T::NAME),
+        &format!("{}::checked_multifactorial(u64, u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_12().get(gm, &config),
         gm.name(),
@@ -239,7 +239,7 @@ fn benchmark_subfactorial_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.subfactorial(u64)", T::NAME),
+        &format!("{}::subfactorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_25::<T>().get(gm, &config),
         gm.name(),
@@ -262,7 +262,7 @@ fn benchmark_checked_subfactorial<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_subfactorial(u64)", T::NAME),
+        &format!("{}::checked_subfactorial(u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_gen().get(gm, &config),
         gm.name(),

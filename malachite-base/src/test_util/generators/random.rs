@@ -2076,6 +2076,39 @@ pub fn random_signed_pair_gen_var_9<
     )
 }
 
+pub fn random_signed_pair_gen_var_10<T: PrimitiveSigned, U: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_signed_pair_gen_var_11<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(geometric_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_small_n", 32),
+            config.get_or("mean_small_d", 1),
+        ))
+        .filter(|&(n, k)| T::checked_binomial_coefficient(n, k).is_some()),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 fn halve_bits<T: PrimitiveSigned>(x: T) -> T {
@@ -3603,6 +3636,17 @@ pub fn random_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>(config: &GenConfig)
         ms_to_n_limit: HashMap::new(),
         phantom: PhantomData::<*const T>,
     })
+}
+
+pub fn random_unsigned_pair_gen_var_32<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_small_n", 32),
+            config.get_or("mean_small_d", 1),
+        ))
+        .filter(|&(n, k)| T::checked_binomial_coefficient(n, k).is_some()),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --

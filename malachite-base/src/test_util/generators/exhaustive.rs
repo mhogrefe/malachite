@@ -906,6 +906,17 @@ pub fn exhaustive_signed_pair_gen_var_11<
     )
 }
 
+pub fn exhaustive_signed_pair_gen_var_12<T: PrimitiveSigned, U: PrimitiveSigned>() -> It<(T, U)> {
+    Box::new(exhaustive_pairs(exhaustive_signeds(), exhaustive_signeds()))
+}
+
+pub fn exhaustive_signed_pair_gen_var_13<T: PrimitiveSigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_signeds())
+            .filter(|&(n, k)| T::checked_binomial_coefficient(n, k).is_some()),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, T, T)> {
@@ -2383,6 +2394,13 @@ pub fn exhaustive_unsigned_pair_gen_var_30<T: PrimitiveUnsigned>() -> It<(u64, u
             phantom: PhantomData::<*const T>,
         },
     )))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_unsigneds())
+            .filter(|&(n, k)| T::checked_binomial_coefficient(n, k).is_some()),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

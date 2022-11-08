@@ -61,7 +61,7 @@ fn benchmark_primorial_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.primorial(u64)", T::NAME),
+        &format!("{}::primorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_27::<T>().get(gm, &config),
         gm.name(),
@@ -84,7 +84,7 @@ fn benchmark_checked_primorial<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_primorial(u64)", T::NAME),
+        &format!("{}::checked_primorial(u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_gen().get(gm, &config),
         gm.name(),
@@ -102,7 +102,7 @@ fn benchmark_product_of_first_n_primes_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.product_of_first_n_primes(u64)", T::NAME),
+        &format!("{}::product_of_first_n_primes(u64)", T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_28::<T>().get(gm, &config),
         gm.name(),
@@ -125,7 +125,7 @@ fn benchmark_checked_product_of_first_n_primes<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.checked_product_of_first_n_primes(u64)", T::NAME),
+        &format!("{}::checked_product_of_first_n_primes(u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_gen().get(gm, &config),
         gm.name(),
