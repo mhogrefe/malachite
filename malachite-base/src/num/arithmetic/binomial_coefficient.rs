@@ -13,9 +13,9 @@ fn checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(n: T, mut k: T) -
     }
     k = min(k, n - k);
     if k == T::ZERO {
-        return Some(T::ONE);
+        Some(T::ONE)
     } else if k == T::ONE {
-        return Some(n);
+        Some(n)
     } else if k == T::TWO {
         (if n.even() { n - T::ONE } else { n }).checked_mul(n >> 1)
     } else {

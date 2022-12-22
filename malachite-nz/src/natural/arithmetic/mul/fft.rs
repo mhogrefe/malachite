@@ -947,11 +947,11 @@ fn limbs_fft_truncate_sqrt<'a>(
     let trunc = trunc - two_n;
     let mut i = 0;
     while i < trunc {
-        limbs_fft_butterfly(*ts, *us, xss_lo[i], xss_hi[i], i >> 1, w);
+        limbs_fft_butterfly(ts, us, xss_lo[i], xss_hi[i], i >> 1, w);
         swap(&mut xss_lo[i], ts);
         swap(&mut xss_hi[i], us);
         i += 1;
-        limbs_fft_butterfly_sqrt(*ts, *us, xss_lo[i], xss_hi[i], i, w, scratch);
+        limbs_fft_butterfly_sqrt(ts, us, xss_lo[i], xss_hi[i], i, w, scratch);
         swap(&mut xss_lo[i], ts);
         swap(&mut xss_hi[i], us);
         i += 1;

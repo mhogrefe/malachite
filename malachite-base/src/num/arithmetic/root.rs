@@ -653,10 +653,8 @@ pub fn fast_floor_cbrt_u32(n: u32) -> u32 {
             3
         } else if n >= 8 {
             2
-        } else if n >= 1 {
-            1
         } else {
-            0
+            u32::from(n >= 1)
         };
     }
     if n < 1331 {
@@ -734,10 +732,8 @@ pub fn fast_floor_cbrt_u64(n: u64) -> u64 {
             3
         } else if n >= 8 {
             2
-        } else if n >= 1 {
-            1
         } else {
-            0
+            u64::from(n >= 1)
         };
     }
     if n < 1331 {

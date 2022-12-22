@@ -1734,6 +1734,7 @@ pub fn striped_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 }
 
 /// Generates random striped signeds from a range.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum StripedRandomSignedInclusiveRange<
     U: PrimitiveUnsigned,

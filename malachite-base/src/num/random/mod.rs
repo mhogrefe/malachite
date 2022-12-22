@@ -122,6 +122,7 @@ impl<T: HasRandomPrimitiveInts> Iterator for RandomPrimitiveInts<T> {
 /// Uniformly generates random unsigned integers less than a positive limit.
 ///
 /// This `enum` is created by [`random_unsigneds_less_than`]; see its documentation for more.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
     One,

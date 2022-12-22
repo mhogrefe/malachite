@@ -127,7 +127,7 @@ impl Iterator for ExhaustiveChars {
                     }
                 }
                 CharType::NonAsciiGraphic => {
-                    if self.c == '\u{3134a}' {
+                    if self.c == '\u{323af}' {
                         self.current_type = CharType::NonGraphic;
                         self.c = '\0';
                     } else {

@@ -94,7 +94,7 @@ where
         let mut median_durations_map: BTreeMap<usize, u64> = BTreeMap::new();
         for (&size, durations) in &durations_map {
             if durations.len() >= min_bucket_size {
-                median_durations_map.insert(size, quick_mean(durations) as u64);
+                median_durations_map.insert(size, quick_mean(durations));
             }
         }
         median_durations_maps.push(median_durations_map);
@@ -136,7 +136,7 @@ pub enum BenchmarkType {
     Algorithms,
 }
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::print_stdout, clippy::type_complexity)]
 pub fn run_benchmark<'a, I: Iterator>(
     title: &'a str,
     benchmark_type: BenchmarkType,
@@ -191,7 +191,7 @@ pub fn run_benchmark<'a, I: Iterator>(
     run_benchmark_internal(options);
 }
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::print_stdout, clippy::type_complexity)]
 pub fn run_benchmark_old<'a, I: Iterator>(
     title: &'a str,
     benchmark_type: BenchmarkType,

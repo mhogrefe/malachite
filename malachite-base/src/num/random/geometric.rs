@@ -270,6 +270,7 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
 }
 
 /// Generates random negative signed integers in a range from a modified geometric distribution.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum GeometricRandomSignedRange<T: PrimitiveSigned> {
     NonNegative(GeometricRandomNaturalValues<T>),

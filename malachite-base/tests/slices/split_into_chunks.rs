@@ -117,7 +117,7 @@ fn split_into_chunks_properties() {
                 [xs_1, xs_2, xs_3, xs_4, xs_5, xs_6, xs_7],
                 xs_8
             ),
-            _ => println!("Large number of chunks"),
+            _ => {}
         },
     );
 }
@@ -175,7 +175,7 @@ fn split_into_chunks_mut_properties() {
                 [xs_1, xs_2, xs_3, xs_4, xs_5, xs_6, xs_7],
                 xs_8
             ),
-            _ => println!("Large number of chunks_mut"),
+            _ => {}
         },
     );
 }

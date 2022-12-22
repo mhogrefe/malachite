@@ -186,10 +186,8 @@ pub_test! {limbs_sub_mul_limb_greater_in_place_right(
         ys.extend(&xs[ys_len..]);
         if borrow == 0 {
             0
-        } else if limbs_sub_limb_in_place(&mut ys[ys_len..], borrow) {
-            1
         } else {
-            0
+            Limb::from(limbs_sub_limb_in_place(&mut ys[ys_len..], borrow))
         }
     }
 }}

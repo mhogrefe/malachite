@@ -5958,7 +5958,7 @@ impl Iterator for HalfGcdMatrixAndVecGenerator {
             let m_s = max(m_s_1, m_s_2);
             let m = random_half_gcd_matrix(m_s, m_n, &mut self.xs);
             let qs = (&mut self.xs).take(qs_len).collect_vec();
-            let column = if self.bs.next().unwrap() { 1 } else { 0 };
+            let column = u8::from(self.bs.next().unwrap());
             return Some((m, qs, column));
         }
     }

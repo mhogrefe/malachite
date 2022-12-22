@@ -879,6 +879,7 @@ where
 ///
 /// This `struct` is created by [`exhaustive_vecs_fixed_length_from_single`]; see its documentation
 /// for more.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ExhaustiveFixedLengthVecs1Input<I: Iterator>
 where
@@ -4434,7 +4435,7 @@ impl Iterator for LexKCompositions {
             return Some(self.xs.clone());
         }
         let last_not_one_index = self.xs.iter().rposition(|&x| x != 1);
-        if last_not_one_index == None || last_not_one_index == Some(0) {
+        if last_not_one_index.is_none() || last_not_one_index == Some(0) {
             self.done = true;
             return None;
         }

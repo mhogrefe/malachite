@@ -60,13 +60,15 @@ MAX_LINE_LENGTH = 100
 line_length_exceptions = set((
     # long Markdown table rows and/or links
     ('./malachite-base/src/lib.rs', 57),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 267),
     ('./malachite-base/src/num/arithmetic/mod.rs', 268),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1266),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1506),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 269),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1267),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1507),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1508),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1509),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1510),
+    ('./malachite-base/src/num/arithmetic/primorial.rs', 77),
+    ('./malachite-base/src/num/arithmetic/primorial.rs', 234),
     ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 102),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 156),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 158),
@@ -93,14 +95,14 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 157),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 523),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 525),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 538),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 540),
-    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 542),
-    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 854),
-    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 856),
-    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 331),
-    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 486),
-    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 516),
-    ('./malachite-nz/src/natural/conversion/mod.rs', 170),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 848),
+    ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 850),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 327),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 474),
+    ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 504),
+    ('./malachite-nz/src/natural/conversion/mod.rs', 158),
     ('./malachite-q/src/arithmetic/mod.rs', 72),
     ('./malachite-q/src/arithmetic/mod.rs', 74),
     ('./malachite-q/src/conversion/mantissa_and_exponent.rs', 187),
@@ -122,13 +124,12 @@ def lint(filename):
         for line in f.readlines():
             line = line.rstrip()
             is_exception = (filename, i) in line_length_exceptions
-            # if is_exception:
-            #     if len(line) <= MAX_LINE_LENGTH:
-            #         raise ValueError(f'line not too long: {filename}: {i} {line}')
-            # elif len(line) > MAX_LINE_LENGTH:
-            #     raise ValueError(f'line too long: {filename}: {i} {line}')
-            if '/tests/' in filename:
-                i += 1
+            if is_exception:
+                if len(line) <= MAX_LINE_LENGTH:
+                    raise ValueError(f'line not too long: {filename}: {i} {line}')
+            elif len(line) > MAX_LINE_LENGTH:
+                raise ValueError(f'line too long: {filename}: {i} {line}')
+            i += 1
     return i - 1
 
 filename_list = []

@@ -31004,7 +31004,7 @@ fn test_extended_gcd() {
 
         let rug_result = rug::Integer::from_str(s)
             .unwrap()
-            .gcd_cofactors(rug::Integer::from_str(t).unwrap(), rug::Integer::new());
+            .extended_gcd(rug::Integer::from_str(t).unwrap(), rug::Integer::new());
         assert_eq!(rug_result.0.to_string(), gcd);
         assert_eq!(rug_result.1.to_string(), x);
         assert_eq!(rug_result.2.to_string(), y);
@@ -31091,7 +31091,7 @@ fn extended_gcd_properties_helper(a: Natural, b: Natural) {
     let (gcd, x, y) = result;
 
     let (rug_gcd, rug_x, rug_y) =
-        natural_to_rug_integer(&a).gcd_cofactors(natural_to_rug_integer(&b), rug::Integer::new());
+        natural_to_rug_integer(&a).extended_gcd(natural_to_rug_integer(&b), rug::Integer::new());
     assert_eq!(rug_integer_to_natural(&rug_gcd), gcd);
     assert_eq!(rug_integer_to_integer(&rug_x), x);
     assert_eq!(rug_integer_to_integer(&rug_y), y);

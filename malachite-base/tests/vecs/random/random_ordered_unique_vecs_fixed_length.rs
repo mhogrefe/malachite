@@ -29,7 +29,7 @@ fn test_random_ordered_unique_vecs_fixed_length() {
     random_ordered_unique_vecs_fixed_length_helper(
         0,
         random_primitive_ints::<u8>(EXAMPLE_SEED),
-        &repeat_n(&[][..], 20).collect_vec().as_slice(),
+        repeat_n(&[][..], 20).collect_vec().as_slice(),
         &[(&[], 1000000)],
         (&[], None),
     );

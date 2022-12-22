@@ -1934,6 +1934,7 @@ pub fn exhaustive_nonzero_finite_primitive_floats_in_range<T: PrimitiveFloat>(
 ///
 /// This `enum` is created by [`exhaustive_primitive_float_range`] and
 /// [`exhaustive_primitive_float_inclusive_range`]; see their documentation for more.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ExhaustivePrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
     JustSpecials(IntoIter<T>),

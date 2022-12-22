@@ -87,7 +87,7 @@ fn benchmark_integer_extended_gcd_library_comparison(
             ),
             ("num", &mut |((x, y), _, _)| no_out!(x.extended_gcd(&y))),
             ("rug", &mut |(_, (x, y), _)| {
-                no_out!(x.gcd_cofactors(y, rug::Integer::new()))
+                no_out!(x.extended_gcd(y, rug::Integer::new()))
             }),
         ],
     );

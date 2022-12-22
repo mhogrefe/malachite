@@ -16,8 +16,8 @@ fn test_contiguous_range_to_char() {
     test(65, Some('A'));
     test(55295, Some(CHAR_JUST_BELOW_SURROGATES));
     test(55296, Some(CHAR_JUST_ABOVE_SURROGATES));
-    test(1112063, Some(char::MAX));
-    test(1112064, None);
+    test(NUMBER_OF_CHARS - 1, Some(char::MAX));
+    test(NUMBER_OF_CHARS, None);
     test(u32::MAX, None);
 }
 

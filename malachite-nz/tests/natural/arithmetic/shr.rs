@@ -255,7 +255,7 @@ fn test_shr_unsigned() {
         n >>= v;
         assert_eq!(n.to_string(), out);
 
-        let n = rug_u.clone() >> v;
+        let n = rug_u >> v;
         assert_eq!(n.to_string(), out);
 
         let num_u = BigUint::from_str(u).unwrap();

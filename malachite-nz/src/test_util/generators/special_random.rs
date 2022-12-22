@@ -7051,7 +7051,7 @@ impl Iterator for HalfGcdMatrixAndVecGenerator {
                 &mut self.striped_bit_source,
                 u64::exact_from(qs_len) << Limb::LOG_WIDTH,
             );
-            let column = if self.bs.next().unwrap() { 1 } else { 0 };
+            let column = u8::from(self.bs.next().unwrap());
             return Some((m, qs, column));
         }
     }
