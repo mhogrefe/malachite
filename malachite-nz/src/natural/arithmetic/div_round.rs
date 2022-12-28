@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
@@ -31,7 +31,7 @@ pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) ->
             RoundingMode::Up | RoundingMode::Ceiling => Some(1),
             RoundingMode::Exact => None,
             // 1 if 2 * n > Natural::from_limbs_asc(ds); otherwise, 0
-            RoundingMode::Nearest => Some(Limb::iverson(
+            RoundingMode::Nearest => Some(Limb::from(
                 ds.len() == 2 && ds[1] == 1 && n.get_highest_bit() && (n << 1) > ds[0],
             )),
         }

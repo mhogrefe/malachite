@@ -10,7 +10,6 @@ use crate::platform::Limb;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 use std::cmp::Ordering;
@@ -38,8 +37,8 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     assert_eq!(scratch.len(), n + 1);
     split_into_chunks!(poly, n, [poly_0, poly_1, poly_2], poly_3);
     assert!(poly_3.len() <= n);
-    v_1[n] = Limb::iverson(limbs_add_same_length_to_out(v_1, poly_0, poly_2));
-    scratch[n] = Limb::iverson(limbs_add_to_out(scratch, poly_1, poly_3));
+    v_1[n] = Limb::from(limbs_add_same_length_to_out(v_1, poly_0, poly_2));
+    scratch[n] = Limb::from(limbs_add_to_out(scratch, poly_1, poly_3));
     let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
     if v_neg_1_neg {
         limbs_sub_same_length_to_out(v_neg_1, scratch, v_1);
@@ -86,7 +85,7 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     }
     if n_high < n {
         scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
-        *scratch_last = Limb::iverson(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
+        *scratch_last = Limb::from(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
     } else {
         *scratch_last = limbs_shl_to_out(scratch_init, poly_3, 2);
         if limbs_slice_add_same_length_in_place_left(scratch_init, poly_1) {
@@ -137,7 +136,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 
     // The degree `degree` is also the number of full-size coefficients, so that the last
     // coefficient, of size `n_high`, starts at poly + degree * n.
-    v_1[n] = Limb::iverson(limbs_add_same_length_to_out(
+    v_1[n] = Limb::from(limbs_add_same_length_to_out(
         v_1,
         coefficients[0],
         coefficients[2],
@@ -147,7 +146,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
         assert!(!limbs_slice_add_greater_in_place_left(v_1, coefficients[i]));
         i += 2;
     }
-    scratch[n] = Limb::iverson(limbs_add_same_length_to_out(
+    scratch[n] = Limb::from(limbs_add_same_length_to_out(
         scratch,
         coefficients[1],
         coefficients[3],
@@ -258,7 +257,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         &mut carry,
     );
     if n_high != n {
-        carry = Limb::iverson(limbs_add_limb_to_out(
+        carry = Limb::from(limbs_add_limb_to_out(
             &mut v_2_init[n_high..],
             &coefficients[degree - 2][n_high..],
             carry,

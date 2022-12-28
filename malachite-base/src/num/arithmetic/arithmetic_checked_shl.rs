@@ -202,7 +202,7 @@ fn arithmetic_checked_shl_signed_signed<
         let width = U::wrapping_from(T::WIDTH);
         let abs_bits = bits.unsigned_abs();
         Some(if width != U::ZERO && abs_bits >= width {
-            -T::iverson(x < T::ZERO)
+            -T::from(x < T::ZERO)
         } else {
             x >> abs_bits
         })

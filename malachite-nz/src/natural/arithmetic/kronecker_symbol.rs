@@ -16,7 +16,6 @@ use malachite_base::num::arithmetic::traits::{
     DivMod, JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, Parity, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_trailing_zeros;
@@ -1088,8 +1087,8 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     /// ```
     fn kronecker_symbol(self, other: &'a Natural) -> i8 {
         match (self, other) {
-            (x, natural_zero!()) => i8::iverson(*x == 1u32),
-            (natural_zero!(), y) => i8::iverson(*y == 1u32),
+            (x, natural_zero!()) => i8::from(*x == 1u32),
+            (natural_zero!(), y) => i8::from(*y == 1u32),
             (Natural(Small(x)), Natural(Small(y))) => {
                 limbs_kronecker_symbol_single(true, *x, true, *y)
             }

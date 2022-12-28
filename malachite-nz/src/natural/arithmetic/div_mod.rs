@@ -37,7 +37,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
@@ -140,7 +140,7 @@ pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Lim
         if adjust {
             r -= d;
         }
-        *out_last = Limb::iverson(adjust);
+        *out_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
@@ -207,7 +207,7 @@ pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         if adjust {
             r -= d;
         }
-        *ns_last = Limb::iverson(adjust);
+        *ns_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for n in ns_init.iter_mut().rev() {
@@ -286,7 +286,7 @@ pub_test! {limbs_div_mod_extra(
             r -= d_norm;
         }
         let (integer_out_last, integer_out_init) = integer_out.split_last_mut().unwrap();
-        *integer_out_last = Limb::iverson(q_high);
+        *integer_out_last = Limb::from(q_high);
         for (q, &n) in integer_out_init.iter_mut().zip(ns_init.iter()).rev() {
             (*q, r) = div_mod_by_preinversion(r, n, d_norm, d_inv);
         }
@@ -362,7 +362,7 @@ pub_crate_test! {limbs_div_mod_extra_in_place(
             r -= d_norm;
         }
         let (integer_ns_last, integer_ns_init) = integer_ns.split_last_mut().unwrap();
-        *integer_ns_last = Limb::iverson(q_high);
+        *integer_ns_last = Limb::from(q_high);
         for q in integer_ns_init.iter_mut().rev() {
             (*q, r) = div_mod_by_preinversion(r, *q, d_norm, d_inv);
         }
@@ -628,7 +628,7 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(qs_hi.len(), ds_lo.len())];
     limbs_mul_greater_to_out(scratch, qs_hi, ds_lo, &mut mul_scratch);
     let ns_lo = &mut ns[..n + lo];
-    let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
+    let mut carry = Limb::from(limbs_sub_same_length_in_place_left(
         &mut ns_lo[lo..],
         &scratch[..n],
     ));
@@ -654,7 +654,7 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     let ns_lo = &mut ns[..n];
     let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ds_lo.len(), lo)];
     limbs_mul_greater_to_out(scratch, ds_lo, qs_lo, &mut mul_scratch);
-    let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns_lo, &scratch[..n]));
+    let mut carry = Limb::from(limbs_sub_same_length_in_place_left(ns_lo, &scratch[..n]));
     if q_lo && limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], ds_lo) {
         carry += 1;
     }
@@ -795,7 +795,7 @@ pub_test! {limbs_div_mod_divide_and_conquer(
                     vec![0; limbs_mul_to_out_scratch_len(qs_alt.len(), ds_lo.len())];
                 limbs_mul_to_out(&mut scratch, qs_alt, ds_lo, &mut mul_scratch);
                 let ns = &mut ns[q_len - q_len_mod_d_len..n_len - q_len_mod_d_len];
-                let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns, &scratch));
+                let mut carry = Limb::from(limbs_sub_same_length_in_place_left(ns, &scratch));
                 if highest_q
                     && limbs_sub_same_length_in_place_left(&mut ns[q_len_mod_d_len..], ds_lo)
                 {
@@ -837,7 +837,7 @@ pub_test! {limbs_div_mod_divide_and_conquer(
             let ns = &mut ns[..d_len];
             let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(q_len, ds_lo.len())];
             limbs_mul_to_out(&mut scratch, qs, ds_lo, &mut mul_scratch);
-            let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(ns, &scratch));
+            let mut carry = Limb::from(limbs_sub_same_length_in_place_left(ns, &scratch));
             if highest_q && limbs_sub_same_length_in_place_left(&mut ns[q_len..], ds_lo) {
                 carry += 1;
             }
@@ -1411,7 +1411,7 @@ pub_test! {limbs_div_mod_barrett_large_helper(
     let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ds_lo.len(), qs.len())];
     limbs_mul_to_out(scratch, ds_lo, qs, &mut mul_scratch);
     let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
-    *scratch_last = Limb::iverson(
+    *scratch_last = Limb::from(
         highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo),
     );
     let (scratch_lo, scratch_hi) = scratch.split_at(n);
@@ -1487,7 +1487,7 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
     if bits == 0 {
         let mut ns = ns.to_vec();
         // always store n_len - 1 quotient limbs
-        qs[n_len - 2] = Limb::iverson(limbs_div_mod_by_two_limb_normalized(qs, &mut ns, ds));
+        qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(qs, &mut ns, ds));
         rs[0] = ns[0];
         rs[1] = ns[1];
     } else {
@@ -1499,7 +1499,7 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
         let ds_shifted = &mut [ds_0 << bits, (ds_1 << bits) | (ds_0 >> cobits)];
         if carry == 0 {
             // always store n_len - 1 quotient limbs
-            qs[n_len - 2] = Limb::iverson(limbs_div_mod_by_two_limb_normalized(
+            qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(
                 qs,
                 &mut ns_shifted[..n_len],
                 ds_shifted,

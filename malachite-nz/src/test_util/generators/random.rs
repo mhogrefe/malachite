@@ -78,7 +78,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
@@ -6523,15 +6523,15 @@ impl Iterator for RationalFromPowerOf2DigitsBinaryGenerator {
 
     fn next(&mut self) -> Option<(Vec<Natural>, RationalSequence<Natural>)> {
         let before_point = (&mut self.bits)
-            .map(Natural::iverson)
+            .map(Natural::from)
             .take(self.sizes.next().unwrap())
             .collect();
         let non_repeating = (&mut self.bits)
-            .map(Natural::iverson)
+            .map(Natural::from)
             .take(self.sizes.next().unwrap())
             .collect();
         let repeating = (&mut self.bits)
-            .map(Natural::iverson)
+            .map(Natural::from)
             .take(self.sizes.next().unwrap())
             .collect();
         Some((

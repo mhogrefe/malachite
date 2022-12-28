@@ -40,7 +40,6 @@ use malachite_base::num::arithmetic::traits::{
     WrappingSubAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::{max, Ordering};
@@ -214,7 +213,7 @@ pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &m
     limbs_square_to_out_toom_2_recursive(v_0, xs_0, scratch_out);
     let (v_0_lo, v_0_hi) = v_0.split_at_mut(n);
     let (v_inf_lo, v_inf_hi) = v_inf.split_at_mut(n);
-    let mut carry = Limb::iverson(limbs_slice_add_same_length_in_place_left(v_inf_lo, v_0_hi));
+    let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(v_inf_lo, v_0_hi));
     let mut carry2 = carry;
     if limbs_add_same_length_to_out(v_0_hi, v_inf_lo, v_0_lo) {
         carry2 += 1;
@@ -339,7 +338,7 @@ pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &m
     let (asm1_last, asm1_init) = asm1[..m].split_last_mut().unwrap();
     let (as1_last, as1_init) = as1[..m].split_last_mut().unwrap();
     let scratch_lo = &mut scratch_lo[..n];
-    let mut carry = Limb::iverson(limbs_add_to_out(scratch_lo, xs_0, xs_2));
+    let mut carry = Limb::from(limbs_add_to_out(scratch_lo, xs_0, xs_2));
     *as1_last = carry;
     if limbs_add_same_length_to_out(as1_init, scratch_lo, xs_1) {
         *as1_last += 1;
@@ -353,9 +352,9 @@ pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &m
     let as2 = &mut out[m..m << 1];
     let (as2_last, as2_init) = as2.split_last_mut().unwrap();
     let (as1_lo, as1_hi) = as1_init.split_at_mut(s);
-    let mut carry = Limb::iverson(limbs_add_same_length_to_out(as2_init, xs_2, as1_lo));
+    let mut carry = Limb::from(limbs_add_same_length_to_out(as2_init, xs_2, as1_lo));
     if s != n {
-        carry = Limb::iverson(limbs_add_limb_to_out(&mut as2_init[s..], as1_hi, carry));
+        carry = Limb::from(limbs_add_limb_to_out(&mut as2_init[s..], as1_hi, carry));
     }
     carry.wrapping_add_assign(*as1_last);
     carry = carry.arithmetic_checked_shl(1).unwrap();

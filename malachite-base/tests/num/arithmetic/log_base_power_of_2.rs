@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::log_base_power_of_2::ceiling_log_base_power_of_2_naive;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{
@@ -390,7 +389,7 @@ fn ceiling_log_base_power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>(
         assert_eq!(n.ceiling_log_base_power_of_2(1), n.ceiling_log_base_2());
         assert_eq!(
             n.ceiling_log_base_power_of_2(T::WIDTH),
-            u64::iverson(n != T::ONE)
+            u64::from(n != T::ONE)
         );
     });
 

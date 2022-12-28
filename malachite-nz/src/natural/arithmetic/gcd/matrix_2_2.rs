@@ -10,7 +10,6 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
-use malachite_base::num::basic::traits::Iverson;
 use std::cmp::Ordering;
 
 // # Worst-case complexity
@@ -177,9 +176,9 @@ pub_test! {limbs_matrix_2_2_mul_small(
             limbs_mul_greater_to_out(t1, ys01, scratch, &mut mul_scratch);
         }
         let (t0_last, t0_init) = t0[..out_len + 1].split_last_mut().unwrap();
-        *t0_last = Limb::iverson(limbs_slice_add_same_length_in_place_left(t0_init, p0));
+        *t0_last = Limb::from(limbs_slice_add_same_length_in_place_left(t0_init, p0));
         let (t1_last, t1_init) = t1[..out_len + 1].split_last_mut().unwrap();
-        *t1_last = Limb::iverson(limbs_slice_add_same_length_in_place_left(t1_init, p1));
+        *t1_last = Limb::from(limbs_slice_add_same_length_in_place_left(t1_init, p1));
         t0 = &mut *xs10;
         t1 = &mut *xs11;
     }
@@ -279,14 +278,14 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         limbs_sub_abs_same_length_in_place_left(xs01_lo_init, xs11_lo)
     } else {
         // xs01 - xs10 + xs11
-        *xs01_lo_last = Limb::iverson(limbs_slice_add_same_length_in_place_left(
+        *xs01_lo_last = Limb::from(limbs_slice_add_same_length_in_place_left(
             xs01_lo_init,
             xs11_lo,
         ));
         false
     };
     let s0_sign = if x01_sign {
-        *s0_last = Limb::iverson(limbs_add_same_length_to_out(s0_init, xs01_lo_init, xs00_lo));
+        *s0_last = Limb::from(limbs_add_same_length_to_out(s0_init, xs01_lo_init, xs00_lo));
         false
     } else if *xs01_lo_last != 0 {
         *s0_last = *xs01_lo_last;
@@ -302,7 +301,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // u0 = s0 * t0
     limbs_mul_to_out(u1, xs00_lo, ys00, &mut mul_scratch);
     let (u0_last, u0_init) = u0.split_last_mut().unwrap();
-    xs00[sum_len] = Limb::iverson(limbs_add_same_length_to_out(xs00, u0_init, &u1[..sum_len]));
+    xs00[sum_len] = Limb::from(limbs_add_same_length_to_out(xs00, u0_init, &u1[..sum_len]));
     // u0 + u5
     assert!(xs00[sum_len] < 2);
     let mut t0_sign = limbs_sub_abs_same_length_to_out(t0_init, ys11, ys10);
@@ -315,7 +314,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
         t0_sign = limbs_sub_abs_same_length_in_place_right(ys01, t0_init);
         0
     } else {
-        Limb::iverson(limbs_slice_add_same_length_in_place_left(t0_init, ys01))
+        Limb::from(limbs_slice_add_same_length_in_place_left(t0_init, ys01))
     };
     if *t0_last != 0 {
         // u3 = s3 * t3
@@ -338,7 +337,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     };
     let (t0_last, t0_init) = t0.split_last_mut().unwrap();
     if t0_sign {
-        *t0_last = Limb::iverson(limbs_slice_add_same_length_in_place_left(t0_init, ys00));
+        *t0_last = Limb::from(limbs_slice_add_same_length_in_place_left(t0_init, ys00));
     } else if *t0_last != 0 {
         if limbs_sub_same_length_in_place_left(t0_init, ys00) {
             *t0_last -= 1;
@@ -365,7 +364,7 @@ pub_test! {limbs_matrix_2_2_mul_strassen(
     // u4 = s4 * t5
     limbs_mul_to_out(u0, s0, ys01, &mut mul_scratch);
     assert!(u0[sum_len] < 2);
-    t0[ys_len] = Limb::iverson(limbs_add_same_length_to_out(t0, ys11, ys01));
+    t0[ys_len] = Limb::from(limbs_add_same_length_to_out(t0, ys11, ys01));
     // u1 = s1 * t1
     limbs_mul_to_out(u1, xs01_lo, t0, &mut mul_scratch);
     assert!(u1[sum_len] < 4);

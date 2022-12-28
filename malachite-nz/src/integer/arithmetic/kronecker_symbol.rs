@@ -13,7 +13,6 @@ use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
 use std::mem::swap;
@@ -69,11 +68,11 @@ pub_crate_test! {
     //
     // (x / 0) = (x = 1 or x = -1)
     if ys_len == 0 {
-        return i8::iverson(xs == [1]);
+        return i8::from(xs == [1]);
     }
     // (0 / y) = (y = 1 or y = -1)
     if xs_len == 0 {
-        return i8::iverson(ys == [1]);
+        return i8::from(ys == [1]);
     }
     assert_ne!(xs[xs_len - 1], 0);
     assert_ne!(ys[ys_len - 1], 0);
@@ -187,7 +186,7 @@ pub_crate_test! {
         ys_alt.copy_from_slice(ys);
     }
     assert_eq!(y_lo, ys_alt[0]);
-    let bits = limbs_jacobi_symbol_init(xs_alt[0], y_lo, u8::iverson(negate));
+    let bits = limbs_jacobi_symbol_init(xs_alt[0], y_lo, u8::from(negate));
     limbs_jacobi_symbol_same_length(xs_alt, ys_alt, bits)
 }}
 
@@ -661,8 +660,8 @@ impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
     /// ```
     fn kronecker_symbol(self, other: &'a Integer) -> i8 {
         match (self, other) {
-            (x, integer_zero!()) => i8::iverson(*x.unsigned_abs_ref() == 1u32),
-            (integer_zero!(), y) => i8::iverson(*y.unsigned_abs_ref() == 1u32),
+            (x, integer_zero!()) => i8::from(*x.unsigned_abs_ref() == 1u32),
+            (integer_zero!(), y) => i8::from(*y.unsigned_abs_ref() == 1u32),
             (
                 Integer {
                     sign: x_sign,

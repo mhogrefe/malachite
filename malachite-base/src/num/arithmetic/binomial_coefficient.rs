@@ -71,6 +71,22 @@ fn checked_binomial_coefficient_signed<
 
 macro_rules! impl_binomial_coefficient_unsigned {
     ($t:ident) => {
+        /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
+        /// function returns `None`.
+        ///
+        /// $$
+        /// f(n, k) = \\begin{cases}
+        ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad \binom{n}{k} < 2^W, \\\\
+        ///     \operatorname{None} & \text{if} \\quad \binom{n}{k} \geq 2^W,
+        /// \\end{cases}
+        /// $$
+        /// where $W$ is `Self::WIDTH`.
+        ///
+        /// # Worst-case complexity
+        /// Constant time and additional memory.
+        ///
+        /// # Examples
+        /// See [here](super::binomial_coefficient#checked_binomial_coefficient).
         impl CheckedBinomialCoefficient for $t {
             #[inline]
             fn checked_binomial_coefficient(n: $t, k: $t) -> Option<$t> {
@@ -84,6 +100,26 @@ apply_to_unsigneds!(impl_binomial_coefficient_unsigned);
 macro_rules! impl_binomial_coefficient_signed {
     ($t:ident) => {
         impl CheckedBinomialCoefficient for $t {
+            /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
+            /// function returns `None`.
+            /// 
+            /// The second argument must be non-negative, but the first may be negative. If it is,
+            /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
+            ///
+            /// $$
+            /// f(n, k) = \\begin{cases}
+            ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad -2^{W-1} \leq
+            ///         \binom{n}{k} < 2^{W-1}, \\\\
+            ///     \operatorname{None} & \\quad \\text{otherwise},
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `Self::WIDTH`.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::binomial_coefficient#checked_binomial_coefficient).
             #[inline]
             fn checked_binomial_coefficient(n: $t, k: $t) -> Option<$t> {
                 checked_binomial_coefficient_signed(n, k)
@@ -96,6 +132,24 @@ apply_to_signeds!(impl_binomial_coefficient_signed);
 macro_rules! impl_binomial_coefficient_primitive_int {
     ($t:ident) => {
         impl BinomialCoefficient for $t {
+            /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
+            /// function panics.
+            ///
+            /// $$
+            /// f(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}.
+            /// $$
+            /// 
+            /// The second argument must be non-negative, but the first may be negative. If it is,
+            /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            /// 
+            /// # Panics
+            /// Panics if the result is not representable by this type.
+            ///
+            /// # Examples
+            /// See [here](super::binomial_coefficient#binomial_coefficient).
             #[inline]
             fn binomial_coefficient(n: $t, k: $t) -> $t {
                 $t::checked_binomial_coefficient(n, k).unwrap()

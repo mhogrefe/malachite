@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     CheckedRoot, Parity, Pow, PowAssign, PowerOf2, Square,
 };
-use malachite_base::num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_unsigned_pair_gen_var_15, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
@@ -221,7 +221,7 @@ fn pow_properties() {
     });
 
     unsigned_gen_var_5().test_properties(|exp| {
-        assert_eq!(Integer::ZERO.pow(exp), u64::iverson(exp == 0));
+        assert_eq!(Integer::ZERO.pow(exp), u64::from(exp == 0));
         assert_eq!(Integer::ONE.pow(exp), 1);
         assert_eq!(Integer::TWO.pow(exp), Integer::power_of_2(exp));
 

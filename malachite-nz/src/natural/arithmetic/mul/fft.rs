@@ -20,7 +20,6 @@ use malachite_base::num::arithmetic::traits::{
     XXAddYYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
@@ -1626,7 +1625,7 @@ fn limbs_fft_mulmod_2expp1<'a>(
         limbs_fft_normmod_2expp1(qs);
         assert_eq!(*ps.last().unwrap(), 0);
         assert_eq!(*qs.last().unwrap(), 0);
-        *ps.last_mut().unwrap() = Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same(
+        *ps.last_mut().unwrap() = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
             &mut ps[..n_2],
             &qs[..n_2],
             false,
@@ -1770,7 +1769,7 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
     for ps in xss.iter_mut() {
         assert_eq!(*ps.last_mut().unwrap(), 0);
         *ps.last_mut().unwrap() =
-            Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same2(ps, nw, scratch));
+            Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(ps, nw, scratch));
     }
     limbs_ifft_negacyclic(xss, w, ts, us, ss);
     let x = xss0[0];
@@ -2329,7 +2328,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
             assert_eq!(*xs_last, 0);
             let c = *ys_last;
             assert!(c < 2);
-            *xs_last = Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same(
+            *xs_last = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                 xs_init,
                 ys_init,
                 c == 1,
@@ -2409,7 +2408,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                     limbs_fft_normmod_2expp1(xs);
                     limbs_fft_normmod_2expp1(ys);
                     let k = (n_2 << Limb::LOG_WIDTH) - nw;
-                    xs[limbs] = Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same(
+                    xs[limbs] = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                         &mut xs[..n_2],
                         &ys[..n_2],
                         false,
@@ -2427,7 +2426,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                     limbs_fft_normmod_2expp1(xs);
                     limbs_fft_normmod_2expp1(ys);
                     let k = (n_2 << Limb::LOG_WIDTH) - nw;
-                    xs[limbs] = Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same(
+                    xs[limbs] = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                         &mut xs[..n_2],
                         &ys[..n_2],
                         false,
@@ -2704,7 +2703,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
             limbs_fft_normmod_2expp1(xs);
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
             assert_eq!(*xs_last, 0);
-            *xs_last = Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same2(
+            *xs_last = Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(
                 xs_init,
                 b,
                 combine_scratch,
@@ -2764,7 +2763,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 for xs in xss_hi.iter_mut() {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
-                        Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
+                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
                 }
                 limbs_ifft_radix2(xss_hi, wy, &mut ts, &mut us);
             }
@@ -2774,7 +2773,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 for xs in xss_chunk.iter_mut() {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
-                        Limb::iverson(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
+                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
                 }
                 limbs_ifft_radix2(xss_chunk, wy, &mut ts, &mut us);
             }

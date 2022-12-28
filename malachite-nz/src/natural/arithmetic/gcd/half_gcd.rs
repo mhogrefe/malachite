@@ -27,7 +27,6 @@ use malachite_base::num::arithmetic::traits::{
     DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, NotAssign, TrailingZeros};
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
@@ -413,8 +412,8 @@ pub(crate) fn limbs_half_gcd_matrix_adjust(
         y_high = false;
     }
     if x_high || y_high {
-        xs[n] = Limb::iverson(x_high);
-        ys[n] = Limb::iverson(y_high);
+        xs[n] = Limb::from(x_high);
+        ys[n] = Limb::from(y_high);
         n += 1;
     } else {
         // The subtraction can reduce the size by at most one limb.
@@ -768,7 +767,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     }
     if xs_len <= s {
         if s == 0 {
-            context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::iverson(!swapped));
+            context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::from(!swapped));
         }
         return 0;
     }
@@ -791,28 +790,28 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
                     fail_on_untested_path("limbs_gcd_subdivide_step, c == Ordering::Equal");
                     if s != 0 {
                         // Just record subtraction and return
-                        context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
-                        context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+                        context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
+                        context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
                     } else {
                         // Found gcd.
-                        context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::iverson(swapped));
+                        context.gcd_subdiv_step_hook(Some(ys_init), None, 0, i8::from(swapped));
                         return 0;
                     }
                 }
                 Ordering::Greater => {
-                    context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+                    context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
                     swap(&mut xs, &mut ys);
                     xs_init = &mut xs[..xs_len];
                     ys_init = &mut ys[..ys_len];
                     swapped.not_assign();
                 }
                 Ordering::Less => {
-                    context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+                    context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
                 }
             }
         }
         Ordering::Greater => {
-            context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+            context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
             swap(&mut xs, &mut ys);
             swap(&mut xs_len, &mut ys_len);
             xs_init = &mut xs[..xs_len];
@@ -820,7 +819,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
             swapped.not_assign();
         }
         Ordering::Less => {
-            context.gcd_subdiv_step_hook_with_1(i8::iverson(swapped));
+            context.gcd_subdiv_step_hook_with_1(i8::from(swapped));
         }
     }
     if xs_len == 1 {
@@ -836,7 +835,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
     let ys_len = xs_len - slice_trailing_zeros(&ys_init[..xs_len]);
     if ys_len <= s {
         if s == 0 {
-            context.gcd_subdiv_step_hook(Some(xs_init), Some(scratch), qn, i8::iverson(swapped));
+            context.gcd_subdiv_step_hook(Some(xs_init), Some(scratch), qn, i8::from(swapped));
             return 0;
         }
         // Quotient is one too large, so decrement it and add back X.
@@ -850,7 +849,7 @@ pub(crate) fn limbs_gcd_subdivide_step<'a, CTX: GcdSubdivideStepContext>(
         }
         assert!(!limbs_sub_limb_in_place(&mut scratch[..qn], 1));
     }
-    context.gcd_subdiv_step_hook(None, Some(scratch), qn, i8::iverson(swapped));
+    context.gcd_subdiv_step_hook(None, Some(scratch), qn, i8::from(swapped));
     xs_len
 }
 

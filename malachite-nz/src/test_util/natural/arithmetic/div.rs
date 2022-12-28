@@ -6,7 +6,6 @@ use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::{
     OverflowingAddAssign, WrappingAddAssign, WrappingSubAssign, XMulYToZZ,
 };
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 
@@ -153,7 +152,7 @@ pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
         if adjust {
             highest_limb -= d;
         }
-        out[len_minus_1] = Limb::iverson(adjust);
+        out[len_minus_1] = Limb::from(adjust);
         let d_inv = limbs_invert_limb(d);
         limbs_div_limb_normalized_to_out(out, &ns[..len_minus_1], highest_limb, d, d_inv)
     } else {
@@ -181,7 +180,7 @@ pub fn limbs_div_limb_in_place_alt(ns: &mut [Limb], d: Limb) {
         if adjust {
             highest_limb -= d;
         }
-        ns[len_minus_1] = Limb::iverson(adjust);
+        ns[len_minus_1] = Limb::from(adjust);
         let d_inv = limbs_invert_limb(d);
         limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], highest_limb, d, d_inv)
     } else {

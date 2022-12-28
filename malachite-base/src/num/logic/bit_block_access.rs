@@ -121,7 +121,7 @@ fn get_bits_signed<T: ModPowerOf2<Output = U> + PrimitiveSigned, U>(
 ) -> U {
     assert!(start <= end);
     (if start >= T::WIDTH {
-        -T::iverson(*x < T::ZERO)
+        -T::from(*x < T::ZERO)
     } else {
         *x >> start
     })

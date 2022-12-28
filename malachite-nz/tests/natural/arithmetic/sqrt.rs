@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
     FloorSqrtAssign, RootRem, ShrRound, SqrtAssignRem, SqrtRem, Square,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::BitAccess;
 #[cfg(feature = "32_bit_limbs")]
@@ -41,7 +41,7 @@ fn test_sqrt_rem_2_newton() {
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()
-                .checked_add(DoubleLimb::join_halves(Limb::iverson(r_hi), r_lo))
+                .checked_add(DoubleLimb::join_halves(Limb::from(r_hi), r_lo))
                 .unwrap(),
             DoubleLimb::join_halves(n_hi, n_lo)
         );
@@ -666,7 +666,7 @@ fn sqrt_rem_2_newton_properties() {
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()
-                .checked_add(DoubleLimb::join_halves(Limb::iverson(r_hi), r_lo))
+                .checked_add(DoubleLimb::join_halves(Limb::from(r_hi), r_lo))
                 .unwrap(),
             DoubleLimb::join_halves(n_hi, n_lo)
         );

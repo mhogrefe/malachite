@@ -96,7 +96,7 @@ fn mod_pow_properties_helper<T: PrimitiveUnsigned>() {
         .test_properties(|(x, exp, m)| mod_pow_properties_helper_helper(x, exp, m, naive_mod_pow));
 
     unsigned_pair_gen_var_12::<u64, T>().test_properties(|(exp, m)| {
-        assert_eq!(T::ZERO.mod_pow(exp, m), T::iverson(exp == 0 && m != T::ONE));
+        assert_eq!(T::ZERO.mod_pow(exp, m), T::from(exp == 0 && m != T::ONE));
         if m != T::ONE {
             assert_eq!(T::ONE.mod_pow(exp, m), T::ONE);
         }

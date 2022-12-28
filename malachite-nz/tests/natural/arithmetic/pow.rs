@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     CheckedLogBase, CheckedRoot, Pow, PowAssign, PowerOf2, Square,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -362,7 +362,7 @@ fn pow_properties() {
     });
 
     unsigned_gen_var_5().test_properties(|exp| {
-        assert_eq!(Natural::ZERO.pow(exp), u64::iverson(exp == 0));
+        assert_eq!(Natural::ZERO.pow(exp), u64::from(exp == 0));
         assert_eq!(Natural::ONE.pow(exp), 1);
         assert_eq!(Natural::TWO.pow(exp), Natural::power_of_2(exp));
     });

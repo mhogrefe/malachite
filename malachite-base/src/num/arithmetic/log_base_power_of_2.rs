@@ -1,8 +1,6 @@
 use crate::num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, DivRound, FloorLogBasePowerOf2,
 };
-#[cfg(feature = "test_build")]
-use crate::num::basic::traits::Iverson;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 use crate::rounding_modes::RoundingMode;
@@ -12,7 +10,7 @@ pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -
     assert_ne!(x, T::ZERO);
     assert_ne!(pow, 0);
     if pow >= T::WIDTH {
-        return u64::iverson(x != T::ONE);
+        return u64::from(x != T::ONE);
     }
     let mut result = 0;
     let mut p = T::ONE;

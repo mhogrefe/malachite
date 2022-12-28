@@ -26,7 +26,7 @@ use malachite_base::num::arithmetic::traits::{
     DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use std::cmp::{max, Ordering};
@@ -94,7 +94,7 @@ impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
                 assert!(
                     c != Ordering::Equal || us_len == 1 && self.us0[0] == 1 && self.us1[0] == 1
                 );
-                d = i8::iverson(c == Ordering::Less);
+                d = i8::from(c == Ordering::Less);
             }
             let ss = if d == 0 {
                 &mut *self.us1
@@ -122,7 +122,7 @@ impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
                 let us0 = &mut us0[..us_len];
                 let us1 = &us1[..us_len];
                 if q == 1 {
-                    Limb::iverson(limbs_slice_add_same_length_in_place_left(us0, us1))
+                    Limb::from(limbs_slice_add_same_length_in_place_left(us0, us1))
                 } else {
                     limbs_slice_add_mul_limb_same_length_in_place_left(us0, us1, q)
                 }
@@ -145,7 +145,7 @@ impl<'a> GcdSubdivideStepContext for ExtendedGcdContext<'a> {
                 }
                 let us0 = &mut us0[..us1_len];
                 let scratch = &scratch[..us1_len];
-                Limb::iverson(if us1_len >= us_len {
+                Limb::from(if us1_len >= us_len {
                     let us_len_old = us_len;
                     us_len = us1_len;
                     limbs_add_to_out_aliased(us0, us_len_old, scratch)
@@ -337,8 +337,8 @@ fn limbs_half_gcd_matrix_mul_vector<'a>(
     limbs_mul_to_out(ys, &m01[..m_n], xs, &mut mul_scratch);
     let b_high = limbs_slice_add_same_length_in_place_left(&mut ys[..big_n], scratch);
     if a_high || b_high {
-        rp[big_n] = Limb::iverson(a_high);
-        ys[big_n] = Limb::iverson(b_high);
+        rp[big_n] = Limb::from(a_high);
+        ys[big_n] = Limb::from(b_high);
         big_n += 1;
     } else {
         // Normalize
@@ -698,7 +698,7 @@ pub fn limbs_extended_gcd(
                 us_len = us1_len;
                 limbs_add_to_out_aliased(&mut ss[..us1_len], old_us_len, us1)
             };
-            ss[us_len] = Limb::iverson(carry);
+            ss[us_len] = Limb::from(carry);
             if carry {
                 us_len += 1;
             }

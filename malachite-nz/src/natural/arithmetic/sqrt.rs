@@ -30,7 +30,6 @@ use malachite_base::num::arithmetic::traits::{
     ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode;
@@ -137,7 +136,7 @@ pub_test! {limbs_sqrt_rem_helper(
     } else {
         limbs_div_mod_qs_to_out_rs_to_ns(scratch, &mut xs_hi[..n], out_hi);
     }
-    let mut q = Limb::iverson(q);
+    let mut q = Limb::from(q);
     q += scratch[h1];
     let mut r_hi = scratch[0].odd();
     limbs_shr_to_out(out, &scratch[..h1], 1);
@@ -158,14 +157,14 @@ pub_test! {limbs_sqrt_rem_helper(
     if limbs_sub_same_length_in_place_left(xs_lo, &xs_hi_hi[..two_h1]) {
         b += 1;
     }
-    let mut r_hi = SignedLimb::iverson(r_hi);
+    let mut r_hi = SignedLimb::from(r_hi);
     r_hi -= if h1 == h2 {
         SignedLimb::exact_from(b)
     } else {
-        SignedLimb::iverson(limbs_sub_limb_in_place(xs_hi, b))
+        SignedLimb::from(limbs_sub_limb_in_place(xs_hi, b))
     };
     if r_hi < 0 {
-        q = Limb::iverson(limbs_slice_add_limb_in_place(out_hi, q));
+        q = Limb::from(limbs_slice_add_limb_in_place(out_hi, q));
         r_hi += SignedLimb::exact_from(
             limbs_slice_add_mul_limb_same_length_in_place_left(xs, out, 2) + (q << 1),
         );
@@ -196,7 +195,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
     let scratch = &mut scratch[..n_len];
     scratch.copy_from_slice(ns);
     let inv = limbs_two_limb_inverse_helper(ds[d_len - 1], ds[d_len - 2]);
-    qs[n_len - d_len] = Limb::iverson(if d_len < DC_DIVAPPR_Q_THRESHOLD {
+    qs[n_len - d_len] = Limb::from(if d_len < DC_DIVAPPR_Q_THRESHOLD {
         limbs_div_schoolbook_approx(qs, scratch, ds, inv)
     } else if d_len < MU_DIVAPPR_Q_THRESHOLD {
         limbs_div_divide_and_conquer_approx(qs, scratch, ds, inv)
@@ -226,7 +225,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // This is equivalent to `mpn_dc_sqrt` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
 pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
-    let odd = usize::iverson(odd);
+    let odd = usize::from(odd);
     assert_eq!(xs.len(), (n << 1) - odd);
     assert_ne!(*xs.last().unwrap(), 0);
     assert!(n > 4);
@@ -238,7 +237,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
     let scratch_hi = &mut scratch[n..]; // length is n + h1 + 4
     if shift != 0 {
         // o is used to exactly set the lowest bits of the dividend.
-        let o = usize::iverson(h1 > (1 + odd));
+        let o = usize::from(h1 > (1 + odd));
         assert_eq!(
             limbs_shl_to_out(
                 &mut scratch_hi[1 - o..],
@@ -263,7 +262,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
     limbs_sqrt_div_approx_helper(qs, scratch_hi_lo, out_hi, scratch_lo);
     // qs_tail len is h1 + 1
     let (qs_head, qs_tail) = qs.split_first_mut().unwrap();
-    let mut qs_last = Limb::iverson(r_hi);
+    let mut qs_last = Limb::from(r_hi);
     qs_last += qs_tail[h1];
     let mut nonzero_remainder = true;
     if qs_last > 1 {
@@ -458,7 +457,7 @@ pub_test! {limbs_sqrt_rem_to_out(
                 high - sqrt.square()
             };
             out_rem[0] = r_lo;
-            usize::iverson(r_lo != 0)
+            usize::from(r_lo != 0)
         }
         2 => {
             if shift == 0 {
@@ -468,7 +467,7 @@ pub_test! {limbs_sqrt_rem_to_out(
                     out_rem[1] = 1;
                     2
                 } else {
-                    usize::iverson(out_rem[0] != 0)
+                    usize::from(out_rem[0] != 0)
                 }
             } else {
                 let mut lo = xs[0];
@@ -476,7 +475,7 @@ pub_test! {limbs_sqrt_rem_to_out(
                 out_sqrt[0] = sqrt_rem_2_newton(hi, lo << two_shift).0 >> shift;
                 lo.wrapping_sub_assign(out_sqrt[0].wrapping_square());
                 out_rem[0] = lo;
-                usize::iverson(lo != 0)
+                usize::from(lo != 0)
             }
         }
         _ => {

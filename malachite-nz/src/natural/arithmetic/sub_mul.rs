@@ -6,7 +6,6 @@ use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
 };
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use std::cmp::Ordering;
 use std::fmt::Display;
@@ -108,7 +107,7 @@ pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
     if borrow == 0 || xs_hi.is_empty() {
         borrow
     } else {
-        Limb::iverson(limbs_sub_limb_in_place(xs_hi, borrow))
+        Limb::from(limbs_sub_limb_in_place(xs_hi, borrow))
     }
 }}
 

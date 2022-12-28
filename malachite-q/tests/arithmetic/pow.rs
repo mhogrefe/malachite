@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     Parity, Pow, PowAssign, PowerOf2, Reciprocal, Square,
 };
-use malachite_base::num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
@@ -245,7 +245,7 @@ fn pow_properties() {
     });
 
     unsigned_gen_var_5::<u64>().test_properties(|exp| {
-        assert_eq!(Rational::ZERO.pow(exp), u64::iverson(exp == 0));
+        assert_eq!(Rational::ZERO.pow(exp), u64::from(exp == 0));
         assert_eq!(Rational::ONE.pow(exp), 1);
         assert_eq!(Rational::TWO.pow(exp), Rational::power_of_2(exp));
 
@@ -321,7 +321,7 @@ fn pow_properties() {
 
     signed_gen_var_5::<i64>().test_properties(|exp| {
         if exp >= 0 {
-            assert_eq!(Rational::ZERO.pow(exp), u64::iverson(exp == 0));
+            assert_eq!(Rational::ZERO.pow(exp), u64::from(exp == 0));
         }
         assert_eq!(Rational::ONE.pow(exp), 1);
         assert_eq!(Rational::TWO.pow(exp), Rational::power_of_2(exp));

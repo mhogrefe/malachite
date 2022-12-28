@@ -15,7 +15,6 @@ use crate::natural::arithmetic::sub::{
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
@@ -363,7 +362,7 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
             assert!(sum == n - 1 || slice_test_zero(&scratch[a + 1..]));
             assert_eq!(
                 scratch[a],
-                Limb::iverson(limbs_sub_limb_in_place(&mut out[..sum], carry))
+                Limb::from(limbs_sub_limb_in_place(&mut out[..sum], carry))
             );
         } else {
             let mut carry = scratch[half_n];

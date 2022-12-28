@@ -1,3 +1,5 @@
+/// TODO document
+pub mod from_bool;
 /// Functions for converting a [`Natural`](crate::natural::Natural) to an
 /// [`Integer`](crate::integer::Integer), and an implementation of the [`From`] trait.
 pub mod from_natural;

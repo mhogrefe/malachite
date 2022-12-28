@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2PowAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -259,7 +259,7 @@ fn mod_power_of_2_pow_properties() {
     natural_unsigned_pair_gen().test_properties(|(exp, pow)| {
         assert_eq!(
             Natural::ZERO.mod_power_of_2_pow(&exp, pow),
-            Natural::iverson(exp == 0 && pow != 0),
+            Natural::from(exp == 0 && pow != 0),
         );
         if pow != 0 {
             assert_eq!(Natural::ONE.mod_power_of_2_pow(exp, pow), 1);
@@ -269,7 +269,7 @@ fn mod_power_of_2_pow_properties() {
     natural_unsigned_pair_gen_var_11().test_properties(|(x, pow)| {
         assert_eq!(
             (&x).mod_power_of_2_pow(Natural::ZERO, pow),
-            Natural::iverson(pow != 0)
+            Natural::from(pow != 0)
         );
         assert_eq!((&x).mod_power_of_2_pow(Natural::ONE, pow), x);
         assert_eq!(

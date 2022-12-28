@@ -43,7 +43,6 @@ use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
@@ -358,7 +357,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
     let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
     let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
                                                 // H(v_0) + L(v_pos_inf)
-    let mut carry = Limb::iverson(limbs_slice_add_same_length_in_place_left(
+    let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(
         v_pos_inf_lo,
         v_0_hi,
     ));
@@ -502,7 +501,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     let (am1, bm1) = out_hi.split_at_mut(n);
     // Compute ap1 = xs0 + xs1 + a3, am1 = xs0 - xs1 + a3
     let mut hi = limbs_add_to_out(ap1, xs_0, xs_2);
-    let mut ap1_hi = Limb::iverson(hi);
+    let mut ap1_hi = Limb::from(hi);
     let mut v_neg_1_neg = ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Ordering::Less;
     if v_neg_1_neg {
         assert!(!limbs_sub_same_length_to_out(am1, xs_1, ap1));
@@ -564,7 +563,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32(
     // size: n
     limbs_mul_same_length_to_out(out_lo, am1, bm1, mul_scratch);
     out_hi[0] =
-        Limb::iverson(hi && limbs_slice_add_same_length_in_place_left(&mut out_lo[n..], bm1));
+        Limb::from(hi && limbs_slice_add_same_length_in_place_left(&mut out_lo[n..], bm1));
     // v1 <-- (v1 + vm1) / 2 = x0 + x2
     let out_b = &out[..m];
     if v_neg_1_neg {
@@ -845,7 +844,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     split_into_chunks_mut!(remainder, m, [asm1, bsm1, as1], mul_scratch);
     let gp = &mut v_neg_1[..n];
     // Compute as1 and asm1.
-    let mut carry = Limb::iverson(limbs_add_to_out(gp, xs_0, xs_2));
+    let mut carry = Limb::from(limbs_add_to_out(gp, xs_0, xs_2));
     let (as1_last, as1_init) = as1.split_last_mut().unwrap();
     *as1_last = carry;
     if limbs_add_same_length_to_out(as1_init, gp, xs_1) {
@@ -872,7 +871,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
         as2_init[s..].copy_from_slice(&as1_init[s..]);
         false
     };
-    let mut carry = Limb::iverson(carry)
+    let mut carry = Limb::from(carry)
         .wrapping_add(*as1_last)
         .arithmetic_checked_shl(1u64)
         .unwrap()
@@ -883,7 +882,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     *as2_last = carry;
     // Compute bs1 and bsm1.
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
-    let mut carry = Limb::iverson(limbs_add_to_out(gp, ys_0, ys_2));
+    let mut carry = Limb::from(limbs_add_to_out(gp, ys_0, ys_2));
     *bs1_last = carry;
     if limbs_add_same_length_to_out(bs1_init, gp, ys_1) {
         *bs1_last += 1;
@@ -909,7 +908,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
         bs2_init[t..].copy_from_slice(&bs1_init[t..]);
         false
     };
-    let mut carry = Limb::iverson(carry)
+    let mut carry = Limb::from(carry)
         .wrapping_add(*bs1_last)
         .arithmetic_checked_shl(1u64)
         .unwrap()
@@ -1119,7 +1118,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
         carry += 1;
     }
     if s != n {
-        carry = Limb::iverson(limbs_add_limb_to_out(&mut as2_init[s..], &xs_2[s..], carry));
+        carry = Limb::from(limbs_add_limb_to_out(&mut as2_init[s..], &xs_2[s..], carry));
     }
     carry = carry.arithmetic_checked_shl(1).unwrap();
     carry.wrapping_add_assign(limbs_slice_shl_in_place(as2_init, 1));
@@ -1135,7 +1134,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     // Compute bs1 and bsm1.
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     if t == n {
-        *bs1_last = Limb::iverson(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
+        *bs1_last = Limb::from(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
         if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             v_neg_1_neg.not_assign();
@@ -1143,7 +1142,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
             limbs_sub_same_length_to_out(bsm1, ys_0, ys_1);
         }
     } else {
-        *bs1_last = Limb::iverson(limbs_add_to_out(bs1_init, ys_0, ys_1));
+        *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_1));
         if slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
         {
             limbs_sub_same_length_to_out(bsm1, ys_1, &ys_0[..t]);
@@ -1168,7 +1167,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     // size: n
     limbs_mul_same_length_to_out(v_neg_1, asm1_init, bsm1, mul_scratch);
     let (v_neg_1_last, v_neg_1_init) = v_neg_1.split_last_mut().unwrap();
-    *v_neg_1_last = Limb::iverson(
+    *v_neg_1_last = Limb::from(
         *asm1_last != 0 && limbs_slice_add_same_length_in_place_left(&mut v_neg_1_init[n..], bsm1),
     );
     // size: n + 1
@@ -1336,7 +1335,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43(
     }
     // 4 * ys_2 + ys_0
     if t != n {
-        carry = Limb::iverson(limbs_add_limb_to_out(
+        carry = Limb::from(limbs_add_limb_to_out(
             &mut small_scratch[t..],
             &ys_0[t..],
             carry,
@@ -1356,7 +1355,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43(
     }
     let (bsm1_last, bsm1_init) = bsm1.split_last_mut().unwrap();
     // Compute bs1 and bsm1.
-    *bsm1_last = Limb::iverson(limbs_add_to_out(bsm1_init, ys_0, ys_2));
+    *bsm1_last = Limb::from(limbs_add_to_out(bsm1_init, ys_0, ys_2));
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     *bs1_last = *bsm1_last;
     if limbs_add_same_length_to_out(bs1_init, bsm1_init, ys_1) {
@@ -2014,7 +2013,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
     // Compute bs1 and bsm1.
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     // ys_0 + ys_2
-    *bs1_last = Limb::iverson(limbs_add_to_out(bs1_init, ys_0, ys_2));
+    *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_2));
     let (bsm1_last, bsm1_init) = bsm1.split_last_mut().unwrap();
     if *bs1_last == 0 && limbs_cmp_same_length(bs1_init, ys_1) == Ordering::Less {
         limbs_sub_same_length_to_out(bsm1_init, ys_1, bs1_init);
@@ -2034,7 +2033,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
     let (out_lo_last, out_lo_init) = out_lo.split_last_mut().unwrap();
     let carry = limbs_shl_to_out(out_lo_init, ys_2, 2);
     let (bs2_last, bs2_init) = bs2.split_last_mut().unwrap();
-    *bs2_last = Limb::iverson(limbs_add_to_out(bs2_init, ys_0, &out_lo_init[..t]));
+    *bs2_last = Limb::from(limbs_add_to_out(bs2_init, ys_0, &out_lo_init[..t]));
     assert!(!limbs_slice_add_limb_in_place(&mut bs2[t..], carry));
     *out_lo_last = limbs_shl_to_out(out_lo_init, ys_1, 1);
     if limbs_cmp_same_length(bs2, out_lo) == Ordering::Less {
@@ -2491,7 +2490,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     let bs1 = bs1;
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     let v_neg_1_neg_b = if t == n {
-        *bs1_last = Limb::iverson(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
+        *bs1_last = Limb::from(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));
         if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
             limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
             true
@@ -2500,7 +2499,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
             false
         }
     } else {
-        *bs1_last = Limb::iverson(limbs_add_to_out(bs1_init, ys_0, ys_1));
+        *bs1_last = Limb::from(limbs_add_to_out(bs1_init, ys_0, ys_1));
         let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
         if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
             let (bsm1_lo, bsm1_hi) = bsm1.split_at_mut(t);
@@ -2515,7 +2514,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     // Compute bs2 and bsm2. Recycling bs1 and bsm1: bs2 = bs1 + ys_1, bsm2 = bsm1 - ys_1
     limbs_add_to_out(bs2, bs1, ys_1);
     let v_neg_2_neg_b = if v_neg_1_neg_b {
-        bsm2[n] = Limb::iverson(limbs_add_to_out(bsm2, bsm1, ys_1));
+        bsm2[n] = Limb::from(limbs_add_to_out(bsm2, bsm1, ys_1));
         true
     } else if t < n {
         let (bsm1_lo, bsm1_hi) = bsm1.split_at(t);
@@ -2577,7 +2576,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     *v_neg_1_last = if *asm1_last == 2 {
         limbs_slice_add_mul_limb_same_length_in_place_left(v_neg_1_hi, bsm1, 2)
     } else {
-        Limb::iverson(
+        Limb::from(
             *asm1_last == 1 && limbs_slice_add_same_length_in_place_left(v_neg_1_hi, bsm1),
         )
     };
@@ -2803,7 +2802,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     let (v3_last, v3_init) = v3.split_last_mut().unwrap();
     if n != t {
         // 16 * ys_2 + ys_0
-        *v3_last = Limb::iverson(limbs_add_to_out_aliased(v3_init, t + 1, ys_0));
+        *v3_last = Limb::from(limbs_add_to_out_aliased(v3_init, t + 1, ys_0));
     } else if limbs_slice_add_same_length_in_place_left(v3_init, ys_0) {
         // 16 * ys_2 + ys_0
         *v3_last += 1;
@@ -2825,7 +2824,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     let (v3_last, v3_init) = v3.split_last_mut().unwrap();
     *v3_last = 0;
     let carry = limbs_add_to_out(scratch2_lo, ys_0, ys_2);
-    *v3_last = Limb::iverson(carry);
+    *v3_last = Limb::from(carry);
     if limbs_add_same_length_to_out(v3_init, scratch2_lo, ys_1) {
         *v3_last += 1;
     }
@@ -2835,7 +2834,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
         *v1_last = 0;
         v_neg_2_neg.not_assign();
     } else {
-        *v1_last = Limb::iverson(carry);
+        *v1_last = Limb::from(carry);
         if limbs_sub_same_length_to_out(v1_init, scratch2_lo, ys_1) {
             v1_last.wrapping_sub_assign(1);
         }
@@ -2861,7 +2860,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
         }
     } else {
         // 4 * ys_2 + ys_0
-        v3[n] = Limb::iverson(limbs_add_to_out_aliased(v3, t + 1, ys_0));
+        v3[n] = Limb::from(limbs_add_to_out_aliased(v3, t + 1, ys_0));
     }
     if limbs_abs_sub_add_same_length(v1, v3, &r8[..m]) {
         v_neg_2_neg.not_assign();

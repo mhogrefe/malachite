@@ -34,7 +34,7 @@ use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
@@ -181,7 +181,7 @@ pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         if adjust {
             r -= d;
         }
-        *out_last = Limb::iverson(adjust);
+        *out_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
@@ -243,7 +243,7 @@ pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         if adjust {
             r -= d;
         }
-        *ns_last = Limb::iverson(adjust);
+        *ns_last = Limb::from(adjust);
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for n in ns_init.iter_mut().rev() {
@@ -887,7 +887,7 @@ fn limbs_div_divide_and_conquer_approx_helper(
     let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(hi, ds_lo.len())];
     limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_lo, &mut mul_scratch);
     let ns_lo = &mut ns[..d_len];
-    let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
+    let mut carry = Limb::from(limbs_sub_same_length_in_place_left(
         ns_lo,
         &scratch[..d_len],
     ));
@@ -1038,7 +1038,7 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
             if q_len_mod_d_len != d_len {
                 let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(qs.len(), ds_lo.len())];
                 limbs_mul_to_out(&mut scratch, qs, ds_lo, &mut mul_scratch);
-                let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
+                let mut carry = Limb::from(limbs_sub_same_length_in_place_left(
                     &mut ns_hi[..d_len],
                     &scratch[..d_len],
                 ));
@@ -1403,7 +1403,7 @@ pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], d
             let mut scratch = vec![0; limbs_div_barrett_scratch_len(n_len, d_len)];
             limbs_div_barrett(qs, ns, ds, &mut scratch)
         };
-        qs[n_len - d_len] = Limb::iverson(highest_q);
+        qs[n_len - d_len] = Limb::from(highest_q);
     } else {
         let mut scratch = vec![0; n_len + 1];
         let carry = limbs_shl_to_out(&mut scratch, ns, bits);
@@ -1424,7 +1424,7 @@ pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], d
             limbs_div_barrett(qs, new_ns, ds, &mut scratch)
         };
         if carry == 0 {
-            qs[n_len - d_len] = Limb::iverson(highest_q);
+            qs[n_len - d_len] = Limb::from(highest_q);
         } else {
             assert!(!highest_q);
         }
@@ -1468,7 +1468,7 @@ fn limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[L
         } else {
             limbs_div_q_dc_helper(qs, ns, ds)
         };
-        qs[n_len - d_len] = Limb::iverson(highest_q);
+        qs[n_len - d_len] = Limb::from(highest_q);
     } else {
         let mut scratch = vec![0; n_len + 1];
         let carry = limbs_shl_to_out(&mut scratch, ns, bits);
@@ -1490,7 +1490,7 @@ fn limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[L
             limbs_div_barrett(qs, new_ns, &new_ds, &mut scratch)
         };
         if carry == 0 {
-            qs[n_len - d_len] = Limb::iverson(highest_q);
+            qs[n_len - d_len] = Limb::from(highest_q);
         } else {
             assert!(!highest_q);
         }
@@ -1527,7 +1527,7 @@ fn limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [L
             let mut scratch = vec![0; limbs_div_barrett_scratch_len(n_len, d_len)];
             limbs_div_barrett(qs, ns, ds, &mut scratch)
         };
-        qs[n_len - d_len] = Limb::iverson(highest_q);
+        qs[n_len - d_len] = Limb::from(highest_q);
     } else {
         let mut scratch = vec![0; n_len + 1];
         let carry = limbs_shl_to_out(&mut scratch, ns, bits);
@@ -1548,7 +1548,7 @@ fn limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [L
             limbs_div_barrett(qs, new_ns, ds, &mut scratch)
         };
         if carry == 0 {
-            qs[n_len - d_len] = Limb::iverson(highest_q);
+            qs[n_len - d_len] = Limb::from(highest_q);
         } else {
             assert!(!highest_q);
         }
@@ -1585,7 +1585,7 @@ fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]
             let mut scratch = vec![0; limbs_div_barrett_scratch_len(n_len, d_len)];
             limbs_div_barrett(qs, ns, ds, &mut scratch)
         };
-        qs[n_len - d_len] = Limb::iverson(highest_q);
+        qs[n_len - d_len] = Limb::from(highest_q);
     } else {
         let mut scratch = vec![0; n_len + 1];
         let carry = limbs_shl_to_out(&mut scratch, ns, bits);
@@ -1607,7 +1607,7 @@ fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]
             limbs_div_barrett(qs, new_ns, &new_ds, &mut scratch)
         };
         if carry == 0 {
-            qs[n_len - d_len] = Limb::iverson(highest_q);
+            qs[n_len - d_len] = Limb::from(highest_q);
         } else {
             assert!(!highest_q);
         }
@@ -1652,7 +1652,7 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
                 vec![0; limbs_div_barrett_approx_scratch_len(new_n_len, q_len_plus_1)];
             limbs_div_barrett_approx(&mut scratch_2, ns_tail, new_ds, &mut scratch)
         };
-        scratch_2[q_len] = Limb::iverson(highest_q);
+        scratch_2[q_len] = Limb::from(highest_q);
     } else {
         let mut scratch = vec![0; n_len + 1];
         let carry = limbs_shl_to_out(&mut scratch, ns_tail, bits);
@@ -1676,7 +1676,7 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
             limbs_div_barrett_approx(&mut scratch_2, new_ns, &new_ds, &mut scratch)
         };
         if carry == 0 {
-            scratch_2[q_len] = Limb::iverson(highest_q);
+            scratch_2[q_len] = Limb::from(highest_q);
         } else if highest_q {
             fail_on_untested_path("limbs_div_to_out_balanced, highest_q");
             // This happens only when the quotient is close to B ^ n and one of the approximate

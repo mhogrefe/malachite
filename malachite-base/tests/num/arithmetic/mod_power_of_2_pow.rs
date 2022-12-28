@@ -53,7 +53,7 @@ fn mod_power_of_2_pow_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_23::<u64, T>().test_properties(|(exp, pow)| {
         assert_eq!(
             T::ZERO.mod_power_of_2_pow(exp, pow),
-            T::iverson(exp == 0 && pow != 0)
+            T::from(exp == 0 && pow != 0)
         );
         if pow != 0 {
             assert_eq!(T::ONE.mod_power_of_2_pow(exp, pow), T::ONE);

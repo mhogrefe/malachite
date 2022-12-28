@@ -132,6 +132,46 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
+/// Traits for computing the binomial coefficient of two numbers. There is a trait whose
+/// implementations panic if the result cannot be represented, and a checked trait whose
+/// implementations return `None` in that case:
+/// [`BinomialCoefficient`](traits::BinomialCoefficient) and
+/// [`CheckedBinomialCoefficient`](traits::CheckedBinomialCoefficient).
+///
+/// # binomial_coefficient
+/// ```
+/// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+///
+/// assert_eq!(u8::binomial_coefficient(3, 0), 1);
+/// assert_eq!(u8::binomial_coefficient(3, 1), 3);
+/// assert_eq!(u8::binomial_coefficient(3, 2), 3);
+/// assert_eq!(u8::binomial_coefficient(3, 3), 1);
+/// assert_eq!(u8::binomial_coefficient(10, 5), 252);
+/// 
+/// assert_eq!(i8::binomial_coefficient(-3, 0), 1);
+/// assert_eq!(i8::binomial_coefficient(-3, 1), -3);
+/// assert_eq!(i8::binomial_coefficient(-3, 2), 6);
+/// assert_eq!(i8::binomial_coefficient(-3, 3), -10);
+/// ```
+///
+/// # checked_binomial_coefficient
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedBinomialCoefficient;
+///
+/// assert_eq!(u8::checked_binomial_coefficient(3, 0), Some(1));
+/// assert_eq!(u8::checked_binomial_coefficient(3, 1), Some(3));
+/// assert_eq!(u8::checked_binomial_coefficient(3, 2), Some(3));
+/// assert_eq!(u8::checked_binomial_coefficient(3, 3), Some(1));
+/// assert_eq!(u8::checked_binomial_coefficient(10, 5), Some(252));
+/// assert_eq!(u8::checked_binomial_coefficient(11, 5), None);
+/// 
+/// assert_eq!(i8::checked_binomial_coefficient(-3, 0), Some(1));
+/// assert_eq!(i8::checked_binomial_coefficient(-3, 1), Some(-3));
+/// assert_eq!(i8::checked_binomial_coefficient(-3, 2), Some(6));
+/// assert_eq!(i8::checked_binomial_coefficient(-3, 3), Some(-10));
+/// assert_eq!(i8::checked_binomial_coefficient(-3, -3), None);
+/// assert_eq!(i8::checked_binomial_coefficient(11, 5), None);
+/// ```
 pub mod binomial_coefficient;
 /// [`Ceiling`](traits::Ceiling) and [`CeilingAssign`](traits::CeilingAssign), traits for computing
 /// the ceiling of a number.

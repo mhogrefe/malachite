@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ModIsReduced, ModMul, ModNeg, ModPow, ModPowAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_15;
 use malachite_nz::natural::arithmetic::mod_pow::{
@@ -500,7 +500,7 @@ fn mod_pow_properties() {
     natural_pair_gen_var_5().test_properties(|(exp, m)| {
         assert_eq!(
             Natural::ZERO.mod_pow(&exp, &m),
-            Natural::iverson(exp == 0 && m != 1),
+            Natural::from(exp == 0 && m != 1),
         );
         if m != 1 {
             assert_eq!(Natural::ONE.mod_pow(exp, m), 1);
@@ -508,7 +508,7 @@ fn mod_pow_properties() {
     });
 
     natural_pair_gen_var_8().test_properties(|(ref x, ref m)| {
-        assert_eq!(x.mod_pow(Natural::ZERO, m), Natural::iverson(*m != 1));
+        assert_eq!(x.mod_pow(Natural::ZERO, m), Natural::from(*m != 1));
         assert_eq!(x.mod_pow(Natural::ONE, m), *x);
         assert_eq!(x.mod_pow(Natural::TWO, m), x.mod_mul(x, m));
     });

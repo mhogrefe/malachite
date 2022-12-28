@@ -21,7 +21,7 @@ use malachite_base::num::arithmetic::traits::{
     SqrtRem,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
@@ -466,7 +466,7 @@ fn limbs_root_to_out_internal(
         }
         // Sometimes two corrections are needed with log_based_root.
         assert!(c <= NEEDED_CORRECTIONS);
-        rs_len = usize::iverson(pow_cmp != Ordering::Equal);
+        rs_len = usize::from(pow_cmp != Ordering::Equal);
         if rs_len != 0 && out_rem_is_some {
             limbs_sub_greater_to_out(rs, &xs[..xs_len], &qs[..qs_len]);
             rs_len = xs_len;

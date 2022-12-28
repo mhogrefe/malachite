@@ -2,7 +2,6 @@ use crate::natural::arithmetic::div_exact::MAX_OVER_3;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 
 // This is equivalent to `MODLIMB_INVERSE_3` from `gmp-impl.h`, GMP 6.2.1.
 const MODLIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) | 1;
@@ -22,7 +21,7 @@ pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
     let mut big_carry = 0;
     for (out_q, n) in out_init.iter_mut().zip(ns_init.iter()) {
         let (diff, carry) = n.overflowing_sub(big_carry);
-        big_carry = Limb::iverson(carry);
+        big_carry = Limb::from(carry);
         let q = diff.wrapping_mul(MODLIMB_INVERSE_3);
         *out_q = q;
         if q >= CEIL_MAX_OVER_3 {
@@ -48,7 +47,7 @@ pub fn limbs_div_exact_3_in_place_alt(ns: &mut [Limb]) {
     let mut big_carry = 0;
     for n in ns_init.iter_mut() {
         let (diff, carry) = n.overflowing_sub(big_carry);
-        big_carry = Limb::iverson(carry);
+        big_carry = Limb::from(carry);
         let q = diff.wrapping_mul(MODLIMB_INVERSE_3);
         *n = q;
         if q >= CEIL_MAX_OVER_3 {

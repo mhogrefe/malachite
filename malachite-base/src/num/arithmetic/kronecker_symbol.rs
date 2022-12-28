@@ -3,7 +3,6 @@ use crate::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, NegAssign, Parity, UnsignedAbs,
 };
 use crate::num::basic::signeds::PrimitiveSigned;
-use crate::num::basic::traits::Iverson;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::SplitInHalf;
 use crate::num::logic::traits::NotAssign;
@@ -247,7 +246,7 @@ fn jacobi_symbol_signed<
 
 fn kronecker_symbol_unsigned<T: PrimitiveUnsigned>(a: T, b: T) -> i8 {
     if b == T::ZERO {
-        i8::iverson(a == T::ONE)
+        i8::from(a == T::ONE)
     } else if a.even() && b.even() {
         0
     } else {
@@ -268,7 +267,7 @@ fn kronecker_symbol_signed<U: PrimitiveUnsigned, S: ModPowerOf2<Output = U> + Pr
     b: S,
 ) -> i8 {
     if b == S::ZERO {
-        i8::iverson(a == S::ONE || a == S::NEGATIVE_ONE)
+        i8::from(a == S::ONE || a == S::NEGATIVE_ONE)
     } else if a.even() && b.even() {
         0
     } else {

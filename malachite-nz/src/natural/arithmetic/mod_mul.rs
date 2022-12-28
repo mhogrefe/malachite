@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2MulAssign, PowerOf2, XMulYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 
@@ -72,7 +72,7 @@ pub_test! {limbs_mod_mul_two_limbs(
     let (t, carry) = (DoubleLimb::from(x_1) * DoubleLimb::from(y_0))
         .overflowing_add(DoubleLimb::from(x_0) * DoubleLimb::from(y_1));
     let (t_2, t_1) = t.split_in_half();
-    let (w_3, w_2, w_1) = Limb::xxx_add_yyy_to_zzz(w_3, w_2, w_1, Limb::iverson(carry), t_2, t_1);
+    let (w_3, w_2, w_1) = Limb::xxx_add_yyy_to_zzz(w_3, w_2, w_1, Limb::from(carry), t_2, t_1);
 
     // z[5:0] = w[3:1] * ninv[2:0], z[5] should end up zero
     let (z_3, z_2) = Limb::x_mul_y_to_zz(w_2, inv_1);
@@ -85,7 +85,7 @@ pub_test! {limbs_mod_mul_two_limbs(
         w_3.wrapping_mul(inv_2),
         z_3,
         z_2,
-        Limb::iverson(carry),
+        Limb::from(carry),
         t_3,
         t_2,
     );

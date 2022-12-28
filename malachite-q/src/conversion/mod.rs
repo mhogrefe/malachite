@@ -3,6 +3,8 @@
 pub mod continued_fraction;
 /// Implementations of traits for working with the digits of [`Rational`](crate::Rational)s.
 pub mod digits;
+/// TODO document
+pub mod from_bool;
 /// Functions for converting a primitive float to a [`Rational`](crate::Rational), choosing the
 /// [`Rational`](crate::Rational) with minimal denominator that rounds to the given float.
 pub mod from_float_simplest;

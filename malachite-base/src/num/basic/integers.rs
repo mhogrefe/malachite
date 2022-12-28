@@ -173,6 +173,7 @@ pub trait PrimitiveInt:
     + FloorRootAssign<u64>
     + FloorSqrt<Output = Self>
     + FloorSqrtAssign
+    + From<bool>
     + FromSciString
     + FromStr
     + FromStringBase

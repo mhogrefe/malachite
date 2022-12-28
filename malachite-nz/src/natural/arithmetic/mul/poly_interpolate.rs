@@ -25,7 +25,6 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Iverson;
 use malachite_base::slices::slice_test_zero;
 use std::mem::swap;
 
@@ -333,7 +332,7 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
         assert!(!limbs_sub_limb_in_place(&mut out[..m], 1));
     }
     let (out_lo, out_hi) = out.split_at_mut(n << 1);
-    let carry = Limb::iverson(limbs_slice_add_same_length_in_place_left(
+    let carry = Limb::from(limbs_slice_add_same_length_in_place_left(
         &mut out_lo[n..],
         w2_lo,
     ));
