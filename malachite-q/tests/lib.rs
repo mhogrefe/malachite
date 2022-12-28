@@ -118,6 +118,7 @@ pub mod conversion {
         pub mod to_digits;
         pub mod to_power_of_2_digits;
     }
+    pub mod from_bool;
     pub mod from_float_simplest;
     pub mod from_integer;
     pub mod from_natural;

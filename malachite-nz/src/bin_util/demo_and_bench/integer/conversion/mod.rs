@@ -3,6 +3,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     clone::register(runner);
     floating_point_from_integer::register(runner);
+    from_bool::register(runner);
     from_floating_point::register(runner);
     from_natural::register(runner);
     from_primitive_int::register(runner);
@@ -17,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod clone;
 mod floating_point_from_integer;
+mod from_bool;
 mod from_floating_point;
 mod from_natural;
 mod from_primitive_int;

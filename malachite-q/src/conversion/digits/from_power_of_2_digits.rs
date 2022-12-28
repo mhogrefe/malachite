@@ -28,8 +28,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::rational_sequences::RationalSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_q::Rational;
@@ -102,8 +100,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::rational_sequences::RationalSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_q::Rational;

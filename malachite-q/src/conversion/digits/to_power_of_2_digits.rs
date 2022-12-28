@@ -61,8 +61,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
@@ -116,8 +114,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///

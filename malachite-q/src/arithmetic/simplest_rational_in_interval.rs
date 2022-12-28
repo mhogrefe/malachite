@@ -153,8 +153,6 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;
@@ -361,8 +359,6 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;

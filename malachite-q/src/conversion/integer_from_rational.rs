@@ -18,8 +18,6 @@ impl TryFrom<Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::conversion::integer_from_rational::IntegerFromRationalError;
     /// use malachite_q::Rational;
@@ -84,9 +82,6 @@ impl<'a> ConvertibleFrom<&'a Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
@@ -118,9 +113,6 @@ impl RoundingFrom<Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
@@ -182,9 +174,6 @@ impl<'a> RoundingFrom<&'a Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;

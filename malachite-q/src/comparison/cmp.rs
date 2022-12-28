@@ -25,8 +25,6 @@ impl Ord for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;

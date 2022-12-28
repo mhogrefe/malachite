@@ -3,7 +3,8 @@
 pub mod continued_fraction;
 /// Implementations of traits for working with the digits of [`Rational`](crate::Rational)s.
 pub mod digits;
-/// TODO document
+/// An implementation of the [`From`] trait for converting a [`bool`] to a
+/// [`Rational`](crate::Rational).
 pub mod from_bool;
 /// Functions for converting a primitive float to a [`Rational`](crate::Rational), choosing the
 /// [`Rational`](crate::Rational) with minimal denominator that rounds to the given float.
@@ -63,8 +64,6 @@ pub mod is_integer;
 ///
 /// # sci_mantissa_and_exponent
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
@@ -87,8 +86,6 @@ pub mod is_integer;
 ///
 /// # from_sci_mantissa_and_exponent
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_q::Rational;
 ///
@@ -134,8 +131,6 @@ pub mod natural_from_rational;
 ///
 /// # rounding_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::traits::OneHalf;
@@ -173,8 +168,6 @@ pub mod natural_from_rational;
 ///
 /// # try_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
@@ -208,8 +201,6 @@ pub mod natural_from_rational;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_base::num::basic::traits::OneHalf;
@@ -267,8 +258,6 @@ pub mod primitive_float_from_rational;
 ///
 /// # convertible_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_q::Rational;
 /// use std::str::FromStr;
@@ -287,8 +276,6 @@ pub mod primitive_float_from_rational;
 ///
 /// # rounding_from
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_q::Rational;

@@ -27,8 +27,6 @@ impl OrdAbs for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::num::comparison::traits::OrdAbs;
     /// use malachite_q::Rational;

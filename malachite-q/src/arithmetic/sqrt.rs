@@ -28,8 +28,6 @@ impl CheckedSqrt for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
@@ -85,8 +83,6 @@ impl<'a> CheckedSqrt for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;

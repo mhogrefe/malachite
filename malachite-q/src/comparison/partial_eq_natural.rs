@@ -15,8 +15,6 @@ impl PartialEq<Natural> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
@@ -42,8 +40,6 @@ impl PartialEq<Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///

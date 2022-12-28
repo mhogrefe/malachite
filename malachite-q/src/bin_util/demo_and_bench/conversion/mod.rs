@@ -4,6 +4,7 @@ pub(crate) fn register(runner: &mut Runner) {
     clone::register(runner);
     continued_fraction::register(runner);
     digits::register(runner);
+    from_bool::register(runner);
     from_float_simplest::register(runner);
     from_integer::register(runner);
     from_natural::register(runner);
@@ -25,6 +26,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod clone;
 mod continued_fraction;
 mod digits;
+mod from_bool;
 mod from_float_simplest;
 mod from_integer;
 mod from_natural;

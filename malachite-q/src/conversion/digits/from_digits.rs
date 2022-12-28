@@ -29,9 +29,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::rational_sequences::RationalSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
@@ -105,9 +102,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::rational_sequences::RationalSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;

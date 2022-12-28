@@ -63,8 +63,6 @@ impl Iterator for ExhaustivePositiveRationals {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_positive_rationals;
 ///
@@ -98,8 +96,6 @@ pub const fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_non_negative_rationals;
 ///
@@ -149,8 +145,6 @@ impl Iterator for ExhaustiveNegativeRationals {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_negative_rationals;
 ///
@@ -212,8 +206,6 @@ impl Iterator for ExhaustiveNonzeroRationals {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_nonzero_rationals;
 ///
@@ -248,8 +240,6 @@ pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_rationals;
 ///
@@ -311,9 +301,6 @@ impl<'a, I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<'a, 
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_nz::natural::Natural;
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
@@ -377,9 +364,6 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_nz::natural::Natural;
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_q::exhaustive::exhaustive_rationals_with_denominator_range_to_negative_infinity;
@@ -443,10 +427,6 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
@@ -521,10 +501,6 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///
 /// # Examples
 /// ```
-/// extern crate itertools;
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;

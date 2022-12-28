@@ -11,8 +11,6 @@ impl From<Natural> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
@@ -40,8 +38,6 @@ impl<'a> From<&'a Natural> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///

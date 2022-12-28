@@ -13,8 +13,6 @@ impl From<Integer> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
@@ -43,8 +41,6 @@ impl<'a> From<&'a Integer> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///

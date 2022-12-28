@@ -1,6 +1,7 @@
 /// Implementations of traits for working with the digits of [`Natural`](crate::natural::Natural)s.
 pub mod digits;
-/// TODO document
+/// An implementation of the [`From`] trait for converting a [`bool`] to a
+/// [`Natural`](crate::natural::Natural).
 pub mod from_bool;
 /// Functions for constructing a [`Natural`](crate::natural::Natural) from [`Limb`](crate#limbs)s.
 pub mod from_limbs;

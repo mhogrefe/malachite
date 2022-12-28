@@ -1,12 +1,12 @@
-use crate::integer::Integer;
 use crate::itertools::Itertools;
+use crate::natural::Natural;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_base::test_util::stats::median;
 use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
 
-pub fn random_integers_helper_helper<I: Clone + Iterator<Item = Integer>>(
+pub fn random_naturals_helper_helper<I: Clone + Iterator<Item = Natural>>(
     xs: I,
     expected_values: &[&str],
     expected_common_values: &[(&str, usize)],
@@ -15,7 +15,7 @@ pub fn random_integers_helper_helper<I: Clone + Iterator<Item = Integer>>(
 ) {
     let actual_values = xs
         .clone()
-        .map(|x| Integer::to_string(&x))
+        .map(|x| Natural::to_string(&x))
         .take(20)
         .collect_vec();
     let actual_values = actual_values.iter().map(String::as_str).collect_vec();
@@ -30,7 +30,7 @@ pub fn random_integers_helper_helper<I: Clone + Iterator<Item = Integer>>(
     let (median_lo, median_hi) = median(xs.clone().take(1000000));
     let (median_lo, median_hi) = (
         median_lo.to_string(),
-        median_hi.map(|x| Integer::to_string(&x)),
+        median_hi.map(|x| Natural::to_string(&x)),
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     // Note that the population moments do not exist.

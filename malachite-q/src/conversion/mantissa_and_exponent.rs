@@ -30,8 +30,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::num::float::NiceFloat;
@@ -112,8 +110,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::num::float::NiceFloat;

@@ -33,9 +33,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
@@ -93,9 +90,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;

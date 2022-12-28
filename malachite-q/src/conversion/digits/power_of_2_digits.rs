@@ -65,8 +65,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::iterators::prefix_to_string;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;

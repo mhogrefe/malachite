@@ -21,9 +21,6 @@ impl PartialOrdAbs<Natural> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -90,9 +87,6 @@ impl PartialOrdAbs<Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;

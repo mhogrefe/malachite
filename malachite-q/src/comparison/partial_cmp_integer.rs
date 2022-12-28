@@ -20,8 +20,6 @@ impl PartialOrd<Integer> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
@@ -95,8 +93,6 @@ impl PartialOrd<Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///

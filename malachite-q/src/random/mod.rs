@@ -59,8 +59,6 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingle<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_positive_rationals;
@@ -125,8 +123,6 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_non_negative_rationals;
@@ -202,8 +198,6 @@ impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_negative_rationals;
@@ -267,8 +261,6 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingleAndSign<
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_nonzero_rationals;
@@ -337,8 +329,6 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::random_rationals;
@@ -404,8 +394,6 @@ pub fn random_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_positive_rationals;
@@ -460,8 +448,6 @@ pub fn striped_random_positive_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_non_negative_rationals;
@@ -525,8 +511,6 @@ pub fn striped_random_non_negative_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_negative_rationals;
@@ -583,8 +567,6 @@ pub fn striped_random_negative_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_nonzero_rationals;
@@ -639,8 +621,6 @@ pub fn striped_random_nonzero_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::random::striped_random_rationals;
@@ -705,9 +685,6 @@ pub fn striped_random_rationals(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
@@ -770,9 +747,6 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
@@ -845,9 +819,6 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
@@ -930,9 +901,6 @@ pub fn random_rationals_with_denominator_range(
 ///
 /// # Examples
 /// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;

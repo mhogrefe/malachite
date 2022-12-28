@@ -28,8 +28,6 @@ impl CheckedRoot<u64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
@@ -93,8 +91,6 @@ impl<'a> CheckedRoot<u64> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
@@ -158,8 +154,6 @@ impl CheckedRoot<i64> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
@@ -220,8 +214,6 @@ impl<'a> CheckedRoot<i64> for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::arithmetic::traits::CheckedRoot;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;

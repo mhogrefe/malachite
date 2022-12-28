@@ -63,9 +63,6 @@ impl ContinuedFraction for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    /// extern crate malachite_base;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::conversion::traits::ContinuedFraction;
@@ -123,9 +120,6 @@ impl<'a> ContinuedFraction for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate itertools;
-    /// extern crate malachite_base;
-    ///
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::conversion::traits::ContinuedFraction;

@@ -18,8 +18,6 @@ pub mod partial_cmp_abs_natural;
 ///
 /// # partial_cmp_abs
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_q::Rational;
 ///
@@ -36,8 +34,6 @@ pub mod partial_cmp_abs_primitive_float;
 ///
 /// # partial_cmp_abs
 /// ```
-/// extern crate malachite_base;
-///
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_q::Rational;
 /// use std::cmp::Ordering;

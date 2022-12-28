@@ -44,8 +44,6 @@ impl FromSciString for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::num::conversion::traits::FromSciString;
     /// use malachite_base::rounding_modes::RoundingMode;
@@ -132,8 +130,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;

@@ -22,9 +22,6 @@ impl PartialOrdAbs<Integer> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
@@ -94,9 +91,6 @@ impl PartialOrdAbs<Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::comparison::traits::PartialOrdAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;

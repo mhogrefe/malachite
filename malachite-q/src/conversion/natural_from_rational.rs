@@ -86,9 +86,6 @@ impl<'a> ConvertibleFrom<&'a Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -125,9 +122,6 @@ impl RoundingFrom<Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
@@ -190,9 +184,6 @@ impl<'a> RoundingFrom<&'a Rational> for Natural {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;

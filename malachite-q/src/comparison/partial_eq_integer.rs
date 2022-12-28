@@ -15,8 +15,6 @@ impl PartialEq<Integer> for Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
@@ -44,8 +42,6 @@ impl PartialEq<Rational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///

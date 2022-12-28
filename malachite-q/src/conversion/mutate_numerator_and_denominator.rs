@@ -10,9 +10,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -45,9 +42,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
@@ -78,9 +72,6 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;

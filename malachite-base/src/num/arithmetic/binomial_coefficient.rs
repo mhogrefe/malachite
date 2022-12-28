@@ -71,23 +71,27 @@ fn checked_binomial_coefficient_signed<
 
 macro_rules! impl_binomial_coefficient_unsigned {
     ($t:ident) => {
-        /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
-        /// function returns `None`.
-        ///
-        /// $$
-        /// f(n, k) = \\begin{cases}
-        ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad \binom{n}{k} < 2^W, \\\\
-        ///     \operatorname{None} & \text{if} \\quad \binom{n}{k} \geq 2^W,
-        /// \\end{cases}
-        /// $$
-        /// where $W$ is `Self::WIDTH`.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        ///
-        /// # Examples
-        /// See [here](super::binomial_coefficient#checked_binomial_coefficient).
         impl CheckedBinomialCoefficient for $t {
+            /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
+            /// function returns `None`.
+            ///
+            /// $$
+            /// f(n, k) = \\begin{cases}
+            ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad \binom{n}{k} < 2^W, \\\\
+            ///     \operatorname{None} & \text{if} \\quad \binom{n}{k} \geq 2^W,
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `Self::WIDTH`.
+            ///
+            /// # Worst-case complexity
+            /// $T(k) = O(k)$
+            ///
+            /// $M(k) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $k$ is `k`.
+            ///
+            /// # Examples
+            /// See [here](super::binomial_coefficient#checked_binomial_coefficient).
             #[inline]
             fn checked_binomial_coefficient(n: $t, k: $t) -> Option<$t> {
                 checked_binomial_coefficient_unsigned(n, k)
@@ -116,7 +120,11 @@ macro_rules! impl_binomial_coefficient_signed {
             /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(k) = O(k)$
+            ///
+            /// $M(k) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $k$ is `k.abs()`.
             ///
             /// # Examples
             /// See [here](super::binomial_coefficient#checked_binomial_coefficient).
@@ -143,7 +151,11 @@ macro_rules! impl_binomial_coefficient_primitive_int {
             /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(k) = O(k)$
+            ///
+            /// $M(k) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $k$ is `k.abs()`.
             /// 
             /// # Panics
             /// Panics if the result is not representable by this type.

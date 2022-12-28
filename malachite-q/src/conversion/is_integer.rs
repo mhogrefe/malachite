@@ -11,8 +11,6 @@ impl<'a> IsInteger for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_base::num::conversion::traits::IsInteger;
     /// use malachite_q::Rational;

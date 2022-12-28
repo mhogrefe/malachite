@@ -149,8 +149,6 @@ impl<'a> SignificantBits for &'a Rational {
     ///
     /// # Examples
     /// ```
-    /// extern crate malachite_base;
-    ///
     /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::Rational;
