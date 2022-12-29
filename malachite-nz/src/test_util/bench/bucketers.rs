@@ -10,6 +10,13 @@ use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::test_util::bench::bucketers::Bucketer;
 use std::cmp::{max, min};
 
+pub fn natural_bucketer(var_name: &str) -> Bucketer<Natural> {
+    Bucketer {
+        bucketing_function: &|x| usize::exact_from(x),
+        bucketing_label: var_name.to_string(),
+    }
+}
+
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),

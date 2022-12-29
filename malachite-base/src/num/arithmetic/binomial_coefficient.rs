@@ -106,7 +106,7 @@ macro_rules! impl_binomial_coefficient_signed {
         impl CheckedBinomialCoefficient for $t {
             /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
             /// function returns `None`.
-            /// 
+            ///
             /// The second argument must be non-negative, but the first may be negative. If it is,
             /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
             ///
@@ -146,7 +146,7 @@ macro_rules! impl_binomial_coefficient_primitive_int {
             /// $$
             /// f(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}.
             /// $$
-            /// 
+            ///
             /// The second argument must be non-negative, but the first may be negative. If it is,
             /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
             ///
@@ -156,7 +156,7 @@ macro_rules! impl_binomial_coefficient_primitive_int {
             /// $M(k) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $k$ is `k.abs()`.
-            /// 
+            ///
             /// # Panics
             /// Panics if the result is not representable by this type.
             ///

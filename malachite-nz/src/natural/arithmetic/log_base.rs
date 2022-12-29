@@ -98,7 +98,7 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
 //
-// Also returns base^p and p, where b^p is close to x.
+// Also returns base^p and p, where base^p is close to x.
 pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, bool, Natural, u64) {
     assert_ne!(*x, 0);
     assert!(*base > 1);

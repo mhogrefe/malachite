@@ -10,7 +10,7 @@ fn test_primes_less_than_helper<T: PrimitiveUnsigned>() {
     let test = |n: u8, out: &[u8]| {
         let n = T::from(n);
         let out = out.iter().map(|&x| T::from(x)).collect_vec();
-        assert_eq!(T::primes_less_than(n).collect_vec(), out);
+        assert_eq!(T::primes_less_than(&n).collect_vec(), out);
         assert_eq!(T::primes().take_while(|&p| p < n).collect_vec(), out);
         assert_eq!(
             primes_naive::<T>().take_while(|&p| p < n).collect_vec(),
@@ -46,7 +46,7 @@ fn test_primes_less_than_or_equal_to_helper<T: PrimitiveUnsigned>() {
     let test = |n: u8, out: &[u8]| {
         let n = T::from(n);
         let out = out.iter().map(|&x| T::from(x)).collect_vec();
-        assert_eq!(T::primes_less_than_or_equal_to(n).collect_vec(), out);
+        assert_eq!(T::primes_less_than_or_equal_to(&n).collect_vec(), out);
         assert_eq!(T::primes().take_while(|&p| p <= n).collect_vec(), out);
         assert_eq!(
             primes_naive::<T>().take_while(|&p| p <= n).collect_vec(),
@@ -156,21 +156,21 @@ fn test_primes() {
     const U32_PRIME_COUNT: usize = 203280221;
     assert_eq!(u32::primes().count(), U32_PRIME_COUNT);
     assert_eq!(
-        u32::primes_less_than_or_equal_to(u32::MAX).count(),
+        u32::primes_less_than_or_equal_to(&u32::MAX).count(),
         U32_PRIME_COUNT
     );
     assert_eq!(
-        u64::primes_less_than_or_equal_to(u64::wrapping_from(u32::MAX)).count(),
+        u64::primes_less_than_or_equal_to(&u64::wrapping_from(u32::MAX)).count(),
         U32_PRIME_COUNT
     );
 }
 
 fn primes_less_than_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_gen_var_5::<T>().test_properties(|n| {
-        let ps = T::primes_less_than(n).collect_vec();
+        let ps = T::primes_less_than(&n).collect_vec();
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
-            T::primes_less_than_or_equal_to(n.saturating_sub(T::ONE)).collect_vec(),
+            T::primes_less_than_or_equal_to(&n.saturating_sub(T::ONE)).collect_vec(),
             ps
         );
         assert_eq!(T::primes().take_while(|&p| p < n).collect_vec(), ps);
@@ -185,10 +185,10 @@ fn primes_less_than_properties() {
 
 fn primes_less_than_or_equal_to_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_gen_var_5::<T>().test_properties(|n| {
-        let ps = T::primes_less_than_or_equal_to(n).collect_vec();
+        let ps = T::primes_less_than_or_equal_to(&n).collect_vec();
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
-            T::primes_less_than(n.saturating_add(T::ONE)).collect_vec(),
+            T::primes_less_than(&n.saturating_add(T::ONE)).collect_vec(),
             ps
         );
         assert_eq!(T::primes().take_while(|&p| p <= n).collect_vec(), ps);

@@ -1054,6 +1054,11 @@ pub fn natural_gen_var_8() -> Generator<Natural> {
     )
 }
 
+// All small `Natural`s.
+pub fn natural_gen_var_9() -> Generator<Natural> {
+    Generator::new_no_special(&exhaustive_natural_gen, &random_natural_gen_var_9)
+}
+
 // -- (Natural, bool) --
 
 pub fn natural_bool_pair_gen() -> Generator<(Natural, bool)> {

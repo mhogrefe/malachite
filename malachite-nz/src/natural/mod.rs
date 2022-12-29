@@ -144,6 +144,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Natural`]s without repetition.
 pub mod exhaustive;
+/// Traits for generating primes, primality testing, and factorization (TODO!)
+pub mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
 /// Iterators that generate [`Natural`]s randomly.

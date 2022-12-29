@@ -23,7 +23,7 @@ fn demo_primes_less_than<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, l
         println!(
             "primes_less_than({}) = {:?}",
             n,
-            T::primes_less_than(n).collect_vec()
+            T::primes_less_than(&n).collect_vec()
         );
     }
 }
@@ -37,7 +37,7 @@ fn demo_primes_less_than_or_equal_to<T: PrimitiveUnsigned>(
         println!(
             "primes_less_than_or_equal_to({}) = {:?}",
             n,
-            T::primes_less_than_or_equal_to(n).collect_vec()
+            T::primes_less_than_or_equal_to(&n).collect_vec()
         );
     }
 }
@@ -65,7 +65,7 @@ fn benchmark_primes_less_than_algorithms<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [
-            ("default", &mut |n| no_out!(T::primes_less_than(n).count())),
+            ("default", &mut |n| no_out!(T::primes_less_than(&n).count())),
             ("using primes", &mut |n| {
                 no_out!(T::primes().take_while(|&p| p < n).count())
             }),
@@ -85,7 +85,7 @@ fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
     usize: TryFrom<T>,
 {
     run_benchmark(
-        &format!("{}::primes_less_than({})", T::NAME, T::NAME),
+        &format!("{}::primes_less_than(&{})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_5::<T>().get(gm, &config),
         gm.name(),
@@ -93,7 +93,7 @@ fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [
-            ("default", &mut |n| no_out!(T::primes_less_than(n).count())),
+            ("default", &mut |n| no_out!(T::primes_less_than(&n).count())),
             ("using primes", &mut |n| {
                 no_out!(T::primes().take_while(|&p| p < n).count())
             }),
@@ -110,7 +110,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
     usize: TryFrom<T>,
 {
     run_benchmark(
-        &format!("{}::primes_less_than_or_equal_to({})", T::NAME, T::NAME),
+        &format!("{}::primes_less_than_or_equal_to(&{})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         unsigned_gen_var_5::<T>().get(gm, &config),
         gm.name(),
@@ -119,7 +119,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |n| {
-                no_out!(T::primes_less_than_or_equal_to(n).count())
+                no_out!(T::primes_less_than_or_equal_to(&n).count())
             }),
             ("using primes", &mut |n| {
                 no_out!(T::primes().take_while(|&p| p <= n).count())
@@ -149,7 +149,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms_2<T: PrimitiveUnsigned>(
         &unsigned_direct_bucketer(),
         &mut [
             ("default", &mut |n| {
-                no_out!(T::primes_less_than_or_equal_to(n).count())
+                no_out!(T::primes_less_than_or_equal_to(&n).count())
             }),
             ("using primes", &mut |n| {
                 no_out!(T::primes().take_while(|&p| p <= n).count())

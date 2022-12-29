@@ -147,7 +147,7 @@ pub mod arithmetic_checked_shr;
 /// assert_eq!(u8::binomial_coefficient(3, 2), 3);
 /// assert_eq!(u8::binomial_coefficient(3, 3), 1);
 /// assert_eq!(u8::binomial_coefficient(10, 5), 252);
-/// 
+///
 /// assert_eq!(i8::binomial_coefficient(-3, 0), 1);
 /// assert_eq!(i8::binomial_coefficient(-3, 1), -3);
 /// assert_eq!(i8::binomial_coefficient(-3, 2), 6);
@@ -164,7 +164,7 @@ pub mod arithmetic_checked_shr;
 /// assert_eq!(u8::checked_binomial_coefficient(3, 3), Some(1));
 /// assert_eq!(u8::checked_binomial_coefficient(10, 5), Some(252));
 /// assert_eq!(u8::checked_binomial_coefficient(11, 5), None);
-/// 
+///
 /// assert_eq!(i8::checked_binomial_coefficient(-3, 0), Some(1));
 /// assert_eq!(i8::checked_binomial_coefficient(-3, 1), Some(-3));
 /// assert_eq!(i8::checked_binomial_coefficient(-3, 2), Some(6));

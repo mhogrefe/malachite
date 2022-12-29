@@ -131,7 +131,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesIterator<T> {
             } else {
                 self.limit.saturating_mul_assign(T::TWO);
                 let j = self.xs.j;
-                self.xs = T::primes_less_than_or_equal_to(self.limit);
+                self.xs = T::primes_less_than_or_equal_to(&self.limit);
                 self.xs.i = 3;
                 self.xs.j = j;
             }
@@ -162,7 +162,7 @@ macro_rules! impl_primes {
             /// # Examples
             /// See [here](super::primes#primes_less_than).
             #[inline]
-            fn primes_less_than(n: $t) -> PrimesLessThanIterator<$t> {
+            fn primes_less_than(n: &$t) -> PrimesLessThanIterator<$t> {
                 PrimesLessThanIterator::new(n.saturating_sub(1))
             }
 
@@ -183,7 +183,7 @@ macro_rules! impl_primes {
             /// # Examples
             /// See [here](super::primes#primes_less_than_or_equal_to).
             #[inline]
-            fn primes_less_than_or_equal_to(n: $t) -> PrimesLessThanIterator<$t> {
+            fn primes_less_than_or_equal_to(&n: &$t) -> PrimesLessThanIterator<$t> {
                 PrimesLessThanIterator::new(n)
             }
 

@@ -1648,6 +1648,17 @@ pub fn random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
     )
 }
 
+pub fn random_natural_gen_var_9(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED,
+            config.get_or("mean_n", 64),
+            config.get_or("mean_d", 1),
+        )
+        .map(Natural::from),
+    )
+}
+
 // -- (Natural, bool) --
 
 pub fn random_natural_bool_pair_gen(config: &GenConfig) -> It<(Natural, bool)> {

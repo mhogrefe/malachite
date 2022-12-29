@@ -7,10 +7,10 @@ pub mod prime_sieve;
 /// use itertools::Itertools;
 /// use malachite_base::num::factorization::traits::Primes;
 ///
-/// assert_eq!(u8::primes_less_than(10).collect_vec(), &[2, 3, 5, 7]);
-/// assert_eq!(u16::primes_less_than(11).collect_vec(), &[2, 3, 5, 7]);
+/// assert_eq!(u8::primes_less_than(&10).collect_vec(), &[2, 3, 5, 7]);
+/// assert_eq!(u16::primes_less_than(&11).collect_vec(), &[2, 3, 5, 7]);
 /// assert_eq!(
-///     u32::primes_less_than(100).collect_vec(),
+///     u32::primes_less_than(&100).collect_vec(),
 ///     &[
 ///         2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83,
 ///         89, 97
@@ -23,10 +23,10 @@ pub mod prime_sieve;
 /// use itertools::Itertools;
 /// use malachite_base::num::factorization::traits::Primes;
 ///
-/// assert_eq!(u8::primes_less_than_or_equal_to(10).collect_vec(), &[2, 3, 5, 7]);
-/// assert_eq!(u16::primes_less_than_or_equal_to(11).collect_vec(), &[2, 3, 5, 7, 11]);
+/// assert_eq!(u8::primes_less_than_or_equal_to(&10).collect_vec(), &[2, 3, 5, 7]);
+/// assert_eq!(u16::primes_less_than_or_equal_to(&11).collect_vec(), &[2, 3, 5, 7, 11]);
 /// assert_eq!(
-///     u32::primes_less_than_or_equal_to(100).collect_vec(),
+///     u32::primes_less_than_or_equal_to(&100).collect_vec(),
 ///     &[
 ///         2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83,
 ///         89, 97
