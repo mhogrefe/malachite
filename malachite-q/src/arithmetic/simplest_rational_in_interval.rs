@@ -76,10 +76,7 @@ fn simplest_rational_one_alt_helper(
 }
 
 fn update_best(best: &mut Option<Rational>, x: &Rational, y: &Rational, candidate: Rational) {
-    if candidate > *x
-        && candidate < *y
-        && (best.is_none() || best.as_ref().unwrap().cmp_complexity(&candidate) > Ordering::Greater)
-    {
+    if best.is_none() && candidate > *x && candidate < *y {
         *best = Some(candidate);
     }
 }
