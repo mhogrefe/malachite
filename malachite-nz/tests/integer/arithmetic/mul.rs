@@ -1,15 +1,20 @@
 use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::test_util::generators::signed_pair_gen;
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_nz::test_util::generators::{
-    integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
+    integer_gen, integer_pair_gen, integer_triple_gen, integer_vec_gen, natural_pair_gen,
+    natural_vec_gen,
 };
+use malachite_nz::test_util::integer::arithmetic::mul::integer_product_naive;
 use num::BigInt;
+use std::iter::{once, Product};
 use std::str::FromStr;
 
 #[test]
@@ -106,6 +111,33 @@ fn test_mul() {
 }
 
 #[test]
+fn test_product() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let product = Integer::product(xs.iter().cloned());
+        assert!(product.is_valid());
+        assert_eq!(product.to_string(), out);
+
+        let product_alt = Integer::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = integer_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    };
+    test("[]", "1");
+    test("[10]", "10");
+    test("[6, -2]", "-12");
+    test("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "0");
+    test("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "3628800");
+    test(
+        "[123456, -789012, 345678, -9012345]",
+        "303462729062737285547520",
+    );
+}
+
+#[test]
 fn mul_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let product_val_val = x.clone() * y.clone();
@@ -181,6 +213,40 @@ fn mul_properties() {
         assert_eq!(
             Integer::from(SignedDoubleLimb::from(x) * SignedDoubleLimb::from(y)),
             Integer::from(x) * Integer::from(y)
+        );
+    });
+}
+
+#[test]
+fn product_properties() {
+    integer_vec_gen().test_properties(|xs| {
+        let product = Integer::product(xs.iter().cloned());
+        assert!(product.is_valid());
+
+        let product_alt = Integer::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = integer_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    });
+
+    integer_gen().test_properties(|x| {
+        assert_eq!(Integer::product(once(&x)), x);
+        assert_eq!(Integer::product(once(x.clone())), x);
+    });
+
+    integer_pair_gen().test_properties(|(x, y)| {
+        let product = &x * &y;
+        assert_eq!(Integer::product([&x, &y].into_iter()), product);
+        assert_eq!(Integer::product([x, y].into_iter()), product);
+    });
+
+    natural_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            Integer::product(xs.iter().map(Integer::from)),
+            Integer::from(Natural::product(xs.into_iter()))
         );
     });
 }

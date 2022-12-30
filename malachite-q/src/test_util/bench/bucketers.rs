@@ -203,3 +203,29 @@ pub fn triple_1_2_rational_bit_i64_max_bucketer<'a, T>(
         bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
     }
 }
+
+pub fn vec_rational_sum_bits_bucketer<'a>() -> Bucketer<'a, Vec<Rational>> {
+    Bucketer {
+        bucketing_function: &|xs| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}
+
+pub fn triple_3_vec_rational_sum_bits_bucketer<'a, T, U>() -> Bucketer<'a, (T, U, Vec<Rational>)> {
+    Bucketer {
+        bucketing_function: &|(_, _, xs)| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}

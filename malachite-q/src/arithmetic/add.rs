@@ -2,7 +2,9 @@ use crate::Rational;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, Gcd, GcdAssign, UnsignedAbs,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
+use std::iter::Sum;
 use std::ops::{Add, AddAssign};
 
 impl Add<Rational> for Rational {
@@ -367,5 +369,100 @@ impl<'a> AddAssign<&'a Rational> for Rational {
                 self.denominator *= (&other.denominator).div_exact(gcd);
             }
         }
+    }
+}
+
+impl Sum for Rational {
+    /// Adds up all the [`Rational`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Rational::sum(xs.map(Rational::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::Rational;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(
+    ///     Rational::sum(vec_from_str::<Rational>("[2, -3, 5, 7]").unwrap().into_iter()),
+    ///     11
+    /// );
+    /// ```
+    fn sum<I>(xs: I) -> Rational
+    where
+        I: Iterator<Item = Rational>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            let mut s = x;
+            for _ in 0..i.trailing_zeros() {
+                s += stack.pop().unwrap();
+            }
+            stack.push(s);
+        }
+        let mut s = Rational::ZERO;
+        for x in stack {
+            s += x;
+        }
+        s
+    }
+}
+
+impl<'a> Sum<&'a Rational> for Rational {
+    /// Adds up all the [`Rational`]s in an iterator of [`Rational`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Rational::sum(xs.map(Rational::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::Rational;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(
+    ///     Rational::sum(
+    ///         vec_from_str::<Rational>("[0, 1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
+    ///                 .unwrap().iter()
+    ///     ).to_string(),
+    ///     "19079/2520"
+    /// );
+    /// ```
+    fn sum<I>(xs: I) -> Rational
+    where
+        I: Iterator<Item = &'a Rational>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            let mut s = x.clone();
+            for _ in 0..i.trailing_zeros() {
+                s += stack.pop().unwrap();
+            }
+            stack.push(s);
+        }
+        let mut s = Rational::ZERO;
+        for x in stack {
+            s += x;
+        }
+        s
     }
 }

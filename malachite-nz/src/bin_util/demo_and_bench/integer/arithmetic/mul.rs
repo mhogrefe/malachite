@@ -1,13 +1,19 @@
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
-    triple_3_pair_integer_max_bit_bucketer,
+    triple_3_pair_integer_max_bit_bucketer, triple_3_vec_integer_sum_bits_bucketer,
+    vec_integer_sum_bits_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    integer_pair_gen, integer_pair_gen_nrm, integer_pair_gen_rm,
+    integer_pair_gen, integer_pair_gen_nrm, integer_pair_gen_rm, integer_vec_gen,
+    integer_vec_gen_nrm,
 };
+use malachite_nz::test_util::integer::arithmetic::mul::integer_product_naive;
+use num::BigInt;
+use std::iter::Product;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_mul);
@@ -16,11 +22,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_mul_ref_ref);
     register_demo!(runner, demo_integer_mul_assign);
     register_demo!(runner, demo_integer_mul_assign_ref);
+    register_demo!(runner, demo_integer_product);
+    register_demo!(runner, demo_integer_ref_product);
 
     register_bench!(runner, benchmark_integer_mul_library_comparison);
     register_bench!(runner, benchmark_integer_mul_evaluation_strategy);
     register_bench!(runner, benchmark_integer_mul_assign_library_comparison);
     register_bench!(runner, benchmark_integer_mul_assign_evaluation_strategy);
+    register_bench!(runner, benchmark_integer_product_algorithms);
+    register_bench!(runner, benchmark_integer_product_library_comparison);
+    register_bench!(runner, benchmark_integer_product_evaluation_strategy);
 }
 
 fn demo_integer_mul(gm: GenMode, config: GenConfig, limit: usize) {
@@ -64,6 +75,22 @@ fn demo_integer_mul_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
         let x_old = x.clone();
         x *= &y;
         println!("x := {}; x *= &{}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_integer_product(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+        println!(
+            "product({:?}) = {}",
+            xs.clone(),
+            Integer::product(xs.into_iter())
+        );
+    }
+}
+
+fn demo_integer_ref_product(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+        println!("product({:?}) = {}", xs, Integer::product(xs.iter()));
     }
 }
 
@@ -149,6 +176,84 @@ fn benchmark_integer_mul_assign_evaluation_strategy(
         &mut [
             ("Integer *= Integer", &mut |(mut x, y)| no_out!(x *= y)),
             ("Integer *= &Integer", &mut |(mut x, y)| no_out!(x *= &y)),
+        ],
+    );
+}
+
+fn benchmark_integer_product_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::product(Iterator<Item=Integer>)",
+        BenchmarkType::LibraryComparison,
+        integer_vec_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("Malachite", &mut |(_, _, xs)| {
+                no_out!(Integer::product(xs.into_iter()))
+            }),
+            ("num", &mut |(xs, _, _)| {
+                no_out!(BigInt::product(xs.into_iter()))
+            }),
+            ("rug", &mut |(_, xs, _)| {
+                no_out!(rug::Integer::product(xs.iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_product_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::product(Iterator<Item=Integer>)",
+        BenchmarkType::Algorithms,
+        integer_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| {
+                no_out!(Integer::product(xs.into_iter()))
+            }),
+            ("naive", &mut |xs| {
+                no_out!(integer_product_naive(xs.into_iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_product_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::product(Iterator<Item=Integer>)",
+        BenchmarkType::EvaluationStrategy,
+        integer_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("Integer::product(Iterator<Item=Integer>)", &mut |xs| {
+                no_out!(Integer::product(xs.into_iter()))
+            }),
+            ("Integer::product(Iterator<Item=&Integer>)", &mut |xs| {
+                no_out!(Integer::product(xs.iter()))
+            }),
         ],
     );
 }

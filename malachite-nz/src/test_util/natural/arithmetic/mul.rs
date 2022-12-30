@@ -2,7 +2,7 @@ use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{One, Zero};
 
 // In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;
@@ -57,4 +57,15 @@ pub fn limbs_product_naive(out: &mut [Limb], factors: &[Limb]) -> usize {
     let size = xs.len();
     out[..size].copy_from_slice(&xs);
     size
+}
+
+pub fn natural_product_naive<I: Iterator<Item = Natural>>(xs: I) -> Natural {
+    let mut p = Natural::ONE;
+    for x in xs {
+        if x == 0 {
+            return Natural::ZERO;
+        }
+        p *= x;
+    }
+    p
 }

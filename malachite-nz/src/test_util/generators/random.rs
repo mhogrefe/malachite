@@ -3652,6 +3652,40 @@ pub fn random_string_triple_gen_var_2(config: &GenConfig) -> It<(String, String,
     )
 }
 
+// -- Vec<Integer> --
+
+pub fn random_integer_vec_gen(config: &GenConfig) -> It<Vec<Integer>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
+// -- Vec<Natural> --
+
+pub fn random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
 // -- (Vec<Natural>, Integer> --
 
 pub fn random_natural_vec_integer_pair_gen_var_1(

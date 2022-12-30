@@ -63,23 +63,29 @@ use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_scratch_len, limbs_mul_same_length_to_out,
     limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
-    triple_3_pair_natural_max_bit_bucketer,
+    triple_3_pair_natural_max_bit_bucketer, triple_3_vec_natural_sum_bits_bucketer,
+    vec_natural_sum_bits_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, unsigned_vec_pair_gen_var_33,
-    unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12,
-    unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15,
-    unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19,
-    unsigned_vec_triple_gen_var_20, unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23,
-    unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_58,
-    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_60, unsigned_vec_triple_gen_var_7,
-    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
+    natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, natural_vec_gen,
+    natural_vec_gen_nrm, unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_10,
+    unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
+    unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
+    unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20,
+    unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_4,
+    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_58, unsigned_vec_triple_gen_var_6,
+    unsigned_vec_triple_gen_var_60, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
+    unsigned_vec_triple_gen_var_9,
 };
+use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
 use malachite_nz::test_util::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
 };
+use num::BigUint;
+use std::iter::Product;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_mul_greater_to_out_fft);
@@ -165,6 +171,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_mul_ref_ref);
     register_demo!(runner, demo_natural_mul_assign);
     register_demo!(runner, demo_natural_mul_assign_ref);
+    register_demo!(runner, demo_natural_product);
+    register_demo!(runner, demo_natural_ref_product);
 
     register_bench!(runner, benchmark_limbs_mul_limb);
     register_bench!(runner, benchmark_limbs_mul_limb_with_carry_to_out);
@@ -282,6 +290,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mul_evaluation_strategy);
     register_bench!(runner, benchmark_natural_mul_assign_library_comparison);
     register_bench!(runner, benchmark_natural_mul_assign_evaluation_strategy);
+    register_bench!(runner, benchmark_natural_product_algorithms);
+    register_bench!(runner, benchmark_natural_product_library_comparison);
+    register_bench!(runner, benchmark_natural_product_evaluation_strategy);
 }
 
 fn demo_limbs_mul_greater_to_out_fft(gm: GenMode, config: GenConfig, limit: usize) {
@@ -641,6 +652,22 @@ fn demo_natural_mul_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
         let x_old = x.clone();
         x *= &y;
         println!("x := {}; x *= &{}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_natural_product(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in natural_vec_gen().get(gm, &config).take(limit) {
+        println!(
+            "product({:?}) = {}",
+            xs.clone(),
+            Natural::product(xs.into_iter())
+        );
+    }
+}
+
+fn demo_natural_ref_product(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in natural_vec_gen().get(gm, &config).take(limit) {
+        println!("product({:?}) = {}", xs, Natural::product(xs.iter()));
     }
 }
 
@@ -1558,6 +1585,84 @@ fn benchmark_natural_mul_assign_evaluation_strategy(
         &mut [
             ("Natural *= Natural", &mut |(mut x, y)| no_out!(x *= y)),
             ("Natural *= &Natural", &mut |(mut x, y)| no_out!(x *= &y)),
+        ],
+    );
+}
+
+fn benchmark_natural_product_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::product(Iterator<Item=Natural>)",
+        BenchmarkType::LibraryComparison,
+        natural_vec_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("Malachite", &mut |(_, _, xs)| {
+                no_out!(Natural::product(xs.into_iter()))
+            }),
+            ("num", &mut |(xs, _, _)| {
+                no_out!(BigUint::product(xs.into_iter()))
+            }),
+            ("rug", &mut |(_, xs, _)| {
+                no_out!(rug::Integer::product(xs.iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_product_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::product(Iterator<Item=Natural>)",
+        BenchmarkType::Algorithms,
+        natural_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| {
+                no_out!(Natural::product(xs.into_iter()))
+            }),
+            ("naive", &mut |xs| {
+                no_out!(natural_product_naive(xs.into_iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_product_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::product(Iterator<Item=Natural>)",
+        BenchmarkType::EvaluationStrategy,
+        natural_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("Natural::product(Iterator<Item=Natural>)", &mut |xs| {
+                no_out!(Natural::product(xs.into_iter()))
+            }),
+            ("Natural::product(Iterator<Item=&Natural>)", &mut |xs| {
+                no_out!(Natural::product(xs.iter()))
+            }),
         ],
     );
 }

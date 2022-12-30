@@ -504,6 +504,7 @@ pub mod pow;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;
+pub mod primorial;
 /// Implementations of traits for taking the $n$th root of a number.
 ///
 /// The traits are [`FloorRoot`](malachite_base::num::arithmetic::traits::FloorRoot),

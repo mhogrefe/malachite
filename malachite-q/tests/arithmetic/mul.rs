@@ -1,14 +1,21 @@
-use malachite_base::num::arithmetic::traits::Reciprocal;
+use malachite_base::num::arithmetic::traits::{Reciprocal, Square};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::vecs::vec_from_str;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
+use malachite_nz::test_util::generators::integer_vec_gen;
 use malachite_q::test_util::arithmetic::mul::mul_naive;
+use malachite_q::test_util::arithmetic::mul::rational_product_naive;
 use malachite_q::test_util::common::{
     bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
     rug_rational_to_rational,
 };
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_pair_gen, rational_triple_gen, rational_vec_gen,
+};
 use malachite_q::Rational;
 use num::BigRational;
+use std::iter::{once, Product};
 use std::str::FromStr;
 
 #[test]
@@ -77,6 +84,33 @@ fn test_mul() {
 }
 
 #[test]
+fn test_product() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let product = Rational::product(xs.iter().cloned());
+        assert!(product.is_valid());
+        assert_eq!(product.to_string(), out);
+
+        let product_alt = Rational::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = rational_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    };
+    test("[]", "1");
+    test("[22/7]", "22/7");
+    test("[22/7, 1/3]", "22/21");
+    test("[0, 1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]", "0");
+    test("[1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]", "1/5");
+    test(
+        "[123456/78901, 34567/890123, 45678/90123]",
+        "217314411648/7056278729357",
+    );
+}
+
+#[test]
 fn mul_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let product_val_val = x.clone() * y.clone();
@@ -140,7 +174,7 @@ fn mul_properties() {
         assert_eq!(Rational::ONE * x, *x);
         assert_eq!(x * Rational::NEGATIVE_ONE, -x);
         assert_eq!(Rational::NEGATIVE_ONE * x, -x);
-        //TODO assert_eq!(x * x, x.square());
+        assert_eq!(x * x, x.square());
     });
 
     rational_triple_gen().test_properties(|(ref x, ref y, ref z)| {
@@ -151,5 +185,39 @@ fn mul_properties() {
 
     integer_pair_gen().test_properties(|(x, y)| {
         assert_eq!(&x * &y, Rational::from(x) * Rational::from(y));
+    });
+}
+
+#[test]
+fn product_properties() {
+    rational_vec_gen().test_properties(|xs| {
+        let product = Rational::product(xs.iter().cloned());
+        assert!(product.is_valid());
+
+        let product_alt = Rational::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = rational_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    });
+
+    rational_gen().test_properties(|x| {
+        assert_eq!(Rational::product(once(&x)), x);
+        assert_eq!(Rational::product(once(x.clone())), x);
+    });
+
+    rational_pair_gen().test_properties(|(x, y)| {
+        let product = &x * &y;
+        assert_eq!(Rational::product([&x, &y].into_iter()), product);
+        assert_eq!(Rational::product([x, y].into_iter()), product);
+    });
+
+    integer_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            Rational::product(xs.iter().map(Rational::from)),
+            Rational::from(Integer::product(xs.into_iter()))
+        );
     });
 }

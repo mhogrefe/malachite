@@ -1,6 +1,7 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
+use std::iter::Product;
 use std::ops::{Mul, MulAssign};
 
 impl Mul<Rational> for Rational {
@@ -233,7 +234,7 @@ impl<'a> MulAssign<&'a Rational> for Rational {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
@@ -270,5 +271,109 @@ impl<'a> MulAssign<&'a Rational> for Rational {
         self.denominator.div_exact_assign(&g_2);
         self.numerator *= (&other.numerator).div_exact(g_2);
         self.denominator *= (&other.denominator).div_exact(g_1);
+    }
+}
+
+impl Product for Rational {
+    /// Multiplies together all the [`Rational`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Rational::sum(xs.map(Rational::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::Rational;
+    /// use std::iter::Product;
+    ///
+    /// assert_eq!(
+    ///     Rational::product(
+    ///         vec_from_str::<Rational>("[1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
+    ///             .unwrap().into_iter()
+    ///     ).to_string(),
+    ///     "1/5"
+    /// );
+    /// ```
+    fn product<I>(xs: I) -> Rational
+    where
+        I: Iterator<Item = Rational>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            if x == 0 {
+                return Rational::ZERO;
+            }
+            let mut p = x;
+            for _ in 0..i.trailing_zeros() {
+                p *= stack.pop().unwrap();
+            }
+            stack.push(p);
+        }
+        let mut p = Rational::ONE;
+        for x in stack.into_iter().rev() {
+            p *= x;
+        }
+        p
+    }
+}
+
+impl<'a> Product<&'a Rational> for Rational {
+    /// Multiplies together all the [`Rational`]s in an iterator of [`Rational`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Rational::sum(xs.map(Rational::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::Rational;
+    /// use std::iter::Product;
+    ///
+    /// assert_eq!(
+    ///     Rational::product(
+    ///         vec_from_str::<Rational>("[1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]")
+    ///             .unwrap().iter()
+    ///     ).to_string(),
+    ///     "1/5"
+    /// );
+    /// ```
+    fn product<I>(xs: I) -> Rational
+    where
+        I: Iterator<Item = &'a Rational>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            if *x == 0 {
+                return Rational::ZERO;
+            }
+            let mut p = x.clone();
+            for _ in 0..i.trailing_zeros() {
+                p *= stack.pop().unwrap();
+            }
+            stack.push(p);
+        }
+        let mut p = Rational::ONE;
+        for x in stack.into_iter().rev() {
+            p *= x;
+        }
+        p
     }
 }

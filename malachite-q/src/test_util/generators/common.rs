@@ -81,3 +81,15 @@ pub fn rational_pair_1_nrm<T: 'static + Clone>(
         )
     }))
 }
+
+pub fn rational_vec_nrm(
+    xss: It<Vec<Rational>>,
+) -> It<(Vec<BigRational>, Vec<rug::Rational>, Vec<Rational>)> {
+    Box::new(xss.map(|xs| {
+        (
+            xs.iter().map(rational_to_bigrational).collect(),
+            xs.iter().map(rational_to_rug_rational).collect(),
+            xs,
+        )
+    }))
+}

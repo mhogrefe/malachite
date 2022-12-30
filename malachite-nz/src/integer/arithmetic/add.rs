@@ -1,6 +1,8 @@
 use crate::integer::Integer;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
+use malachite_base::num::basic::traits::Zero;
+use std::iter::Sum;
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
@@ -330,5 +332,78 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                 ax.sub_right_assign_no_panic(ay);
             }
         };
+    }
+}
+
+impl Sum for Integer {
+    /// Adds up all the [`Integer`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Integer::sum(xs.map(Integer::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::integer::Integer;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(
+    ///     Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().into_iter()),
+    ///     11
+    /// );
+    /// ```
+    fn sum<I>(xs: I) -> Integer
+    where
+        I: Iterator<Item = Integer>,
+    {
+        let mut s = Integer::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
+    }
+}
+
+impl<'a> Sum<&'a Integer> for Integer {
+    /// Adds up all the [`Integer`]s in an iterator of [`Integer`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Integer::sum(xs.map(Integer::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::integer::Integer;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().iter()), 11);
+    /// ```
+    fn sum<I>(xs: I) -> Integer
+    where
+        I: Iterator<Item = &'a Integer>,
+    {
+        let mut s = Integer::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
     }
 }

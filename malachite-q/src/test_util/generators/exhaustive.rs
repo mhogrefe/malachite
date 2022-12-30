@@ -36,6 +36,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
     lex_pairs,
 };
+use malachite_base::vecs::exhaustive::exhaustive_vecs;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::exhaustive::{
@@ -652,4 +653,10 @@ pub fn exhaustive_string_triple_gen_var_3() -> It<(String, String, String)> {
             serde_json::to_string(&x).unwrap(),
         )
     }))
+}
+
+// -- Vec<Rational> --
+
+pub fn exhaustive_rational_vec_gen() -> It<Vec<Rational>> {
+    Box::new(exhaustive_vecs(exhaustive_rationals()))
 }

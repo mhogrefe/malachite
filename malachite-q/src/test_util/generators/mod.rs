@@ -1,6 +1,6 @@
 use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
-    rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm,
+    rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm, rational_vec_nrm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -882,6 +882,24 @@ pub fn string_triple_gen_var_3() -> Generator<(String, String, String)> {
         &exhaustive_string_triple_gen_var_3,
         &random_string_triple_gen_var_3,
         &special_random_string_triple_gen_var_3,
+    )
+}
+
+// -- Vec<Rational> --
+
+pub fn rational_vec_gen() -> Generator<Vec<Rational>> {
+    Generator::new(
+        &exhaustive_rational_vec_gen,
+        &random_rational_vec_gen,
+        &special_random_rational_vec_gen,
+    )
+}
+
+pub fn rational_vec_gen_nrm() -> Generator<(Vec<BigRational>, Vec<rug::Rational>, Vec<Rational>)> {
+    Generator::new(
+        &|| rational_vec_nrm(exhaustive_rational_vec_gen()),
+        &|config| rational_vec_nrm(random_rational_vec_gen(config)),
+        &|config| rational_vec_nrm(special_random_rational_vec_gen(config)),
     )
 }
 

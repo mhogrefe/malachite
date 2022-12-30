@@ -1,13 +1,19 @@
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
-    triple_3_pair_integer_max_bit_bucketer,
+    triple_3_pair_integer_max_bit_bucketer, triple_3_vec_integer_sum_bits_bucketer,
+    vec_integer_sum_bits_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    integer_pair_gen, integer_pair_gen_nrm, integer_pair_gen_rm,
+    integer_pair_gen, integer_pair_gen_nrm, integer_pair_gen_rm, integer_vec_gen,
+    integer_vec_gen_nrm,
 };
+use malachite_nz::test_util::integer::arithmetic::add::integer_sum_alt;
+use num::BigInt;
+use std::iter::Sum;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_add);
@@ -16,11 +22,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_add_ref_ref);
     register_demo!(runner, demo_integer_add_assign);
     register_demo!(runner, demo_integer_add_assign_ref);
+    register_demo!(runner, demo_integer_sum);
+    register_demo!(runner, demo_integer_ref_sum);
 
     register_bench!(runner, benchmark_integer_add_library_comparison);
     register_bench!(runner, benchmark_integer_add_evaluation_strategy);
     register_bench!(runner, benchmark_integer_add_assign_library_comparison);
     register_bench!(runner, benchmark_integer_add_assign_evaluation_strategy);
+    register_bench!(runner, benchmark_integer_sum_algorithms);
+    register_bench!(runner, benchmark_integer_sum_library_comparison);
+    register_bench!(runner, benchmark_integer_sum_evaluation_strategy);
 }
 
 fn demo_integer_add(gm: GenMode, config: GenConfig, limit: usize) {
@@ -64,6 +75,18 @@ fn demo_integer_add_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
         let x_old = x.clone();
         x += &y;
         println!("x := {}; x += &{}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_integer_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs.clone(), Integer::sum(xs.into_iter()));
+    }
+}
+
+fn demo_integer_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs, Integer::sum(xs.iter()));
     }
 }
 
@@ -149,6 +172,75 @@ fn benchmark_integer_add_assign_evaluation_strategy(
         &mut [
             ("Integer += Integer", &mut |(mut x, y)| no_out!(x += y)),
             ("Integer += &Integer", &mut |(mut x, y)| no_out!(x += &y)),
+        ],
+    );
+}
+
+fn benchmark_integer_sum_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::sum(Iterator<Item=Integer>)",
+        BenchmarkType::LibraryComparison,
+        integer_vec_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("Malachite", &mut |(_, _, xs)| {
+                no_out!(Integer::sum(xs.into_iter()))
+            }),
+            ("num", &mut |(xs, _, _)| {
+                no_out!(BigInt::sum(xs.into_iter()))
+            }),
+            ("rug", &mut |(_, xs, _)| {
+                no_out!(rug::Integer::sum(xs.iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_sum_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Integer::sum(Iterator<Item=Integer>)",
+        BenchmarkType::Algorithms,
+        integer_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| no_out!(Integer::sum(xs.into_iter()))),
+            ("alt", &mut |xs| no_out!(integer_sum_alt(xs.into_iter()))),
+        ],
+    );
+}
+
+fn benchmark_integer_sum_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::sum(Iterator<Item=Integer>)",
+        BenchmarkType::EvaluationStrategy,
+        integer_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_integer_sum_bits_bucketer(),
+        &mut [
+            ("Integer::sum(Iterator<Item=Integer>)", &mut |xs| {
+                no_out!(Integer::sum(xs.into_iter()))
+            }),
+            ("Integer::sum(Iterator<Item=&Integer>)", &mut |xs| {
+                no_out!(Integer::sum(xs.iter()))
+            }),
         ],
     );
 }

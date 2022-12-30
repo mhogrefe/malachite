@@ -25,7 +25,10 @@ use crate::platform::{
     MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
     MUL_TOOM8H_THRESHOLD,
 };
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::Zero;
 use std::cmp::max;
+use std::iter::Product;
 use std::ops::{Mul, MulAssign};
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
@@ -707,6 +710,101 @@ impl<'a> MulAssign<&'a Natural> for Natural {
                 self.trim();
             }
         }
+    }
+}
+
+impl Product for Natural {
+    /// Multiplies together all the [`Natural`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Natural::sum(xs.map(Natural::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::Product;
+    ///
+    /// assert_eq!(
+    ///     Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()),
+    ///     210
+    /// );
+    /// ```
+    fn product<I>(xs: I) -> Natural
+    where
+        I: Iterator<Item = Natural>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            if x == 0 {
+                return Natural::ZERO;
+            }
+            let mut p = x;
+            for _ in 0..i.trailing_zeros() {
+                p *= stack.pop().unwrap();
+            }
+            stack.push(p);
+        }
+        let mut p = Natural::ONE;
+        for x in stack.into_iter().rev() {
+            p *= x;
+        }
+        p
+    }
+}
+
+impl<'a> Product<&'a Natural> for Natural {
+    /// Multiplies together all the [`Natural`]s in an iterator of [`Natural`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Natural::sum(xs.map(Natural::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::Product;
+    ///
+    /// assert_eq!(Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 210);
+    /// ```
+    fn product<I>(xs: I) -> Natural
+    where
+        I: Iterator<Item = &'a Natural>,
+    {
+        let mut stack = Vec::new();
+        for (i, x) in xs.enumerate().map(|(i, x)| (i + 1, x)) {
+            if *x == 0 {
+                return Natural::ZERO;
+            }
+            let mut p = x.clone();
+            for _ in 0..i.trailing_zeros() {
+                p *= stack.pop().unwrap();
+            }
+            stack.push(p);
+        }
+        let mut p = Natural::ONE;
+        for x in stack.into_iter().rev() {
+            p *= x;
+        }
+        p
     }
 }
 

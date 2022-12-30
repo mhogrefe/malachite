@@ -1,3 +1,4 @@
+pub mod add;
 pub mod checked_sub;
 pub mod div;
 pub mod div_exact;

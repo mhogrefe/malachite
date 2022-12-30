@@ -1,13 +1,20 @@
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::vecs::vec_from_str;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
+use malachite_nz::test_util::generators::integer_vec_gen;
 use malachite_q::test_util::arithmetic::add::add_naive;
+use malachite_q::test_util::arithmetic::add::rational_sum_naive;
 use malachite_q::test_util::common::{
     bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
     rug_rational_to_rational,
 };
-use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_pair_gen, rational_triple_gen, rational_vec_gen,
+};
 use malachite_q::Rational;
 use num::BigRational;
+use std::iter::{once, Sum};
 use std::str::FromStr;
 
 #[test]
@@ -71,6 +78,35 @@ fn test_add() {
 }
 
 #[test]
+fn test_sum() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let sum = Rational::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+        assert_eq!(sum.to_string(), out);
+
+        let sum_alt = Rational::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = rational_sum_naive(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    };
+    test("[]", "0");
+    test("[22/7]", "22/7");
+    test("[22/7, 1/3]", "73/21");
+    test(
+        "[0, 1, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 8/9, 9/10]",
+        "19079/2520",
+    );
+    test(
+        "[123456/78901, 34567/890123, 45678/90123]",
+        "342501191973781/162294410775211",
+    );
+}
+
+#[test]
 fn add_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let sum_val_val = x.clone() + y.clone();
@@ -127,5 +163,39 @@ fn add_properties() {
 
     integer_pair_gen().test_properties(|(x, y)| {
         assert_eq!(&x + &y, Rational::from(x) + Rational::from(y));
+    });
+}
+
+#[test]
+fn sum_properties() {
+    rational_vec_gen().test_properties(|xs| {
+        let sum = Rational::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+
+        let sum_alt = Rational::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = rational_sum_naive(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    });
+
+    rational_gen().test_properties(|x| {
+        assert_eq!(Rational::sum(once(&x)), x);
+        assert_eq!(Rational::sum(once(x.clone())), x);
+    });
+
+    rational_pair_gen().test_properties(|(x, y)| {
+        let sum = &x + &y;
+        assert_eq!(Rational::sum([&x, &y].into_iter()), sum);
+        assert_eq!(Rational::sum([x, y].into_iter()), sum);
+    });
+
+    integer_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            Rational::sum(xs.iter().map(Rational::from)),
+            Rational::from(Integer::sum(xs.into_iter()))
+        );
     });
 }

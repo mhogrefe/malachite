@@ -1,14 +1,19 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::signed_pair_gen;
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_nz::test_util::generators::{
-    integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
+    integer_gen, integer_pair_gen, integer_triple_gen, integer_vec_gen, natural_pair_gen,
+    natural_vec_gen,
 };
+use malachite_nz::test_util::integer::arithmetic::add::integer_sum_alt;
 use num::BigInt;
+use std::iter::{once, Sum};
 use std::str::FromStr;
 
 #[test]
@@ -62,6 +67,29 @@ fn test_add() {
     test("1000000000000", "-123", "999999999877");
     test("123", "-1000000000000", "-999999999877");
     test("12345678987654321", "-314159265358979", "12031519722295342");
+}
+
+#[test]
+fn test_sum() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let sum = Integer::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+        assert_eq!(sum.to_string(), out);
+
+        let sum_alt = Integer::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = integer_sum_alt(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    };
+    test("[]", "0");
+    test("[10]", "10");
+    test("[6, -2]", "4");
+    test("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "55");
+    test("[123456, -789012, 345678, -9012345]", "-9332223");
 }
 
 #[test]
@@ -124,6 +152,40 @@ fn add_properties() {
         assert_eq!(
             Integer::from(SignedDoubleLimb::from(x) + SignedDoubleLimb::from(y)),
             Integer::from(x) + Integer::from(y)
+        );
+    });
+}
+
+#[test]
+fn sum_properties() {
+    integer_vec_gen().test_properties(|xs| {
+        let sum = Integer::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+
+        let sum_alt = Integer::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = integer_sum_alt(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    });
+
+    integer_gen().test_properties(|x| {
+        assert_eq!(Integer::sum(once(&x)), x);
+        assert_eq!(Integer::sum(once(x.clone())), x);
+    });
+
+    integer_pair_gen().test_properties(|(x, y)| {
+        let sum = &x + &y;
+        assert_eq!(Integer::sum([&x, &y].into_iter()), sum);
+        assert_eq!(Integer::sum([x, y].into_iter()), sum);
+    });
+
+    natural_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            Integer::sum(xs.iter().map(Integer::from)),
+            Integer::from(Natural::sum(xs.into_iter()))
         );
     });
 }

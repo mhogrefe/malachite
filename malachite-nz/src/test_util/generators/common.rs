@@ -251,3 +251,27 @@ pub fn integer_integer_triple_1_2_rm<T: 'static + Clone>(
         )
     }))
 }
+
+pub fn integer_vec_nrm(
+    xss: It<Vec<Integer>>,
+) -> It<(Vec<BigInt>, Vec<rug::Integer>, Vec<Integer>)> {
+    Box::new(xss.map(|xs| {
+        (
+            xs.iter().map(integer_to_bigint).collect(),
+            xs.iter().map(integer_to_rug_integer).collect(),
+            xs,
+        )
+    }))
+}
+
+pub fn natural_vec_nrm(
+    xss: It<Vec<Natural>>,
+) -> It<(Vec<BigUint>, Vec<rug::Integer>, Vec<Natural>)> {
+    Box::new(xss.map(|xs| {
+        (
+            xs.iter().map(natural_to_biguint).collect(),
+            xs.iter().map(natural_to_rug_integer).collect(),
+            xs,
+        )
+    }))
+}

@@ -9,6 +9,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11,
 };
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::arithmetic::add::{
     limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
     limbs_add_same_length_to_out, limbs_add_same_length_with_carry_in_in_place_left,
@@ -22,10 +23,14 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz::test_util::generators::{
+    natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
+};
+use malachite_nz::test_util::natural::arithmetic::add::natural_sum_alt;
 use num::BigUint;
 use rug;
 use std::cmp::max;
+use std::iter::{once, Sum};
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -781,6 +786,29 @@ fn test_add() {
 }
 
 #[test]
+fn test_sum() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let sum = Natural::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+        assert_eq!(sum.to_string(), out);
+
+        let sum_alt = Natural::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = natural_sum_alt(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    };
+    test("[]", "0");
+    test("[10]", "10");
+    test("[6, 2]", "8");
+    test("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "55");
+    test("[123456, 789012, 345678, 9012345]", "10270491");
+}
+
+#[test]
 fn limbs_add_limb_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
@@ -1163,5 +1191,32 @@ fn add_properties() {
             DoubleLimb::from(x) + DoubleLimb::from(y),
             Natural::from(x) + Natural::from(y)
         );
+    });
+}
+
+#[test]
+fn sum_properties() {
+    natural_vec_gen().test_properties(|xs| {
+        let sum = Natural::sum(xs.iter().cloned());
+        assert!(sum.is_valid());
+
+        let sum_alt = Natural::sum(xs.iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = natural_sum_alt(xs.into_iter());
+        assert!(sum_alt.is_valid());
+        assert_eq!(sum_alt, sum);
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_eq!(Natural::sum(once(&x)), x);
+        assert_eq!(Natural::sum(once(x.clone())), x);
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        let sum = &x + &y;
+        assert_eq!(Natural::sum([&x, &y].into_iter()), sum);
+        assert_eq!(Natural::sum([x, y].into_iter()), sum);
     });
 }

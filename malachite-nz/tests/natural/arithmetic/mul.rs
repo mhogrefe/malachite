@@ -11,6 +11,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
     unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::arithmetic::mul::fft::{
     limbs_mul_greater_to_out_fft, limbs_mul_greater_to_out_fft_scratch_len,
     limbs_mul_greater_to_out_fft_with_cutoff, limbs_mul_greater_to_out_fft_with_cutoff_scratch_len,
@@ -56,18 +57,20 @@ use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_nz::test_util::generators::{
-    natural_gen, natural_pair_gen, natural_triple_gen, unsigned_vec_pair_gen_var_33,
-    unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12,
-    unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15,
-    unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5,
-    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_60, unsigned_vec_triple_gen_var_7,
-    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
+    natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
+    unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11,
+    unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14,
+    unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_4,
+    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_60,
+    unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
 };
+use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
 use malachite_nz::test_util::natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
 };
 use num::BigUint;
 use rug;
+use std::iter::{once, Product};
 use std::str::FromStr;
 
 fn series(start: Limb, len: usize) -> Vec<Limb> {
@@ -92,6 +95,33 @@ fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
     test(&[u32::MAX, 5], 2, &[u32::MAX - 1, 11]);
     test(&[u32::MAX], 2, &[u32::MAX - 1, 1]);
     test(&[u32::MAX], u32::MAX, &[1, u32::MAX - 1]);
+}
+
+#[test]
+fn test_product() {
+    let test = |xs, out| {
+        let xs = vec_from_str(xs).unwrap();
+        let product = Natural::product(xs.iter().cloned());
+        assert!(product.is_valid());
+        assert_eq!(product.to_string(), out);
+
+        let product_alt = Natural::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = natural_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    };
+    test("[]", "1");
+    test("[10]", "10");
+    test("[6, 2]", "12");
+    test("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "0");
+    test("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", "3628800");
+    test(
+        "[123456, 789012, 345678, 9012345]",
+        "303462729062737285547520",
+    );
 }
 
 #[test]
@@ -12288,5 +12318,32 @@ fn mul_properties() {
         assert_eq!((x * y) * z, x * (y * z));
         assert_eq!(x * (y + z), x * y + x * z);
         assert_eq!((x + y) * z, x * z + y * z);
+    });
+}
+
+#[test]
+fn product_properties() {
+    natural_vec_gen().test_properties(|xs| {
+        let product = Natural::product(xs.iter().cloned());
+        assert!(product.is_valid());
+
+        let product_alt = Natural::product(xs.iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = natural_product_naive(xs.into_iter());
+        assert!(product_alt.is_valid());
+        assert_eq!(product_alt, product);
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_eq!(Natural::product(once(&x)), x);
+        assert_eq!(Natural::product(once(x.clone())), x);
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        let product = &x * &y;
+        assert_eq!(Natural::product([&x, &y].into_iter()), product);
+        assert_eq!(Natural::product([x, y].into_iter()), product);
     });
 }

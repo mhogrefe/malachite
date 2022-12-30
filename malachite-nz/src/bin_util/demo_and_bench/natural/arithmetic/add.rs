@@ -18,14 +18,20 @@ use malachite_nz::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
-    triple_3_pair_natural_max_bit_bucketer,
+    triple_3_pair_natural_max_bit_bucketer, triple_3_vec_natural_sum_bits_bucketer,
+    vec_natural_sum_bits_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm,
+    natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, natural_vec_gen,
+    natural_vec_gen_nrm,
 };
+use malachite_nz::test_util::natural::arithmetic::add::natural_sum_alt;
+use num::BigUint;
+use std::iter::Sum;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_add_limb);
@@ -49,6 +55,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_add_val_ref);
     register_demo!(runner, demo_natural_add_ref_val);
     register_demo!(runner, demo_natural_add_ref_ref);
+    register_demo!(runner, demo_natural_sum);
+    register_demo!(runner, demo_natural_ref_sum);
 
     register_bench!(runner, benchmark_limbs_add_limb);
     register_bench!(runner, benchmark_limbs_add_limb_to_out);
@@ -69,6 +77,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_add_assign_evaluation_strategy);
     register_bench!(runner, benchmark_natural_add_library_comparison);
     register_bench!(runner, benchmark_natural_add_evaluation_strategy);
+    register_bench!(runner, benchmark_natural_sum_algorithms);
+    register_bench!(runner, benchmark_natural_sum_library_comparison);
+    register_bench!(runner, benchmark_natural_sum_evaluation_strategy);
 }
 
 fn demo_limbs_add_limb(gm: GenMode, config: GenConfig, limit: usize) {
@@ -300,6 +311,18 @@ fn demo_natural_add_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
 fn demo_natural_add_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
         println!("&{} + &{} = {}", x, y, &x + &y);
+    }
+}
+
+fn demo_natural_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in natural_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs.clone(), Natural::sum(xs.into_iter()));
+    }
+}
+
+fn demo_natural_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in natural_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs, Natural::sum(xs.iter()));
     }
 }
 
@@ -656,6 +679,75 @@ fn benchmark_natural_add_evaluation_strategy(
             ("Natural + &Natural", &mut |(x, y)| no_out!(x + &y)),
             ("&Natural + Natural", &mut |(x, y)| no_out!(&x + y)),
             ("&Natural + &Natural", &mut |(x, y)| no_out!(&x + &y)),
+        ],
+    );
+}
+
+fn benchmark_natural_sum_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::sum(Iterator<Item=Natural>)",
+        BenchmarkType::LibraryComparison,
+        natural_vec_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("Malachite", &mut |(_, _, xs)| {
+                no_out!(Natural::sum(xs.into_iter()))
+            }),
+            ("num", &mut |(xs, _, _)| {
+                no_out!(BigUint::sum(xs.into_iter()))
+            }),
+            ("rug", &mut |(_, xs, _)| {
+                no_out!(rug::Integer::sum(xs.iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_sum_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Natural::sum(Iterator<Item=Natural>)",
+        BenchmarkType::Algorithms,
+        natural_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| no_out!(Natural::sum(xs.into_iter()))),
+            ("alt", &mut |xs| no_out!(natural_sum_alt(xs.into_iter()))),
+        ],
+    );
+}
+
+fn benchmark_natural_sum_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::sum(Iterator<Item=Natural>)",
+        BenchmarkType::EvaluationStrategy,
+        natural_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_natural_sum_bits_bucketer(),
+        &mut [
+            ("Natural::sum(Iterator<Item=Natural>)", &mut |xs| {
+                no_out!(Natural::sum(xs.into_iter()))
+            }),
+            ("Natural::sum(Iterator<Item=&Natural>)", &mut |xs| {
+                no_out!(Natural::sum(xs.iter()))
+            }),
         ],
     );
 }

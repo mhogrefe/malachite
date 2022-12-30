@@ -2,13 +2,19 @@ use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_q::test_util::arithmetic::add::add_naive;
+use malachite_q::test_util::arithmetic::add::rational_sum_naive;
 use malachite_q::test_util::bench::bucketers::{
     pair_2_pair_rational_max_bit_bucketer, pair_rational_max_bit_bucketer,
-    triple_3_pair_rational_max_bit_bucketer,
+    triple_3_pair_rational_max_bit_bucketer, triple_3_vec_rational_sum_bits_bucketer,
+    vec_rational_sum_bits_bucketer,
 };
 use malachite_q::test_util::generators::{
-    rational_pair_gen, rational_pair_gen_nrm, rational_pair_gen_rm,
+    rational_pair_gen, rational_pair_gen_nrm, rational_pair_gen_rm, rational_vec_gen,
+    rational_vec_gen_nrm,
 };
+use malachite_q::Rational;
+use num::BigRational;
+use std::iter::Sum;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_add);
@@ -17,12 +23,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_add_ref_ref);
     register_demo!(runner, demo_rational_add_assign);
     register_demo!(runner, demo_rational_add_assign_ref);
+    register_demo!(runner, demo_rational_sum);
+    register_demo!(runner, demo_rational_ref_sum);
 
     register_bench!(runner, benchmark_rational_add_library_comparison);
     register_bench!(runner, benchmark_rational_add_evaluation_strategy);
     register_bench!(runner, benchmark_rational_add_algorithms);
     register_bench!(runner, benchmark_rational_add_assign_library_comparison);
     register_bench!(runner, benchmark_rational_add_assign_evaluation_strategy);
+    register_bench!(runner, benchmark_rational_sum_algorithms);
+    register_bench!(runner, benchmark_rational_sum_library_comparison);
+    register_bench!(runner, benchmark_rational_sum_evaluation_strategy);
 }
 
 fn demo_rational_add(gm: GenMode, config: GenConfig, limit: usize) {
@@ -66,6 +77,18 @@ fn demo_rational_add_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
         let x_old = x.clone();
         x += &y;
         println!("x := {}; x += &{}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_rational_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs.clone(), Rational::sum(xs.into_iter()));
+    }
+}
+
+fn demo_rational_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+        println!("sum({:?}) = {}", xs, Rational::sum(xs.iter()));
     }
 }
 
@@ -173,6 +196,82 @@ fn benchmark_rational_add_assign_evaluation_strategy(
         &mut [
             ("Rational += Rational", &mut |(mut x, y)| no_out!(x += y)),
             ("Rational += &Rational", &mut |(mut x, y)| no_out!(x += &y)),
+        ],
+    );
+}
+
+fn benchmark_rational_sum_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::sum(Iterator<Item=Rational>)",
+        BenchmarkType::LibraryComparison,
+        rational_vec_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_vec_rational_sum_bits_bucketer(),
+        &mut [
+            ("Malachite", &mut |(_, _, xs)| {
+                no_out!(Rational::sum(xs.into_iter()))
+            }),
+            ("num", &mut |(xs, _, _)| {
+                no_out!(BigRational::sum(xs.into_iter()))
+            }),
+            ("rug", &mut |(_, xs, _)| {
+                no_out!(rug::Rational::sum(xs.iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_rational_sum_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::sum(Iterator<Item=Rational>)",
+        BenchmarkType::Algorithms,
+        rational_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_rational_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| no_out!(Rational::sum(xs.into_iter()))),
+            ("naive", &mut |xs| {
+                no_out!(rational_sum_naive(xs.into_iter()))
+            }),
+        ],
+    );
+}
+
+fn benchmark_rational_sum_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::sum(Iterator<Item=Rational>)",
+        BenchmarkType::EvaluationStrategy,
+        rational_vec_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_rational_sum_bits_bucketer(),
+        &mut [
+            ("Rational::sum(Iterator<Item=Rational>)", &mut |xs| {
+                no_out!(Rational::sum(xs.into_iter()))
+            }),
+            ("Rational::sum(Iterator<Item=&Rational>)", &mut |xs| {
+                no_out!(Rational::sum(xs.iter()))
+            }),
         ],
     );
 }

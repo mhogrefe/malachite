@@ -649,9 +649,61 @@ pub fn rational_from_digits_bucketer<'a>(
     }
 }
 
+pub fn vec_integer_sum_bits_bucketer<'a>() -> Bucketer<'a, Vec<Integer>> {
+    Bucketer {
+        bucketing_function: &|xs| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}
+
+pub fn vec_natural_sum_bits_bucketer<'a>() -> Bucketer<'a, Vec<Natural>> {
+    Bucketer {
+        bucketing_function: &|xs| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}
+
 pub fn pair_1_vec_natural_sum_bits_bucketer<'a, T>() -> Bucketer<'a, (Vec<Natural>, T)> {
     Bucketer {
         bucketing_function: &|(xs, _)| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}
+
+pub fn triple_3_vec_integer_sum_bits_bucketer<'a, T, U>() -> Bucketer<'a, (T, U, Vec<Integer>)> {
+    Bucketer {
+        bucketing_function: &|(_, _, xs)| {
+            usize::exact_from(
+                xs.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
+    }
+}
+
+pub fn triple_3_vec_natural_sum_bits_bucketer<'a, T, U>() -> Bucketer<'a, (T, U, Vec<Natural>)> {
+    Bucketer {
+        bucketing_function: &|(_, _, xs)| {
             usize::exact_from(
                 xs.iter()
                     .map(SignificantBits::significant_bits)

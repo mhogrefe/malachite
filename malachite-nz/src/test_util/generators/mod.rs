@@ -7,9 +7,9 @@ use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
-    integer_rm, integer_triple_1_rm, natural_natural_triple_1_2_rm, natural_nrm, natural_pair_1_nm,
-    natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm,
-    natural_triple_1_rm, natural_triple_nrm, natural_triple_rm,
+    integer_rm, integer_triple_1_rm, integer_vec_nrm, natural_natural_triple_1_2_rm, natural_nrm,
+    natural_pair_1_nm, natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm,
+    natural_rm, natural_triple_1_rm, natural_triple_nrm, natural_triple_rm, natural_vec_nrm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -2299,6 +2299,42 @@ pub fn string_triple_gen_var_2() -> Generator<(String, String, String)> {
 }
 
 // var 3 is in malachite-q.
+
+// -- Vec<Integer> --
+
+pub fn integer_vec_gen() -> Generator<Vec<Integer>> {
+    Generator::new(
+        &exhaustive_integer_vec_gen,
+        &random_integer_vec_gen,
+        &special_random_integer_vec_gen,
+    )
+}
+
+pub fn integer_vec_gen_nrm() -> Generator<(Vec<BigInt>, Vec<rug::Integer>, Vec<Integer>)> {
+    Generator::new(
+        &|| integer_vec_nrm(exhaustive_integer_vec_gen()),
+        &|config| integer_vec_nrm(random_integer_vec_gen(config)),
+        &|config| integer_vec_nrm(special_random_integer_vec_gen(config)),
+    )
+}
+
+// -- Vec<Natural> --
+
+pub fn natural_vec_gen() -> Generator<Vec<Natural>> {
+    Generator::new(
+        &exhaustive_natural_vec_gen,
+        &random_natural_vec_gen,
+        &special_random_natural_vec_gen,
+    )
+}
+
+pub fn natural_vec_gen_nrm() -> Generator<(Vec<BigUint>, Vec<rug::Integer>, Vec<Natural>)> {
+    Generator::new(
+        &|| natural_vec_nrm(exhaustive_natural_vec_gen()),
+        &|config| natural_vec_nrm(random_natural_vec_gen(config)),
+        &|config| natural_vec_nrm(special_random_natural_vec_gen(config)),
+    )
+}
 
 // -- (Vec<Natural>, Integer) --
 

@@ -2013,6 +2013,18 @@ pub fn exhaustive_string_triple_gen_var_2() -> It<(String, String, String)> {
 
 // var 3 is in malachite-q.
 
+// -- Vec<Integer> --
+
+pub fn exhaustive_integer_vec_gen() -> It<Vec<Integer>> {
+    Box::new(exhaustive_vecs(exhaustive_integers()))
+}
+
+// -- Vec<Natural> --
+
+pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {
+    Box::new(exhaustive_vecs(exhaustive_naturals()))
+}
+
 // -- (Vec<Natural>, Integer)
 
 pub fn exhaustive_natural_vec_integer_pair_gen_var_1() -> It<(Vec<Natural>, Integer)> {

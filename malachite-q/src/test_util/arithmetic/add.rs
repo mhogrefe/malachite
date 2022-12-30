@@ -1,5 +1,6 @@
 use crate::Rational;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 
 pub fn add_naive(x: Rational, y: Rational) -> Rational {
@@ -10,4 +11,12 @@ pub fn add_naive(x: Rational, y: Rational) -> Rational {
     let n =
         Integer::from_sign_and_abs(x_sign, xn * &yd) + Integer::from_sign_and_abs(y_sign, yn * &xd);
     Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), xd * yd)
+}
+
+pub fn rational_sum_naive<I: Iterator<Item = Rational>>(xs: I) -> Rational {
+    let mut s = Rational::ZERO;
+    for x in xs {
+        s += x;
+    }
+    s
 }

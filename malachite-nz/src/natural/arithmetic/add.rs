@@ -3,7 +3,9 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::iter::Sum;
 use std::ops::{Add, AddAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -778,5 +780,75 @@ impl<'a> AddAssign<&'a Natural> for Natural {
                 limbs_vec_add_in_place_left(xs, ys);
             }
         }
+    }
+}
+
+impl Sum for Natural {
+    /// Adds up all the [`Natural`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Natural::sum(xs.map(Natural::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()), 17);
+    /// ```
+    fn sum<I>(xs: I) -> Natural
+    where
+        I: Iterator<Item = Natural>,
+    {
+        let mut s = Natural::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
+    }
+}
+
+impl<'a> Sum<&'a Natural> for Natural {
+    /// Adds up all the [`Natural`]s in an iterator of [`Natural`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `Natural::sum(xs.map(Natural::significant_bits))`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::Sum;
+    ///
+    /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 17);
+    /// ```
+    fn sum<I>(xs: I) -> Natural
+    where
+        I: Iterator<Item = &'a Natural>,
+    {
+        let mut s = Natural::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
     }
 }

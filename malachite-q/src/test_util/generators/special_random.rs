@@ -40,6 +40,7 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
+use malachite_base::vecs::random::random_vecs;
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::random::{
@@ -1611,4 +1612,23 @@ pub fn special_random_string_triple_gen_var_3(config: &GenConfig) -> It<(String,
             )
         }),
     )
+}
+
+// -- Vec<Rational> --
+
+pub fn special_random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
 }
