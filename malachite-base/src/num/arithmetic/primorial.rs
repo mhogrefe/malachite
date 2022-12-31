@@ -210,6 +210,8 @@ macro_rules! impl_primorials_b {
             /// $$
             /// f(n) = n\\# = \prod_{p \leq n \atop p \\ \\text {prime}} p.
             /// $$
+            /// 
+            /// $n\\# = O(e^{(1+o(1))n})$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -237,6 +239,12 @@ macro_rules! impl_primorials_b {
             /// f(n) = p_n\\# = \prod_{k=1}^n p_n,
             /// $$
             /// where $p_n$ is the $n$th prime number.
+            /// 
+            /// $p_n\\# = O\left ( \left ( \frac{1}{e}k\log k\left ( \frac{\log k}{e^2}k
+            /// \right )^{1/\log k} \right )^k \omega(1)\right )$.
+            /// 
+            /// This asymptotic approximation is due to
+            /// [Bart Michels](https://math.stackexchange.com/a/1594930).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

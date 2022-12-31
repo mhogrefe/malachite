@@ -359,9 +359,15 @@ impl Factorial for Natural {
     /// $$
     /// f(n) = n! = 1 \times 2 \times 3 \times \cdots \times n.
     /// $$
+    /// 
+    /// $n! = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
     ///
     /// # Examples
     /// ```
@@ -432,8 +438,12 @@ impl DoubleFactorial for Natural {
     /// $$
     /// where $i$ is 1 if $n$ is odd and $2$ if $n$ is even.
     ///
+    /// $n!! = O(\sqrt{n}(n/e)^{n/2})$.
+    /// 
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
     ///
     /// # Examples
     /// ```
@@ -510,9 +520,13 @@ impl Multifactorial for Natural {
     /// $$
     /// If $n$ is divisible by $m$, then $i$ is $m$; otherwise, $i$ is the remainder when $n$ is
     /// divided by $m$.
+    /// 
+    /// $n!^{(m)} = O(\sqrt{n}(n/e)^{n/m})$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, m) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n, m) = O(n \log n)$
     ///
     /// # Examples
     /// ```
@@ -630,9 +644,13 @@ impl Subfactorial for Natural {
     /// $$
     /// f(n) = \\ !n = \lfloor n!/e \rfloor.
     /// $$
+    /// 
+    /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
     ///
     /// # Examples
     /// ```

@@ -5,7 +5,10 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::GenConfig;
-use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_pair_gen_var_18};
+use malachite_base::test_util::generators::{
+    unsigned_gen_var_23, unsigned_gen_var_24, unsigned_gen_var_25, unsigned_gen_var_5,
+    unsigned_pair_gen_var_18, unsigned_pair_gen_var_43,
+};
 use malachite_nz::natural::arithmetic::factorial::{limbs_odd_factorial, subfactorial_naive};
 use malachite_nz::natural::Natural;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -2163,6 +2166,10 @@ fn factorial_properties() {
             );
         }
     });
+
+    unsigned_gen_var_23::<Limb>().test_properties(|n| {
+        assert_eq!(Natural::factorial(n), Limb::factorial(n));
+    });
 }
 
 #[test]
@@ -2183,6 +2190,10 @@ fn double_factorial_properties() {
                 n
             );
         }
+    });
+
+    unsigned_gen_var_24::<Limb>().test_properties(|n| {
+        assert_eq!(Natural::double_factorial(n), Limb::double_factorial(n));
     });
 }
 
@@ -2206,6 +2217,10 @@ fn multifactorial_properties() {
             );
         }
     });
+
+    unsigned_pair_gen_var_43::<Limb>().test_properties(|(n, m)| {
+        assert_eq!(Natural::multifactorial(n, m), Limb::multifactorial(n, m));
+    });
 }
 
 #[test]
@@ -2228,5 +2243,9 @@ fn subfactorial_properties() {
                 n
             );
         }
+    });
+
+    unsigned_gen_var_25::<Limb>().test_properties(|n| {
+        assert_eq!(Natural::subfactorial(n), Limb::subfactorial(n));
     });
 }

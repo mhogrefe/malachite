@@ -51,6 +51,7 @@ pub(crate) fn register(runner: &mut Runner) {
     parity::register(runner);
     pow::register(runner);
     power_of_2::register(runner);
+    primorial::register(runner);
     root::register(runner);
     round_to_multiple::register(runner);
     round_to_multiple_of_power_of_2::register(runner);
@@ -117,6 +118,7 @@ mod next_power_of_2;
 mod parity;
 mod pow;
 mod power_of_2;
+mod primorial;
 mod root;
 mod round_to_multiple;
 mod round_to_multiple_of_power_of_2;
