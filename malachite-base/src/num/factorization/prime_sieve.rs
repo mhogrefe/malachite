@@ -405,8 +405,6 @@ pub_test! {limbs_count_ones<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
 // $T(n) = O(n\log\log n)$
 //
 // $M(n) = O(1)$
-//
-// This is equivalent to `gmp_primesieve` from `primesieve.c`, GMP 6.2.1.
 fn limbs_prime_sieve_generic<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
     bit_array: &mut [T],
     n: u64,
@@ -449,6 +447,7 @@ fn limbs_prime_sieve_generic<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
 }
 
 #[doc(hidden)]
+// This is equivalent to `gmp_primesieve` from `primesieve.c`, GMP 6.2.1.
 #[inline]
 pub fn limbs_prime_sieve_u32(bit_array: &mut [u32], n: u64) -> u64 {
     limbs_prime_sieve_generic(
@@ -461,6 +460,7 @@ pub fn limbs_prime_sieve_u32(bit_array: &mut [u32], n: u64) -> u64 {
 }
 
 #[doc(hidden)]
+// This is equivalent to `gmp_primesieve` from `primesieve.c`, GMP 6.2.1.
 #[inline]
 pub fn limbs_prime_sieve_u64(bit_array: &mut [u64], n: u64) -> u64 {
     limbs_prime_sieve_generic(

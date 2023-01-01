@@ -194,7 +194,7 @@ const FACTORS_PER_LIMB: usize =
 // n ^ log <= Limb::MAX: a limb can store log factors less than n.
 //
 // This is equivalent to log_n_max, `gmp-impl.h`, GMP 6.2.1.
-fn log_n_max(n: Limb) -> u64 {
+pub(crate) fn log_n_max(n: Limb) -> u64 {
     // NTH_ROOT_NUMB_MASK_TABLE[0] is Limb::MAX, so a match will always be found
     u64::wrapping_from(
         NTH_ROOT_NUMB_MASK_TABLE
@@ -224,8 +224,7 @@ fn log_n_max(n: Limb) -> u64 {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1, where the output buffer
-// is supplied and the size is returned.
+// This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1.
 pub_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
@@ -359,7 +358,7 @@ impl Factorial for Natural {
     /// $$
     /// f(n) = n! = 1 \times 2 \times 3 \times \cdots \times n.
     /// $$
-    /// 
+    ///
     /// $n! = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity
@@ -439,7 +438,7 @@ impl DoubleFactorial for Natural {
     /// where $i$ is 1 if $n$ is odd and $2$ if $n$ is even.
     ///
     /// $n!! = O(\sqrt{n}(n/e)^{n/2})$.
-    /// 
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
@@ -520,7 +519,7 @@ impl Multifactorial for Natural {
     /// $$
     /// If $n$ is divisible by $m$, then $i$ is $m$; otherwise, $i$ is the remainder when $n$ is
     /// divided by $m$.
-    /// 
+    ///
     /// $n!^{(m)} = O(\sqrt{n}(n/e)^{n/m})$.
     ///
     /// # Worst-case complexity
@@ -644,7 +643,7 @@ impl Subfactorial for Natural {
     /// $$
     /// f(n) = \\ !n = \lfloor n!/e \rfloor.
     /// $$
-    /// 
+    ///
     /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity

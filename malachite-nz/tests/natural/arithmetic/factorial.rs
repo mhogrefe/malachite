@@ -11,7 +11,6 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::natural::arithmetic::factorial::{limbs_odd_factorial, subfactorial_naive};
 use malachite_nz::natural::Natural;
-#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::common::rug_integer_to_natural;
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;

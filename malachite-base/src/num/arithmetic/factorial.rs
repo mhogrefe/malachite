@@ -216,7 +216,7 @@ macro_rules! impl_factorials_a {
             /// \\end{cases}
             /// $$
             /// where $W$ is `Self::WIDTH`.
-            /// 
+            ///
             /// $n! = O(\sqrt{n}(n/e)^n)$.
             ///
             /// # Worst-case complexity
@@ -242,7 +242,7 @@ macro_rules! impl_factorials_a {
             /// \\end{cases}
             /// $$
             /// where $W$ is `Self::WIDTH`.
-            /// 
+            ///
             /// $n!! = O(\sqrt{n}(n/e)^{n/2})$.
             ///
             /// # Worst-case complexity
@@ -278,7 +278,7 @@ macro_rules! impl_factorials_a {
             /// \\end{cases}
             /// $$
             /// where $W$ is `Self::WIDTH`.
-            /// 
+            ///
             /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
             ///
             /// # Worst-case complexity
@@ -341,7 +341,7 @@ impl CheckedFactorial for usize {
     /// \\end{cases}
     /// $$
     /// where $W$ is `usize::WIDTH`.
-    /// 
+    ///
     /// $n! = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity
@@ -372,7 +372,7 @@ impl CheckedSubfactorial for usize {
     /// \\end{cases}
     /// $$
     /// where $W$ is `usize::WIDTH`.
-    /// 
+    ///
     /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
     ///
     /// # Worst-case complexity
@@ -400,7 +400,7 @@ impl CheckedDoubleFactorial for usize {
     /// \\end{cases}
     /// $$
     /// where $W$ is `usize::WIDTH`.
-    /// 
+    ///
     /// $n!! = O(\sqrt{n}(n/e)^{n/2})$.
     ///
     /// # Worst-case complexity
@@ -429,7 +429,7 @@ macro_rules! impl_factorials_b {
             /// $$
             /// f(n) = n! = 1 \times 2 \times 3 \times \cdots \times n.
             /// $$
-            /// 
+            ///
             /// $n! = O(\sqrt{n}(n/e)^n)$.
             ///
             /// # Worst-case complexity
@@ -457,7 +457,7 @@ macro_rules! impl_factorials_b {
             /// f(n) = n!! = n \times (n - 2) \times (n - 4) \times \cdots \times i,
             /// $$
             /// where $i$ is 1 if $n$ is odd and $2$ if $n$ is even.
-            /// 
+            ///
             /// $n!! = O(\sqrt{n}(n/e)^{n/2})$.
             ///
             /// # Worst-case complexity
@@ -486,7 +486,7 @@ macro_rules! impl_factorials_b {
             /// $$
             /// If $n$ is divisible by $m$, then $i$ is $m$; otherwise, $i$ is the remainder when
             /// $n$ is divided by $m$.
-            /// 
+            ///
             /// $n!^{(m)} = O(\sqrt{n}(n/e)^{n/m})$.
             ///
             /// # Worst-case complexity
@@ -515,7 +515,7 @@ macro_rules! impl_factorials_b {
             /// \\end{cases}
             /// $$
             /// where $W$ is `Self::WIDTH`.
-            /// 
+            ///
             /// $n!^{(m)} = O(\sqrt{n}(n/e)^{n/m})$.
             ///
             /// # Worst-case complexity
@@ -548,7 +548,7 @@ macro_rules! impl_factorials_b {
             /// $$
             /// f(n) = \\ !n = \lfloor n!/e \rfloor.
             /// $$
-            /// 
+            ///
             /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
             ///
             /// # Worst-case complexity

@@ -20,6 +20,7 @@ pub mod mod_power_of_2_square;
 pub mod mul;
 pub mod neg;
 pub mod pow;
+pub mod primorial;
 pub mod root;
 pub mod sqrt;
 pub mod square;

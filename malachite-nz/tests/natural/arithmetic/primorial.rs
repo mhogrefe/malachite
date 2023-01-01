@@ -7,6 +7,9 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::common::rug_integer_to_natural;
+use malachite_nz::test_util::natural::arithmetic::primorial::{
+    primorial_naive, product_of_first_n_primes_naive,
+};
 use rug::Complete;
 
 #[test]
@@ -15,6 +18,7 @@ fn test_primorial() {
         let p = Natural::primorial(n);
         assert!(p.is_valid());
         assert_eq!(p.to_string(), out);
+        assert_eq!(primorial_naive(n).to_string(), out);
         assert_eq!(
             rug::Integer::primorial(u32::exact_from(n))
                 .complete()
@@ -29,6 +33,11 @@ fn test_primorial() {
     test(4, "6");
     test(5, "30");
     test(20, "9699690");
+    // sieve[index] & mask == 0
+    // prod <= max_prod
+    // sieve[index] & mask != 0
+    // prod > max_prod
+    test(53, "32589158477190044730");
     test(100, "2305567963945518424753102147331756070");
 }
 
@@ -38,6 +47,7 @@ fn test_product_of_first_n_primes() {
         let p = Natural::product_of_first_n_primes(n);
         assert!(p.is_valid());
         assert_eq!(p.to_string(), out);
+        assert_eq!(product_of_first_n_primes_naive(n).to_string(), out);
     }
     test(0, "1");
     test(1, "2");
@@ -59,6 +69,7 @@ fn primorial_properties() {
     unsigned_gen_var_5().test_properties(|n| {
         let p = Natural::primorial(n);
         assert!(p.is_valid());
+        assert_eq!(primorial_naive(n), p);
         assert_eq!(
             rug_integer_to_natural(&rug::Integer::primorial(u32::exact_from(n)).complete()),
             p
@@ -77,6 +88,7 @@ fn product_of_first_n_primes_properties() {
     unsigned_gen_var_5().test_properties(|n| {
         let f = Natural::product_of_first_n_primes(n);
         assert!(f.is_valid());
+        assert_eq!(product_of_first_n_primes_naive(n), f);
         assert_ne!(f, 0);
         if n != 0 {
             let p = u64::primes().nth(usize::exact_from(n) - 1).unwrap();

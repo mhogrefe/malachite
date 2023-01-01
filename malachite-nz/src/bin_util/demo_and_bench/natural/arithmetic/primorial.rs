@@ -6,6 +6,9 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz::test_util::natural::arithmetic::primorial::{
+    primorial_naive, product_of_first_n_primes_naive,
+};
 use rug::Complete;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -13,7 +16,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_product_of_first_n_primes);
 
     register_bench!(runner, benchmark_primorial_library_comparison);
-    register_bench!(runner, benchmark_product_of_first_n_primes);
+    register_bench!(runner, benchmark_primorial_algorithms);
+    register_bench!(runner, benchmark_product_of_first_n_primes_algorithms);
 }
 
 fn demo_primorial(gm: GenMode, config: GenConfig, limit: usize) {
@@ -51,7 +55,23 @@ fn benchmark_primorial_library_comparison(
     );
 }
 
-fn benchmark_product_of_first_n_primes(
+fn benchmark_primorial_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Natural.primorial(u64)",
+        BenchmarkType::Algorithms,
+        unsigned_gen_var_5().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_direct_bucketer(),
+        &mut [
+            ("default", &mut |n| no_out!(Natural::primorial(n))),
+            ("naive", &mut |n| no_out!(primorial_naive(n))),
+        ],
+    );
+}
+
+fn benchmark_product_of_first_n_primes_algorithms(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -59,14 +79,19 @@ fn benchmark_product_of_first_n_primes(
 ) {
     run_benchmark(
         "Natural.product_of_first_n_primes(u64)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         unsigned_gen_var_5().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &unsigned_direct_bucketer(),
-        &mut [("Malachite", &mut |n| {
-            no_out!(Natural::product_of_first_n_primes(n))
-        })],
+        &mut [
+            ("default", &mut |n| {
+                no_out!(Natural::product_of_first_n_primes(n))
+            }),
+            ("naive", &mut |n| {
+                no_out!(product_of_first_n_primes_naive(n))
+            }),
+        ],
     );
 }
