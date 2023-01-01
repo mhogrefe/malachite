@@ -149,4 +149,4 @@ flags.
   {% endfor %}
 </ul>
 
-Copyright © 2022 Mikhail Hogrefe
+Copyright © 2023 Mikhail Hogrefe

@@ -7,4 +7,4 @@ Parts of Malachite are derived from [GMP](https://gmplib.org/) and
 
 <https://www.malachite.rs/>
 
-Copyright © 2022 Mikhail Hogrefe
+Copyright © 2023 Mikhail Hogrefe
