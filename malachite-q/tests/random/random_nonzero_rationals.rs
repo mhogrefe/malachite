@@ -1,14 +1,9 @@
-use itertools::Itertools;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::test_util::stats::common_values_map::common_values_map;
-use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
+use malachite_base::test_util::stats::moments::MomentStats;
 use malachite_q::random::random_nonzero_rationals;
-use malachite_q::Rational;
+use malachite_q::test_util::random::random_rationals_helper_helper;
 
 fn random_nonzero_rationals_helper(
     mean_bits_numerator: u64,
@@ -18,45 +13,12 @@ fn random_nonzero_rationals_helper(
     expected_sample_median: (&str, Option<&str>),
     expected_sample_moment_stats: MomentStats,
 ) {
-    let xs = random_nonzero_rationals(EXAMPLE_SEED, mean_bits_numerator, mean_bits_denominator);
-    let actual_values = xs
-        .clone()
-        .map(|x| Rational::to_string(&x))
-        .take(20)
-        .collect_vec();
-    let actual_values = actual_values.iter().map(String::as_str).collect_vec();
-    let actual_common_values = common_values_map(1000000, 10, xs.clone())
-        .into_iter()
-        .map(|(x, freq)| (x.to_string(), freq))
-        .collect_vec();
-    let actual_common_values = actual_common_values
-        .iter()
-        .map(|(x, freq)| (x.as_str(), *freq))
-        .collect_vec();
-    let (median_lo, median_hi) = median(xs.clone().take(1000000));
-    let (median_lo, median_hi) = (
-        median_lo.to_string(),
-        median_hi.map(|x| Rational::to_string(&x)),
-    );
-    let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
-    // Note that the population moments do not exist.
-    let actual_sample_moment_stats = moment_stats(
-        xs.take(1000000)
-            .map(|x| f64::rounding_from(x, RoundingMode::Nearest)),
-    );
-    assert_eq!(
-        (
-            actual_values.as_slice(),
-            actual_common_values.as_slice(),
-            actual_sample_median,
-            actual_sample_moment_stats
-        ),
-        (
-            expected_values,
-            expected_common_values,
-            expected_sample_median,
-            expected_sample_moment_stats
-        )
+    random_rationals_helper_helper(
+        random_nonzero_rationals(EXAMPLE_SEED, mean_bits_numerator, mean_bits_denominator),
+        expected_values,
+        expected_common_values,
+        expected_sample_median,
+        expected_sample_moment_stats,
     );
 }
 

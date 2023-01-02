@@ -1,16 +1,10 @@
-use itertools::Itertools;
-use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::strings::ToDebugString;
-use malachite_base::test_util::stats::common_values_map::common_values_map;
-use malachite_base::test_util::stats::median;
-use malachite_base::test_util::stats::moments::{moment_stats, MomentStats};
+use malachite_base::test_util::stats::moments::MomentStats;
 use malachite_nz::natural::Natural;
 use malachite_q::random::random_rationals_with_denominator_inclusive_range;
+use malachite_q::test_util::random::random_rationals_helper_helper;
 use malachite_q::Rational;
 use std::str::FromStr;
 
@@ -20,48 +14,35 @@ fn random_rationals_with_denominator_inclusive_range_helper(
     b: &str,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-    expected_values: &str,
-    expected_common_values: &str,
-    expected_sample_median: &str,
+    expected_values: &[&str],
+    expected_common_values: &[(&str, usize)],
+    expected_sample_median: (&str, Option<&str>),
     expected_sample_moment_stats: MomentStats,
 ) {
-    let d = Natural::from_str(d).unwrap();
-    let xs = random_rationals_with_denominator_inclusive_range(
-        EXAMPLE_SEED,
-        &d,
-        Rational::from_str(a).unwrap(),
-        Rational::from_str(b).unwrap(),
-        mean_bits_numerator,
-        mean_bits_denominator,
-    );
-    assert_eq!(
-        (
-            prefix_to_string(xs.clone(), 20).as_str(),
-            common_values_map(1000000, 10, xs.clone())
-                .into_iter()
-                .collect_vec()
-                .to_debug_string()
-                .as_str(),
-            median(xs.clone().take(1000000)).to_debug_string().as_str(),
-            moment_stats(
-                xs.take(1000000)
-                    .map(|x| f64::rounding_from(x, RoundingMode::Nearest))
-            )
+    random_rationals_helper_helper(
+        random_rationals_with_denominator_inclusive_range(
+            EXAMPLE_SEED,
+            &Natural::from_str(d).unwrap(),
+            Rational::from_str(a).unwrap(),
+            Rational::from_str(b).unwrap(),
+            mean_bits_numerator,
+            mean_bits_denominator,
         ),
-        (
-            expected_values,
-            expected_common_values,
-            expected_sample_median,
-            expected_sample_moment_stats
-        )
+        expected_values,
+        expected_common_values,
+        expected_sample_median,
+        expected_sample_moment_stats,
     );
 }
 
 #[test]
 fn test_random_rationals_with_denominator_inclusive_range() {
-    let values = "[0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, ...]";
-    let common_values = "[(0, 523140), (1, 476860)]";
-    let sample_median = "(0, None)";
+    let values = &[
+        "0", "1", "0", "1", "1", "0", "0", "0", "1", "1", "0", "0", "1", "1", "0", "1", "0", "1",
+        "1", "0",
+    ];
+    let common_values = &[("0", 523140), ("1", 476860)];
+    let sample_median = ("0", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.47685999999999046),
         standard_deviation: NiceFloat(0.49946450310787194),
@@ -80,9 +61,12 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...]";
-    let common_values = "[(1, 1000000)]";
-    let sample_median = "(1, None)";
+    let values = &[
+        "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
+        "1", "1",
+    ];
+    let common_values = &[("1", 1000000)];
+    let sample_median = ("1", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(1.0),
         standard_deviation: NiceFloat(0.0),
@@ -101,10 +85,12 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, \
-    1/2, 1/2, 1/2, 1/2, 1/2, ...]";
-    let common_values = "[(1/2, 1000000)]";
-    let sample_median = "(1/2, None)";
+    let values = &[
+        "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2",
+        "1/2", "1/2", "1/2", "1/2", "1/2", "1/2", "1/2",
+    ];
+    let common_values = &[("1/2", 1000000)];
+    let sample_median = ("1/2", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.5),
         standard_deviation: NiceFloat(0.0),
@@ -123,10 +109,12 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[5/6, 1/6, 1/6, 1/6, 1/6, 5/6, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6, \
-    1/6, 1/6, 1/6, 5/6, 1/6, ...]";
-    let common_values = "[(1/6, 783614), (5/6, 216386)]";
-    let sample_median = "(1/6, None)";
+    let values = &[
+        "5/6", "1/6", "1/6", "1/6", "1/6", "5/6", "1/6", "1/6", "1/6", "1/6", "1/6", "1/6", "1/6",
+        "1/6", "1/6", "1/6", "1/6", "1/6", "5/6", "1/6",
+    ];
+    let common_values = &[("1/6", 783614), ("5/6", 216386)];
+    let sample_median = ("1/6", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.3109239999999932),
         standard_deviation: NiceFloat(0.2745204048819774),
@@ -145,11 +133,20 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[41/100, 43/100, 41/100, 41/100, 39/100, 41/100, 49/100, 41/100, 41/100, \
-    39/100, 49/100, 37/100, 37/100, 49/100, 39/100, 37/100, 41/100, 41/100, 43/100, 37/100, ...]";
-    let common_values = "[(37/100, 167531), (47/100, 167302), (49/100, 166766), (41/100, 166355), \
-    (43/100, 166287), (39/100, 165759)]";
-    let sample_median = "(43/100, None)";
+    let values = &[
+        "41/100", "43/100", "41/100", "41/100", "39/100", "41/100", "49/100", "41/100", "41/100",
+        "39/100", "49/100", "37/100", "37/100", "49/100", "39/100", "37/100", "41/100", "41/100",
+        "43/100", "37/100",
+    ];
+    let common_values = &[
+        ("37/100", 167531),
+        ("47/100", 167302),
+        ("49/100", 166766),
+        ("41/100", 166355),
+        ("43/100", 166287),
+        ("39/100", 165759),
+    ];
+    let sample_median = ("43/100", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.42668872000000546),
         standard_deviation: NiceFloat(0.042331383354523355),
@@ -168,9 +165,12 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, ...]";
-    let common_values = "[(3, 1000000)]";
-    let sample_median = "(3, None)";
+    let values = &[
+        "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3",
+        "3", "3",
+    ];
+    let common_values = &[("3", 1000000)];
+    let sample_median = ("3", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(3.0),
         standard_deviation: NiceFloat(0.0),
@@ -189,10 +189,12 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, \
-    17/6, 17/6, 17/6, 17/6, 17/6, 17/6, 17/6, ...]";
-    let common_values = "[(17/6, 1000000)]";
-    let sample_median = "(17/6, None)";
+    let values = &[
+        "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6",
+        "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6", "17/6",
+    ];
+    let common_values = &[("17/6", 1000000)];
+    let sample_median = ("17/6", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(2.8333333333333335),
         standard_deviation: NiceFloat(0.0),
@@ -211,13 +213,24 @@ fn test_random_rationals_with_denominator_inclusive_range() {
         sample_moment_stats,
     );
 
-    let values = "[301/100, 279/100, 313/100, 299/100, 301/100, 273/100, 279/100, 301/100, \
-    297/100, 311/100, 309/100, 301/100, 279/100, 289/100, 279/100, 279/100, 309/100, 293/100, \
-    287/100, 299/100, ...]";
-    let common_values = "[(299/100, 59348), (307/100, 59112), (281/100, 59097), (297/100, 58997), \
-    (283/100, 58975), (293/100, 58941), (309/100, 58919), (311/100, 58910), (287/100, 58857), \
-    (289/100, 58794)]";
-    let sample_median = "(293/100, None)";
+    let values = &[
+        "301/100", "279/100", "313/100", "299/100", "301/100", "273/100", "279/100", "301/100",
+        "297/100", "311/100", "309/100", "301/100", "279/100", "289/100", "279/100", "279/100",
+        "309/100", "293/100", "287/100", "299/100",
+    ];
+    let common_values = &[
+        ("299/100", 59348),
+        ("307/100", 59112),
+        ("281/100", 59097),
+        ("297/100", 58997),
+        ("283/100", 58975),
+        ("293/100", 58941),
+        ("309/100", 58919),
+        ("311/100", 58910),
+        ("287/100", 58857),
+        ("289/100", 58794),
+    ];
+    let sample_median = ("293/100", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(2.937086759999876),
         standard_deviation: NiceFloat(0.12202969771309406),
