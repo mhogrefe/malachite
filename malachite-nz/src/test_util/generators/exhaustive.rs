@@ -252,6 +252,13 @@ pub fn exhaustive_integer_pair_gen_var_6() -> It<(Integer, Integer)> {
     )
 }
 
+pub fn exhaustive_integer_pair_gen_var_7() -> It<(Integer, Integer)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_unsigneds::<Limb>().map(Integer::from),
+    ))
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn exhaustive_integer_triple_gen() -> It<(Integer, Integer, Integer)> {
@@ -1080,6 +1087,13 @@ pub fn exhaustive_natural_pair_gen_var_13() -> It<(Natural, Natural)> {
 
 pub fn exhaustive_natural_pair_gen_var_14() -> It<(Natural, Natural)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_naturals()).filter(|(x, y)| x.coprime_with(y)))
+}
+
+pub fn exhaustive_natural_pair_gen_var_15() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_unsigneds::<Limb>().map(Natural::from),
+    ))
 }
 
 // -- (Natural, Natural, bool) --

@@ -51,12 +51,12 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, other: RHS) -> Option<Self::Output>;
 }
 
-pub trait BinomialCoefficient {
-    fn binomial_coefficient(n: Self, k: Self) -> Self;
+pub trait BinomialCoefficient<T = Self> {
+    fn binomial_coefficient(n: T, k: T) -> Self;
 }
 
-pub trait CheckedBinomialCoefficient: Sized {
-    fn checked_binomial_coefficient(n: Self, k: Self) -> Option<Self>;
+pub trait CheckedBinomialCoefficient<T = Self>: Sized {
+    fn checked_binomial_coefficient(n: T, k: T) -> Option<Self>;
 }
 
 /// Takes the ceiling of a number.

@@ -79,7 +79,7 @@ pub trait PrimitiveInt:
     + ArithmeticCheckedShr<i8, Output = Self>
     + ArithmeticCheckedShr<isize, Output = Self>
     + Binary
-    + BinomialCoefficient
+    + BinomialCoefficient<Self>
     + BitAccess
     + BitAnd<Self, Output = Self>
     + BitAndAssign<Self>
@@ -97,7 +97,7 @@ pub trait PrimitiveInt:
     + CeilingSqrtAssign
     + CheckedAdd<Self, Output = Self>
     + CheckedAddMul<Self, Self, Output = Self>
-    + CheckedBinomialCoefficient
+    + CheckedBinomialCoefficient<Self>
     + CheckedDiv<Self, Output = Self>
     + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>

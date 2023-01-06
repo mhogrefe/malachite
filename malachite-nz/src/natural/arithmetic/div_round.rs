@@ -39,7 +39,7 @@ pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) ->
 }}
 
 // Compares 2x and y
-fn double_cmp(x: &Natural, y: &Natural) -> Ordering {
+pub(crate) fn double_cmp(x: &Natural, y: &Natural) -> Ordering {
     (x.significant_bits() + 1)
         .cmp(&y.significant_bits())
         .then_with(|| x.cmp_normalized(y))

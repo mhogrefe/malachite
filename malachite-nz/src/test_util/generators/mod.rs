@@ -4,6 +4,7 @@ use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
+use crate::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
@@ -292,6 +293,38 @@ pub fn integer_pair_gen_var_6() -> Generator<(Integer, Integer)> {
         &exhaustive_integer_pair_gen_var_6,
         &random_integer_pair_gen_var_6,
         &special_random_integer_pair_gen_var_6,
+    )
+}
+
+// All pairs of `Integer`s where the second `Integer` is small and non-negative.
+pub fn integer_pair_gen_var_7() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_7,
+        &random_integer_pair_gen_var_7,
+        &special_random_integer_pair_gen_var_7,
+    )
+}
+
+pub fn integer_pair_gen_var_7_rm() -> Generator<((rug::Integer, u32), (Integer, Integer))> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_integer_pair_gen_var_7()
+                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_integer_pair_gen_var_7(config)
+                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_integer_pair_gen_var_7(config)
+                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
     )
 }
 
@@ -1314,6 +1347,38 @@ pub fn natural_pair_gen_var_14() -> Generator<(Natural, Natural)> {
         &exhaustive_natural_pair_gen_var_14,
         &random_natural_pair_gen_var_14,
         &special_random_natural_pair_gen_var_14,
+    )
+}
+
+// All pairs of `Natural`s where the second `Natural` is small.
+pub fn natural_pair_gen_var_15() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_15,
+        &random_natural_pair_gen_var_15,
+        &special_random_natural_pair_gen_var_15,
+    )
+}
+
+pub fn natural_pair_gen_var_15_rm() -> Generator<((rug::Integer, u32), (Natural, Natural))> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_natural_pair_gen_var_15()
+                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_natural_pair_gen_var_15(config)
+                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_natural_pair_gen_var_15(config)
+                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+            )
+        },
     )
 }
 

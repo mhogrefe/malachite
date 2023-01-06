@@ -446,6 +446,29 @@ pub fn special_random_integer_pair_gen_var_6(config: &GenConfig) -> It<(Integer,
     )
 }
 
+pub fn special_random_integer_pair_gen_var_7(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds::<Limb>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+            .map(Integer::from)
+        },
+    ))
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn special_random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
@@ -2275,6 +2298,29 @@ pub fn special_random_natural_pair_gen_var_14(config: &GenConfig) -> It<(Natural
         ))
         .filter(|(x, y)| x.coprime_with(y)),
     )
+}
+
+pub fn special_random_natural_pair_gen_var_15(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds::<Limb>(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+            .map(Natural::from)
+        },
+    ))
 }
 
 // -- (Natural, Natural, bool) --

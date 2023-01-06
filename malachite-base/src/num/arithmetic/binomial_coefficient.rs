@@ -112,8 +112,10 @@ macro_rules! impl_binomial_coefficient_signed {
             ///
             /// $$
             /// f(n, k) = \\begin{cases}
-            ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad -2^{W-1} \leq
-            ///         \binom{n}{k} < 2^{W-1}, \\\\
+            ///     \operatorname{Some}(\binom{n}{k}) & \text{if} \\quad n \geq 0 \\ \text{and}
+            ///         \\ -2^{W-1} \leq \binom{n}{k} < 2^{W-1}, \\\\
+            ///     \operatorname{Some}((-1)^k \binom{-n+k-1}{k}) & \text{if} \\quad n < 0
+            ///         \\ \text{and} \\ -2^{W-1} \leq \binom{n}{k} < 2^{W-1}, \\\\
             ///     \operatorname{None} & \\quad \\text{otherwise},
             /// \\end{cases}
             /// $$
@@ -142,13 +144,16 @@ macro_rules! impl_binomial_coefficient_primitive_int {
         impl BinomialCoefficient for $t {
             /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
             /// function panics.
-            ///
-            /// $$
-            /// f(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}.
-            /// $$
-            ///
+            /// 
             /// The second argument must be non-negative, but the first may be negative. If it is,
             /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
+            ///
+            /// $$
+            /// f(n, k) = \\begin{cases}
+            ///     \binom{n}{k} & \text{if} \\quad n \geq 0, \\\\
+            ///     (-1)^k \binom{-n+k-1}{k} & \text{if} \\quad n < 0.
+            /// \\end{cases}
+            /// $$
             ///
             /// # Worst-case complexity
             /// $T(k) = O(k)$
@@ -158,7 +163,7 @@ macro_rules! impl_binomial_coefficient_primitive_int {
             /// where $T$ is time, $M$ is additional memory, and $k$ is `k.abs()`.
             ///
             /// # Panics
-            /// Panics if the result is not representable by this type.
+            /// Panics if the result is not representable by this type, or if $k$ is negative.
             ///
             /// # Examples
             /// See [here](super::binomial_coefficient#binomial_coefficient).

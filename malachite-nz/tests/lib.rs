@@ -49,6 +49,7 @@ pub mod integer {
         pub mod abs;
         pub mod add;
         pub mod add_mul;
+        pub mod binomial_coefficient;
         pub mod div;
         pub mod div_exact;
         pub mod div_mod;
@@ -188,6 +189,7 @@ pub mod natural {
     pub mod arithmetic {
         pub mod add;
         pub mod add_mul;
+        pub mod binomial_coefficient;
         pub mod checked_sub;
         pub mod checked_sub_mul;
         pub mod coprime_with;

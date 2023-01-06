@@ -4,6 +4,10 @@ pub mod add;
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 pub mod add_mul;
+/// Implementations of
+/// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
+/// for computing the binomial coefficient of two numbers.
+pub mod binomial_coefficient;
 /// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait
 /// for subtracting two numbers and checking whether the result is representable.
 pub mod checked_sub;
@@ -504,6 +508,8 @@ pub mod pow;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;
+/// An implementation of [`Primorial`](malachite_base::num::arithmetic::traits::Primorial), a trait
+/// for computing the primorial of a number.
 pub mod primorial;
 /// Implementations of traits for taking the $n$th root of a number.
 ///

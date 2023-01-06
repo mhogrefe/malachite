@@ -7,6 +7,10 @@ pub mod add;
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 pub mod add_mul;
+/// Implementations of
+/// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
+/// for computing the binomial coefficient of two numbers.
+pub mod binomial_coefficient;
 /// Division of [`Integer`](super::Integer)s.
 pub mod div;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and

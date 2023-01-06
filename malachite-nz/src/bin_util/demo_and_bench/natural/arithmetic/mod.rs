@@ -3,6 +3,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_mul::register(runner);
+    binomial_coefficient::register(runner);
     checked_sub::register(runner);
     checked_sub_mul::register(runner);
     coprime_with::register(runner);
@@ -70,6 +71,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod add;
 mod add_mul;
+mod binomial_coefficient;
 mod checked_sub;
 mod checked_sub_mul;
 mod coprime_with;

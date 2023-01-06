@@ -198,6 +198,7 @@ fn binomial_coefficient_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen_var_1::<T>().test_properties(|n| {
         assert_eq!(T::binomial_coefficient(n, n), T::ONE);
         assert_eq!(T::binomial_coefficient(n, n - T::ONE), n);
+        assert_eq!(T::binomial_coefficient(T::ZERO, n), T::ZERO);
     });
 }
 
@@ -234,6 +235,7 @@ fn binomial_coefficient_helper_signed<T: PrimitiveSigned>() {
         assert_eq!(T::binomial_coefficient(n, n), T::ONE);
         if n != T::ZERO {
             assert_eq!(T::binomial_coefficient(n, n - T::ONE), n);
+            assert_eq!(T::binomial_coefficient(T::ZERO, n), T::ZERO);
         }
     });
 }
