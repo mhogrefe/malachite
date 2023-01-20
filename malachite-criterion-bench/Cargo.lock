@@ -67,9 +67,9 @@ dependencies = [
 
 [[package]]
 name = "bumpalo"
-version = "3.10.0"
+version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37ccbd214614c6783386c1af30caf03192f17891059cecc394b4fb119e363de3"
+checksum = "0d261e256854913907f67ed06efbc3338dfe6179796deefc1ff763fc1aee5535"
 
 [[package]]
 name = "cast"
@@ -341,9 +341,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.2.2"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33e0d6e626906911b8b052ea9dc27adeb139c520abba0b72366ca97b249e42e9"
+checksum = "2b06bfa98a4b4802af5a4263b4ad4660e28e51e8490f6354eb9336c70767e1c5"
 dependencies = [
  "itertools 0.9.0",
  "rand",
@@ -354,7 +354,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.2.2"
+version = "0.3.2"
 dependencies = [
  "criterion",
  "malachite-base",
@@ -365,9 +365,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.2.2"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fe2112ec240e17b44088ed9d11eafa0a77f1f37a5d8af9db0f422766693fcb8"
+checksum = "c89e21c64b7af5be3dc8cef16f786243faf59459fe4ba93b44efdeb264e5ade4"
 dependencies = [
  "embed-doc-image",
  "itertools 0.9.0",
