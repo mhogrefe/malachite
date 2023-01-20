@@ -1,6 +1,5 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
     integer_natural_pair_gen, natural_pair_gen,
@@ -35,7 +34,7 @@ fn partial_cmp_natural_properties() {
         let cmp = x.partial_cmp(&y);
         assert_eq!(x.cmp(&Integer::from(&y)), cmp.unwrap());
         assert_eq!(
-            integer_to_rug_integer(&x).partial_cmp(&natural_to_rug_integer(&y)),
+            rug::Integer::from(&x).partial_cmp(&rug::Integer::from(&y)),
             cmp
         );
         assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));

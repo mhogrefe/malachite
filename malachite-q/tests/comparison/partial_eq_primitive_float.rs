@@ -1,7 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use malachite_q::Rational;
 use rug;
@@ -43,7 +42,7 @@ fn test_partial_eq() {
     test("-3/2", -1.5, true);
 }
 
-#[allow(clippy::trait_duplication_in_bounds)]
+#[allow(clippy::cmp_owned, clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Rational> + PartialEq<Natural> + PartialEq<rug::Rational> + PrimitiveFloat,
 >()
@@ -54,9 +53,9 @@ where
 {
     rational_primitive_float_pair_gen::<T>().test_properties(|(n, f)| {
         let eq = n == f;
-        assert_eq!(rational_to_rug_rational(&n) == f, eq);
+        assert_eq!(rug::Rational::from(&n) == f, eq);
         assert_eq!(f == n, eq);
-        assert_eq!(f == rational_to_rug_rational(&n), eq);
+        assert_eq!(f == rug::Rational::from(&n), eq);
         assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
         if f.is_finite() {
             assert_eq!(PartialEq::<Rational>::eq(&n, &Rational::exact_from(f)), eq);

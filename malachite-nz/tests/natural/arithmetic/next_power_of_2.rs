@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, IsPowerOf2, NextPowerOf2, NextPowerOf2Assign, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1};
 use malachite_nz::natural::arithmetic::next_power_of_2::{
@@ -9,7 +10,6 @@ use malachite_nz::natural::arithmetic::next_power_of_2::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
@@ -171,7 +171,7 @@ fn mod_power_of_2_add_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
-        let result_alt = rug_integer_to_natural(&natural_to_rug_integer(&n).next_power_of_two());
+        let result_alt = Natural::exact_from(&rug::Integer::from(&n).next_power_of_two());
         assert_eq!(result_alt, result);
 
         assert!(result.is_power_of_2());

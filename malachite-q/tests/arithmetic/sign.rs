@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::test_util::arithmetic::sign::num_sign;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
 use num::BigRational;
@@ -27,8 +26,8 @@ fn test_sign() {
 fn sign_properties() {
     rational_gen().test_properties(|n| {
         let sign = n.sign();
-        assert_eq!(rational_to_rug_rational(&n).cmp0(), sign);
-        assert_eq!(num_sign(&rational_to_bigrational(&n)), sign);
+        assert_eq!(rug::Rational::from(&n).cmp0(), sign);
+        assert_eq!(num_sign(&BigRational::from(&n)), sign);
         assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });

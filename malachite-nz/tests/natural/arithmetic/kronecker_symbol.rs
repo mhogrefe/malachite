@@ -14,7 +14,6 @@ use malachite_nz::natural::arithmetic::kronecker_symbol::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_8, natural_pair_gen, natural_pair_gen_var_12,
     natural_pair_gen_var_13, natural_pair_gen_var_14, natural_pair_gen_var_4, natural_triple_gen,
@@ -3161,7 +3160,7 @@ fn jacobi_symbol_properties() {
 
         assert_eq!(jacobi_symbol_simple(a.clone(), n.clone()), s);
         assert_eq!(
-            natural_to_rug_integer(&a).jacobi(&natural_to_rug_integer(&n)),
+            rug::Integer::from(&a).jacobi(&rug::Integer::from(&n)),
             i32::from(s)
         );
         assert!(s.le_abs(&1i8));
@@ -3235,7 +3234,7 @@ fn kronecker_symbol_properties_helper(a: Natural, n: Natural) {
     assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
 
     assert_eq!(
-        natural_to_rug_integer(&a).kronecker(&natural_to_rug_integer(&n)),
+        rug::Integer::from(&a).kronecker(&rug::Integer::from(&n)),
         i32::from(s)
     );
     assert!(s.le_abs(&1i8));

@@ -2,7 +2,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::string_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::string_gen_var_12;
 use malachite_q::Rational;
 use num::BigRational;
@@ -51,13 +50,10 @@ fn from_str_properties() {
 
     string_gen_var_12().test_properties(|s| {
         let n = Rational::from_str(&s).unwrap();
-        assert_eq!(
-            BigRational::from_str(&s).unwrap(),
-            rational_to_bigrational(&n)
-        );
+        assert_eq!(BigRational::from_str(&s).unwrap(), BigRational::from(&n));
         assert_eq!(
             rug::Rational::from_str(&s).unwrap(),
-            rational_to_rug_rational(&n)
+            rug::Rational::from(&n)
         );
     });
 

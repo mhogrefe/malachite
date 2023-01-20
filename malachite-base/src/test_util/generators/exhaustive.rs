@@ -2403,6 +2403,8 @@ pub fn exhaustive_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>() -> It<(T, T)>
     )
 }
 
+// var 32 is in malachite-nz.
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(

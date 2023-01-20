@@ -12,7 +12,6 @@ use malachite_nz::natural::arithmetic::eq_mod_power_of_2::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_1,
     natural_natural_unsigned_triple_gen_var_1, natural_natural_unsigned_triple_gen_var_2,
@@ -134,8 +133,7 @@ fn eq_mod_power_of_2_properties() {
     natural_natural_unsigned_triple_gen_var_1().test_properties(|(x, y, pow)| {
         let eq_mod_power_of_2 = x.eq_mod_power_of_2(&y, pow);
         assert_eq!(
-            natural_to_rug_integer(&x)
-                .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)),
+            rug::Integer::from(&x).is_congruent_2pow(&rug::Integer::from(&y), u32::exact_from(pow)),
             eq_mod_power_of_2
         );
         assert_eq!(y.eq_mod_power_of_2(&x, pow), eq_mod_power_of_2);
@@ -147,16 +145,17 @@ fn eq_mod_power_of_2_properties() {
 
     natural_natural_unsigned_triple_gen_var_2().test_properties(|(x, y, pow)| {
         assert!(x.eq_mod_power_of_2(&y, pow));
-        assert!(natural_to_rug_integer(&x)
-            .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)));
+        assert!(
+            rug::Integer::from(&x).is_congruent_2pow(&rug::Integer::from(&y), u32::exact_from(pow))
+        );
         assert!(y.eq_mod_power_of_2(&x, pow));
         assert_eq!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
     });
 
     natural_natural_unsigned_triple_gen_var_3().test_properties(|(x, y, pow)| {
         assert!(!x.eq_mod_power_of_2(&y, pow));
-        assert!(!natural_to_rug_integer(&x)
-            .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)));
+        assert!(!rug::Integer::from(&x)
+            .is_congruent_2pow(&rug::Integer::from(&y), u32::exact_from(pow)));
         assert!(!y.eq_mod_power_of_2(&x, pow));
         assert_ne!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
     });

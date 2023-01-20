@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, DivRound, EqModPowerOf2, ModPowerOf2,
+    DivExact, DivExactAssign, DivRound, EqModPowerOf2, ModPowerOf2, ModPowerOf2Neg,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;
@@ -22,12 +22,12 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
     limbs_modular_div_mod_barrett_scratch_len, limbs_modular_div_mod_divide_and_conquer,
     limbs_modular_div_mod_schoolbook, limbs_modular_div_ref, limbs_modular_div_ref_scratch_len,
-    limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
-    limbs_modular_invert_limb, limbs_modular_invert_scratch_len, test_invert_limb_table,
+    limbs_modular_div_schoolbook, limbs_modular_div_schoolbook_in_place,
+    limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_limb,
+    limbs_modular_invert_scratch_len, test_invert_limb_table,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
     natural_gen, natural_gen_var_2, natural_pair_gen_var_6, unsigned_vec_gen_var_5,
@@ -301,7 +301,6 @@ fn test_limbs_modular_invert() {
         let mut scratch = vec![0; limbs_modular_invert_scratch_len(n)];
         limbs_modular_invert(&mut is, ds, &mut scratch);
         assert_eq!(&is[..n], is_out);
-        assert_eq!(&is[n..], &is_in[n..]);
         verify_limbs_modular_invert(ds, is_out);
     };
     // rn < DC_BDIV_Q_THRESHOLD
@@ -2144,7 +2143,14 @@ fn verify_limbs_modular_div(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     );
 }
 
-#[cfg(feature = "32_bit_limbs")]
+fn verify_limbs_modular_div_neg(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
+    let n = Natural::from_limbs_asc(ns);
+    let d = Natural::from_limbs_asc(ds);
+    let q = Natural::from_limbs_asc(qs);
+    let p = u64::wrapping_from(ns.len()) << Limb::LOG_WIDTH;
+    assert_eq!((q * d).mod_power_of_2(p).mod_power_of_2_neg(p), n);
+}
+
 #[test]
 fn test_limbs_modular_div_schoolbook() {
     let test = |qs_in: &[Limb], ns_in: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
@@ -2153,25 +2159,56 @@ fn test_limbs_modular_div_schoolbook() {
         let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
         limbs_modular_div_schoolbook(&mut qs, &mut ns, ds, inverse);
         assert_eq!(&qs[..ns.len()], qs_out);
-        verify_limbs_modular_div(ns_in, ds, qs_out);
+        verify_limbs_modular_div_neg(ns_in, ds, qs_out);
+
+        let mut ns = ns_in.to_vec();
+        limbs_modular_div_schoolbook_in_place(&mut ns, ds, inverse);
+        assert_eq!(ns, qs_out);
     };
-    test(&[10; 3], &[0, 0, 0], &[1, 2], &[0, 0, 0]);
-    test(&[10; 3], &[1, 2, 3], &[1, 2], &[1, 0, 3]);
-    test(&[10; 3], &[1, 2, 3], &[3], &[2863311531, 0, 1]);
-    test(
-        &[10; 3],
-        &[1, 2, 3],
-        &[u32::MAX],
-        &[u32::MAX, 0xfffffffc, 0xfffffff9],
-    );
-    test(
-        &[10; 3],
-        &[1, 2, 3],
-        &[5, 6],
-        &[3435973837, 3607772528, 3401614098],
-    );
-    test(&[10; 3], &[1, 2, 3], &[1, 2, 3], &[1, 0, 0]);
-    test(&[10; 3], &[1, 2, 3], &[1, u32::MAX, 3], &[1, 3, 2]);
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test(&[10; 3], &[0, 0, 0], &[1, 2], &[0, 0, 0]);
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[1, 2],
+            &[u32::MAX, u32::MAX, 0xfffffffc],
+        );
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[3],
+            &[1431655765, u32::MAX, 0xfffffffe],
+        );
+        test(&[10; 3], &[1, 2, 3], &[u32::MAX], &[1, 3, 6]);
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[5, 6],
+            &[858993459, 687194767, 893353197],
+        );
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[1, 2, 3],
+            &[u32::MAX, u32::MAX, u32::MAX],
+        );
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[1, u32::MAX, 3],
+            &[u32::MAX, 0xfffffffc, 0xfffffffd],
+        );
+    }
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        test(
+            &[10; 3],
+            &[1, 2, 3],
+            &[1, 2],
+            &[u64::MAX, u64::MAX, 0xfffffffffffffffc],
+        );
+    }
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2206,6 +2243,31 @@ fn limbs_modular_div_schoolbook_fail_4() {
     let ds = &[4, 5];
     let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
     limbs_modular_div_schoolbook(&mut [10; 3], &mut [1, 2, 3], ds, inverse);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_schoolbook_in_place_fail_1() {
+    limbs_modular_div_schoolbook_in_place(&mut [1, 2, 3], &[], 1);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_schoolbook_in_place_fail_2() {
+    let ds = &[1, 2, 3, 4];
+    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    limbs_modular_div_schoolbook_in_place(&mut [1, 2, 3], ds, inverse);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_schoolbook_in_place_fail_3() {
+    let ds = &[4, 5];
+    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    limbs_modular_div_schoolbook_in_place(&mut [1, 2, 3], ds, inverse);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2983,14 +3045,12 @@ fn test_limbs_modular_div() {
         let mut mut_ns = ns.to_vec();
         limbs_modular_div(&mut qs, &mut mut_ns, ds, &mut scratch);
         assert_eq!(&qs[..n], qs_out);
-        assert_eq!(&qs[n..], &qs_in[n..]);
 
         let mut qs = qs_in.to_vec();
         let n = ns.len();
         let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(n, ds.len())];
         limbs_modular_div_ref(&mut qs, ns, ds, &mut scratch);
         assert_eq!(&qs[..n], qs_out);
-        assert_eq!(&qs[n..], &qs_in[n..]);
 
         verify_limbs_modular_div(ns, ds, qs_out);
     };
@@ -4165,27 +4225,23 @@ fn test_limbs_div_exact() {
         limbs_div_exact_to_out(&mut qs, &mut mut_ns, &mut mut_ds);
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
-        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
 
         let mut qs = qs_in.to_vec();
         let mut mut_ns = ns.to_vec();
         limbs_div_exact_to_out_val_ref(&mut qs, &mut mut_ns, ds);
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
-        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
 
         let mut qs = qs_in.to_vec();
         let mut mut_ds = ds.to_vec();
         limbs_div_exact_to_out_ref_val(&mut qs, ns, &mut mut_ds);
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
-        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
 
         let mut qs = qs_in.to_vec();
         limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
-        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
 
         let qs = limbs_div_exact(ns, ds);
         let qs: &[Limb] = &qs;
@@ -4687,7 +4743,11 @@ fn limbs_modular_div_schoolbook_properties() {
     large_type_gen_var_13().test_properties(|(mut qs, mut ns, ds, inverse)| {
         let ns_old = ns.clone();
         limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
-        verify_limbs_modular_div(&ns_old, &ds, &qs);
+        verify_limbs_modular_div_neg(&ns_old, &ds, &qs);
+
+        let mut ns = ns_old.to_vec();
+        limbs_modular_div_schoolbook_in_place(&mut ns, &ds, inverse);
+        assert_eq!(ns, &qs[..ns.len()]);
     });
 }
 
@@ -4815,9 +4875,7 @@ fn div_exact_properties() {
         assert_eq!(q_alt, q);
 
         assert_eq!(
-            rug_integer_to_natural(
-                &natural_to_rug_integer(&x).div_exact(&natural_to_rug_integer(&y))
-            ),
+            Natural::exact_from(&rug::Integer::from(&x).div_exact(&rug::Integer::from(&y))),
             q
         );
 

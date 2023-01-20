@@ -1,7 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::{
     integer_primitive_float_pair_gen, natural_primitive_float_pair_gen,
 };
@@ -59,7 +58,7 @@ fn test_partial_eq() {
     test("-1208925819614629174706177", -1.2089258e24, false);
 }
 
-#[allow(clippy::trait_duplication_in_bounds)]
+#[allow(clippy::cmp_owned, clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_float_properties_helper<
     T: PartialEq<Integer> + PartialEq<Natural> + PartialEq<rug::Integer> + PrimitiveFloat,
 >()
@@ -70,9 +69,9 @@ where
 {
     integer_primitive_float_pair_gen::<T>().test_properties(|(n, f)| {
         let eq = n == f;
-        assert_eq!(integer_to_rug_integer(&n) == f, eq);
+        assert_eq!(rug::Integer::from(&n) == f, eq);
         assert_eq!(f == n, eq);
-        assert_eq!(f == integer_to_rug_integer(&n), eq);
+        assert_eq!(f == rug::Integer::from(&n), eq);
         assert_eq!(n.partial_cmp(&f) == Some(Ordering::Equal), eq);
         if eq {
             assert!(f.is_integer());

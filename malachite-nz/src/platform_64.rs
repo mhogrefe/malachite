@@ -1934,6 +1934,145 @@ pub const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x57e22099c030d941;
 pub const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
     [Limb::MAX, 0xffffffff, 0x285145, 0xffff, 0x1bdb, 0x659, 0x235, 0xff];
 
+// This is equivalent to `ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE: [Limb; 64] = [
+    0x1,
+    0xaaaaaaaaaaaaaaab,
+    0xaaaaaaaaaaaaaaab,
+    0xeeeeeeeeeeeeeeef,
+    0x4fa4fa4fa4fa4fa5,
+    0x2ff2ff2ff2ff2ff3,
+    0x2ff2ff2ff2ff2ff3,
+    0x938cc70553e3771b,
+    0xb71c27cddd93e49f,
+    0xb38e3229fcdee63d,
+    0xe684bb63544a4cbf,
+    0xc2f684917ca340fb,
+    0xf747c9cba417526d,
+    0xbb26eb51d7bd49c3,
+    0xbb26eb51d7bd49c3,
+    0xb0a7efb985294093,
+    0xbe4b8c69f259eabb,
+    0x6854d17ed6dc4fb9,
+    0xe1aa904c915f4325,
+    0x3b8206df131cead1,
+    0x79c6009fea76fe13,
+    0xd8c5d381633cd365,
+    0x4841f12b21144677,
+    0x4a91ff68200b0d0f,
+    0x8f9513a58c4f9e8b,
+    0x2b3e690621a42251,
+    0x4f520f00e03c04e7,
+    0x2edf84ee600211d3,
+    0xadcaa2764aaacdfd,
+    0x161f4f9033f4fe63,
+    0x161f4f9033f4fe63,
+    0xbada2932ea4d3e03,
+    0xcec189f3efaa30d3,
+    0xf7475bb68330bf91,
+    0x37eb7bf7d5b01549,
+    0x46b35660a4e91555,
+    0xa567c12d81f151f7,
+    0x4c724007bb2071b1,
+    0xf4a0cce58a016bd,
+    0xfa21068e66106475,
+    0x244ab72b5a318ae1,
+    0x366ce67e080d0f23,
+    0xd666fdae5dd2a449,
+    0xd740ddd0acc06a0d,
+    0xb050bbbb28e6f97b,
+    0x70b003fe890a5c75,
+    0xd03aabff83037427,
+    0x13ec4ca72c783bd7,
+    0x90282c06afdbd96f,
+    0x4414ddb9db4a95d5,
+    0xa2c68735ae6832e9,
+    0xbf72d71455676665,
+    0xa8469fab6b759b7f,
+    0xc1e55b56e606caf9,
+    0x40455630fc4a1cff,
+    0x120a7b0046d16f7,
+    0xa7c3553b08faef23,
+    0x9f0bfd1b08d48639,
+    0xa433ffce9a304d37,
+    0xa22ad1d53915c683,
+    0xcb6cbc723ba5dd1d,
+    0x547fb1b8ab9d0ba3,
+    0x547fb1b8ab9d0ba3,
+    0x8f15a826498852e3,
+];
+
+pub const ODD_CENTRAL_BINOMIAL_OFFSET: usize = 13;
+
+// This table contains binomial(2k, k) / 2 ^ t.
+//
+// This is equivalent to `bin2kk` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE: [Limb; 23] = [
+    0x13d66b,
+    0x4c842f,
+    0x93ee7d,
+    0x11e9e123,
+    0x22c60053,
+    0x873ae4d1,
+    0x10757bd97,
+    0x80612c6cd,
+    0xfaa556bc1,
+    0x3d3cc24821,
+    0x77cfeb6bbb,
+    0x7550ebd97c7,
+    0xe5f08695caf,
+    0x386120ffce11,
+    0x6eabb28dd6df,
+    0x3658e31c82a8f,
+    0x6ad2050312783,
+    0x1a42902a5af0bf,
+    0x33ac44f881661d,
+    0xcb764f927d82123,
+    0x190c23fa46b93983,
+    0x62b7609e25caf1b9,
+    0xc29cb72925ef2cff,
+];
+
+pub const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = 35;
+
+// This table contains the inverses of elements in the previous table.
+//
+// This is equivalent to `bin2kkinv` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 23] = [
+    0x61e5bd199bb12643,
+    0x78321494dc8342cf,
+    0x4fd348704ebf7ad5,
+    0x7e722ba086ab568b,
+    0xa5fcc124265843db,
+    0x89c4a6b18633f431,
+    0x4daa2c15f8ce9227,
+    0x801c618ca9be9605,
+    0x32dc192f948a441,
+    0xd02b90c2bf3be1,
+    0xd897e8c1749aa173,
+    0x54a234fc01fef9f7,
+    0x83ff2ab4d1ff7a4f,
+    0xa427f1c9b304e2f1,
+    0x9c14595d1793651f,
+    0x883a71c607a7b46f,
+    0xd089863c54bc9f2b,
+    0x9022f6bce5d07f3f,
+    0xbec207e218768c35,
+    0x9d70cb4cbb4f168b,
+    0x3c3d3403828a9d2b,
+    0x7672df58c56bc489,
+    0x1e66ca55d727d2ff,
+];
+
+// This table contains the values t in the formula binomial(2k, k) / 2 ^ t.
+//
+// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `CENTRAL_BINOMIAL_2FAC_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 23] =
+    [3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3];
+
 // https://oeis.org/A005187, skipping the initial 0
 //
 // This is equivalent to `__gmp_fac2cnt_table` in `mpn/comb_tables.c`, GMP 6.2.1, and
@@ -1944,8 +2083,6 @@ pub const TABLE_2N_MINUS_POPC_2N: [u8; 40] = [
 ];
 
 pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
-
-// end of auto-generated code
 
 pub const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
 

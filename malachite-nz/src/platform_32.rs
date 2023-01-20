@@ -419,6 +419,42 @@ pub const ODD_DOUBLEFACTORIAL_TABLE_MAX: Limb = 0x27065f73;
 pub const NTH_ROOT_NUMB_MASK_TABLE: [Limb; 8] =
     [Limb::MAX, 0xffff, 0x659, 0xff, 0x54, 0x28, 0x17, 0xf];
 
+// This is equivalent to `ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE: [Limb; 31] = [
+    0x1, 0xaaaaaaab, 0xaaaaaaab, 0xeeeeeeef, 0xa4fa4fa5, 0xf2ff2ff3, 0xf2ff2ff3, 0x53e3771b,
+    0xdd93e49f, 0xfcdee63d, 0x544a4cbf, 0x7ca340fb, 0xa417526d, 0xd7bd49c3, 0xd7bd49c3, 0x85294093,
+    0xf259eabb, 0xd6dc4fb9, 0x915f4325, 0x131cead1, 0xea76fe13, 0x633cd365, 0x21144677, 0x200b0d0f,
+    0x8c4f9e8b, 0x21a42251, 0xe03c04e7, 0x600211d3, 0x4aaacdfd, 0x33f4fe63, 0x33f4fe63,
+];
+
+pub const ODD_CENTRAL_BINOMIAL_OFFSET: usize = 8;
+
+// This table contains binomial(2k, k) / 2 ^ t.
+//
+// This is equivalent to `bin2kk` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE: [Limb; 11] = [
+    0x1923, 0x2f7b, 0xb46d, 0x15873, 0xa50c7, 0x13d66b, 0x4c842f, 0x93ee7d, 0x11e9e123, 0x22c60053,
+    0x873ae4d1,
+];
+
+pub const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = 18;
+
+// This table contains the inverses of elements in the previous table.
+//
+// This is equivalent to `bin2kkinv` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 11] = [
+    0x16a2de8b, 0x847457b3, 0xfa6f7565, 0xf0e50cbb, 0xdca370f7, 0x9bb12643, 0xdc8342cf, 0x4ebf7ad5,
+    0x86ab568b, 0x265843db, 0x8633f431,
+];
+
+// This table contains the values t in the formula binomial(2k, k) / 2 ^ t.
+//
+// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and
+// `CENTRAL_BINOMIAL_2FAC_TABLE` from `fac_table.h`, GMP 6.2.1.
+pub const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 11] = [1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2];
+
 // https://oeis.org/A005187, skipping the initial 0
 //
 // This is equivalent to `__gmp_fac2cnt_table` in `mpn/comb_tables.c`, GMP 6.2.1, and

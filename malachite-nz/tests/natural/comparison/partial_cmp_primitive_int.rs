@@ -4,7 +4,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_signed_triple_gen, natural_natural_unsigned_triple_gen,
     natural_signed_pair_gen, natural_signed_pair_gen_var_1, natural_signed_signed_triple_gen,
@@ -127,13 +126,13 @@ where
 {
     natural_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp = n.partial_cmp(&u);
-        assert_eq!(num_partial_cmp_unsigned(&natural_to_biguint(&n), u), cmp);
-        assert_eq!(natural_to_rug_integer(&n).partial_cmp(&u), cmp);
+        assert_eq!(num_partial_cmp_unsigned(&From::from(&n), u), cmp);
+        assert_eq!(rug::Integer::from(&n).partial_cmp(&u), cmp);
         assert_eq!(Some(n.cmp(&Natural::from(u))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&natural_to_rug_integer(&n)), cmp_rev);
+        assert_eq!(u.partial_cmp(&rug::Integer::from(&n)), cmp_rev);
         assert_eq!(Some(Natural::from(u).cmp(&n)), cmp_rev);
     });
 
@@ -174,11 +173,11 @@ where
 {
     natural_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let cmp = n.partial_cmp(&i);
-        assert_eq!(natural_to_rug_integer(&n).partial_cmp(&i), cmp);
+        assert_eq!(rug::Integer::from(&n).partial_cmp(&i), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(i.partial_cmp(&n), cmp_rev);
-        assert_eq!(i.partial_cmp(&natural_to_rug_integer(&n)), cmp_rev);
+        assert_eq!(i.partial_cmp(&rug::Integer::from(&n)), cmp_rev);
     });
 
     natural_signed_pair_gen_var_1::<T>().test_properties(|(n, i)| {

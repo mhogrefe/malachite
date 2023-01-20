@@ -23,13 +23,11 @@ use malachite_nz::natural::arithmetic::sqrt::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::natural_gen;
 use malachite_nz::test_util::natural::arithmetic::sqrt::{
     ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary,
 };
+use num::BigUint;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -822,11 +820,8 @@ fn floor_sqrt_properties() {
         assert_eq!(n_alt, sqrt);
         assert_eq!(floor_sqrt_binary(&n), sqrt);
         assert_eq!((&n).floor_root(2), sqrt);
-        assert_eq!(biguint_to_natural(&natural_to_biguint(&n).sqrt()), sqrt);
-        assert_eq!(
-            rug_integer_to_natural(&natural_to_rug_integer(&n).sqrt()),
-            sqrt
-        );
+        assert_eq!(Natural::from(&BigUint::from(&n).sqrt()), sqrt);
+        assert_eq!(Natural::exact_from(&rug::Integer::from(&n).sqrt()), sqrt);
 
         let square = (&sqrt).square();
         let ceiling_sqrt = (&n).ceiling_sqrt();
@@ -904,9 +899,9 @@ fn sqrt_rem_properties() {
         assert_eq!(n_alt, sqrt);
         assert_eq!(sqrt_rem_binary(&n), (sqrt.clone(), rem.clone()));
         assert_eq!((&n).root_rem(2), (sqrt.clone(), rem.clone()));
-        let (rug_sqrt, rug_rem) = natural_to_rug_integer(&n).sqrt_rem(rug::Integer::new());
-        assert_eq!(rug_integer_to_natural(&rug_sqrt), sqrt);
-        assert_eq!(rug_integer_to_natural(&rug_rem), rem);
+        let (rug_sqrt, rug_rem) = rug::Integer::from(&n).sqrt_rem(rug::Integer::new());
+        assert_eq!(Natural::exact_from(&rug_sqrt), sqrt);
+        assert_eq!(Natural::exact_from(&rug_rem), rem);
 
         assert_eq!((&n).floor_sqrt(), sqrt);
         assert!(rem <= &sqrt << 1);

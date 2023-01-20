@@ -1,6 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_primitive_float_triple_gen, natural_primitive_float_pair_gen,
     natural_primitive_float_primitive_float_triple_gen,
@@ -81,11 +80,11 @@ where
 {
     natural_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp = n.partial_cmp(&u);
-        assert_eq!(natural_to_rug_integer(&n).partial_cmp(&u), cmp);
+        assert_eq!(rug::Integer::from(&n).partial_cmp(&u), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&natural_to_rug_integer(&n)), cmp_rev);
+        assert_eq!(u.partial_cmp(&rug::Integer::from(&n)), cmp_rev);
     });
 
     natural_natural_primitive_float_triple_gen::<T>().test_properties(|(n, m, u)| {

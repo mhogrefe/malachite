@@ -6,7 +6,6 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
-use malachite_q::test_util::common::{rational_to_rug_rational, rug_rational_to_rational};
 use malachite_q::test_util::generators::{
     rational_gen, rational_signed_pair_gen_var_1, rational_unsigned_pair_gen_var_1,
 };
@@ -270,23 +269,17 @@ fn shr_properties() {
 
     rational_unsigned_pair_gen_var_1::<u32>().test_properties(|(n, u)| {
         let shifted = &n >> u;
-        let mut rug_n = rational_to_rug_rational(&n);
+        let mut rug_n = rug::Rational::from(&n);
         rug_n >>= u;
-        assert_eq!(rug_rational_to_rational(&rug_n), shifted);
-        assert_eq!(
-            rug_rational_to_rational(&(rational_to_rug_rational(&n) >> u)),
-            shifted
-        );
+        assert_eq!(Rational::from(&rug_n), shifted);
+        assert_eq!(Rational::from(&(rug::Rational::from(&n) >> u)), shifted);
     });
 
     rational_signed_pair_gen_var_1::<i32>().test_properties(|(n, i)| {
         let shifted = &n >> i;
-        let mut rug_n = rational_to_rug_rational(&n);
+        let mut rug_n = rug::Rational::from(&n);
         rug_n >>= i;
-        assert_eq!(rug_rational_to_rational(&rug_n), shifted);
-        assert_eq!(
-            rug_rational_to_rational(&(rational_to_rug_rational(&n) >> i)),
-            shifted
-        );
+        assert_eq!(Rational::from(&rug_n), shifted);
+        assert_eq!(Rational::from(&(rug::Rational::from(&n) >> i)), shifted);
     });
 }

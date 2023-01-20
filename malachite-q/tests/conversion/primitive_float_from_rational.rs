@@ -11,7 +11,6 @@ use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_1, integer_rounding_mode_pair_gen_var_1,
 };
 use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_4, rational_gen_var_5, rational_gen_var_6,
     rational_rounding_mode_pair_gen_var_5,
@@ -1446,15 +1445,12 @@ fn float_rounding_from_rational_properties() {
         if x.lt_abs(&max) {
             let f = f32::rounding_from(&x, RoundingMode::Down);
             if NiceFloat(f) != NiceFloat(-0.0) {
-                assert_eq!(
-                    NiceFloat(f),
-                    NiceFloat(rational_to_rug_rational(&x).to_f32())
-                );
+                assert_eq!(NiceFloat(f), NiceFloat(rug::Rational::from(&x).to_f32()));
             }
         }
         assert_eq!(
             NiceFloat(f64::rounding_from(&x, RoundingMode::Down)),
-            NiceFloat(rational_to_rug_rational(&x).to_f64())
+            NiceFloat(rug::Rational::from(&x).to_f64())
         );
     });
 }

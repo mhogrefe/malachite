@@ -18,9 +18,6 @@ use malachite_nz::natural::arithmetic::shl::{
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_triple_gen_var_5,
@@ -560,33 +557,27 @@ fn shl_properties() {
 
     natural_unsigned_pair_gen_var_4::<u32>().test_properties(|(n, u)| {
         let shifted = &n << u;
-        let mut rug_n = natural_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n <<= u;
-        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
+        assert_eq!(Natural::exact_from(&rug_n), shifted);
 
         assert_eq!(
-            biguint_to_natural(&(&natural_to_biguint(&n) << usize::exact_from(u))),
+            Natural::from(&(&BigUint::from(&n) << usize::exact_from(u))),
             shifted
         );
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(&n) << usize::exact_from(u))),
+            Natural::from(&(BigUint::from(&n) << usize::exact_from(u))),
             shifted
         );
-        assert_eq!(
-            rug_integer_to_natural(&(natural_to_rug_integer(&n) << u)),
-            shifted
-        );
+        assert_eq!(Natural::exact_from(&(rug::Integer::from(&n) << u)), shifted);
     });
 
     natural_signed_pair_gen_var_2::<i32>().test_properties(|(n, i)| {
         let shifted = &n << i;
-        let mut rug_n = natural_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n <<= i;
-        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
+        assert_eq!(Natural::exact_from(&rug_n), shifted);
 
-        assert_eq!(
-            rug_integer_to_natural(&(natural_to_rug_integer(&n) << i)),
-            shifted
-        );
+        assert_eq!(Natural::exact_from(&(rug::Integer::from(&n) << i)), shifted);
     });
 }

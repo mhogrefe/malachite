@@ -4,7 +4,6 @@ use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
-use crate::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
@@ -310,19 +309,19 @@ pub fn integer_pair_gen_var_7_rm() -> Generator<((rug::Integer, u32), (Integer, 
         &|| {
             Box::new(
                 exhaustive_integer_pair_gen_var_7()
-                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
         &|config| {
             Box::new(
                 random_integer_pair_gen_var_7(config)
-                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
         &|config| {
             Box::new(
                 special_random_integer_pair_gen_var_7(config)
-                    .map(|(x, y)| ((integer_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
     )
@@ -1364,19 +1363,19 @@ pub fn natural_pair_gen_var_15_rm() -> Generator<((rug::Integer, u32), (Natural,
         &|| {
             Box::new(
                 exhaustive_natural_pair_gen_var_15()
-                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
         &|config| {
             Box::new(
                 random_natural_pair_gen_var_15(config)
-                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
         &|config| {
             Box::new(
                 special_random_natural_pair_gen_var_15(config)
-                    .map(|(x, y)| ((natural_to_rug_integer(&x), u32::exact_from(&y)), (x, y))),
+                    .map(|(x, y)| ((rug::Integer::from(&x), u32::exact_from(&y)), (x, y))),
             )
         },
     )
@@ -2323,6 +2322,55 @@ pub fn unsigned_bool_pair_gen_var_1() -> Generator<(usize, bool)> {
     Generator::new_no_special(
         &exhaustive_unsigned_bool_pair_gen_var_1,
         &random_unsigned_bool_pair_gen_var_1,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 44 are in malachite-base
+
+// All `(T, T)` where `T` is unsigned, both `T`s are small, the first `T` is greater than or equal
+// to the second, and both are greater than `ODD_FACTORIAL_TABLE_LIMIT`.
+pub fn unsigned_pair_gen_var_45<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_32,
+        &random_unsigned_pair_gen_var_33,
+    )
+}
+
+// All `(T, T)` where `T` is unsigned, both `T`s are small, the first `T` is greater than or equal
+// to the second, and the second is at least 2 and no greater than `ODD_FACTORIAL_TABLE_LIMIT`.
+pub fn unsigned_pair_gen_var_46<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_33,
+        &random_unsigned_pair_gen_var_34,
+    )
+}
+
+// All `(T, T)` where `T` is unsigned, both `T`s are small, the first `T` is at least 2 more than
+// the second, the second is at least 2, and the first is no greater than
+// `ODD_FACTORIAL_EXTTABLE_LIMIT`.
+pub fn unsigned_pair_gen_var_47<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_34,
+        &random_unsigned_pair_gen_var_35,
+    )
+}
+
+// All `(T, T)` where `T` is unsigned, both `T`s are small, the first `T` is greater than or equal
+// to the second, and both are greater than `ODD_FACTORIAL_TABLE_LIMIT`.
+pub fn unsigned_pair_gen_var_48<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_35,
+        &random_unsigned_pair_gen_var_36,
+    )
+}
+
+// All `(Limb, Limb)` that are valid inputs to `limbs_binomial_coefficient_limb_limb_goetgheluck`.
+pub fn unsigned_pair_gen_var_49() -> Generator<(Limb, Limb)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_36,
+        &random_unsigned_pair_gen_var_37,
     )
 }
 

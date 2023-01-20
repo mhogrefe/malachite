@@ -11,7 +11,6 @@ use malachite_nz::integer::logic::checked_hamming_distance::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen_var_1, natural_pair_gen,
 };
@@ -142,7 +141,7 @@ fn checked_hamming_distance_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let distance = x.checked_hamming_distance(&y);
         assert_eq!(
-            rug_checked_hamming_distance(&integer_to_rug_integer(&x), &integer_to_rug_integer(&y)),
+            rug_checked_hamming_distance(&rug::Integer::from(&x), &rug::Integer::from(&y)),
             distance
         );
         assert_eq!(y.checked_hamming_distance(&x), distance);

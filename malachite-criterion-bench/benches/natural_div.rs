@@ -12,11 +12,11 @@ use malachite_nz::natural::Natural;
 use num::BigUint;
 use std::str::FromStr;
 
-pub fn natural_to_biguint(n: &Natural) -> BigUint {
+pub fn BigUint::from(n: &Natural) -> BigUint {
     BigUint::from_str(n.to_string().as_ref()).unwrap()
 }
 
-pub fn natural_to_rug_integer(n: &Natural) -> rug::Integer {
+pub fn rug::Integer::from(n: &Natural) -> rug::Integer {
     rug::Integer::from_str(n.to_string().as_ref()).unwrap()
 }
 
@@ -31,10 +31,10 @@ fn bench_div(c: &mut Criterion) {
             i << 1,
         );
         let y = get_random_natural_with_bits(&mut random_primitive_ints(EXAMPLE_SEED.fork("b")), i);
-        let x_num = natural_to_biguint(&x);
-        let y_num = natural_to_biguint(&y);
-        let x_rug = natural_to_rug_integer(&x);
-        let y_rug = natural_to_rug_integer(&y);
+        let x_num = BigUint::from(&x);
+        let y_num = BigUint::from(&y);
+        let x_rug = rug::Integer::from(&x);
+        let y_rug = rug::Integer::from(&y);
         group.bench_function(BenchmarkId::new("malachite", i), |b| {
             b.iter_with_setup(|| (x.clone(), y.clone()), |(x, y)| x / y)
         });

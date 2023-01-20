@@ -9,7 +9,6 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
 use malachite_nz::test_util::natural::logic::get_bit::num_get_bit;
 use num::BigUint;
@@ -74,11 +73,8 @@ fn limbs_get_bit_properties() {
 fn get_bit_properties() {
     natural_unsigned_pair_gen_var_4().test_properties(|(n, index)| {
         let bit = n.get_bit(index);
-        assert_eq!(num_get_bit(&natural_to_biguint(&n), index), bit);
-        assert_eq!(
-            natural_to_rug_integer(&n).get_bit(u32::exact_from(index)),
-            bit
-        );
+        assert_eq!(num_get_bit(&BigUint::from(&n), index), bit);
+        assert_eq!(rug::Integer::from(&n).get_bit(u32::exact_from(index)), bit);
         assert_eq!(&n & Natural::power_of_2(index) != 0, bit);
         assert_ne!((!n).get_bit(index), bit);
     });

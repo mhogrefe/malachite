@@ -14,11 +14,11 @@ use malachite_base::test_util::generators::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_unsigned_pair_gen_var_1, integer_unsigned_pair_gen_var_2,
     integer_unsigned_unsigned_triple_gen_var_1,
 };
+use num::BigInt;
 use std::cmp::max;
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -116,8 +116,8 @@ fn to_string_properties() {
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(&x, 10)), s);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(&x, 10)), s);
         assert_eq!(format!("{:00?}", BaseFmtWrapper::new(&x, 10)), s);
-        assert_eq!(integer_to_bigint(&x).to_string(), s);
-        assert_eq!(integer_to_rug_integer(&x).to_string(), s);
+        assert_eq!(BigInt::from(&x).to_string(), s);
+        assert_eq!(rug::Integer::from(&x).to_string(), s);
         assert!(string_is_subset(&s, "-0123456789"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -138,11 +138,11 @@ fn to_string_properties() {
             s_padded
         );
         assert_eq!(
-            format!("{:0width$}", integer_to_bigint(&x), width = width),
+            format!("{:0width$}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:0width$}", integer_to_rug_integer(&x), width = width),
+            format!("{:0width$}", rug::Integer::from(&x), width = width),
             s_padded
         );
     });
@@ -275,10 +275,10 @@ fn to_binary_string_properties() {
         assert_eq!(format!("{:00b}", x), s);
         assert_eq!(format!("{:#00b}", x), prefixed_s);
         assert_eq!(x.to_string_base(2), s);
-        let num_x = integer_to_bigint(&x);
+        let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_binary_string(), s);
         assert_eq!(format!("{:#b}", num_x), prefixed_s);
-        let rug_x = integer_to_rug_integer(&x);
+        let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_binary_string(), s);
         assert_eq!(format!("{:#b}", rug_x), prefixed_s);
         assert!(string_is_subset(&s, "-01"));
@@ -292,21 +292,21 @@ fn to_binary_string_properties() {
         let s_padded = format!("{:0width$b}", x, width = width);
         test_padding(&s, &s_padded, width);
         assert_eq!(
-            format!("{:0width$b}", integer_to_bigint(&x), width = width),
+            format!("{:0width$b}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:0width$b}", integer_to_rug_integer(&x), width = width),
+            format!("{:0width$b}", rug::Integer::from(&x), width = width),
             s_padded
         );
 
         let s_padded = format!("{:#0width$b}", x, width = width);
         assert_eq!(
-            format!("{:#0width$b}", integer_to_bigint(&x), width = width),
+            format!("{:#0width$b}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:#0width$b}", integer_to_rug_integer(&x), width = width),
+            format!("{:#0width$b}", rug::Integer::from(&x), width = width),
             s_padded
         );
     });
@@ -442,10 +442,10 @@ fn to_octal_string_properties() {
         assert_eq!(format!("{:00o}", x), s);
         assert_eq!(format!("{:#00o}", x), prefixed_s);
         assert_eq!(x.to_string_base(8), s);
-        let num_x = integer_to_bigint(&x);
+        let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_octal_string(), s);
         assert_eq!(format!("{:#o}", num_x), prefixed_s);
-        let rug_x = integer_to_rug_integer(&x);
+        let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_octal_string(), s);
         assert_eq!(format!("{:#o}", rug_x), prefixed_s);
         assert!(string_is_subset(&s, "-01234567"));
@@ -459,21 +459,21 @@ fn to_octal_string_properties() {
         let s_padded = format!("{:0width$o}", x, width = width);
         test_padding(&s, &s_padded, width);
         assert_eq!(
-            format!("{:0width$o}", integer_to_bigint(&x), width = width),
+            format!("{:0width$o}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:0width$o}", integer_to_rug_integer(&x), width = width),
+            format!("{:0width$o}", rug::Integer::from(&x), width = width),
             s_padded
         );
 
         let s_padded = format!("{:#0width$o}", x, width = width);
         assert_eq!(
-            format!("{:#0width$o}", integer_to_bigint(&x), width = width),
+            format!("{:#0width$o}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:#0width$o}", integer_to_rug_integer(&x), width = width),
+            format!("{:#0width$o}", rug::Integer::from(&x), width = width),
             s_padded
         );
     });
@@ -662,10 +662,10 @@ fn to_hex_string_properties() {
             }
         );
         assert_eq!(x.to_string_base(16), s);
-        let num_x = integer_to_bigint(&x);
+        let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_lower_hex_string(), s);
         assert_eq!(format!("{:#x}", num_x), prefixed_s);
-        let rug_x = integer_to_rug_integer(&x);
+        let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_lower_hex_string(), s);
         assert_eq!(format!("{:#x}", rug_x), prefixed_s);
         assert!(string_is_subset(&s, "-0123456789abcdef"));
@@ -679,21 +679,21 @@ fn to_hex_string_properties() {
         let s_padded = format!("{:0width$x}", x, width = width);
         test_padding(&s, &s_padded, width);
         assert_eq!(
-            format!("{:0width$x}", integer_to_bigint(&x), width = width),
+            format!("{:0width$x}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:0width$x}", integer_to_rug_integer(&x), width = width),
+            format!("{:0width$x}", rug::Integer::from(&x), width = width),
             s_padded
         );
 
         let s_padded = format!("{:#0width$x}", x, width = width);
         assert_eq!(
-            format!("{:#0width$x}", integer_to_bigint(&x), width = width),
+            format!("{:#0width$x}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:#0width$x}", integer_to_rug_integer(&x), width = width),
+            format!("{:#0width$x}", rug::Integer::from(&x), width = width),
             s_padded
         );
 
@@ -706,21 +706,21 @@ fn to_hex_string_properties() {
         let s_padded = s_padded_upper;
         test_padding(&s, &s_padded, width);
         assert_eq!(
-            format!("{:0width$X}", integer_to_bigint(&x), width = width),
+            format!("{:0width$X}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:0width$X}", integer_to_rug_integer(&x), width = width),
+            format!("{:0width$X}", rug::Integer::from(&x), width = width),
             s_padded
         );
 
         let s_padded = format!("{:#0width$X}", x, width = width);
         assert_eq!(
-            format!("{:#0width$X}", integer_to_bigint(&x), width = width),
+            format!("{:#0width$X}", BigInt::from(&x), width = width),
             s_padded
         );
         assert_eq!(
-            format!("{:#0width$X}", integer_to_rug_integer(&x), width = width),
+            format!("{:#0width$X}", rug::Integer::from(&x), width = width),
             s_padded
         );
     });

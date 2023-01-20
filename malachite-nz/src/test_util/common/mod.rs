@@ -11,82 +11,116 @@ use rug::integer::Order;
 use std::cmp::Ordering;
 
 #[cfg(feature = "32_bit_limbs")]
-#[inline]
-pub fn biguint_to_natural(n: &BigUint) -> Natural {
-    Natural::from_owned_limbs_asc(n.to_u32_digits())
+impl From<&BigUint> for Natural {
+    #[inline]
+    fn from(n: &BigUint) -> Natural {
+        Natural::from_owned_limbs_asc(n.to_u32_digits())
+    }
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
-#[inline]
-pub fn biguint_to_natural(n: &BigUint) -> Natural {
-    Natural::from_owned_limbs_asc(Limb::vec_from_other_type_slice(&n.to_u32_digits()))
+impl From<&BigUint> for Natural {
+    #[inline]
+    fn from(n: &BigUint) -> Natural {
+        Natural::from_owned_limbs_asc(Limb::vec_from_other_type_slice(&n.to_u32_digits()))
+    }
 }
 
 #[cfg(feature = "32_bit_limbs")]
-#[inline]
-pub fn natural_to_biguint(n: &Natural) -> BigUint {
-    BigUint::new(n.to_limbs_asc())
+impl From<&Natural> for BigUint {
+    #[inline]
+    fn from(n: &Natural) -> BigUint {
+        BigUint::new(n.to_limbs_asc())
+    }
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
-#[inline]
-pub fn natural_to_biguint(n: &Natural) -> BigUint {
-    BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
+impl From<&Natural> for BigUint {
+    #[inline]
+    fn from(n: &Natural) -> BigUint {
+        BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
+    }
 }
 
 #[cfg(feature = "32_bit_limbs")]
-pub fn natural_to_bigint(n: &Natural) -> BigInt {
-    BigInt::from_biguint(
-        if *n == 0 { Sign::NoSign } else { Sign::Plus },
-        BigUint::new(n.to_limbs_asc()),
-    )
+impl From<&Natural> for BigInt {
+    #[inline]
+    fn from(n: &Natural) -> BigInt {
+        BigInt::from_biguint(
+            if *n == 0 { Sign::NoSign } else { Sign::Plus },
+            BigUint::new(n.to_limbs_asc()),
+        )
+    }
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
-pub fn natural_to_bigint(n: &Natural) -> BigInt {
-    BigInt::from_biguint(
-        if *n == 0 { Sign::NoSign } else { Sign::Plus },
-        BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc())),
-    )
+impl From<&Natural> for BigInt {
+    #[inline]
+    fn from(n: &Natural) -> BigInt {
+        BigInt::from_biguint(
+            if *n == 0 { Sign::NoSign } else { Sign::Plus },
+            BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc())),
+        )
+    }
 }
 
-#[inline]
-pub fn rug_integer_to_natural(n: &rug::Integer) -> Natural {
-    assert!(*n >= 0);
-    Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf))
+impl TryFrom<&rug::Integer> for Natural {
+    type Error = ();
+
+    #[inline]
+    fn try_from(n: &rug::Integer) -> Result<Natural, ()> {
+        if *n >= 0 {
+            Ok(Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)))
+        } else {
+            Err(())
+        }
+    }
 }
 
-#[inline]
-pub fn natural_to_rug_integer(n: &Natural) -> rug::Integer {
-    rug::Integer::from_digits(&n.to_limbs_asc(), Order::Lsf)
+impl From<&Natural> for rug::Integer {
+    #[inline]
+    fn from(n: &Natural) -> rug::Integer {
+        rug::Integer::from_digits(&n.to_limbs_asc(), Order::Lsf)
+    }
 }
 
-#[inline]
-pub fn bigint_to_integer(n: &BigInt) -> Integer {
-    Integer::from_sign_and_abs(n.sign() != Sign::Minus, biguint_to_natural(n.magnitude()))
+impl From<&BigInt> for Integer {
+    #[inline]
+    fn from(n: &BigInt) -> Integer {
+        Integer::from_sign_and_abs(n.sign() != Sign::Minus, Natural::from(n.magnitude()))
+    }
 }
 
-pub fn integer_to_bigint(n: &Integer) -> BigInt {
-    let sign = match n.sign() {
-        Ordering::Less => Sign::Minus,
-        Ordering::Equal => Sign::NoSign,
-        Ordering::Greater => Sign::Plus,
-    };
-    BigInt::from_biguint(sign, natural_to_biguint(n.unsigned_abs_ref()))
+impl From<&Integer> for BigInt {
+    #[inline]
+    fn from(n: &Integer) -> BigInt {
+        let sign = match n.sign() {
+            Ordering::Less => Sign::Minus,
+            Ordering::Equal => Sign::NoSign,
+            Ordering::Greater => Sign::Plus,
+        };
+        BigInt::from_biguint(sign, BigUint::from(n.unsigned_abs_ref()))
+    }
 }
 
-pub fn rug_integer_to_integer(n: &rug::Integer) -> Integer {
-    Integer::from_sign_and_abs(
-        *n >= 0,
-        Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)),
-    )
+impl From<&rug::Integer> for Integer {
+    #[inline]
+    fn from(n: &rug::Integer) -> Integer {
+        Integer::from_sign_and_abs(
+            *n >= 0,
+            Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)),
+        )
+    }
 }
 
-pub fn integer_to_rug_integer(n: &Integer) -> rug::Integer {
-    let out = natural_to_rug_integer(n.unsigned_abs_ref());
-    if *n >= 0 {
-        out
-    } else {
-        -out
+impl From<&Integer> for rug::Integer {
+    #[inline]
+    fn from(n: &Integer) -> rug::Integer {
+        let out = rug::Integer::from(n.unsigned_abs_ref());
+        if *n >= 0 {
+            out
+        } else {
+            -out
+        }
     }
 }

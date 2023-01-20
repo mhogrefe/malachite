@@ -3649,6 +3649,8 @@ pub fn random_unsigned_pair_gen_var_32<T: PrimitiveUnsigned>(config: &GenConfig)
     )
 }
 
+// var 33 is in malachite-nz
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
 struct ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {

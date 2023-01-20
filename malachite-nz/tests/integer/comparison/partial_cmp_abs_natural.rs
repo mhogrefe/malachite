@@ -2,7 +2,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
     integer_natural_pair_gen, natural_pair_gen,
@@ -101,7 +100,7 @@ fn partial_cmp_abs_natural_properties() {
         let cmp = x.partial_cmp_abs(&y);
         assert_eq!(x.cmp_abs(&Integer::from(&y)), cmp.unwrap());
         assert_eq!(
-            Some(integer_to_rug_integer(&x).cmp_abs(&natural_to_rug_integer(&y))),
+            Some(rug::Integer::from(&x).cmp_abs(&rug::Integer::from(&y))),
             cmp
         );
         assert_eq!(y.partial_cmp_abs(&x), cmp.map(Ordering::reverse));

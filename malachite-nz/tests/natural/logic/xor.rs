@@ -1,5 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen, unsigned_vec_pair_gen_var_6,
@@ -13,9 +14,6 @@ use malachite_nz::natural::logic::xor::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
 use malachite_nz::test_util::natural::logic::xor::{natural_xor_alt_1, natural_xor_alt_2};
 use num::BigUint;
@@ -476,16 +474,16 @@ fn or_properties() {
         assert_eq!(mut_x, result);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = natural_to_rug_integer(&x);
-        mut_x ^= natural_to_rug_integer(&y);
-        assert_eq!(rug_integer_to_natural(&mut_x), result);
+        let mut mut_x = rug::Integer::from(&x);
+        mut_x ^= rug::Integer::from(&y);
+        assert_eq!(Natural::exact_from(&mut_x), result);
 
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(&x) ^ natural_to_biguint(&y))),
+            Natural::from(&(BigUint::from(&x) ^ BigUint::from(&y))),
             result
         );
         assert_eq!(
-            rug_integer_to_natural(&(natural_to_rug_integer(&x) ^ natural_to_rug_integer(&y))),
+            Natural::exact_from(&(rug::Integer::from(&x) ^ rug::Integer::from(&y))),
             result
         );
 

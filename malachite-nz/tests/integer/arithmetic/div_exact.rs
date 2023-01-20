@@ -6,7 +6,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_3;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_8, integer_pair_gen_var_2, natural_pair_gen_var_6,
 };
@@ -303,9 +302,7 @@ fn div_exact_properties() {
         assert_eq!(q_alt, q);
 
         assert_eq!(
-            rug_integer_to_integer(
-                &integer_to_rug_integer(&x).div_exact(&integer_to_rug_integer(&y))
-            ),
+            Integer::from(&rug::Integer::from(&x).div_exact(&rug::Integer::from(&y))),
             q
         );
 

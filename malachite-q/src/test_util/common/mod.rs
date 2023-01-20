@@ -1,38 +1,41 @@
 use crate::Rational;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, natural_to_bigint, natural_to_rug_integer, rug_integer_to_integer,
-};
-use num::BigRational;
+use malachite_nz::integer::Integer;
+use num::{BigInt, BigRational};
 
-pub fn bigrational_to_rational(n: &BigRational) -> Rational {
-    Rational::from_integers(bigint_to_integer(n.numer()), bigint_to_integer(n.denom()))
-}
-
-pub fn rational_to_bigrational(n: &Rational) -> BigRational {
-    let mut q = BigRational::new_raw(
-        natural_to_bigint(n.numerator_ref()),
-        natural_to_bigint(n.denominator_ref()),
-    );
-    if *n < 0 {
-        q = -q;
+impl From<&BigRational> for Rational {
+    fn from(n: &BigRational) -> Rational {
+        Rational::from_integers(Integer::from(n.numer()), Integer::from(n.denom()))
     }
-    q
 }
 
-pub fn rug_rational_to_rational(n: &rug::Rational) -> Rational {
-    Rational::from_integers(
-        rug_integer_to_integer(n.numer()),
-        rug_integer_to_integer(n.denom()),
-    )
-}
-
-pub fn rational_to_rug_rational(n: &Rational) -> rug::Rational {
-    let mut q = rug::Rational::from((
-        natural_to_rug_integer(n.numerator_ref()),
-        natural_to_rug_integer(n.denominator_ref()),
-    ));
-    if *n < 0 {
-        q = -q;
+impl From<&Rational> for BigRational {
+    fn from(n: &Rational) -> BigRational {
+        let mut q = BigRational::new_raw(
+            BigInt::from(n.numerator_ref()),
+            BigInt::from(n.denominator_ref()),
+        );
+        if *n < 0 {
+            q = -q;
+        }
+        q
     }
-    q
+}
+
+impl From<&rug::Rational> for Rational {
+    fn from(n: &rug::Rational) -> Rational {
+        Rational::from_integers(Integer::from(n.numer()), Integer::from(n.denom()))
+    }
+}
+
+impl From<&Rational> for rug::Rational {
+    fn from(n: &Rational) -> rug::Rational {
+        let mut q = rug::Rational::from((
+            rug::Integer::from(n.numerator_ref()),
+            rug::Integer::from(n.denominator_ref()),
+        ));
+        if *n < 0 {
+            q = -q;
+        }
+        q
+    }
 }

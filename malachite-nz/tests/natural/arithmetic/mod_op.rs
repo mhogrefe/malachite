@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_vec_pair_gen_var_11, unsigned_vec_pair_gen_var_18,
@@ -24,9 +24,6 @@ use malachite_nz::natural::arithmetic::mod_op::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_12, natural_gen, natural_gen_var_2, natural_pair_gen_var_5,
     natural_pair_gen_var_6, natural_triple_gen_var_4, unsigned_sextuple_gen_var_2,
@@ -12943,17 +12940,17 @@ fn mod_properties_helper(x: Natural, y: Natural) {
     let remainder_alt = (&x).div_mod(&y).1;
     assert_eq!(remainder_alt, remainder);
 
-    let num_remainder = natural_to_biguint(&x).mod_floor(&natural_to_biguint(&y));
-    assert_eq!(biguint_to_natural(&num_remainder), remainder);
+    let num_remainder = BigUint::from(&x).mod_floor(&BigUint::from(&y));
+    assert_eq!(Natural::from(&num_remainder), remainder);
 
-    let num_remainder = natural_to_biguint(&x) % &natural_to_biguint(&y);
-    assert_eq!(biguint_to_natural(&num_remainder), remainder);
+    let num_remainder = BigUint::from(&x) % &BigUint::from(&y);
+    assert_eq!(Natural::from(&num_remainder), remainder);
 
-    let rug_remainder = natural_to_rug_integer(&x).rem_floor(natural_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_natural(&rug_remainder), remainder);
+    let rug_remainder = rug::Integer::from(&x).rem_floor(rug::Integer::from(&y));
+    assert_eq!(Natural::exact_from(&rug_remainder), remainder);
 
-    let rug_remainder = natural_to_rug_integer(&x) % natural_to_rug_integer(&y);
-    assert_eq!(rug_integer_to_natural(&rug_remainder), remainder);
+    let rug_remainder = rug::Integer::from(&x) % rug::Integer::from(&y);
+    assert_eq!(Natural::exact_from(&rug_remainder), remainder);
 
     assert!(remainder < y);
     assert_eq!(&remainder % y, remainder);
@@ -13027,8 +13024,8 @@ fn neg_mod_properties_helper(x: Natural, y: Natural) {
     let remainder_alt = (&x).neg_mod(&y);
     assert_eq!(remainder_alt, remainder);
 
-    let rug_remainder = rug_neg_mod(natural_to_rug_integer(&x), natural_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_natural(&rug_remainder), remainder);
+    let rug_remainder = rug_neg_mod(rug::Integer::from(&x), rug::Integer::from(&y));
+    assert_eq!(Natural::exact_from(&rug_remainder), remainder);
 
     assert!(remainder < y);
 }

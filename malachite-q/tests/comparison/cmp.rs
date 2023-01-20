@@ -1,6 +1,5 @@
 use malachite_base::test_util::common::test_cmp_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
 use num::BigRational;
@@ -42,14 +41,8 @@ fn test_cmp() {
 fn cmp_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp(&y);
-        assert_eq!(
-            rational_to_bigrational(&x).cmp(&rational_to_bigrational(&y)),
-            ord,
-        );
-        assert_eq!(
-            rational_to_rug_rational(&x).cmp(&rational_to_rug_rational(&y)),
-            ord,
-        );
+        assert_eq!(BigRational::from(&x).cmp(&BigRational::from(&y)), ord,);
+        assert_eq!(rug::Rational::from(&x).cmp(&rug::Rational::from(&y)), ord,);
         assert_eq!(y.cmp(&x).reverse(), ord);
         assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
         assert_eq!((-y).cmp(&-x), ord);

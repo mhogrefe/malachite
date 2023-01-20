@@ -32,7 +32,9 @@ use crate::platform::{
 use malachite_base::fail_on_untested_path;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivRem;
-use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ};
+use malachite_base::num::arithmetic::traits::{
+    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
@@ -1875,6 +1877,51 @@ fn limbs_div_in_place_naive(ns: &mut [Limb], d: Limb) {
         let (q, r) = DoubleLimb::join_halves(upper, lower).div_rem(limb);
         *n = q.lower_half();
         upper = r.lower_half();
+    }
+}
+
+// This is equivalent to `mpn_pi1_bdiv_q_1` from `mpn/generic/bdiv_q_1.c`, GMP 6.2.1, where
+// rp == up.
+pub(crate) fn limbs_hensel_div_limb_in_place(
+    ns: &mut [Limb],
+    d: Limb,
+    d_inv: Limb,
+    shift: u64,
+) -> bool {
+    let n_len = ns.len();
+    assert_ne!(n_len, 0);
+    assert_ne!(d, 0);
+    let mut carry = 0;
+    if shift == 0 {
+        let (ns_head, ns_tail) = ns.split_first_mut().unwrap();
+        let mut l = ns_head.wrapping_mul(d_inv);
+        *ns_head = l;
+        let mut carry_2 = false;
+        for n in ns_tail {
+            let mut carry = Limb::x_mul_y_to_zz(l, d).0;
+            if carry_2 {
+                carry += 1;
+            }
+            (l, carry_2) = n.overflowing_sub(carry);
+            l.wrapping_mul_assign(d_inv);
+            *n = l;
+        }
+        carry_2
+    } else {
+        for i in 0..n_len - 1 {
+            let n = (ns[i] >> shift) | (ns[i + 1] << (Limb::WIDTH - shift));
+            let (mut l, carry_2) = n.overflowing_sub(carry);
+            l.wrapping_mul_assign(d_inv);
+            ns[i] = l;
+            carry = Limb::x_mul_y_to_zz(l, d).0;
+            if carry_2 {
+                carry += 1;
+            }
+        }
+        let ns_last = ns.last_mut().unwrap();
+        let (l, carry_2) = (*ns_last >> shift).overflowing_sub(carry);
+        *ns_last = l.wrapping_mul(d_inv);
+        carry_2
     }
 }
 

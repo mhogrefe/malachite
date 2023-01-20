@@ -11,7 +11,6 @@ use malachite_nz::integer::arithmetic::kronecker_symbol::limbs_kronecker_symbol;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_9, integer_pair_gen, integer_pair_gen_var_4,
     integer_pair_gen_var_5, integer_pair_gen_var_6, integer_triple_gen, integer_triple_gen_var_2,
@@ -462,7 +461,7 @@ fn jacobi_symbol_properties() {
         assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
 
         assert_eq!(
-            integer_to_rug_integer(&a).jacobi(&integer_to_rug_integer(&n)),
+            rug::Integer::from(&a).jacobi(&rug::Integer::from(&n)),
             i32::from(s)
         );
         assert!(s.le_abs(&1i8));
@@ -540,7 +539,7 @@ fn kronecker_symbol_properties() {
         assert_eq!(a.clone().kronecker_symbol(&n), s);
         assert_eq!(a.clone().kronecker_symbol(n.clone()), s);
         assert_eq!(
-            integer_to_rug_integer(&a).kronecker(&integer_to_rug_integer(&n)),
+            rug::Integer::from(&a).kronecker(&rug::Integer::from(&n)),
             i32::from(s)
         );
         assert!(s.le_abs(&1i8));

@@ -6,7 +6,6 @@ use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{integer_gen, natural_gen};
 use num::BigInt;
 use rug;
@@ -33,11 +32,8 @@ fn test_significant_bits() {
 fn significant_bits_properties() {
     integer_gen().test_properties(|x| {
         let bits = x.significant_bits();
-        assert_eq!(u64::wrapping_from(integer_to_bigint(&x).bits()), bits);
-        assert_eq!(
-            u64::from(integer_to_rug_integer(&x).significant_bits()),
-            bits
-        );
+        assert_eq!(u64::wrapping_from(BigInt::from(&x).bits()), bits);
+        assert_eq!(u64::from(rug::Integer::from(&x).significant_bits()), bits);
         assert_eq!((-&x).significant_bits(), bits);
         let x_abs = x.abs();
         assert_eq!(x_abs <= Limb::MAX, bits <= Limb::WIDTH);

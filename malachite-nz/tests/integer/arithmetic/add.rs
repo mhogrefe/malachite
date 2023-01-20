@@ -4,9 +4,6 @@ use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, integer_vec_gen, natural_pair_gen,
     natural_vec_gen,
@@ -116,16 +113,13 @@ fn add_properties() {
         assert_eq!(mut_x, sum);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = integer_to_rug_integer(&x);
-        mut_x += integer_to_rug_integer(&y);
-        assert_eq!(rug_integer_to_integer(&mut_x), sum);
+        let mut mut_x = rug::Integer::from(&x);
+        mut_x += rug::Integer::from(&y);
+        assert_eq!(Integer::from(&mut_x), sum);
 
+        assert_eq!(Integer::from(&(BigInt::from(&x) + BigInt::from(&y))), sum);
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(&x) + integer_to_bigint(&y))),
-            sum
-        );
-        assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(&x) + integer_to_rug_integer(&y))),
+            Integer::from(&(rug::Integer::from(&x) + rug::Integer::from(&y))),
             sum
         );
         assert_eq!(&y + &x, sum);

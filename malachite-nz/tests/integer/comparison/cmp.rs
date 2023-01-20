@@ -2,7 +2,6 @@ use malachite_base::test_util::common::test_cmp_helper;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
@@ -36,11 +35,8 @@ fn test_ord() {
 fn cmp_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp(&y);
-        assert_eq!(integer_to_bigint(&x).cmp(&integer_to_bigint(&y)), ord);
-        assert_eq!(
-            integer_to_rug_integer(&x).cmp(&integer_to_rug_integer(&y)),
-            ord
-        );
+        assert_eq!(BigInt::from(&x).cmp(&BigInt::from(&y)), ord);
+        assert_eq!(rug::Integer::from(&x).cmp(&rug::Integer::from(&y)), ord);
         assert_eq!(y.cmp(&x).reverse(), ord);
         assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
         assert_eq!((-y).cmp(&-x), ord);

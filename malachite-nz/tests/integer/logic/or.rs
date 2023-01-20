@@ -17,7 +17,6 @@ use malachite_nz::integer::logic::or::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
@@ -868,12 +867,12 @@ fn or_properties() {
         assert_eq!(mut_x, result);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = integer_to_rug_integer(&x);
-        mut_x |= integer_to_rug_integer(&y);
-        assert_eq!(rug_integer_to_integer(&mut_x), result);
+        let mut mut_x = rug::Integer::from(&x);
+        mut_x |= rug::Integer::from(&y);
+        assert_eq!(Integer::from(&mut_x), result);
 
         assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(&x) | integer_to_rug_integer(&y))),
+            Integer::from(&(rug::Integer::from(&x) | rug::Integer::from(&y))),
             result
         );
 

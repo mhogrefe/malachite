@@ -3,10 +3,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
 use num::BigRational;
@@ -47,14 +43,8 @@ fn floor_properties() {
         let floor = x.clone().floor();
         assert!(floor.is_valid());
 
-        assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).floor()),
-            floor
-        );
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).floor()),
-            floor
-        );
+        assert_eq!(Rational::from(&BigRational::from(&x).floor()), floor);
+        assert_eq!(Rational::from(&rug::Rational::from(&x).floor()), floor);
 
         let floor_alt = (&x).floor();
         assert!(floor_alt.is_valid());

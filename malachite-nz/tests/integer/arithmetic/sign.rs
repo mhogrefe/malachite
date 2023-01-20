@@ -2,7 +2,6 @@ use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_nz::test_util::integer::arithmetic::sign::num_sign;
 use num::BigInt;
@@ -28,8 +27,8 @@ fn test_sign() {
 fn sign_properties() {
     integer_gen().test_properties(|n| {
         let sign = n.sign();
-        assert_eq!(integer_to_rug_integer(&n).cmp0(), sign);
-        assert_eq!(num_sign(&integer_to_bigint(&n)), sign);
+        assert_eq!(rug::Integer::from(&n).cmp0(), sign);
+        assert_eq!(num_sign(&BigInt::from(&n)), sign);
         assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });

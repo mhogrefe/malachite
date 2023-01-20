@@ -10,7 +10,6 @@ use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_unsigned_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
 };
@@ -105,7 +104,7 @@ fn index_of_next_false_bit_properties() {
         let result = n.index_of_next_false_bit(u);
         assert_eq!(result, integer_index_of_next_false_bit_alt(&n, u));
         assert_eq!(
-            integer_to_rug_integer(&n)
+            rug::Integer::from(&n)
                 .find_zero(u32::exact_from(u))
                 .map(u64::from),
             result

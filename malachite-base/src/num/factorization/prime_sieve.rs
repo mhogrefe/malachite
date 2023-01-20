@@ -288,7 +288,7 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
                 let mut lmask = T::power_of_2(lindex & T::WIDTH_MASK);
                 while lindex <= bits {
                     bit_array[usize::exact_from(lindex >> T::LOG_WIDTH)] |= lmask;
-                    lmask = lmask.rotate_left(maskrot);
+                    lmask.rotate_left_assign(maskrot);
                     lindex += step;
                 }
                 // lindex = n_to_bit(id_to_n(i)*bit_to_n(i));
@@ -296,12 +296,13 @@ fn first_block_primesieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
                 lmask = T::power_of_2(lindex & T::WIDTH_MASK);
                 while lindex <= bits {
                     bit_array[usize::exact_from(lindex >> T::LOG_WIDTH)] |= lmask;
-                    lmask = lmask.rotate_left(maskrot);
+                    lmask.rotate_left_assign(maskrot);
                     lindex += step
                 }
             }
-            mask = mask.rotate_left(1);
-            if mask.odd() {
+            mask <<= 1;
+            if mask == T::ZERO {
+                mask = T::ONE;
                 index += 1;
             }
         }
@@ -349,7 +350,7 @@ fn block_resieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
             let mut lmask = T::power_of_2(lindex & T::WIDTH_MASK);
             while lindex <= bits {
                 bit_array[usize::exact_from(lindex >> T::LOG_WIDTH)] |= lmask;
-                lmask = lmask.rotate_left(maskrot);
+                lmask.rotate_left_assign(maskrot);
                 lindex += step;
             }
             // lindex = n_to_bit(id_to_n(i)*bit_to_n(i));
@@ -361,12 +362,13 @@ fn block_resieve<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
             lmask = T::power_of_2(lindex & T::WIDTH_MASK);
             while lindex <= bits {
                 bit_array[usize::exact_from(lindex >> T::LOG_WIDTH)] |= lmask;
-                lmask = lmask.rotate_left(maskrot);
+                lmask.rotate_left_assign(maskrot);
                 lindex += step;
             }
         }
-        mask = mask.rotate_left(1);
-        if mask.odd() {
+        mask <<= 1;
+        if mask == T::ZERO {
+            mask = T::ONE;
             index += 1;
         }
     }

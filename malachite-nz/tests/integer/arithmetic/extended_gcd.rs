@@ -1,14 +1,11 @@
 use malachite_base::num::arithmetic::traits::{DivExact, ExtendedGcd, Gcd};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-    rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen};
 use num::BigInt;
 use num::Integer as NumInteger;
@@ -199,17 +196,17 @@ fn extended_gcd_properties() {
         let (gcd, x, y) = result;
 
         if a != 0u32 || b != 0u32 {
-            let num_result = integer_to_bigint(&a).extended_gcd(&integer_to_bigint(&b));
-            assert_eq!(bigint_to_integer(&num_result.gcd), gcd);
-            assert_eq!(bigint_to_integer(&num_result.x), x);
-            assert_eq!(bigint_to_integer(&num_result.y), y);
+            let num_result = BigInt::from(&a).extended_gcd(&BigInt::from(&b));
+            assert_eq!(Integer::from(&num_result.gcd), gcd);
+            assert_eq!(Integer::from(&num_result.x), x);
+            assert_eq!(Integer::from(&num_result.y), y);
         }
 
-        let (rug_gcd, rug_x, rug_y) = integer_to_rug_integer(&a)
-            .extended_gcd(integer_to_rug_integer(&b), rug::Integer::new());
-        assert_eq!(rug_integer_to_natural(&rug_gcd), gcd);
-        assert_eq!(rug_integer_to_integer(&rug_x), x);
-        assert_eq!(rug_integer_to_integer(&rug_y), y);
+        let (rug_gcd, rug_x, rug_y) =
+            rug::Integer::from(&a).extended_gcd(rug::Integer::from(&b), rug::Integer::new());
+        assert_eq!(Natural::exact_from(&rug_gcd), gcd);
+        assert_eq!(Integer::from(&rug_x), x);
+        assert_eq!(Integer::from(&rug_y), y);
 
         assert_eq!(a.unsigned_abs_ref().gcd(b.unsigned_abs_ref()), gcd);
         assert_eq!(&a * &x + &b * &y, Integer::from(&gcd));

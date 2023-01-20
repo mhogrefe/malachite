@@ -3,6 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_15;
 use malachite_nz::natural::arithmetic::mod_pow::{
@@ -10,15 +11,13 @@ use malachite_nz::natural::arithmetic::mod_pow::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     natural_pair_gen_var_5, natural_pair_gen_var_8, natural_quadruple_gen_var_2,
     natural_quadruple_gen_var_3, natural_triple_gen_var_5, unsigned_vec_quadruple_gen_var_6,
     unsigned_vec_quadruple_gen_var_7,
 };
 use malachite_nz::test_util::natural::arithmetic::mod_pow::simple_binary_mod_pow;
+use num::BigUint;
 use std::str::FromStr;
 
 fn verify_limbs_mod_pow(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
@@ -482,13 +481,12 @@ fn mod_pow_properties() {
         assert_eq!(mut_x, power);
         assert!(mut_x.is_valid());
 
-        let num_power =
-            natural_to_biguint(&x).modpow(&natural_to_biguint(&exp), &natural_to_biguint(&m));
-        assert_eq!(biguint_to_natural(&num_power), power);
-        let rug_power = natural_to_rug_integer(&x)
-            .pow_mod(&natural_to_rug_integer(&exp), &natural_to_rug_integer(&m))
+        let num_power = BigUint::from(&x).modpow(&BigUint::from(&exp), &BigUint::from(&m));
+        assert_eq!(Natural::from(&num_power), power);
+        let rug_power = rug::Integer::from(&x)
+            .pow_mod(&rug::Integer::from(&exp), &rug::Integer::from(&m))
             .unwrap();
-        assert_eq!(rug_integer_to_natural(&rug_power), power);
+        assert_eq!(Natural::exact_from(&rug_power), power);
 
         if exp.even() {
             assert_eq!(x.mod_neg(&m).mod_pow(exp, m), power);

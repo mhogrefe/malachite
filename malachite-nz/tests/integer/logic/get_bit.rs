@@ -10,7 +10,6 @@ use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::{integer_gen_var_4, integer_unsigned_pair_gen_var_2};
 use rug;
 use std::str::FromStr;
@@ -97,10 +96,7 @@ fn limbs_get_bit_neg_properties() {
 fn get_bit_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(n, index)| {
         let bit = n.get_bit(index);
-        assert_eq!(
-            integer_to_rug_integer(&n).get_bit(u32::exact_from(index)),
-            bit
-        );
+        assert_eq!(rug::Integer::from(&n).get_bit(u32::exact_from(index)), bit);
         assert_eq!(&n & Integer::power_of_2(index) != 0, bit);
         assert_eq!(!(!n).get_bit(index), bit);
     });

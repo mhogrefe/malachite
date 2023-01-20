@@ -5,6 +5,7 @@ use crate::natural::arithmetic::add::{
 use crate::natural::arithmetic::mul::{
     limbs_mul_same_length_to_out, limbs_mul_same_length_to_out_scratch_len,
 };
+use crate::natural::arithmetic::neg::{limbs_neg, limbs_neg_in_place};
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
@@ -12,17 +13,16 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
-use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::platform::{Limb, SignedLimb, FFT_TAB, MULMOD_TAB};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
-    XXAddYYToZZ, XXSubYYToZZ,
+    CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ,
+    XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
+use malachite_base::slices::slice_set_zero;
 use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 
@@ -139,7 +139,7 @@ fn limbs_fft_mulmod_2expp1_basecase_same(
     scratch: &mut [Limb],
 ) -> bool {
     if carry {
-        let out = limbs_fft_neg_in_place(xs) && limbs_slice_add_limb_in_place(xs, 1);
+        let out = limbs_neg_in_place(xs) && limbs_slice_add_limb_in_place(xs, 1);
         *xs.last_mut().unwrap() &= Limb::MAX >> k;
         out
     } else {
@@ -171,37 +171,6 @@ fn limbs_fft_div_2expmod_2expp1_in_place(xs: &mut [Limb], d: u64) {
     }
 }
 
-// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1.
-fn limbs_fft_neg(out: &mut [Limb], xs: &[Limb]) -> bool {
-    let n = xs.len();
-    let zeros = slice_leading_zeros(xs);
-    slice_set_zero(&mut out[..zeros]);
-    if zeros == n {
-        return false;
-    }
-    out[zeros] = xs[zeros].wrapping_neg();
-    let offset = zeros + 1;
-    if offset != n {
-        limbs_not_to_out(&mut out[offset..], &xs[offset..]);
-    }
-    true
-}
-
-// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1, where rp == up.
-fn limbs_fft_neg_in_place(xs: &mut [Limb]) -> bool {
-    let n = xs.len();
-    let zeros = slice_leading_zeros(xs);
-    if zeros == n {
-        return false;
-    }
-    xs[zeros].wrapping_neg_assign();
-    let offset = zeros + 1;
-    if offset != n {
-        limbs_not_in_place(&mut xs[offset..]);
-    }
-    true
-}
-
 // This is equivalent to `fft_adjust` from `fft/adjust.c`, FLINT 2.7.1. limbs is one less than the
 // length of out and the length of xs.
 fn limbs_fft_adjust(out: &mut [Limb], xs: &[Limb], i: usize, w: usize) {
@@ -218,7 +187,7 @@ fn limbs_fft_adjust(out: &mut [Limb], xs: &[Limb], i: usize, w: usize) {
         out_init[x..].copy_from_slice(xs_lo);
         *out_last = 0;
         let (xs_last, xs_hi_init) = xs_hi.split_last().unwrap();
-        let carry = limbs_fft_neg(out, xs_hi_init);
+        let carry = limbs_neg(out, xs_hi_init);
         let out_hi = &mut out[x..];
         limbs_fft_addmod_2expp1_1(out_hi, xs_last.wrapping_neg());
         if carry {
@@ -252,7 +221,7 @@ fn limbs_fft_adjust_sqrt(out: &mut [Limb], xs: &[Limb], i: usize, w: usize, scra
         let (xs_last, xs_init) = xs.split_last().unwrap();
         let (xs_lo, xs_hi) = xs_init.split_at(n - y);
         scratch_init[y..].copy_from_slice(xs_lo);
-        let carry = limbs_fft_neg(scratch_init, xs_hi);
+        let carry = limbs_neg(scratch_init, xs_hi);
         *scratch_last = 0;
         let scratch_hi = &mut scratch[y..];
         limbs_fft_addmod_2expp1_1(scratch_hi, xs_last.wrapping_neg());
@@ -272,7 +241,7 @@ fn limbs_fft_adjust_sqrt(out: &mut [Limb], xs: &[Limb], i: usize, w: usize, scra
     if y == 0 {
         fail_on_untested_path("limbs_fft_adjust_sqrt, y == 0 second time");
     } else {
-        carry = limbs_fft_neg(scratch, out_hi);
+        carry = limbs_neg(scratch, out_hi);
     }
     let scratch_hi = &mut scratch[y..];
     limbs_fft_addmod_2expp1_1(scratch_hi, out_last.wrapping_neg());
@@ -363,7 +332,7 @@ fn limbs_butterfly_lsh_b(
             }
             let (ts_lo, ts_hi) = ts.split_at_mut(x);
             let mut carry_1 = (carry >> 1).wrapping_neg();
-            if limbs_fft_neg_in_place(ts_lo) {
+            if limbs_neg_in_place(ts_lo) {
                 carry_1.wrapping_sub_assign(1);
             }
             limbs_fft_addmod_2expp1_1(ts_hi, carry_1.wrapping_sub(xs_last.wrapping_add(*ys_last)));
@@ -392,12 +361,12 @@ fn limbs_butterfly_lsh_b(
                 }
                 let mut carry_1 = carry >> 1;
                 let (ts_lo, ts_hi) = ts.split_at_mut(r);
-                if limbs_fft_neg_in_place(ts_lo) {
+                if limbs_neg_in_place(ts_lo) {
                     carry_1 += 1;
                 }
                 let carry = limbs_fft_sumdiff(&mut ts_hi[..w], &mut us[..n], ys_hi, xs_hi);
                 let (ts_mid, ts_hi) = ts_hi.split_at_mut(y);
-                let carry_2 = limbs_fft_neg_in_place(ts_mid);
+                let carry_2 = limbs_neg_in_place(ts_mid);
                 let carry_3 = limbs_sub_limb_in_place(ts_mid, carry_1);
                 carry_1 = (carry >> 1).wrapping_neg();
                 if carry_3 {
@@ -450,7 +419,7 @@ fn limbs_butterfly_lsh_b(
                 carry_1 = (carry >> 1)
                     .wrapping_neg()
                     .wrapping_sub(xs_last.wrapping_add(*ys_last));
-                if limbs_fft_neg_in_place(ts_lo) {
+                if limbs_neg_in_place(ts_lo) {
                     carry_1.wrapping_sub_assign(1);
                 }
                 limbs_fft_addmod_2expp1_1(ts_hi, carry_1);
@@ -473,7 +442,7 @@ fn limbs_butterfly_lsh_b(
                 let mut carry_1 = (carry >> 1)
                     .wrapping_neg()
                     .wrapping_sub(xs_last.wrapping_add(*ys_last));
-                if limbs_fft_neg_in_place(ts_lo) {
+                if limbs_neg_in_place(ts_lo) {
                     carry_1.wrapping_sub_assign(1);
                 }
                 limbs_fft_addmod_2expp1_1(&mut ts[x..], carry_1);
@@ -535,7 +504,7 @@ fn limbs_butterfly_rsh_b(
             let (us_last, us_init_hi) = us_hi.split_last_mut().unwrap();
             let carry_1 = carry >> 1;
             let carry_2 = if carry.even() { 0 } else { Limb::MAX };
-            let carry_3 = limbs_fft_neg_in_place(xs_lo);
+            let carry_3 = limbs_neg_in_place(xs_lo);
             let carry = limbs_fft_sumdiff(ts_init_hi, us_init_hi, xs_lo, ys_hi);
             *us_last = (if carry.even() { 0 } else { Limb::MAX }).wrapping_sub(*ys_last);
             *ts_last = ys_last.wrapping_add(carry >> 1);
@@ -560,13 +529,13 @@ fn limbs_butterfly_rsh_b(
                 let (ts_last, ts_hi) = ts[q..].split_last_mut().unwrap();
                 let (us_last, us_hi) = us[q..].split_last_mut().unwrap();
                 let carry = limbs_fft_sumdiff(ts_hi, us_hi, ys_lo, xs_mid);
-                let carry_3 = limbs_fft_neg_in_place(ts_hi);
+                let carry_3 = limbs_neg_in_place(ts_hi);
                 *ts_last = (carry >> 1).wrapping_neg();
                 if carry_3 {
                     ts_last.wrapping_sub_assign(1);
                 }
                 *us_last = if carry.even() { 0 } else { Limb::MAX };
-                let carry_3 = limbs_fft_neg_in_place(xs_lo);
+                let carry_3 = limbs_neg_in_place(xs_lo);
                 let carry = limbs_fft_sumdiff(&mut ts[s..], &mut us[s..], xs_lo, ys_hi);
                 let mut k = (carry >> 1).wrapping_add(*ys_last);
                 if carry_3 {
@@ -599,13 +568,13 @@ fn limbs_butterfly_rsh_b(
                 let (ys_mid, ys_hi) = ys_hi.split_at_mut(x);
                 let ts_hi = &mut ts_init[s..];
                 let carry = limbs_fft_sumdiff(ts_hi, &mut us_init[s..], ys_mid, xs_lo);
-                let carry_3 = limbs_fft_neg_in_place(ts_hi);
+                let carry_3 = limbs_neg_in_place(ts_hi);
                 *ts_last = (carry >> 1).wrapping_neg();
                 if carry_3 {
                     ts_last.wrapping_sub_assign(1);
                 }
                 *us_last = if carry.even() { 0 } else { Limb::MAX };
-                let carry_3 = limbs_fft_neg_in_place(ys_lo);
+                let carry_3 = limbs_neg_in_place(ys_lo);
                 let carry = limbs_fft_sumdiff(&mut ts_init[q..], &mut us_init[q..], xs_hi, ys_lo);
                 let mut k = (carry >> 1).wrapping_add(*xs_last);
                 if carry_3 {
@@ -639,7 +608,7 @@ fn limbs_butterfly_rsh_b(
                 let carry = limbs_fft_sumdiff(ts_hi, us_hi, ys_lo, xs_lo);
                 *us_last = if carry.even() { 0 } else { Limb::MAX };
                 *ts_last = (carry >> 1).wrapping_neg();
-                if limbs_fft_neg_in_place(ts_hi) {
+                if limbs_neg_in_place(ts_hi) {
                     ts_last.wrapping_sub_assign(1);
                 }
                 limbs_fft_addmod_2expp1_1(ts_hi, carry_1 + *xs_last + *ys_last);
@@ -886,7 +855,7 @@ fn limbs_fft_butterfly_sqrt(
     scratch_init[y..].copy_from_slice(ts_lo);
     *scratch_last = 0;
     assert_ne!(y, 0);
-    let carry = limbs_fft_neg(scratch_init, ts_hi);
+    let carry = limbs_neg(scratch_init, ts_hi);
     let scratch_hi = &mut scratch[y..];
     limbs_fft_addmod_2expp1_1(scratch_hi, ts_last.wrapping_neg());
     if carry {
@@ -1141,7 +1110,7 @@ fn limbs_ifft_butterfly_sqrt(
     *scratch_last = 0;
     assert_ne!(y, 0);
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(y);
-    let carry = limbs_fft_neg(scratch_lo, ys_hi);
+    let carry = limbs_neg(scratch_lo, ys_hi);
     limbs_fft_addmod_2expp1_1(scratch_hi, ys_last.wrapping_neg());
     if carry {
         limbs_sub_limb_in_place(scratch_hi, 1);
@@ -1244,11 +1213,11 @@ fn limbs_fft_radix2_twiddle<'a>(
         limbs_butterfly_lsh_b(ts, us, xs_lo, xs_hi, x, y);
         limbs_fft_mul_2expmod_2expp1_in_place(ts, b1);
         if negate2 {
-            limbs_fft_neg_in_place(ts);
+            limbs_neg_in_place(ts);
         }
         limbs_fft_mul_2expmod_2expp1_in_place(us, b2);
         if negate1 {
-            limbs_fft_neg_in_place(us);
+            limbs_neg_in_place(us);
         }
         swap(xs_lo, ts);
         swap(xs_hi, us);
@@ -1506,10 +1475,10 @@ fn limbs_ifft_negacyclic<'a>(
             swap(xs_lo, ts);
             swap(xs_hi, us);
             limbs_fft_adjust(ts, xs_lo, n - (i >> 1), w);
-            limbs_fft_neg_in_place(ts);
+            limbs_neg_in_place(ts);
             swap(xs_lo, ts);
             limbs_fft_adjust(us, xs_hi, n - ((n + i) >> 1), w);
-            limbs_fft_neg_in_place(us);
+            limbs_neg_in_place(us);
             swap(xs_hi, us);
             i += 1;
             let xs_lo = &mut xss_lo[i];
@@ -1518,10 +1487,10 @@ fn limbs_ifft_negacyclic<'a>(
             swap(xs_lo, ts);
             swap(xs_hi, us);
             limbs_fft_adjust_sqrt(ts, xs_lo, two_n - i, w, scratch);
-            limbs_fft_neg_in_place(ts);
+            limbs_neg_in_place(ts);
             swap(xs_lo, ts);
             limbs_fft_adjust_sqrt(us, xs_hi, n - i, w, scratch);
-            limbs_fft_neg_in_place(us);
+            limbs_neg_in_place(us);
             swap(xs_hi, us);
             i += 1;
         }
@@ -1532,10 +1501,10 @@ fn limbs_ifft_negacyclic<'a>(
             swap(xs_lo, ts);
             swap(xs_hi, us);
             limbs_fft_adjust(ts, xs_lo, two_n - i, half_w);
-            limbs_fft_neg_in_place(ts);
+            limbs_neg_in_place(ts);
             swap(xs_lo, ts);
             limbs_fft_adjust(us, xs_hi, n - i, half_w);
-            limbs_fft_neg_in_place(us);
+            limbs_neg_in_place(us);
             swap(xs_hi, us);
         }
     }
@@ -1881,11 +1850,11 @@ fn limbs_ifft_radix2_twiddle<'a>(
         let b2 = u64::wrapping_from(b2) & Limb::WIDTH_MASK;
         if negate1 {
             fail_on_untested_path("limbs_ifft_butterfly_twiddle, negate1");
-            limbs_fft_neg_in_place(xs_lo);
+            limbs_neg_in_place(xs_lo);
         }
         limbs_fft_div_2expmod_2expp1_in_place(xs_lo, b1);
         if negate2 {
-            limbs_fft_neg_in_place(xs_hi);
+            limbs_neg_in_place(xs_hi);
         }
         limbs_fft_div_2expmod_2expp1_in_place(xs_hi, b2);
         limbs_butterfly_rsh_b(ts, us, xs_lo, xs_hi, x, y);

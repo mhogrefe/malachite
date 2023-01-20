@@ -4,9 +4,6 @@ use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{integer_gen, integer_integer_natural_triple_gen};
 use num::{BigInt, Signed};
 use std::str::FromStr;
@@ -70,12 +67,9 @@ fn abs_properties() {
         let abs = x.clone().abs();
         assert!(abs.is_valid());
 
-        assert_eq!(bigint_to_integer(&integer_to_bigint(&x).abs()), abs);
+        assert_eq!(Integer::from(&BigInt::from(&x).abs()), abs);
 
-        assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&x).abs()),
-            abs
-        );
+        assert_eq!(Integer::from(&rug::Integer::from(&x).abs()), abs);
 
         let abs_alt = (&x).abs();
         assert!(abs_alt.is_valid());

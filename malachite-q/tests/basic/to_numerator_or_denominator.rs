@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::traits::One;
 use malachite_base::strings::ToDebugString;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{bigint_to_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
 use num::{BigRational, Signed};
@@ -47,14 +46,8 @@ fn to_numerator_properties() {
         assert_eq!(*q.numerator_ref(), n);
         assert_eq!(q.to_numerator_and_denominator().0, n);
 
-        assert_eq!(
-            bigint_to_integer(rational_to_bigrational(&q).numer()).abs(),
-            n
-        );
-        assert_eq!(
-            rug_integer_to_integer(rational_to_rug_rational(&q).numer()).abs(),
-            n
-        );
+        assert_eq!(Integer::from(BigRational::from(&q).numer()).abs(), n);
+        assert_eq!(Integer::from(rug::Rational::from(&q).numer()).abs(), n);
     });
 
     integer_gen().test_properties(|n| {
@@ -99,14 +92,8 @@ fn to_denominator_properties() {
         assert_eq!(*q.denominator_ref(), d);
         assert_eq!(q.to_numerator_and_denominator().1, d);
 
-        assert_eq!(
-            bigint_to_integer(rational_to_bigrational(&q).denom()).abs(),
-            d
-        );
-        assert_eq!(
-            rug_integer_to_integer(rational_to_rug_rational(&q).denom()).abs(),
-            d
-        );
+        assert_eq!(Integer::from(BigRational::from(&q).denom()).abs(), d);
+        assert_eq!(Integer::from(rug::Rational::from(&q).denom()).abs(), d);
     });
 
     integer_gen().test_properties(|n| {

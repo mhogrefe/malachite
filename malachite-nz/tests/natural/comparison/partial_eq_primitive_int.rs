@@ -4,7 +4,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{natural_signed_pair_gen, natural_unsigned_pair_gen};
 use malachite_nz::test_util::natural::comparison::partial_eq_primitive_int::*;
 use num::BigUint;
@@ -100,12 +99,12 @@ where
 {
     natural_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let eq = n == u;
-        assert_eq!(num_partial_eq_unsigned(&natural_to_biguint(&n), u), eq);
-        assert_eq!(natural_to_rug_integer(&n) == u, eq);
+        assert_eq!(num_partial_eq_unsigned(&From::from(&n), u), eq);
+        assert_eq!(rug::Integer::from(&n) == u, eq);
         assert_eq!(&n == &Natural::from(u), eq);
 
         assert_eq!(u == n, eq);
-        assert_eq!(u == natural_to_rug_integer(&n), eq);
+        assert_eq!(u == rug::Integer::from(&n), eq);
         assert_eq!(&Natural::from(u) == &n, eq);
         assert_eq!(n.partial_cmp(&u) == Some(Ordering::Equal), eq);
     });
@@ -117,7 +116,7 @@ where
 }
 
 // Extra refs necessary for type inference
-#[allow(clippy::op_ref, clippy::trait_duplication_in_bounds)]
+#[allow(clippy::cmp_owned, clippy::op_ref, clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_int_properties_helper_signed<
     T: PartialEq<Natural> + PartialEq<rug::Integer> + PrimitiveSigned,
 >()
@@ -128,11 +127,11 @@ where
 {
     natural_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let eq = n == i;
-        assert_eq!(natural_to_rug_integer(&n) == i, eq);
+        assert_eq!(rug::Integer::from(&n) == i, eq);
         assert_eq!(&n == &Integer::from(i), eq);
 
         assert_eq!(i == n, eq);
-        assert_eq!(i == natural_to_rug_integer(&n), eq);
+        assert_eq!(i == rug::Integer::from(&n), eq);
         assert_eq!(&Integer::from(i) == &n, eq);
         assert_eq!(n.partial_cmp(&i) == Some(Ordering::Equal), eq);
     });

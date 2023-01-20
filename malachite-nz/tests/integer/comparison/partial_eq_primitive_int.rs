@@ -2,7 +2,6 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{integer_signed_pair_gen, integer_unsigned_pair_gen};
 use malachite_nz::test_util::integer::comparison::partial_eq_primitive_int::*;
 use num::BigInt;
@@ -123,12 +122,12 @@ where
 {
     integer_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let eq = n == u;
-        assert_eq!(num_partial_eq_primitive(&integer_to_bigint(&n), u), eq);
-        assert_eq!(integer_to_rug_integer(&n) == u, eq);
+        assert_eq!(num_partial_eq_primitive(&From::from(&n), u), eq);
+        assert_eq!(rug::Integer::from(&n) == u, eq);
         assert_eq!(&n == &Integer::from(u), eq);
 
         assert_eq!(u == n, eq);
-        assert_eq!(u == integer_to_rug_integer(&n), eq);
+        assert_eq!(u == rug::Integer::from(&n), eq);
         assert_eq!(&Integer::from(u) == &n, eq);
     });
 
@@ -149,11 +148,11 @@ where
 {
     integer_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let eq = n == i;
-        assert_eq!(integer_to_rug_integer(&n) == i, eq);
+        assert_eq!(rug::Integer::from(&n) == i, eq);
         assert_eq!(&n == &Integer::from(i), eq);
 
         assert_eq!(i == n, eq);
-        assert_eq!(i == integer_to_rug_integer(&n), eq);
+        assert_eq!(i == rug::Integer::from(&n), eq);
         assert_eq!(&Integer::from(i) == &n, eq);
     });
 

@@ -6,7 +6,6 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::rug_integer_to_natural;
 use malachite_nz::test_util::natural::arithmetic::primorial::{
     primorial_naive, product_of_first_n_primes_naive,
 };
@@ -71,7 +70,7 @@ fn primorial_properties() {
         assert!(p.is_valid());
         assert_eq!(primorial_naive(n), p);
         assert_eq!(
-            rug_integer_to_natural(&rug::Integer::primorial(u32::exact_from(n)).complete()),
+            Natural::exact_from(&rug::Integer::primorial(u32::exact_from(n)).complete()),
             p
         );
         assert_ne!(p, 0u32);

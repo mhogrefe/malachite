@@ -7,13 +7,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, signed_unsigned_pair_gen_var_18};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_4, integer_unsigned_pair_gen_var_3, natural_gen,
     natural_unsigned_pair_gen_var_7,
 };
+use num::BigInt;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -303,11 +301,8 @@ fn floor_cbrt_properties() {
         assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         if n >= 0 {
-            assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
-            assert_eq!(
-                rug_integer_to_integer(&integer_to_rug_integer(&n).root(3)),
-                cbrt
-            );
+            assert_eq!(Integer::from(&BigInt::from(&n).nth_root(3)), cbrt);
+            assert_eq!(Integer::from(&rug::Integer::from(&n).root(3)), cbrt);
         }
 
         let cube = (&cbrt).pow(3);
@@ -344,11 +339,8 @@ fn ceiling_cbrt_properties() {
         assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         if n < 0 {
-            assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
-            assert_eq!(
-                rug_integer_to_integer(&integer_to_rug_integer(&n).root(3)),
-                cbrt
-            );
+            assert_eq!(Integer::from(&BigInt::from(&n).nth_root(3)), cbrt);
+            assert_eq!(Integer::from(&rug::Integer::from(&n).root(3)), cbrt);
         }
         let cube = (&cbrt).pow(3);
         let floor_cbrt = (&n).floor_root(3);
@@ -417,11 +409,11 @@ fn floor_root_properties() {
         assert_eq!(n_alt, root);
         if n >= 0 {
             assert_eq!(
-                bigint_to_integer(&integer_to_bigint(&n).nth_root(u32::exact_from(exp))),
+                Integer::from(&BigInt::from(&n).nth_root(u32::exact_from(exp))),
                 root
             );
             assert_eq!(
-                rug_integer_to_integer(&integer_to_rug_integer(&n).root(u32::exact_from(exp))),
+                Integer::from(&rug::Integer::from(&n).root(u32::exact_from(exp))),
                 root
             );
         }
@@ -471,11 +463,11 @@ fn ceiling_root_properties() {
         assert_eq!(n_alt, root);
         if n < 0 {
             assert_eq!(
-                bigint_to_integer(&integer_to_bigint(&n).nth_root(u32::exact_from(exp))),
+                Integer::from(&BigInt::from(&n).nth_root(u32::exact_from(exp))),
                 root
             );
             assert_eq!(
-                rug_integer_to_integer(&integer_to_rug_integer(&n).root(u32::exact_from(exp))),
+                Integer::from(&rug::Integer::from(&n).root(u32::exact_from(exp))),
                 root
             );
         }

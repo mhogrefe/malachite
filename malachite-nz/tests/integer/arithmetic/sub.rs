@@ -2,9 +2,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen, natural_pair_gen};
 use num::BigInt;
 use rug;
@@ -88,16 +85,13 @@ fn sub_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, diff);
 
-        let mut mut_x = integer_to_rug_integer(&x);
-        mut_x -= integer_to_rug_integer(&y);
-        assert_eq!(rug_integer_to_integer(&mut_x), diff);
+        let mut mut_x = rug::Integer::from(&x);
+        mut_x -= rug::Integer::from(&y);
+        assert_eq!(Integer::from(&mut_x), diff);
 
+        assert_eq!(Integer::from(&(BigInt::from(&x) - BigInt::from(&y))), diff);
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(&x) - integer_to_bigint(&y))),
-            diff
-        );
-        assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(&x) - integer_to_rug_integer(&y))),
+            Integer::from(&(rug::Integer::from(&x) - rug::Integer::from(&y))),
             diff
         );
         assert_eq!(&y - &x, -&diff);

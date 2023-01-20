@@ -1,6 +1,5 @@
 use malachite_base::test_util::common::test_eq_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
 use num::BigRational;
@@ -43,14 +42,8 @@ fn test_eq() {
 fn eq_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let eq = x == y;
-        assert_eq!(
-            rational_to_bigrational(&x) == rational_to_bigrational(&y),
-            eq
-        );
-        assert_eq!(
-            rational_to_rug_rational(&x) == rational_to_rug_rational(&y),
-            eq
-        );
+        assert_eq!(BigRational::from(&x) == BigRational::from(&y), eq);
+        assert_eq!(rug::Rational::from(&x) == rug::Rational::from(&y), eq);
         assert_eq!(y == x, eq);
     });
 

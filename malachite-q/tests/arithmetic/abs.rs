@@ -1,9 +1,5 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
 use num::{BigRational, Signed};
@@ -43,15 +39,9 @@ fn abs_properties() {
         let abs = x.clone().abs();
         assert!(abs.is_valid());
 
-        assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).abs()),
-            abs
-        );
+        assert_eq!(Rational::from(&BigRational::from(&x).abs()), abs);
 
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).abs()),
-            abs
-        );
+        assert_eq!(Rational::from(&rug::Rational::from(&x).abs()), abs);
 
         let abs_alt = (&x).abs();
         assert!(abs_alt.is_valid());

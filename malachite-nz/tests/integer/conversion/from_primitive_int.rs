@@ -4,7 +4,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{bigint_to_integer, rug_integer_to_integer};
 use num::BigInt;
 use rug;
 
@@ -112,25 +111,25 @@ fn from_primitive_int_properties() {
 
     unsigned_gen::<u32>().test_properties(|u| {
         let n = Integer::from(u);
-        assert_eq!(bigint_to_integer(&BigInt::from(u)), n);
-        assert_eq!(rug_integer_to_integer(&rug::Integer::from(u)), n);
+        assert_eq!(Integer::from(&BigInt::from(u)), n);
+        assert_eq!(Integer::from(&rug::Integer::from(u)), n);
     });
 
     unsigned_gen::<u64>().test_properties(|u| {
         let n = Integer::from(u);
-        assert_eq!(bigint_to_integer(&BigInt::from(u)), n);
-        assert_eq!(rug_integer_to_integer(&rug::Integer::from(u)), n);
+        assert_eq!(Integer::from(&BigInt::from(u)), n);
+        assert_eq!(Integer::from(&rug::Integer::from(u)), n);
     });
 
     signed_gen::<i32>().test_properties(|i| {
         let n = Integer::from(i);
-        assert_eq!(bigint_to_integer(&BigInt::from(i)), n);
-        assert_eq!(rug_integer_to_integer(&rug::Integer::from(i)), n);
+        assert_eq!(Integer::from(&BigInt::from(i)), n);
+        assert_eq!(Integer::from(&rug::Integer::from(i)), n);
     });
 
     signed_gen::<i64>().test_properties(|i| {
         let n = Integer::from(i);
-        assert_eq!(bigint_to_integer(&BigInt::from(i)), n);
-        assert_eq!(rug_integer_to_integer(&rug::Integer::from(i)), n);
+        assert_eq!(Integer::from(&BigInt::from(i)), n);
+        assert_eq!(Integer::from(&rug::Integer::from(i)), n);
     });
 }

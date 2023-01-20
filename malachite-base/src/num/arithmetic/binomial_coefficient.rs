@@ -144,7 +144,7 @@ macro_rules! impl_binomial_coefficient_primitive_int {
         impl BinomialCoefficient for $t {
             /// Computes the binomial coefficient of two numbers. If the inputs are too large, the
             /// function panics.
-            /// 
+            ///
             /// The second argument must be non-negative, but the first may be negative. If it is,
             /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
             ///

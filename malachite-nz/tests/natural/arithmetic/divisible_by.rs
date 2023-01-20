@@ -14,7 +14,6 @@ use malachite_nz::natural::arithmetic::divisible_by::{
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_6,
     natural_pair_gen_var_7, unsigned_vec_pair_gen_var_17,
@@ -962,11 +961,11 @@ fn divisible_by_properties() {
 
         assert_eq!(x == 0 || y != 0 && &x % &y == 0, divisible);
         assert_eq!(
-            num_divisible_by(&natural_to_biguint(&x), &natural_to_biguint(&y)),
+            num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)),
             divisible
         );
         assert_eq!(
-            natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)),
+            rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)),
             divisible
         );
     });
@@ -974,21 +973,15 @@ fn divisible_by_properties() {
     natural_pair_gen_var_6().test_properties(|(x, y)| {
         assert!((&x).divisible_by(&y));
         assert!(x == 0 || y != 0 && &x % &y == 0);
-        assert!(num_divisible_by(
-            &natural_to_biguint(&x),
-            &natural_to_biguint(&y)
-        ));
-        assert!(natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)));
+        assert!(num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)));
+        assert!(rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
 
     natural_pair_gen_var_7().test_properties(|(x, y)| {
         assert!(!(&x).divisible_by(&y));
         assert!(x != 0 && (y == 0 || &x % &y != 0));
-        assert!(!num_divisible_by(
-            &natural_to_biguint(&x),
-            &natural_to_biguint(&y)
-        ));
-        assert!(!natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)));
+        assert!(!num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)));
+        assert!(!rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
 
     natural_gen().test_properties(|n| {

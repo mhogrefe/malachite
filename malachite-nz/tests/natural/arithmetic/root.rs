@@ -12,13 +12,11 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::arithmetic::root::{limbs_floor_root, limbs_root_rem};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
 use malachite_nz::test_util::natural::arithmetic::root::{
     ceiling_root_binary, checked_root_binary, floor_root_binary, root_rem_binary,
 };
+use num::BigUint;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -518,14 +516,8 @@ fn floor_cbrt_properties() {
         assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         assert_eq!(floor_root_binary(&n, 3), cbrt);
-        assert_eq!(
-            biguint_to_natural(&natural_to_biguint(&n).nth_root(3)),
-            cbrt
-        );
-        assert_eq!(
-            rug_integer_to_natural(&natural_to_rug_integer(&n).root(3)),
-            cbrt
-        );
+        assert_eq!(Natural::from(&BigUint::from(&n).nth_root(3)), cbrt);
+        assert_eq!(Natural::exact_from(&rug::Integer::from(&n).root(3)), cbrt);
 
         let cube = (&cbrt).pow(3);
         let ceiling_cbrt = (&n).ceiling_root(3);
@@ -616,9 +608,9 @@ fn cbrt_rem_properties() {
         assert_eq!(n_alt, cbrt);
         assert_eq!(rem_alt, rem);
         assert_eq!(root_rem_binary(&n, 3), (cbrt.clone(), rem.clone()));
-        let (rug_cbrt, rug_rem) = natural_to_rug_integer(&n).root_rem(rug::Integer::new(), 3);
-        assert_eq!(rug_integer_to_natural(&rug_cbrt), cbrt);
-        assert_eq!(rug_integer_to_natural(&rug_rem), rem);
+        let (rug_cbrt, rug_rem) = rug::Integer::from(&n).root_rem(rug::Integer::new(), 3);
+        assert_eq!(Natural::exact_from(&rug_cbrt), cbrt);
+        assert_eq!(Natural::exact_from(&rug_rem), rem);
 
         assert_eq!((&n).floor_root(3), cbrt);
         assert_eq!(cbrt.pow(3) + rem, n);
@@ -647,11 +639,11 @@ fn floor_root_properties() {
         assert_eq!(n_alt, root);
         assert_eq!(floor_root_binary(&n, exp), root);
         assert_eq!(
-            biguint_to_natural(&natural_to_biguint(&n).nth_root(u32::exact_from(exp))),
+            Natural::from(&BigUint::from(&n).nth_root(u32::exact_from(exp))),
             root
         );
         assert_eq!(
-            rug_integer_to_natural(&natural_to_rug_integer(&n).root(u32::exact_from(exp))),
+            Natural::exact_from(&rug::Integer::from(&n).root(u32::exact_from(exp))),
             root
         );
 
@@ -760,9 +752,9 @@ fn root_rem_properties() {
         assert_eq!(rem_alt, rem);
         assert_eq!(root_rem_binary(&n, exp), (root.clone(), rem.clone()));
         let (rug_root, rug_rem) =
-            natural_to_rug_integer(&n).root_rem(rug::Integer::new(), u32::exact_from(exp));
-        assert_eq!(rug_integer_to_natural(&rug_root), root);
-        assert_eq!(rug_integer_to_natural(&rug_rem), rem);
+            rug::Integer::from(&n).root_rem(rug::Integer::new(), u32::exact_from(exp));
+        assert_eq!(Natural::exact_from(&rug_root), root);
+        assert_eq!(Natural::exact_from(&rug_rem), rem);
 
         assert_eq!((&n).floor_root(exp), root);
         assert_eq!(root.pow(exp) + rem, n);

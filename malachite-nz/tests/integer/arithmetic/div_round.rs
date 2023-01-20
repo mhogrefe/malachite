@@ -7,9 +7,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_signed_rounding_mode_triple_gen_var_1;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_integer_rounding_mode_triple_gen_var_1, integer_pair_gen_var_1, integer_pair_gen_var_3,
     integer_rounding_mode_pair_gen, integer_rounding_mode_pair_gen_var_2,
@@ -1061,25 +1058,19 @@ fn div_round_properties() {
         assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Exact), x);
 
         assert_eq!(
-            rug_integer_to_integer(
-                &integer_to_rug_integer(&x).div_trunc(integer_to_rug_integer(&y))
-            ),
+            Integer::from(&rug::Integer::from(&x).div_trunc(rug::Integer::from(&y))),
             (&x).div_round(&y, RoundingMode::Down)
         );
         assert_eq!(
-            bigint_to_integer(&integer_to_bigint(&x).div_floor(&integer_to_bigint(&y))),
+            Integer::from(&BigInt::from(&x).div_floor(&BigInt::from(&y))),
             (&x).div_round(&y, RoundingMode::Floor)
         );
         assert_eq!(
-            rug_integer_to_integer(
-                &integer_to_rug_integer(&x).div_floor(integer_to_rug_integer(&y))
-            ),
+            Integer::from(&rug::Integer::from(&x).div_floor(rug::Integer::from(&y))),
             (&x).div_round(&y, RoundingMode::Floor)
         );
         assert_eq!(
-            rug_integer_to_integer(
-                &integer_to_rug_integer(&x).div_ceil(integer_to_rug_integer(&y))
-            ),
+            Integer::from(&rug::Integer::from(&x).div_ceil(rug::Integer::from(&y))),
             x.div_round(y, RoundingMode::Ceiling)
         );
     });

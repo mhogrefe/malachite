@@ -2176,6 +2176,8 @@ pub fn unsigned_pair_gen_var_44<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     )
 }
 
+// var 45 is in malachite-nz
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 // All `(T, u64, `bool) where `T` is unsigned and either the `bool` is false or the `u64` is

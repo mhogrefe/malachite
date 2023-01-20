@@ -10,9 +10,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_4;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_8, integer_pair_gen_var_1, integer_pair_gen_var_2,
     natural_pair_gen_var_5,
@@ -1507,13 +1504,13 @@ fn div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
-    let (num_q, num_r) = integer_to_bigint(&x).div_mod_floor(&integer_to_bigint(&y));
-    assert_eq!(bigint_to_integer(&num_q), q);
-    assert_eq!(bigint_to_integer(&num_r), r);
+    let (num_q, num_r) = BigInt::from(&x).div_mod_floor(&BigInt::from(&y));
+    assert_eq!(Integer::from(&num_q), q);
+    assert_eq!(Integer::from(&num_r), r);
 
-    let (rug_q, rug_r) = integer_to_rug_integer(&x).div_rem_floor(integer_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_integer(&rug_q), q);
-    assert_eq!(rug_integer_to_integer(&rug_r), r);
+    let (rug_q, rug_r) = rug::Integer::from(&x).div_rem_floor(rug::Integer::from(&y));
+    assert_eq!(Integer::from(&rug_q), q);
+    assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
     assert!(r == 0 || (r > 0) == (y > 0));
@@ -1621,13 +1618,13 @@ fn div_rem_properties_helper(x: Integer, y: Integer) {
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
-    let (num_q, num_r) = integer_to_bigint(&x).div_rem(&integer_to_bigint(&y));
-    assert_eq!(bigint_to_integer(&num_q), q);
-    assert_eq!(bigint_to_integer(&num_r), r);
+    let (num_q, num_r) = BigInt::from(&x).div_rem(&BigInt::from(&y));
+    assert_eq!(Integer::from(&num_q), q);
+    assert_eq!(Integer::from(&num_r), r);
 
-    let (rug_q, rug_r) = integer_to_rug_integer(&x).div_rem(integer_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_integer(&rug_q), q);
-    assert_eq!(rug_integer_to_integer(&rug_r), r);
+    let (rug_q, rug_r) = rug::Integer::from(&x).div_rem(rug::Integer::from(&y));
+    assert_eq!(Integer::from(&rug_q), q);
+    assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
     assert!(r == 0 || (r > 0) == (x > 0));
@@ -1736,9 +1733,9 @@ fn ceiling_div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
-    let (rug_q, rug_r) = integer_to_rug_integer(&x).div_rem_ceil(integer_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_integer(&rug_q), q);
-    assert_eq!(rug_integer_to_integer(&rug_r), r);
+    let (rug_q, rug_r) = rug::Integer::from(&x).div_rem_ceil(rug::Integer::from(&y));
+    assert_eq!(Integer::from(&rug_q), q);
+    assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
     assert!(r == 0 || (r > 0) != (y > 0));

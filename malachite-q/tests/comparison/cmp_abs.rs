@@ -2,7 +2,6 @@ use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::test_util::common::test_custom_cmp_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
 use rug;
@@ -33,7 +32,7 @@ fn cmp_abs_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp_abs(&y);
         assert_eq!(
-            rational_to_rug_rational(&x).cmp_abs(&rational_to_rug_rational(&y)),
+            rug::Rational::from(&x).cmp_abs(&rug::Rational::from(&y)),
             ord
         );
         assert_eq!((&x).abs().cmp(&(&y).abs()), ord);

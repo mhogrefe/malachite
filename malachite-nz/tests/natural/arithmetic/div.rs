@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_vec_unsigned_pair_gen_var_22,
@@ -20,9 +21,6 @@ use malachite_nz::natural::arithmetic::div::{
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_gen,
     natural_gen_var_2, natural_pair_gen_var_5, natural_pair_gen_var_6,
@@ -31786,11 +31784,11 @@ fn div_properties_helper(x: Natural, y: Natural) {
     let q_alt = (&x).div_mod(&y).0;
     assert_eq!(q_alt, q);
 
-    let num_q = natural_to_biguint(&x) / &natural_to_biguint(&y);
-    assert_eq!(biguint_to_natural(&num_q), q);
+    let num_q = BigUint::from(&x) / &BigUint::from(&y);
+    assert_eq!(Natural::from(&num_q), q);
 
-    let rug_q = natural_to_rug_integer(&x) / natural_to_rug_integer(&y);
-    assert_eq!(rug_integer_to_natural(&rug_q), q);
+    let rug_q = rug::Integer::from(&x) / rug::Integer::from(&y);
+    assert_eq!(Natural::exact_from(&rug_q), q);
 
     let r = &x - &q * &y;
     assert!(r < y);

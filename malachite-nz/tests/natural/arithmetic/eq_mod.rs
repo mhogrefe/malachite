@@ -20,7 +20,6 @@ use malachite_nz::natural::arithmetic::eq_mod::{
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_pair_gen, natural_triple_gen, natural_triple_gen_var_1, natural_triple_gen_var_2,
     unsigned_vec_triple_gen_var_54, unsigned_vec_triple_gen_var_55,
@@ -936,8 +935,7 @@ fn eq_mod_properties() {
             equal
         );
         assert_eq!(
-            natural_to_rug_integer(&x)
-                .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)),
+            rug::Integer::from(&x).is_congruent(&rug::Integer::from(&y), &rug::Integer::from(&m)),
             equal
         );
     });
@@ -945,15 +943,17 @@ fn eq_mod_properties() {
     natural_triple_gen_var_1().test_properties(|(x, y, m)| {
         assert!((&x).eq_mod(&y, &m));
         assert!((&y).eq_mod(&x, &m));
-        assert!(natural_to_rug_integer(&x)
-            .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)));
+        assert!(
+            rug::Integer::from(&x).is_congruent(&rug::Integer::from(&y), &rug::Integer::from(&m))
+        );
     });
 
     natural_triple_gen_var_2().test_properties(|(x, y, m)| {
         assert!(!(&x).eq_mod(&y, &m));
         assert!(!(&y).eq_mod(&x, &m));
-        assert!(!natural_to_rug_integer(&x)
-            .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)));
+        assert!(
+            !rug::Integer::from(&x).is_congruent(&rug::Integer::from(&y), &rug::Integer::from(&m))
+        );
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

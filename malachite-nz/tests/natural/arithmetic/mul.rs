@@ -53,9 +53,6 @@ use malachite_nz::natural::arithmetic::mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
     unsigned_vec_pair_gen_var_33, unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11,
@@ -12275,11 +12272,11 @@ fn mul_properties() {
         assert!(mut_x.is_valid());
 
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(&x) * natural_to_biguint(&y))),
+            Natural::from(&(BigUint::from(&x) * BigUint::from(&y))),
             product
         );
         assert_eq!(
-            rug_integer_to_natural(&(natural_to_rug_integer(&x) * natural_to_rug_integer(&y))),
+            Natural::exact_from(&(rug::Integer::from(&x) * rug::Integer::from(&y))),
             product
         );
         assert_eq!(&y * &x, product);

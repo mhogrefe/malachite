@@ -1,13 +1,10 @@
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::biguint_to_natural;
-use malachite_nz::test_util::common::{
-    natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use malachite_nz::test_util::natural::arithmetic::checked_sub::checked_sub;
 use num::BigUint;
@@ -37,7 +34,7 @@ fn test_checked_sub_natural() {
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = checked_sub(BigUint::from_str(s).unwrap(), BigUint::from_str(t).unwrap())
-            .map(|x| biguint_to_natural(&x));
+            .map(|x| Natural::from(&x));
         assert_eq!(on.to_debug_string(), out);
 
         let on = checked_sub(
@@ -83,9 +80,9 @@ fn checked_sub_properties() {
             assert!(mut_x.is_valid());
             let diff = mut_x;
 
-            let mut rug_x = natural_to_rug_integer(&x);
-            rug_x -= natural_to_rug_integer(&y);
-            assert_eq!(rug_integer_to_natural(&rug_x), diff);
+            let mut rug_x = rug::Integer::from(&x);
+            rug_x -= rug::Integer::from(&y);
+            assert_eq!(Natural::exact_from(&rug_x), diff);
             Some(diff)
         } else {
             None
@@ -111,13 +108,12 @@ fn checked_sub_properties() {
         assert_eq!(reverse_diff.is_some(), x == y || diff.is_none());
 
         assert_eq!(
-            checked_sub(natural_to_biguint(&x), natural_to_biguint(&y))
-                .map(|x| biguint_to_natural(&x)),
+            checked_sub(BigUint::from(&x), BigUint::from(&y)).map(|x| Natural::from(&x)),
             diff
         );
         assert_eq!(
-            checked_sub(natural_to_rug_integer(&x), natural_to_rug_integer(&y))
-                .map(|x| rug_integer_to_natural(&x)),
+            checked_sub(rug::Integer::from(&x), rug::Integer::from(&y))
+                .map(|x| Natural::exact_from(&x)),
             diff
         );
 

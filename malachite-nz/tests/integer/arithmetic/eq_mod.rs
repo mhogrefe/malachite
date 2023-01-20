@@ -16,7 +16,6 @@ use malachite_nz::integer::arithmetic::eq_mod::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_integer_natural_triple_gen, integer_integer_natural_triple_gen_var_1,
     integer_integer_natural_triple_gen_var_2, integer_natural_pair_gen, integer_pair_gen,
@@ -723,8 +722,7 @@ fn eq_mod_properties() {
         assert_eq!((&x - &y).divisible_by(Integer::from(&m)), equal);
         assert_eq!((&y - &x).divisible_by(Integer::from(&m)), equal);
         assert_eq!(
-            integer_to_rug_integer(&x)
-                .is_congruent(&integer_to_rug_integer(&y), &natural_to_rug_integer(&m)),
+            rug::Integer::from(&x).is_congruent(&rug::Integer::from(&y), &rug::Integer::from(&m)),
             equal
         );
     });
@@ -732,15 +730,14 @@ fn eq_mod_properties() {
     integer_integer_natural_triple_gen_var_1().test_properties(|(ref x, ref y, ref m)| {
         assert!(x.eq_mod(y, m));
         assert!(y.eq_mod(x, m));
-        assert!(integer_to_rug_integer(x)
-            .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)));
+        assert!(rug::Integer::from(x).is_congruent(&rug::Integer::from(y), &rug::Integer::from(m)));
     });
 
     integer_integer_natural_triple_gen_var_2().test_properties(|(ref x, ref y, ref m)| {
         assert!(!x.eq_mod(y, m));
         assert!(!y.eq_mod(x, m));
-        assert!(!integer_to_rug_integer(x)
-            .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)));
+        assert!(!rug::Integer::from(x)
+            .is_congruent(&rug::Integer::from(y), &rug::Integer::from(m)));
     });
 
     integer_pair_gen().test_properties(|(x, y)| {

@@ -11,7 +11,6 @@ use malachite_nz::natural::logic::hamming_distance::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
 use malachite_nz::test_util::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
@@ -154,7 +153,7 @@ fn hamming_distance_properties() {
     natural_pair_gen().test_properties(|(x, y)| {
         let distance = x.hamming_distance(&y);
         assert_eq!(
-            rug_hamming_distance(&natural_to_rug_integer(&x), &natural_to_rug_integer(&y)),
+            rug_hamming_distance(&rug::Integer::from(&x), &rug::Integer::from(&y)),
             distance
         );
         assert_eq!(y.hamming_distance(&x), distance);

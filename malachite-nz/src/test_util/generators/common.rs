@@ -1,17 +1,14 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
-use crate::test_util::common::{
-    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
-};
 use malachite_base::test_util::generators::common::It;
 use num::{BigInt, BigUint};
 
 pub fn natural_nrm(xs: It<Natural>) -> It<(BigUint, rug::Integer, Natural)> {
-    Box::new(xs.map(|x| (natural_to_biguint(&x), natural_to_rug_integer(&x), x)))
+    Box::new(xs.map(|x| (BigUint::from(&x), rug::Integer::from(&x), x)))
 }
 
 pub fn natural_rm(xs: It<Natural>) -> It<(rug::Integer, Natural)> {
-    Box::new(xs.map(|x| (natural_to_rug_integer(&x), x)))
+    Box::new(xs.map(|x| (rug::Integer::from(&x), x)))
 }
 
 #[allow(clippy::type_complexity)]
@@ -24,8 +21,8 @@ pub fn natural_pair_nrm(
 )> {
     Box::new(ps.map(|(x, y)| {
         (
-            (natural_to_biguint(&x), natural_to_biguint(&y)),
-            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+            (BigUint::from(&x), BigUint::from(&y)),
+            (rug::Integer::from(&x), rug::Integer::from(&y)),
             (x, y),
         )
     }))
@@ -34,24 +31,19 @@ pub fn natural_pair_nrm(
 pub fn natural_pair_rm(
     ps: It<(Natural, Natural)>,
 ) -> It<((rug::Integer, rug::Integer), (Natural, Natural))> {
-    Box::new(ps.map(|(x, y)| {
-        (
-            (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
-            (x, y),
-        )
-    }))
+    Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), rug::Integer::from(&y)), (x, y))))
 }
 
 pub fn natural_pair_1_rm<T: 'static + Clone>(
     ps: It<(Natural, T)>,
 ) -> It<((rug::Integer, T), (Natural, T))> {
-    Box::new(ps.map(|(x, y)| ((natural_to_rug_integer(&x), y.clone()), (x, y))))
+    Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), y.clone()), (x, y))))
 }
 
 pub fn natural_pair_1_nm<T: 'static + Clone>(
     ps: It<(Natural, T)>,
 ) -> It<((BigUint, T), (Natural, T))> {
-    Box::new(ps.map(|(x, y)| ((natural_to_biguint(&x), y.clone()), (x, y))))
+    Box::new(ps.map(|(x, y)| ((BigUint::from(&x), y.clone()), (x, y))))
 }
 
 #[allow(clippy::type_complexity)]
@@ -60,8 +52,8 @@ pub fn natural_pair_1_nrm<T: 'static + Clone>(
 ) -> It<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Box::new(ps.map(|(x, y)| {
         (
-            (natural_to_biguint(&x), y.clone()),
-            (natural_to_rug_integer(&x), y.clone()),
+            (BigUint::from(&x), y.clone()),
+            (rug::Integer::from(&x), y.clone()),
             (x, y),
         )
     }))
@@ -77,15 +69,11 @@ pub fn natural_triple_nrm(
 )> {
     Box::new(ts.map(|(x, y, z)| {
         (
+            (BigUint::from(&x), BigUint::from(&y), BigUint::from(&z)),
             (
-                natural_to_biguint(&x),
-                natural_to_biguint(&y),
-                natural_to_biguint(&z),
-            ),
-            (
-                natural_to_rug_integer(&x),
-                natural_to_rug_integer(&y),
-                natural_to_rug_integer(&z),
+                rug::Integer::from(&x),
+                rug::Integer::from(&y),
+                rug::Integer::from(&z),
             ),
             (x, y, z),
         )
@@ -102,9 +90,9 @@ pub fn natural_triple_rm(
     Box::new(ts.map(|(x, y, z)| {
         (
             (
-                natural_to_rug_integer(&x),
-                natural_to_rug_integer(&y),
-                natural_to_rug_integer(&z),
+                rug::Integer::from(&x),
+                rug::Integer::from(&y),
+                rug::Integer::from(&z),
             ),
             (x, y, z),
         )
@@ -115,31 +103,21 @@ pub fn natural_triple_rm(
 pub fn natural_triple_1_rm<T: 'static + Clone, U: 'static + Clone>(
     ts: It<(Natural, T, U)>,
 ) -> It<((rug::Integer, T, U), (Natural, T, U))> {
-    Box::new(ts.map(|(x, y, z)| {
-        (
-            (natural_to_rug_integer(&x), y.clone(), z.clone()),
-            (x, y, z),
-        )
-    }))
+    Box::new(ts.map(|(x, y, z)| ((rug::Integer::from(&x), y.clone(), z.clone()), (x, y, z))))
 }
 
 pub fn integer_rm(xs: It<Integer>) -> It<(rug::Integer, Integer)> {
-    Box::new(xs.map(|x| (integer_to_rug_integer(&x), x)))
+    Box::new(xs.map(|x| (rug::Integer::from(&x), x)))
 }
 
 pub fn integer_nrm(xs: It<Integer>) -> It<(BigInt, rug::Integer, Integer)> {
-    Box::new(xs.map(|x| (integer_to_bigint(&x), integer_to_rug_integer(&x), x)))
+    Box::new(xs.map(|x| (BigInt::from(&x), rug::Integer::from(&x), x)))
 }
 
 pub fn integer_pair_rm(
     ps: It<(Integer, Integer)>,
 ) -> It<((rug::Integer, rug::Integer), (Integer, Integer))> {
-    Box::new(ps.map(|(x, y)| {
-        (
-            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
-            (x, y),
-        )
-    }))
+    Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), rug::Integer::from(&y)), (x, y))))
 }
 
 #[allow(clippy::type_complexity)]
@@ -152,8 +130,8 @@ pub fn integer_pair_nrm(
 )> {
     Box::new(ps.map(|(x, y)| {
         (
-            (integer_to_bigint(&x), integer_to_bigint(&y)),
-            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (BigInt::from(&x), BigInt::from(&y)),
+            (rug::Integer::from(&x), rug::Integer::from(&y)),
             (x, y),
         )
     }))
@@ -162,7 +140,7 @@ pub fn integer_pair_nrm(
 pub fn integer_pair_1_rm<T: 'static + Clone>(
     ps: It<(Integer, T)>,
 ) -> It<((rug::Integer, T), (Integer, T))> {
-    Box::new(ps.map(|(x, y)| ((integer_to_rug_integer(&x), y.clone()), (x, y))))
+    Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), y.clone()), (x, y))))
 }
 
 #[allow(clippy::type_complexity)]
@@ -171,8 +149,8 @@ pub fn integer_pair_1_nrm<T: 'static + Clone>(
 ) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))> {
     Box::new(ps.map(|(x, y)| {
         (
-            (integer_to_bigint(&x), y.clone()),
-            (integer_to_rug_integer(&x), y.clone()),
+            (BigInt::from(&x), y.clone()),
+            (rug::Integer::from(&x), y.clone()),
             (x, y),
         )
     }))
@@ -182,23 +160,13 @@ pub fn integer_pair_1_nrm<T: 'static + Clone>(
 pub fn integer_triple_1_rm<T: 'static + Clone, U: 'static + Clone>(
     ts: It<(Integer, T, U)>,
 ) -> It<((rug::Integer, T, U), (Integer, T, U))> {
-    Box::new(ts.map(|(x, y, z)| {
-        (
-            (integer_to_rug_integer(&x), y.clone(), z.clone()),
-            (x, y, z),
-        )
-    }))
+    Box::new(ts.map(|(x, y, z)| ((rug::Integer::from(&x), y.clone(), z.clone()), (x, y, z))))
 }
 
 pub fn integer_natural_pair_rm(
     ps: It<(Integer, Natural)>,
 ) -> It<((rug::Integer, rug::Integer), (Integer, Natural))> {
-    Box::new(ps.map(|(x, y)| {
-        (
-            (integer_to_rug_integer(&x), natural_to_rug_integer(&y)),
-            (x, y),
-        )
-    }))
+    Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), rug::Integer::from(&y)), (x, y))))
 }
 
 #[allow(clippy::type_complexity)]
@@ -211,9 +179,9 @@ pub fn integer_integer_natural_triple_rm(
     Box::new(ts.map(|(x, y, z)| {
         (
             (
-                integer_to_rug_integer(&x),
-                integer_to_rug_integer(&y),
-                natural_to_rug_integer(&z),
+                rug::Integer::from(&x),
+                rug::Integer::from(&y),
+                rug::Integer::from(&z),
             ),
             (x, y, z),
         )
@@ -226,11 +194,7 @@ pub fn natural_natural_triple_1_2_rm<T: 'static + Clone>(
 ) -> It<((rug::Integer, rug::Integer, T), (Natural, Natural, T))> {
     Box::new(ts.map(|(x, y, z)| {
         (
-            (
-                natural_to_rug_integer(&x),
-                natural_to_rug_integer(&y),
-                z.clone(),
-            ),
+            (rug::Integer::from(&x), rug::Integer::from(&y), z.clone()),
             (x, y, z),
         )
     }))
@@ -242,11 +206,7 @@ pub fn integer_integer_triple_1_2_rm<T: 'static + Clone>(
 ) -> It<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
     Box::new(ts.map(|(x, y, z)| {
         (
-            (
-                integer_to_rug_integer(&x),
-                integer_to_rug_integer(&y),
-                z.clone(),
-            ),
+            (rug::Integer::from(&x), rug::Integer::from(&y), z.clone()),
             (x, y, z),
         )
     }))
@@ -257,8 +217,8 @@ pub fn integer_vec_nrm(
 ) -> It<(Vec<BigInt>, Vec<rug::Integer>, Vec<Integer>)> {
     Box::new(xss.map(|xs| {
         (
-            xs.iter().map(integer_to_bigint).collect(),
-            xs.iter().map(integer_to_rug_integer).collect(),
+            xs.iter().map(BigInt::from).collect(),
+            xs.iter().map(rug::Integer::from).collect(),
             xs,
         )
     }))
@@ -269,8 +229,8 @@ pub fn natural_vec_nrm(
 ) -> It<(Vec<BigUint>, Vec<rug::Integer>, Vec<Natural>)> {
     Box::new(xss.map(|xs| {
         (
-            xs.iter().map(natural_to_biguint).collect(),
-            xs.iter().map(natural_to_rug_integer).collect(),
+            xs.iter().map(BigUint::from).collect(),
+            xs.iter().map(rug::Integer::from).collect(),
             xs,
         )
     }))

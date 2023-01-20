@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{DivExact, ExtendedGcd, Gcd};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_11,
@@ -10,9 +11,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    natural_to_rug_integer, rug_integer_to_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_pair_gen_var_4};
 use malachite_nz::test_util::natural::arithmetic::extended_gcd::{
     extended_gcd_binary_natural, extended_gcd_euclidean_natural,
@@ -31091,10 +31089,10 @@ fn extended_gcd_properties_helper(a: Natural, b: Natural) {
     let (gcd, x, y) = result;
 
     let (rug_gcd, rug_x, rug_y) =
-        natural_to_rug_integer(&a).extended_gcd(natural_to_rug_integer(&b), rug::Integer::new());
-    assert_eq!(rug_integer_to_natural(&rug_gcd), gcd);
-    assert_eq!(rug_integer_to_integer(&rug_x), x);
-    assert_eq!(rug_integer_to_integer(&rug_y), y);
+        rug::Integer::from(&a).extended_gcd(rug::Integer::from(&b), rug::Integer::new());
+    assert_eq!(Natural::exact_from(&rug_gcd), gcd);
+    assert_eq!(Integer::from(&rug_x), x);
+    assert_eq!(Integer::from(&rug_y), y);
 
     assert_eq!((&a).gcd(&b), gcd);
     assert_eq!(

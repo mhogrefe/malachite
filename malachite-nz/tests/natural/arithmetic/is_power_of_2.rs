@@ -6,7 +6,6 @@ use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1
 use malachite_nz::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{natural_gen, natural_gen_var_2};
 use rug;
 use std::str::FromStr;
@@ -72,7 +71,7 @@ fn limbs_is_power_of_2_properties() {
 fn is_power_of_2_properties() {
     natural_gen().test_properties(|x| {
         let is_power_of_2 = x.is_power_of_2();
-        assert_eq!(natural_to_rug_integer(&x).is_power_of_two(), is_power_of_2);
+        assert_eq!(rug::Integer::from(&x).is_power_of_two(), is_power_of_2);
     });
 
     natural_gen_var_2().test_properties(|x| {

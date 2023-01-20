@@ -8,12 +8,10 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen_var_1, natural_gen, natural_natural_bool_triple_gen_var_1,
     natural_pair_gen_var_5,
 };
-use malachite_q::test_util::common::{bigrational_to_rational, rug_rational_to_rational};
 use malachite_q::Rational;
 use num::{BigInt, BigRational};
 use std::str::FromStr;
@@ -153,16 +151,13 @@ fn from_integers_properties() {
         assert_eq!(x, x_alt);
 
         assert_eq!(
-            bigrational_to_rational(&BigRational::new(
-                integer_to_bigint(&n),
-                integer_to_bigint(&d)
-            )),
+            Rational::from(&BigRational::new(BigInt::from(&n), BigInt::from(&d))),
             x
         );
         assert_eq!(
-            rug_rational_to_rational(&rug::Rational::from((
-                integer_to_rug_integer(&n),
-                integer_to_rug_integer(&d)
+            Rational::from(&rug::Rational::from((
+                rug::Integer::from(&n),
+                rug::Integer::from(&d)
             ))),
             x
         );
@@ -222,7 +217,7 @@ where
         let x = Rational::from_signeds(n, d);
         assert!(x.is_valid());
 
-        let x_alt = rug_rational_to_rational(&rug::Rational::from((n, d)));
+        let x_alt = Rational::from(&rug::Rational::from((n, d)));
         assert!(PartialEq::<Rational>::eq(&x_alt, &x));
         if n != T::ZERO {
             assert_eq!(

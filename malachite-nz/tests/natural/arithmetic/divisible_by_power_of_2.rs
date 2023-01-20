@@ -9,7 +9,6 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_4,
     natural_unsigned_pair_gen_var_9,
@@ -90,7 +89,7 @@ fn divisible_by_power_of_2_properties() {
     natural_unsigned_pair_gen_var_4().test_properties(|(x, pow)| {
         let divisible = x.divisible_by_power_of_2(pow);
         assert_eq!(
-            natural_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)),
+            rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)),
             divisible
         );
         if x != 0 {
@@ -103,7 +102,7 @@ fn divisible_by_power_of_2_properties() {
 
     natural_unsigned_pair_gen_var_9().test_properties(|(x, pow)| {
         assert!(x.divisible_by_power_of_2(pow));
-        assert!(natural_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)));
+        assert!(rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)));
         if x != 0 {
             assert!(x.trailing_zeros().unwrap() >= pow);
         }
@@ -113,7 +112,7 @@ fn divisible_by_power_of_2_properties() {
 
     natural_unsigned_pair_gen_var_10().test_properties(|(x, pow)| {
         assert!(!x.divisible_by_power_of_2(pow));
-        assert!(!natural_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)));
+        assert!(!rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)));
         if x != 0 {
             assert!(x.trailing_zeros().unwrap() < pow);
         }

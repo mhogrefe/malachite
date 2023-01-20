@@ -10,7 +10,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_4;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
@@ -75,9 +74,9 @@ fn clear_bit_properties() {
         assert!(mut_n.is_valid());
         let result = mut_n;
 
-        let mut rug_n = natural_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n.set_bit(u32::exact_from(index), false);
-        assert_eq!(rug_integer_to_natural(&rug_n), result);
+        assert_eq!(Natural::exact_from(&rug_n), result);
 
         let mut mut_n = n.clone();
         mut_n.assign_bit(index, false);

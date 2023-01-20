@@ -1,9 +1,9 @@
 use malachite_base::strings::string_is_subset;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::test_util::generators::integer_gen;
-use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
+use num::BigRational;
 use std::str::FromStr;
 
 #[test]
@@ -37,8 +37,8 @@ fn to_string_properties() {
     rational_gen().test_properties(|x| {
         let s = x.to_string();
         assert_eq!(x.to_debug_string(), s);
-        assert_eq!(rational_to_bigrational(&x).to_string(), s);
-        assert_eq!(rational_to_rug_rational(&x).to_string(), s);
+        assert_eq!(BigRational::from(&x).to_string(), s);
+        assert_eq!(rug::Rational::from(&x).to_string(), s);
         assert!(string_is_subset(&s, "-/0123456789"));
         if x != 0 {
             assert!(!s.starts_with('0'));

@@ -5,10 +5,6 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_rational_signed_triple_gen_var_1,
     rational_rational_unsigned_triple_gen_var_1, rational_signed_pair_gen_var_2,
@@ -228,12 +224,9 @@ fn pow_properties() {
 
         assert_eq!((&x).pow(i64::exact_from(exp)), power);
 
+        assert_eq!(Rational::from(&BigRational::from(&x).pow(exp)), power);
         assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).pow(exp)),
-            power
-        );
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).pow(u32::exact_from(exp))),
+            Rational::from(&rug::Rational::from(&x).pow(u32::exact_from(exp))),
             power
         );
     });
@@ -299,12 +292,9 @@ fn pow_properties() {
         //     assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
         // }
 
+        assert_eq!(Rational::from(&BigRational::from(&x).pow(exp)), power);
         assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).pow(exp)),
-            power
-        );
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).pow(i32::exact_from(exp))),
+            Rational::from(&rug::Rational::from(&x).pow(i32::exact_from(exp))),
             power
         );
     });

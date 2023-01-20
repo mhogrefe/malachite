@@ -1,7 +1,5 @@
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::natural_pair_gen;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::rational_natural_pair_gen;
 use malachite_q::Rational;
 use rug;
@@ -41,10 +39,7 @@ fn partial_eq_natural_properties() {
         let eq = x == y;
         assert_eq!(y == x, eq);
         assert_eq!(x == Rational::from(&y), eq);
-        assert_eq!(
-            rational_to_rug_rational(&x) == natural_to_rug_integer(&y),
-            eq
-        );
+        assert_eq!(rug::Rational::from(&x) == rug::Integer::from(&y), eq);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

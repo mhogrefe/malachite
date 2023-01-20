@@ -1,7 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{rational_signed_pair_gen, rational_unsigned_pair_gen};
 use malachite_q::Rational;
 use rug;
@@ -124,11 +123,11 @@ where
 {
     rational_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let eq = n == u;
-        assert_eq!(rational_to_rug_rational(&n) == u, eq);
+        assert_eq!(rug::Rational::from(&n) == u, eq);
         assert_eq!(&n == &Rational::from(u), eq);
 
         assert_eq!(u == n, eq);
-        assert_eq!(u == rational_to_rug_rational(&n), eq);
+        assert_eq!(u == rug::Rational::from(&n), eq);
         assert_eq!(&Rational::from(u) == &n, eq);
     });
 
@@ -149,11 +148,11 @@ where
 {
     rational_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let eq = n == i;
-        assert_eq!(rational_to_rug_rational(&n) == i, eq);
+        assert_eq!(rug::Rational::from(&n) == i, eq);
         assert_eq!(&n == &Rational::from(i), eq);
 
         assert_eq!(i == n, eq);
-        assert_eq!(i == rational_to_rug_rational(&n), eq);
+        assert_eq!(i == rug::Rational::from(&n), eq);
         assert_eq!(&Rational::from(i) == &n, eq);
     });
 

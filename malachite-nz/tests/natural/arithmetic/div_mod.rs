@@ -26,9 +26,6 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_11, large_type_gen_var_12, large_type_gen_var_18, large_type_gen_var_19,
     natural_gen, natural_gen_var_2, natural_pair_gen_var_5, natural_pair_gen_var_6,
@@ -24000,21 +23997,21 @@ fn div_mod_and_div_rem_properties_helper(x: Natural, y: Natural) {
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
-    let (num_q, num_r) = natural_to_biguint(&x).div_mod_floor(&natural_to_biguint(&y));
-    assert_eq!(biguint_to_natural(&num_q), q);
-    assert_eq!(biguint_to_natural(&num_r), r);
+    let (num_q, num_r) = BigUint::from(&x).div_mod_floor(&BigUint::from(&y));
+    assert_eq!(Natural::from(&num_q), q);
+    assert_eq!(Natural::from(&num_r), r);
 
-    let (num_q, num_r) = natural_to_biguint(&x).div_rem(&natural_to_biguint(&y));
-    assert_eq!(biguint_to_natural(&num_q), q);
-    assert_eq!(biguint_to_natural(&num_r), r);
+    let (num_q, num_r) = BigUint::from(&x).div_rem(&BigUint::from(&y));
+    assert_eq!(Natural::from(&num_q), q);
+    assert_eq!(Natural::from(&num_r), r);
 
-    let (rug_q, rug_r) = natural_to_rug_integer(&x).div_rem_floor(natural_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_natural(&rug_q), q);
-    assert_eq!(rug_integer_to_natural(&rug_r), r);
+    let (rug_q, rug_r) = rug::Integer::from(&x).div_rem_floor(rug::Integer::from(&y));
+    assert_eq!(Natural::exact_from(&rug_q), q);
+    assert_eq!(Natural::exact_from(&rug_r), r);
 
-    let (rug_q, rug_r) = natural_to_rug_integer(&x).div_rem(natural_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_natural(&rug_q), q);
-    assert_eq!(rug_integer_to_natural(&rug_r), r);
+    let (rug_q, rug_r) = rug::Integer::from(&x).div_rem(rug::Integer::from(&y));
+    assert_eq!(Natural::exact_from(&rug_q), q);
+    assert_eq!(Natural::exact_from(&rug_r), r);
 
     assert!(r < y);
     assert_eq!(q * y + r, x);
@@ -24099,10 +24096,9 @@ fn ceiling_div_neg_mod_properties_helper(x: Natural, y: Natural) {
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
-    let (rug_q, rug_r) =
-        rug_ceiling_div_neg_mod(natural_to_rug_integer(&x), natural_to_rug_integer(&y));
-    assert_eq!(rug_integer_to_natural(&rug_q), q);
-    assert_eq!(rug_integer_to_natural(&rug_r), r);
+    let (rug_q, rug_r) = rug_ceiling_div_neg_mod(rug::Integer::from(&x), rug::Integer::from(&y));
+    assert_eq!(Natural::exact_from(&rug_q), q);
+    assert_eq!(Natural::exact_from(&rug_r), r);
 
     assert!(r < y);
     assert_eq!(q * y - r, x);

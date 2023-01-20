@@ -33,7 +33,7 @@ use malachite_base::test_util::runner::Runner;
 // cargo run --release --features bin_build -- -l 100000 -m random -b
 //     benchmark_limbs_to_digits_small_base_algorithms
 //
-// cargo run -- -g digits_data
+// cargo run --features bin_build -- -g digits_data
 #[cfg(feature = "bin_build")]
 fn main() {
     let args = read_command_line_arguments("malachite-nz test utils");

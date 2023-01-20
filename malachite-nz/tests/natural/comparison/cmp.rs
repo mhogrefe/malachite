@@ -12,7 +12,6 @@ use malachite_nz::natural::comparison::cmp::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_9, natural_triple_gen,
     natural_triple_gen_var_6,
@@ -209,11 +208,8 @@ fn limbs_cmp_normalized_properties() {
 fn cmp_properties() {
     natural_pair_gen().test_properties(|(x, y)| {
         let cmp = x.cmp(&y);
-        assert_eq!(natural_to_biguint(&x).cmp(&natural_to_biguint(&y)), cmp);
-        assert_eq!(
-            natural_to_rug_integer(&x).cmp(&natural_to_rug_integer(&y)),
-            cmp
-        );
+        assert_eq!(BigUint::from(&x).cmp(&BigUint::from(&y)), cmp);
+        assert_eq!(rug::Integer::from(&x).cmp(&rug::Integer::from(&y)), cmp);
         assert_eq!(y.cmp(&x).reverse(), cmp);
         assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
         assert_eq!((-y).cmp(&(-x)), cmp);

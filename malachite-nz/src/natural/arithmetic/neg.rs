@@ -1,6 +1,41 @@
 use crate::integer::Integer;
+use crate::malachite_base::num::arithmetic::traits::WrappingNegAssign;
+use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::Natural;
+use crate::platform::Limb;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use std::ops::Neg;
+
+// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1.
+pub(crate) fn limbs_neg(out: &mut [Limb], xs: &[Limb]) -> bool {
+    let n = xs.len();
+    let zeros = slice_leading_zeros(xs);
+    slice_set_zero(&mut out[..zeros]);
+    if zeros == n {
+        return false;
+    }
+    out[zeros] = xs[zeros].wrapping_neg();
+    let offset = zeros + 1;
+    if offset != n {
+        limbs_not_to_out(&mut out[offset..], &xs[offset..]);
+    }
+    true
+}
+
+// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1, where rp == up.
+pub(crate) fn limbs_neg_in_place(xs: &mut [Limb]) -> bool {
+    let n = xs.len();
+    let zeros = slice_leading_zeros(xs);
+    if zeros == n {
+        return false;
+    }
+    xs[zeros].wrapping_neg_assign();
+    let offset = zeros + 1;
+    if offset != n {
+        limbs_not_in_place(&mut xs[offset..]);
+    }
+    true
+}
 
 impl Neg for Natural {
     type Output = Integer;

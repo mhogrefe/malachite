@@ -149,7 +149,7 @@ fn test_primes() {
         7703, 7717, 7723, 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829, 7841, 7853, \
         7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919]";
     let ps = Natural::primes().take(1000).collect_vec();
-    assert!(ps.iter().all(|p| p.is_valid()));
+    assert!(ps.iter().all(Natural::is_valid));
     assert_eq!(ps.to_debug_string(), expected);
 }
 
@@ -157,7 +157,7 @@ fn test_primes() {
 fn primes_less_than_properties() {
     natural_gen_var_9().test_properties(|n| {
         let ps = Natural::primes_less_than(&n).collect_vec();
-        assert!(ps.iter().all(|p| p.is_valid()));
+        assert!(ps.iter().all(Natural::is_valid));
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
             Natural::primes_less_than_or_equal_to(&(&n).saturating_sub(Natural::ONE)).collect_vec(),
@@ -171,7 +171,7 @@ fn primes_less_than_properties() {
 fn primes_less_than_or_equal_to_properties() {
     natural_gen_var_9().test_properties(|n| {
         let ps = Natural::primes_less_than_or_equal_to(&n).collect_vec();
-        assert!(ps.iter().all(|p| p.is_valid()));
+        assert!(ps.iter().all(Natural::is_valid));
         assert!(is_strictly_ascending(ps.iter()));
         assert_eq!(
             Natural::primes_less_than(&(&n + Natural::ONE)).collect_vec(),

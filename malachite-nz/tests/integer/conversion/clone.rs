@@ -1,9 +1,6 @@
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen};
 use num::BigInt;
 use rug;
@@ -59,11 +56,8 @@ fn clone_and_clone_from_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, x);
 
-        assert_eq!(bigint_to_integer(&integer_to_bigint(&x).clone()), x);
-        assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&x).clone()),
-            x
-        );
+        assert_eq!(Integer::from(&BigInt::from(&x).clone()), x);
+        assert_eq!(Integer::from(&rug::Integer::from(&x).clone()), x);
     });
 
     integer_pair_gen().test_properties(|(x, y)| {
@@ -72,13 +66,13 @@ fn clone_and_clone_from_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, y);
 
-        let mut num_x = integer_to_bigint(&x);
-        num_x.clone_from(&integer_to_bigint(&y));
-        assert_eq!(bigint_to_integer(&num_x), y);
+        let mut num_x = BigInt::from(&x);
+        num_x.clone_from(&BigInt::from(&y));
+        assert_eq!(Integer::from(&num_x), y);
 
-        let mut rug_x = integer_to_rug_integer(&x);
-        rug_x.clone_from(&integer_to_rug_integer(&y));
-        assert_eq!(rug_integer_to_integer(&rug_x), y);
+        let mut rug_x = rug::Integer::from(&x);
+        rug_x.clone_from(&rug::Integer::from(&y));
+        assert_eq!(Integer::from(&rug_x), y);
     });
 
     signed_pair_gen::<SignedLimb>().test_properties(|(i, j)| {

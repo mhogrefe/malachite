@@ -8,9 +8,6 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_signed_pair_gen_var_1, integer_unsigned_pair_gen_var_2,
     natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
@@ -361,31 +358,25 @@ fn shl_properties() {
 
     integer_unsigned_pair_gen_var_2::<u32>().test_properties(|(n, u)| {
         let shifted = &n << u;
-        let mut rug_n = integer_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n <<= u;
-        assert_eq!(rug_integer_to_integer(&rug_n), shifted);
+        assert_eq!(Integer::from(&rug_n), shifted);
         assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(&n) << usize::exact_from(u))),
+            Integer::from(&(&BigInt::from(&n) << usize::exact_from(u))),
             shifted
         );
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(&n) << usize::exact_from(u))),
+            Integer::from(&(BigInt::from(&n) << usize::exact_from(u))),
             shifted
         );
-        assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(&n) << u)),
-            shifted
-        );
+        assert_eq!(Integer::from(&(rug::Integer::from(&n) << u)), shifted);
     });
 
     integer_signed_pair_gen_var_1::<i32>().test_properties(|(n, i)| {
         let shifted = &n << i;
-        let mut rug_n = integer_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n <<= i;
-        assert_eq!(rug_integer_to_integer(&rug_n), shifted);
-        assert_eq!(
-            rug_integer_to_integer(&(integer_to_rug_integer(&n) << i)),
-            shifted
-        );
+        assert_eq!(Integer::from(&rug_n), shifted);
+        assert_eq!(Integer::from(&(rug::Integer::from(&n) << i)), shifted);
     });
 }

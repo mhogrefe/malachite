@@ -51,9 +51,6 @@ use crate::natural::random::{
 };
 use crate::natural::Natural;
 use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
-use crate::test_util::common::{
-    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
-};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
     random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
@@ -126,6 +123,7 @@ use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
 use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
+use num::{BigInt, BigUint};
 use std::cmp::{max, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -4369,8 +4367,8 @@ pub fn special_random_string_triple_gen_var_1(config: &GenConfig) -> It<(String,
         )
         .map(|x| {
             (
-                serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
-                serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&BigUint::from(&x)).unwrap(),
+                serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
                 serde_json::to_string(&x).unwrap(),
             )
         }),
@@ -4388,8 +4386,8 @@ pub fn special_random_string_triple_gen_var_2(config: &GenConfig) -> It<(String,
         )
         .map(|x| {
             (
-                serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
-                serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&BigInt::from(&x)).unwrap(),
+                serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
                 serde_json::to_string(&x).unwrap(),
             )
         }),

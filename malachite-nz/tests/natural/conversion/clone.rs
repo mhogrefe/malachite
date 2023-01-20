@@ -1,9 +1,7 @@
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_pair_gen_var_27};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use num::BigUint;
 use rug;
@@ -57,11 +55,8 @@ fn clone_and_clone_from_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, x);
 
-        assert_eq!(biguint_to_natural(&natural_to_biguint(&x).clone()), x);
-        assert_eq!(
-            rug_integer_to_natural(&natural_to_rug_integer(&x).clone()),
-            x
-        );
+        assert_eq!(Natural::from(&BigUint::from(&x).clone()), x);
+        assert_eq!(Natural::exact_from(&rug::Integer::from(&x).clone()), x);
     });
 
     unsigned_gen::<Limb>().test_properties(|u| {
@@ -77,13 +72,13 @@ fn clone_and_clone_from_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, y);
 
-        let mut num_x = natural_to_biguint(&x);
-        num_x.clone_from(&natural_to_biguint(&y));
-        assert_eq!(biguint_to_natural(&num_x), y);
+        let mut num_x = BigUint::from(&x);
+        num_x.clone_from(&BigUint::from(&y));
+        assert_eq!(Natural::from(&num_x), y);
 
-        let mut rug_x = natural_to_rug_integer(&x);
-        rug_x.clone_from(&natural_to_rug_integer(&y));
-        assert_eq!(rug_integer_to_natural(&rug_x), y);
+        let mut rug_x = rug::Integer::from(&x);
+        rug_x.clone_from(&rug::Integer::from(&y));
+        assert_eq!(Natural::exact_from(&rug_x), y);
     });
 
     unsigned_pair_gen_var_27::<Limb>().test_properties(|(u, v)| {

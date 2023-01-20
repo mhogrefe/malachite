@@ -1,7 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::integer_unsigned_bool_triple_gen_var_1;
 use rug;
 use std::str::FromStr;
@@ -51,8 +50,8 @@ fn assign_bit_properties() {
         assert!(mut_n.is_valid());
         let result = mut_n;
 
-        let mut rug_n = integer_to_rug_integer(&n);
+        let mut rug_n = rug::Integer::from(&n);
         rug_n.set_bit(u32::exact_from(index), bit);
-        assert_eq!(rug_integer_to_integer(&rug_n), result);
+        assert_eq!(Integer::from(&rug_n), result);
     });
 }

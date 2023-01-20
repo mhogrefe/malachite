@@ -2,7 +2,6 @@ use crate::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
 };
-use crate::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_xxyz, exhaustive_triples_from_single,
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
@@ -43,6 +42,7 @@ use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use malachite_nz::natural::Natural;
+use num::BigRational;
 use std::ops::Shr;
 
 // -- Rational --
@@ -648,8 +648,8 @@ pub fn exhaustive_string_gen_var_12() -> It<String> {
 pub fn exhaustive_string_triple_gen_var_3() -> It<(String, String, String)> {
     Box::new(exhaustive_rationals().map(|x| {
         (
-            serde_json::to_string(&rational_to_bigrational(&x)).unwrap(),
-            serde_json::to_string(&rational_to_rug_rational(&x)).unwrap(),
+            serde_json::to_string(&BigRational::from(&x)).unwrap(),
+            serde_json::to_string(&rug::Rational::from(&x)).unwrap(),
             serde_json::to_string(&x).unwrap(),
         )
     }))

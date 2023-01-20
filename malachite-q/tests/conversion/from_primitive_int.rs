@@ -3,7 +3,6 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::natural::Natural;
-use malachite_q::test_util::common::rug_rational_to_rational;
 use malachite_q::Rational;
 use rug;
 
@@ -78,7 +77,8 @@ where
         assert_eq!(alt_n, n);
         let alt_n: Rational = From::from(u128::exact_from(u));
         assert_eq!(alt_n, n);
-        assert_eq!(rug_rational_to_rational(&rug::Rational::from(u)), n);
+        let alt_n: Rational = From::from(&rug::Rational::from(u));
+        assert_eq!(alt_n, n);
     });
 }
 
@@ -95,7 +95,8 @@ where
         assert_eq!(T::exact_from(&n), i);
         let alt_n: Rational = From::from(i128::exact_from(i));
         assert_eq!(alt_n, n);
-        assert_eq!(rug_rational_to_rational(&rug::Rational::from(i)), n);
+        let alt_n: Rational = From::from(&rug::Rational::from(i));
+        assert_eq!(alt_n, n);
     });
 
     signed_gen_var_2::<T>().test_properties(|i| {

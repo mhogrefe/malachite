@@ -23,9 +23,6 @@ use malachite_nz::natural::arithmetic::sub::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_10};
 use malachite_nz::test_util::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_with_overlap_naive,
@@ -1262,9 +1259,9 @@ fn sub_properties() {
         let diff_alt = mut_x;
         assert_eq!(diff_alt, diff);
 
-        let mut rug_x = natural_to_rug_integer(&x);
-        rug_x -= natural_to_rug_integer(&y);
-        assert_eq!(rug_integer_to_natural(&rug_x), diff);
+        let mut rug_x = rug::Integer::from(&x);
+        rug_x -= rug::Integer::from(&y);
+        assert_eq!(Natural::exact_from(&rug_x), diff);
 
         let diff_alt = x.clone() - y.clone();
         assert!(diff_alt.is_valid());
@@ -1283,11 +1280,11 @@ fn sub_properties() {
         assert!(diff_alt.is_valid());
 
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(&x) - natural_to_biguint(&y))),
+            Natural::from(&(BigUint::from(&x) - BigUint::from(&y))),
             diff
         );
         assert_eq!(
-            rug_integer_to_natural(&(natural_to_rug_integer(&x) - natural_to_rug_integer(&y))),
+            Natural::exact_from(&(rug::Integer::from(&x) - rug::Integer::from(&y))),
             diff
         );
 

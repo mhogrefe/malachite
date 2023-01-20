@@ -2,7 +2,6 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_integer_signed_triple_gen, integer_integer_unsigned_triple_gen,
     integer_signed_pair_gen, integer_signed_signed_triple_gen, integer_unsigned_pair_gen,
@@ -159,13 +158,13 @@ where
 {
     integer_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp = n.partial_cmp(&u);
-        assert_eq!(num_partial_cmp_primitive(&integer_to_bigint(&n), u), cmp);
-        assert_eq!(integer_to_rug_integer(&n).partial_cmp(&u), cmp);
+        assert_eq!(num_partial_cmp_primitive(&From::from(&n), u), cmp);
+        assert_eq!(rug::Integer::from(&n).partial_cmp(&u), cmp);
         assert_eq!(Some(n.cmp(&Integer::from(u))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&integer_to_rug_integer(&n)), cmp_rev);
+        assert_eq!(u.partial_cmp(&rug::Integer::from(&n)), cmp_rev);
         assert_eq!(Some(Integer::from(u).cmp(&n)), cmp_rev);
     });
 
@@ -202,13 +201,13 @@ where
 {
     integer_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let cmp = n.partial_cmp(&i);
-        assert_eq!(num_partial_cmp_primitive(&integer_to_bigint(&n), i), cmp);
-        assert_eq!(integer_to_rug_integer(&n).partial_cmp(&i), cmp);
+        assert_eq!(num_partial_cmp_primitive(&From::from(&n), i), cmp);
+        assert_eq!(rug::Integer::from(&n).partial_cmp(&i), cmp);
         assert_eq!(Some(n.cmp(&Integer::from(i))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(i.partial_cmp(&n), cmp_rev);
-        assert_eq!(i.partial_cmp(&integer_to_rug_integer(&n)), cmp_rev);
+        assert_eq!(i.partial_cmp(&rug::Integer::from(&n)), cmp_rev);
         assert_eq!(Some(Integer::from(i).cmp(&n)), cmp_rev);
     });
 

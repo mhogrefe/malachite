@@ -9,7 +9,6 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
 use malachite_nz::test_util::natural::logic::index_of_next_true_bit::*;
 use rug;
@@ -92,7 +91,7 @@ fn index_of_next_true_bit_properties() {
         let result = n.index_of_next_true_bit(u);
         assert_eq!(result, natural_index_of_next_true_bit_alt(&n, u));
         assert_eq!(
-            natural_to_rug_integer(&n)
+            rug::Integer::from(&n)
                 .find_one(u32::exact_from(u))
                 .map(u64::from),
             result

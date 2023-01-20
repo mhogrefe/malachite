@@ -6,9 +6,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_4;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_8, integer_pair_gen_var_1, integer_pair_gen_var_2,
     natural_pair_gen_var_5,
@@ -417,11 +414,11 @@ fn div_properties_helper(x: Integer, y: Integer) {
     let q_alt = (&x).div_rem(&y).0;
     assert_eq!(q_alt, q);
 
-    let num_q = integer_to_bigint(&x) / &integer_to_bigint(&y);
-    assert_eq!(bigint_to_integer(&num_q), q);
+    let num_q = BigInt::from(&x) / &BigInt::from(&y);
+    assert_eq!(Integer::from(&num_q), q);
 
-    let rug_q = integer_to_rug_integer(&x) / integer_to_rug_integer(&y);
-    assert_eq!(rug_integer_to_integer(&rug_q), q);
+    let rug_q = rug::Integer::from(&x) / rug::Integer::from(&y);
+    assert_eq!(Integer::from(&rug_q), q);
 
     let remainder = &x - &q * &y;
     assert!(remainder.lt_abs(&y));

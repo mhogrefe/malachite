@@ -3,10 +3,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
 use num::BigRational;
@@ -47,15 +43,9 @@ fn ceiling_properties() {
         let ceiling = x.clone().ceiling();
         assert!(ceiling.is_valid());
 
-        assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).ceil()),
-            ceiling
-        );
+        assert_eq!(Rational::from(&BigRational::from(&x).ceil()), ceiling);
 
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).ceil()),
-            ceiling
-        );
+        assert_eq!(Rational::from(&rug::Rational::from(&x).ceil()), ceiling);
 
         let ceiling_alt = (&x).ceiling();
         assert!(ceiling_alt.is_valid());

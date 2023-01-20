@@ -7,7 +7,6 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use num::{BigInt, Num};
 use rug;
 use std::collections::HashMap;
@@ -72,11 +71,8 @@ fn from_str_properties() {
         }
         assert_eq!(Integer::from_str(&with_zero).unwrap(), n);
 
-        assert_eq!(BigInt::from_str(&s).unwrap(), integer_to_bigint(&n));
-        assert_eq!(
-            rug::Integer::from_str(&s).unwrap(),
-            integer_to_rug_integer(&n)
-        );
+        assert_eq!(BigInt::from_str(&s).unwrap(), BigInt::from(&n));
+        assert_eq!(rug::Integer::from_str(&s).unwrap(), rug::Integer::from(&n));
     });
 
     unsigned_gen_var_11().test_properties(|u| {
@@ -200,15 +196,12 @@ fn from_string_base_properties() {
         assert_eq!(Integer::from_string_base(base, &with_zero).unwrap(), n);
 
         if let Ok(base) = u32::try_from(base) {
-            assert_eq!(
-                BigInt::from_str_radix(&s, base).unwrap(),
-                integer_to_bigint(&n)
-            );
+            assert_eq!(BigInt::from_str_radix(&s, base).unwrap(), BigInt::from(&n));
         }
         if let Ok(base) = i32::try_from(base) {
             assert_eq!(
                 rug::Integer::from_str_radix(&s, base).unwrap(),
-                integer_to_rug_integer(&n)
+                rug::Integer::from(&n)
             );
         }
     });

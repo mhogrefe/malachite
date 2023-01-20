@@ -1,18 +1,38 @@
 use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+use malachite_base::test_util::bench::bucketers::usize_convertible_pair_max_bucketer;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::unsigned_pair_gen_var_28;
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::arithmetic::binomial_coefficient::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
 };
-use malachite_nz::test_util::generators::{natural_pair_gen_var_15, natural_pair_gen_var_15_rm};
-use malachite_nz::test_util::natural::arithmetic::binomial_coefficient::binomial_coefficient_naive;
+use malachite_nz::test_util::generators::{
+    natural_pair_gen_var_15, natural_pair_gen_var_15_rm, unsigned_pair_gen_var_45,
+    unsigned_pair_gen_var_46, unsigned_pair_gen_var_47, unsigned_pair_gen_var_48,
+    unsigned_pair_gen_var_49,
+};
+use malachite_nz::test_util::natural::arithmetic::binomial_coefficient::*;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_limbs_binomial_coefficient_limb_limb_bdiv);
+    register_demo!(runner, demo_limbs_binomial_coefficient_limb_limb_small_k);
+    register_demo!(runner, demo_limbs_binomial_coefficient_limb_limb_basecase);
+    register_demo!(
+        runner,
+        demo_limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer
+    );
+    register_demo!(
+        runner,
+        demo_limbs_binomial_coefficient_limb_limb_goetgheluck
+    );
+    register_demo!(runner, demo_binomial_coefficient_limb_limb);
     register_demo!(runner, demo_natural_binomial_coefficient);
     register_demo!(runner, demo_natural_binomial_coefficient_ref);
 
+    register_bench!(runner, benchmark_binomial_coefficient_limb_limb_algorithms);
     register_bench!(
         runner,
         benchmark_natural_binomial_coefficient_evaluation_strategy
@@ -22,6 +42,84 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_natural_binomial_coefficient_library_comparison
     );
+}
+
+fn demo_limbs_binomial_coefficient_limb_limb_bdiv(gm: GenMode, config: GenConfig, limit: usize) {
+    for (n, k) in unsigned_pair_gen_var_45().get(gm, &config).take(limit) {
+        println!(
+            "limbs_binomial_coefficient_limb_limb_bdiv({}, {}) = {:?}",
+            n,
+            k,
+            limbs_binomial_coefficient_limb_limb_bdiv(n, k),
+        );
+    }
+}
+
+fn demo_limbs_binomial_coefficient_limb_limb_small_k(gm: GenMode, config: GenConfig, limit: usize) {
+    for (n, k) in unsigned_pair_gen_var_46().get(gm, &config).take(limit) {
+        println!(
+            "limbs_binomial_coefficient_limb_limb_small_k({}, {}) = {:?}",
+            n,
+            k,
+            limbs_binomial_coefficient_limb_limb_small_k(n, k),
+        );
+    }
+}
+
+fn demo_limbs_binomial_coefficient_limb_limb_basecase(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (n, k) in unsigned_pair_gen_var_47().get(gm, &config).take(limit) {
+        println!(
+            "limbs_binomial_coefficient_limb_limb_basecase({}, {}) = {}",
+            n,
+            k,
+            limbs_binomial_coefficient_limb_limb_basecase(n, k),
+        );
+    }
+}
+
+fn demo_limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (n, k) in unsigned_pair_gen_var_48().get(gm, &config).take(limit) {
+        println!(
+            "limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer({}, {}) = {:?}",
+            n,
+            k,
+            limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(n, k),
+        );
+    }
+}
+
+fn demo_limbs_binomial_coefficient_limb_limb_goetgheluck(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (n, k) in unsigned_pair_gen_var_49().get(gm, &config).take(limit) {
+        println!(
+            "limbs_binomial_coefficient_limb_limb_goetgheluck({}, {}) = {:?}",
+            n,
+            k,
+            limbs_binomial_coefficient_limb_limb_goetgheluck(n, k),
+        );
+    }
+}
+
+fn demo_binomial_coefficient_limb_limb(gm: GenMode, config: GenConfig, limit: usize) {
+    for (n, k) in unsigned_pair_gen_var_28().get(gm, &config).take(limit) {
+        println!(
+            "binomial_coefficient_limb_limb({}, {}) = {}",
+            n,
+            k,
+            binomial_coefficient_limb_limb(n, k),
+        );
+    }
 }
 
 fn demo_natural_binomial_coefficient(gm: GenMode, config: GenConfig, limit: usize) {
@@ -46,6 +144,34 @@ fn demo_natural_binomial_coefficient_ref(gm: GenMode, config: GenConfig, limit: 
             Natural::binomial_coefficient(&n, &k)
         );
     }
+}
+
+fn benchmark_binomial_coefficient_limb_limb_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "binomial_coefficient_limb_limb(Limb, Limb)",
+        BenchmarkType::Algorithms,
+        unsigned_pair_gen_var_28().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &usize_convertible_pair_max_bucketer("n", "k"),
+        &mut [
+            ("default", &mut |(n, k)| {
+                no_out!(binomial_coefficient_limb_limb(n, k))
+            }),
+            ("naive", &mut |(n, k)| {
+                no_out!(Natural::binomial_coefficient(
+                    Natural::from(n),
+                    Natural::from(k)
+                ))
+            }),
+        ],
+    );
 }
 
 fn benchmark_natural_binomial_coefficient_evaluation_strategy(
@@ -93,8 +219,11 @@ fn benchmark_natural_binomial_coefficient_algorithms(
             ("default", &mut |(n, k)| {
                 no_out!(Natural::binomial_coefficient(n, k))
             }),
-            ("naive", &mut |(n, k)| {
-                no_out!(binomial_coefficient_naive(n, k))
+            ("naive 1", &mut |(n, k)| {
+                no_out!(binomial_coefficient_naive_1(n, k))
+            }),
+            ("naive 2", &mut |(n, k)| {
+                no_out!(binomial_coefficient_naive_2(n, k))
             }),
         ],
     );

@@ -2,7 +2,6 @@ use malachite_base::test_util::common::test_eq_helper;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
@@ -22,8 +21,8 @@ fn test_eq() {
 fn eq_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let eq = x == y;
-        assert_eq!(integer_to_bigint(&x) == integer_to_bigint(&y), eq);
-        assert_eq!(integer_to_rug_integer(&x) == integer_to_rug_integer(&y), eq);
+        assert_eq!(BigInt::from(&x) == BigInt::from(&y), eq);
+        assert_eq!(rug::Integer::from(&x) == rug::Integer::from(&y), eq);
         assert_eq!(y == x, eq);
     });
 

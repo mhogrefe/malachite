@@ -53,7 +53,7 @@ fn limbs_approx_sqrt(x: u64) -> u64 {
     (u64::power_of_2(s) + (x >> s)) >> 1
 }
 
-const fn bit_to_n(bit: u64) -> u64 {
+pub(crate) const fn bit_to_n(bit: u64) -> u64 {
     (bit * 3 + 4) | 1
 }
 
@@ -129,8 +129,9 @@ fn limbs_2_multiswing_odd(
                 }
             }
         }
-        mask = mask.rotate_left(1);
-        if mask == 1 {
+        mask <<= 1;
+        if mask == 0 {
+            mask = 1;
             index += 1;
         }
     }
@@ -149,8 +150,9 @@ fn limbs_2_multiswing_odd(
                 }
             }
         }
-        mask = mask.rotate_left(1);
-        if mask == 1 {
+        mask <<= 1;
+        if mask == 0 {
+            mask = 1;
             index += 1;
         }
     }
@@ -169,8 +171,9 @@ fn limbs_2_multiswing_odd(
                 prod *= prime;
             }
         }
-        mask = mask.rotate_left(1);
-        if mask == 1 {
+        mask <<= 1;
+        if mask == 0 {
+            mask = 1;
             index += 1;
         }
     }
@@ -225,7 +228,7 @@ pub(crate) fn log_n_max(n: Limb) -> u64 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1.
-pub_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
+pub_crate_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
         assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);

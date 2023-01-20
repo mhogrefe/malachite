@@ -5,6 +5,9 @@ use crate::integer::exhaustive::{
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::Integer;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
+use crate::natural::arithmetic::binomial_coefficient::{
+    BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
+};
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -59,9 +62,9 @@ use crate::natural::exhaustive::{
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::Natural;
-use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
-use crate::test_util::common::{
-    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+use crate::platform::{
+    Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
+    ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
 };
 use crate::test_util::extra_variadic::{
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
@@ -95,6 +98,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
     primitive_int_increasing_range, PrimitiveIntIncreasingRange,
 };
+use malachite_base::num::factorization::prime_sieve::n_to_bit;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
@@ -128,6 +132,7 @@ use malachite_base::vecs::exhaustive::{
     exhaustive_vecs_min_length, lex_vecs_fixed_length_from_single, ExhaustiveVecs,
     LexFixedLengthVecsFromSingle,
 };
+use num::{BigInt, BigUint};
 use std::cmp::{max, Ordering};
 use std::iter::once;
 use std::marker::PhantomData;
@@ -1976,6 +1981,98 @@ pub fn exhaustive_unsigned_bool_pair_gen_var_1() -> It<(usize, bool)> {
     )
 }
 
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 31 are in malachite-base.
+
+pub fn exhaustive_unsigned_pair_gen_var_32<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    // TODO
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigneds(),
+            primitive_int_increasing_inclusive_range(
+                T::exact_from(ODD_FACTORIAL_TABLE_LIMIT + 1),
+                T::MAX,
+            ),
+        )
+        .filter(|&(n, k)| n >= k),
+    )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_33<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    // TODO
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigneds(),
+            primitive_int_increasing_inclusive_range(
+                T::TWO,
+                T::wrapping_from(ODD_FACTORIAL_TABLE_LIMIT),
+            ),
+        )
+        .filter(|&(n, k)| n >= k),
+    )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_34<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs(
+            primitive_int_increasing_inclusive_range(
+                T::from(4u8),
+                T::wrapping_from(ODD_FACTORIAL_EXTTABLE_LIMIT),
+            ),
+            primitive_int_increasing_inclusive_range(
+                T::TWO,
+                T::wrapping_from(ODD_FACTORIAL_EXTTABLE_LIMIT - 2),
+            ),
+        )
+        .filter(|&(n, k)| n >= k + T::TWO),
+    )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_35<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs(
+            primitive_int_increasing_inclusive_range(
+                T::wrapping_from((ODD_CENTRAL_BINOMIAL_OFFSET << 1) + 1),
+                T::MAX,
+            ),
+            primitive_int_increasing_inclusive_range(
+                T::wrapping_from((ODD_CENTRAL_BINOMIAL_OFFSET << 1) - 1),
+                T::wrapping_from(
+                    (if BIN_UIUI_RECURSIVE_SMALLDC {
+                        ODD_CENTRAL_BINOMIAL_TABLE_LIMIT
+                    } else {
+                        ODD_FACTORIAL_TABLE_LIMIT
+                    }) << 1,
+                ),
+            ),
+        )
+        .filter(|&(n, k)| n >= k + T::TWO),
+    )
+}
+
+#[allow(clippy::useless_conversion)]
+pub fn exhaustive_unsigned_pair_gen_var_36() -> It<(Limb, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            primitive_int_increasing_inclusive_range(
+                Limb::wrapping_from(BIN_GOETGHELUCK_THRESHOLD) << 1,
+                Limb::MAX,
+            ),
+            primitive_int_increasing_inclusive_range(
+                Limb::wrapping_from(BIN_GOETGHELUCK_THRESHOLD),
+                Limb::MAX,
+            ),
+        )
+        .filter(|&(n, k)| {
+            n >= k + 5
+                && k > (n >> 4)
+                && n_to_bit(u64::from(n - k)) < n_to_bit(u64::from(n))
+                && k <= n - k
+        }),
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 // var 1 is in malachite-base.
@@ -2008,8 +2105,8 @@ pub fn exhaustive_unsigned_sextuple_gen_var_2() -> It<(Limb, Limb, Limb, Limb, L
 pub fn exhaustive_string_triple_gen_var_1() -> It<(String, String, String)> {
     Box::new(exhaustive_naturals().map(|x| {
         (
-            serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
-            serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+            serde_json::to_string(&BigUint::from(&x)).unwrap(),
+            serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
             serde_json::to_string(&x).unwrap(),
         )
     }))
@@ -2018,8 +2115,8 @@ pub fn exhaustive_string_triple_gen_var_1() -> It<(String, String, String)> {
 pub fn exhaustive_string_triple_gen_var_2() -> It<(String, String, String)> {
     Box::new(exhaustive_integers().map(|x| {
         (
-            serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
-            serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+            serde_json::to_string(&BigInt::from(&x)).unwrap(),
+            serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
             serde_json::to_string(&x).unwrap(),
         )
     }))

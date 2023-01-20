@@ -2,9 +2,6 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{integer_gen, natural_gen};
 use num::BigInt;
 use std::str::FromStr;
@@ -50,11 +47,8 @@ fn neg_properties() {
         assert!(negative_alt.is_valid());
         assert_eq!(negative_alt, negative);
 
-        assert_eq!(bigint_to_integer(&-integer_to_bigint(&x)), negative);
-        assert_eq!(
-            rug_integer_to_integer(&-integer_to_rug_integer(&x)),
-            negative
-        );
+        assert_eq!(Integer::from(&-BigInt::from(&x)), negative);
+        assert_eq!(Integer::from(&-rug::Integer::from(&x)), negative);
 
         assert_eq!(negative == x, x == 0);
         assert_eq!(-&negative, x);

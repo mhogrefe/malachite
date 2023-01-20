@@ -4,7 +4,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::signed_pair_gen_var_12;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::{integer_gen, integer_gen_var_4, integer_pair_gen_var_7};
 use std::str::FromStr;
 
@@ -22,7 +21,7 @@ fn test_binomial_coefficient() {
         assert_eq!(b_alt, b);
 
         assert_eq!(
-            integer_to_rug_integer(&n)
+            rug::Integer::from(&n)
                 .binomial(u32::exact_from(&k))
                 .to_string(),
             out,
@@ -73,7 +72,7 @@ fn binomial_coefficient_properties() {
         assert_eq!(b, b_alt);
 
         assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&n).binomial(u32::exact_from(&k))),
+            Integer::from(&rug::Integer::from(&n).binomial(u32::exact_from(&k))),
             b
         );
         assert_eq!(b == 0, n >= 0 && n < k);

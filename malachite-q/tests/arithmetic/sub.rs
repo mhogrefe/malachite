@@ -1,10 +1,6 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::test_util::arithmetic::sub::sub_naive;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
 use malachite_q::Rational;
 use num::BigRational;
@@ -96,18 +92,16 @@ fn sub_properties() {
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, diff);
 
-        let mut mut_x = rational_to_rug_rational(&x);
-        mut_x -= rational_to_rug_rational(&y);
-        assert_eq!(rug_rational_to_rational(&mut_x), diff);
+        let mut mut_x = rug::Rational::from(&x);
+        mut_x -= rug::Rational::from(&y);
+        assert_eq!(Rational::from(&mut_x), diff);
 
         assert_eq!(
-            bigrational_to_rational(&(rational_to_bigrational(&x) - rational_to_bigrational(&y))),
+            Rational::from(&(BigRational::from(&x) - BigRational::from(&y))),
             diff
         );
         assert_eq!(
-            rug_rational_to_rational(
-                &(rational_to_rug_rational(&x) - rational_to_rug_rational(&y))
-            ),
+            Rational::from(&(rug::Rational::from(&x) - rug::Rational::from(&y))),
             diff
         );
         assert_eq!(sub_naive(x.clone(), y.clone()), diff);

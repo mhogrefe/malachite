@@ -5,10 +5,10 @@ use malachite_base::num::basic::traits::One;
 
 impl BinomialCoefficient for Integer {
     /// Computes the binomial coefficient of two [`Integer`]s, taking both by value.
-    /// 
+    ///
     /// The second argument must be non-negative, but the first may be negative. If it is,
     /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
-    /// 
+    ///
     /// $$
     /// f(n, k) = \\begin{cases}
     ///     \binom{n}{k} & \text{if} \\quad n \geq 0, \\\\
@@ -18,7 +18,7 @@ impl BinomialCoefficient for Integer {
     ///
     /// # Worst-case complexity
     /// TODO
-    /// 
+    ///
     /// # Panics
     /// Panics if $k$ is negative.
     ///
@@ -37,7 +37,7 @@ impl BinomialCoefficient for Integer {
     ///     Integer::binomial_coefficient(Integer::from(100), Integer::from(50)).to_string(),
     ///     "100891344545564193334812497256"
     /// );
-    /// 
+    ///
     /// assert_eq!(Integer::binomial_coefficient(Integer::from(-3), Integer::from(0)), 1);
     /// assert_eq!(Integer::binomial_coefficient(Integer::from(-3), Integer::from(1)), -3);
     /// assert_eq!(Integer::binomial_coefficient(Integer::from(-3), Integer::from(2)), 6);
@@ -59,10 +59,10 @@ impl BinomialCoefficient for Integer {
 
 impl<'a> BinomialCoefficient<&'a Integer> for Integer {
     /// Computes the binomial coefficient of two [`Integer`]s, taking both by reference.
-    /// 
+    ///
     /// The second argument must be non-negative, but the first may be negative. If it is,
     /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
-    /// 
+    ///
     /// $$
     /// f(n, k) = \\begin{cases}
     ///     \binom{n}{k} & \text{if} \\quad n \geq 0, \\\\
@@ -72,7 +72,7 @@ impl<'a> BinomialCoefficient<&'a Integer> for Integer {
     ///
     /// # Worst-case complexity
     /// TODO
-    /// 
+    ///
     /// # Panics
     /// Panics if $k$ is negative.
     ///
@@ -91,7 +91,7 @@ impl<'a> BinomialCoefficient<&'a Integer> for Integer {
     ///     Integer::binomial_coefficient(&Integer::from(100), &Integer::from(50)).to_string(),
     ///     "100891344545564193334812497256"
     /// );
-    /// 
+    ///
     /// assert_eq!(Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(0)), 1);
     /// assert_eq!(Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(1)), -3);
     /// assert_eq!(Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(2)), 6);

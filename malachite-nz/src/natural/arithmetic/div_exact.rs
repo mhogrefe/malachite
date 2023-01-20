@@ -18,6 +18,7 @@ use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len, limbs_mul_to_out,
     limbs_mul_to_out_scratch_len,
 };
+use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
@@ -34,7 +35,8 @@ use crate::platform::{
 };
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
+    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingAddAssign,
+    WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -421,6 +423,7 @@ pub_test! {limbs_modular_invert_small(
 ) {
     if size < DC_BDIV_Q_THRESHOLD {
         limbs_modular_div_schoolbook(is, scratch, ds, d_inv);
+        limbs_neg_in_place(is);
     } else {
         limbs_modular_div_divide_and_conquer(is, scratch, ds, d_inv);
     }
@@ -997,20 +1000,9 @@ pub_crate_test! {limbs_modular_div_mod_barrett(
     }
 }}
 
-// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
-// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+// Computes Q = -N/D mod B^un, destroys N.
 //
-// The straightforward way to compute Q is to cancel one limb at a time, using
-//     qs\[i\] = D ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
-//     N -= 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
-//
-// But we prefer addition to subtraction, since
-// `limbs_slice_add_mul_limb_same_length_in_place_left` is often faster than
-// `limbs_sub_mul_limb_same_length_in_place_left`. Q = -N / D can be computed by iterating
-//     qs\[i\] = (-D) ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
-//     N += 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
-//
-// And then we flip the sign: -Q = ~Q + 1.
+// D must be odd. d_inv is (-D)^-1 mod B.
 //
 // # Worst-case complexity
 // $T(n) = O(n^2)$
@@ -1020,39 +1012,100 @@ pub_crate_test! {limbs_modular_div_mod_barrett(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1.
-// Investigate changes from 6.1.2?
-pub_test! {limbs_modular_div_schoolbook(
-    qs: &mut [Limb],
-    ns: &mut [Limb],
+pub_crate_test! {limbs_modular_div_schoolbook(
+    mut qs: &mut [Limb],
+    mut ns: &mut [Limb],
     ds: &[Limb],
-    d_inv: Limb
+    d_inv: Limb,
 ) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
     assert!(n_len >= d_len);
     assert!(ds[0].odd());
-    let qs = &mut qs[..n_len];
-    let diff = n_len - d_len;
-    for i in 0..diff {
-        let (ns_lo, ns_hi) = ns[i..].split_at_mut(d_len);
-        let q = d_inv.wrapping_mul(ns_lo[0]);
-        let carry = limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
-        limbs_slice_add_limb_in_place(ns_hi, carry);
-        assert_eq!(ns_lo[0], 0);
-        qs[i] = !q;
+    if n_len > d_len {
+        let mut carry = 0;
+        let limit = n_len - d_len - 1;
+        for i in 0..limit {
+            let (ns_lo, ns_hi) = ns[i..].split_at_mut(d_len);
+            let q = d_inv.wrapping_mul(ns_lo[0]);
+            let mut hi = limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
+            assert_eq!(ns_lo[0], 0);
+            qs[i] = q;
+            let mut carry_b;
+            (hi, carry_b) = hi.overflowing_add(carry);
+            carry = Limb::from(carry_b);
+            (hi, carry_b) = hi.overflowing_add(ns_hi[0]);
+            if carry_b {
+                carry += 1;
+            }
+            ns_hi[0] = hi;
+        }
+        ns = &mut ns[limit..];
+        qs = &mut qs[limit..];
+        let q = d_inv.wrapping_mul(ns[0]);
+        let (ns_lo, ns_hi) = ns.split_at_mut(d_len);
+        let hi = carry + limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
+        qs[0] = q;
+        ns_hi[0].wrapping_add_assign(hi);
+        ns = &mut ns[1..];
+        qs = &mut qs[1..];
     }
-    let last_index = n_len - 1;
-    for i in diff..last_index {
+    let ns = &mut ns[..d_len];
+    for i in 0..d_len - 1 {
         let ns_hi = &mut ns[i..];
         let q = d_inv.wrapping_mul(ns_hi[0]);
-        limbs_slice_add_mul_limb_same_length_in_place_left(ns_hi, &ds[..n_len - i], q);
-        assert_eq!(ns_hi[0], 0);
-        qs[i] = !q;
+        limbs_slice_add_mul_limb_same_length_in_place_left(ns_hi, &ds[..d_len - i], q);
+        qs[i] = q;
     }
-    qs[last_index] = !d_inv.wrapping_mul(ns[last_index]);
-    limbs_slice_add_limb_in_place(qs, 1);
+    let last_index = d_len - 1;
+    qs[last_index] = d_inv.wrapping_mul(ns[last_index]);
 }}
+
+// This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1, where
+// qp == up.
+pub fn limbs_modular_div_schoolbook_in_place(mut ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    assert!(n_len >= d_len);
+    assert!(ds[0].odd());
+    if n_len > d_len {
+        let mut carry = 0;
+        let limit = n_len - d_len - 1;
+        for i in 0..limit {
+            let (ns_lo, ns_hi) = ns[i..].split_at_mut(d_len);
+            let q = d_inv.wrapping_mul(ns_lo[0]);
+            let mut hi = limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
+            assert_eq!(ns_lo[0], 0);
+            ns_lo[0] = q;
+            let mut carry_b;
+            (hi, carry_b) = hi.overflowing_add(carry);
+            carry = Limb::from(carry_b);
+            (hi, carry_b) = hi.overflowing_add(ns_hi[0]);
+            if carry_b {
+                carry += 1;
+            }
+            ns_hi[0] = hi;
+        }
+        ns = &mut ns[limit..];
+        let q = d_inv.wrapping_mul(ns[0]);
+        let (ns_lo, ns_hi) = ns.split_at_mut(d_len);
+        let hi = carry + limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
+        ns_lo[0] = q;
+        ns_hi[0].wrapping_add_assign(hi);
+        ns = &mut ns[1..];
+    }
+    let ns = &mut ns[..d_len];
+    for i in 0..d_len - 1 {
+        let ns_hi = &mut ns[i..];
+        let q = d_inv.wrapping_mul(ns_hi[0]);
+        limbs_slice_add_mul_limb_same_length_in_place_left(ns_hi, &ds[..d_len - i], q);
+        ns_hi[0] = q;
+    }
+    let last_index = d_len - 1;
+    ns[last_index].wrapping_mul_assign(d_inv);
+}
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -1104,6 +1157,7 @@ fn limbs_modular_div_divide_and_conquer_helper(
     }
     let m = n - n_rem;
     limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], d_inv);
+    limbs_neg_in_place(&mut qs[m..]);
 }
 
 // Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
@@ -1187,6 +1241,7 @@ pub_test! {limbs_modular_div_divide_and_conquer(
         );
     } else if n_len < DC_BDIV_Q_THRESHOLD {
         limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
+        limbs_neg_in_place(qs);
     } else {
         let mut scratch = vec![0; n_len];
         limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, d_inv, &mut scratch);
@@ -1452,6 +1507,7 @@ pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scra
     if d_len < DC_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
         limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
+        limbs_neg_in_place(qs);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
         limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv);
@@ -1490,6 +1546,7 @@ pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scra
         scratch.copy_from_slice(ns);
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
         limbs_modular_div_schoolbook(qs, scratch, ds, d_inv);
+        limbs_neg_in_place(qs);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
         let scratch = &mut scratch[..n_len];
         scratch.copy_from_slice(ns);

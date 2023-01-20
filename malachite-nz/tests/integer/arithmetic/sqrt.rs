@@ -6,10 +6,8 @@ use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::test_util::generators::signed_gen_var_2;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{integer_gen_var_4, natural_gen};
+use num::BigInt;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -132,11 +130,8 @@ fn floor_sqrt_properties() {
         n_alt.floor_sqrt_assign();
         assert_eq!(n_alt, sqrt);
         assert_eq!((&n).floor_root(2), sqrt);
-        assert_eq!(bigint_to_integer(&integer_to_bigint(&n).sqrt()), sqrt);
-        assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&n).sqrt()),
-            sqrt
-        );
+        assert_eq!(Integer::from(&BigInt::from(&n).sqrt()), sqrt);
+        assert_eq!(Integer::from(&rug::Integer::from(&n).sqrt()), sqrt);
 
         let square = (&sqrt).square();
         let ceiling_sqrt = (&n).ceiling_sqrt();

@@ -1,10 +1,6 @@
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_q::test_util::arithmetic::div::div_naive;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_pair_gen_var_1, rational_triple_gen_var_1,
 };
@@ -141,18 +137,16 @@ fn div_properties() {
         assert_eq!(mut_x, quotient);
         assert!(mut_x.is_valid());
 
-        let mut mut_x = rational_to_rug_rational(&x);
-        mut_x /= rational_to_rug_rational(&y);
-        assert_eq!(rug_rational_to_rational(&mut_x), quotient);
+        let mut mut_x = rug::Rational::from(&x);
+        mut_x /= rug::Rational::from(&y);
+        assert_eq!(Rational::from(&mut_x), quotient);
 
         assert_eq!(
-            bigrational_to_rational(&(rational_to_bigrational(&x) / rational_to_bigrational(&y))),
+            Rational::from(&(BigRational::from(&x) / BigRational::from(&y))),
             quotient
         );
         assert_eq!(
-            rug_rational_to_rational(
-                &(rational_to_rug_rational(&x) / rational_to_rug_rational(&y))
-            ),
+            Rational::from(&(rug::Rational::from(&x) / rug::Rational::from(&y))),
             quotient
         );
         assert_eq!(div_naive(x.clone(), y.clone()), quotient);

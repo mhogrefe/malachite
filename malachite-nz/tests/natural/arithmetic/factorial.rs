@@ -12,7 +12,6 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::arithmetic::factorial::{limbs_odd_factorial, subfactorial_naive};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::rug_integer_to_natural;
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;
 use malachite_nz::test_util::natural::arithmetic::factorial::{
     double_factorial_naive, factorial_naive, multifactorial_naive,
@@ -2153,7 +2152,7 @@ fn factorial_properties() {
         assert!(f.is_valid());
         assert_eq!(factorial_naive(n), f);
         assert_eq!(
-            rug_integer_to_natural(&rug::Integer::factorial(u32::exact_from(n)).complete()),
+            Natural::exact_from(&rug::Integer::factorial(u32::exact_from(n)).complete()),
             f
         );
         assert_eq!(Natural::multifactorial(n, 1), f);
@@ -2178,7 +2177,7 @@ fn double_factorial_properties() {
         assert!(f.is_valid());
         assert_eq!(double_factorial_naive(n), f);
         assert_eq!(
-            rug_integer_to_natural(&rug::Integer::factorial_2(u32::exact_from(n)).complete()),
+            Natural::exact_from(&rug::Integer::factorial_2(u32::exact_from(n)).complete()),
             f
         );
         assert_eq!(Natural::multifactorial(n, 2), f);
@@ -2202,7 +2201,7 @@ fn multifactorial_properties() {
         let f = Natural::multifactorial(n, m);
         assert!(f.is_valid());
         assert_eq!(
-            rug_integer_to_natural(
+            Natural::exact_from(
                 &rug::Integer::factorial_m(u32::exact_from(n), u32::exact_from(m)).complete()
             ),
             f,

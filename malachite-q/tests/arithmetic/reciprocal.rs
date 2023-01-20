@@ -1,9 +1,5 @@
 use malachite_base::num::arithmetic::traits::{Abs, Reciprocal, ReciprocalAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_q::test_util::common::{
-    bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
-    rug_rational_to_rational,
-};
 use malachite_q::test_util::generators::rational_gen_var_1;
 use malachite_q::Rational;
 use num::BigRational;
@@ -62,15 +58,9 @@ fn reciprocal_properties() {
         let reciprocal = x.clone().reciprocal();
         assert!(reciprocal.is_valid());
 
-        assert_eq!(
-            bigrational_to_rational(&rational_to_bigrational(&x).recip()),
-            reciprocal
-        );
+        assert_eq!(Rational::from(&BigRational::from(&x).recip()), reciprocal);
 
-        assert_eq!(
-            rug_rational_to_rational(&rational_to_rug_rational(&x).recip()),
-            reciprocal
-        );
+        assert_eq!(Rational::from(&rug::Rational::from(&x).recip()), reciprocal);
 
         let reciprocal_alt = (&x).reciprocal();
         assert!(reciprocal_alt.is_valid());

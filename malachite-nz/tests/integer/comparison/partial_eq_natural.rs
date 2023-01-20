@@ -1,6 +1,5 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz::test_util::generators::{integer_natural_pair_gen, natural_pair_gen};
 use rug;
 use std::str::FromStr;
@@ -36,7 +35,7 @@ fn partial_eq_natural_properties() {
         let eq = x == y;
         assert_eq!(y == x, eq);
         assert_eq!(x == Integer::from(&y), eq);
-        assert_eq!(integer_to_rug_integer(&x) == natural_to_rug_integer(&y), eq);
+        assert_eq!(rug::Integer::from(&x) == rug::Integer::from(&y), eq);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

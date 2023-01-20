@@ -1,6 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_primitive_float_pair_gen,
     rational_primitive_float_primitive_float_triple_gen,
@@ -66,11 +65,11 @@ where
 {
     rational_primitive_float_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp = n.partial_cmp(&u);
-        assert_eq!(rational_to_rug_rational(&n).partial_cmp(&u), cmp);
+        assert_eq!(rug::Rational::from(&n).partial_cmp(&u), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&rational_to_rug_rational(&n)), cmp_rev);
+        assert_eq!(u.partial_cmp(&rug::Rational::from(&n)), cmp_rev);
 
         if u.is_finite() {
             assert_eq!(n.cmp(&Rational::exact_from(u)), cmp.unwrap());

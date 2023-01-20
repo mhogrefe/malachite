@@ -2,7 +2,6 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz::test_util::generators::{integer_gen, natural_gen};
 use rug;
 use std::str::FromStr;
@@ -42,8 +41,8 @@ fn not_properties() {
         let not = !x.clone();
         assert!(not.is_valid());
 
-        let rug_not = !integer_to_rug_integer(&x);
-        assert_eq!(rug_integer_to_integer(&rug_not), not);
+        let rug_not = !rug::Integer::from(&x);
+        assert_eq!(Integer::from(&rug_not), not);
 
         let not_alt = !&x;
         assert!(not_alt.is_valid());

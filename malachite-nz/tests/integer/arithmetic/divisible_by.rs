@@ -5,7 +5,6 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_8, integer_pair_gen, integer_pair_gen_var_2,
     integer_pair_gen_var_3, natural_pair_gen,
@@ -369,11 +368,11 @@ fn divisible_by_properties() {
         assert_eq!((-&x).divisible_by(&y), divisible);
         assert_eq!((&x).divisible_by(-&y), divisible);
         assert_eq!(
-            num_divisible_by(&integer_to_bigint(&x), &integer_to_bigint(&y)),
+            num_divisible_by(&BigInt::from(&x), &BigInt::from(&y)),
             divisible
         );
         assert_eq!(
-            integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)),
+            rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)),
             divisible
         );
     });
@@ -381,21 +380,15 @@ fn divisible_by_properties() {
     integer_pair_gen_var_2().test_properties(|(x, y)| {
         assert!((&x).divisible_by(&y));
         assert!(x == 0 || y != 0 && &x % &y == 0);
-        assert!(num_divisible_by(
-            &integer_to_bigint(&x),
-            &integer_to_bigint(&y)
-        ));
-        assert!(integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)));
+        assert!(num_divisible_by(&BigInt::from(&x), &BigInt::from(&y)));
+        assert!(rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
 
     integer_pair_gen_var_3().test_properties(|(x, y)| {
         assert!(!(&x).divisible_by(&y));
         assert!(x != 0 && (y == 0 || &x % &y != 0));
-        assert!(!num_divisible_by(
-            &integer_to_bigint(&x),
-            &integer_to_bigint(&y)
-        ));
-        assert!(!integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)));
+        assert!(!num_divisible_by(&BigInt::from(&x), &BigInt::from(&y)));
+        assert!(!rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
 
     integer_gen().test_properties(|n| {

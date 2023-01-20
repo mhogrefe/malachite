@@ -3,6 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -12,9 +13,6 @@ use malachite_base::test_util::generators::{
 use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     natural_natural_rounding_mode_triple_gen_var_1, natural_pair_gen_var_5, natural_pair_gen_var_7,
     natural_rounding_mode_pair_gen, natural_rounding_mode_pair_gen_var_2,
@@ -428,25 +426,19 @@ fn div_round_properties() {
         assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Exact), x);
 
         assert_eq!(
-            rug_integer_to_natural(
-                &natural_to_rug_integer(&x).div_trunc(natural_to_rug_integer(&y))
-            ),
+            Natural::exact_from(&rug::Integer::from(&x).div_trunc(rug::Integer::from(&y))),
             (&x).div_round(&y, RoundingMode::Down)
         );
         assert_eq!(
-            biguint_to_natural(&natural_to_biguint(&x).div_floor(&natural_to_biguint(&y))),
+            Natural::from(&BigUint::from(&x).div_floor(&BigUint::from(&y))),
             (&x).div_round(&y, RoundingMode::Floor)
         );
         assert_eq!(
-            rug_integer_to_natural(
-                &natural_to_rug_integer(&x).div_floor(natural_to_rug_integer(&y))
-            ),
+            Natural::exact_from(&rug::Integer::from(&x).div_floor(rug::Integer::from(&y))),
             (&x).div_round(&y, RoundingMode::Floor)
         );
         assert_eq!(
-            rug_integer_to_natural(
-                &natural_to_rug_integer(&x).div_ceil(natural_to_rug_integer(&y))
-            ),
+            Natural::exact_from(&rug::Integer::from(&x).div_ceil(rug::Integer::from(&y))),
             (&x).div_round(&y, RoundingMode::Ceiling)
         );
         assert_eq!(

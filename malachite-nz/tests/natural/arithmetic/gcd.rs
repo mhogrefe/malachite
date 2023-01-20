@@ -18,9 +18,6 @@ use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_nz::test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,
     natural_gen, natural_pair_gen, natural_pair_gen_var_4, natural_triple_gen,
@@ -13083,11 +13080,11 @@ fn gcd_properties_helper(x: Natural, y: Natural) {
     assert!(mut_x.is_valid());
 
     assert_eq!(
-        biguint_to_natural(&(natural_to_biguint(&x).gcd(&natural_to_biguint(&y)))),
+        Natural::from(&(BigUint::from(&x).gcd(&BigUint::from(&y)))),
         gcd
     );
     assert_eq!(
-        rug_integer_to_natural(&(natural_to_rug_integer(&x).gcd(&natural_to_rug_integer(&y)))),
+        Natural::exact_from(&(rug::Integer::from(&x).gcd(&rug::Integer::from(&y)))),
         gcd
     );
 

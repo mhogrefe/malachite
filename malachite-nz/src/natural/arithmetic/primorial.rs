@@ -19,6 +19,7 @@ const SMALL_PRIMORIAL_LIMIT: u64 = 53;
 
 // This is equivalent to `mpz_primorial_ui` from `mpz/primorial_ui.c`, GMP 6.2.1,
 // where n is too large for the primorial of n to fit in a single limb.
+#[allow(clippy::useless_conversion)]
 fn limbs_primorial(n: Limb) -> Vec<Limb> {
     let n_u64 = u64::from(n);
     let size = usize::exact_from(n >> Limb::LOG_WIDTH);

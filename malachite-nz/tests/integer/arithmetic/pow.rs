@@ -6,9 +6,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_unsigned_pair_gen_var_15, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz::test_util::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_unsigned_triple_gen_var_1, integer_unsigned_pair_gen_var_2,
     integer_unsigned_unsigned_triple_gen_var_3, natural_unsigned_pair_gen_var_4,
@@ -207,9 +204,9 @@ fn pow_properties() {
             assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
         }
 
-        assert_eq!(bigint_to_integer(&integer_to_bigint(&x).pow(exp)), power);
+        assert_eq!(Integer::from(&BigInt::from(&x).pow(exp)), power);
         assert_eq!(
-            rug_integer_to_integer(&integer_to_rug_integer(&x).pow(u32::exact_from(exp))),
+            Integer::from(&rug::Integer::from(&x).pow(u32::exact_from(exp))),
             power
         );
     });

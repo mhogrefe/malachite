@@ -3,7 +3,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::primitive_float_gen_var_8;
-use malachite_q::test_util::common::rug_rational_to_rational;
 use malachite_q::Rational;
 
 #[test]
@@ -247,14 +246,14 @@ fn try_from_float_properties() {
     primitive_float_gen_var_8::<f32>().test_properties(|f| {
         assert_eq!(
             Rational::exact_from(f),
-            rug_rational_to_rational(&rug::Rational::from_f32(f).unwrap())
+            Rational::from(&rug::Rational::from_f32(f).unwrap())
         );
     });
 
     primitive_float_gen_var_8::<f64>().test_properties(|f| {
         assert_eq!(
             Rational::exact_from(f),
-            rug_rational_to_rational(&rug::Rational::from_f64(f).unwrap())
+            Rational::from(&rug::Rational::from_f64(f).unwrap())
         );
     });
 }

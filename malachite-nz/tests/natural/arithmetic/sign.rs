@@ -2,7 +2,6 @@ use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::test_util::generators::unsigned_gen;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz::test_util::common::natural_to_rug_integer;
 use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::cmp::Ordering;
@@ -23,7 +22,7 @@ fn test_sign() {
 fn sign_properties() {
     natural_gen().test_properties(|n| {
         let sign = n.sign();
-        assert_eq!(natural_to_rug_integer(&n).cmp0(), sign);
+        assert_eq!(rug::Integer::from(&n).cmp0(), sign);
         assert_ne!(sign, Ordering::Less);
         assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());

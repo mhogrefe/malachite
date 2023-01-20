@@ -1,7 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_rational_signed_triple_gen, rational_rational_unsigned_triple_gen,
     rational_signed_pair_gen, rational_signed_signed_triple_gen, rational_unsigned_pair_gen,
@@ -176,12 +175,12 @@ where
 {
     rational_unsigned_pair_gen::<T>().test_properties(|(n, u)| {
         let cmp = n.partial_cmp(&u);
-        assert_eq!(rational_to_rug_rational(&n).partial_cmp(&u), cmp);
+        assert_eq!(rug::Rational::from(&n).partial_cmp(&u), cmp);
         assert_eq!(Some(n.cmp(&Rational::from(u))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(u.partial_cmp(&n), cmp_rev);
-        assert_eq!(u.partial_cmp(&rational_to_rug_rational(&n)), cmp_rev);
+        assert_eq!(u.partial_cmp(&rug::Rational::from(&n)), cmp_rev);
         assert_eq!(Some(Rational::from(u).cmp(&n)), cmp_rev);
     });
 
@@ -217,12 +216,12 @@ where
 {
     rational_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let cmp = n.partial_cmp(&i);
-        assert_eq!(rational_to_rug_rational(&n).partial_cmp(&i), cmp);
+        assert_eq!(rug::Rational::from(&n).partial_cmp(&i), cmp);
         assert_eq!(Some(n.cmp(&Rational::from(i))), cmp);
 
         let cmp_rev = cmp.map(Ordering::reverse);
         assert_eq!(i.partial_cmp(&n), cmp_rev);
-        assert_eq!(i.partial_cmp(&rational_to_rug_rational(&n)), cmp_rev);
+        assert_eq!(i.partial_cmp(&rug::Rational::from(&n)), cmp_rev);
         assert_eq!(Some(Rational::from(i).cmp(&n)), cmp_rev);
     });
 

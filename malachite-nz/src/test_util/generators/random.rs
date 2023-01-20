@@ -4,6 +4,8 @@ use crate::integer::random::{
     RandomIntegers,
 };
 use crate::integer::Integer;
+use crate::natural::arithmetic::binomial_coefficient::BIN_GOETGHELUCK_THRESHOLD;
+use crate::natural::arithmetic::binomial_coefficient::BIN_UIUI_RECURSIVE_SMALLDC;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -49,9 +51,9 @@ use crate::natural::random::{
     RandomNaturals, RandomNaturalsLessThan,
 };
 use crate::natural::Natural;
-use crate::platform::{Limb, SQR_TOOM2_THRESHOLD};
-use crate::test_util::common::{
-    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+use crate::platform::{
+    Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
+    ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
 };
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
@@ -85,6 +87,7 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
+use malachite_base::num::factorization::prime_sieve::n_to_bit;
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
@@ -122,6 +125,7 @@ use malachite_base::vecs::random::{
     random_vecs, random_vecs_length_range, random_vecs_min_length, RandomVecs,
 };
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
+use num::{BigInt, BigUint};
 use std::cmp::{max, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -3615,6 +3619,137 @@ pub fn random_unsigned_bool_pair_gen_var_1(config: &GenConfig) -> It<(usize, boo
     )
 }
 
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 32 are in malachite-base
+
+pub fn random_unsigned_pair_gen_var_33<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::exact_from(ODD_FACTORIAL_TABLE_LIMIT + 1),
+                    T::MAX,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(n, k)| n >= k),
+    )
+}
+
+pub fn random_unsigned_pair_gen_var_34<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::TWO,
+                    T::wrapping_from(ODD_FACTORIAL_TABLE_LIMIT),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(n, k)| n >= k),
+    )
+}
+
+pub fn random_unsigned_pair_gen_var_35<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::from(4u8),
+                    T::wrapping_from(ODD_FACTORIAL_EXTTABLE_LIMIT),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::TWO,
+                    T::wrapping_from(ODD_FACTORIAL_EXTTABLE_LIMIT - 2),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(n, k)| n >= k + T::TWO),
+    )
+}
+
+pub fn random_unsigned_pair_gen_var_36<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::wrapping_from((ODD_CENTRAL_BINOMIAL_OFFSET << 1) + 1),
+                    T::MAX,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    T::wrapping_from((ODD_CENTRAL_BINOMIAL_OFFSET << 1) - 1),
+                    T::wrapping_from(if BIN_UIUI_RECURSIVE_SMALLDC {
+                        ODD_CENTRAL_BINOMIAL_TABLE_LIMIT
+                    } else {
+                        ODD_FACTORIAL_TABLE_LIMIT
+                    }) << 1,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(n, k)| n >= k + T::TWO),
+    )
+}
+
+pub fn random_unsigned_pair_gen_var_37(config: &GenConfig) -> It<(Limb, Limb)> {
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_small_n", 32),
+            config.get_or("mean_small_d", 1),
+        ))
+        .filter_map(|(mut n, mut k)| {
+            n += u64::wrapping_from(BIN_GOETGHELUCK_THRESHOLD) << 1;
+            k += u64::wrapping_from(BIN_GOETGHELUCK_THRESHOLD);
+            if n >= k + 5 && k > (n >> 4) && n_to_bit(n - k) < n_to_bit(n) && k <= n - k {
+                Some((Limb::exact_from(n), Limb::exact_from(k)))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 pub fn random_unsigned_sextuple_gen_var_1(
@@ -3669,8 +3804,8 @@ pub fn random_string_triple_gen_var_1(config: &GenConfig) -> It<(String, String,
         )
         .map(|x| {
             (
-                serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
-                serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&BigUint::from(&x)).unwrap(),
+                serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
                 serde_json::to_string(&x).unwrap(),
             )
         }),
@@ -3686,8 +3821,8 @@ pub fn random_string_triple_gen_var_2(config: &GenConfig) -> It<(String, String,
         )
         .map(|x| {
             (
-                serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
-                serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&BigInt::from(&x)).unwrap(),
+                serde_json::to_string(&rug::Integer::from(&x)).unwrap(),
                 serde_json::to_string(&x).unwrap(),
             )
         }),

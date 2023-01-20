@@ -1,7 +1,5 @@
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::common::integer_to_rug_integer;
 use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_q::test_util::common::rational_to_rug_rational;
 use malachite_q::test_util::generators::{
     rational_integer_integer_triple_gen, rational_integer_pair_gen,
     rational_rational_integer_triple_gen,
@@ -56,7 +54,7 @@ fn partial_cmp_integer_properties() {
         let cmp = x.partial_cmp(&y);
         assert_eq!(x.cmp(&Rational::from(&y)), cmp.unwrap());
         assert_eq!(
-            rational_to_rug_rational(&x).partial_cmp(&integer_to_rug_integer(&y)),
+            rug::Rational::from(&x).partial_cmp(&rug::Integer::from(&y)),
             cmp
         );
         assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
