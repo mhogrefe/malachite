@@ -30,6 +30,9 @@ serde_json = { version = "^1.0.32", optional = true }
 num = { version = "0.4.0", optional = true, features = ["serde"] }
 rug = { version = "1.16.0", default-features = false, optional = true, features = ["rational", "serde"] }
 
+[dev-dependencies]
+malachite-q = { path = ".", features = ["test_build"] }
+
 [features]
 enable_serde = ["serde", "malachite-nz/enable_serde"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs"]

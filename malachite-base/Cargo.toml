@@ -38,6 +38,7 @@ test_build = ["gnuplot", "time", "clap"]
 bin_build = ["walkdir", "test_build"]
 
 [dev-dependencies]
+malachite-base = { path = ".", features = ["test_build"] }
 maplit = "1.0.2"
 
 [package.metadata.docs.rs]
