@@ -376,41 +376,12 @@ dependencies = [
 
 [[package]]
 name = "malachite"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
- "malachite-base 0.3.1",
- "malachite-nz 0.3.1",
- "malachite-q 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-q 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
-]
-
-[[package]]
-name = "malachite-base"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cf52f2a985fb8bec407608a90774592403d99a6f7b04c582641af7b5ce2871a"
-dependencies = [
- "clap",
- "gnuplot",
- "itertools 0.9.0",
- "rand",
- "rand_chacha",
- "ryu",
- "sha3",
- "time",
-]
-
-[[package]]
-name = "malachite-base"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6966380e35149e65ed5182d1ba34dddacdfd012617558a94e8ee3a2795e34d3a"
-dependencies = [
- "itertools 0.9.0",
- "rand",
- "rand_chacha",
- "ryu",
- "sha3",
 ]
 
 [[package]]
@@ -420,36 +391,41 @@ dependencies = [
  "clap",
  "gnuplot",
  "itertools 0.9.0",
+ "malachite-base 0.3.2",
  "maplit",
  "rand",
  "rand_chacha",
  "ryu",
  "sha3",
- "time",
+ "time 0.2.0",
  "walkdir",
 ]
 
 [[package]]
-name = "malachite-criterion-bench"
-version = "0.3.1"
+name = "malachite-base"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b06bfa98a4b4802af5a4263b4ad4660e28e51e8490f6354eb9336c70767e1c5"
 dependencies = [
- "criterion",
- "malachite-base 0.3.2",
- "malachite-nz 0.3.2",
- "num",
- "rug",
+ "clap",
+ "gnuplot",
+ "itertools 0.9.0",
+ "rand",
+ "rand_chacha",
+ "ryu",
+ "sha3",
+ "time 0.1.45",
 ]
 
 [[package]]
-name = "malachite-nz"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c492f43fabcea46b1869f0a000db5140c347205892d497db6aaa9844901d444c"
+name = "malachite-criterion-bench"
+version = "0.3.2"
 dependencies = [
- "embed-doc-image",
- "itertools 0.9.0",
- "malachite-base 0.3.1",
- "serde",
+ "criterion",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num",
+ "rug",
 ]
 
 [[package]]
@@ -458,19 +434,7 @@ version = "0.3.2"
 dependencies = [
  "embed-doc-image",
  "itertools 0.9.0",
- "malachite-base 0.2.6",
- "num",
- "rug",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "malachite-q"
-version = "0.3.1"
-dependencies = [
- "itertools 0.9.0",
- "malachite-base 0.3.2",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "malachite-nz 0.3.2",
  "num",
  "rug",
@@ -479,14 +443,43 @@ dependencies = [
 ]
 
 [[package]]
-name = "malachite-q"
-version = "0.3.1"
+name = "malachite-nz"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48d4a5b1a20d21aa9acb5a2a281887306b90738dc2e876b4d8aea1a24bceeda4"
+checksum = "c89e21c64b7af5be3dc8cef16f786243faf59459fe4ba93b44efdeb264e5ade4"
+dependencies = [
+ "embed-doc-image",
+ "itertools 0.9.0",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num",
+ "rug",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "malachite-q"
+version = "0.3.2"
 dependencies = [
  "itertools 0.9.0",
- "malachite-base 0.3.1",
- "malachite-nz 0.3.1",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-q 0.3.2",
+ "num",
+ "rug",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "malachite-q"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3755e541d5134b5016594c9043094172c4dda9259b3ce824a7b8101941850360"
+dependencies = [
+ "itertools 0.9.0",
+ "malachite-base 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "malachite-nz 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
 ]
 
@@ -876,6 +869,12 @@ dependencies = [
  "wasi 0.10.0+wasi-snapshot-preview1",
  "winapi",
 ]
+
+[[package]]
+name = "time"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fcc26de0a81a07c8352b548977862908fa9863e0e6e4f0eb36b2a9f4f8845585"
 
 [[package]]
 name = "tinytemplate"
