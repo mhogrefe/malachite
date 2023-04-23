@@ -1,4 +1,4 @@
-use derive_more::{Binary, LowerHex, Octal, UpperHex};
+use derive_more::{Binary, LowerHex, Octal, UpperHex, From};
 use malachite::Integer;
 use num_integer::Roots;
 use num_traits::{Num, One, Signed, Zero};
@@ -30,8 +30,9 @@ impl Neg for Sign {
 }
 
 #[derive(
-    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,
+    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,From
 )]
+#[from(forward)]
 pub struct BigInt(Integer);
 
 forward_unary_op!(BigInt, Not, not);

@@ -1,4 +1,4 @@
-use derive_more::{Binary, LowerHex, Octal, UpperHex};
+use derive_more::{Binary, LowerHex, Octal, UpperHex, From};
 use malachite::Natural;
 use num_integer::Roots;
 use num_traits::{Num, One, Signed, Zero, Unsigned};
@@ -10,8 +10,9 @@ use std::{
 use crate::ParseBigIntError;
 
 #[derive(
-    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,
+    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,From
 )]
+#[from(forward)]
 pub struct BigUint(Natural);
 
 forward_binary_op!(BigUint, Add, add);
