@@ -4,6 +4,7 @@ use std::error::Error;
 #[macro_use]
 mod macros;
 mod bigint;
+mod biguint;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParseBigIntError {

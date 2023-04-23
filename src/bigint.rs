@@ -1,7 +1,7 @@
 use derive_more::{Binary, LowerHex, Octal, UpperHex};
 use malachite::Integer;
 use num_integer::Roots;
-use num_traits::{self, Num, One, Signed, Zero};
+use num_traits::{Num, One, Signed, Zero};
 use std::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Not, Rem, Sub},
