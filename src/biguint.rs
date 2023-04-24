@@ -1,16 +1,34 @@
-use derive_more::{Binary, LowerHex, Octal, UpperHex, From};
-use malachite::Natural;
+use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
+use malachite::{
+    num::{
+        conversion::traits::{Digits, PowerOf2Digits, ToStringBase},
+        logic::traits::{BitAccess, CountOnes, SignificantBits},
+    },
+    Natural,
+};
 use num_integer::Roots;
-use num_traits::{Num, One, Signed, Zero, Unsigned};
+use num_traits::{Num, One, Unsigned, Zero};
 use std::{
-    cmp::Ordering,
-    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Not, Rem, Sub},
+    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Rem, Sub},
+    str::FromStr,
 };
 
 use crate::ParseBigIntError;
 
 #[derive(
-    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,From
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Default,
+    Debug,
+    Binary,
+    Octal,
+    LowerHex,
+    UpperHex,
+    From,
 )]
 #[from(forward)]
 pub struct BigUint(Natural);
@@ -96,4 +114,165 @@ impl Roots for BigUint {
 
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
+}
+
+impl FromStr for BigUint {
+    type Err = ParseBigIntError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::from_str_radix(s, 10)
+    }
+}
+
+impl BigUint {
+    pub fn new(digits: Vec<u32>) -> Self {
+        todo!()
+    }
+
+    #[inline]
+    pub fn from_slice(slice: &[u32]) -> Self {
+        let mut uint = BigUint::zero();
+        uint.assign_from_slice(slice);
+        uint
+    }
+
+    pub fn assign_from_slice(&mut self, slice: &[u32]) {
+        todo!()
+    }
+
+    #[inline]
+    pub fn from_bytes_be(bytes: &[u8]) -> Self {
+        // SAFETY: &[u8] cannot have any digit greater than 2^8
+        Self(unsafe {
+            Natural::from_power_of_2_digits_desc(8, bytes.iter().cloned()).unwrap_unchecked()
+        })
+    }
+
+    #[inline]
+    pub fn from_bytes_le(bytes: &[u8]) -> Self {
+        // SAFETY: &[u8] cannot have any digit greater than 2^8
+        Self(unsafe {
+            Natural::from_power_of_2_digits_asc(8, bytes.iter().cloned()).unwrap_unchecked()
+        })
+    }
+
+    #[inline]
+    pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<BigUint> {
+        let s = std::str::from_utf8(bytes).ok()?;
+        Self::from_str_radix(s, radix).ok()
+    }
+
+    pub fn from_radix_be(bytes: &[u8], radix: u32) -> Option<Self> {
+        todo!()
+    }
+
+    pub fn from_radix_le(bytes: &[u8], radix: u32) -> Option<Self> {
+        todo!()
+    }
+
+    #[inline]
+    pub fn to_bytes_be(&self) -> Vec<u8> {
+        self.0.to_power_of_2_digits_desc(8)
+    }
+
+    #[inline]
+    pub fn to_bytes_le(&self) -> Vec<u8> {
+        self.0.to_power_of_2_digits_asc(8)
+    }
+
+    #[inline]
+    pub fn to_u32_digits(&self) -> Vec<u32> {
+        self.0.to_power_of_2_digits_asc(32)
+    }
+
+    #[inline]
+    pub fn to_u64_digits(&self) -> Vec<u64> {
+        self.0.to_limbs_asc()
+    }
+
+    pub fn iter_u32_digits(&self) {
+        todo!()
+    }
+
+    pub fn iter_u64_digits(&self) {
+        todo!()
+    }
+
+    #[inline]
+    pub fn to_str_radix(&self, radix: u32) -> String {
+        self.0.to_string_base(radix as u8)
+    }
+
+    #[inline]
+    pub fn to_radix_be(&self, radix: u32) -> Vec<u8> {
+        debug_assert!(radix <= 256);
+        if radix == 256 {
+            self.to_bytes_be()
+        } else {
+            self.0.to_digits_desc(&(radix as u8))
+        }
+    }
+
+    #[inline]
+    pub fn to_radix_le(&self, radix: u32) -> Vec<u8> {
+        debug_assert!(radix <= 256);
+        if radix == 256 {
+            self.to_bytes_le()
+        } else {
+            self.0.to_digits_asc(&(radix as u8))
+        }
+    }
+
+    #[inline]
+    pub fn bits(&self) -> u64 {
+        self.0.significant_bits()
+    }
+
+    pub fn pow(&self, exponent: u32) -> Self {
+        todo!()
+    }
+
+    pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
+        todo!()
+    }
+
+    #[inline]
+    pub fn cbrt(&self) -> Self {
+        Roots::cbrt(self)
+    }
+
+    #[inline]
+    pub fn nth_root(&self, n: u32) -> Self {
+        Roots::nth_root(self, n)
+    }
+
+    #[inline]
+    pub fn trailing_zeros(&self) -> Option<u64> {
+        self.0.trailing_zeros()
+    }
+
+    #[inline]
+    pub fn trailing_ones(&self) -> u64 {
+        todo!()
+    }
+
+    #[inline]
+    pub fn count_ones(&self) -> u64 {
+        self.0.count_ones()
+    }
+
+    #[inline]
+    pub fn bit(&self, bit: u64) -> bool {
+        self.0.get_bit(bit)
+    }
+
+    #[inline]
+    pub fn set_bit(&mut self, bit: u64, value: bool) {
+        if value {
+            self.0.set_bit(bit)
+        } else {
+            self.0.clear_bit(bit)
+        }
+    }
 }
