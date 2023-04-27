@@ -19,6 +19,10 @@ use std::{
 
 use crate::ParseBigIntError;
 
+pub trait ToBigUint {
+    fn to_biguint(&self) -> Option<BigUint>;
+}
+
 #[derive(
     Clone,
     PartialEq,
@@ -111,6 +115,12 @@ impl CheckedDiv for BigUint {
     }
 }
 
+impl ToBigUint for BigUint {
+    fn to_biguint(&self) -> Option<BigUint> {
+        Some(self.clone())
+    }
+}
+
 impl Zero for BigUint {
     fn zero() -> Self {
         Self(<Natural as malachite::num::basic::traits::Zero>::ZERO)
@@ -179,10 +189,6 @@ impl Roots for BigUint {
     fn nth_root(&self, n: u32) -> Self {
         todo!()
     }
-}
-
-pub trait ToBigUint {
-    fn to_biguint(&self) -> Option<BigUint>;
 }
 
 impl FromStr for BigUint {
