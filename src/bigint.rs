@@ -37,14 +37,14 @@ pub struct BigInt(Integer);
 
 forward_unary_op!(BigInt, Not, not);
 forward_unary_op!(BigInt, Neg, neg);
-forward_binary_op!(BigInt, Add, add);
-forward_binary_op!(BigInt, Sub, sub);
-forward_binary_op!(BigInt, Mul, mul);
-forward_binary_op!(BigInt, Div, div);
-forward_binary_op!(BigInt, Rem, rem);
-forward_binary_op!(BigInt, BitAnd, bitand);
-forward_binary_op!(BigInt, BitOr, bitor);
-forward_binary_op!(BigInt, BitXor, bitxor);
+forward_binary_self!(BigInt, Add, add);
+forward_binary_self!(BigInt, Sub, sub);
+forward_binary_self!(BigInt, Mul, mul);
+forward_binary_self!(BigInt, Div, div);
+forward_binary_self!(BigInt, Rem, rem);
+forward_binary_self!(BigInt, BitAnd, bitand);
+forward_binary_self!(BigInt, BitOr, bitor);
+forward_binary_self!(BigInt, BitXor, bitxor);
 
 impl Zero for BigInt {
     #[inline]

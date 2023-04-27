@@ -7,9 +7,12 @@ use malachite::{
     Natural,
 };
 use num_integer::Roots;
-use num_traits::{Num, One, Unsigned, Zero};
+use num_traits::{Num, One, Pow, Unsigned, Zero};
 use std::{
-    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Rem, Sub},
+    ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+    },
     str::FromStr,
 };
 
@@ -33,14 +36,48 @@ use crate::ParseBigIntError;
 #[from(forward)]
 pub struct BigUint(Natural);
 
-forward_binary_op!(BigUint, Add, add);
-forward_binary_op!(BigUint, Sub, sub);
-forward_binary_op!(BigUint, Mul, mul);
-forward_binary_op!(BigUint, Div, div);
-forward_binary_op!(BigUint, Rem, rem);
-forward_binary_op!(BigUint, BitAnd, bitand);
-forward_binary_op!(BigUint, BitOr, bitor);
-forward_binary_op!(BigUint, BitXor, bitxor);
+forward_binary_self!(BigUint, Add, add);
+forward_binary_self!(BigUint, Sub, sub);
+forward_binary_self!(BigUint, Mul, mul);
+forward_binary_self!(BigUint, Div, div);
+forward_binary_self!(BigUint, Rem, rem);
+// // forward_binary_self!(BigUint, Pow, pow, malachite::num::arithmetic::traits::Pow::pow);
+forward_binary_self!(BigUint, BitAnd, bitand);
+forward_binary_self!(BigUint, BitOr, bitor);
+forward_binary_self!(BigUint, BitXor, bitxor);
+
+forward_assign_self!(BigUint, AddAssign, add_assign);
+forward_assign_self!(BigUint, SubAssign, sub_assign);
+forward_assign_self!(BigUint, MulAssign, mul_assign);
+forward_assign_self!(BigUint, DivAssign, div_assign);
+forward_assign_self!(BigUint, RemAssign, rem_assign);
+forward_assign_self!(BigUint, BitAndAssign, bitand_assign);
+forward_assign_self!(BigUint, BitOrAssign, bitor_assign);
+forward_assign_self!(BigUint, BitXorAssign, bitxor_assign);
+
+apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Add, add});
+apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Sub, sub});
+apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Mul, mul});
+apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Div, div});
+apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Rem, rem});
+
+apply_to_unsigneds!(forward_binary_left_primitive_into{_, BigUint, Add, add});
+apply_to_unsigneds!(forward_binary_left_primitive_into{_, BigUint, Sub, sub});
+apply_to_unsigneds!(forward_binary_left_primitive_into{_, BigUint, Mul, mul});
+apply_to_unsigneds!(forward_binary_left_primitive_into{_, BigUint, Div, div});
+apply_to_unsigneds!(forward_binary_left_primitive_into{_, BigUint, Rem, rem});
+
+apply_to_primitives!(forward_binary_right_primitive{BigUint, _, Shl, shl});
+apply_to_primitives!(forward_binary_right_primitive{BigUint, _, Shr, shr});
+
+apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, AddAssign, add_assign});
+apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, SubAssign, sub_assign});
+apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, MulAssign, mul_assign});
+apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, DivAssign, div_assign});
+apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, RemAssign, rem_assign});
+
+apply_to_primitives!(forward_assign_primitive{BigUint, _, ShlAssign, shl_assign});
+apply_to_primitives!(forward_assign_primitive{BigUint, _, ShrAssign, shr_assign});
 
 impl Zero for BigUint {
     fn zero() -> Self {
