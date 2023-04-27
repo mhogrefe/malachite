@@ -1,13 +1,16 @@
 use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
-        conversion::traits::{Digits, PowerOf2Digits, ToStringBase},
+        conversion::traits::{Digits, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, CountOnes, SignificantBits},
     },
+    rounding_modes::RoundingMode,
     Natural,
 };
 use num_integer::Roots;
-use num_traits::{CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, Num, One, Pow, Unsigned, Zero};
+use num_traits::{
+    CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, Num, One, Pow, ToPrimitive, Unsigned, Zero,
+};
 use std::{
     cmp::Ordering::{Equal, Greater, Less},
     ops::{
@@ -118,6 +121,76 @@ impl CheckedDiv for BigUint {
 impl ToBigUint for BigUint {
     fn to_biguint(&self) -> Option<BigUint> {
         Some(self.clone())
+    }
+}
+
+impl ToPrimitive for BigUint {
+    fn to_i64(&self) -> Option<i64> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_u64(&self) -> Option<u64> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_isize(&self) -> Option<isize> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_i8(&self) -> Option<i8> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_i16(&self) -> Option<i16> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_i32(&self) -> Option<i32> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_i128(&self) -> Option<i128> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_usize(&self) -> Option<usize> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_u8(&self) -> Option<u8> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_u16(&self) -> Option<u16> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_u32(&self) -> Option<u32> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_u128(&self) -> Option<u128> {
+        (&self.0).try_into().ok()
+    }
+
+    fn to_f32(&self) -> Option<f32> {
+        // FIXME: correctness?
+        let val: f32 = (&self.0).rounding_into(RoundingMode::Down);
+        if val == f32::MAX || val == f32::MIN {
+            (self.0 == val).then_some(val)
+        } else {
+            Some(val)
+        }
+    }
+
+    fn to_f64(&self) -> Option<f64> {
+        // FIXME: correctness?
+        let val: f64 = (&self.0).rounding_into(RoundingMode::Down);
+        if val == f64::MAX || val == f64::MIN {
+            (self.0 == val).then_some(val)
+        } else {
+            Some(val)
+        }
     }
 }
 
