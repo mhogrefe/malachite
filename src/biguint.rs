@@ -79,6 +79,9 @@ apply_to_unsigneds!(forward_assign_primitive_into{BigUint, _, RemAssign, rem_ass
 apply_to_primitives!(forward_assign_primitive{BigUint, _, ShlAssign, shl_assign});
 apply_to_primitives!(forward_assign_primitive{BigUint, _, ShrAssign, shr_assign});
 
+apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
+// TODO: pow self
+
 impl Zero for BigUint {
     fn zero() -> Self {
         Self(<Natural as malachite::num::basic::traits::Zero>::ZERO)

@@ -222,3 +222,20 @@ macro_rules! forward_assign_primitive_into {
         });
     };
 }
+
+macro_rules! forward_pow_primitive {
+    ($lhs:ty, $rhs:ty) => {
+        impl_binary_op!($lhs, $rhs, $lhs, Pow, pow, |lhs: $lhs, rhs: $rhs| {
+            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, rhs as _).into()
+        });
+        impl_binary_op!(&$lhs, $rhs, $lhs, Pow, pow, |lhs: &$lhs, rhs: $rhs| {
+            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, rhs as _).into()
+        });
+        impl_binary_op!($lhs, &$rhs, $lhs, Pow, pow, |lhs: $lhs, rhs: &$rhs| {
+            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, *rhs as _).into()
+        });
+        impl_binary_op!(&$lhs, &$rhs, $lhs, Pow, pow, |lhs: &$lhs, rhs: &$rhs| {
+            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, *rhs as _).into()
+        });
+    };
+}
