@@ -7,8 +7,9 @@ use malachite::{
     Natural,
 };
 use num_integer::Roots;
-use num_traits::{Num, One, Pow, Unsigned, Zero};
+use num_traits::{CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, Num, One, Pow, Unsigned, Zero};
 use std::{
+    cmp::Ordering::{Equal, Greater, Less},
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
         DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
@@ -81,6 +82,34 @@ apply_to_primitives!(forward_assign_primitive{BigUint, _, ShrAssign, shr_assign}
 
 apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
 // TODO: pow self
+
+impl CheckedAdd for BigUint {
+    fn checked_add(&self, v: &Self) -> Option<Self> {
+        Some(self.add(v))
+    }
+}
+
+impl CheckedSub for BigUint {
+    fn checked_sub(&self, v: &Self) -> Option<Self> {
+        match self.cmp(v) {
+            Less => None,
+            Equal => Some(Self::zero()),
+            Greater => Some(self.sub(v)),
+        }
+    }
+}
+
+impl CheckedMul for BigUint {
+    fn checked_mul(&self, v: &Self) -> Option<Self> {
+        Some(self.mul(v))
+    }
+}
+
+impl CheckedDiv for BigUint {
+    fn checked_div(&self, v: &Self) -> Option<Self> {
+        (!v.is_zero()).then(|| self.div(v))
+    }
+}
 
 impl Zero for BigUint {
     fn zero() -> Self {
