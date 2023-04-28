@@ -1,7 +1,9 @@
 use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
-        arithmetic::traits::{DivRem, DivRound, DivisibleBy, Gcd, Lcm, Mod, Parity},
+        arithmetic::traits::{
+            DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
+        },
         conversion::traits::{Digits, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, CountOnes, SignificantBits},
     },
@@ -264,7 +266,7 @@ impl num_integer::Integer for BigUint {
 
 impl Roots for BigUint {
     fn nth_root(&self, n: u32) -> Self {
-        todo!()
+        (&self.0).floor_root(n as u64).into()
     }
 }
 
@@ -279,7 +281,7 @@ impl FromStr for BigUint {
 
 impl BigUint {
     pub fn new(digits: Vec<u32>) -> Self {
-        todo!()
+        Self::from_slice(digits.as_slice())
     }
 
     #[inline]
@@ -290,7 +292,9 @@ impl BigUint {
     }
 
     pub fn assign_from_slice(&mut self, slice: &[u32]) {
-        todo!()
+        self.0 = unsafe {
+            Natural::from_power_of_2_digits_asc(32, slice.iter().cloned()).unwrap_unchecked()
+        };
     }
 
     #[inline]
@@ -316,11 +320,19 @@ impl BigUint {
     }
 
     pub fn from_radix_be(bytes: &[u8], radix: u32) -> Option<Self> {
-        todo!()
+        if radix == 256 {
+            Some(Self::from_bytes_be(bytes))
+        } else {
+            Natural::from_digits_desc(&(radix as u8), bytes.iter().cloned()).map(Self)
+        }
     }
 
     pub fn from_radix_le(bytes: &[u8], radix: u32) -> Option<Self> {
-        todo!()
+        if radix == 256 {
+            Some(Self::from_bytes_le(bytes))
+        } else {
+            Natural::from_digits_asc(&(radix as u8), bytes.iter().cloned()).map(Self)
+        }
     }
 
     #[inline]
@@ -382,11 +394,11 @@ impl BigUint {
     }
 
     pub fn pow(&self, exponent: u32) -> Self {
-        todo!()
+        Pow::pow(self, exponent)
     }
 
     pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
-        todo!()
+        (&self.0).mod_pow(&exponent.0, &modulus.0).into()
     }
 
     #[inline]
