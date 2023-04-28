@@ -1,6 +1,7 @@
 use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
+        arithmetic::traits::{DivRem, DivRound, DivisibleBy, Gcd, Lcm, Mod, Parity},
         conversion::traits::{Digits, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, CountOnes, SignificantBits},
     },
@@ -196,12 +197,6 @@ impl ToPrimitive for BigUint {
     }
 }
 
-fn test() {
-    let i = 10i8;
-    let val = BigUint::try_from(i).unwrap();
-    let uint = Natural::try_from(i).unwrap();
-}
-
 impl Zero for BigUint {
     fn zero() -> Self {
         Self(<Natural as malachite::num::basic::traits::Zero>::ZERO)
@@ -230,39 +225,40 @@ impl Num for BigUint {
 
 impl num_integer::Integer for BigUint {
     fn div_floor(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).div_round(&other.0, RoundingMode::Floor).into()
     }
 
     fn mod_floor(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).mod_op(&other.0).into()
     }
 
     fn gcd(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).gcd(&other.0).into()
     }
 
     fn lcm(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).lcm(&other.0).into()
     }
 
     fn divides(&self, other: &Self) -> bool {
-        todo!()
+        Self::is_multiple_of(self, other)
     }
 
     fn is_multiple_of(&self, other: &Self) -> bool {
-        todo!()
+        (&self.0).divisible_by(&other.0)
     }
 
     fn is_even(&self) -> bool {
-        todo!()
+        self.0.even()
     }
 
     fn is_odd(&self) -> bool {
-        todo!()
+        self.0.odd()
     }
 
     fn div_rem(&self, other: &Self) -> (Self, Self) {
-        todo!()
+        let (div, rem) = (&self.0).div_rem(&other.0);
+        (div.into(), rem.into())
     }
 }
 
