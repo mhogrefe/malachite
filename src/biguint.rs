@@ -5,7 +5,7 @@ use malachite::{
             DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
         },
         conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
-        logic::traits::{BitAccess, CountOnes, SignificantBits},
+        logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
     },
     rounding_modes::RoundingMode,
     Natural,
@@ -444,7 +444,7 @@ impl BigUint {
 
     #[inline]
     pub fn trailing_ones(&self) -> u64 {
-        todo!()
+        self.0.bits().take_while(|&x| x).count() as u64
     }
 
     #[inline]
