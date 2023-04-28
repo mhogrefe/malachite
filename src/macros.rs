@@ -47,6 +47,17 @@ macro_rules! apply_to_primitives {
     };
 }
 
+macro_rules! forward_from {
+    ($lhs:ty, $rhs:ty) => {
+        impl From<$rhs> for $lhs {
+            #[inline]
+            fn from(value: $rhs) -> Self {
+                Self(<_ as From<_>>::from(value))
+            }
+        }
+    };
+}
+
 macro_rules! forward_unary_op {
     ($struct:tt, $trait:tt, $fn:ident) => {
         impl $trait for $struct {

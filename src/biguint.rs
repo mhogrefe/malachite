@@ -20,7 +20,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::ParseBigIntError;
+use crate::{ParseBigIntError, TryFromBigIntError};
 
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
@@ -41,8 +41,9 @@ pub trait ToBigUint {
     UpperHex,
     From,
 )]
-#[from(forward)]
 pub struct BigUint(Natural);
+
+apply_to_unsigneds!(forward_from{BigUint, _});
 
 forward_binary_self!(BigUint, Add, add);
 forward_binary_self!(BigUint, Sub, sub);
@@ -192,6 +193,19 @@ impl ToPrimitive for BigUint {
             Some(val)
         }
     }
+}
+
+impl TryFrom<i8> for BigUint {
+    type Error = TryFromBigIntError<()>;
+
+    fn try_from(value: i8) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}
+
+fn test() {
+    let i = 10i8;
+    let val = BigUint::try_from(i).unwrap();
 }
 
 impl Zero for BigUint {
