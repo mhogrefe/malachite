@@ -58,6 +58,19 @@ macro_rules! forward_from {
     };
 }
 
+macro_rules! forward_try_from {
+    ($lhs:ty, $rhs:ty) => {
+        impl TryFrom<$rhs> for $lhs {
+            type Error = TryFromBigIntError<()>;
+
+            #[inline]
+            fn try_from(value: $rhs) -> Result<Self, Self::Error> {
+                <_ as TryFrom<_>>::try_from(value).map_err(|_| Self::Error::new(())).map(Self)
+            }
+        }
+    };
+}
+
 macro_rules! forward_unary_op {
     ($struct:tt, $trait:tt, $fn:ident) => {
         impl $trait for $struct {

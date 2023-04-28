@@ -44,6 +44,7 @@ pub trait ToBigUint {
 pub struct BigUint(Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
+apply_to_signeds!(forward_try_from{BigUint, _});
 
 forward_binary_self!(BigUint, Add, add);
 forward_binary_self!(BigUint, Sub, sub);
@@ -195,17 +196,10 @@ impl ToPrimitive for BigUint {
     }
 }
 
-impl TryFrom<i8> for BigUint {
-    type Error = TryFromBigIntError<()>;
-
-    fn try_from(value: i8) -> Result<Self, Self::Error> {
-        todo!()
-    }
-}
-
 fn test() {
     let i = 10i8;
     let val = BigUint::try_from(i).unwrap();
+    let uint = Natural::try_from(i).unwrap();
 }
 
 impl Zero for BigUint {
