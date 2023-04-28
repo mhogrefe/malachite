@@ -4,7 +4,7 @@ use malachite::{
         arithmetic::traits::{
             DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModPow, Parity,
         },
-        conversion::traits::{Digits, PowerOf2Digits, RoundingInto, ToStringBase},
+        conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, CountOnes, SignificantBits},
     },
     rounding_modes::RoundingMode,
@@ -220,8 +220,34 @@ impl Unsigned for BigUint {}
 impl Num for BigUint {
     type FromStrRadixErr = ParseBigIntError;
 
-    fn from_str_radix(str: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
-        todo!()
+    fn from_str_radix(s: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        let mut s = s;
+        if s.starts_with('+') {
+            let tail = &s[1..];
+            if !tail.starts_with('+') {
+                s = tail
+            }
+        }
+
+        // fast path
+        if let Some(val) = Natural::from_string_base(radix as u8, s) {
+            return Ok(val.into());
+        }
+
+        if s.is_empty() {
+            return Err(ParseBigIntError::empty());
+        }
+
+        if s.starts_with('_') {
+            // Must lead with a real digit!
+            return Err(ParseBigIntError::invalid());
+        }
+
+        let v: Vec<u8> = s.bytes().filter(|&x| x != b'_').collect();
+        let s = std::str::from_utf8(v.as_slice()).map_err(|_| ParseBigIntError::invalid())?;
+        Natural::from_string_base(radix as u8, s)
+            .map(Self)
+            .ok_or_else(|| ParseBigIntError::invalid())
     }
 }
 
