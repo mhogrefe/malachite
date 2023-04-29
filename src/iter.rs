@@ -78,6 +78,61 @@ impl ExactSizeIterator for U32Digits<'_> {
 
 impl FusedIterator for U32Digits<'_> {}
 
+pub struct U64Digits<'a> {
+    iter: LimbIterator<'a>,
+}
+
+impl<'a> U64Digits<'a> {
+    #[inline]
+    pub(crate) fn new(iter: LimbIterator<'a>) -> Self {
+        Self { iter }
+    }
+}
+
+impl Iterator for U64Digits<'_> {
+    type Item = u64;
+
+    #[inline]
+    fn next(&mut self) -> Option<u64> {
+        self.iter.next()
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<u64> {
+        self.iter.nth(n)
+    }
+
+    #[inline]
+    fn last(self) -> Option<u64> {
+        self.iter.last()
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.iter.count()
+    }
+}
+
+impl DoubleEndedIterator for U64Digits<'_> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back()
+    }
+}
+
+impl ExactSizeIterator for U64Digits<'_> {
+    #[inline]
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl FusedIterator for U64Digits<'_> {}
+
 #[test]
 fn test_iter_u32_digits() {
     let n = super::BigUint::from(5u8);
@@ -95,6 +150,27 @@ fn test_iter_u32_digits() {
     assert_eq!(it.next(), Some(830850304));
     assert_eq!(it.len(), 1);
     assert_eq!(it.next(), Some(26));
+    assert_eq!(it.len(), 0);
+    assert_eq!(it.next(), None);
+}
+
+#[test]
+fn test_iter_u64_digits() {
+    let n = super::BigUint::from(5u8);
+    let mut it = n.iter_u64_digits();
+    assert_eq!(it.len(), 1);
+    assert_eq!(it.next(), Some(5));
+    assert_eq!(it.len(), 0);
+    assert_eq!(it.next(), None);
+    assert_eq!(it.len(), 0);
+    assert_eq!(it.next(), None);
+
+    let n = super::BigUint::from(18_446_744_073_709_551_616u128);
+    let mut it = n.iter_u64_digits();
+    assert_eq!(it.len(), 2);
+    assert_eq!(it.next(), Some(0));
+    assert_eq!(it.len(), 1);
+    assert_eq!(it.next(), Some(1));
     assert_eq!(it.len(), 0);
     assert_eq!(it.next(), None);
 }

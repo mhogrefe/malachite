@@ -23,7 +23,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{ParseBigIntError, TryFromBigIntError, iter::U32Digits};
+use crate::{ParseBigIntError, TryFromBigIntError, U32Digits, U64Digits};
 
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
@@ -385,8 +385,8 @@ impl BigUint {
         U32Digits::new(self.0.limbs())
     }
 
-    pub fn iter_u64_digits(&self) {
-        todo!()
+    pub fn iter_u64_digits(&self) -> U64Digits {
+        U64Digits::new(self.0.limbs())
     }
 
     #[inline]

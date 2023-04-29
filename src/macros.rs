@@ -65,7 +65,9 @@ macro_rules! forward_try_from {
 
             #[inline]
             fn try_from(value: $rhs) -> Result<Self, Self::Error> {
-                <_ as TryFrom<_>>::try_from(value).map_err(|_| Self::Error::new(())).map(Self)
+                <_ as TryFrom<_>>::try_from(value)
+                    .map_err(|_| Self::Error::new(()))
+                    .map(Self)
             }
         }
     };
