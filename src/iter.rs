@@ -1,3 +1,5 @@
+use std::iter::FusedIterator;
+
 use malachite::natural::conversion::to_limbs::LimbIterator;
 
 pub struct U32Digits<'a> {
@@ -53,6 +55,7 @@ impl Iterator for U32Digits<'_> {
         self.len()
     }
 
+    #[inline]
     fn last(self) -> Option<Self::Item> {
         self.iter.last().map(|limb| {
             if self.last_hi_is_zero {
@@ -65,12 +68,15 @@ impl Iterator for U32Digits<'_> {
 }
 
 impl ExactSizeIterator for U32Digits<'_> {
+    #[inline]
     fn len(&self) -> usize {
         self.len
     }
 }
 
 // TODO: DoubleEndedIterator
+
+impl FusedIterator for U32Digits<'_> {}
 
 #[test]
 fn test_iter_u32_digits() {
