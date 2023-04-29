@@ -16,6 +16,7 @@ use num_traits::{
 };
 use std::{
     cmp::Ordering::{Equal, Greater, Less},
+    iter::{Product, Sum},
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
         DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
@@ -95,6 +96,9 @@ apply_to_primitives!(forward_assign_primitive{BigUint, _, ShlAssign, shl_assign}
 apply_to_primitives!(forward_assign_primitive{BigUint, _, ShrAssign, shr_assign});
 
 apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
+
+impl_product_iter_type!(BigUint);
+impl_sum_iter_type!(BigUint);
 
 impl CheckedAdd for BigUint {
     fn checked_add(&self, v: &Self) -> Option<Self> {

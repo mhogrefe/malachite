@@ -268,21 +268,85 @@ macro_rules! forward_pow_primitive {
 
 macro_rules! forward_pow_biguint {
     ($lhs:ty) => {
-        impl_binary_op!($lhs, BigUint, BigUint, Pow, pow, |lhs: $lhs, rhs: BigUint| {
-            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
-        });
-        impl_binary_op!(&$lhs, BigUint, BigUint, Pow, pow, |lhs: &$lhs, rhs: BigUint| {
-            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
-        });
-        impl_binary_op!($lhs, &BigUint, BigUint, Pow, pow, |lhs: $lhs, rhs: &BigUint| {
-            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
-        });
-        impl_binary_op!(&$lhs, &BigUint, BigUint, Pow, pow, |lhs: &$lhs, rhs: &BigUint| {
-            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
-        });
+        impl_binary_op!(
+            $lhs,
+            BigUint,
+            BigUint,
+            Pow,
+            pow,
+            |lhs: $lhs, rhs: BigUint| {
+                let exp =
+                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
+            }
+        );
+        impl_binary_op!(
+            &$lhs,
+            BigUint,
+            BigUint,
+            Pow,
+            pow,
+            |lhs: &$lhs, rhs: BigUint| {
+                let exp =
+                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
+            }
+        );
+        impl_binary_op!(
+            $lhs,
+            &BigUint,
+            BigUint,
+            Pow,
+            pow,
+            |lhs: $lhs, rhs: &BigUint| {
+                let exp =
+                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
+            }
+        );
+        impl_binary_op!(
+            &$lhs,
+            &BigUint,
+            BigUint,
+            Pow,
+            pow,
+            |lhs: &$lhs, rhs: &BigUint| {
+                let exp =
+                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(&lhs.0, exp).into()
+            }
+        );
+    };
+}
+
+macro_rules! impl_sum_iter_type {
+    ($res:ty) => {
+        impl<T> Sum<T> for $res
+        where
+            $res: Add<T, Output = $res>,
+        {
+            fn sum<I>(iter: I) -> Self
+            where
+                I: Iterator<Item = T>,
+            {
+                iter.fold(Zero::zero(), <$res>::add)
+            }
+        }
+    };
+}
+
+macro_rules! impl_product_iter_type {
+    ($res:ty) => {
+        impl<T> Product<T> for $res
+        where
+            $res: Mul<T, Output = $res>,
+        {
+            fn product<I>(iter: I) -> Self
+            where
+                I: Iterator<Item = T>,
+            {
+                iter.fold(One::one(), <$res>::mul)
+            }
+        }
     };
 }
