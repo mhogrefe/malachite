@@ -68,6 +68,8 @@ forward_assign_self!(BigUint, BitAndAssign, bitand_assign);
 forward_assign_self!(BigUint, BitOrAssign, bitor_assign);
 forward_assign_self!(BigUint, BitXorAssign, bitxor_assign);
 
+forward_pow_biguint!(BigUint);
+
 apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Add, add});
 apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Sub, sub});
 apply_to_unsigneds!(forward_binary_right_primitive_into{BigUint, _, Mul, mul});
@@ -93,7 +95,6 @@ apply_to_primitives!(forward_assign_primitive{BigUint, _, ShlAssign, shl_assign}
 apply_to_primitives!(forward_assign_primitive{BigUint, _, ShrAssign, shr_assign});
 
 apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
-// TODO: pow self
 
 impl CheckedAdd for BigUint {
     fn checked_add(&self, v: &Self) -> Option<Self> {
