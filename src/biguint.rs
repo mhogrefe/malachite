@@ -12,8 +12,10 @@ use malachite::{
 };
 use num_integer::Roots;
 use num_traits::{
-    CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, Num, One, Pow, ToPrimitive, Unsigned, Zero,
+    CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Num, One, Pow, ToPrimitive,
+    Unsigned, Zero,
 };
+use paste::paste;
 use std::{
     cmp::Ordering::{Equal, Greater, Less},
     iter::{Product, Sum},
@@ -29,6 +31,8 @@ use crate::{ParseBigIntError, TryFromBigIntError, U32Digits, U64Digits};
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
 }
+
+apply_to_primitives!(impl_primitive_convert{BigUint, _});
 
 #[derive(
     Clone,
@@ -202,6 +206,13 @@ impl ToPrimitive for BigUint {
             Some(val)
         }
     }
+}
+
+impl FromPrimitive for BigUint {
+    apply_to_signeds!(impl_from_primitive_fn_try_from{_});
+    apply_to_unsigneds!(impl_from_primitive_fn_infallible{_});
+    impl_from_primitive_fn_float!(f32);
+    impl_from_primitive_fn_float!(f64);
 }
 
 impl Zero for BigUint {

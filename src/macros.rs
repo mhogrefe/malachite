@@ -350,3 +350,52 @@ macro_rules! impl_product_iter_type {
         }
     };
 }
+
+macro_rules! impl_from_primitive_fn_infallible {
+    ($t:ty) => {
+        paste! {
+            #[inline]
+            fn [<from_ $t>](n: $t) -> Option<Self> {
+                Some(Self::from(n))
+            }
+        }
+    };
+}
+
+macro_rules! impl_from_primitive_fn_try_from {
+    ($t:ty) => {
+        paste! {
+            #[inline]
+            fn [<from_ $t>](n: $t) -> Option<Self> {
+                Self::try_from(n).ok()
+            }
+        }
+    };
+}
+
+macro_rules! impl_from_primitive_fn_float {
+    ($t:ty) => {
+        paste! {
+            #[inline]
+            fn [<from_ $t>](n: $t) -> Option<Self> {
+                if !n.is_finite() {
+                    return None;
+                }
+                Some(Self(n.rounding_into(RoundingMode::Down)))
+            }
+        }
+    };
+}
+
+macro_rules! impl_primitive_convert {
+    ($res:ty, $t:ty) => {
+        paste! {
+            impl [<To $res>] for $t {
+                #[inline]
+                fn [<to_ $res:lower>](&self) -> Option<$res> {
+                    $res::[<from_ $t>](*self)
+                }
+            }
+        }
+    };
+}
