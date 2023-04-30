@@ -73,6 +73,28 @@ macro_rules! forward_try_from {
     };
 }
 
+macro_rules! forward_try_into {
+    ($res:ty, $t:ty) => {
+        impl TryFrom<$res> for $t {
+            type Error = TryFromBigIntError<$res>;
+
+            #[inline]
+            fn try_from(value: $res) -> Result<Self, Self::Error> {
+                <$t>::try_from(&value.0).map_err(|_| Self::Error::new(value))
+            }
+        }
+
+        impl TryFrom<&$res> for $t {
+            type Error = TryFromBigIntError<()>;
+
+            #[inline]
+            fn try_from(value: &$res) -> Result<Self, Self::Error> {
+                <$t>::try_from(&value.0).map_err(|_| Self::Error::new(()))
+            }
+        }
+    };
+}
+
 macro_rules! forward_unary_op {
     ($struct:tt, $trait:tt, $fn:ident) => {
         impl $trait for $struct {
@@ -395,6 +417,17 @@ macro_rules! impl_primitive_convert {
                 fn [<to_ $res:lower>](&self) -> Option<$res> {
                     $res::[<from_ $t>](*self)
                 }
+            }
+        }
+    };
+}
+
+macro_rules! impl_to_primitive_fn_try_into {
+    ($t:ty) => {
+        paste! {
+            #[inline]
+            fn [<to_ $t>](&self)-> Option<$t> {
+                self.try_into().ok()
             }
         }
     };

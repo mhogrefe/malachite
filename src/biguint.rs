@@ -53,6 +53,7 @@ pub struct BigUint(Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
 apply_to_signeds!(forward_try_from{BigUint, _});
+apply_to_primitives!(forward_try_into{BigUint, _});
 
 forward_binary_self!(BigUint, Add, add);
 forward_binary_self!(BigUint, Sub, sub);
@@ -139,53 +140,7 @@ impl ToBigUint for BigUint {
 }
 
 impl ToPrimitive for BigUint {
-    fn to_i64(&self) -> Option<i64> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_u64(&self) -> Option<u64> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_isize(&self) -> Option<isize> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_i8(&self) -> Option<i8> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_i16(&self) -> Option<i16> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_i32(&self) -> Option<i32> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_i128(&self) -> Option<i128> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_usize(&self) -> Option<usize> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_u8(&self) -> Option<u8> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_u16(&self) -> Option<u16> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_u32(&self) -> Option<u32> {
-        (&self.0).try_into().ok()
-    }
-
-    fn to_u128(&self) -> Option<u128> {
-        (&self.0).try_into().ok()
-    }
+    apply_to_primitives!(impl_to_primitive_fn_try_into{_});
 
     fn to_f32(&self) -> Option<f32> {
         // FIXME: correctness?
