@@ -34,6 +34,7 @@ pub trait ToBigUint {
 
 apply_to_primitives!(impl_primitive_convert{BigUint, _});
 
+#[repr(transparent)]
 #[derive(
     Clone,
     PartialEq,
@@ -49,7 +50,7 @@ apply_to_primitives!(impl_primitive_convert{BigUint, _});
     UpperHex,
     From,
 )]
-pub struct BigUint(Natural);
+pub struct BigUint(pub(crate) Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
 apply_to_signeds!(forward_try_from{BigUint, _});
@@ -60,7 +61,6 @@ forward_binary_self!(BigUint, Sub, sub);
 forward_binary_self!(BigUint, Mul, mul);
 forward_binary_self!(BigUint, Div, div);
 forward_binary_self!(BigUint, Rem, rem);
-// // forward_binary_self!(BigUint, Pow, pow, malachite::num::arithmetic::traits::Pow::pow);
 forward_binary_self!(BigUint, BitAnd, bitand);
 forward_binary_self!(BigUint, BitOr, bitor);
 forward_binary_self!(BigUint, BitXor, bitxor);
@@ -141,26 +141,8 @@ impl ToBigUint for BigUint {
 
 impl ToPrimitive for BigUint {
     apply_to_primitives!(impl_to_primitive_fn_try_into{_});
-
-    fn to_f32(&self) -> Option<f32> {
-        // FIXME: correctness?
-        let val: f32 = (&self.0).rounding_into(RoundingMode::Down);
-        if val == f32::MAX || val == f32::MIN {
-            (self.0 == val).then_some(val)
-        } else {
-            Some(val)
-        }
-    }
-
-    fn to_f64(&self) -> Option<f64> {
-        // FIXME: correctness?
-        let val: f64 = (&self.0).rounding_into(RoundingMode::Down);
-        if val == f64::MAX || val == f64::MIN {
-            (self.0 == val).then_some(val)
-        } else {
-            Some(val)
-        }
-    }
+    impl_to_primitive_fn_float!(f32);
+    impl_to_primitive_fn_float!(f64);
 }
 
 impl FromPrimitive for BigUint {
@@ -289,6 +271,7 @@ impl BigUint {
     }
 
     pub fn assign_from_slice(&mut self, slice: &[u32]) {
+        // SAFETY: &[u32] cannot have any digit greater than 2^32
         self.0 = unsafe {
             Natural::from_power_of_2_digits_asc(32, slice.iter().cloned()).unwrap_unchecked()
         };
@@ -311,7 +294,7 @@ impl BigUint {
     }
 
     #[inline]
-    pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<BigUint> {
+    pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<Self> {
         let s = std::str::from_utf8(bytes).ok()?;
         Self::from_str_radix(s, radix).ok()
     }

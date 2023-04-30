@@ -1,13 +1,36 @@
-use derive_more::{Binary, LowerHex, Octal, UpperHex, From};
-use malachite::Integer;
+use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
+use malachite::{
+    num::{arithmetic::traits::Abs, conversion::traits::RoundingInto},
+    rounding_modes::RoundingMode,
+    Integer,
+};
 use num_integer::Roots;
-use num_traits::{Num, One, Signed, Zero};
+use num_traits::{
+    CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Num, One, Pow, Signed,
+    ToPrimitive, Zero,
+};
+use paste::paste;
 use std::{
     cmp::Ordering,
-    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Not, Rem, Sub},
+    iter::{Product, Sum},
+    ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        DivAssign, Mul, MulAssign, Neg, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
+        SubAssign,
+    },
 };
 
-use crate::ParseBigIntError;
+use crate::{
+    BigUint, ParseBigIntError,
+    Sign::{Minus, NoSign, Plus},
+    TryFromBigIntError,
+};
+
+pub trait ToBigInt {
+    fn to_bigint(&self) -> Option<BigInt>;
+}
+
+apply_to_primitives!(impl_primitive_convert{BigInt, _});
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Copy, Clone, Debug, Hash)]
 pub enum Sign {
@@ -22,21 +45,37 @@ impl Neg for Sign {
     #[inline]
     fn neg(self) -> Self::Output {
         match self {
-            Sign::Minus => Sign::Plus,
-            Sign::NoSign => Sign::NoSign,
-            Sign::Plus => Sign::Minus,
+            Minus => Plus,
+            NoSign => NoSign,
+            Plus => Minus,
         }
     }
 }
 
+#[repr(transparent)]
 #[derive(
-    Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Debug, Binary, Octal, LowerHex, UpperHex,From
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Default,
+    Debug,
+    Binary,
+    Octal,
+    LowerHex,
+    UpperHex,
+    From,
 )]
-#[from(forward)]
 pub struct BigInt(Integer);
+
+apply_to_primitives!(forward_from{BigInt, _});
+apply_to_primitives!(forward_try_into{BigInt, _});
 
 forward_unary_op!(BigInt, Not, not);
 forward_unary_op!(BigInt, Neg, neg);
+
 forward_binary_self!(BigInt, Add, add);
 forward_binary_self!(BigInt, Sub, sub);
 forward_binary_self!(BigInt, Mul, mul);
@@ -45,6 +84,88 @@ forward_binary_self!(BigInt, Rem, rem);
 forward_binary_self!(BigInt, BitAnd, bitand);
 forward_binary_self!(BigInt, BitOr, bitor);
 forward_binary_self!(BigInt, BitXor, bitxor);
+
+forward_assign_self!(BigInt, AddAssign, add_assign);
+forward_assign_self!(BigInt, SubAssign, sub_assign);
+forward_assign_self!(BigInt, MulAssign, mul_assign);
+forward_assign_self!(BigInt, DivAssign, div_assign);
+forward_assign_self!(BigInt, RemAssign, rem_assign);
+forward_assign_self!(BigInt, BitAndAssign, bitand_assign);
+forward_assign_self!(BigInt, BitOrAssign, bitor_assign);
+forward_assign_self!(BigInt, BitXorAssign, bitxor_assign);
+
+forward_pow_biguint!(BigInt);
+
+apply_to_primitives!(forward_binary_right_primitive_into{BigInt, _, Add, add});
+apply_to_primitives!(forward_binary_right_primitive_into{BigInt, _, Sub, sub});
+apply_to_primitives!(forward_binary_right_primitive_into{BigInt, _, Mul, mul});
+apply_to_primitives!(forward_binary_right_primitive_into{BigInt, _, Div, div});
+apply_to_primitives!(forward_binary_right_primitive_into{BigInt, _, Rem, rem});
+
+apply_to_primitives!(forward_binary_left_primitive_into{_, BigInt, Add, add});
+apply_to_primitives!(forward_binary_left_primitive_into{_, BigInt, Sub, sub});
+apply_to_primitives!(forward_binary_left_primitive_into{_, BigInt, Mul, mul});
+apply_to_primitives!(forward_binary_left_primitive_into{_, BigInt, Div, div});
+apply_to_primitives!(forward_binary_left_primitive_into{_, BigInt, Rem, rem});
+
+apply_to_primitives!(forward_binary_right_primitive{BigInt, _, Shl, shl});
+apply_to_primitives!(forward_binary_right_primitive{BigInt, _, Shr, shr});
+
+apply_to_primitives!(forward_assign_primitive_into{BigInt, _, AddAssign, add_assign});
+apply_to_primitives!(forward_assign_primitive_into{BigInt, _, SubAssign, sub_assign});
+apply_to_primitives!(forward_assign_primitive_into{BigInt, _, MulAssign, mul_assign});
+apply_to_primitives!(forward_assign_primitive_into{BigInt, _, DivAssign, div_assign});
+apply_to_primitives!(forward_assign_primitive_into{BigInt, _, RemAssign, rem_assign});
+
+apply_to_primitives!(forward_assign_primitive{BigInt, _, ShlAssign, shl_assign});
+apply_to_primitives!(forward_assign_primitive{BigInt, _, ShrAssign, shr_assign});
+
+apply_to_unsigneds!(forward_pow_primitive{BigInt, _});
+
+impl_product_iter_type!(BigInt);
+impl_sum_iter_type!(BigInt);
+
+impl CheckedAdd for BigInt {
+    fn checked_add(&self, v: &Self) -> Option<Self> {
+        Some(self.add(v))
+    }
+}
+
+impl CheckedSub for BigInt {
+    fn checked_sub(&self, v: &Self) -> Option<Self> {
+        Some(self.sub(v))
+    }
+}
+
+impl CheckedMul for BigInt {
+    fn checked_mul(&self, v: &Self) -> Option<Self> {
+        Some(self.mul(v))
+    }
+}
+
+impl CheckedDiv for BigInt {
+    fn checked_div(&self, v: &Self) -> Option<Self> {
+        (!v.is_zero()).then(|| self.div(v))
+    }
+}
+
+impl ToBigInt for BigInt {
+    fn to_bigint(&self) -> Option<BigInt> {
+        Some(self.clone())
+    }
+}
+
+impl ToPrimitive for BigInt {
+    apply_to_primitives!(impl_to_primitive_fn_try_into{_});
+    impl_to_primitive_fn_float!(f32);
+    impl_to_primitive_fn_float!(f64);
+}
+
+impl FromPrimitive for BigInt {
+    apply_to_primitives!(impl_from_primitive_fn_infallible{_});
+    impl_from_primitive_fn_float!(f32);
+    impl_from_primitive_fn_float!(f64);
+}
 
 impl Zero for BigInt {
     #[inline]
@@ -66,18 +187,23 @@ impl One for BigInt {
 
 impl Signed for BigInt {
     fn abs(&self) -> Self {
-        Self(Integer::from_sign_and_abs_ref(
-            true,
-            self.0.unsigned_abs_ref(),
-        ))
+        (&self.0).abs().into()
     }
 
     fn abs_sub(&self, other: &Self) -> Self {
-        todo!()
+        if self <= other {
+            Self::zero()
+        } else {
+            self - other
+        }
     }
 
     fn signum(&self) -> Self {
-        todo!()
+        match self.sign() {
+            Minus => -Self::one(),
+            NoSign => Self::zero(),
+            Plus => Self::one(),
+        }
     }
 
     fn is_positive(&self) -> bool {
@@ -141,6 +267,92 @@ impl Roots for BigInt {
     }
 }
 
-pub trait ToBigInt {
-    fn to_bigint(&self) -> Option<BigInt>;
+impl BigInt {
+    #[inline]
+    fn abs_ref(&self) -> &BigUint {
+        unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
+    }
+
+    #[inline]
+    pub fn new(sign: Sign, digits: Vec<u32>) -> Self {
+        Self::from_biguint(sign, BigUint::new(digits))
+    }
+
+    #[inline]
+    pub fn from_biguint(sign: Sign, mut abs: BigUint) -> Self {
+        if sign == NoSign {
+            abs = BigUint::zero();
+        }
+
+        Integer::from_sign_and_abs(sign != Minus, abs.0).into()
+    }
+
+    #[inline]
+    pub fn from_slice(sign: Sign, slice: &[u32]) -> Self {
+        Self::from_biguint(sign, BigUint::from_slice(slice))
+    }
+
+    #[inline]
+    pub fn assign_from_slice(&mut self, sign: Sign, slice: &[u32]) {
+        if sign == NoSign {
+            self.set_zero();
+        } else {
+            *self = Self::from_slice(sign, slice);
+        }
+    }
+
+    #[inline]
+    pub fn from_bytes_be(sign: Sign, bytes: &[u8]) -> Self {
+        Self::from_biguint(sign, BigUint::from_bytes_be(bytes))
+    }
+
+    #[inline]
+    pub fn from_bytes_le(sign: Sign, bytes: &[u8]) -> Self {
+        Self::from_biguint(sign, BigUint::from_bytes_le(bytes))
+    }
+
+    #[inline]
+    pub fn from_signed_bytes_be(digits: &[u8]) -> Self {
+        todo!()
+    }
+
+    #[inline]
+    pub fn from_signed_bytes_le(digits: &[u8]) -> Self {
+        todo!()
+    }
+
+    #[inline]
+    pub fn parse_bytes(bytes: &[u8], radix: u32) -> Option<Self> {
+        let s = std::str::from_utf8(bytes).ok()?;
+        Self::from_str_radix(s, radix).ok()
+    }
+
+    #[inline]
+    pub fn from_radix_be(sign: Sign, buf: &[u8], radix: u32) -> Option<Self> {
+        BigUint::from_radix_be(buf, radix).map(|u| Self::from_biguint(sign, u))
+    }
+
+    #[inline]
+    pub fn from_radix_le(sign: Sign, buf: &[u8], radix: u32) -> Option<Self> {
+        BigUint::from_radix_le(buf, radix).map(|u| Self::from_biguint(sign, u))
+    }
+
+    #[inline]
+    pub fn to_bytes_be(&self) -> (Sign, Vec<u8>) {
+        (self.sign(), self.abs_ref().to_bytes_be())
+    }
+
+    #[inline]
+    pub fn to_bytes_le(&self) -> (Sign, Vec<u8>) {
+        (self.sign(), self.abs_ref().to_bytes_le())
+    }
+
+    #[inline]
+    pub fn sign(&self) -> Sign {
+        match <_ as malachite::num::arithmetic::traits::Sign>::sign(&self.0) {
+            Ordering::Less => Minus,
+            Ordering::Equal => NoSign,
+            Ordering::Greater => Plus,
+        }
+    }
 }

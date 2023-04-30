@@ -290,22 +290,14 @@ macro_rules! forward_pow_primitive {
 
 macro_rules! forward_pow_biguint {
     ($lhs:ty) => {
-        impl_binary_op!(
-            $lhs,
-            BigUint,
-            BigUint,
-            Pow,
-            pow,
-            |lhs: $lhs, rhs: BigUint| {
-                let exp =
-                    malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
-                <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
-            }
-        );
+        impl_binary_op!($lhs, BigUint, $lhs, Pow, pow, |lhs: $lhs, rhs: BigUint| {
+            let exp = malachite::num::conversion::traits::SaturatingFrom::saturating_from(&rhs.0);
+            <_ as malachite::num::arithmetic::traits::Pow<u64>>::pow(lhs.0, exp).into()
+        });
         impl_binary_op!(
             &$lhs,
             BigUint,
-            BigUint,
+            $lhs,
             Pow,
             pow,
             |lhs: &$lhs, rhs: BigUint| {
@@ -317,7 +309,7 @@ macro_rules! forward_pow_biguint {
         impl_binary_op!(
             $lhs,
             &BigUint,
-            BigUint,
+            $lhs,
             Pow,
             pow,
             |lhs: $lhs, rhs: &BigUint| {
@@ -329,7 +321,7 @@ macro_rules! forward_pow_biguint {
         impl_binary_op!(
             &$lhs,
             &BigUint,
-            BigUint,
+            $lhs,
             Pow,
             pow,
             |lhs: &$lhs, rhs: &BigUint| {
@@ -428,6 +420,23 @@ macro_rules! impl_to_primitive_fn_try_into {
             #[inline]
             fn [<to_ $t>](&self)-> Option<$t> {
                 self.try_into().ok()
+            }
+        }
+    };
+}
+
+macro_rules! impl_to_primitive_fn_float {
+    ($t:ty) => {
+        paste! {
+            #[inline]
+            fn [<to_ $t>](&self) -> Option<$t> {
+                // FIXME: correctness?
+                let val: $t = (&self.0).rounding_into(RoundingMode::Down);
+                if val == $t::MAX || val == $t::MIN {
+                    (self.0 == val).then_some(val)
+                } else {
+                    Some(val)
+                }
             }
         }
     };
