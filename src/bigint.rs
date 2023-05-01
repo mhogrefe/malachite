@@ -5,6 +5,7 @@ use malachite::{
             Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
         conversion::traits::{RoundingInto, ToStringBase},
+        logic::traits::BitAccess,
     },
     rounding_modes::RoundingMode,
     Integer,
@@ -236,38 +237,47 @@ impl Num for BigInt {
 }
 
 impl num_integer::Integer for BigInt {
+    #[inline]
     fn div_floor(&self, other: &Self) -> Self {
         (&self.0).div_round(&other.0, RoundingMode::Floor).into()
     }
 
+    #[inline]
     fn mod_floor(&self, other: &Self) -> Self {
         (&self.0).mod_op(&other.0).into()
     }
 
+    #[inline]
     fn gcd(&self, other: &Self) -> Self {
         self.magnitude().gcd(other.magnitude()).into()
     }
 
+    #[inline]
     fn lcm(&self, other: &Self) -> Self {
         self.magnitude().lcm(other.magnitude()).into()
     }
 
+    #[inline]
     fn divides(&self, other: &Self) -> bool {
         Self::is_multiple_of(self, other)
     }
 
+    #[inline]
     fn is_multiple_of(&self, other: &Self) -> bool {
         (&self.0).divisible_by(&other.0)
     }
 
+    #[inline]
     fn is_even(&self) -> bool {
         self.0.even()
     }
 
+    #[inline]
     fn is_odd(&self) -> bool {
         self.0.odd()
     }
 
+    #[inline]
     fn div_rem(&self, other: &Self) -> (Self, Self) {
         let (div, rem) = (&self.0).div_rem(&other.0);
         (div.into(), rem.into())
@@ -275,6 +285,7 @@ impl num_integer::Integer for BigInt {
 }
 
 impl Roots for BigInt {
+    #[inline]
     fn nth_root(&self, n: u32) -> Self {
         (&self.0).floor_root(n as u64).into()
     }
@@ -364,18 +375,22 @@ impl BigInt {
         (self.sign(), self.magnitude().to_bytes_le())
     }
 
+    #[inline]
     pub fn to_u32_digits(&self) -> (Sign, Vec<u32>) {
         (self.sign(), self.magnitude().to_u32_digits())
     }
 
+    #[inline]
     pub fn to_u64_digits(&self) -> (Sign, Vec<u64>) {
         (self.sign(), self.magnitude().to_u64_digits())
     }
 
+    #[inline]
     pub fn iter_u32_digits(&self) -> U32Digits {
         self.magnitude().iter_u32_digits()
     }
 
+    #[inline]
     pub fn iter_u64_digits(&self) -> U64Digits {
         self.magnitude().iter_u64_digits()
     }
@@ -388,14 +403,17 @@ impl BigInt {
         todo!()
     }
 
+    #[inline]
     pub fn to_str_radix(&self, radix: u32) -> String {
         self.0.to_string_base(radix as u8)
     }
 
+    #[inline]
     pub fn to_radix_be(&self, radix: u32) -> (Sign, Vec<u8>) {
         (self.sign(), self.magnitude().to_radix_be(radix))
     }
 
+    #[inline]
     pub fn to_radix_le(&self, radix: u32) -> (Sign, Vec<u8>) {
         (self.sign(), self.magnitude().to_radix_le(radix))
     }
@@ -414,14 +432,17 @@ impl BigInt {
         unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
     }
 
+    #[inline]
     pub fn into_parts(self) -> (Sign, BigUint) {
         (self.sign(), self.0.unsigned_abs().into())
     }
 
+    #[inline]
     pub fn bits(&self) -> u64 {
         self.magnitude().bits()
     }
 
+    #[inline]
     pub fn to_biguint(&self) -> Option<BigUint> {
         match self.sign() {
             Plus => Some(self.magnitude().clone()),
@@ -453,6 +474,7 @@ impl BigInt {
         Some(self / v)
     }
 
+    #[inline]
     pub fn pow(&self, exponent: u32) -> Self {
         Pow::pow(self, exponent)
     }
@@ -480,5 +502,39 @@ impl BigInt {
         }
 
         Self::from_biguint(modulus.sign(), abs)
+    }
+
+    #[inline]
+    pub fn sqrt(&self) -> Self {
+        Roots::sqrt(self)
+    }
+
+    #[inline]
+    pub fn cbrt(&self) -> Self {
+        Roots::cbrt(self)
+    }
+
+    #[inline]
+    pub fn nth_root(&self, n: u32) -> Self {
+        Roots::nth_root(self, n)
+    }
+
+    #[inline]
+    pub fn trailing_zeros(&self) -> Option<u64> {
+        self.magnitude().trailing_zeros()
+    }
+
+    #[inline]
+    pub fn bit(&self, bit: u64) -> bool {
+        self.0.get_bit(bit)
+    }
+
+    #[inline]
+    pub fn set_bit(&mut self, bit: u64, value: bool) {
+        if value {
+            self.0.set_bit(bit)
+        } else {
+            self.0.clear_bit(bit)
+        }
     }
 }
