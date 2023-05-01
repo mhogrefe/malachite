@@ -30,7 +30,7 @@ use std::{
 use crate::{
     BigUint, ParseBigIntError,
     Sign::{Minus, NoSign, Plus},
-    TryFromBigIntError, U32Digits, U64Digits,
+    ToBigUint, TryFromBigIntError, U32Digits, U64Digits,
 };
 
 pub trait ToBigInt {
@@ -133,32 +133,44 @@ impl_product_iter_type!(BigInt);
 impl_sum_iter_type!(BigInt);
 
 impl CheckedAdd for BigInt {
+    #[inline]
     fn checked_add(&self, v: &Self) -> Option<Self> {
         Some(self.add(v))
     }
 }
 
 impl CheckedSub for BigInt {
+    #[inline]
     fn checked_sub(&self, v: &Self) -> Option<Self> {
         Some(self.sub(v))
     }
 }
 
 impl CheckedMul for BigInt {
+    #[inline]
     fn checked_mul(&self, v: &Self) -> Option<Self> {
         Some(self.mul(v))
     }
 }
 
 impl CheckedDiv for BigInt {
+    #[inline]
     fn checked_div(&self, v: &Self) -> Option<Self> {
         (!v.is_zero()).then(|| self.div(v))
     }
 }
 
 impl ToBigInt for BigInt {
+    #[inline]
     fn to_bigint(&self) -> Option<BigInt> {
         Some(self.clone())
+    }
+}
+
+impl ToBigUint for BigInt {
+    #[inline]
+    fn to_biguint(&self) -> Option<BigUint> {
+        (!self.is_negative()).then(|| self.magnitude().clone())
     }
 }
 
@@ -175,8 +187,9 @@ impl FromPrimitive for BigInt {
 }
 
 impl From<BigUint> for BigInt {
+    #[inline]
     fn from(value: BigUint) -> Self {
-        Integer::from_sign_and_abs(true, value.0).into()
+        Integer::from(value.0).into()
     }
 }
 
@@ -193,16 +206,19 @@ impl Zero for BigInt {
 }
 
 impl One for BigInt {
+    #[inline]
     fn one() -> Self {
         Self(<Integer as malachite::num::basic::traits::One>::ONE)
     }
 }
 
 impl Signed for BigInt {
+    #[inline]
     fn abs(&self) -> Self {
         (&self.0).abs().into()
     }
 
+    #[inline]
     fn abs_sub(&self, other: &Self) -> Self {
         if self <= other {
             Self::zero()
@@ -211,6 +227,7 @@ impl Signed for BigInt {
         }
     }
 
+    #[inline]
     fn signum(&self) -> Self {
         match self.sign() {
             Minus => -Self::one(),
@@ -219,10 +236,12 @@ impl Signed for BigInt {
         }
     }
 
+    #[inline]
     fn is_positive(&self) -> bool {
         self.sign() == Plus
     }
 
+    #[inline]
     fn is_negative(&self) -> bool {
         self.sign() == Minus
     }
@@ -231,6 +250,7 @@ impl Signed for BigInt {
 impl Num for BigInt {
     type FromStrRadixErr = ParseBigIntError;
 
+    #[inline]
     fn from_str_radix(mut s: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
         let sign = if s.starts_with('-') {
             let tail = &s[1..];
@@ -415,12 +435,14 @@ impl BigInt {
         self.magnitude().iter_u64_digits()
     }
 
+    #[inline]
     pub fn to_signed_bytes_be(&self) -> Vec<u8> {
         let limbs = self.0.to_twos_complement_limbs_asc();
         let u = Natural::from_owned_limbs_asc(limbs);
         u.to_power_of_2_digits_desc(8)
     }
 
+    #[inline]
     pub fn to_signed_bytes_le(&self) -> Vec<u8> {
         let limbs = self.0.to_twos_complement_limbs_asc();
         let u = Natural::from_owned_limbs_asc(limbs);
@@ -503,6 +525,7 @@ impl BigInt {
         Pow::pow(self, exponent)
     }
 
+    #[inline]
     pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
         assert!(
             !exponent.is_negative(),

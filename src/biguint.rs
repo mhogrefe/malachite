@@ -26,7 +26,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{ParseBigIntError, TryFromBigIntError, U32Digits, U64Digits};
+use crate::{ParseBigIntError, ToBigInt, TryFromBigIntError, U32Digits, U64Digits};
 
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
@@ -106,12 +106,14 @@ impl_product_iter_type!(BigUint);
 impl_sum_iter_type!(BigUint);
 
 impl CheckedAdd for BigUint {
+    #[inline]
     fn checked_add(&self, v: &Self) -> Option<Self> {
         Some(self.add(v))
     }
 }
 
 impl CheckedSub for BigUint {
+    #[inline]
     fn checked_sub(&self, v: &Self) -> Option<Self> {
         match self.cmp(v) {
             Less => None,
@@ -122,20 +124,30 @@ impl CheckedSub for BigUint {
 }
 
 impl CheckedMul for BigUint {
+    #[inline]
     fn checked_mul(&self, v: &Self) -> Option<Self> {
         Some(self.mul(v))
     }
 }
 
 impl CheckedDiv for BigUint {
+    #[inline]
     fn checked_div(&self, v: &Self) -> Option<Self> {
         (!v.is_zero()).then(|| self.div(v))
     }
 }
 
 impl ToBigUint for BigUint {
+    #[inline]
     fn to_biguint(&self) -> Option<BigUint> {
         Some(self.clone())
+    }
+}
+
+impl ToBigInt for BigUint {
+    #[inline]
+    fn to_bigint(&self) -> Option<crate::BigInt> {
+        Some(malachite::Integer::from(&self.0).into())
     }
 }
 
@@ -153,16 +165,19 @@ impl FromPrimitive for BigUint {
 }
 
 impl Zero for BigUint {
+    #[inline]
     fn zero() -> Self {
         Self(<Natural as malachite::num::basic::traits::Zero>::ZERO)
     }
 
+    #[inline]
     fn is_zero(&self) -> bool {
         *self == Self::zero()
     }
 }
 
 impl One for BigUint {
+    #[inline]
     fn one() -> Self {
         Self(<Natural as malachite::num::basic::traits::One>::ONE)
     }
@@ -205,38 +220,47 @@ impl Num for BigUint {
 }
 
 impl num_integer::Integer for BigUint {
+    #[inline]
     fn div_floor(&self, other: &Self) -> Self {
         (&self.0).div_round(&other.0, RoundingMode::Floor).into()
     }
 
+    #[inline]
     fn mod_floor(&self, other: &Self) -> Self {
         (&self.0).mod_op(&other.0).into()
     }
 
+    #[inline]
     fn gcd(&self, other: &Self) -> Self {
         (&self.0).gcd(&other.0).into()
     }
 
+    #[inline]
     fn lcm(&self, other: &Self) -> Self {
         (&self.0).lcm(&other.0).into()
     }
 
+    #[inline]
     fn divides(&self, other: &Self) -> bool {
         Self::is_multiple_of(self, other)
     }
 
+    #[inline]
     fn is_multiple_of(&self, other: &Self) -> bool {
         (&self.0).divisible_by(&other.0)
     }
 
+    #[inline]
     fn is_even(&self) -> bool {
         self.0.even()
     }
 
+    #[inline]
     fn is_odd(&self) -> bool {
         self.0.odd()
     }
 
+    #[inline]
     fn div_rem(&self, other: &Self) -> (Self, Self) {
         let (div, rem) = (&self.0).div_rem(&other.0);
         (div.into(), rem.into())
@@ -244,6 +268,7 @@ impl num_integer::Integer for BigUint {
 }
 
 impl Roots for BigUint {
+    #[inline]
     fn nth_root(&self, n: u32) -> Self {
         (&self.0).floor_root(n as u64).into()
     }
@@ -259,6 +284,7 @@ impl FromStr for BigUint {
 }
 
 impl BigUint {
+    #[inline]
     pub fn new(digits: Vec<u32>) -> Self {
         Self::from_slice(digits.as_slice())
     }
@@ -270,6 +296,7 @@ impl BigUint {
         uint
     }
 
+    #[inline]
     pub fn assign_from_slice(&mut self, slice: &[u32]) {
         // SAFETY: &[u32] cannot have any digit greater than 2^32
         self.0 = unsafe {
@@ -299,6 +326,7 @@ impl BigUint {
         Self::from_str_radix(s, radix).ok()
     }
 
+    #[inline]
     pub fn from_radix_be(bytes: &[u8], radix: u32) -> Option<Self> {
         if radix == 256 {
             Some(Self::from_bytes_be(bytes))
@@ -307,6 +335,7 @@ impl BigUint {
         }
     }
 
+    #[inline]
     pub fn from_radix_le(bytes: &[u8], radix: u32) -> Option<Self> {
         if radix == 256 {
             Some(Self::from_bytes_le(bytes))
@@ -335,10 +364,12 @@ impl BigUint {
         self.0.to_limbs_asc()
     }
 
+    #[inline]
     pub fn iter_u32_digits(&self) -> U32Digits {
         U32Digits::new(self.0.limbs())
     }
 
+    #[inline]
     pub fn iter_u64_digits(&self) -> U64Digits {
         U64Digits::new(self.0.limbs())
     }
@@ -373,10 +404,12 @@ impl BigUint {
         self.0.significant_bits()
     }
 
+    #[inline]
     pub fn pow(&self, exponent: u32) -> Self {
         Pow::pow(self, exponent)
     }
 
+    #[inline]
     pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
         (&self.0).mod_pow(&exponent.0, &modulus.0).into()
     }
