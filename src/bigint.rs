@@ -1,6 +1,9 @@
 use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
 use malachite::{
-    num::{arithmetic::traits::Abs, conversion::traits::RoundingInto},
+    num::{
+        arithmetic::traits::{Abs, DivRem, DivRound, DivisibleBy, Mod, Parity},
+        conversion::traits::RoundingInto,
+    },
     rounding_modes::RoundingMode,
     Integer,
 };
@@ -167,6 +170,12 @@ impl FromPrimitive for BigInt {
     impl_from_primitive_fn_float!(f64);
 }
 
+impl From<BigUint> for BigInt {
+    fn from(value: BigUint) -> Self {
+        Integer::from_sign_and_abs(true, value.0).into()
+    }
+}
+
 impl Zero for BigInt {
     #[inline]
     fn zero() -> Self {
@@ -207,11 +216,11 @@ impl Signed for BigInt {
     }
 
     fn is_positive(&self) -> bool {
-        todo!()
+        self.sign() == Plus
     }
 
     fn is_negative(&self) -> bool {
-        todo!()
+        self.sign() == Minus
     }
 }
 
@@ -225,39 +234,40 @@ impl Num for BigInt {
 
 impl num_integer::Integer for BigInt {
     fn div_floor(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).div_round(&other.0, RoundingMode::Floor).into()
     }
 
     fn mod_floor(&self, other: &Self) -> Self {
-        todo!()
+        (&self.0).mod_op(&other.0).into()
     }
 
     fn gcd(&self, other: &Self) -> Self {
-        todo!()
+        self.abs_ref().gcd(other.abs_ref()).into()
     }
 
     fn lcm(&self, other: &Self) -> Self {
-        todo!()
+        self.abs_ref().lcm(other.abs_ref()).into()
     }
 
     fn divides(&self, other: &Self) -> bool {
-        todo!()
+        Self::is_multiple_of(self, other)
     }
 
     fn is_multiple_of(&self, other: &Self) -> bool {
-        todo!()
+        (&self.0).divisible_by(&other.0)
     }
 
     fn is_even(&self) -> bool {
-        todo!()
+        self.0.even()
     }
 
     fn is_odd(&self) -> bool {
-        todo!()
+        self.0.odd()
     }
 
     fn div_rem(&self, other: &Self) -> (Self, Self) {
-        todo!()
+        let (div, rem) = (&self.0).div_rem(&other.0);
+        (div.into(), rem.into())
     }
 }
 
