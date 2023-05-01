@@ -4,7 +4,7 @@ use malachite::{
         arithmetic::traits::{
             Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
-        conversion::traits::{RoundingInto, ToStringBase, PowerOf2Digits},
+        conversion::traits::{PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::BitAccess,
     },
     rounding_modes::RoundingMode,
@@ -341,12 +341,22 @@ impl BigInt {
 
     #[inline]
     pub fn from_signed_bytes_be(digits: &[u8]) -> Self {
-        todo!()
+        // SAFETY: &[u8] cannot have any digit greater than 2^8
+        let u = unsafe {
+            Natural::from_power_of_2_digits_desc(8, digits.iter().cloned()).unwrap_unchecked()
+        };
+        let limbs = u.into_limbs_asc();
+        Integer::from_owned_twos_complement_limbs_asc(limbs).into()
     }
 
     #[inline]
     pub fn from_signed_bytes_le(digits: &[u8]) -> Self {
-        todo!()
+        // SAFETY: &[u8] cannot have any digit greater than 2^8
+        let u = unsafe {
+            Natural::from_power_of_2_digits_asc(8, digits.iter().cloned()).unwrap_unchecked()
+        };
+        let limbs = u.into_limbs_asc();
+        Integer::from_owned_twos_complement_limbs_asc(limbs).into()
     }
 
     #[inline]
