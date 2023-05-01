@@ -1,8 +1,10 @@
 use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
-        arithmetic::traits::{Abs, DivRem, DivRound, DivisibleBy, Mod, Parity},
-        conversion::traits::RoundingInto,
+        arithmetic::traits::{
+            Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
+        },
+        conversion::traits::{RoundingInto, ToStringBase},
     },
     rounding_modes::RoundingMode,
     Integer,
@@ -21,12 +23,13 @@ use std::{
         DivAssign, Mul, MulAssign, Neg, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
         SubAssign,
     },
+    str::FromStr,
 };
 
 use crate::{
     BigUint, ParseBigIntError,
     Sign::{Minus, NoSign, Plus},
-    TryFromBigIntError,
+    TryFromBigIntError, U32Digits, U64Digits,
 };
 
 pub trait ToBigInt {
@@ -242,11 +245,11 @@ impl num_integer::Integer for BigInt {
     }
 
     fn gcd(&self, other: &Self) -> Self {
-        self.abs_ref().gcd(other.abs_ref()).into()
+        self.magnitude().gcd(other.magnitude()).into()
     }
 
     fn lcm(&self, other: &Self) -> Self {
-        self.abs_ref().lcm(other.abs_ref()).into()
+        self.magnitude().lcm(other.magnitude()).into()
     }
 
     fn divides(&self, other: &Self) -> bool {
@@ -273,16 +276,20 @@ impl num_integer::Integer for BigInt {
 
 impl Roots for BigInt {
     fn nth_root(&self, n: u32) -> Self {
-        todo!()
+        (&self.0).floor_root(n as u64).into()
+    }
+}
+
+impl FromStr for BigInt {
+    type Err = ParseBigIntError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::from_str_radix(s, 10)
     }
 }
 
 impl BigInt {
-    #[inline]
-    fn abs_ref(&self) -> &BigUint {
-        unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
-    }
-
     #[inline]
     pub fn new(sign: Sign, digits: Vec<u32>) -> Self {
         Self::from_biguint(sign, BigUint::new(digits))
@@ -349,12 +356,48 @@ impl BigInt {
 
     #[inline]
     pub fn to_bytes_be(&self) -> (Sign, Vec<u8>) {
-        (self.sign(), self.abs_ref().to_bytes_be())
+        (self.sign(), self.magnitude().to_bytes_be())
     }
 
     #[inline]
     pub fn to_bytes_le(&self) -> (Sign, Vec<u8>) {
-        (self.sign(), self.abs_ref().to_bytes_le())
+        (self.sign(), self.magnitude().to_bytes_le())
+    }
+
+    pub fn to_u32_digits(&self) -> (Sign, Vec<u32>) {
+        (self.sign(), self.magnitude().to_u32_digits())
+    }
+
+    pub fn to_u64_digits(&self) -> (Sign, Vec<u64>) {
+        (self.sign(), self.magnitude().to_u64_digits())
+    }
+
+    pub fn iter_u32_digits(&self) -> U32Digits {
+        self.magnitude().iter_u32_digits()
+    }
+
+    pub fn iter_u64_digits(&self) -> U64Digits {
+        self.magnitude().iter_u64_digits()
+    }
+
+    pub fn to_signed_bytes_be(&self) -> Vec<u8> {
+        todo!()
+    }
+
+    pub fn to_signed_bytes_le(&self) -> Vec<u8> {
+        todo!()
+    }
+
+    pub fn to_str_radix(&self, radix: u32) -> String {
+        self.0.to_string_base(radix as u8)
+    }
+
+    pub fn to_radix_be(&self, radix: u32) -> (Sign, Vec<u8>) {
+        (self.sign(), self.magnitude().to_radix_be(radix))
+    }
+
+    pub fn to_radix_le(&self, radix: u32) -> (Sign, Vec<u8>) {
+        (self.sign(), self.magnitude().to_radix_le(radix))
     }
 
     #[inline]
@@ -364,5 +407,78 @@ impl BigInt {
             Ordering::Equal => NoSign,
             Ordering::Greater => Plus,
         }
+    }
+
+    #[inline]
+    pub fn magnitude(&self) -> &BigUint {
+        unsafe { std::mem::transmute(self.0.unsigned_abs_ref()) }
+    }
+
+    pub fn into_parts(self) -> (Sign, BigUint) {
+        (self.sign(), self.0.unsigned_abs().into())
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.magnitude().bits()
+    }
+
+    pub fn to_biguint(&self) -> Option<BigUint> {
+        match self.sign() {
+            Plus => Some(self.magnitude().clone()),
+            NoSign => Some(BigUint::zero()),
+            Minus => None,
+        }
+    }
+
+    #[inline]
+    pub fn checked_add(&self, v: &BigInt) -> Option<BigInt> {
+        Some(self + v)
+    }
+
+    #[inline]
+    pub fn checked_sub(&self, v: &BigInt) -> Option<BigInt> {
+        Some(self - v)
+    }
+
+    #[inline]
+    pub fn checked_mul(&self, v: &BigInt) -> Option<BigInt> {
+        Some(self * v)
+    }
+
+    #[inline]
+    pub fn checked_div(&self, v: &BigInt) -> Option<BigInt> {
+        if v.is_zero() {
+            return None;
+        }
+        Some(self / v)
+    }
+
+    pub fn pow(&self, exponent: u32) -> Self {
+        Pow::pow(self, exponent)
+    }
+
+    pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
+        assert!(
+            !exponent.is_negative(),
+            "negative exponentiation is not supported!"
+        );
+        assert!(
+            !modulus.is_zero(),
+            "attempt to calculate with zero modulus!"
+        );
+
+        let mut abs = self
+            .magnitude()
+            .modpow(exponent.magnitude(), modulus.magnitude());
+
+        if abs.is_zero() {
+            return Self::zero();
+        }
+
+        if (self.is_negative() && exponent.0.odd()) != modulus.is_negative() {
+            abs = modulus.magnitude() - abs;
+        }
+
+        Self::from_biguint(modulus.sign(), abs)
     }
 }
