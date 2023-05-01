@@ -231,8 +231,18 @@ impl Signed for BigInt {
 impl Num for BigInt {
     type FromStrRadixErr = ParseBigIntError;
 
-    fn from_str_radix(str: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
-        todo!()
+    fn from_str_radix(mut s: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        let sign = if s.starts_with('-') {
+            let tail = &s[1..];
+            if !tail.starts_with('+') {
+                s = tail
+            }
+            Minus
+        } else {
+            Plus
+        };
+        let u = BigUint::from_str_radix(s, radix)?;
+        Ok(BigInt::from_biguint(sign, u))
     }
 }
 
