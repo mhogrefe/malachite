@@ -4,11 +4,11 @@ use malachite::{
         arithmetic::traits::{
             Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
-        conversion::traits::{RoundingInto, ToStringBase},
+        conversion::traits::{RoundingInto, ToStringBase, PowerOf2Digits},
         logic::traits::BitAccess,
     },
     rounding_modes::RoundingMode,
-    Integer,
+    Integer, Natural,
 };
 use num_integer::Roots;
 use num_traits::{
@@ -396,11 +396,15 @@ impl BigInt {
     }
 
     pub fn to_signed_bytes_be(&self) -> Vec<u8> {
-        todo!()
+        let limbs = self.0.to_twos_complement_limbs_asc();
+        let u = Natural::from_owned_limbs_asc(limbs);
+        u.to_power_of_2_digits_desc(8)
     }
 
     pub fn to_signed_bytes_le(&self) -> Vec<u8> {
-        todo!()
+        let limbs = self.0.to_twos_complement_limbs_asc();
+        let u = Natural::from_owned_limbs_asc(limbs);
+        u.to_power_of_2_digits_asc(8)
     }
 
     #[inline]
