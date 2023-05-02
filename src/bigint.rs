@@ -38,6 +38,8 @@ pub trait ToBigInt {
 }
 
 apply_to_primitives!(impl_primitive_convert{BigInt, _});
+impl_primitive_convert!(BigInt, f32);
+impl_primitive_convert!(BigInt, f64);
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Copy, Clone, Debug, Hash)]
 pub enum Sign {

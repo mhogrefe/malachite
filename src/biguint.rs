@@ -33,6 +33,8 @@ pub trait ToBigUint {
 }
 
 apply_to_primitives!(impl_primitive_convert{BigUint, _});
+impl_primitive_convert!(BigUint, f32);
+impl_primitive_convert!(BigUint, f64);
 
 #[repr(transparent)]
 #[derive(
