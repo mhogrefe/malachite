@@ -1,4 +1,4 @@
-use derive_more::{Binary, From, LowerHex, Octal, UpperHex};
+use derive_more::{Binary, Display, From, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
         arithmetic::traits::{
@@ -46,12 +46,14 @@ impl_primitive_convert!(BigUint, f64);
     Hash,
     Default,
     Debug,
+    Display,
     Binary,
     Octal,
     LowerHex,
     UpperHex,
     From,
 )]
+#[display(fmt = "{}", "self.0")]
 pub struct BigUint(pub(crate) Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
