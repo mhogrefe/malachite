@@ -1,4 +1,4 @@
-use derive_more::{Binary, Display, From, LowerHex, Octal, UpperHex};
+use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
         arithmetic::traits::{
@@ -52,8 +52,10 @@ impl_primitive_convert!(BigUint, f64);
     LowerHex,
     UpperHex,
     From,
+    Into,
 )]
 #[display(fmt = "{}", "self.0")]
+#[into(owned, ref, ref_mut)]
 pub struct BigUint(pub(crate) Natural);
 
 apply_to_unsigneds!(forward_from{BigUint, _});
@@ -219,7 +221,7 @@ impl Num for BigUint {
         let s = std::str::from_utf8(v.as_slice()).map_err(|_| ParseBigIntError::invalid())?;
         Natural::from_string_base(radix as u8, s)
             .map(Self)
-            .ok_or_else(|| ParseBigIntError::invalid())
+            .ok_or_else(ParseBigIntError::invalid)
     }
 }
 

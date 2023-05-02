@@ -1,4 +1,4 @@
-use derive_more::{Binary, Display, From, LowerHex, Octal, UpperHex};
+use derive_more::{Binary, Display, From, Into, LowerHex, Octal, UpperHex};
 use malachite::{
     num::{
         arithmetic::traits::{
@@ -77,8 +77,10 @@ impl Neg for Sign {
     LowerHex,
     UpperHex,
     From,
+    Into,
 )]
 #[display(fmt = "{}", "self.0")]
+#[into(owned, ref, ref_mut)]
 pub struct BigInt(Integer);
 
 apply_to_primitives!(forward_from{BigInt, _});
