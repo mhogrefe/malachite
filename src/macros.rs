@@ -339,6 +339,7 @@ macro_rules! impl_sum_iter_type {
         where
             $res: Add<T, Output = $res>,
         {
+            #[inline]
             fn sum<I>(iter: I) -> Self
             where
                 I: Iterator<Item = T>,
@@ -355,6 +356,7 @@ macro_rules! impl_product_iter_type {
         where
             $res: Mul<T, Output = $res>,
         {
+            #[inline]
             fn product<I>(iter: I) -> Self
             where
                 I: Iterator<Item = T>,
