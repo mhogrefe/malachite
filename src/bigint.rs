@@ -212,7 +212,7 @@ impl Zero for BigInt {
 
     #[inline]
     fn is_zero(&self) -> bool {
-        <Integer as malachite::num::arithmetic::traits::Sign>::sign(&self.0) == Ordering::Equal
+        self.sign() == NoSign
     }
 }
 
