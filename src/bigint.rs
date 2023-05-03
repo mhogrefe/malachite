@@ -4,11 +4,11 @@ use malachite::{
         arithmetic::traits::{
             Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
-        conversion::traits::{PowerOf2Digits, RoundingInto, ToStringBase},
+        conversion::traits::{RoundingInto, ToStringBase},
         logic::traits::BitAccess,
     },
     rounding_modes::RoundingMode,
-    Integer, Natural,
+    Integer,
 };
 use num_integer::Roots;
 use num_traits::{
@@ -382,22 +382,38 @@ impl BigInt {
 
     #[inline]
     pub fn from_signed_bytes_be(digits: &[u8]) -> Self {
-        // SAFETY: &[u8] cannot have any digit greater than 2^8
-        let u = unsafe {
-            Natural::from_power_of_2_digits_desc(8, digits.iter().cloned()).unwrap_unchecked()
+        let is_negative = match digits.first().cloned() {
+            Some(x) => x > 0x7f,
+            None => return Self::zero(),
         };
-        let limbs = u.into_limbs_asc();
-        Integer::from_owned_twos_complement_limbs_asc(limbs).into()
+
+        if is_negative {
+            let mut v = Vec::from(digits);
+            twos_complement_be(&mut v);
+            let u = BigUint::from_bytes_be(v.as_slice());
+            Self::from_biguint(Minus, u)
+        } else {
+            let u = BigUint::from_bytes_be(digits);
+            Self::from_biguint(Plus, u)
+        }
     }
 
     #[inline]
     pub fn from_signed_bytes_le(digits: &[u8]) -> Self {
-        // SAFETY: &[u8] cannot have any digit greater than 2^8
-        let u = unsafe {
-            Natural::from_power_of_2_digits_asc(8, digits.iter().cloned()).unwrap_unchecked()
+        let is_negative = match digits.first().cloned() {
+            Some(x) => x > 0x7f,
+            None => return Self::zero(),
         };
-        let limbs = u.into_limbs_asc();
-        Integer::from_owned_twos_complement_limbs_asc(limbs).into()
+
+        if is_negative {
+            let mut v = Vec::from(digits);
+            twos_complement_le(&mut v);
+            let u = BigUint::from_bytes_le(v.as_slice());
+            Self::from_biguint(Minus, u)
+        } else {
+            let u = BigUint::from_bytes_le(digits);
+            Self::from_biguint(Plus, u)
+        }
     }
 
     #[inline]
@@ -448,16 +464,20 @@ impl BigInt {
 
     #[inline]
     pub fn to_signed_bytes_be(&self) -> Vec<u8> {
-        let limbs = self.0.to_twos_complement_limbs_asc();
-        let u = Natural::from_owned_limbs_asc(limbs);
-        u.to_power_of_2_digits_desc(8)
+        let mut bytes = self.magnitude().to_bytes_be();
+        if self.is_negative() {
+            twos_complement_be(&mut bytes);
+        }
+        bytes
     }
 
     #[inline]
     pub fn to_signed_bytes_le(&self) -> Vec<u8> {
-        let limbs = self.0.to_twos_complement_limbs_asc();
-        let u = Natural::from_owned_limbs_asc(limbs);
-        u.to_power_of_2_digits_asc(8)
+        let mut bytes = self.magnitude().to_bytes_le();
+        if self.is_negative() {
+            twos_complement_le(&mut bytes);
+        }
+        bytes
     }
 
     #[inline]
@@ -593,6 +613,36 @@ impl BigInt {
             self.0.set_bit(bit)
         } else {
             self.0.clear_bit(bit)
+        }
+    }
+}
+/// Perform in-place two's complement of the given binary representation,
+/// in little-endian byte order.
+#[inline]
+fn twos_complement_le(digits: &mut [u8]) {
+    twos_complement(digits)
+}
+
+/// Perform in-place two's complement of the given binary representation
+/// in big-endian byte order.
+#[inline]
+fn twos_complement_be(digits: &mut [u8]) {
+    twos_complement(digits.iter_mut().rev())
+}
+
+/// Perform in-place two's complement of the given digit iterator
+/// starting from the least significant byte.
+#[inline]
+fn twos_complement<'a, I>(digits: I)
+where
+    I: IntoIterator<Item = &'a mut u8>,
+{
+    let mut carry = true;
+    for d in digits {
+        *d = !*d;
+        if carry {
+            *d = d.wrapping_add(1);
+            carry = d.is_zero();
         }
     }
 }
