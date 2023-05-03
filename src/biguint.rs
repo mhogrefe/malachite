@@ -45,7 +45,6 @@ impl_primitive_convert!(BigUint, f64);
     Ord,
     Hash,
     Default,
-    Debug,
     Display,
     Binary,
     Octal,
@@ -110,6 +109,12 @@ apply_to_unsigneds!(forward_pow_primitive{BigUint, _});
 
 impl_product_iter_type!(BigUint);
 impl_sum_iter_type!(BigUint);
+
+impl std::fmt::Debug for BigUint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 impl CheckedAdd for BigUint {
     #[inline]

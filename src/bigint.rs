@@ -70,7 +70,6 @@ impl Neg for Sign {
     Ord,
     Hash,
     Default,
-    Debug,
     Display,
     Binary,
     Octal,
@@ -137,6 +136,12 @@ apply_to_unsigneds!(forward_pow_primitive{BigInt, _});
 
 impl_product_iter_type!(BigInt);
 impl_sum_iter_type!(BigInt);
+
+impl std::fmt::Debug for BigInt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 impl CheckedAdd for BigInt {
     #[inline]
