@@ -1,6 +1,6 @@
 [package]
 name = "malachite-bigint"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
 edition = "2021"
 license = "MIT"
