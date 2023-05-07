@@ -422,7 +422,12 @@ impl BigUint {
 
     #[inline]
     pub fn modpow(&self, exponent: &Self, modulus: &Self) -> Self {
-        (&self.0).mod_pow(&exponent.0, &modulus.0).into()
+        if self >= modulus {
+            let x = self % modulus;
+            x.0.mod_pow(&exponent.0, &modulus.0).into()
+        } else {
+            (&self.0).mod_pow(&exponent.0, &modulus.0).into()
+        }
     }
 
     #[inline]
