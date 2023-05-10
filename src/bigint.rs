@@ -646,3 +646,11 @@ where
         }
     }
 }
+
+#[test]
+fn test_float_convert_nearest() {
+    let n25 = "10000000000000000000000000";
+    let val = BigInt::from_str(n25).unwrap();
+    let f = val.to_f64().unwrap();
+    assert_eq!(f.to_string(), n25);
+}

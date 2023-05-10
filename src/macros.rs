@@ -432,8 +432,7 @@ macro_rules! impl_to_primitive_fn_float {
         paste! {
             #[inline]
             fn [<to_ $t>](&self) -> Option<$t> {
-                // FIXME: correctness?
-                let val: $t = (&self.0).rounding_into(RoundingMode::Down);
+                let val: $t = (&self.0).rounding_into(RoundingMode::Nearest);
                 if val == $t::MAX || val == $t::MIN {
                     (self.0 == val).then_some(val)
                 } else {
