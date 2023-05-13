@@ -400,7 +400,7 @@ impl BigInt {
 
     #[inline]
     pub fn from_signed_bytes_le(digits: &[u8]) -> Self {
-        let is_negative = match digits.first().cloned() {
+        let is_negative = match digits.last().cloned() {
             Some(x) => x > 0x7f,
             None => return Self::zero(),
         };
@@ -465,6 +465,14 @@ impl BigInt {
     #[inline]
     pub fn to_signed_bytes_be(&self) -> Vec<u8> {
         let mut bytes = self.magnitude().to_bytes_be();
+        let first_byte = bytes.first().cloned().unwrap_or(0);
+        let is_negative = self.is_negative();
+        if first_byte > 0x7f
+            && !(first_byte == 0x80 && bytes.iter().skip(1).all(Zero::is_zero) && is_negative)
+        {
+            // msb used by magnitude, extend by 1 byte
+            bytes.insert(0, 0);
+        }
         if self.is_negative() {
             twos_complement_be(&mut bytes);
         }
@@ -474,6 +482,14 @@ impl BigInt {
     #[inline]
     pub fn to_signed_bytes_le(&self) -> Vec<u8> {
         let mut bytes = self.magnitude().to_bytes_le();
+        let is_negative = self.is_negative();
+        let last_byte = bytes.last().cloned().unwrap_or(0);
+        if last_byte > 0x7f
+            && !(last_byte == 0x80 && bytes.iter().rev().skip(1).all(Zero::is_zero) && is_negative)
+        {
+            // msb used by magnitude, extend by 1 byte
+            bytes.push(0);
+        }
         if self.is_negative() {
             twos_complement_le(&mut bytes);
         }
@@ -653,4 +669,13 @@ fn test_float_convert_nearest() {
     let val = BigInt::from_str(n25).unwrap();
     let f = val.to_f64().unwrap();
     assert_eq!(f.to_string(), n25);
+}
+
+#[test]
+fn test_to_signed_bytes() {
+    let sysmax = i64::MAX;
+    let i = BigInt::from(sysmax);
+    let b = i.to_signed_bytes_le();
+    let i2 = BigInt::from_signed_bytes_le(&b);
+    assert_eq!(i, i2);
 }
