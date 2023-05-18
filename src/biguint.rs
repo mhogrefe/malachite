@@ -208,6 +208,18 @@ impl Num for BigUint {
             }
         }
 
+        // FIXME: workaround, remove the check if malachite issue fixed
+        // https://github.com/mhogrefe/malachite/issues/20
+        if radix == 16
+            && s.bytes().any(|x| {
+                !matches!(x,
+                    b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F'
+                )
+            })
+        {
+            return Err(ParseBigIntError::invalid());
+        }
+
         // fast path
         if let Some(val) = Natural::from_string_base(radix as u8, s) {
             return Ok(val.into());
@@ -468,4 +480,9 @@ impl BigUint {
             self.0.clear_bit(bit)
         }
     }
+}
+
+#[test]
+fn test_from_string_base() {
+    assert!(BigUint::from_str_radix("1000000000000000111111100112abcdefg", 16).is_err());
 }
