@@ -75,6 +75,22 @@ impl From<BigInt> for num_bigint::BigInt {
     }
 }
 
+#[cfg(feature = "num-bigint")]
+#[test]
+fn num_bigint_conversion_test() {
+    let tester = |val: BigInt| {
+        let numval = num_bigint::BigInt::from(val.clone());
+        let val2 = BigInt::from(numval);
+        assert_eq!(val, val2);
+    };
+
+    tester(50723.into());
+    tester(BigInt::from(-52321));
+    tester(0.into());
+    tester(BigInt::from(std::u64::MAX).pow(1000u32));
+    tester(BigInt::from(std::i64::MIN).pow(1000u32));
+}
+
 pub trait ToBigInt {
     fn to_bigint(&self) -> Option<BigInt>;
 }
