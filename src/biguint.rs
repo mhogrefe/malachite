@@ -28,6 +28,32 @@ use std::{
 
 use crate::{ParseBigIntError, ToBigInt, TryFromBigIntError, U32Digits, U64Digits};
 
+#[cfg(feature = "num-bigint")]
+impl From<num_bigint::BigUint> for BigUint {
+    #[inline]
+    fn from(value: num_bigint::BigUint) -> Self {
+        if let Some(x) = value.to_u64() {
+            Self::from(x)
+        } else {
+            let limbs = value.to_u64_digits();
+            Self(Natural::from_owned_limbs_asc(limbs))
+        }
+    }
+}
+
+#[cfg(feature = "num-bigint")]
+impl From<BigUint> for num_bigint::BigUint {
+    #[inline]
+    fn from(value: BigUint) -> Self {
+        if let Some(x) = value.to_u64() {
+            Self::from(x)
+        } else {
+            let digits = value.to_u32_digits();
+            Self::new(digits)
+        }
+    }
+}
+
 pub trait ToBigUint {
     fn to_biguint(&self) -> Option<BigUint>;
 }

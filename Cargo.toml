@@ -12,3 +12,4 @@ num-traits = { version = "0.2.11", default-features = false, features = ["i128"]
 num-integer = { version = "0.1.45", default-features = false, features = ["i128"] }
 derive_more = "0.99.17"
 paste = "1.0.12"
+num-bigint = { version = "0.4", default-features = false, optional = true }

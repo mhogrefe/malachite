@@ -33,6 +33,48 @@ use crate::{
     ToBigUint, TryFromBigIntError, U32Digits, U64Digits,
 };
 
+#[cfg(feature = "num-bigint")]
+impl From<num_bigint::Sign> for Sign {
+    #[inline]
+    fn from(value: num_bigint::Sign) -> Self {
+        match value {
+            num_bigint::Sign::Minus => Minus,
+            num_bigint::Sign::NoSign => NoSign,
+            num_bigint::Sign::Plus => Plus,
+        }
+    }
+}
+
+#[cfg(feature = "num-bigint")]
+impl From<Sign> for num_bigint::Sign {
+    #[inline]
+    fn from(value: Sign) -> Self {
+        match value {
+            Minus => num_bigint::Sign::Minus,
+            NoSign => num_bigint::Sign::NoSign,
+            Plus => num_bigint::Sign::Plus,
+        }
+    }
+}
+
+#[cfg(feature = "num-bigint")]
+impl From<num_bigint::BigInt> for BigInt {
+    #[inline]
+    fn from(value: num_bigint::BigInt) -> Self {
+        let (sign, abs) = value.into_parts();
+        Self::from_biguint(sign.into(), abs.into())
+    }
+}
+
+#[cfg(feature = "num-bigint")]
+impl From<BigInt> for num_bigint::BigInt {
+    #[inline]
+    fn from(value: BigInt) -> Self {
+        let (sign, abs) = value.into_parts();
+        Self::from_biguint(sign.into(), abs.into())
+    }
+}
+
 pub trait ToBigInt {
     fn to_bigint(&self) -> Option<BigInt>;
 }
