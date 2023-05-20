@@ -4,6 +4,8 @@ mod bigint;
 mod biguint;
 mod error;
 mod iter;
+#[cfg(feature = "num-bigint")]
+mod num_bigint_conversion;
 
 pub use bigint::{BigInt, Sign, ToBigInt};
 pub use biguint::{BigUint, ToBigUint};
