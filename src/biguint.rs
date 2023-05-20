@@ -239,7 +239,7 @@ impl Num for BigUint {
         if radix == 16
             && s.bytes().any(|x| {
                 !matches!(x,
-                    b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F'
+                    b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' | b'_'
                 )
             })
         {
