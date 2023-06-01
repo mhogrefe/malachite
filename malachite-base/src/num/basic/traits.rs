@@ -75,14 +75,14 @@ macro_rules! impl_non_zero {
             impl One for $t {
                 const ONE: Self = match Self::new(1) {
                     Some(v) => v,
-                    None => unreachable!("1 is a valid non zero value")
+                    None => unreachable!() // 1 is a valid non zero value
                 };
             }
 
             impl Two for $t {
                 const TWO: Self = match Self::new(2) {
                     Some(v) => v,
-                    None => unreachable!("2 is a valid non zero value")
+                    None => unreachable!() // 2 is a valid non zero value
                 };
             }
         )+
@@ -94,7 +94,7 @@ macro_rules! impl_non_zero {
             impl NegativeOne for $i {
                 const NEGATIVE_ONE: Self = match Self::new(-1) {
                     Some(v) => v,
-                    None => unreachable!("-1 is a valid non zero value")
+                    None => unreachable!() // -1 is a valid non zero value
                 };
             }
         )+
