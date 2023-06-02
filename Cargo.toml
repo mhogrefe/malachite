@@ -3,7 +3,7 @@ name = "malachite-bigint"
 version = "0.1.0"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
 edition = "2021"
-license = "MIT"
+license = "LGPL-3.0-only"
 description = "A drop-in num-bigint replacement based on malachite"
 
 [dependencies]
