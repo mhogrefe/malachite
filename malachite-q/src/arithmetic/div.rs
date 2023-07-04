@@ -1,5 +1,7 @@
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Reciprocal};
+use malachite_base::num::arithmetic::traits::{
+    CheckedDiv, DivExact, DivExactAssign, Gcd, Reciprocal,
+};
 use malachite_base::num::basic::traits::Zero;
 use std::ops::{Div, DivAssign};
 
@@ -196,6 +198,200 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
             numerator: (&self.numerator).div_exact(&g_1) * (&other.denominator).div_exact(&g_2),
             denominator: (&other.numerator).div_exact(g_1) * (&self.denominator).div_exact(g_2),
         }
+    }
+}
+
+impl CheckedDiv<Rational> for Rational {
+    type Output = Rational;
+
+    /// Divides a [`Rational`] by another [`Rational`], taking both by value.
+    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::TWO.checked_div(Rational::TWO), Some(1));
+    /// assert_eq!(Rational::TWO.checked_div(Rational::ZERO), None);
+    /// assert_eq!(
+    ///     (Rational::from_signeds(22, 7).checked_div(Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     "200/63"
+    /// );
+    /// ```
+    fn checked_div(self, other: Rational) -> Option<Rational> {
+        if other == 0u32 {
+            return None;
+        } else if self == 0u32 {
+            return Some(Rational::ZERO);
+        } else if self == 1u32 {
+            return Some(other.reciprocal());
+        } else if other == 1u32 {
+            return Some(self);
+        }
+        let g_1 = (&self.numerator).gcd(&other.numerator);
+        let g_2 = (&other.denominator).gcd(&self.denominator);
+        Some(Rational {
+            sign: self.sign == other.sign,
+            numerator: (self.numerator).div_exact(&g_1) * (other.denominator).div_exact(&g_2),
+            denominator: (other.numerator).div_exact(g_1) * (self.denominator).div_exact(g_2),
+        })
+    }
+}
+
+impl<'a> CheckedDiv<&'a Rational> for Rational {
+    type Output = Rational;
+
+    /// Divides a [`Rational`] by another [`Rational`], taking the first by value and the second by
+    /// reference.
+    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::TWO.checked_div(&Rational::TWO), Some(1));
+    /// assert_eq!(Rational::TWO.checked_div(&Rational::ZERO), None);
+    /// assert_eq!(
+    ///     (Rational::from_signeds(22, 7).checked_div(&Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     "200/63"
+    /// );
+    /// ```
+    #[inline]
+    fn checked_div(self, other: &'a Rational) -> Option<Rational> {
+        if other == &0u32 {
+            None
+        } else if self == 0u32 {
+            Some(Rational::ZERO)
+        } else {
+            (other.checked_div(self)).map(Rational::reciprocal)
+        }
+    }
+}
+
+impl<'a> CheckedDiv<Rational> for &'a Rational {
+    type Output = Rational;
+
+    /// Divides a [`Rational`] by another [`Rational`], taking the first by reference and the second
+    /// by value.
+    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!((&Rational::TWO).checked_div(Rational::TWO), Some(1));
+    /// assert_eq!((&Rational::TWO).checked_div(Rational::ZERO), None);
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7).checked_div(Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     "200/63"
+    /// );
+    /// ```
+    fn checked_div(self, other: Rational) -> Option<Rational> {
+        if other == 0u32 {
+            return None;
+        } else if *self == 0u32 {
+            return Some(Rational::ZERO);
+        } else if *self == 1u32 {
+            return Some(other.reciprocal());
+        } else if other == 1u32 {
+            return Some(self.clone());
+        }
+        let g_1 = (&self.numerator).gcd(&other.numerator);
+        let g_2 = (&other.denominator).gcd(&self.denominator);
+        Some(Rational {
+            sign: self.sign == other.sign,
+            numerator: (&self.numerator).div_exact(&g_1) * (other.denominator).div_exact(&g_2),
+            denominator: (other.numerator).div_exact(g_1) * (&self.denominator).div_exact(g_2),
+        })
+    }
+}
+
+impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
+    type Output = Rational;
+
+    /// Divides a [`Rational`] by another [`Rational`], taking both by reference.
+    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \frac{x}{y}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!((&Rational::TWO).checked_div(&Rational::TWO), Some(1));
+    /// assert_eq!((&Rational::TWO).checked_div(&Rational::ZERO), None);
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(22, 7).checked_div(&Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     "200/63"
+    /// );
+    /// ```
+    fn checked_div(self, other: &'a Rational) -> Option<Rational> {
+        if *other == 0u32 {
+            return None;
+        } else if *self == 0u32 {
+            return Some(Rational::ZERO);
+        } else if *self == 1u32 {
+            return Some(other.reciprocal());
+        } else if *other == 1u32 {
+            return Some(self.clone());
+        }
+        let g_1 = (&self.numerator).gcd(&other.numerator);
+        let g_2 = (&other.denominator).gcd(&self.denominator);
+        Some(Rational {
+            sign: self.sign == other.sign,
+            numerator: (&self.numerator).div_exact(&g_1) * (&other.denominator).div_exact(&g_2),
+            denominator: (&other.numerator).div_exact(g_1) * (&self.denominator).div_exact(g_2),
+        })
     }
 }
 
