@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::Reciprocal;
+use malachite_base::num::arithmetic::traits::{CheckedDiv, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_q::test_util::arithmetic::div::div_naive;
 use malachite_q::test_util::generators::{
@@ -68,6 +68,69 @@ fn test_div() {
     test("4/5", "-4/5", "-1");
     test("-4/5", "4/5", "-1");
     test("-4/5", "-4/5", "1");
+}
+
+#[test]
+fn test_checked_div() {
+    let test = |s, t, out: Option<&'static str>| {
+        let u = Rational::from_str(s).unwrap();
+        let v = Rational::from_str(t).unwrap();
+
+        let n = u.clone().checked_div(v.clone());
+        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        if out.is_some() {
+            assert!(n.unwrap().is_valid());
+        }
+
+        let n = (&u).checked_div(v.clone());
+        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        if out.is_some() {
+            assert!(n.unwrap().is_valid());
+        }
+
+        let n = u.clone().checked_div(&v);
+        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        if out.is_some() {
+            assert!(n.unwrap().is_valid());
+        }
+
+        let n = (&u).checked_div(&v);
+        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        if out.is_some() {
+            assert!(n.unwrap().is_valid());
+        }
+    };
+    test("0", "1/123", Some("0"));
+    test("0", "-1/123", Some("0"));
+    test("0", "0", None);
+    test("1", "1/123", Some("123"));
+    test("1", "-1/123", Some("-123"));
+    test("1", "0", None);
+    test("-1", "1/123", Some("-123"));
+    test("-1", "-1/123", Some("123"));
+    test("-1", "0", None);
+    test("123", "1", Some("123"));
+    test("123", "-1", Some("-123"));
+    test("123", "0", None);
+    test("-123", "1", Some("-123"));
+    test("-123", "-1", Some("123"));
+    test("-123", "0", None);
+    test("123", "1/456", Some("56088"));
+    test("123", "-1/456", Some("-56088"));
+    test("-123", "1/456", Some("-56088"));
+    test("-123", "-1/456", Some("56088"));
+    test("22/7", "2/3", Some("33/7"));
+    test("22/7", "-2/3", Some("-33/7"));
+    test("22/7", "0", None);
+    test("-22/7", "2/3", Some("-33/7"));
+    test("-22/7", "-2/3", Some("33/7"));
+    test("-22/7", "0", None);
+    test("4/5", "4/5", Some("1"));
+    test("4/5", "-4/5", Some("-1"));
+    test("4/5", "0", None);
+    test("-4/5", "4/5", Some("-1"));
+    test("-4/5", "-4/5", Some("1"));
+    test("-4/5", "0", None);
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
