@@ -120,7 +120,8 @@ fn approximate_properties() {
             (&x).round_to_multiple(
                 Rational::from(a.denominator_ref()).reciprocal(),
                 RoundingMode::Nearest
-            ),
+            )
+            .0,
             a
         );
         assert_eq!((-x).approximate(&max_denominator), -a);
@@ -135,7 +136,9 @@ fn approximate_properties() {
 
     rational_natural_natural_triple_gen_var_1().test_properties(|(x, d, max_d)| {
         let a = (&x).approximate(&max_d);
-        let a_alt = (&x).round_to_multiple(Rational::from(&d).reciprocal(), RoundingMode::Nearest);
+        let a_alt = (&x)
+            .round_to_multiple(Rational::from(&d).reciprocal(), RoundingMode::Nearest)
+            .0;
         assert!((&x - a_alt).ge_abs(&(&x - &a)));
 
         let a_worse = x.approximate(&d);
@@ -146,7 +149,7 @@ fn approximate_properties() {
         assert_eq!((&x).approximate(x.denominator_ref()), x);
         assert_eq!(
             (&x).approximate(&Natural::ONE),
-            Integer::rounding_from(x, RoundingMode::Nearest)
+            Integer::rounding_from(x, RoundingMode::Nearest).0
         );
     });
 }

@@ -51,8 +51,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_mod_mul_precomputed_algorithms);
 }
 
-fn demo_limbs_invert_limb_u32(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen_var_12().get(gm, &config).take(limit) {
+fn demo_limbs_invert_limb_u32(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen_var_12().get(gm, config).take(limit) {
         println!(
             "limbs_invert_limb_u32({}) = {}",
             x,
@@ -61,8 +61,8 @@ fn demo_limbs_invert_limb_u32(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_invert_limb_u64(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen_var_12().get(gm, &config).take(limit) {
+fn demo_limbs_invert_limb_u64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen_var_12().get(gm, config).take(limit) {
         println!(
             "limbs_invert_limb_u64({}) = {}",
             x,
@@ -76,11 +76,11 @@ fn demo_limbs_mod_preinverted<
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x_1, x_0, m, inv) in unsigned_quadruple_gen_var_5::<T, DT>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -94,36 +94,36 @@ fn demo_limbs_mod_preinverted<
     }
 }
 
-fn demo_mod_mul<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_mul<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in unsigned_triple_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} * {} ≡ {} mod {}", x, y, x.mod_mul(y, m), m);
     }
 }
 
-fn demo_mod_mul_assign<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_mul_assign<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, m) in unsigned_triple_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.mod_mul_assign(y, m);
-        println!("x := {}; x.mod_mul_assign({}, {}); x = {}", old_x, y, m, x);
+        println!("x := {old_x}; x.mod_mul_assign({y}, {m}); x = {x}");
     }
 }
 
 fn benchmark_limbs_invert_limb_u32_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_invert_limb_u32(u32)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_12().get(gm, &config),
+        unsigned_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -139,14 +139,14 @@ fn benchmark_limbs_invert_limb_u32_algorithms(
 
 fn benchmark_limbs_invert_limb_u64_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_invert_limb_u64(u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_12().get(gm, &config),
+        unsigned_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -165,7 +165,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -178,7 +178,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_quadruple_gen_var_5::<T, DT>().get(gm, &config),
+        unsigned_quadruple_gen_var_5::<T, DT>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -196,14 +196,14 @@ fn benchmark_limbs_mod_preinverted_algorithms<
 
 fn benchmark_mod_mul_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_12::<T>().get(gm, &config),
+        unsigned_triple_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -220,14 +220,14 @@ fn benchmark_mod_mul_algorithms_with_fast<
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_12::<T>().get(gm, &config),
+        unsigned_triple_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -249,14 +249,14 @@ fn benchmark_mod_mul_algorithms_with_fast<
 
 fn benchmark_mod_mul_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_12::<T>().get(gm, &config),
+        unsigned_triple_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -267,14 +267,14 @@ fn benchmark_mod_mul_assign<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_mul_precomputed_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_12::<T>().get(gm, &config),
+        unsigned_triple_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

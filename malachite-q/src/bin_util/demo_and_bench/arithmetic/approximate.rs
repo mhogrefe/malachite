@@ -24,38 +24,38 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_approximate_evaluation_strategy);
 }
 
-fn demo_rational_approximate_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_approximate_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in rational_natural_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         x.approximate_assign(&y);
-        println!("x := {}; x.approximate_assign({}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.approximate_assign({y}); x = {x}");
     }
 }
 
-fn demo_rational_approximate(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_approximate(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_natural_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("({}).approximate({}) = {}", x.clone(), y, x.approximate(&y));
     }
 }
 
-fn demo_rational_approximate_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_approximate_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in rational_natural_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).approximate({}) = {}", x, y, (&x).approximate(&y));
     }
 }
 
-fn demo_rational_approximate_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen_var_7().get(gm, &config).take(limit) {
-        println!("{}", x);
+fn demo_rational_approximate_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen_var_7().get(gm, config).take(limit) {
+        println!("{x}");
         for d in exhaustive_natural_inclusive_range(Natural::ONE, x.to_denominator()) {
             let a = (&x).approximate(&d);
             println!("    {}: {} ≈ {}", d, a, NiceFloat(f64::exact_from(&a)));
@@ -65,14 +65,14 @@ fn demo_rational_approximate_2(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_rational_approximate_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.approximate_assign(&Natural)",
         BenchmarkType::Single,
-        rational_natural_pair_gen_var_3().get(gm, &config),
+        rational_natural_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -83,14 +83,14 @@ fn benchmark_rational_approximate_assign(
 
 fn benchmark_rational_approximate_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.approximate(&Natural)",
         BenchmarkType::Algorithms,
-        rational_natural_pair_gen_var_4().get(gm, &config),
+        rational_natural_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -104,14 +104,14 @@ fn benchmark_rational_approximate_algorithms(
 
 fn benchmark_rational_approximate_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.approximate(&Natural)",
         BenchmarkType::EvaluationStrategy,
-        rational_natural_pair_gen_var_3().get(gm, &config),
+        rational_natural_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

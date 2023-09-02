@@ -1,5 +1,4 @@
 use crate::integer::Integer;
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
@@ -179,14 +178,14 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
                     sign: sx,
                     abs: ref ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => Integer {
                 sign: sx,
                 abs: ax - ay,
             },
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of result is opposite of sign of other
             (
-                &Integer { abs: ref ax, .. },
+                Integer { abs: ax, .. },
                 &Integer {
                     sign: sy,
                     abs: ref ay,
@@ -249,7 +248,7 @@ impl SubAssign<Integer> for Integer {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 - 10, -5 - -10, or -5 - -5; sign of self is flipped
             _ => {
@@ -311,7 +310,7 @@ impl<'a> SubAssign<&'a Integer> for Integer {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             (
                 &mut Integer {

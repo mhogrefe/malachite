@@ -42,11 +42,16 @@ impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
         assert!(*self > 0u32);
         match pow.sign() {
             Ordering::Equal => panic!("Cannot take base-1 logarithm"),
-            Ordering::Greater => self.floor_log_base_2().div_round(pow, RoundingMode::Floor),
+            Ordering::Greater => {
+                self.floor_log_base_2()
+                    .div_round(pow, RoundingMode::Floor)
+                    .0
+            }
             Ordering::Less => {
                 -(self
                     .ceiling_log_base_2()
-                    .div_round(-pow, RoundingMode::Ceiling))
+                    .div_round(-pow, RoundingMode::Ceiling)
+                    .0)
             }
         }
     }
@@ -88,10 +93,17 @@ impl<'a> CeilingLogBasePowerOf2<i64> for &'a Rational {
         assert!(*self > 0u32);
         match pow.sign() {
             Ordering::Equal => panic!("Cannot take base-1 logarithm"),
-            Ordering::Greater => self
-                .ceiling_log_base_2()
-                .div_round(pow, RoundingMode::Ceiling),
-            Ordering::Less => -self.floor_log_base_2().div_round(-pow, RoundingMode::Floor),
+            Ordering::Greater => {
+                self.ceiling_log_base_2()
+                    .div_round(pow, RoundingMode::Ceiling)
+                    .0
+            }
+            Ordering::Less => {
+                -self
+                    .floor_log_base_2()
+                    .div_round(-pow, RoundingMode::Floor)
+                    .0
+            }
         }
     }
 }

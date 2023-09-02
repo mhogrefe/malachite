@@ -32,18 +32,18 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_cmp_complexity(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_cmp_complexity(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         match x.cmp_complexity(&y) {
-            Ordering::Less => println!("{} c< {}", x, y),
-            Ordering::Equal => println!("{} c= {}", x, y),
-            Ordering::Greater => println!("{} c> {}", x, y),
+            Ordering::Less => println!("{x} c< {y}"),
+            Ordering::Equal => println!("{x} c= {y}"),
+            Ordering::Greater => println!("{x} c> {y}"),
         }
     }
 }
 
-fn demo_simplest_rational_in_open_interval(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen_var_3().get(gm, &config).take(limit) {
+fn demo_simplest_rational_in_open_interval(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "simplest_rational_in_open_interval({}, {}) = {}",
             x,
@@ -53,8 +53,8 @@ fn demo_simplest_rational_in_open_interval(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_simplest_rational_in_closed_interval(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_simplest_rational_in_closed_interval(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen_var_4().get(gm, config).take(limit) {
         println!(
             "simplest_rational_in_closed_interval({}, {}) = {}",
             x,
@@ -66,14 +66,14 @@ fn demo_simplest_rational_in_closed_interval(gm: GenMode, config: GenConfig, lim
 
 fn benchmark_rational_cmp_complexity(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.cmp_complexity(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -84,14 +84,14 @@ fn benchmark_rational_cmp_complexity(
 
 fn benchmark_simplest_rational_in_open_interval_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "simplest_rational_in_open_interval(&Rational, &Rational)",
         BenchmarkType::Algorithms,
-        rational_pair_gen_var_5().get(gm, &config),
+        rational_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -112,14 +112,14 @@ fn benchmark_simplest_rational_in_open_interval_algorithms(
 
 fn benchmark_simplest_rational_in_open_interval_algorithms_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "simplest_rational_in_open_interval(&Rational, &Rational)",
         BenchmarkType::Algorithms,
-        rational_pair_gen_var_3().get(gm, &config),
+        rational_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -137,14 +137,14 @@ fn benchmark_simplest_rational_in_open_interval_algorithms_2(
 
 fn benchmark_simplest_rational_in_closed_interval(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "simplest_rational_in_closed_interval(&Rational, &Rational)",
         BenchmarkType::Single,
-        rational_pair_gen_var_4().get(gm, &config),
+        rational_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -157,14 +157,14 @@ fn benchmark_simplest_rational_in_closed_interval(
 
 fn benchmark_simplest_rational_in_closed_interval_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "simplest_rational_in_closed_interval(&Rational, &Rational)",
         BenchmarkType::Algorithms,
-        rational_pair_gen_var_6().get(gm, &config),
+        rational_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,

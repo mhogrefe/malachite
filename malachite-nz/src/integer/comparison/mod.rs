@@ -15,6 +15,7 @@ pub mod partial_cmp_abs_natural;
 /// # partial_cmp_abs
 /// ```
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
@@ -82,9 +83,9 @@ pub mod partial_cmp_natural;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert!(Integer::from(-123) < -122.5f32);
-/// assert!(Integer::from(123) < f32::POSITIVE_INFINITY);
+/// assert!(Integer::from(123) < f32::INFINITY);
 /// assert!(-122.5f32 > Integer::from(-123));
-/// assert!(f32::POSITIVE_INFINITY > Integer::from(123));
+/// assert!(f32::INFINITY > Integer::from(123));
 /// ```
 pub mod partial_cmp_primitive_float;
 /// Comparison of [`Integer`](crate::integer::Integer)s and primitive integers.

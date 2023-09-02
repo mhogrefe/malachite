@@ -23,8 +23,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_from_bits_desc_algorithms_signed);
 }
 
-fn demo_from_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for bs in bool_vec_gen_var_1::<T>().get(gm, &config).take(limit) {
+fn demo_from_bits_asc_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for bs in bool_vec_gen_var_1::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
@@ -34,8 +38,8 @@ fn demo_from_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenCon
     }
 }
 
-fn demo_from_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for bs in bool_vec_gen_var_2::<T>().get(gm, &config).take(limit) {
+fn demo_from_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bs in bool_vec_gen_var_2::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
@@ -47,10 +51,10 @@ fn demo_from_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig,
 
 fn demo_from_bits_desc_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for bs in bool_vec_gen_var_3::<T>().get(gm, &config).take(limit) {
+    for bs in bool_vec_gen_var_3::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
@@ -60,8 +64,8 @@ fn demo_from_bits_desc_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_from_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for bs in bool_vec_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_from_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bs in bool_vec_gen_var_4::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
@@ -73,14 +77,14 @@ fn demo_from_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
 
 fn benchmark_from_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_bits_asc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
-        bool_vec_gen_var_1::<T>().get(gm, &config),
+        bool_vec_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -101,14 +105,14 @@ fn benchmark_from_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_from_bits_asc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_bits_asc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
-        bool_vec_gen_var_2::<T>().get(gm, &config),
+        bool_vec_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -129,14 +133,14 @@ fn benchmark_from_bits_asc_algorithms_signed<T: PrimitiveSigned>(
 
 fn benchmark_from_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_bits_desc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
-        bool_vec_gen_var_3::<T>().get(gm, &config),
+        bool_vec_gen_var_3::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -154,14 +158,14 @@ fn benchmark_from_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_from_bits_desc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_bits_desc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
-        bool_vec_gen_var_4::<T>().get(gm, &config),
+        bool_vec_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

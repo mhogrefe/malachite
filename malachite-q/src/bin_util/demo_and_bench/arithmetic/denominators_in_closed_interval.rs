@@ -12,8 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_denominators_in_closed_interval);
 }
 
-fn demo_denominators_in_closed_interval(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b) in rational_pair_gen_var_3().get(gm, &config).take(limit) {
+fn demo_denominators_in_closed_interval(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b) in rational_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "denominators_in_closed_interval({}, {}) = {}",
             a,
@@ -25,14 +25,14 @@ fn demo_denominators_in_closed_interval(gm: GenMode, config: GenConfig, limit: u
 
 fn benchmark_denominators_in_closed_interval(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "denominators_in_closed_interval(&Rational, &Rational)",
         BenchmarkType::Single,
-        rational_pair_gen_var_3().get(gm, &config),
+        rational_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

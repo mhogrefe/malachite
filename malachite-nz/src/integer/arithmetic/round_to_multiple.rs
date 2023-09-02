@@ -1,12 +1,15 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 impl RoundToMultiple<Integer> for Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
-    /// rounding mode. Both [`Integer`]s are taken by value.
+    /// rounding mode. Both [`Integer`]s are taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the returned value is less than, equal to, or greater than the original
+    /// value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///
@@ -57,56 +60,91 @@ impl RoundToMultiple<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(-5).round_to_multiple(Integer::ZERO, RoundingMode::Down), 0);
-    ///
-    /// assert_eq!(Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Down), -8);
-    /// assert_eq!(Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Up), -12);
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(5), RoundingMode::Exact),
-    ///     -10);
-    /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(3), RoundingMode::Nearest),
-    ///     -9);
-    /// assert_eq!(
-    ///     Integer::from(-20).round_to_multiple(Integer::from(3), RoundingMode::Nearest),
-    ///     -21);
-    /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Nearest),
-    ///     -8);
-    /// assert_eq!(
-    ///     Integer::from(-14).round_to_multiple(Integer::from(4), RoundingMode::Nearest),
-    ///     -16
+    ///     Integer::from(-5).round_to_multiple(Integer::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Greater)"
     /// );
     ///
-    /// assert_eq!(Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Down), -8);
-    /// assert_eq!(Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Up), -12);
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(-5), RoundingMode::Exact),
-    ///     -10
+    ///     Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(-3), RoundingMode::Nearest),
-    ///     -9
+    ///     Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).round_to_multiple(Integer::from(-3), RoundingMode::Nearest),
-    ///     -21
+    ///     Integer::from(-10).round_to_multiple(Integer::from(5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Nearest),
-    ///     -8
+    ///     Integer::from(-10).round_to_multiple(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).round_to_multiple(Integer::from(-4), RoundingMode::Nearest),
-    ///     -16
+    ///     Integer::from(-20).round_to_multiple(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).round_to_multiple(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(-5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).round_to_multiple(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).round_to_multiple(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: Integer, rm: RoundingMode) -> Integer {
-        self.round_to_multiple_assign(other, rm);
-        self
+    fn round_to_multiple(mut self, other: Integer, rm: RoundingMode) -> (Integer, Ordering) {
+        let o = self.round_to_multiple_assign(other, rm);
+        (self, o)
     }
 }
 
@@ -114,7 +152,9 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
-    /// rounding mode. The first [`Integer`] is taken by value and the second by reference.
+    /// rounding mode. The first [`Integer`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///
@@ -165,59 +205,91 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(-5).round_to_multiple(&Integer::ZERO, RoundingMode::Down), 0);
-    ///
-    /// assert_eq!(Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Down), -8);
-    /// assert_eq!(Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Up), -12);
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(5), RoundingMode::Exact),
-    ///     -10);
-    /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(3), RoundingMode::Nearest),
-    ///     -9);
-    /// assert_eq!(
-    ///     Integer::from(-20).round_to_multiple(&Integer::from(3), RoundingMode::Nearest),
-    ///     -21);
-    /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Nearest),
-    ///     -8);
-    /// assert_eq!(
-    ///     Integer::from(-14).round_to_multiple(&Integer::from(4), RoundingMode::Nearest),
-    ///     -16
+    ///     Integer::from(-5).round_to_multiple(&Integer::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Down),
-    ///     -8
-    /// );
-    /// assert_eq!(Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Up), -12);
-    /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(-5), RoundingMode::Exact),
-    ///     -10
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest),
-    ///     -9
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-20).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest),
-    ///     -21
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest),
-    ///     -8
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-14).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest),
-    ///     -16
+    ///     Integer::from(-20).round_to_multiple(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).round_to_multiple(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(-5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &'a Integer, rm: RoundingMode) -> Integer {
-        self.round_to_multiple_assign(other, rm);
-        self
+    fn round_to_multiple(mut self, other: &'a Integer, rm: RoundingMode) -> (Integer, Ordering) {
+        let o = self.round_to_multiple_assign(other, rm);
+        (self, o)
     }
 }
 
@@ -225,7 +297,9 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
-    /// rounding mode. The first [`Integer`] is taken by reference and the second by value.
+    /// rounding mode. The first [`Integer`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///
@@ -276,68 +350,92 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(-5)).round_to_multiple(Integer::ZERO, RoundingMode::Down), 0);
-    ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Down),
-    ///     -8
-    /// );
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Up),
-    ///     -12
-    /// );
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(5), RoundingMode::Exact),
-    ///     -10);
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(3), RoundingMode::Nearest),
-    ///     -9);
-    /// assert_eq!(
-    ///     (&Integer::from(-20)).round_to_multiple(Integer::from(3), RoundingMode::Nearest),
-    ///     -21);
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Nearest),
-    ///     -8);
-    /// assert_eq!(
-    ///     (&Integer::from(-14)).round_to_multiple(Integer::from(4), RoundingMode::Nearest),
-    ///     -16
+    ///     (&Integer::from(-5)).round_to_multiple(Integer::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Down),
-    ///     -8
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Up),
-    ///     -12
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-5), RoundingMode::Exact),
-    ///     -10
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-3), RoundingMode::Nearest),
-    ///     -9
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).round_to_multiple(Integer::from(-3), RoundingMode::Nearest),
-    ///     -21
+    ///     (&Integer::from(-20)).round_to_multiple(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Nearest),
-    ///     -8
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).round_to_multiple(Integer::from(-4), RoundingMode::Nearest),
-    ///     -16
+    ///     (&Integer::from(-14)).round_to_multiple(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).round_to_multiple(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).round_to_multiple(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: Integer, rm: RoundingMode) -> Integer {
-        Integer::from_sign_and_abs(
-            self.sign,
-            (&self.abs).round_to_multiple(other.abs, if self.sign { rm } else { -rm }),
+    fn round_to_multiple(self, other: Integer, rm: RoundingMode) -> (Integer, Ordering) {
+        let (n, o) = (&self.abs).round_to_multiple(other.abs, if self.sign { rm } else { -rm });
+        (
+            Integer::from_sign_and_abs(self.sign, n),
+            if self.sign { o } else { o.reverse() },
         )
     }
 }
@@ -346,7 +444,9 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
-    /// rounding mode. Both [`Integer`]s are taken by reference.
+    /// rounding mode. Both [`Integer`]s are taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the returned value is less than, equal to, or greater than the original
+    /// value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///
@@ -397,75 +497,101 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!((&Integer::from(-5)).round_to_multiple(&Integer::ZERO, RoundingMode::Down), 0);
-    ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Down),
-    ///     -8
-    /// );
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Up),
-    ///     -12
-    /// );
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(5), RoundingMode::Exact),
-    ///     -10);
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(3), RoundingMode::Nearest),
-    ///     -9);
-    /// assert_eq!(
-    ///     (&Integer::from(-20)).round_to_multiple(&Integer::from(3), RoundingMode::Nearest),
-    ///     -21);
-    /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Nearest),
-    ///     -8);
-    /// assert_eq!(
-    ///     (&Integer::from(-14)).round_to_multiple(&Integer::from(4), RoundingMode::Nearest),
-    ///     -16
+    ///     (&Integer::from(-5)).round_to_multiple(&Integer::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Greater)"
     /// );
     ///
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Down),
-    ///     -8
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Up),
-    ///     -12
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-5), RoundingMode::Exact),
-    ///     -10
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest),
-    ///     -9
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-20)).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest),
-    ///     -21
+    ///     (&Integer::from(-20)).round_to_multiple(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest),
-    ///     -8
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-14)).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest),
-    ///     -16
+    ///     (&Integer::from(-14)).round_to_multiple(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-5), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-10, Equal)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-9, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).round_to_multiple(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-21, Less)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).round_to_multiple(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-16, Less)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: &'b Integer, rm: RoundingMode) -> Integer {
-        Integer::from_sign_and_abs(
-            self.sign,
-            (&self.abs).round_to_multiple(&other.abs, if self.sign { rm } else { -rm }),
+    fn round_to_multiple(self, other: &'b Integer, rm: RoundingMode) -> (Integer, Ordering) {
+        let (n, o) = (&self.abs).round_to_multiple(&other.abs, if self.sign { rm } else { -rm });
+        (
+            Integer::from_sign_and_abs(self.sign, n),
+            if self.sign { o } else { o.reverse() },
         )
     }
 }
 
 impl RoundToMultipleAssign<Integer> for Integer {
     /// Rounds an [`Integer`] to a multiple of another [`Integer`] in place, according to a
-    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by value.
+    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by value. An
+    /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+    /// greater than the original value.
     ///
     /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
     /// documentation for details.
@@ -493,80 +619,126 @@ impl RoundToMultipleAssign<Integer> for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
+    /// use std::cmp::Ordering;
     ///
     /// let mut x = Integer::from(-5);
-    /// x.round_to_multiple_assign(Integer::ZERO, RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::ZERO, RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(4), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(4), RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(4), RoundingMode::Up);
+    /// assert_eq!(x.round_to_multiple_assign(Integer::from(4), RoundingMode::Up), Ordering::Less);
     /// assert_eq!(x, -12);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(5), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(5), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, -10);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(3), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -9);
     ///
     /// let mut x = Integer::from(-20);
-    /// x.round_to_multiple_assign(Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(3), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -21);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(4), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-14);
-    /// x.round_to_multiple_assign(Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(4), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -16);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Up),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -12);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(-5), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-5), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, -10);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-3), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -9);
     ///
     /// let mut x = Integer::from(-20);
-    /// x.round_to_multiple_assign(Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-3), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -21);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-14);
-    /// x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Integer::from(-4), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: Integer, rm: RoundingMode) {
+    fn round_to_multiple_assign(&mut self, other: Integer, rm: RoundingMode) -> Ordering {
         if self.sign {
-            self.abs.round_to_multiple_assign(other.abs, rm);
+            self.abs.round_to_multiple_assign(other.abs, rm)
         } else {
-            self.abs.round_to_multiple_assign(other.abs, -rm);
+            let o = self.abs.round_to_multiple_assign(other.abs, -rm);
             self.sign = self.abs == 0;
+            o.reverse()
         }
     }
 }
 
 impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// Rounds an [`Integer`] to a multiple of another [`Integer`] in place, according to a
-    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by reference.
+    /// specified rounding mode. The [`Integer`] on the right-hand side is taken by reference. An
+    /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+    /// greater than the original value.
     ///
     /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
     /// documentation for details.
@@ -594,73 +766,120 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
+    /// use std::cmp::Ordering;
     ///
     /// let mut x = Integer::from(-5);
-    /// x.round_to_multiple_assign(&Integer::ZERO, RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::ZERO, RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Up),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -12);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(5), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(5), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, -10);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(3), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -9);
     ///
     /// let mut x = Integer::from(-20);
-    /// x.round_to_multiple_assign(&Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(3), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -21);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-14);
-    /// x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(4), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -16);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Down),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Up),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -12);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(-5), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-5), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, -10);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-3), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -9);
     ///
     /// let mut x = Integer::from(-20);
-    /// x.round_to_multiple_assign(&Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-3), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -21);
     ///
     /// let mut x = Integer::from(-10);
-    /// x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, -8);
     ///
     /// let mut x = Integer::from(-14);
-    /// x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Integer::from(-4), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, -16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &'a Integer, rm: RoundingMode) {
+    fn round_to_multiple_assign(&mut self, other: &'a Integer, rm: RoundingMode) -> Ordering {
         if self.sign {
-            self.abs.round_to_multiple_assign(&other.abs, rm);
+            self.abs.round_to_multiple_assign(&other.abs, rm)
         } else {
-            self.abs.round_to_multiple_assign(&other.abs, -rm);
+            let o = self.abs.round_to_multiple_assign(&other.abs, -rm);
             self.sign = self.abs == 0;
+            o.reverse()
         }
     }
 }

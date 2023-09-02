@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_neg_assign);
 }
 
-fn demo_rational_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("-({}) = {}", n.clone(), -n);
     }
 }
 
-fn demo_rational_neg_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_neg_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("-(&{}) = {}", n, -&n);
     }
 }
 
-fn demo_rational_neg_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.neg_assign();
-        println!("n := {}; n.neg_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.neg_assign(); n = {n}");
     }
 }
 
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_neg_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Rational",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -63,14 +63,14 @@ fn benchmark_rational_neg_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_neg_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Rational",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -82,11 +82,11 @@ fn benchmark_rational_neg_evaluation_strategy(
     );
 }
 
-fn benchmark_rational_neg_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_neg_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.neg_assign()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

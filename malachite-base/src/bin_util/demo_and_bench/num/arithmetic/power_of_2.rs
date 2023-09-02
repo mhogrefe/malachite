@@ -19,38 +19,38 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_power_of_2_primitive_float);
 }
 
-fn demo_power_of_2_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for pow in unsigned_gen_var_15::<T>().get(gm, &config).take(limit) {
+fn demo_power_of_2_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for pow in unsigned_gen_var_15::<T>().get(gm, config).take(limit) {
         println!("2^{} = {}", pow, T::power_of_2(pow));
     }
 }
 
-fn demo_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for pow in unsigned_gen_var_16::<T>().get(gm, &config).take(limit) {
+fn demo_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for pow in unsigned_gen_var_16::<T>().get(gm, config).take(limit) {
         println!("2^{} = {}", pow, T::power_of_2(pow));
     }
 }
 
 fn demo_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for pow in signed_gen_var_11::<T>().get(gm, &config).take(limit) {
+    for pow in signed_gen_var_11::<T>().get(gm, config).take(limit) {
         println!("2^({}) = {}", pow, NiceFloat(T::power_of_2(pow)));
     }
 }
 
 fn benchmark_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_15::<T>().get(gm, &config),
+        unsigned_gen_var_15::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -61,14 +61,14 @@ fn benchmark_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_16::<T>().get(gm, &config),
+        unsigned_gen_var_16::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -79,14 +79,14 @@ fn benchmark_power_of_2_signed<T: PrimitiveSigned>(
 
 fn benchmark_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.power_of_2(i64)", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_11::<T>().get(gm, &config),
+        signed_gen_var_11::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

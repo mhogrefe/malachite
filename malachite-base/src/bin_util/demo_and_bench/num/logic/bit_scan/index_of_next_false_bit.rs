@@ -17,11 +17,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, start) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -35,11 +35,11 @@ fn demo_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_index_of_next_false_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, start) in signed_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -53,14 +53,14 @@ fn demo_index_of_next_false_bit_signed<T: PrimitiveSigned>(
 
 fn benchmark_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.index_of_next_false_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -73,14 +73,14 @@ fn benchmark_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_index_of_next_false_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.index_of_next_false_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

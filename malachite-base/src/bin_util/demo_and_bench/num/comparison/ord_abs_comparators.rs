@@ -25,64 +25,64 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_ge_abs_signed);
 }
 
-fn demo_lt_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_lt_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.lt_abs(&{}) = {}", x, y, x.lt_abs(&y));
     }
 }
 
-fn demo_gt_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_gt_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.gt_abs(&{}) = {}", x, y, x.gt_abs(&y));
     }
 }
 
-fn demo_le_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_le_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.le_abs(&{}) = {}", x, y, x.le_abs(&y));
     }
 }
 
-fn demo_ge_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_ge_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.ge_abs(&{}) = {}", x, y, x.ge_abs(&y));
     }
 }
 
-fn demo_lt_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_lt_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).lt_abs(&{}) = {}", x, y, x.lt_abs(&y));
     }
 }
 
-fn demo_gt_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_gt_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).gt_abs(&{}) = {}", x, y, x.gt_abs(&y));
     }
 }
 
-fn demo_le_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_le_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).le_abs(&{}) = {}", x, y, x.le_abs(&y));
     }
 }
 
-fn demo_ge_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_ge_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).ge_abs(&{}) = {}", x, y, x.ge_abs(&y));
     }
 }
 
 fn benchmark_lt_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.lt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_lt_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_gt_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.gt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -111,14 +111,14 @@ fn benchmark_gt_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_le_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.le_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -129,14 +129,14 @@ fn benchmark_le_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ge_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ge_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -147,14 +147,14 @@ fn benchmark_ge_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_lt_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.lt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -165,14 +165,14 @@ fn benchmark_lt_abs_signed<T: PrimitiveSigned>(
 
 fn benchmark_gt_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.gt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -183,14 +183,14 @@ fn benchmark_gt_abs_signed<T: PrimitiveSigned>(
 
 fn benchmark_le_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.le_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -201,14 +201,14 @@ fn benchmark_le_abs_signed<T: PrimitiveSigned>(
 
 fn benchmark_ge_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ge_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

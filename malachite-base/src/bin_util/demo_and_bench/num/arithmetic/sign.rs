@@ -20,34 +20,34 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_sign_primitive_float);
 }
 
-fn demo_sign_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sign_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.sign() = {:?}", u, u.sign());
     }
 }
 
-fn demo_sign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.sign() = {:?}", i, i.sign());
     }
 }
 
-fn demo_sign_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sign_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!("({}).sign() = {:?}", NiceFloat(f), f.sign());
     }
 }
 
 fn benchmark_sign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -58,14 +58,14 @@ fn benchmark_sign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_sign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -76,14 +76,14 @@ fn benchmark_sign_signed<T: PrimitiveSigned>(
 
 fn benchmark_sign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

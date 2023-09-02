@@ -53,9 +53,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_eq_mod_algorithms);
 }
 
-fn demo_limbs_eq_neg_limb_mod_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_eq_neg_limb_mod_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y, m) in unsigned_vec_unsigned_unsigned_triple_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -68,9 +68,9 @@ fn demo_limbs_eq_neg_limb_mod_limb(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_limbs_pos_limb_eq_neg_limb_mod(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_pos_limb_eq_neg_limb_mod(gm: GenMode, config: &GenConfig, limit: usize) {
     for (m, x, y) in unsigned_vec_unsigned_unsigned_triple_gen_var_5()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -83,9 +83,9 @@ fn demo_limbs_pos_limb_eq_neg_limb_mod(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_limbs_pos_eq_neg_limb_mod(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_pos_eq_neg_limb_mod(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, mut m, y) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_m = m.clone();
@@ -99,9 +99,9 @@ fn demo_limbs_pos_eq_neg_limb_mod(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_limbs_pos_eq_neg_limb_mod_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_pos_eq_neg_limb_mod_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, m, y) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -114,9 +114,9 @@ fn demo_limbs_pos_eq_neg_limb_mod_ref(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_limbs_pos_eq_neg_mod_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_pos_eq_neg_mod_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, m) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -129,11 +129,8 @@ fn demo_limbs_pos_eq_neg_mod_limb(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_limbs_pos_eq_neg_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys, mut m) in unsigned_vec_triple_gen_var_36()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_pos_eq_neg_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, mut m) in unsigned_vec_triple_gen_var_36().get(gm, config).take(limit) {
         let old_m = m.clone();
         println!(
             "limbs_pos_eq_neg_mod({:?}, {:?}, {:?}) = {}",
@@ -145,11 +142,8 @@ fn demo_limbs_pos_eq_neg_mod(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_pos_eq_neg_mod_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys, m) in unsigned_vec_triple_gen_var_36()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_pos_eq_neg_mod_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, m) in unsigned_vec_triple_gen_var_36().get(gm, config).take(limit) {
         println!(
             "limbs_pos_eq_neg_mod_ref({:?}, {:?}, {:?}) = {}",
             xs,
@@ -160,132 +154,132 @@ fn demo_limbs_pos_eq_neg_mod_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_eq_mod(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         let m_old = m.clone();
         if x.eq_mod(y, m) {
-            println!("{} is equal to {} mod {}", x_old, y_old, m_old);
+            println!("{x_old} is equal to {y_old} mod {m_old}");
         } else {
-            println!("{} is not equal to {} mod {}", x_old, y_old, m_old);
+            println!("{x_old} is not equal to {y_old} mod {m_old}");
         }
     }
 }
 
-fn demo_integer_eq_mod_val_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         if x.eq_mod(y, &m) {
-            println!("{} is equal to {} mod &{}", x_old, y_old, m);
+            println!("{x_old} is equal to {y_old} mod &{m}");
         } else {
-            println!("{} is not equal to {} mod &{}", x_old, y_old, m);
+            println!("{x_old} is not equal to {y_old} mod &{m}");
         }
     }
 }
 
-fn demo_integer_eq_mod_val_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let m_old = m.clone();
         if x.eq_mod(&y, m) {
-            println!("{} is equal to &{} mod {}", x_old, y, m_old);
+            println!("{x_old} is equal to &{y} mod {m_old}");
         } else {
-            println!("{} is not equal to &{} mod {}", x_old, y, m_old);
+            println!("{x_old} is not equal to &{y} mod {m_old}");
         }
     }
 }
 
-fn demo_integer_eq_mod_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         if x.eq_mod(&y, &m) {
-            println!("{} is equal to &{} mod &{}", x_old, y, m);
+            println!("{x_old} is equal to &{y} mod &{m}");
         } else {
-            println!("{} is not equal to &{} mod &{}", x_old, y, m);
+            println!("{x_old} is not equal to &{y} mod &{m}");
         }
     }
 }
 
-fn demo_integer_eq_mod_ref_val_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
         let m_old = m.clone();
         if (&x).eq_mod(y, m) {
-            println!("&{} is equal to {} mod {}", x, y_old, m_old);
+            println!("&{x} is equal to {y_old} mod {m_old}");
         } else {
-            println!("&{} is not equal to {} mod {}", x, y_old, m_old);
+            println!("&{x} is not equal to {y_old} mod {m_old}");
         }
     }
 }
 
-fn demo_integer_eq_mod_ref_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
         if (&x).eq_mod(y, &m) {
-            println!("&{} is equal to {} mod &{}", x, y_old, m);
+            println!("&{x} is equal to {y_old} mod &{m}");
         } else {
-            println!("&{} is not equal to {} mod &{}", x, y_old, m);
+            println!("&{x} is not equal to {y_old} mod &{m}");
         }
     }
 }
 
-fn demo_integer_eq_mod_ref_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let m_old = m.clone();
         if (&x).eq_mod(&y, m) {
-            println!("&{} is equal to &{} mod {}", x, y, m_old);
+            println!("&{x} is equal to &{y} mod {m_old}");
         } else {
-            println!("&{} is not equal to &{} mod {}", x, y, m_old);
+            println!("&{x} is not equal to &{y} mod {m_old}");
         }
     }
 }
 
-fn demo_integer_eq_mod_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, m) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if (&x).eq_mod(&y, &m) {
-            println!("&{} is equal to &{} mod &{}", x, y, m);
+            println!("&{x} is equal to &{y} mod &{m}");
         } else {
-            println!("&{} is not equal to &{} mod &{}", x, y, m);
+            println!("&{x} is not equal to &{y} mod &{m}");
         }
     }
 }
 
 fn benchmark_limbs_eq_neg_limb_mod_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_neg_limb_mod_limb(&mut [Limb], Limb, Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_7().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -298,14 +292,14 @@ fn benchmark_limbs_eq_neg_limb_mod_limb(
 
 fn benchmark_limbs_pos_limb_eq_neg_limb_mod(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_pos_limb_eq_neg_limb_mod(Limb, Limb, &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_5().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -318,14 +312,14 @@ fn benchmark_limbs_pos_limb_eq_neg_limb_mod(
 
 fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_mod_limb(&[Limb], Limb, &[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -343,14 +337,14 @@ fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
 
 fn benchmark_limbs_pos_eq_neg_mod_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_pos_eq_neg_mod_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -363,14 +357,14 @@ fn benchmark_limbs_pos_eq_neg_mod_limb(
 
 fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_mod_limb(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_triple_gen_var_36().get(gm, &config),
+        unsigned_vec_triple_gen_var_36().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -388,14 +382,14 @@ fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
 
 fn benchmark_integer_eq_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::EvaluationStrategy,
-        integer_integer_natural_triple_gen().get(gm, &config),
+        integer_integer_natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -431,14 +425,14 @@ fn benchmark_integer_eq_mod_evaluation_strategy(
 
 fn benchmark_integer_eq_mod_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::LibraryComparison,
-        integer_integer_natural_triple_gen_rm().get(gm, &config),
+        integer_integer_natural_triple_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -453,14 +447,14 @@ fn benchmark_integer_eq_mod_library_comparison(
 #[allow(clippy::short_circuit_statement, unused_must_use)]
 fn benchmark_integer_eq_mod_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::Algorithms,
-        integer_integer_natural_triple_gen().get(gm, &config),
+        integer_integer_natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -386,7 +386,7 @@ fn div_mod_properties_helper_signed<T: PrimitiveSigned>() {
 
         assert_eq!(x.div_mod(y), (q, r));
 
-        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Floor), x.mod_op(y));
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Floor).0, x.mod_op(y));
         assert_eq!(q_alt, q);
         assert_eq!(r_alt, r);
 
@@ -838,7 +838,7 @@ fn ceiling_div_neg_mod_properties_helper<T: PrimitiveUnsigned>() {
 
         assert_eq!(x.ceiling_div_neg_mod(y), (q, r));
 
-        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling), x.neg_mod(y));
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling).0, x.neg_mod(y));
         assert_eq!(q_alt, q);
         assert_eq!(r_alt, r);
 
@@ -1133,7 +1133,7 @@ fn ceiling_div_mod_properties_helper<T: PrimitiveSigned>() {
 
         assert_eq!(x.ceiling_div_mod(y), (q, r));
 
-        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y));
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling).0, x.ceiling_mod(y));
         assert_eq!(q_alt, q);
         assert_eq!(r_alt, r);
 

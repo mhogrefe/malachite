@@ -269,7 +269,7 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
     b: T,
 ) -> PrimitiveIntIncreasingRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     PrimitiveIntIncreasingRange {
         a: Some(a),
@@ -308,7 +308,7 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
     b: T,
 ) -> PrimitiveIntIncreasingRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     PrimitiveIntIncreasingRange {
         a: Some(a),
@@ -347,7 +347,7 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 /// ```
 pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSignedRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a >= T::ZERO {
         ExhaustiveSignedRange::NonNegative(primitive_int_increasing_range(a, b))
@@ -396,7 +396,7 @@ pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
     b: T,
 ) -> ExhaustiveSignedRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a >= T::ZERO {
         ExhaustiveSignedRange::NonNegative(primitive_int_increasing_inclusive_range(a, b))
@@ -451,7 +451,7 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 ///
 /// `NiceFloat(a)` must be less than or equal to `NiceFloat(b)`. If `NiceFloat(a)` and
 /// `NiceFloat(b)` are equal, the range is empty. This function cannot create a range that includes
-/// `POSITIVE_INFINITY`; for that, use [`primitive_float_increasing_inclusive_range`].
+/// `INFINITY`; for that, use [`primitive_float_increasing_inclusive_range`].
 ///
 /// Let $\varphi$ be
 /// [`to_ordered_representation`](super::basic::floats::PrimitiveFloat::to_ordered_representation):
@@ -780,7 +780,7 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 /// Positive and negative zero are both excluded.
 ///
 /// [`MIN_POSITIVE_SUBNORMAL`](super::basic::floats::PrimitiveFloat::MIN_POSITIVE_SUBNORMAL) is
-/// generated first and `POSITIVE_INFINITY` is generated last. The returned iterator is
+/// generated first and `INFINITY` is generated last. The returned iterator is
 /// double-ended, so it may be reversed.
 ///
 /// Let $\varphi$ be
@@ -819,7 +819,7 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 #[inline]
 pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T>
 {
-    primitive_float_increasing_inclusive_range(T::MIN_POSITIVE_SUBNORMAL, T::POSITIVE_INFINITY)
+    primitive_float_increasing_inclusive_range(T::MIN_POSITIVE_SUBNORMAL, T::INFINITY)
 }
 
 /// Generates all negative primitive floats, in ascending order.
@@ -873,7 +873,7 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// Positive and negative zero are both excluded.
 ///
-/// `NEGATIVE_INFINITY` is generated first and `POSITIVE_INFINITY` is generated last. The returned
+/// `NEGATIVE_INFINITY` is generated first and `INFINITY` is generated last. The returned
 /// iterator is double-ended, so it may be reversed.
 ///
 /// Let $\varphi$ be
@@ -923,7 +923,7 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// Positive and negative zero are both included. Negative zero comes first.
 ///
-/// `NEGATIVE_INFINITY` is generated first and `POSITIVE_INFINITY` is generated last. The returned
+/// `NEGATIVE_INFINITY` is generated first and `INFINITY` is generated last. The returned
 /// iterator is double-ended, so it may be reversed.
 ///
 /// Let $\varphi$ be
@@ -961,7 +961,7 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 /// );
 /// ```
 pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T> {
-    primitive_float_increasing_inclusive_range(T::NEGATIVE_INFINITY, T::POSITIVE_INFINITY)
+    primitive_float_increasing_inclusive_range(T::NEGATIVE_INFINITY, T::INFINITY)
 }
 
 /// Generates all finite positive primitive floats with a specified `sci_exponent` and precision.
@@ -1090,7 +1090,6 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision<T: PrimitiveF
     }
 }
 
-#[doc(hidden)]
 #[derive(Clone, Debug)]
 struct PrimitiveFloatsWithExponentGenerator<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -1129,7 +1128,7 @@ fn exhaustive_primitive_floats_with_sci_exponent_helper<T: PrimitiveFloat>(
     )
 }
 
-/// Generates all finite positive primitive floats with a specified `sci_exponent`.
+/// Generates all positive finite primitive floats with a specified `sci_exponent`.
 ///
 /// This `struct` is created by [`exhaustive_primitive_floats_with_sci_exponent`]; see its
 /// documentation for more.
@@ -1153,7 +1152,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
     }
 }
 
-/// Generates all finite positive primitive floats with a specified sci-exponent.
+/// Generates all positive finite primitive floats with a specified sci-exponent.
 ///
 /// Positive and negative zero are both excluded.
 ///
@@ -1214,7 +1213,6 @@ pub fn exhaustive_primitive_floats_with_sci_exponent<T: PrimitiveFloat>(
     ))
 }
 
-#[doc(hidden)]
 #[derive(Clone, Debug)]
 struct ExhaustivePositiveFinitePrimitiveFloatsGenerator<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -1249,7 +1247,7 @@ fn exhaustive_positive_finite_primitive_floats_helper<T: PrimitiveFloat>(
     )
 }
 
-/// Generates all finite positive primitive floats.
+/// Generates all positive finite primitive floats.
 ///
 /// This `struct` is created by [`exhaustive_positive_finite_primitive_floats`]; see its
 /// documentation for more.
@@ -1274,7 +1272,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
     }
 }
 
-/// Generates all finite positive primitive floats.
+/// Generates all positive finite primitive floats.
 ///
 /// Positive and negative zero are both excluded.
 ///
@@ -1308,7 +1306,7 @@ pub fn exhaustive_positive_finite_primitive_floats<T: PrimitiveFloat>(
     ExhaustivePositiveFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats_helper())
 }
 
-/// Generates all finite negative primitive floats.
+/// Generates all negative finite primitive floats.
 ///
 /// This `struct` is created by [`exhaustive_negative_finite_primitive_floats`]; see its
 /// documentation for more.
@@ -1326,7 +1324,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
     }
 }
 
-/// Generates all finite negative primitive floats.
+/// Generates all negative finite primitive floats.
 ///
 /// Positive and negative zero are both excluded.
 ///
@@ -1361,7 +1359,7 @@ pub fn exhaustive_negative_finite_primitive_floats<T: PrimitiveFloat>(
     ExhaustiveNegativeFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats())
 }
 
-/// Generates all finite nonzero primitive floats.
+/// Generates all nonzero finite primitive floats.
 ///
 /// This `struct` is created by [`exhaustive_nonzero_finite_primitive_floats`]; see its
 /// documentation for more.
@@ -1387,7 +1385,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
     }
 }
 
-/// Generates all finite nonzero primitive floats.
+/// Generates all nonzero finite primitive floats.
 ///
 /// Positive and negative zero are both excluded.
 ///
@@ -1496,7 +1494,7 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<Once<T>, ExhaustivePositiveFinitePrimitiveFloats<T>> {
-    once(T::POSITIVE_INFINITY).chain(exhaustive_positive_finite_primitive_floats())
+    once(T::INFINITY).chain(exhaustive_positive_finite_primitive_floats())
 }
 
 /// Generates all negative primitive floats.
@@ -1568,7 +1566,7 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY]
+    vec![T::INFINITY, T::NEGATIVE_INFINITY]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
@@ -1605,7 +1603,7 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![T::NAN, T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
+    vec![T::NAN, T::INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
@@ -1651,14 +1649,14 @@ pub_test! {exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<
     }
     let trailing_zeros = max_precision - precision;
     let increment = u64::power_of_2(trailing_zeros + 1);
-    let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Up);
+    let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Up).0;
     if !start_mantissa.get_bit(trailing_zeros) {
         start_mantissa.set_bit(trailing_zeros);
     }
     if start_mantissa > bm {
         return ConstantPrecisionPrimitiveFloats::default();
     }
-    let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Down);
+    let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Down).0;
     if !end_mantissa.get_bit(trailing_zeros) {
         let adjust = u64::power_of_2(trailing_zeros);
         if adjust > end_mantissa {
@@ -2064,9 +2062,9 @@ pub fn exhaustive_primitive_float_inclusive_range<T: PrimitiveFloat>(
     assert!(!b.is_nan());
     assert!(NiceFloat(a) <= NiceFloat(b));
     let mut specials = Vec::new();
-    if b == T::POSITIVE_INFINITY {
-        specials.push(T::POSITIVE_INFINITY);
-        if a == T::POSITIVE_INFINITY {
+    if b == T::INFINITY {
+        specials.push(T::INFINITY);
+        if a == T::INFINITY {
             return ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(specials.into_iter());
         }
         b = T::MAX_FINITE;

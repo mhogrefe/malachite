@@ -12,30 +12,30 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_mod_neg_assign);
 }
 
-fn demo_mod_neg<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in unsigned_pair_gen_var_16::<T>().get(gm, &config).take(limit) {
+fn demo_mod_neg<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in unsigned_pair_gen_var_16::<T>().get(gm, config).take(limit) {
         println!("-{} ≡ {} mod {}", n, n.mod_neg(m), m);
     }
 }
 
-fn demo_mod_neg_assign<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut n, m) in unsigned_pair_gen_var_16::<T>().get(gm, &config).take(limit) {
+fn demo_mod_neg_assign<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut n, m) in unsigned_pair_gen_var_16::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.mod_neg_assign(m);
-        println!("n := {}; n.mod_neg_assign({}); n = {}", old_n, m, n);
+        println!("n := {old_n}; n.mod_neg_assign({m}); n = {n}");
     }
 }
 
 fn benchmark_mod_neg<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_neg({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_16::<T>().get(gm, &config),
+        unsigned_pair_gen_var_16::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -46,14 +46,14 @@ fn benchmark_mod_neg<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_neg_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_neg({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_16::<T>().get(gm, &config),
+        unsigned_pair_gen_var_16::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

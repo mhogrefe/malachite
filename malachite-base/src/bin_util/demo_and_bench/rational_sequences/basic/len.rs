@@ -9,20 +9,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_len);
 }
 
-fn demo_rational_sequence_len(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_len(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("len({}) = {:?}", xs, xs.len());
     }
 }
 
-fn benchmark_rational_sequence_len(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_sequence_len(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "RationalSequence.len()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

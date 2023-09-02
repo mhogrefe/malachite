@@ -331,7 +331,7 @@ where
         assert!(shifted_alt.is_valid());
         assert_eq!(shifted_alt, shifted);
 
-        assert_eq!((&n).shl_round(i, RoundingMode::Floor), shifted);
+        assert_eq!((&n).shl_round(i, RoundingMode::Floor).0, shifted);
 
         if i >= T::ZERO {
             assert_eq!(&n << i.unsigned_abs(), shifted);

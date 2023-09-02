@@ -33,10 +33,13 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n
     } else if n <= (low_threshold - 1) << 2 {
         n.round_to_multiple_of_power_of_2(1, RoundingMode::Ceiling)
+            .0
     } else if n <= (low_threshold - 1) << 3 {
         n.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+            .0
     } else {
         n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
+            .0
     }
 }
 

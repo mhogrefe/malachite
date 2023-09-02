@@ -71,16 +71,11 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
 impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
     /// Compares two `NiceFloat`s for equality.
     ///
-    /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
-    /// respects the expected properties of antisymmetry, reflexivity, and transitivity.
-    /// `NiceFloat` has a total order. These are the classes of floats, in ascending order:
-    ///   - Negative infinity
-    ///   - Negative nonzero finite floats
-    ///   - Negative zero
-    ///   - NaN
-    ///   - Positive zero
-    ///   - Positive nonzero finite floats
-    ///   - Positive infinity
+    /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
+    /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
+    /// `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
+    /// concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal
+    /// to each other.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -125,11 +120,16 @@ impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
 impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     /// Compares two `NiceFloat`s.
     ///
-    /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
-    /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
-    /// `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
-    /// concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal
-    /// to each other.
+    /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
+    /// respects the expected properties of antisymmetry, reflexivity, and transitivity.
+    /// `NiceFloat` has a total order. These are the classes of floats, in ascending order:
+    ///   - Negative infinity
+    ///   - Negative nonzero finite floats
+    ///   - Negative zero
+    ///   - NaN
+    ///   - Positive zero
+    ///   - Positive nonzero finite floats
+    ///   - Positive infinity
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -142,7 +142,7 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     /// assert!(NiceFloat(0.0) > NiceFloat(-0.0));
     /// assert!(NiceFloat(f32::NAN) < NiceFloat(0.0));
     /// assert!(NiceFloat(f32::NAN) > NiceFloat(-0.0));
-    /// assert!(NiceFloat(f32::POSITIVE_INFINITY) > NiceFloat(f32::NAN));
+    /// assert!(NiceFloat(f32::INFINITY) > NiceFloat(f32::NAN));
     /// assert!(NiceFloat(f32::NAN) < NiceFloat(1.0));
     /// ```
     fn cmp(&self, other: &NiceFloat<T>) -> Ordering {
@@ -239,11 +239,12 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::basic::traits::NegativeInfinity;
     /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert_eq!(NiceFloat(0.0).to_string(), "0.0");
     /// assert_eq!(NiceFloat(-0.0).to_string(), "-0.0");
-    /// assert_eq!(NiceFloat(f32::POSITIVE_INFINITY).to_string(), "Infinity");
+    /// assert_eq!(NiceFloat(f32::INFINITY).to_string(), "Infinity");
     /// assert_eq!(NiceFloat(f32::NEGATIVE_INFINITY).to_string(), "-Infinity");
     /// assert_eq!(NiceFloat(f32::NAN).to_string(), "NaN");
     ///
@@ -314,7 +315,7 @@ impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
     fn from_str(src: &str) -> Result<NiceFloat<T>, <T as FromStr>::Err> {
         match src {
             "NaN" => Ok(T::NAN),
-            "Infinity" => Ok(T::POSITIVE_INFINITY),
+            "Infinity" => Ok(T::INFINITY),
             "-Infinity" => Ok(T::NEGATIVE_INFINITY),
             "inf" | "-inf" => T::from_str("invalid"),
             src => T::from_str(src),

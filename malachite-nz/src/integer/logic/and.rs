@@ -4,6 +4,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use std::cmp::{max, Ordering};
@@ -460,7 +461,7 @@ pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         if boundary_limb_seen {
             out.extend_from_slice(zs);
         } else {
-            for &z in zs.iter() {
+            for &z in zs {
                 out.push(limbs_and_neg_neg_helper(z, &mut boundary_limb_seen));
             }
         }
@@ -607,7 +608,7 @@ pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
         }
     }
     if xs_len > ys_len && !boundary_limb_seen {
-        for x in xs[ys_len..].iter_mut() {
+        for x in &mut xs[ys_len..] {
             *x = limbs_and_neg_neg_helper(*x, &mut boundary_limb_seen);
         }
     }
@@ -646,7 +647,7 @@ pub_test! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) 
         if boundary_limb_seen {
             xs.extend_from_slice(zs);
         } else {
-            for &z in zs.iter() {
+            for &z in zs {
                 xs.push(limbs_and_neg_neg_helper(z, &mut boundary_limb_seen));
             }
         }
@@ -735,7 +736,7 @@ impl Natural {
 
     fn and_assign_neg_limb_neg(&mut self, other: Limb) {
         match *self {
-            natural_zero!() => {}
+            Natural::ZERO => {}
             Natural(Small(ref mut small)) => {
                 let result = small.wrapping_neg() & other;
                 if result == 0 {

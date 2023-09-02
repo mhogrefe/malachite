@@ -1,8 +1,8 @@
 use crate::integer::Integer;
-use crate::malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use std::ops::Neg;
 

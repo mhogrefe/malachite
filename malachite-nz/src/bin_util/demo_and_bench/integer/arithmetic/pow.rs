@@ -20,20 +20,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_pow_evaluation_strategy);
 }
 
-fn demo_integer_pow_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_pow_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, pow) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.pow_assign(pow);
-        println!("x := {}; x.pow_assign({}); x = {}", n_old, pow, n);
+        println!("x := {n_old}; x.pow_assign({pow}); x = {n}");
     }
 }
 
-fn demo_integer_pow(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_pow(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -41,20 +41,20 @@ fn demo_integer_pow(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_pow_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_pow_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).pow({}) = {}", n, pow, (&n).pow(pow));
     }
 }
 
-fn benchmark_integer_pow_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_pow_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.pow_assign(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -65,14 +65,14 @@ fn benchmark_integer_pow_assign(gm: GenMode, config: GenConfig, limit: usize, fi
 
 fn benchmark_integer_pow_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.pow_assign(u64)",
         BenchmarkType::LibraryComparison,
-        integer_unsigned_pair_gen_var_2_nrm().get(gm, &config),
+        integer_unsigned_pair_gen_var_2_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -91,14 +91,14 @@ fn benchmark_integer_pow_library_comparison(
 
 fn benchmark_integer_pow_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.pow(u64)",
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

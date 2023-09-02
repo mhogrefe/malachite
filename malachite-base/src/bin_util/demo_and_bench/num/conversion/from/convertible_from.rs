@@ -50,10 +50,10 @@ fn demo_primitive_int_convertible_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<U>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             u,
@@ -65,10 +65,10 @@ fn demo_primitive_int_convertible_from_unsigned<
 
 fn demo_primitive_int_convertible_from_signed<T: ConvertibleFrom<U> + Named, U: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for i in signed_gen::<U>().get(gm, &config).take(limit) {
+    for i in signed_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             i,
@@ -83,10 +83,10 @@ fn demo_primitive_int_convertible_from_primitive_float<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in primitive_float_gen::<U>().get(gm, &config).take(limit) {
+    for x in primitive_float_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             NiceFloat(x),
@@ -101,10 +101,10 @@ fn demo_primitive_float_convertible_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<U>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             u,
@@ -119,10 +119,10 @@ fn demo_primitive_float_convertible_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for i in signed_gen::<U>().get(gm, &config).take(limit) {
+    for i in signed_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             i,
@@ -137,14 +137,14 @@ fn benchmark_primitive_int_convertible_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.convertible_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -158,14 +158,14 @@ fn benchmark_primitive_int_convertible_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.convertible_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen::<U>().get(gm, &config),
+        signed_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -179,14 +179,14 @@ fn benchmark_primitive_int_convertible_from_primitive_float<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.convertible_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<U>().get(gm, &config),
+        primitive_float_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -200,14 +200,14 @@ fn benchmark_primitive_float_convertible_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.convertible_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -221,14 +221,14 @@ fn benchmark_primitive_float_convertible_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.convertible_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen::<U>().get(gm, &config),
+        signed_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

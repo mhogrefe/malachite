@@ -7,6 +7,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
+use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_18, unsigned_pair_gen_var_5};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
@@ -366,15 +367,16 @@ fn power_of_2_digits_primitive_properties_helper<T: PrimitiveUnsigned>()
 where
     for<'a> &'a Natural: PowerOf2DigitIterable<T>,
     Natural: PowerOf2Digits<T>,
+    for<'a> <&'a Natural as PowerOf2DigitIterable<T>>::PowerOf2DigitIterator: Clone,
 {
     natural_unsigned_pair_gen_var_6::<T>().test_properties(|(ref n, log_base)| {
-        let significant_digits = usize::exact_from(
-            n.significant_bits()
-                .div_round(log_base, RoundingMode::Ceiling),
-        );
-        assert_eq!(
-            PowerOf2DigitIterable::<T>::power_of_2_digits(n, log_base).size_hint(),
-            (significant_digits, Some(significant_digits))
+        test_double_ended_iterator_size_hint(
+            PowerOf2DigitIterable::<T>::power_of_2_digits(n, log_base),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+                    .0,
+            ),
         );
     });
 
@@ -406,6 +408,7 @@ where
             if i < n
                 .significant_bits()
                 .div_round(log_base, RoundingMode::Ceiling)
+                .0
             {
                 assert_eq!(
                     digits.get(i),
@@ -433,13 +436,13 @@ fn power_of_2_digits_primitive_properties() {
 #[test]
 fn power_of_2_digits_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(ref n, log_base)| {
-        let significant_digits = usize::exact_from(
-            n.significant_bits()
-                .div_round(log_base, RoundingMode::Ceiling),
-        );
-        assert_eq!(
-            PowerOf2DigitIterable::<Natural>::power_of_2_digits(n, log_base).size_hint(),
-            (significant_digits, Some(significant_digits))
+        test_double_ended_iterator_size_hint(
+            PowerOf2DigitIterable::<Natural>::power_of_2_digits(n, log_base),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+                    .0,
+            ),
         );
     });
 
@@ -468,6 +471,7 @@ fn power_of_2_digits_properties() {
         if i < n
             .significant_bits()
             .div_round(log_base, RoundingMode::Ceiling)
+            .0
         {
             assert_eq!(
                 digits.get(i),

@@ -15,7 +15,7 @@ pub(crate) fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
         if high <= low {
             return low;
         }
-        let mid = (&low + &high).shr_round(1, RoundingMode::Ceiling);
+        let mid = (&low + &high).shr_round(1, RoundingMode::Ceiling).0;
         match f(&mid).cmp(x) {
             Ordering::Equal => return mid,
             Ordering::Less => low = mid,
@@ -28,7 +28,7 @@ pub fn floor_sqrt_binary(x: &Natural) -> Natural {
     if x < &Natural::TWO {
         x.clone()
     } else {
-        let p = Natural::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling));
+        let p = Natural::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling).0);
         floor_inverse_binary(|x| x.square(), x, &p >> 1, p)
     }
 }

@@ -37,7 +37,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
@@ -1869,8 +1869,8 @@ impl<'a> Rem<Natural> for &'a Natural {
     /// ```
     fn rem(self, other: Natural) -> Natural {
         match (self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => Natural::ZERO,
+            (_, Natural::ZERO) => panic!("division by zero"),
+            (_, Natural::ONE) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(d))),
             (Natural(Small(_)), _) => self.clone(),
             (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {
@@ -1926,8 +1926,8 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     /// ```
     fn rem(self, other: &'b Natural) -> Natural {
         match (self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => Natural::ZERO,
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Natural::ONE) => Natural::ZERO,
             (n, d) if std::ptr::eq(n, d) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(*d))),
             (Natural(Small(_)), _) => self.clone(),
@@ -2026,8 +2026,8 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     /// ```
     fn rem_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => *self = Natural::ZERO,
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Natural::ONE) => *self = Natural::ZERO,
             (_, Natural(Small(d))) => self.rem_assign_limb(*d),
             (Natural(Small(_)), _) => {}
             (&mut Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {

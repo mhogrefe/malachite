@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 impl From<Natural> for SerdeNatural {
     #[inline]
     fn from(x: Natural) -> SerdeNatural {
-        SerdeNatural(format!("{:#x}", x))
+        SerdeNatural(format!("{x:#x}"))
     }
 }
 

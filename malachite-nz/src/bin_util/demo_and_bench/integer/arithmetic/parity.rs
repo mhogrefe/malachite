@@ -13,31 +13,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_odd);
 }
 
-fn demo_integer_even(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_even(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         if n.even() {
-            println!("{} is even", n);
+            println!("{n} is even");
         } else {
-            println!("{} is not even", n);
+            println!("{n} is not even");
         }
     }
 }
 
-fn demo_integer_odd(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_odd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         if n.even() {
-            println!("{} is odd", n);
+            println!("{n} is odd");
         } else {
-            println!("{} is not odd", n);
+            println!("{n} is not odd");
         }
     }
 }
 
-fn benchmark_integer_even(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_even(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.even()",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -46,11 +46,11 @@ fn benchmark_integer_even(gm: GenMode, config: GenConfig, limit: usize, file_nam
     );
 }
 
-fn benchmark_integer_odd(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_odd(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.odd()",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

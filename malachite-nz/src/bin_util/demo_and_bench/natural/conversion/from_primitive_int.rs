@@ -23,20 +23,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_natural_convertible_from_signed);
 }
 
-fn demo_natural_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: From<T>,
 {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("Natural::from({}) = {}", u, Natural::from(u));
     }
 }
 
-fn demo_natural_try_from_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_try_from_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: TryFrom<T, Error = NaturalFromSignedError>,
 {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("Natural::try_from({}) = {:?}", i, Natural::try_from(i));
     }
 }
@@ -56,12 +56,12 @@ natural_signed_single_arg_demo_with_trait!(
 
 fn demo_natural_convertible_from_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ConvertibleFrom<T>,
 {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a Limb",
             i,
@@ -77,7 +77,7 @@ fn demo_natural_convertible_from_signed<T: PrimitiveSigned>(
 #[allow(unused_must_use)]
 fn benchmark_natural_from_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -86,7 +86,7 @@ fn benchmark_natural_from_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural::from({})", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -97,7 +97,7 @@ fn benchmark_natural_from_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_natural_try_from_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -106,7 +106,7 @@ fn benchmark_natural_try_from_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!(concat!("Natural::try_from({})"), T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

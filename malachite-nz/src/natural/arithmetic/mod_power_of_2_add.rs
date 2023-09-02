@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 
@@ -24,7 +25,7 @@ use malachite_base::rounding_modes::RoundingMode;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
         limbs_add_limb(xs, y)
     } else {
         let mut out = xs.to_vec();
@@ -50,7 +51,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
     y: Limb,
     pow: u64
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
         limbs_slice_add_limb_in_place(xs, y)
     } else {
         if !limbs_slice_add_limb_in_place(xs, y) {
@@ -140,7 +141,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
     ys: &[Limb],
     pow: u64,
 ) -> bool {
-    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
+    if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0) {
         limbs_slice_add_greater_in_place_left(xs, ys)
     } else {
         if !limbs_slice_add_greater_in_place_left(xs, ys) {
@@ -164,7 +165,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if xs_len < max_len && ys_len < max_len {
         limbs_vec_add_in_place_left(xs, ys)
     } else {
@@ -219,7 +220,7 @@ impl Natural {
     fn mod_power_of_2_add_limb_ref(&self, y: Limb, pow: u64) -> Natural {
         match (self, y, pow) {
             (_, 0, _) => self.clone(),
-            (&natural_zero!(), _, _) => Natural(Small(y)),
+            (&Natural::ZERO, _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(small.mod_power_of_2_add(other, pow)))
             }
@@ -240,7 +241,7 @@ impl Natural {
     fn mod_power_of_2_add_assign_limb(&mut self, y: Limb, pow: u64) {
         match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut natural_zero!(), _, _) => *self = Natural(Small(y)),
+            (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_add_assign(other, pow)
             }

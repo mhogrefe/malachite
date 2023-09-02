@@ -23507,7 +23507,7 @@ fn test_ceiling_div_neg_mod() {
         assert_eq!(r.to_string(), remainder);
 
         let (q, r) = (
-            u.clone().div_round(v.clone(), RoundingMode::Ceiling),
+            u.clone().div_round(v.clone(), RoundingMode::Ceiling).0,
             u.neg_mod(v),
         );
         assert_eq!(q.to_string(), quotient);
@@ -24092,7 +24092,10 @@ fn ceiling_div_neg_mod_properties_helper(x: Natural, y: Natural) {
     assert!(r_alt.is_valid());
     assert_eq!(r_alt, r);
 
-    let (q_alt, r_alt) = ((&x).div_round(&y, RoundingMode::Ceiling), (&x).neg_mod(&y));
+    let (q_alt, r_alt) = (
+        (&x).div_round(&y, RoundingMode::Ceiling).0,
+        (&x).neg_mod(&y),
+    );
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 

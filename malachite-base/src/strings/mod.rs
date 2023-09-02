@@ -104,7 +104,7 @@ impl<T: Debug> ToDebugString for T {
     /// ```
     #[inline]
     fn to_debug_string(&self) -> String {
-        format!("{:?}", self)
+        format!("{self:?}")
     }
 }
 
@@ -126,7 +126,7 @@ impl<T: Binary> ToBinaryString for T {
     /// ```
     #[inline]
     fn to_binary_string(&self) -> String {
-        format!("{:b}", self)
+        format!("{self:b}")
     }
 }
 
@@ -148,7 +148,7 @@ impl<T: Octal> ToOctalString for T {
     /// ```
     #[inline]
     fn to_octal_string(&self) -> String {
-        format!("{:o}", self)
+        format!("{self:o}")
     }
 }
 
@@ -170,7 +170,7 @@ impl<T: LowerHex> ToLowerHexString for T {
     /// ```
     #[inline]
     fn to_lower_hex_string(&self) -> String {
-        format!("{:x}", self)
+        format!("{self:x}")
     }
 }
 
@@ -192,7 +192,7 @@ impl<T: UpperHex> ToUpperHexString for T {
     /// ```
     #[inline]
     fn to_upper_hex_string(&self) -> String {
-        format!("{:X}", self)
+        format!("{self:X}")
     }
 }
 

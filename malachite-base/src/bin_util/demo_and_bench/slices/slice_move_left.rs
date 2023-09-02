@@ -10,25 +10,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_slice_move_left);
 }
 
-fn demo_slice_move_left(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_slice_move_left(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, amount) in unsigned_vec_unsigned_pair_gen_var_1::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_xs = xs.clone();
         slice_move_left(&mut xs, amount);
-        println!(
-            "xs := {:?}; slice_move_left(&mut xs, {}); xs = {:?}",
-            old_xs, amount, xs
-        );
+        println!("xs := {old_xs:?}; slice_move_left(&mut xs, {amount}); xs = {xs:?}");
     }
 }
 
-fn benchmark_slice_move_left(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_slice_move_left(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "slice_move_left(&mut [T], usize)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_1::<u8>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_1::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

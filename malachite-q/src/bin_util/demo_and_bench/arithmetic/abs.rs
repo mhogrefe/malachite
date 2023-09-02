@@ -18,36 +18,36 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_abs_assign);
 }
 
-fn demo_rational_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("|{}| = {}", n.clone(), n.abs());
     }
 }
 
-fn demo_rational_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_abs_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("|&{}| = {}", n, (&n).abs());
     }
 }
 
-fn demo_rational_abs_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_abs_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.abs_assign();
-        println!("n := {}; n.abs_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.abs_assign(); n = {n}");
     }
 }
 
 fn benchmark_rational_abs_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.abs()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -62,14 +62,14 @@ fn benchmark_rational_abs_library_comparison(
 
 fn benchmark_rational_abs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.abs()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -81,11 +81,11 @@ fn benchmark_rational_abs_evaluation_strategy(
     );
 }
 
-fn benchmark_rational_abs_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_abs_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.abs_assign()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

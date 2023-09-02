@@ -1,5 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::from::{
     PrimitiveFloatFromSignedError, PrimitiveFloatFromUnsignedError, SignedFromFloatError,
@@ -46,7 +47,7 @@ pub fn test_try_from() {
         Err(UnsignedFromFloatError::FloatInfiniteOrNan),
     );
     test_double_primitive_int::<_, u8, _>(
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         Err(UnsignedFromFloatError::FloatInfiniteOrNan),
     );
     test_double_primitive_int::<_, u8, _>(
@@ -145,7 +146,7 @@ fn exact_from_fail() {
     assert_panic!(u8::exact_from(NiceFloat(500.0f32)));
     assert_panic!(u8::exact_from(NiceFloat(123.1f32)));
     assert_panic!(u8::exact_from(NiceFloat(f32::NAN)));
-    assert_panic!(u8::exact_from(NiceFloat(f32::POSITIVE_INFINITY)));
+    assert_panic!(u8::exact_from(NiceFloat(f32::INFINITY)));
     assert_panic!(u8::exact_from(NiceFloat(f32::NEGATIVE_INFINITY)));
     assert_panic!(u8::exact_from(NiceFloat(256.0f32)));
     assert_panic!(i8::exact_from(NiceFloat(128.0f32)));
@@ -180,7 +181,7 @@ where
         let u = T::exact_from(f);
         assert_eq!(NiceFloat::<U>::exact_from(u), f);
         assert_eq!(T::try_from(f).unwrap(), u);
-        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact), u);
+        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact).0, u);
     });
 }
 
@@ -208,7 +209,7 @@ where
         let i = T::exact_from(f);
         assert_eq!(NiceFloat::<U>::exact_from(i), f);
         assert_eq!(T::try_from(f).unwrap(), i);
-        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact), i);
+        assert_eq!(T::rounding_from(f.0, RoundingMode::Exact).0, i);
     });
 }
 
@@ -231,7 +232,7 @@ where
         let f = NiceFloat::<T>::exact_from(u);
         assert_eq!(U::exact_from(f), u);
         assert_eq!(NiceFloat::<T>::try_from(u).unwrap(), f);
-        assert_eq!(NiceFloat(T::rounding_from(u, RoundingMode::Exact)), f);
+        assert_eq!(NiceFloat(T::rounding_from(u, RoundingMode::Exact).0), f);
     });
 }
 
@@ -254,7 +255,7 @@ where
         let f = NiceFloat::<T>::exact_from(i);
         assert_eq!(U::exact_from(f), i);
         assert_eq!(NiceFloat::<T>::try_from(i).unwrap(), f);
-        assert_eq!(NiceFloat(T::rounding_from(i, RoundingMode::Exact)), f);
+        assert_eq!(NiceFloat(T::rounding_from(i, RoundingMode::Exact).0), f);
     });
 }
 

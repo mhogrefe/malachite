@@ -15,21 +15,21 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_bits_get_algorithms);
 }
 
-fn demo_integer_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("bits({}) = {:?}", n, n.bits().collect_vec());
     }
 }
 
-fn demo_integer_bits_rev(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_bits_rev(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("bits({}).rev() = {:?}", n, n.bits().rev().collect_vec());
     }
 }
 
-fn demo_integer_bits_index(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_bits_index(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, i) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("bits({})[{}] = {:?}", n, i, n.bits()[i]);
@@ -39,14 +39,14 @@ fn demo_integer_bits_index(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_bits_get_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.bits()[u64]",
         BenchmarkType::Algorithms,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -57,12 +57,12 @@ fn demo_primitive_int_try_from_primitive_float<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     <T as TryFrom<NiceFloat<U>>>::Error: Debug,
 {
-    for f in primitive_float_gen::<U>().get(gm, &config).take(limit) {
+    for f in primitive_float_gen::<U>().get(gm, config).take(limit) {
         let f = NiceFloat(f);
         println!("{}::try_from({}) = {:?}", T::NAME, f, T::try_from(f));
     }
@@ -70,13 +70,13 @@ fn demo_primitive_int_try_from_primitive_float<
 
 fn demo_primitive_float_try_from_unsigned<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<U>: TryFrom<T>,
     <NiceFloat<U> as TryFrom<T>>::Error: Debug,
 {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!(
             "{}::try_from({}) = {:?}",
             U::NAME,
@@ -88,13 +88,13 @@ fn demo_primitive_float_try_from_unsigned<T: PrimitiveUnsigned, U: PrimitiveFloa
 
 fn demo_primitive_float_try_from_signed<T: PrimitiveSigned, U: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<U>: TryFrom<T>,
     <NiceFloat<U> as TryFrom<T>>::Error: Debug,
 {
-    for u in signed_gen::<T>().get(gm, &config).take(limit) {
+    for u in signed_gen::<T>().get(gm, config).take(limit) {
         println!(
             "{}::try_from({}) = {:?}",
             U::NAME,
@@ -106,20 +106,20 @@ fn demo_primitive_float_try_from_signed<T: PrimitiveSigned, U: PrimitiveFloat>(
 
 fn demo_primitive_int_exact_from_unsigned<T: TryFrom<U> + Display + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<U>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<U>().get(gm, config).take(limit) {
         println!("{}::exact_from({}) = {}", T::NAME, u, T::exact_from(u));
     }
 }
 
 fn demo_primitive_int_exact_from_signed<T: TryFrom<U> + Display + Named, U: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for i in signed_gen_var_2::<U>().get(gm, &config).take(limit) {
+    for i in signed_gen_var_2::<U>().get(gm, config).take(limit) {
         println!("{}::exact_from({}) = {}", T::NAME, i, T::exact_from(i));
     }
 }
@@ -129,13 +129,13 @@ fn demo_unsigned_exact_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<U>: TryFrom<T>,
 {
     for f in primitive_float_gen_var_13::<U, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let f = NiceFloat(f);
@@ -148,13 +148,13 @@ fn demo_signed_exact_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<U>: TryFrom<T>,
 {
     for f in primitive_float_gen_var_14::<U, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let f = NiceFloat(f);
@@ -167,12 +167,12 @@ fn demo_primitive_float_exact_from_unsigned<
     U: PrimitiveUnsigned + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<T>: TryFrom<U>,
 {
-    for u in unsigned_gen_var_18::<U, T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen_var_18::<U, T>().get(gm, config).take(limit) {
         println!(
             "{}::exact_from({}) = {}",
             T::NAME,
@@ -187,12 +187,12 @@ fn demo_primitive_float_exact_from_signed<
     U: PrimitiveSigned + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     NiceFloat<T>: TryFrom<U>,
 {
-    for i in signed_gen_var_7::<U, T>().get(gm, &config).take(limit) {
+    for i in signed_gen_var_7::<U, T>().get(gm, config).take(limit) {
         println!(
             "{}::exact_from({}) = {}",
             T::NAME,
@@ -207,14 +207,14 @@ fn benchmark_primitive_int_try_from_primitive_float<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.try_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<U>().get(gm, &config),
+        primitive_float_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -228,7 +228,7 @@ fn benchmark_primitive_int_try_from_primitive_float<
 
 fn benchmark_primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -237,7 +237,7 @@ fn benchmark_primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUn
     run_benchmark(
         &format!("{}.try_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -250,7 +250,7 @@ fn benchmark_primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUn
 
 fn benchmark_primitive_float_try_from_signed<T: PrimitiveFloat, U: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -259,7 +259,7 @@ fn benchmark_primitive_float_try_from_signed<T: PrimitiveFloat, U: PrimitiveSign
     run_benchmark(
         &format!("{}.try_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen::<U>().get(gm, &config),
+        signed_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -272,14 +272,14 @@ fn benchmark_primitive_float_try_from_signed<T: PrimitiveFloat, U: PrimitiveSign
 
 fn benchmark_primitive_int_exact_from_unsigned<T: TryFrom<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -290,14 +290,14 @@ fn benchmark_primitive_int_exact_from_unsigned<T: TryFrom<U> + Named, U: Primiti
 
 fn benchmark_primitive_int_exact_from_signed<T: TryFrom<U> + Named, U: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen_var_2::<U>().get(gm, &config),
+        signed_gen_var_2::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -311,7 +311,7 @@ fn benchmark_unsigned_exact_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -320,7 +320,7 @@ fn benchmark_unsigned_exact_from_primitive_float<
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_13::<U, T>().get(gm, &config),
+        primitive_float_gen_var_13::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -334,7 +334,7 @@ fn benchmark_signed_exact_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -343,7 +343,7 @@ fn benchmark_signed_exact_from_primitive_float<
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_14::<U, T>().get(gm, &config),
+        primitive_float_gen_var_14::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -357,7 +357,7 @@ fn benchmark_primitive_float_exact_from_unsigned<
     U: PrimitiveUnsigned + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -366,7 +366,7 @@ fn benchmark_primitive_float_exact_from_unsigned<
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_18::<U, T>().get(gm, &config),
+        unsigned_gen_var_18::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -380,7 +380,7 @@ fn benchmark_primitive_float_exact_from_signed<
     U: PrimitiveSigned + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -389,7 +389,7 @@ fn benchmark_primitive_float_exact_from_signed<
     run_benchmark(
         &format!("{}.exact_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen_var_7::<U, T>().get(gm, &config),
+        signed_gen_var_7::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

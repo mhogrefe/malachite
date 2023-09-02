@@ -239,7 +239,7 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
             let mut frac = rs[0].wrapping_add(1);
             let old_i = i;
             i -= digits_per_limb;
-            for d in buffer[i..old_i].iter_mut() {
+            for d in &mut buffer[i..old_i] {
                 let digit;
                 (digit, frac) = Limb::x_mul_y_to_zz(frac, limb_base);
                 *d = T::wrapping_from(digit);
@@ -318,7 +318,7 @@ pub_test! {limbs_choose_power_table_algorithm(
 ) -> (usize, PowerTableAlgorithm) {
     let digits_per_limb = get_chars_per_limb(base);
     let mut number_of_powers = 0;
-    let mut power: usize = xs_len.shr_round(1, RoundingMode::Ceiling);
+    let mut power: usize = xs_len.shr_round(1, RoundingMode::Ceiling).0;
     while power != 1 {
         exptab[number_of_powers] = power * digits_per_limb;
         number_of_powers += 1;
@@ -327,7 +327,7 @@ pub_test! {limbs_choose_power_table_algorithm(
     exptab[number_of_powers] = digits_per_limb;
     if HAVE_MPN_COMPUTE_POWTAB_MUL && HAVE_MPN_COMPUTE_POWTAB_DIV {
         let power = xs_len - 1;
-        let n = xs_len.shr_round(1, RoundingMode::Ceiling);
+        let n = xs_len.shr_round(1, RoundingMode::Ceiling).0;
         let mut mul_cost = 1;
         let mut div_cost = 1;
         for i in (1..number_of_powers).rev() {
@@ -897,7 +897,7 @@ fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         return Vec::new();
     }
-    let limit = (bits + 3).shr_round(1, RoundingMode::Ceiling);
+    let limit = (bits + 3).shr_round(1, RoundingMode::Ceiling).0;
     let mut powers = Vec::new();
     let mut power = base.clone();
     loop {
@@ -1512,7 +1512,7 @@ where
     let big_big_base = Natural::from(big_base);
     let mut x = Natural::ZERO;
     for chunk in xs.rchunks(digits_per_limb).rev() {
-        for &y in chunk.iter() {
+        for &y in chunk {
             if y >= t_base {
                 return None;
             }
@@ -1536,7 +1536,7 @@ fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural>
     {
         return Vec::new();
     }
-    let limit = digits.shr_round(1u64, RoundingMode::Ceiling);
+    let limit = digits.shr_round(1u64, RoundingMode::Ceiling).0;
     let mut powers = Vec::new();
     let mut power = base.clone();
     let mut p = 1;

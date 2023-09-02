@@ -15,7 +15,7 @@ fn abs_negative_zero_helper<T: PrimitiveFloat>() {
     test(T::ZERO, T::ZERO);
     test(T::NEGATIVE_ZERO, T::ZERO);
     test(T::NAN, T::NAN);
-    test(T::POSITIVE_INFINITY, T::POSITIVE_INFINITY);
+    test(T::INFINITY, T::INFINITY);
     test(T::NEGATIVE_INFINITY, T::NEGATIVE_INFINITY);
     test(T::ONE, T::ONE);
     test(T::NEGATIVE_ONE, T::NEGATIVE_ONE);

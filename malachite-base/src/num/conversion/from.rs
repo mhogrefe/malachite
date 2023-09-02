@@ -3,13 +3,14 @@ use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
+use crate::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_round;
 use crate::num::conversion::traits::{
     ConvertibleFrom, OverflowingFrom, RoundingFrom, SaturatingFrom, SciMantissaAndExponent,
     WrappingFrom,
 };
 use crate::num::float::NiceFloat;
 use crate::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 use std::ops::Neg;
 
 // This macro defines conversions from a type to itself.
@@ -386,20 +387,22 @@ no_containment_conversion!(i128, isize);
 fn primitive_float_rounding_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     value: U,
     rm: RoundingMode,
-) -> T {
+) -> (T, Ordering) {
     if value == U::ZERO {
-        return T::ZERO;
+        return (T::ZERO, Ordering::Equal);
     }
-    let (mantissa, exponent) = sci_mantissa_and_exponent_with_rounding(value, rm).unwrap();
+    let (mantissa, exponent, o) = sci_mantissa_and_exponent_round(value, rm).unwrap();
     if let Some(f) = T::from_sci_mantissa_and_exponent(mantissa, i64::wrapping_from(exponent)) {
-        f
+        (f, o)
     } else {
         match rm {
             RoundingMode::Exact => {
                 panic!("Value cannot be represented exactly as an {}", T::NAME)
             }
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => T::MAX_FINITE,
-            _ => T::POSITIVE_INFINITY,
+            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
+                (T::MAX_FINITE, Ordering::Less)
+            }
+            _ => (T::INFINITY, Ordering::Greater),
         }
     }
 }
@@ -407,49 +410,67 @@ fn primitive_float_rounding_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigne
 fn unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     value: U,
     rm: RoundingMode,
-) -> T {
+) -> (T, Ordering) {
     assert!(!value.is_nan());
     if value.is_infinite() {
-        let limit = if value > U::ZERO { T::MAX } else { T::ZERO };
-        return match rm {
-            RoundingMode::Exact => {
-                panic!("Value cannot be represented exactly as a {}", T::NAME)
+        return if value.is_sign_positive() {
+            match rm {
+                RoundingMode::Exact => {
+                    panic!("Value cannot be represented exactly as a {}", T::NAME)
+                }
+                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                    (T::MAX, Ordering::Less)
+                }
+                _ => panic!("Cannot round away from positive infinity"),
             }
-            RoundingMode::Down | RoundingMode::Nearest => limit,
-            RoundingMode::Floor if value > U::ZERO => limit,
-            RoundingMode::Ceiling if value < U::ZERO => limit,
-            _ => panic!("Cannot round away from extreme value"),
+        } else {
+            match rm {
+                RoundingMode::Exact => {
+                    panic!("Value cannot be represented exactly as a {}", T::NAME)
+                }
+                RoundingMode::Down | RoundingMode::Ceiling | RoundingMode::Nearest => {
+                    (T::ZERO, Ordering::Greater)
+                }
+                _ => panic!("Cannot round away from negative infinity"),
+            }
         };
     }
     if value == U::ZERO {
-        return T::ZERO;
+        return (T::ZERO, Ordering::Equal);
     }
-    if value < U::ZERO {
+    if value.is_sign_negative() {
         return match rm {
             RoundingMode::Exact => {
                 panic!("Value cannot be represented exactly as a {}", T::NAME)
             }
-            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => T::ZERO,
-            _ => panic!("Value is less than 0 and rounding mode is {}", rm),
+            RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
+                (T::ZERO, Ordering::Greater)
+            }
+            _ => panic!("Value is less than 0 and rounding mode is {rm}"),
         };
     }
     let (mut mantissa, exponent) = value.integer_mantissa_and_exponent();
-    let result = if exponent <= 0 {
-        mantissa.shr_round_assign(-exponent, rm);
-        T::try_from(mantissa).ok()
+    let (result, o) = if exponent <= 0 {
+        let o = mantissa.shr_round_assign(-exponent, rm);
+        (T::try_from(mantissa).ok(), o)
     } else {
-        T::try_from(mantissa)
-            .ok()
-            .and_then(|n| n.arithmetic_checked_shl(exponent))
+        (
+            T::try_from(mantissa)
+                .ok()
+                .and_then(|n| n.arithmetic_checked_shl(exponent)),
+            Ordering::Equal,
+        )
     };
     if let Some(n) = result {
-        n
+        (n, o)
     } else {
         match rm {
             RoundingMode::Exact => {
                 panic!("Value cannot be represented exactly as a {}", T::NAME)
             }
-            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => T::MAX,
+            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
+                (T::MAX, Ordering::Less)
+            }
             _ => panic!(
                 "Value is greater than {}::MAX and rounding mode is {}",
                 T::NAME,
@@ -468,7 +489,7 @@ fn primitive_float_try_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     if value == U::ZERO {
         return Ok(T::ZERO);
     }
-    let (mantissa, exponent) = sci_mantissa_and_exponent_with_rounding(value, RoundingMode::Exact)
+    let (mantissa, exponent, _) = sci_mantissa_and_exponent_round(value, RoundingMode::Exact)
         .ok_or(PrimitiveFloatFromUnsignedError)?;
     T::from_sci_mantissa_and_exponent(mantissa, i64::wrapping_from(exponent))
         .ok_or(PrimitiveFloatFromUnsignedError)
@@ -536,7 +557,9 @@ macro_rules! impl_from_float_unsigned {
                 impl RoundingFrom<$u> for $f {
                     /// Converts a value of an unsigned type to a value of a floating point type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
+                    /// also returned, indicating whether the returned value is less than, equal
+                    /// to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor` or `Down`, the largest float less than or
                     ///   equal to the value is returned.
@@ -558,7 +581,7 @@ macro_rules! impl_from_float_unsigned {
                     /// # Examples
                     /// See [here](super::from#rounding_from).
                     #[inline]
-                    fn rounding_from(value: $u, rm: RoundingMode) -> $f {
+                    fn rounding_from(value: $u, rm: RoundingMode) -> ($f, Ordering) {
                         primitive_float_rounding_from_unsigned(value, rm)
                     }
                 }
@@ -566,7 +589,9 @@ macro_rules! impl_from_float_unsigned {
                 impl RoundingFrom<$f> for $u {
                     /// Converts a value of a floating point type to a value of an unsigned type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
+                    /// also returned, indicating whether the returned value is less than, equal
+                    /// to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -602,7 +627,7 @@ macro_rules! impl_from_float_unsigned {
                     /// # Examples
                     /// See [here](super::from#rounding_from).
                     #[inline]
-                    fn rounding_from(value: $f, rm: RoundingMode) -> $u {
+                    fn rounding_from(value: $f, rm: RoundingMode) -> ($u, Ordering) {
                         unsigned_rounding_from_primitive_float(value, rm)
                     }
                 }
@@ -699,12 +724,13 @@ fn primitive_float_rounding_from_signed<
 >(
     value: S,
     rm: RoundingMode,
-) -> F {
+) -> (F, Ordering) {
     let abs = value.unsigned_abs();
     if value >= S::ZERO {
         F::rounding_from(abs, rm)
     } else {
-        -F::rounding_from(abs, -rm)
+        let (x, o) = F::rounding_from(abs, -rm);
+        (-x, o.reverse())
     }
 }
 
@@ -715,29 +741,45 @@ fn signed_rounding_from_primitive_float<
 >(
     value: F,
     rm: RoundingMode,
-) -> S {
+) -> (S, Ordering) {
     if value.is_infinite() {
-        let limit = if value > F::ZERO { S::MAX } else { S::MIN };
-        return match rm {
-            RoundingMode::Exact => {
-                panic!("Value cannot be represented exactly as a {}", S::NAME)
+        return if value.is_sign_positive() {
+            match rm {
+                RoundingMode::Exact => {
+                    panic!("Value cannot be represented exactly as a {}", S::NAME)
+                }
+                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                    (S::MAX, Ordering::Less)
+                }
+                _ => panic!("Cannot round away from extreme value"),
             }
-            RoundingMode::Down | RoundingMode::Nearest => limit,
-            RoundingMode::Floor if value > F::ZERO => limit,
-            RoundingMode::Ceiling if value < F::ZERO => limit,
-            _ => panic!("Cannot round away from extreme value"),
+        } else {
+            match rm {
+                RoundingMode::Exact => {
+                    panic!("Value cannot be represented exactly as a {}", S::NAME)
+                }
+                RoundingMode::Down | RoundingMode::Nearest | RoundingMode::Ceiling => {
+                    (S::MIN, Ordering::Greater)
+                }
+                _ => panic!("Cannot round away from extreme value"),
+            }
         };
     }
-    if value >= F::ZERO {
-        let abs = U::rounding_from(value, rm);
+    if value == F::ZERO {
+        return (S::ZERO, Ordering::Equal);
+    }
+    if value.is_sign_positive() {
+        let (abs, o) = U::rounding_from(value, rm);
         if let Ok(n) = S::try_from(abs) {
-            n
+            (n, o)
         } else {
             match rm {
                 RoundingMode::Exact => {
                     panic!("Value cannot be represented exactly as an {}", S::NAME)
                 }
-                RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => S::MAX,
+                RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
+                    (S::MAX, Ordering::Less)
+                }
                 _ => panic!(
                     "Value is greater than {}::MAX and rounding mode is {}",
                     S::NAME,
@@ -746,20 +788,22 @@ fn signed_rounding_from_primitive_float<
             }
         }
     } else {
-        let abs = U::rounding_from(-value, -rm);
+        let (abs, o) = U::rounding_from(-value, -rm);
         let n = if abs == S::MIN.unsigned_abs() {
             Some(S::MIN)
         } else {
             S::try_from(abs).ok().map(Neg::neg)
         };
         if let Some(n) = n {
-            n
+            (n, o.reverse())
         } else {
             match rm {
                 RoundingMode::Exact => {
                     panic!("Value cannot be represented exactly as an {}", S::NAME)
                 }
-                RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => S::MIN,
+                RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
+                    (S::MIN, Ordering::Greater)
+                }
                 _ => panic!(
                     "Value is smaller than {}::MIN and rounding mode is {}",
                     S::NAME,
@@ -842,11 +886,7 @@ fn primitive_float_convertible_from_signed<
     F::convertible_from(value.unsigned_abs())
 }
 
-fn signed_convertible_from_primitive_float<
-    U: PrimitiveUnsigned,
-    S: PrimitiveSigned,
-    F: PrimitiveFloat,
->(
+fn signed_convertible_from_primitive_float<U: PrimitiveUnsigned, F: PrimitiveFloat>(
     value: F,
 ) -> bool {
     if !value.is_integer() {
@@ -871,7 +911,9 @@ macro_rules! impl_from_float_signed {
                 impl RoundingFrom<$i> for $f {
                     /// Converts a value of a signed type to a value of a floating point type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
+                    /// also returned, indicating whether the returned value is less than, equal
+                    /// to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest float less than or equal to
                     ///   the value is returned.
@@ -897,7 +939,7 @@ macro_rules! impl_from_float_signed {
                     /// # Examples
                     /// See [here](super::from#rounding_from).
                     #[inline]
-                    fn rounding_from(value: $i, rm: RoundingMode) -> $f {
+                    fn rounding_from(value: $i, rm: RoundingMode) -> ($f, Ordering) {
                         primitive_float_rounding_from_signed::<$u, $i, $f>(value, rm)
                     }
                 }
@@ -905,7 +947,9 @@ macro_rules! impl_from_float_signed {
                 impl RoundingFrom<$f> for $i {
                     /// Converts a value of a floating point type to a value of a signed type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode).
+                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
+                    /// also returned, indicating whether the returned value is less than, equal
+                    /// to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -944,7 +988,7 @@ macro_rules! impl_from_float_signed {
                     /// # Examples
                     /// See [here](super::from#rounding_from).
                     #[inline]
-                    fn rounding_from(value: $f, rm: RoundingMode) -> $i {
+                    fn rounding_from(value: $f, rm: RoundingMode) -> ($i, Ordering) {
                         signed_rounding_from_primitive_float::<$u, $i, $f>(value, rm)
                     }
                 }
@@ -1021,7 +1065,7 @@ macro_rules! impl_from_float_signed {
                     /// See [here](super::from#convertible_from).
                     #[inline]
                     fn convertible_from(value: $f) -> bool {
-                        signed_convertible_from_primitive_float::<$u, $i, $f>(value)
+                        signed_convertible_from_primitive_float::<$u, $f>(value)
                     }
                 }
             };

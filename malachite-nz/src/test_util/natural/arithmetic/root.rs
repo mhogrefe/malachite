@@ -11,7 +11,7 @@ pub fn floor_root_binary(x: &Natural, exp: u64) -> Natural {
     } else if exp == 1 || x < &Natural::TWO {
         x.clone()
     } else {
-        let p = Natural::power_of_2(x.significant_bits().div_round(exp, RoundingMode::Ceiling));
+        let p = Natural::power_of_2(x.significant_bits().div_round(exp, RoundingMode::Ceiling).0);
         floor_inverse_binary(|x| x.pow(exp), x, &p >> 1, p)
     }
 }

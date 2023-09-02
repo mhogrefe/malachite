@@ -10,8 +10,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_char_to_contiguous_range);
 }
 
-fn demo_char_to_contiguous_range(gm: GenMode, config: GenConfig, limit: usize) {
-    for c in char_gen().get(gm, &config).take(limit) {
+fn demo_char_to_contiguous_range(gm: GenMode, config: &GenConfig, limit: usize) {
+    for c in char_gen().get(gm, config).take(limit) {
         println!(
             "char_to_contiguous_range({:?}) = {}",
             c,
@@ -22,14 +22,14 @@ fn demo_char_to_contiguous_range(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_char_to_contiguous_range(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "char_to_contiguous_range(char)",
         BenchmarkType::Single,
-        char_gen().get(gm, &config),
+        char_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

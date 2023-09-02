@@ -1,5 +1,4 @@
 use crate::integer::Integer;
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::basic::traits::Zero;
 use std::iter::Sum;
@@ -180,14 +179,14 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                     sign: sx,
                     abs: ref ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => Integer {
                 sign: sx,
                 abs: ax - ay,
             },
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of result is sign of other
             (
-                &Integer { abs: ref ax, .. },
+                Integer { abs: ax, .. },
                 &Integer {
                     sign: sy,
                     abs: ref ay,
@@ -252,7 +251,7 @@ impl AddAssign<Integer> for Integer {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             _ => {
@@ -315,7 +314,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     sign: sx,
                     abs: ref mut ax,
                 },
-                &Integer { abs: ref ay, .. },
+                Integer { abs: ay, .. },
             ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 += -10, -5 += 10, or -5 += 5; sign of self is flipped
             (

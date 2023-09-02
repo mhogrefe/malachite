@@ -28,7 +28,7 @@ use rand_chacha::ChaCha20Rng;
 /// less often in Malachite than in GMP, since Malachite generally initializes new memory with
 /// zeros.
 pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         *x = T::ZERO;
     }
 }

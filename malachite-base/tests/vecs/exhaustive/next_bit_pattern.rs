@@ -1,5 +1,5 @@
-use crate::malachite_base::num::arithmetic::traits::BinomialCoefficient;
 use itertools::repeat_n;
+use malachite_base::num::arithmetic::traits::BinomialCoefficient;
 use malachite_base::vecs::exhaustive::next_bit_pattern;
 
 fn pattern_to_string(pattern: &[bool]) -> String {

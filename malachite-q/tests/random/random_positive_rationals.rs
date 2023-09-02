@@ -1,4 +1,3 @@
-use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
@@ -173,7 +172,7 @@ fn test_random_positive_rationals() {
     let sample_median = ("1942164762009/1930873766009", Some("3568/3547"));
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(6.065823121451175e234),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

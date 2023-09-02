@@ -18,8 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_primes_less_than_or_equal_to_algorithms_2);
 }
 
-fn demo_primes_less_than<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_5::<T>().get(gm, &config).take(limit) {
+fn demo_primes_less_than<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_5::<T>().get(gm, config).take(limit) {
         println!(
             "primes_less_than({}) = {:?}",
             n,
@@ -30,10 +30,10 @@ fn demo_primes_less_than<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, l
 
 fn demo_primes_less_than_or_equal_to<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in unsigned_gen_var_5::<T>().get(gm, &config).take(limit) {
+    for n in unsigned_gen_var_5::<T>().get(gm, config).take(limit) {
         println!(
             "primes_less_than_or_equal_to({}) = {:?}",
             n,
@@ -42,15 +42,15 @@ fn demo_primes_less_than_or_equal_to<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_primes<T: PrimitiveUnsigned>(_gm: GenMode, _config: GenConfig, limit: usize) {
+fn demo_primes<T: PrimitiveUnsigned>(_gm: GenMode, _config: &GenConfig, limit: usize) {
     for p in T::primes().take(limit) {
-        println!("{}", p);
+        println!("{p}");
     }
 }
 
 fn benchmark_primes_less_than_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -59,7 +59,7 @@ fn benchmark_primes_less_than_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}::primes_less_than({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5::<T>().get(gm, &config),
+        unsigned_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -78,7 +78,7 @@ fn benchmark_primes_less_than_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -87,7 +87,7 @@ fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}::primes_less_than(&{})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5::<T>().get(gm, &config),
+        unsigned_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -103,7 +103,7 @@ fn benchmark_primes_less_than_algorithms_2<T: PrimitiveUnsigned>(
 
 fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -112,7 +112,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}::primes_less_than_or_equal_to(&{})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5::<T>().get(gm, &config),
+        unsigned_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -133,7 +133,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_primes_less_than_or_equal_to_algorithms_2<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -142,7 +142,7 @@ fn benchmark_primes_less_than_or_equal_to_algorithms_2<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}::primes_less_than_or_equal_to({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5::<T>().get(gm, &config),
+        unsigned_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

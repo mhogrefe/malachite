@@ -538,7 +538,7 @@ where
         assert!(shifted_alt.is_valid());
         assert_eq!(shifted_alt, shifted);
 
-        assert_eq!(n.shl_round(i, RoundingMode::Floor), shifted);
+        assert_eq!(n.shl_round(i, RoundingMode::Floor).0, shifted);
     });
 
     natural_gen().test_properties(|n| {

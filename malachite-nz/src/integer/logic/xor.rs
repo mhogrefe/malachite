@@ -12,6 +12,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 use std::cmp::{max, Ordering};
 use std::ops::{BitXor, BitXorAssign};
@@ -398,7 +399,7 @@ pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         if boundary_seen {
             out.extend_from_slice(zs);
         } else {
-            for &z in zs.iter() {
+            for &z in zs {
                 out.push(limbs_xor_pos_neg_helper(!z, &mut boundary_seen));
             }
         }
@@ -445,7 +446,7 @@ pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         for (out, &x) in out[x_i + 1..xs_len].iter_mut().zip(xs[x_i + 1..].iter()) {
             *out = !x;
         }
-        for out in out[xs_len..y_i].iter_mut() {
+        for out in &mut out[xs_len..y_i] {
             *out = Limb::MAX;
         }
         out[y_i] = ys[y_i] - 1;
@@ -587,14 +588,14 @@ pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
             if boundary_seen {
                 xs.extend_from_slice(&ys[xs_len..]);
             } else {
-                for &y in ys[xs_len..].iter() {
+                for &y in &ys[xs_len..] {
                     xs.push(limbs_xor_pos_neg_helper(!y, &mut boundary_seen));
                 }
             }
         }
         Ordering::Greater => {
             if !boundary_seen {
-                for x in xs[ys_len..].iter_mut() {
+                for x in &mut xs[ys_len..] {
                     *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
                 }
             }
@@ -689,12 +690,12 @@ pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
         if boundary_seen {
             ys.extend_from_slice(&xs[ys_len..]);
         } else {
-            for &x in xs[ys_len..].iter() {
+            for &x in &xs[ys_len..] {
                 ys.push(limbs_xor_pos_neg_helper(!x, &mut boundary_seen));
             }
         }
     } else if xs_len < ys_len && !boundary_seen {
-        for y in ys[xs_len..].iter_mut() {
+        for y in &mut ys[xs_len..] {
             *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_seen);
         }
     }
@@ -733,7 +734,7 @@ pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
         for (y, &x) in ys[x_i + 1..].iter_mut().zip(xs[x_i + 1..].iter()) {
             *y = !x;
         }
-        for y in ys[xs_len..y_i].iter_mut() {
+        for y in &mut ys[xs_len..y_i] {
             *y = Limb::MAX;
         }
         ys[y_i] -= 1;
@@ -745,7 +746,7 @@ pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
     if xs_len >= ys_len {
         let mut boundary_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
         if xs_len != ys_len && !boundary_seen {
-            for x in xs[ys_len..].iter_mut() {
+            for x in &mut xs[ys_len..] {
                 *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
             }
         }
@@ -756,7 +757,7 @@ pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
     } else {
         let mut boundary_seen = limbs_xor_pos_neg_in_place_right_helper(xs, ys, x_i, y_i);
         if !boundary_seen {
-            for y in ys[xs_len..].iter_mut() {
+            for y in &mut ys[xs_len..] {
                 *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_seen);
             }
         }
@@ -983,7 +984,7 @@ pub_test! {limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -
 impl Natural {
     fn xor_assign_neg_limb_pos(&mut self, other: Limb) {
         match self {
-            natural_zero!() => {}
+            &mut Natural::ZERO => {}
             Natural(Small(ref mut small)) => {
                 let result = small.wrapping_neg() ^ other;
                 if result == 0 {
@@ -1001,7 +1002,7 @@ impl Natural {
 
     fn xor_neg_limb_pos(&self, other: Limb) -> Natural {
         match *self {
-            natural_zero!() => self.clone(),
+            Natural::ZERO => self.clone(),
             Natural(Small(ref small)) => {
                 let result = small.wrapping_neg() ^ other;
                 Natural(if result == 0 {

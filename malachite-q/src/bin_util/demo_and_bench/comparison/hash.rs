@@ -10,22 +10,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_hash_library_comparison);
 }
 
-fn demo_rational_hash(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_hash(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("hash({}) = {}", n, hash(&n));
     }
 }
 
 fn benchmark_rational_hash_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational hash",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

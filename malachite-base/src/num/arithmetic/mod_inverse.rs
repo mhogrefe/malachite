@@ -124,7 +124,7 @@ pub_test! {mod_inverse_binary<
     }
     let limit = (m >> 1u32).wrapping_neg();
     if inverse < limit {
-        let k = (limit - inverse).div_round(m, RoundingMode::Ceiling);
+        let k = (limit - inverse).div_round(m, RoundingMode::Ceiling).0;
         inverse.wrapping_add_assign(m.wrapping_mul(k));
     }
     Some(if inverse.get_highest_bit() {

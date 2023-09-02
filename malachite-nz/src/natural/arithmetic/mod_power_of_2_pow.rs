@@ -104,7 +104,7 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
 pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
-    let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     xs.resize(out_len, 0);
     let mut scratch = vec![0; out_len];
     limbs_pow_low(xs, es, &mut scratch);
@@ -241,8 +241,8 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     fn mod_power_of_2_pow(self, exp: &Natural, pow: u64) -> Natural {
         match (self, exp) {
             _ if pow == 0 => Natural::ZERO,
-            (_, natural_zero!()) => Natural::ONE,
-            (natural_zero!(), _) | (natural_one!(), _) | (_, natural_one!()) => self.clone(),
+            (_, &Natural::ZERO) => Natural::ONE,
+            (&Natural::ZERO, _) | (&Natural::ONE, _) | (_, &Natural::ONE) => self.clone(),
             (Natural(Small(x)), Natural(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {
@@ -325,8 +325,8 @@ impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
     fn mod_power_of_2_pow_assign(&mut self, exp: &Natural, pow: u64) {
         match (&mut *self, exp) {
             _ if pow == 0 => *self = Natural::ZERO,
-            (_, natural_zero!()) => *self = Natural::ONE,
-            (natural_zero!(), _) | (natural_one!(), _) | (_, natural_one!()) => {}
+            (_, &Natural::ZERO) => *self = Natural::ONE,
+            (&mut Natural::ZERO, _) | (&mut Natural::ONE, _) | (_, &Natural::ONE) => {}
             (Natural(Small(ref mut x)), Natural(Small(e)))
                 if pow <= Limb::WIDTH && u64::convertible_from(*e) =>
             {

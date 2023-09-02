@@ -48,7 +48,7 @@ fn floor_log_base_2_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 fn floor_log_base_2_fail_helper_primitive_float<T: PrimitiveFloat>() {
     assert_panic!(T::ZERO.floor_log_base_2());
     assert_panic!(T::NAN.floor_log_base_2());
-    assert_panic!(T::POSITIVE_INFINITY.floor_log_base_2());
+    assert_panic!(T::INFINITY.floor_log_base_2());
     assert_panic!(T::NEGATIVE_INFINITY.floor_log_base_2());
 }
 
@@ -103,7 +103,7 @@ fn ceiling_log_base_2_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 fn ceiling_log_base_2_fail_helper_primitive_float<T: PrimitiveFloat>() {
     assert_panic!(T::ZERO.ceiling_log_base_2());
     assert_panic!(T::NAN.ceiling_log_base_2());
-    assert_panic!(T::POSITIVE_INFINITY.ceiling_log_base_2());
+    assert_panic!(T::INFINITY.ceiling_log_base_2());
     assert_panic!(T::NEGATIVE_INFINITY.ceiling_log_base_2());
 }
 
@@ -158,7 +158,7 @@ fn checked_log_base_2_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 fn checked_log_base_2_fail_helper_primitive_float<T: PrimitiveFloat>() {
     assert_panic!(T::ZERO.checked_log_base_2());
     assert_panic!(T::NAN.checked_log_base_2());
-    assert_panic!(T::POSITIVE_INFINITY.checked_log_base_2());
+    assert_panic!(T::INFINITY.checked_log_base_2());
     assert_panic!(T::NEGATIVE_INFINITY.checked_log_base_2());
 }
 

@@ -620,7 +620,7 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
     b: T,
 ) -> RandomUnsignedRange<T> {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     RandomUnsignedRange {
         xs: random_unsigneds_less_than(seed, b - a),
@@ -664,7 +664,7 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     b: T,
 ) -> RandomUnsignedInclusiveRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a == T::ZERO && b == T::MAX {
         RandomUnsignedInclusiveRange::All(random_primitive_ints(seed))
@@ -707,7 +707,7 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 #[inline]
 pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> RandomSignedRange<T> {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     RandomSignedRange {
         xs: T::new_unsigned_range(seed, a, b),
@@ -751,7 +751,7 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
     b: T,
 ) -> RandomSignedInclusiveRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     RandomSignedInclusiveRange {
         xs: T::new_unsigned_inclusive_range(seed, a, b),
@@ -923,7 +923,7 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
 /// `NaN` is never generated.
 ///
 /// $a$ must be less than $b$. This function cannot create a range that includes
-/// `T::POSITIVE_INFINITY`; for that, use [`random_primitive_float_inclusive_range`].
+/// `T::INFINITY`; for that, use [`random_primitive_float_inclusive_range`].
 ///
 /// The output length is infinite.
 ///
@@ -1037,7 +1037,7 @@ pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
     }
 }
 
-/// Generates finite positive primitive floats.
+/// Generates random finite positive primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1074,7 +1074,7 @@ pub fn random_positive_finite_primitive_floats<T: PrimitiveFloat>(
     random_primitive_float_inclusive_range(seed, T::MIN_POSITIVE_SUBNORMAL, T::MAX_FINITE)
 }
 
-/// Generates finite negative primitive floats.
+/// Generates random finite negative primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1111,7 +1111,7 @@ pub fn random_negative_finite_primitive_floats<T: PrimitiveFloat>(
     random_primitive_float_inclusive_range(seed, -T::MAX_FINITE, -T::MIN_POSITIVE_SUBNORMAL)
 }
 
-/// Generates finite nonzero primitive floats.
+/// Generates random finite nonzero primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1148,7 +1148,7 @@ pub fn random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
     nonzero_values(random_finite_primitive_floats(seed))
 }
 
-/// Generates finite primitive floats.
+/// Generates random finite primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1182,7 +1182,7 @@ pub fn random_finite_primitive_floats<T: PrimitiveFloat>(
     random_primitive_float_inclusive_range(seed, -T::MAX_FINITE, T::MAX_FINITE)
 }
 
-/// Generates positive primitive floats.
+/// Generates random positive primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1213,10 +1213,10 @@ pub fn random_finite_primitive_floats<T: PrimitiveFloat>(
 pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
 ) -> RandomPrimitiveFloatInclusiveRange<T> {
-    random_primitive_float_inclusive_range(seed, T::MIN_POSITIVE_SUBNORMAL, T::POSITIVE_INFINITY)
+    random_primitive_float_inclusive_range(seed, T::MIN_POSITIVE_SUBNORMAL, T::INFINITY)
 }
 
-/// Generates negative primitive floats.
+/// Generates random negative primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1250,7 +1250,7 @@ pub fn random_negative_primitive_floats<T: PrimitiveFloat>(
     random_primitive_float_inclusive_range(seed, T::NEGATIVE_INFINITY, -T::MIN_POSITIVE_SUBNORMAL)
 }
 
-/// Generates nonzero primitive floats.
+/// Generates random nonzero primitive floats.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
@@ -1308,7 +1308,7 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
     }
 }
 
-/// Generates finite primitive floats.
+/// Generates random finite primitive floats.
 ///
 /// Every float has an equal probability of being chosen. This does not mean that the distribution
 /// approximates a uniform distribution over the reals. For example, a float in $[1/4, 1/2)$ is as
@@ -1337,7 +1337,7 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
 /// ```
 #[inline]
 pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitiveFloats<T> {
-    let nan = T::POSITIVE_INFINITY.to_ordered_representation() + 1;
+    let nan = T::INFINITY.to_ordered_representation() + 1;
     RandomPrimitiveFloats {
         phantom: PhantomData,
         xs: random_unsigned_inclusive_range(seed, 0, nan),
@@ -1395,7 +1395,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
     }
 }
 
-/// Generates finite positive primitive floats.
+/// Generates positive finite primitive floats.
 ///
 /// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
 /// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
@@ -1411,6 +1411,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 ///   but they may be as high as you like.
 ///
 /// Positive zero is generated; negative zero is not. `NaN` is not generated either.
+/// TODO: don't generate any zeros!
 ///
 /// The output length is infinite.
 ///
@@ -1479,7 +1480,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
     }
 }
 
-/// Generates finite negative primitive floats.
+/// Generates negative finite primitive floats.
 ///
 /// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
 /// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
@@ -1739,7 +1740,7 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 ) -> WithSpecialValue<SpecialRandomPositiveFiniteFloats<T>> {
     with_special_value(
         seed,
-        T::POSITIVE_INFINITY,
+        T::INFINITY,
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -1877,7 +1878,7 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 ) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
     with_special_values(
         seed,
-        vec![T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY],
+        vec![T::INFINITY, T::NEGATIVE_INFINITY],
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -1944,7 +1945,7 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
 ) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
     with_special_values(
         seed,
-        vec![T::ZERO, T::NEGATIVE_ZERO, T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY, T::NAN],
+        vec![T::ZERO, T::NEGATIVE_ZERO, T::INFINITY, T::NEGATIVE_INFINITY, T::NAN],
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -1977,11 +1978,11 @@ fn mantissas_inclusive<T: PrimitiveFloat>(
         bm.set_bit(T::MANTISSA_WIDTH);
         T::MANTISSA_WIDTH + 1 - precision
     };
-    let mut lo = am.shr_round(p, RoundingMode::Up);
+    let mut lo = am.shr_round(p, RoundingMode::Up).0;
     if lo.even() {
         lo += 1;
     }
-    let mut hi = bm.shr_round(p, RoundingMode::Down);
+    let mut hi = bm.shr_round(p, RoundingMode::Down).0;
     if hi == 0 {
         return None;
     } else if hi.even() {
@@ -2396,13 +2397,13 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
     assert_ne!(mean_precision_denominator, 0);
     assert!(mean_precision_numerator > mean_precision_denominator);
     let only_special =
-        a == T::POSITIVE_INFINITY || b == T::NEGATIVE_INFINITY || a == T::ZERO && b == T::ZERO;
+        a == T::INFINITY || b == T::NEGATIVE_INFINITY || a == T::ZERO && b == T::ZERO;
     let mut special_values = Vec::new();
     if a == T::NEGATIVE_INFINITY {
         special_values.push(a);
         a = -T::MAX_FINITE;
     }
-    if b == T::POSITIVE_INFINITY {
+    if b == T::INFINITY {
         special_values.push(b);
         b = T::MAX_FINITE;
     }

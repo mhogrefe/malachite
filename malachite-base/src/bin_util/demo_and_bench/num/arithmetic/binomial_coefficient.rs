@@ -26,30 +26,30 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in unsigned_pair_gen_var_44().get(gm, &config).take(limit) {
+    for (n, k) in unsigned_pair_gen_var_44().get(gm, config).take(limit) {
         println!("C({}, {}) = {}", n, k, T::binomial_coefficient(n, k));
     }
 }
 
 fn demo_binomial_coefficient_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in signed_pair_gen_var_12().get(gm, &config).take(limit) {
+    for (n, k) in signed_pair_gen_var_12().get(gm, config).take(limit) {
         println!("C({}, {}) = {}", n, k, T::binomial_coefficient(n, k));
     }
 }
 
 fn demo_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in unsigned_pair_gen_var_28().get(gm, &config).take(limit) {
+    for (n, k) in unsigned_pair_gen_var_28().get(gm, config).take(limit) {
         println!(
             "C({}, {}) = {:?}",
             n,
@@ -61,10 +61,10 @@ fn demo_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_checked_binomial_coefficient_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in signed_pair_gen_var_11().get(gm, &config).take(limit) {
+    for (n, k) in signed_pair_gen_var_11().get(gm, config).take(limit) {
         println!(
             "C({}, {}) = {:?}",
             n,
@@ -76,7 +76,7 @@ fn demo_checked_binomial_coefficient_signed<T: PrimitiveSigned>(
 
 fn benchmark_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -90,7 +90,7 @@ fn benchmark_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_44().get(gm, &config),
+        unsigned_pair_gen_var_44().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -103,7 +103,7 @@ fn benchmark_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_binomial_coefficient_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -118,7 +118,7 @@ fn benchmark_binomial_coefficient_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_pair_gen_var_12().get(gm, &config),
+        signed_pair_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -131,7 +131,7 @@ fn benchmark_binomial_coefficient_signed<T: PrimitiveSigned>(
 
 fn benchmark_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -145,7 +145,7 @@ fn benchmark_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_28().get(gm, &config),
+        unsigned_pair_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -158,7 +158,7 @@ fn benchmark_checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_binomial_coefficient_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -173,7 +173,7 @@ fn benchmark_checked_binomial_coefficient_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_pair_gen_var_11().get(gm, &config),
+        signed_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,

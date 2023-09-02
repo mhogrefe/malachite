@@ -13,27 +13,27 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_flip_bit_library_comparison);
 }
 
-fn demo_natural_flip_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_flip_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.flip_bit(index);
-        println!("x := {}; x.flip_bit({}); x = {}", n_old, index, n);
+        println!("x := {n_old}; x.flip_bit({index}); x = {n}");
     }
 }
 
 fn benchmark_natural_flip_bit_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.flip_bit(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_4_rm().get(gm, &config),
+        natural_unsigned_pair_gen_var_4_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

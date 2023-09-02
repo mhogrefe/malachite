@@ -21,11 +21,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_next_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for n in primitive_float_gen_var_19::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -38,23 +38,23 @@ fn demo_next_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn demo_next_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in unsigned_gen_var_14::<T>().get(gm, &config).take(limit) {
+    for mut n in unsigned_gen_var_14::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.next_power_of_2_assign();
-        println!("n := {}; n.next_power_of_2_assign(); n = {}", old_n, n);
+        println!("n := {old_n}; n.next_power_of_2_assign(); n = {n}");
     }
 }
 
 fn demo_next_power_of_2_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for mut n in primitive_float_gen_var_19::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
@@ -69,14 +69,14 @@ fn demo_next_power_of_2_assign_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_next_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.next_power_of_2()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_19::<T>().get(gm, &config),
+        primitive_float_gen_var_19::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -87,14 +87,14 @@ fn benchmark_next_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_next_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.next_power_of_2_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_14::<T>().get(gm, &config),
+        unsigned_gen_var_14::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -105,14 +105,14 @@ fn benchmark_next_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_next_power_of_2_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.next_power_of_2_assign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_19::<T>().get(gm, &config),
+        primitive_float_gen_var_19::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

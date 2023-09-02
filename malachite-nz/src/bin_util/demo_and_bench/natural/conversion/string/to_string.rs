@@ -75,134 +75,134 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_to_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{}", n);
+fn demo_natural_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n}");
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_string_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:0{}}}\", {}) = {}",
             width,
             n,
-            format!("{:0width$}", n, width = width)
+            format!("{n:0width$}")
         );
     }
 }
 
-fn demo_natural_to_binary_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:b}", n);
+fn demo_natural_to_binary_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:b}");
     }
 }
 
-fn demo_natural_to_binary_string_with_0b(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:#b}", n);
+fn demo_natural_to_binary_string_with_0b(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:#b}");
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_binary_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_binary_string_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:0{}b}}\", {}) = {}",
             width,
             n,
-            format!("{:0width$b}", n, width = width)
+            format!("{n:0width$b}")
         );
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_binary_string_with_0b_and_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_binary_string_with_0b_and_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:#0{}b}}\", {}) = {}",
             width,
             n,
-            format!("{:#0width$b}", n, width = width)
+            format!("{n:#0width$b}")
         );
     }
 }
 
-fn demo_natural_to_octal_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:o}", n);
+fn demo_natural_to_octal_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:o}");
     }
 }
 
-fn demo_natural_to_octal_string_with_0o(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:#o}", n);
+fn demo_natural_to_octal_string_with_0o(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:#o}");
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_octal_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_octal_string_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:0{}o}}\", {}) = {}",
             width,
             n,
-            format!("{:0width$o}", n, width = width)
+            format!("{n:0width$o}")
         );
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_octal_string_with_0o_and_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_octal_string_with_0o_and_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:#0{}o}}\", {}) = {}",
             width,
             n,
-            format!("{:#0width$o}", n, width = width)
+            format!("{n:#0width$o}")
         );
     }
 }
 
-fn demo_natural_to_lower_hex_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:x}", n);
+fn demo_natural_to_lower_hex_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:x}");
     }
 }
 
-fn demo_natural_to_lower_hex_string_with_0x(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:#x}", n);
+fn demo_natural_to_lower_hex_string_with_0x(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:#x}");
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_lower_hex_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_lower_hex_string_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:0{}x}}\", {}) = {}",
             width,
             n,
-            format!("{:0width$x}", n, width = width)
+            format!("{n:0width$x}")
         );
     }
 }
@@ -210,45 +210,45 @@ fn demo_natural_to_lower_hex_string_with_width(gm: GenMode, config: GenConfig, l
 #[allow(clippy::format_in_format_args)]
 fn demo_natural_to_lower_hex_string_with_0x_and_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:#0{}x}}\", {}) = {}",
             width,
             n,
-            format!("{:#0width$x}", n, width = width)
+            format!("{n:#0width$x}")
         );
     }
 }
 
-fn demo_natural_to_upper_hex_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:X}", n);
+fn demo_natural_to_upper_hex_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:X}");
     }
 }
 
-fn demo_natural_to_upper_hex_string_with_0x(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
-        println!("{:#X}", n);
+fn demo_natural_to_upper_hex_string_with_0x(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("{n:#X}");
     }
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_to_upper_hex_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_upper_hex_string_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:0{}X}}\", {}) = {}",
             width,
             n,
-            format!("{:0width$X}", n, width = width)
+            format!("{n:0width$X}")
         );
     }
 }
@@ -256,25 +256,25 @@ fn demo_natural_to_upper_hex_string_with_width(gm: GenMode, config: GenConfig, l
 #[allow(clippy::format_in_format_args)]
 fn demo_natural_to_upper_hex_string_with_0x_and_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, width) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
             "format!(\"{{:#0{}X}}\", {}) = {}",
             width,
             n,
-            format!("{:#0width$X}", n, width = width)
+            format!("{n:#0width$X}")
         );
     }
 }
 
-fn demo_natural_to_string_base(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_string_base(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base) in natural_unsigned_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -286,9 +286,9 @@ fn demo_natural_to_string_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_to_string_base_upper(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_string_base_upper(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base) in natural_unsigned_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -301,9 +301,9 @@ fn demo_natural_to_string_base_upper(gm: GenMode, config: GenConfig, limit: usiz
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_base_fmt_wrapper_fmt(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_base_fmt_wrapper_fmt(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base) in natural_unsigned_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -316,9 +316,9 @@ fn demo_natural_base_fmt_wrapper_fmt(gm: GenMode, config: GenConfig, limit: usiz
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_base_fmt_wrapper_fmt_upper(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_base_fmt_wrapper_fmt_upper(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base) in natural_unsigned_pair_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -331,9 +331,9 @@ fn demo_natural_base_fmt_wrapper_fmt_upper(gm: GenMode, config: GenConfig, limit
 }
 
 #[allow(clippy::format_in_format_args)]
-fn demo_natural_base_fmt_wrapper_fmt_with_width(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_base_fmt_wrapper_fmt_with_width(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base, width) in natural_unsigned_unsigned_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -349,11 +349,11 @@ fn demo_natural_base_fmt_wrapper_fmt_with_width(gm: GenMode, config: GenConfig, 
 #[allow(clippy::format_in_format_args)]
 fn demo_natural_base_fmt_wrapper_fmt_upper_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, base, width) in natural_unsigned_unsigned_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -368,14 +368,14 @@ fn demo_natural_base_fmt_wrapper_fmt_upper_with_width(
 
 fn benchmark_natural_to_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_string()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -390,14 +390,14 @@ fn benchmark_natural_to_string_library_comparison(
 
 fn benchmark_natural_to_string_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_string()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -412,34 +412,34 @@ fn benchmark_natural_to_string_algorithms(
 
 fn benchmark_natural_to_string_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usize}}\", Natural)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{:0width$}", x, width = width))
+            no_out!(format!("{x:0width$}"))
         })],
     );
 }
 
 fn benchmark_natural_to_binary_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_binary_string()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -454,14 +454,14 @@ fn benchmark_natural_to_binary_string_library_comparison(
 
 fn benchmark_natural_to_binary_string_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_binary_string()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -478,34 +478,34 @@ fn benchmark_natural_to_binary_string_algorithms(
 
 fn benchmark_natural_to_binary_string_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usizeb}}\", Natural)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{:0width$b}", x, width = width))
+            no_out!(format!("{x:0width$b}"))
         })],
     );
 }
 
 fn benchmark_natural_to_octal_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_octal_string()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -520,14 +520,14 @@ fn benchmark_natural_to_octal_string_library_comparison(
 
 fn benchmark_natural_to_octal_string_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_octal_string()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -544,34 +544,34 @@ fn benchmark_natural_to_octal_string_algorithms(
 
 fn benchmark_natural_to_octal_string_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usizeo}}\", Natural)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{:0width$o}", x, width = width))
+            no_out!(format!("{x:0width$o}"))
         })],
     );
 }
 
 fn benchmark_natural_to_lower_hex_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_lower_hex_string()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -588,14 +588,14 @@ fn benchmark_natural_to_lower_hex_string_library_comparison(
 
 fn benchmark_natural_to_lower_hex_string_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_lower_hex_string()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -614,34 +614,34 @@ fn benchmark_natural_to_lower_hex_string_algorithms(
 
 fn benchmark_natural_to_lower_hex_string_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usizex}}\", Natural)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{:0width$x}", x, width = width))
+            no_out!(format!("{x:0width$x}"))
         })],
     );
 }
 
 fn benchmark_natural_to_upper_hex_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_upper_hex_string()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -658,34 +658,34 @@ fn benchmark_natural_to_upper_hex_string_library_comparison(
 
 fn benchmark_natural_to_upper_hex_string_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usizeX}}\", Natural)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, width)| {
-            no_out!(format!("{:0width$X}", x, width = width))
+            no_out!(format!("{x:0width$X}"))
         })],
     );
 }
 
 fn benchmark_natural_to_string_base_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_string_base(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_3_nrm().get(gm, &config),
+        natural_unsigned_pair_gen_var_3_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -706,14 +706,14 @@ fn benchmark_natural_to_string_base_library_comparison(
 
 fn benchmark_natural_to_string_base_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_string_base(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_3().get(gm, &config),
+        natural_unsigned_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -732,14 +732,14 @@ fn benchmark_natural_to_string_base_algorithms(
 
 fn benchmark_natural_to_string_base_upper_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_string_base_upper(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_3().get(gm, &config),
+        natural_unsigned_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -757,14 +757,14 @@ fn benchmark_natural_to_string_base_upper_algorithms(
 
 fn benchmark_natural_base_fmt_wrapper_fmt_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:0usize}}\", BaseFmtWrapper::new(Natural, u64))",
         BenchmarkType::Single,
-        natural_unsigned_unsigned_triple_gen_var_1().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -781,14 +781,14 @@ fn benchmark_natural_base_fmt_wrapper_fmt_with_width(
 
 fn benchmark_natural_base_fmt_wrapper_fmt_upper_with_width(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "format!(\"{{:#0usize}}\", BaseFmtWrapper::new(Natural, u64))",
         BenchmarkType::Single,
-        natural_unsigned_unsigned_triple_gen_var_1().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

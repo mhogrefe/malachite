@@ -23,51 +23,45 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_not_evaluation_strategy);
 }
 
-fn demo_limbs_not(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_limbs_not(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!("limbs_not({:?}) = {:?}", xs, limbs_not(&xs));
     }
 }
 
-fn demo_limbs_not_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_not_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_1().get(gm, config).take(limit) {
         let out_old = out.clone();
         limbs_not_to_out(&mut out, &xs);
-        println!(
-            "out := {:?}; limbs_not_to_out(&mut out, &{:?}); out = {:?}",
-            out_old, xs, out
-        );
+        println!("out := {out_old:?}; limbs_not_to_out(&mut out, &{xs:?}); out = {out:?}");
     }
 }
 
-fn demo_limbs_not_in_place(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_limbs_not_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut xs in unsigned_vec_gen().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         limbs_not_in_place(&mut xs);
-        println!(
-            "xs := {:?}; limbs_not_in_place(&mut xs); xs = {:?}",
-            xs_old, xs
-        );
+        println!("xs := {xs_old:?}; limbs_not_in_place(&mut xs); xs = {xs:?}");
     }
 }
 
-fn demo_natural_not(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_not(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("!{} = {}", n.clone(), !n);
     }
 }
 
-fn demo_natural_not_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_not_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("!&{} = {}", n, !&n);
     }
 }
 
-fn benchmark_limbs_not(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_not(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_not(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -76,11 +70,11 @@ fn benchmark_limbs_not(gm: GenMode, config: GenConfig, limit: usize, file_name: 
     );
 }
 
-fn benchmark_limbs_not_to_out(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_not_to_out(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_not_to_out(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_1().get(gm, &config),
+        unsigned_vec_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -91,11 +85,11 @@ fn benchmark_limbs_not_to_out(gm: GenMode, config: GenConfig, limit: usize, file
     );
 }
 
-fn benchmark_limbs_not_in_place(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_not_in_place(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_not_in_place(&mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -107,14 +101,14 @@ fn benchmark_limbs_not_in_place(gm: GenMode, config: GenConfig, limit: usize, fi
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_not_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "!Natural",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -126,14 +120,14 @@ fn benchmark_natural_not_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_not_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "!Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

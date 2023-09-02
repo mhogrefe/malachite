@@ -29,7 +29,7 @@ pub mod integers;
 /// assert_eq!(i16::NEGATIVE_ONE, -1);
 /// ```
 pub mod signeds;
-/// Traits for constants and the Iverson bracket.
+/// Traits for constants.
 pub mod traits;
 /// The [`PrimitiveUnsigned`](unsigneds::PrimitiveUnsigned) trait.
 pub mod unsigneds;

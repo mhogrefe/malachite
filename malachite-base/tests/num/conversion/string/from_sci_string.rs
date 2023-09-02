@@ -795,12 +795,7 @@ fn from_sci_string_with_options_helper_helper<T: PrimitiveInt>(
         assert!(!s.contains("-+"));
         assert!(!s.contains("--"));
         assert!(!s.contains("-+"));
-        assert!(
-            s.chars().filter(|&c| c == '.').count() <= 1,
-            "{} {:?}",
-            s,
-            options
-        );
+        assert!(s.chars().filter(|&c| c == '.').count() <= 1);
         assert!(s.chars().filter(|&c| c == '-').count() <= 2);
         assert!(s.chars().filter(|&c| c == '+').count() <= 2);
         for c in ['.', 'e', 'E', '+'] {

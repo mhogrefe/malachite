@@ -916,7 +916,7 @@ fn to_sci_properties() {
             let pow = powers_of_10
                 .entry(log - default_p + 1)
                 .or_insert_with_key(|&p| (&ten).pow(p));
-            assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest), x_from);
+            assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest).0, x_from);
         }
     });
 
@@ -997,7 +997,7 @@ fn to_sci_with_options_properties() {
                 let pow = powers
                     .entry((base, neg_scale))
                     .or_insert_with(|| (&q_base).pow(neg_scale));
-                let rounded = (&x).round_to_multiple(&*pow, options.get_rounding_mode());
+                let rounded = (&x).round_to_multiple(&*pow, options.get_rounding_mode()).0;
                 assert_eq!(rounded, x_from);
             } else {
                 assert_eq!(x_from, x);

@@ -15,7 +15,7 @@ use std::marker::PhantomData;
 pub struct PrimitivePowerOf2DigitIterator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     pub(crate) value: T,
     pub(crate) log_base: u64,
-    pub(crate) some_remaining: bool,
+    pub(crate) remaining: usize,
     // If `n` is nonzero, this index initially points to the least-significant bit of the least-
     // significant digit, and is left-shifted by `next`.
     pub(crate) i: u64,
@@ -31,12 +31,10 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     type Item = U;
 
     fn next(&mut self) -> Option<U> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = U::wrapping_from(self.value.get_bits(self.i, self.i + self.log_base));
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.i += self.log_base;
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -44,12 +42,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = usize::exact_from(
-            self.value
-                .significant_bits()
-                .div_round(self.log_base, RoundingMode::Ceiling),
-        );
-        (significant_digits, Some(significant_digits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
@@ -57,12 +50,10 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     DoubleEndedIterator for PrimitivePowerOf2DigitIterator<T, U>
 {
     fn next_back(&mut self) -> Option<U> {
-        if self.some_remaining {
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
+        if self.remaining != 0 {
             let digit = U::wrapping_from(self.value.get_bits(self.j, self.j + self.log_base));
             self.j.saturating_sub_assign(self.log_base);
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -127,11 +118,12 @@ fn power_of_2_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     }
     let significant_digits = x
         .significant_bits()
-        .div_round(log_base, RoundingMode::Ceiling);
+        .div_round(log_base, RoundingMode::Ceiling)
+        .0;
     PrimitivePowerOf2DigitIterator {
         value: x,
         log_base,
-        some_remaining: significant_digits != 0,
+        remaining: usize::exact_from(significant_digits),
         i: 0,
         j: significant_digits.saturating_sub(1) * log_base,
         phantom: PhantomData,

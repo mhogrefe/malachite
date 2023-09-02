@@ -44,8 +44,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_binomial_coefficient_limb_limb_bdiv(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in unsigned_pair_gen_var_45().get(gm, &config).take(limit) {
+fn demo_limbs_binomial_coefficient_limb_limb_bdiv(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in unsigned_pair_gen_var_45().get(gm, config).take(limit) {
         println!(
             "limbs_binomial_coefficient_limb_limb_bdiv({}, {}) = {:?}",
             n,
@@ -55,8 +55,12 @@ fn demo_limbs_binomial_coefficient_limb_limb_bdiv(gm: GenMode, config: GenConfig
     }
 }
 
-fn demo_limbs_binomial_coefficient_limb_limb_small_k(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in unsigned_pair_gen_var_46().get(gm, &config).take(limit) {
+fn demo_limbs_binomial_coefficient_limb_limb_small_k(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, k) in unsigned_pair_gen_var_46().get(gm, config).take(limit) {
         println!(
             "limbs_binomial_coefficient_limb_limb_small_k({}, {}) = {:?}",
             n,
@@ -68,10 +72,10 @@ fn demo_limbs_binomial_coefficient_limb_limb_small_k(gm: GenMode, config: GenCon
 
 fn demo_limbs_binomial_coefficient_limb_limb_basecase(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in unsigned_pair_gen_var_47().get(gm, &config).take(limit) {
+    for (n, k) in unsigned_pair_gen_var_47().get(gm, config).take(limit) {
         println!(
             "limbs_binomial_coefficient_limb_limb_basecase({}, {}) = {}",
             n,
@@ -83,10 +87,10 @@ fn demo_limbs_binomial_coefficient_limb_limb_basecase(
 
 fn demo_limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in unsigned_pair_gen_var_48().get(gm, &config).take(limit) {
+    for (n, k) in unsigned_pair_gen_var_48().get(gm, config).take(limit) {
         println!(
             "limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer({}, {}) = {:?}",
             n,
@@ -98,10 +102,10 @@ fn demo_limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
 
 fn demo_limbs_binomial_coefficient_limb_limb_goetgheluck(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, k) in unsigned_pair_gen_var_49().get(gm, &config).take(limit) {
+    for (n, k) in unsigned_pair_gen_var_49().get(gm, config).take(limit) {
         println!(
             "limbs_binomial_coefficient_limb_limb_goetgheluck({}, {}) = {:?}",
             n,
@@ -111,8 +115,8 @@ fn demo_limbs_binomial_coefficient_limb_limb_goetgheluck(
     }
 }
 
-fn demo_binomial_coefficient_limb_limb(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in unsigned_pair_gen_var_28().get(gm, &config).take(limit) {
+fn demo_binomial_coefficient_limb_limb(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in unsigned_pair_gen_var_28().get(gm, config).take(limit) {
         println!(
             "binomial_coefficient_limb_limb({}, {}) = {}",
             n,
@@ -122,8 +126,8 @@ fn demo_binomial_coefficient_limb_limb(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_natural_binomial_coefficient(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in natural_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_natural_binomial_coefficient(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in natural_pair_gen_var_15().get(gm, config).take(limit) {
         let n_orig = n.clone();
         let k_orig = k.clone();
         println!(
@@ -135,8 +139,8 @@ fn demo_natural_binomial_coefficient(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_natural_binomial_coefficient_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in natural_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_natural_binomial_coefficient_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in natural_pair_gen_var_15().get(gm, config).take(limit) {
         println!(
             "C({}, {}) = {}",
             n,
@@ -148,14 +152,14 @@ fn demo_natural_binomial_coefficient_ref(gm: GenMode, config: GenConfig, limit: 
 
 fn benchmark_binomial_coefficient_limb_limb_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "binomial_coefficient_limb_limb(Limb, Limb)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_28().get(gm, &config),
+        unsigned_pair_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -176,14 +180,14 @@ fn benchmark_binomial_coefficient_limb_limb_algorithms(
 
 fn benchmark_natural_binomial_coefficient_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.binomial_coefficient(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_15().get(gm, &config),
+        natural_pair_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -203,14 +207,14 @@ fn benchmark_natural_binomial_coefficient_evaluation_strategy(
 
 fn benchmark_natural_binomial_coefficient_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.binomial_coefficient(Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_15().get(gm, &config),
+        natural_pair_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -232,14 +236,14 @@ fn benchmark_natural_binomial_coefficient_algorithms(
 #[allow(unused_must_use)]
 fn benchmark_natural_binomial_coefficient_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.binomial_coefficient(Natural, Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_15_rm().get(gm, &config),
+        natural_pair_gen_var_15_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

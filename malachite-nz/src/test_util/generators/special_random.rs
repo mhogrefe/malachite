@@ -44,9 +44,9 @@ use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
 use crate::natural::random::{
-    get_striped_random_natural_with_up_to_bits, striped_random_natural_range,
-    striped_random_natural_range_to_infinity, striped_random_naturals,
-    striped_random_positive_naturals, StripedRandomNaturalInclusiveRange,
+    get_striped_random_natural_with_bits, get_striped_random_natural_with_up_to_bits,
+    striped_random_natural_range, striped_random_natural_range_to_infinity,
+    striped_random_naturals, striped_random_positive_naturals, StripedRandomNaturalInclusiveRange,
     StripedRandomNaturalRangeToInfinity, StripedRandomNaturals,
 };
 use crate::natural::Natural;
@@ -657,7 +657,7 @@ pub fn special_random_integer_integer_natural_triple_gen_var_2(
                 )
             },
         )
-        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+        .filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -1052,6 +1052,42 @@ pub fn special_random_integer_signed_signed_triple_gen<T: PrimitiveSigned>(
     ))
 }
 
+// -- (Integer, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn special_random_integer_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Integer, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Integer, PrimitiveSigned, RoundingMode) --
 
 pub fn special_random_integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -1321,6 +1357,30 @@ pub fn special_random_integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
         )
         .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
     )
+}
+
+pub fn special_random_integer_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned, bool) --
@@ -1608,6 +1668,8 @@ where
         .map(|(n, u, rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
     )
 }
+
+// var 3 is in malachite-float.
 
 // -- (Integer, RoundingMode) --
 
@@ -2388,7 +2450,7 @@ pub fn special_random_natural_triple_gen_var_2(
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+        .filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -3171,6 +3233,49 @@ pub fn special_random_natural_signed_pair_gen_var_3<T: PrimitiveSigned>(
     ))
 }
 
+struct NaturalBitsMultipleOfLimbBitsGenerator {
+    bit_source: StripedBitSource,
+    limb_counts: GeometricRandomNaturalValues<u64>,
+}
+
+impl Iterator for NaturalBitsMultipleOfLimbBitsGenerator {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        Some(get_striped_random_natural_with_bits(
+            &mut self.bit_source,
+            self.limb_counts.next().unwrap() << Limb::LOG_WIDTH,
+        ))
+    }
+}
+
+pub fn special_random_natural_signed_pair_gen_var_4<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| NaturalBitsMultipleOfLimbBitsGenerator {
+            bit_source: StripedBitSource::new(
+                seed.fork("bit_source"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            ),
+            limb_counts: geometric_random_positive_unsigneds(
+                seed.fork("limb_counts"),
+                config.get_or("mean_small_n", 2),
+                config.get_or("mean_small_d", 1),
+            ),
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveSigned, PrimitiveSigned) ---
 
 pub fn special_random_natural_signed_signed_triple_gen<T: PrimitiveSigned>(
@@ -3234,6 +3339,40 @@ pub fn special_random_natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigne
             (x, y, m)
         }),
     )
+}
+
+pub fn special_random_natural_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Natural, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Natural, PrimitiveSigned, RoundingMode) --
@@ -4032,6 +4171,8 @@ where
     )
 }
 
+// var 2 is in malachite-float
+
 // --(Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecTripleGenerator {
@@ -4049,7 +4190,8 @@ impl Iterator for NaturalUnsignedBoolVecTripleGenerator {
         let bs = get_striped_bool_vec(
             &mut self.striped_bit_source,
             x.significant_bits()
-                .div_round(log_base, RoundingMode::Ceiling),
+                .div_round(log_base, RoundingMode::Ceiling)
+                .0,
         );
         Some((x, log_base, bs))
     }

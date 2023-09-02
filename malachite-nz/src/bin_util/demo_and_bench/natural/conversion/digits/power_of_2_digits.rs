@@ -40,13 +40,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_power_of_2_digits<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: PowerOf2DigitIterable<T>,
 {
     for (n, log_base) in natural_unsigned_pair_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -60,13 +60,13 @@ fn demo_natural_power_of_2_digits<T: PrimitiveUnsigned>(
 
 fn demo_natural_power_of_2_digits_rev<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: PowerOf2DigitIterable<T>,
 {
     for (n, log_base) in natural_unsigned_pair_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -82,13 +82,13 @@ fn demo_natural_power_of_2_digits_rev<T: PrimitiveUnsigned>(
 
 fn demo_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: PowerOf2DigitIterable<T>,
 {
     for (n, log_base) in natural_unsigned_pair_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -102,13 +102,13 @@ fn demo_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
 
 fn demo_natural_power_of_2_digits_get<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: PowerOf2DigitIterable<T>,
 {
     for (n, log_base, i) in natural_unsigned_unsigned_triple_gen_var_2::<u64, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -121,9 +121,9 @@ fn demo_natural_power_of_2_digits_get<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_natural_power_of_2_digits_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_power_of_2_digits_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -135,9 +135,9 @@ fn demo_natural_power_of_2_digits_natural(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_natural_power_of_2_digits_rev_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_power_of_2_digits_rev_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -151,9 +151,9 @@ fn demo_natural_power_of_2_digits_rev_natural(gm: GenMode, config: GenConfig, li
     }
 }
 
-fn demo_natural_power_of_2_digits_size_hint_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_power_of_2_digits_size_hint_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -165,9 +165,9 @@ fn demo_natural_power_of_2_digits_size_hint_natural(gm: GenMode, config: GenConf
     }
 }
 
-fn demo_natural_power_of_2_digits_get_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_power_of_2_digits_get_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base, i) in natural_unsigned_unsigned_triple_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -182,7 +182,7 @@ fn demo_natural_power_of_2_digits_get_natural(gm: GenMode, config: GenConfig, li
 
 fn benchmark_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -194,7 +194,7 @@ fn benchmark_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_6::<T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -213,7 +213,7 @@ fn benchmark_natural_power_of_2_digits_size_hint<T: PrimitiveUnsigned>(
 
 fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -226,7 +226,7 @@ fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        natural_unsigned_unsigned_triple_gen_var_2::<u64, T>().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_2::<u64, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -256,14 +256,14 @@ fn benchmark_natural_power_of_2_digits_get_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_natural_power_of_2_digits_size_hint_natural(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "PowerOf2DigitIterable::<Natural>::power_of_2_digits(&Natural, u64).size_hint()",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -282,14 +282,14 @@ fn benchmark_natural_power_of_2_digits_size_hint_natural(
 #[allow(clippy::let_unit_value)]
 fn benchmark_natural_power_of_2_digits_get_natural_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "PowerOf2DigitIterable::<Natural>::power_of_2_digits(&Natural, u64).get(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_unsigned_triple_gen_var_3().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

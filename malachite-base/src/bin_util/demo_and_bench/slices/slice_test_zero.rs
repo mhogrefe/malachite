@@ -10,17 +10,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_slice_test_zero);
 }
 
-fn demo_slice_test_zero(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_slice_test_zero(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen::<u8>().get(gm, config).take(limit) {
         println!("slice_test_zero({:?}) = {:?}", xs, slice_test_zero(&xs));
     }
 }
 
-fn benchmark_slice_test_zero(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_slice_test_zero(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "slice_test_zero(&[T])",
         BenchmarkType::Single,
-        unsigned_vec_gen::<u8>().get(gm, &config),
+        unsigned_vec_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

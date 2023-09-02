@@ -15,30 +15,30 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_checked_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.checked_square() = {:?}", x, x.checked_square());
     }
 }
 
-fn demo_checked_square_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_checked_square_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen::<T>().get(gm, config).take(limit) {
         println!("({}).checked_square() = {:?}", x, x.checked_square());
     }
 }
 
 fn benchmark_checked_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_square()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -49,14 +49,14 @@ fn benchmark_checked_square_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_square_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_square()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -33,58 +33,52 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_integer_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: ShrRoundAssign<T> + Shl<T, Output = Integer>,
 {
     for (mut n, u, rm) in integer_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.shr_round_assign(u, rm);
-        println!(
-            "x := {}; x.shr_round_assign({}, {}); x = {}",
-            n_old, u, rm, n
-        );
+        let o = n.shr_round_assign(u, rm);
+        println!("x := {n_old}; x.shr_round_assign({u}, {rm}) = {o:?}; x = {n}");
     }
 }
 
 fn demo_integer_shr_round_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: ShrRoundAssign<T> + Shl<T, Output = Integer>,
 {
     for (mut n, i, rm) in integer_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.shr_round_assign(i, rm);
-        println!(
-            "x := {}; x.shr_round_assign({}, {}); x = {}",
-            n_old, i, rm, n
-        );
+        let o = n.shr_round_assign(i, rm);
+        println!("x := {n_old}; x.shr_round_assign({i}, {rm}) = {o:?}; x = {n}");
     }
 }
 
 fn demo_integer_shr_round_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: ShrRound<T, Output = Integer> + Shl<T, Output = Integer>,
 {
     for (n, u, rm) in integer_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {}) = {}",
+            "{}.shr_round({}, {}) = {:?}",
             n_old,
             u,
             rm,
@@ -93,17 +87,17 @@ fn demo_integer_shr_round_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_integer_shr_round_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_integer_shr_round_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Integer: ShrRound<T, Output = Integer> + Shl<T, Output = Integer>,
 {
     for (n, i, rm) in integer_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {}) = {}",
+            "{}.shr_round({}, {}) = {:?}",
             n_old,
             i,
             rm,
@@ -114,18 +108,18 @@ where
 
 fn demo_integer_shr_round_ref_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: Shl<T, Output = Integer>,
     for<'a> &'a Integer: ShrRound<T, Output = Integer>,
 {
     for (n, u, rm) in integer_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).shr_round({}, {}) = {}",
+            "(&{}).shr_round({}, {}) = {:?}",
             n,
             u,
             rm,
@@ -136,18 +130,18 @@ fn demo_integer_shr_round_ref_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_integer_shr_round_ref_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: Shl<T, Output = Integer>,
     for<'a> &'a Integer: ShrRound<T, Output = Integer>,
 {
     for (n, i, rm) in integer_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).shr_round({}, {}) = {}",
+            "(&{}).shr_round({}, {}) = {:?}",
             n,
             i,
             rm,
@@ -158,7 +152,7 @@ fn demo_integer_shr_round_ref_signed<T: PrimitiveSigned>(
 
 fn benchmark_integer_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -167,18 +161,20 @@ fn benchmark_integer_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Integer.shr_round_assign({}, RoundingMode)", T::NAME),
         BenchmarkType::Single,
-        integer_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        integer_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_integer_bit_bucketer("n"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.shr_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.shr_round_assign(y, rm))
+        })],
     );
 }
 
 fn benchmark_integer_shr_round_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -187,18 +183,20 @@ fn benchmark_integer_shr_round_assign_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Integer.shr_round_assign({}, RoundingMode)", T::NAME),
         BenchmarkType::Single,
-        integer_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        integer_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_integer_bit_bucketer("n"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.shr_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.shr_round_assign(y, rm))
+        })],
     );
 }
 
 fn benchmark_integer_shr_round_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -208,7 +206,7 @@ fn benchmark_integer_shr_round_evaluation_strategy_unsigned<T: PrimitiveUnsigned
     run_benchmark(
         &format!("Integer.shr_round({}, RoundingMode)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        integer_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -228,7 +226,7 @@ fn benchmark_integer_shr_round_evaluation_strategy_unsigned<T: PrimitiveUnsigned
 
 fn benchmark_integer_shr_round_evaluation_strategy_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -238,7 +236,7 @@ fn benchmark_integer_shr_round_evaluation_strategy_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Integer.shr_round({}, RoundingMode)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        integer_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        integer_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

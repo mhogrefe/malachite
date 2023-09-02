@@ -13,34 +13,34 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_to_debug_string);
 }
 
-fn demo_rational_sequence_to_string(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
-        println!("{}", xs);
+        println!("{xs}");
     }
 }
 
-fn demo_rational_sequence_to_debug_string(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_to_debug_string(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
-        println!("{:?}", xs);
+        println!("{xs:?}");
     }
 }
 
 fn benchmark_rational_sequence_to_string(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.to_string()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -51,14 +51,14 @@ fn benchmark_rational_sequence_to_string(
 
 fn benchmark_rational_sequence_to_debug_string(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.to_debug_string()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

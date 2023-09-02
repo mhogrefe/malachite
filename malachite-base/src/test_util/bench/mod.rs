@@ -5,17 +5,15 @@ use gnuplot::{AxesCommon, Caption, Color, Figure};
 use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap};
 use std::iter::Iterator;
-use time::precise_time_ns;
+use std::time::Instant;
 
 fn escape_label_string(s: &str) -> String {
     let mut escaped = String::new();
     for c in s.chars() {
         if c == '_' {
-            escaped.push_str("\\\\_");
+            escaped.push_str("\\_");
         } else if c == '&' {
-            // Ugly, but don't know what else to do. "&" and "\&" never worked, and "\\&" no longer
-            // works.
-            escaped.push_str("<amp>");
+            escaped.push_str("\\&");
         } else {
             escaped.push(c);
         }
@@ -43,7 +41,7 @@ where
     pub series_options: Vec<BenchmarkSeriesOptions<'a, I::Item>>,
 }
 
-fn quick_median(mut xs: Vec<u64>) -> u64 {
+fn quick_median(xs: &mut [u64]) -> u64 {
     assert!(!xs.is_empty());
     xs.sort_unstable();
     let half_index = xs.len() >> 1;
@@ -77,12 +75,11 @@ where
             let mut durations_vec = Vec::new();
             for _ in 0..reps {
                 let x = x.clone();
-                let start_time = precise_time_ns();
+                let now = Instant::now();
                 (series.function)(x);
-                let end_time = precise_time_ns();
-                durations_vec.push(end_time - start_time);
+                durations_vec.push(u64::exact_from(now.elapsed().as_nanos()));
             }
-            let median_duration = quick_median(durations_vec);
+            let median_duration = quick_median(&mut durations_vec);
             durations_maps[i]
                 .entry(size)
                 .or_insert_with(Vec::new)
@@ -151,9 +148,8 @@ pub fn run_benchmark<'a, I: Iterator>(
 {
     if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
         panic!(
-            "Bad benchmark: {}. \
+            "Bad benchmark: {title}. \
              Benchmarks should have type Single iff they have only one series.",
-            title
         );
     }
     if limit == 0 {
@@ -161,12 +157,12 @@ pub fn run_benchmark<'a, I: Iterator>(
     }
     let title = match benchmark_type {
         BenchmarkType::Single => title.to_string(),
-        BenchmarkType::LibraryComparison => format!("{} library comparison", title),
-        BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
-        BenchmarkType::Algorithms => format!("{} algorithms", title),
+        BenchmarkType::LibraryComparison => format!("{title} library comparison"),
+        BenchmarkType::EvaluationStrategy => format!("{title} evaluation strategy"),
+        BenchmarkType::Algorithms => format!("{title} algorithms"),
     };
-    println!("benchmarking {} {}", generation_mode_name, title);
-    let colors = vec!["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
+    println!("benchmarking {generation_mode_name} {title}");
+    let colors = ["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
     }
@@ -207,9 +203,8 @@ pub fn run_benchmark_old<'a, I: Iterator>(
 {
     if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
         panic!(
-            "Bad benchmark: {}. \
+            "Bad benchmark: {title}. \
              Benchmarks should have type Single iff they have only one series.",
-            title
         );
     }
     if limit == 0 {
@@ -217,12 +212,12 @@ pub fn run_benchmark_old<'a, I: Iterator>(
     }
     let title = match benchmark_type {
         BenchmarkType::Single => title.to_string(),
-        BenchmarkType::LibraryComparison => format!("{} library comparison", title),
-        BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
-        BenchmarkType::Algorithms => format!("{} algorithms", title),
+        BenchmarkType::LibraryComparison => format!("{title} library comparison"),
+        BenchmarkType::EvaluationStrategy => format!("{title} evaluation strategy"),
+        BenchmarkType::Algorithms => format!("{title} algorithms"),
     };
-    println!("benchmarking {} {}", generation_mode_name, title);
-    let colors = vec!["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
+    println!("benchmarking {generation_mode_name} {title}");
+    let colors = ["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
     }
@@ -241,7 +236,7 @@ pub fn run_benchmark_old<'a, I: Iterator>(
         bucketing_function,
         x_axis_label: bucketing_label,
         y_axis_label: "time (ns)",
-        file_name: format!("benchmarks/{}", file_name),
+        file_name: format!("benchmarks/{file_name}"),
         series_options,
     };
     run_benchmark_internal(options);

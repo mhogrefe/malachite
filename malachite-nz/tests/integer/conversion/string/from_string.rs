@@ -48,7 +48,7 @@ fn from_str_properties() {
         let trimmed = s.strip_prefix('-').unwrap_or(&s);
         assert_eq!(
             Integer::from_str(&s).is_ok(),
-            !trimmed.is_empty() && trimmed.chars().all(|c| ('0'..='9').contains(&c)),
+            !trimmed.is_empty() && trimmed.chars().all(|c| c.is_ascii_digit()),
         );
     });
 

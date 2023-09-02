@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
@@ -108,8 +109,7 @@ fn to_limbs_desc_properties() {
 #[test]
 fn limbs_properties() {
     natural_gen().test_properties(|n| {
-        let limb_count = usize::exact_from(n.limb_count());
-        assert_eq!(n.limbs().size_hint(), (limb_count, Some(limb_count)));
+        test_double_ended_iterator_size_hint(n.limbs(), usize::exact_from(n.limb_count()));
     });
 
     natural_bool_vec_pair_gen_var_1().test_properties(|(n, bs)| {

@@ -56,7 +56,7 @@ fn ceiling_properties() {
         assert!(ceiling_alt.is_valid());
         assert_eq!(ceiling_alt, ceiling);
 
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Ceiling), ceiling);
+        assert_eq!(Integer::rounding_from(&x, RoundingMode::Ceiling).0, ceiling);
         assert!(ceiling >= x);
         assert!(&ceiling - Integer::ONE < x);
         assert_eq!(ceiling, Rational::from(&ceiling).ceiling());

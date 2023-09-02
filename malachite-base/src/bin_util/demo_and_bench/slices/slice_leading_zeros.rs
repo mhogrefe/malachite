@@ -10,8 +10,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_slice_leading_zeros);
 }
 
-fn demo_slice_leading_zeros(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_slice_leading_zeros(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen::<u8>().get(gm, config).take(limit) {
         println!(
             "slice_leading_zeros({:?}) = {}",
             xs,
@@ -20,11 +20,11 @@ fn demo_slice_leading_zeros(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_slice_leading_zeros(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_slice_leading_zeros(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "slice_leading_zeros(&[T])",
         BenchmarkType::Single,
-        unsigned_vec_gen::<u8>().get(gm, &config),
+        unsigned_vec_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

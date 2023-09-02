@@ -20,11 +20,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_power_of_2_digits<T: PowerOf2DigitIterable<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base) in unsigned_pair_gen_var_4::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -41,11 +41,11 @@ fn demo_power_of_2_digits_rev<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base) in unsigned_pair_gen_var_4::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -64,11 +64,11 @@ fn demo_power_of_2_digits_size_hint<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base) in unsigned_pair_gen_var_4::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -85,11 +85,11 @@ fn demo_power_of_2_digits_get<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base, i) in unsigned_triple_gen_var_3::<T, U, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -107,7 +107,7 @@ fn benchmark_power_of_2_digits_size_hint<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -118,7 +118,7 @@ fn benchmark_power_of_2_digits_size_hint<
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_4::<T, U>().get(gm, &config),
+        unsigned_pair_gen_var_4::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -134,7 +134,7 @@ fn benchmark_power_of_2_digits_get_algorithms<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -145,7 +145,7 @@ fn benchmark_power_of_2_digits_get_algorithms<
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_3::<T, U, u64>().get(gm, &config),
+        unsigned_triple_gen_var_3::<T, U, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

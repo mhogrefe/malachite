@@ -29,74 +29,74 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_pow_i64_assign);
 }
 
-fn demo_rational_pow_u64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_u64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in rational_unsigned_pair_gen_var_1::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("({}).pow({}) = {}", n.clone(), exp, n.pow(exp));
     }
 }
 
-fn demo_rational_pow_u64_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_u64_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in rational_unsigned_pair_gen_var_1::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).pow({}) = {}", n, exp, (&n).pow(exp));
     }
 }
 
-fn demo_rational_pow_assign_u64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_assign_u64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, exp) in rational_unsigned_pair_gen_var_1::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.pow_assign(exp);
-        println!("n := {}; n.pow_assign({}); n = {}", n_old, exp, n);
+        println!("n := {n_old}; n.pow_assign({exp}); n = {n}");
     }
 }
 
-fn demo_rational_pow_i64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_i64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in rational_signed_pair_gen_var_2::<i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("({}).pow({}) = {}", n.clone(), exp, n.pow(exp));
     }
 }
 
-fn demo_rational_pow_i64_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_i64_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in rational_signed_pair_gen_var_2::<i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).pow({}) = {}", n, exp, (&n).pow(exp));
     }
 }
 
-fn demo_rational_pow_assign_i64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_pow_assign_i64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, exp) in rational_signed_pair_gen_var_2::<i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.pow_assign(exp);
-        println!("n := {}; n.pow_assign({}); n = {}", n_old, exp, n);
+        println!("n := {n_old}; n.pow_assign({exp}); n = {n}");
     }
 }
 
 fn benchmark_rational_pow_u64_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.pow_assign(u64)",
         BenchmarkType::LibraryComparison,
-        rational_unsigned_pair_gen_var_1_nrm().get(gm, &config),
+        rational_unsigned_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -115,14 +115,14 @@ fn benchmark_rational_pow_u64_library_comparison(
 
 fn benchmark_rational_pow_u64_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.pow(u64)",
         BenchmarkType::EvaluationStrategy,
-        rational_unsigned_pair_gen_var_1::<u64>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -138,14 +138,14 @@ fn benchmark_rational_pow_u64_evaluation_strategy(
 
 fn benchmark_rational_pow_u64_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.pow_assign(u64)",
         BenchmarkType::Single,
-        rational_unsigned_pair_gen_var_1::<u64>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -156,14 +156,14 @@ fn benchmark_rational_pow_u64_assign(
 
 fn benchmark_rational_pow_i64_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.pow_assign(i64)",
         BenchmarkType::LibraryComparison,
-        rational_signed_pair_gen_var_2_nrm().get(gm, &config),
+        rational_signed_pair_gen_var_2_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -182,14 +182,14 @@ fn benchmark_rational_pow_i64_library_comparison(
 
 fn benchmark_rational_pow_i64_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.pow(i64)",
         BenchmarkType::EvaluationStrategy,
-        rational_signed_pair_gen_var_2::<i64>().get(gm, &config),
+        rational_signed_pair_gen_var_2::<i64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -205,14 +205,14 @@ fn benchmark_rational_pow_i64_evaluation_strategy(
 
 fn benchmark_rational_pow_i64_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.pow_assign(i64)",
         BenchmarkType::Single,
-        rational_signed_pair_gen_var_2::<i64>().get(gm, &config),
+        rational_signed_pair_gen_var_2::<i64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

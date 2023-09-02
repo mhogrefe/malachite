@@ -145,7 +145,7 @@ pub fn random_ascii_chars(seed: Seed) -> RandomCharRange {
 #[inline]
 pub fn random_char_range(seed: Seed, a: char, mut b: char) -> RandomCharRange {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     decrement_char(&mut b);
     random_char_inclusive_range(seed, a, b)
@@ -189,7 +189,7 @@ pub fn random_char_range(seed: Seed, a: char, mut b: char) -> RandomCharRange {
 #[inline]
 pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     RandomCharRange {
         chunks: random_unsigned_inclusive_range(
@@ -374,7 +374,7 @@ pub fn graphic_weighted_random_char_range(
     p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     decrement_char(&mut b);
     graphic_weighted_random_char_inclusive_range(seed, a, b, p_numerator, p_denominator)
@@ -438,15 +438,15 @@ pub fn graphic_weighted_random_char_inclusive_range(
     p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     let (graphic_chars, non_graphic_chars): (Vec<_>, Vec<_>) =
         (a..=b).partition(|&c| char_is_graphic(c));
     if graphic_chars.is_empty() {
-        panic!("The range {:?}..={:?} contains no graphic chars", a, b);
+        panic!("The range {a:?}..={b:?} contains no graphic chars");
     }
     if non_graphic_chars.is_empty() {
-        panic!("The range {:?}..={:?} only contains graphic chars", a, b);
+        panic!("The range {a:?}..={b:?} only contains graphic chars");
     }
     WeightedGraphicRandomCharRange {
         xs: weighted_random_bools(seed.fork("xs"), p_numerator, p_denominator),

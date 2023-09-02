@@ -4,18 +4,19 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 use std::ops::{Shl, ShlAssign};
 
 fn shl_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,
     bits: S,
     rm: RoundingMode,
-) -> Integer
+) -> (Integer, Ordering)
 where
     &'a Integer: Shl<U, Output = Integer> + ShrRound<U, Output = Integer>,
 {
     if bits >= S::ZERO {
-        x << bits.unsigned_abs()
+        (x << bits.unsigned_abs(), Ordering::Equal)
     } else {
         x.shr_round(bits.unsigned_abs(), rm)
     }
@@ -25,13 +26,15 @@ fn shl_round_assign_i<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Integer,
     bits: S,
     rm: RoundingMode,
-) where
+) -> Ordering
+where
     Integer: ShlAssign<U> + ShrRoundAssign<U>,
 {
     if bits >= S::ZERO {
         *x <<= bits.unsigned_abs();
+        Ordering::Equal
     } else {
-        x.shr_round_assign(bits.unsigned_abs(), rm);
+        x.shr_round_assign(bits.unsigned_abs(), rm)
     }
 }
 
@@ -41,21 +44,25 @@ macro_rules! impl_shl_round_signed {
             type Output = Integer;
 
             /// Left-shifts an [`Integer`] (multiplies or divides it by a power of 2), taking it by
-            /// value, and rounds according to the specified rounding mode.
+            /// value, and rounds according to the specified rounding mode. An [`Ordering`] is also
+            /// returned, indicating whether the returned value is less than, equal to, or greater
+            /// than the exact value. If `bits` is non-negative, then the returned [`Ordering`] is
+            /// always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use
             /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
             /// if `bits` is negative.
             ///
-            /// Let $q = x2^k$:
+            /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
+            /// the pair, without the [`Ordering`]:
             ///
-            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            /// $g(x, k, \mathrm{Down}) = g(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
-            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            /// $g(x, k, \mathrm{Up}) = g(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
             ///
             /// $$
-            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            /// g(x, k, \mathrm{Nearest}) = \begin{cases}
             ///     \lfloor q \rfloor & \text{if}
             ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
             ///     \lceil q \rceil & \text{if}
@@ -69,7 +76,11 @@ macro_rules! impl_shl_round_signed {
             /// \end{cases}
             /// $$
             ///
-            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            /// $g(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$
@@ -86,9 +97,9 @@ macro_rules! impl_shl_round_signed {
             /// # Examples
             /// See [here](super::shl_round#shl_round).
             #[inline]
-            fn shl_round(mut self, bits: $t, rm: RoundingMode) -> Integer {
-                self.shl_round_assign(bits, rm);
-                self
+            fn shl_round(mut self, bits: $t, rm: RoundingMode) -> (Integer, Ordering) {
+                let o = self.shl_round_assign(bits, rm);
+                (self, o)
             }
         }
 
@@ -96,21 +107,25 @@ macro_rules! impl_shl_round_signed {
             type Output = Integer;
 
             /// Left-shifts an [`Integer`] (multiplies or divides it by a power of 2), taking it by
-            /// reference, and rounds according to the specified rounding mode.
+            /// reference, and rounds according to the specified rounding mode. An [`Ordering`] is
+            /// also returned, indicating whether the returned value is less than, equal to, or
+            /// greater than the exact value. If `bits` is non-negative, then the returned
+            /// [`Ordering`] is always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use
             /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
             /// if `bits` is negative.
             ///
-            /// Let $q = x2^k$:
+            /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
+            /// the pair, without the [`Ordering`]:
             ///
-            /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            /// $g(x, k, \mathrm{Down}) = g(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
-            /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            /// $g(x, k, \mathrm{Up}) = g(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
             ///
             /// $$
-            /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+            /// g(x, k, \mathrm{Nearest}) = \begin{cases}
             ///     \lfloor q \rfloor & \text{if}
             ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
             ///     \lceil q \rceil & \text{if}
@@ -124,7 +139,11 @@ macro_rules! impl_shl_round_signed {
             /// \end{cases}
             /// $$
             ///
-            /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            /// $g(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$
@@ -141,14 +160,16 @@ macro_rules! impl_shl_round_signed {
             /// # Examples
             /// See [here](super::shl_round#shl_round).
             #[inline]
-            fn shl_round(self, bits: $t, rm: RoundingMode) -> Integer {
+            fn shl_round(self, bits: $t, rm: RoundingMode) -> (Integer, Ordering) {
                 shl_round_signed_ref(self, bits, rm)
             }
         }
 
         impl ShlRoundAssign<$t> for Integer {
             /// Left-shifts an [`Integer`] (multiplies or divides it by a power of 2) and rounds
-            /// according to the specified rounding mode, in place.
+            /// according to the specified rounding mode, in place. An [`Ordering`] is returned,
+            /// indicating whether the assigned value is less than, equal to, or greater than the
+            /// exact value.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use
@@ -169,8 +190,8 @@ macro_rules! impl_shl_round_signed {
             /// # Examples
             /// See [here](super::shl_round#shl_round_assign).
             #[inline]
-            fn shl_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                shl_round_assign_i(self, bits, rm);
+            fn shl_round_assign(&mut self, bits: $t, rm: RoundingMode) -> Ordering {
+                shl_round_assign_i(self, bits, rm)
             }
         }
     };

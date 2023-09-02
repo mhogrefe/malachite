@@ -40,21 +40,18 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_jacobi_symbol_same_length(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_32().get(gm, &config).take(limit) {
+fn demo_limbs_jacobi_symbol_same_length(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_32().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let ys_old = ys.clone();
         let bits = limbs_jacobi_symbol_init(xs[0], ys[0], 0);
         let s = limbs_jacobi_symbol_same_length(&mut xs, &mut ys, bits);
-        println!(
-            "limbs_jacobi_symbol_same_length({:?}, {:?}) = {}",
-            xs_old, ys_old, s
-        );
+        println!("limbs_jacobi_symbol_same_length({xs_old:?}, {ys_old:?}) = {s}");
     }
 }
 
-fn demo_natural_jacobi_symbol(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_12().get(gm, &config).take(limit) {
+fn demo_natural_jacobi_symbol(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_12().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         println!(
@@ -66,28 +63,28 @@ fn demo_natural_jacobi_symbol(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_jacobi_symbol_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_12().get(gm, &config).take(limit) {
+fn demo_natural_jacobi_symbol_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_12().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!("{}.jacobi_symbol({}) = {}", n_old, m, n.jacobi_symbol(&m));
     }
 }
 
-fn demo_natural_jacobi_symbol_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_12().get(gm, &config).take(limit) {
+fn demo_natural_jacobi_symbol_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_12().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!("{}.jacobi_symbol({}) = {}", n, m_old, (&n).jacobi_symbol(m));
     }
 }
 
-fn demo_natural_jacobi_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_12().get(gm, &config).take(limit) {
+fn demo_natural_jacobi_symbol_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_12().get(gm, config).take(limit) {
         println!("{}.jacobi_symbol({}) = {}", n, m, (&n).jacobi_symbol(&m));
     }
 }
 
-fn demo_natural_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_kronecker_symbol(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         println!(
@@ -99,8 +96,8 @@ fn demo_natural_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_kronecker_symbol_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_kronecker_symbol_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!(
             "{}.kronecker_symbol({}) = {}",
@@ -111,8 +108,8 @@ fn demo_natural_kronecker_symbol_val_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_natural_kronecker_symbol_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_kronecker_symbol_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!(
             "{}.kronecker_symbol({}) = {}",
@@ -123,8 +120,8 @@ fn demo_natural_kronecker_symbol_ref_val(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_natural_kronecker_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_kronecker_symbol_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen().get(gm, config).take(limit) {
         println!(
             "{}.kronecker_symbol({}) = {}",
             n,
@@ -136,14 +133,14 @@ fn demo_natural_kronecker_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: 
 
 fn benchmark_limbs_jacobi_symbol_same_length(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_jacobi_symbol_same_length(&mut [Limb], &mut [Limb], u8)",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_32().get(gm, &config),
+        unsigned_vec_pair_gen_var_32().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -157,14 +154,14 @@ fn benchmark_limbs_jacobi_symbol_same_length(
 
 fn benchmark_natural_jacobi_symbol_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.jacobi_symbol(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_12_rm().get(gm, &config),
+        natural_pair_gen_var_12_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -178,14 +175,14 @@ fn benchmark_natural_jacobi_symbol_library_comparison(
 
 fn benchmark_natural_jacobi_symbol_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.jacobi_symbol(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_12().get(gm, &config),
+        natural_pair_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -209,14 +206,14 @@ fn benchmark_natural_jacobi_symbol_evaluation_strategy(
 
 fn benchmark_natural_jacobi_symbol_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.jacobi_symbol(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_12().get(gm, &config),
+        natural_pair_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -230,14 +227,14 @@ fn benchmark_natural_jacobi_symbol_algorithms(
 
 fn benchmark_natural_kronecker_symbol_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.kronecker_symbol(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_rm().get(gm, &config),
+        natural_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -253,14 +250,14 @@ fn benchmark_natural_kronecker_symbol_library_comparison(
 
 fn benchmark_natural_kronecker_symbol_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.kronecker_symbol(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

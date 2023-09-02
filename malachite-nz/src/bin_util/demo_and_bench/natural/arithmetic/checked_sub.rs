@@ -18,23 +18,23 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_checked_sub_evaluation_strategy);
 }
 
-fn demo_natural_checked_sub(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.checked_sub({}) = {:?}", x_old, y_old, x.checked_sub(y));
     }
 }
 
-fn demo_natural_checked_sub_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.checked_sub(&{}) = {:?}", x_old, y, x.checked_sub(&y));
     }
 }
 
-fn demo_natural_checked_sub_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).checked_sub({}) = {:?}",
@@ -45,22 +45,22 @@ fn demo_natural_checked_sub_ref_val(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_natural_checked_sub_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         println!("(&{}).checked_sub(&{}) = {:?}", x, y, (&x).checked_sub(&y));
     }
 }
 
 fn benchmark_natural_checked_sub_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_nrm().get(gm, &config),
+        natural_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -75,14 +75,14 @@ fn benchmark_natural_checked_sub_library_comparison(
 
 fn benchmark_natural_checked_sub_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

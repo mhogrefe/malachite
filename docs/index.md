@@ -100,6 +100,7 @@ The `malachite` crate re-exports three sub-crates.
   - Various functions for logic and bit manipulation, like
     [`BitAnd`](https://doc.rust-lang.org/nightly/core/ops/trait.BitAnd.html) and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
+
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `naturals_and_integers` or `malachite-nz` feature.
 - **malachite-q** ([crates.io](https://crates.io/crates/malachite-q),
@@ -114,8 +115,12 @@ The `malachite` crate re-exports three sub-crates.
   - Functions for expressing
     [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s in
     scientific notation.
+
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `rationals` or `malachite-q` feature.
+
+- **malachite-float** Arbitrary-precision floating-point numbers. These are in development, and
+  most features are missing.
 
 Malachite is under active development, with many more types and features planned for the future.
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that

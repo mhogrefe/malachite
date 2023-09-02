@@ -30,7 +30,7 @@ impl Natural {
         }
         let digit_len = self
             .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling);
+            .div_round(log_base, RoundingMode::Ceiling).0;
         let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
         let mut previous_index = 0;
         for _ in 0..digit_len {
@@ -684,7 +684,7 @@ impl Natural {
         assert_ne!(log_base, 0);
         let digit_len = self
             .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling);
+            .div_round(log_base, RoundingMode::Ceiling).0;
         let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
         let mut previous_index = 0;
         for _ in 0..digit_len {

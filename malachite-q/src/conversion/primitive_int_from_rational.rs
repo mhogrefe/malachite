@@ -9,6 +9,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use std::cmp::Ordering;
 use std::ops::Neg;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -28,28 +29,31 @@ fn convertible_from_unsigned<T: for<'a> ConvertibleFrom<&'a Natural>>(x: &Ration
     x.sign && x.denominator == 1u32 && T::convertible_from(&x.numerator)
 }
 
+#[allow(clippy::let_and_return)] // n doesn't live long enough for a direct return
 fn rounding_from_unsigned<'a, T: for<'b> TryFrom<&'b Natural> + Max + Named + Zero>(
     x: &'a Rational,
     rm: RoundingMode,
-) -> T {
+) -> (T, Ordering) {
     if x.sign {
-        if let Ok(q) = T::try_from(&(&x.numerator).div_round(&x.denominator, rm)) {
-            q
+        let (n, o) = (&x.numerator).div_round(&x.denominator, rm);
+        let out = if let Ok(q) = T::try_from(&n) {
+            (q, o)
         } else if rm == RoundingMode::Down
             || rm == RoundingMode::Floor
             || rm == RoundingMode::Nearest
         {
-            T::MAX
+            (T::MAX, Ordering::Less)
         } else {
             panic!(
                 "Rational is too large to round to {} using RoundingMode {}",
                 rm,
                 T::NAME
             );
-        }
+        };
+        out
     } else if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest
     {
-        T::ZERO
+        (T::ZERO, Ordering::Greater)
     } else {
         panic!(
             "Cannot round negative Rational to {} using RoundingMode {}",
@@ -127,14 +131,14 @@ fn convertible_from_signed<T: PrimitiveInt>(x: &Rational) -> bool {
 fn rounding_from_signed<'a, T: Max + Min + Named + for<'b> WrappingFrom<&'b Integer>>(
     x: &'a Rational,
     rm: RoundingMode,
-) -> T
+) -> (T, Ordering)
 where
     Integer: PartialOrd<T>,
 {
-    let i = Integer::rounding_from(x, rm);
+    let (i, o) = Integer::rounding_from(x, rm);
     if i > T::MAX {
         if rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest {
-            T::MAX
+            (T::MAX, Ordering::Less)
         } else {
             panic!(
                 "Rational is too large to round to {} using RoundingMode {}",
@@ -144,7 +148,7 @@ where
         }
     } else if i < T::MIN {
         if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest {
-            T::MIN
+            (T::MIN, Ordering::Greater)
         } else {
             panic!(
                 "Rational is too small to round to {} using RoundingMode {}",
@@ -153,7 +157,7 @@ where
             );
         }
     } else {
-        T::wrapping_from(&i)
+        (T::wrapping_from(&i), o)
     }
 }
 
@@ -218,7 +222,7 @@ macro_rules! impl_from_unsigned {
             /// # Examples
             /// See [here](super::primitive_int_from_rational#rounding_from).
             #[inline]
-            fn rounding_from(value: &Rational, rm: RoundingMode) -> $u {
+            fn rounding_from(value: &Rational, rm: RoundingMode) -> ($u, Ordering) {
                 rounding_from_unsigned(value, rm)
             }
         }
@@ -288,7 +292,7 @@ macro_rules! impl_from_signed {
             /// # Examples
             /// See [here](super::primitive_int_from_rational#rounding_from).
             #[inline]
-            fn rounding_from(value: &Rational, rm: RoundingMode) -> $s {
+            fn rounding_from(value: &Rational, rm: RoundingMode) -> ($s, Ordering) {
                 rounding_from_signed(value, rm)
             }
         }

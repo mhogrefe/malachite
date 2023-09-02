@@ -34,8 +34,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_subfactorial);
 }
 
-fn demo_limbs_odd_factorial(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, double) in unsigned_bool_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_odd_factorial(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, double) in unsigned_bool_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_odd_factorial({:?}, {}) = {:?}",
             n,
@@ -45,22 +45,22 @@ fn demo_limbs_odd_factorial(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_factorial(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_factorial(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("{}! = {}", n, Natural::factorial(n));
     }
 }
 
-fn demo_double_factorial(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_double_factorial(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("{}!! = {}", n, Natural::double_factorial(n));
     }
 }
 
-fn demo_multifactorial(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in unsigned_pair_gen_var_18().get(gm, &config).take(limit) {
+fn demo_multifactorial(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in unsigned_pair_gen_var_18().get(gm, config).take(limit) {
         if m <= 5 {
-            print!("{}", n);
+            print!("{n}");
             for _ in 0..m {
                 print!("!");
             }
@@ -71,17 +71,17 @@ fn demo_multifactorial(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_subfactorial(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_subfactorial(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("!{} = {}", n, Natural::subfactorial(n));
     }
 }
 
-fn benchmark_limbs_odd_factorial(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_odd_factorial(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_odd_factorial(u64, bool)",
         BenchmarkType::Single,
-        unsigned_bool_pair_gen_var_1().get(gm, &config),
+        unsigned_bool_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -92,11 +92,11 @@ fn benchmark_limbs_odd_factorial(gm: GenMode, config: GenConfig, limit: usize, f
     );
 }
 
-fn benchmark_factorial_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_factorial_algorithms(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.factorial(u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,14 +110,14 @@ fn benchmark_factorial_algorithms(gm: GenMode, config: GenConfig, limit: usize, 
 
 fn benchmark_factorial_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.factorial(u64)",
         BenchmarkType::LibraryComparison,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -133,14 +133,14 @@ fn benchmark_factorial_library_comparison(
 
 fn benchmark_double_factorial_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.double_factorial(u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -154,14 +154,14 @@ fn benchmark_double_factorial_algorithms(
 
 fn benchmark_double_factorial_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.double_factorial(u64)",
         BenchmarkType::LibraryComparison,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -177,14 +177,14 @@ fn benchmark_double_factorial_library_comparison(
 
 fn benchmark_multifactorial_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.multifactorial(u64, u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_18().get(gm, &config),
+        unsigned_pair_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -200,14 +200,14 @@ fn benchmark_multifactorial_algorithms(
 
 fn benchmark_multifactorial_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.multifactorial(u64, u64)",
         BenchmarkType::LibraryComparison,
-        unsigned_pair_gen_var_18().get(gm, &config),
+        unsigned_pair_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -225,11 +225,11 @@ fn benchmark_multifactorial_library_comparison(
     );
 }
 
-fn benchmark_subfactorial(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_subfactorial(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.subfactorial(u64)",
         BenchmarkType::Single,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

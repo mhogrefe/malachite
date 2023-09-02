@@ -15,7 +15,7 @@ macro_rules! impl_float {
             /// $M(n) = O(n \log n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.sci_exponent())`.
+            /// `max(self.significant_bits(), other.sci_exponent().abs())`.
             ///
             /// # Examples
             /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
@@ -28,7 +28,7 @@ macro_rules! impl_float {
                     Some(Ordering::Less)
                 } else {
                     let ord_cmp = self
-                        .floor_log_base_2_of_abs()
+                        .floor_log_base_2_abs()
                         .cmp(&other.abs().floor_log_base_2());
                     Some(if ord_cmp != Ordering::Equal {
                         ord_cmp
@@ -48,7 +48,7 @@ macro_rules! impl_float {
             /// $M(n) = O(n \log n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.sci_exponent(), other.significant_bits())`.
+            /// `max(self.sci_exponent().abs(), other.significant_bits())`.
             ///
             /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             #[inline]

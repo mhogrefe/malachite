@@ -14,12 +14,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_signed_match_benches!(runner, benchmark_mod_power_of_2_inverse_algorithms);
 }
 
-fn demo_mod_power_of_2_inverse<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in unsigned_pair_gen_var_39::<T>().get(gm, &config).take(limit) {
+fn demo_mod_power_of_2_inverse<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, pow) in unsigned_pair_gen_var_39::<T>().get(gm, config).take(limit) {
         if let Some(inverse) = n.mod_power_of_2_inverse(pow) {
-            println!("{}⁻¹ ≡ {} mod 2^{}", n, inverse, pow);
+            println!("{n}⁻¹ ≡ {inverse} mod 2^{pow}");
         } else {
-            println!("{} is not invertible mod 2^{}", n, pow);
+            println!("{n} is not invertible mod 2^{pow}");
         }
     }
 }
@@ -29,14 +33,14 @@ fn benchmark_mod_power_of_2_inverse_algorithms<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_inverse(u64)", U::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_39::<U>().get(gm, &config),
+        unsigned_pair_gen_var_39::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

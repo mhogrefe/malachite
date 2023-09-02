@@ -23,44 +23,38 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_round_to_multiple_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        x.round_to_multiple_assign(y, rm);
-        println!(
-            "x := {}; x.round_to_multiple_assign({}, {}); x = {}",
-            x_old, y_old, rm, x
-        );
+        let o = x.round_to_multiple_assign(y, rm);
+        println!("x := {x_old}; x.round_to_multiple_assign({y_old}, {rm}) = {o:?}; x = {x}");
     }
 }
 
-fn demo_integer_round_to_multiple_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
-        x.round_to_multiple_assign(&y, rm);
-        println!(
-            "x := {}; x.round_to_multiple_assign(&{}, {}); x = {}",
-            x_old, y, rm, x
-        );
+        let o = x.round_to_multiple_assign(&y, rm);
+        println!("x := {x_old}; x.round_to_multiple_assign(&{y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
-fn demo_integer_round_to_multiple(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
-            "({}).round_to_multiple({}, {}) = {}",
+            "({}).round_to_multiple({}, {}) = {:?}",
             x_old,
             y_old,
             rm,
@@ -69,14 +63,14 @@ fn demo_integer_round_to_multiple(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_integer_round_to_multiple_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         println!(
-            "({}).round_to_multiple(&{}, {}) = {}",
+            "({}).round_to_multiple(&{}, {}) = {:?}",
             x_old,
             y,
             rm,
@@ -85,14 +79,14 @@ fn demo_integer_round_to_multiple_val_ref(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_round_to_multiple_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
         println!(
-            "(&{}).round_to_multiple({}, {}) = {}",
+            "(&{}).round_to_multiple({}, {}) = {:?}",
             x,
             y_old,
             rm,
@@ -101,13 +95,13 @@ fn demo_integer_round_to_multiple_ref_val(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_round_to_multiple_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_round_to_multiple_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).round_to_multiple(&{}, {}) = {}",
+            "(&{}).round_to_multiple(&{}, {}) = {:?}",
             x,
             y,
             rm,
@@ -118,14 +112,14 @@ fn demo_integer_round_to_multiple_ref_ref(gm: GenMode, config: GenConfig, limit:
 
 fn benchmark_integer_round_to_multiple_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.round_to_multiple_assign(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        integer_integer_rounding_mode_triple_gen_var_2().get(gm, &config),
+        integer_integer_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -133,11 +127,11 @@ fn benchmark_integer_round_to_multiple_assign_evaluation_strategy(
         &mut [
             (
                 "Integer.round_to_multiple_assign(Integer, RoundingMode)",
-                &mut |(mut x, y, rm)| x.round_to_multiple_assign(y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.round_to_multiple_assign(y, rm)),
             ),
             (
                 "Integer.round_to_multiple_assign(&Integer, RoundingMode)",
-                &mut |(mut x, y, rm)| x.round_to_multiple_assign(&y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.round_to_multiple_assign(&y, rm)),
             ),
         ],
     );
@@ -145,14 +139,14 @@ fn benchmark_integer_round_to_multiple_assign_evaluation_strategy(
 
 fn benchmark_integer_round_to_multiple_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.round_to_multiple(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        integer_integer_rounding_mode_triple_gen_var_2().get(gm, &config),
+        integer_integer_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

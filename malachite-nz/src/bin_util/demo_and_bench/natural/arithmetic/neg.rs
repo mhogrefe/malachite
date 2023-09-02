@@ -14,14 +14,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_neg_evaluation_strategy);
 }
 
-fn demo_natural_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("-{} = {}", n.clone(), -n);
     }
 }
 
-fn demo_natural_neg_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_neg_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("-(&{}) = {}", n.clone(), -n);
     }
 }
@@ -29,14 +29,14 @@ fn demo_natural_neg_ref(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
 fn benchmark_natural_neg_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Natural",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -52,14 +52,14 @@ fn benchmark_natural_neg_library_comparison(
 #[allow(unused_must_use, clippy::no_effect)]
 fn benchmark_natural_neg_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

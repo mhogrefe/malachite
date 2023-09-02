@@ -23,11 +23,11 @@ fn demo_from_power_of_2_digits_asc<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, log_base) in unsigned_vec_unsigned_pair_gen_var_6::<U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -45,11 +45,11 @@ fn demo_from_power_of_2_digits_desc<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, log_base) in unsigned_vec_unsigned_pair_gen_var_6::<U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -67,11 +67,11 @@ fn demo_from_power_of_2_digits_asc_targeted<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, log_base) in unsigned_vec_unsigned_pair_gen_var_2::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -89,11 +89,11 @@ fn demo_from_power_of_2_digits_desc_targeted<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, log_base) in unsigned_vec_unsigned_pair_gen_var_3::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -111,7 +111,7 @@ fn benchmark_from_power_of_2_digits_asc<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -122,7 +122,7 @@ fn benchmark_from_power_of_2_digits_asc<
             U::NAME
         ),
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_2::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_2::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -138,7 +138,7 @@ fn benchmark_from_power_of_2_digits_desc<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -149,7 +149,7 @@ fn benchmark_from_power_of_2_digits_desc<
             U::NAME
         ),
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_3::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_3::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

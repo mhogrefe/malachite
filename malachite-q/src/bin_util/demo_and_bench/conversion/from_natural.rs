@@ -11,15 +11,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_from_natural_evaluation_strategy);
 }
 
-fn demo_rational_from_natural(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_rational_from_natural(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         let n_clone = n.clone();
         println!("Rational::from({}) = {}", n_clone, Rational::from(n));
     }
 }
 
-fn demo_rational_from_natural_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_rational_from_natural_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("Rational::from(&{}) = {}", n, Rational::from(&n));
     }
 }
@@ -27,14 +27,14 @@ fn demo_rational_from_natural_ref(gm: GenMode, config: GenConfig, limit: usize) 
 #[allow(unused_must_use)]
 fn benchmark_rational_from_natural_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

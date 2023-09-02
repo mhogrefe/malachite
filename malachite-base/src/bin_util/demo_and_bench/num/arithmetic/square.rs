@@ -29,17 +29,21 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_square_assign_primitive_float);
 }
 
-fn demo_square_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen_var_21::<T>().get(gm, &config).take(limit) {
+fn demo_square_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_21::<T>().get(gm, config).take(limit) {
         println!("{}.square() = {}", u, u.square());
     }
 }
 
-fn demo_square_assign_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut u in unsigned_gen_var_21::<T>().get(gm, &config).take(limit) {
+fn demo_square_assign_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut u in unsigned_gen_var_21::<T>().get(gm, config).take(limit) {
         let old_u = u;
         u.square_assign();
-        println!("u := {}; u.square_assign(); u = {}", old_u, u);
+        println!("u := {old_u}; u.square_assign(); u = {u}");
     }
 }
 
@@ -48,10 +52,10 @@ fn demo_square_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for i in signed_gen_var_10::<U, S>().get(gm, &config).take(limit) {
+    for i in signed_gen_var_10::<U, S>().get(gm, config).take(limit) {
         println!("{}.square() = {}", i, i.square());
     }
 }
@@ -61,28 +65,28 @@ fn demo_square_assign_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut i in signed_gen_var_10::<U, S>().get(gm, &config).take(limit) {
+    for mut i in signed_gen_var_10::<U, S>().get(gm, config).take(limit) {
         let old_i = i;
         i.square_assign();
-        println!("i := {}; i.square_assign(); i = {}", old_i, i);
+        println!("i := {old_i}; i.square_assign(); i = {i}");
     }
 }
 
-fn demo_square_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_square_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!("({}).square() = {}", NiceFloat(f), NiceFloat(f.square()));
     }
 }
 
 fn demo_square_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+    for mut f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         let old_f = f;
         f.square_assign();
         println!(
@@ -95,14 +99,14 @@ fn demo_square_assign_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_21::<T>().get(gm, &config),
+        unsigned_gen_var_21::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -113,14 +117,14 @@ fn benchmark_square_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_square_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_21::<T>().get(gm, &config),
+        unsigned_gen_var_21::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -134,14 +138,14 @@ fn benchmark_square_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square()", S::NAME),
         BenchmarkType::Single,
-        signed_gen_var_10::<U, S>().get(gm, &config),
+        signed_gen_var_10::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -155,14 +159,14 @@ fn benchmark_square_assign_signed<
     U: PrimitiveUnsigned + WrappingFrom<S>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square_assign()", S::NAME),
         BenchmarkType::Single,
-        signed_gen_var_10::<U, S>().get(gm, &config),
+        signed_gen_var_10::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -173,14 +177,14 @@ fn benchmark_square_assign_signed<
 
 fn benchmark_square_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -191,14 +195,14 @@ fn benchmark_square_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_square_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.square_assign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

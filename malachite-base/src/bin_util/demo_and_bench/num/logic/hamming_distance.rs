@@ -15,20 +15,20 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_hamming_distance_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.hamming_distance({}) = {}", x, y, x.hamming_distance(y));
     }
 }
 
 fn demo_checked_hamming_distance_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!(
             "({}).checked_hamming_distance({}) = {:?}",
             x,
@@ -40,14 +40,14 @@ fn demo_checked_hamming_distance_signed<T: PrimitiveSigned>(
 
 fn benchmark_hamming_distance_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.hamming_distance({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -58,14 +58,14 @@ fn benchmark_hamming_distance_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_hamming_distance_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_hamming_distance({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

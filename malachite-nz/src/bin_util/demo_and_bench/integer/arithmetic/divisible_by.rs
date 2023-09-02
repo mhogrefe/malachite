@@ -19,60 +19,60 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_divisible_by_evaluation_strategy);
 }
 
-fn demo_integer_divisible_by(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_divisible_by(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         if x.divisible_by(y) {
-            println!("{} is divisible by {}", x_old, y_old);
+            println!("{x_old} is divisible by {y_old}");
         } else {
-            println!("{} is not divisible by {}", x_old, y_old);
+            println!("{x_old} is not divisible by {y_old}");
         }
     }
 }
 
-fn demo_integer_divisible_by_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_divisible_by_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         if x.divisible_by(&y) {
-            println!("{} is divisible by {}", x_old, y);
+            println!("{x_old} is divisible by {y}");
         } else {
-            println!("{} is not divisible by {}", x_old, y);
+            println!("{x_old} is not divisible by {y}");
         }
     }
 }
 
-fn demo_integer_divisible_by_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_divisible_by_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         if (&x).divisible_by(y) {
-            println!("{} is divisible by {}", x, y_old);
+            println!("{x} is divisible by {y_old}");
         } else {
-            println!("{} is not divisible by {}", x, y_old);
+            println!("{x} is not divisible by {y_old}");
         }
     }
 }
 
-fn demo_integer_divisible_by_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_divisible_by_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         if (&x).divisible_by(&y) {
-            println!("{} is divisible by {}", x, y);
+            println!("{x} is divisible by {y}");
         } else {
-            println!("{} is not divisible by {}", x, y);
+            println!("{x} is not divisible by {y}");
         }
     }
 }
 
 fn benchmark_integer_divisible_by_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_nrm().get(gm, &config),
+        integer_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_integer_divisible_by_library_comparison(
 #[allow(clippy::no_effect, clippy::short_circuit_statement, unused_must_use)]
 fn benchmark_integer_divisible_by_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -116,14 +116,14 @@ fn benchmark_integer_divisible_by_algorithms(
 
 fn benchmark_integer_divisible_by_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

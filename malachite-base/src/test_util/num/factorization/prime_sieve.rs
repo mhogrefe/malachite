@@ -26,7 +26,7 @@ pub fn limbs_prime_sieve_naive_1<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u
     assert!(n > 4);
     let mut f = 5;
     let mut b = false;
-    'outer: for x in bit_array.iter_mut() {
+    'outer: for x in &mut *bit_array {
         *x = T::MAX;
         for i in 0..T::WIDTH {
             if is_prime_simple(f) {
@@ -82,7 +82,7 @@ fn limbs_clear_bit<T: PrimitiveUnsigned>(xs: &mut [T], index: u64) {
 
 pub fn limbs_prime_sieve_naive_2<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u64) -> u64 {
     assert!(n > 4);
-    for x in bit_array.iter_mut() {
+    for x in &mut *bit_array {
         *x = T::MAX;
     }
     let mut p = 0;
@@ -109,7 +109,7 @@ pub fn limbs_prime_sieve_naive_2<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u
             m += two_p;
         }
     }
-    for x in bit_array.iter_mut() {
+    for x in &mut *bit_array {
         x.not_assign();
     }
     let bit_len = u64::exact_from(bit_array.len()) << T::LOG_WIDTH;

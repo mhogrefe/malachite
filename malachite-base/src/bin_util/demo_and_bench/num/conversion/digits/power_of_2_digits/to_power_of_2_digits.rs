@@ -22,11 +22,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_to_power_of_2_digits_asc<T: PowerOf2Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base) in unsigned_pair_gen_var_4::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -43,11 +43,11 @@ fn demo_to_power_of_2_digits_desc<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, log_base) in unsigned_pair_gen_var_4::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -64,7 +64,7 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -75,7 +75,7 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
             T::NAME
         ),
         BenchmarkType::EvaluationStrategy,
-        unsigned_pair_gen_var_4::<T, U>().get(gm, &config),
+        unsigned_pair_gen_var_4::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -99,7 +99,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -110,7 +110,7 @@ fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
             T::NAME
         ),
         BenchmarkType::EvaluationStrategy,
-        unsigned_pair_gen_var_4::<T, U>().get(gm, &config),
+        unsigned_pair_gen_var_4::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

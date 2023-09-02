@@ -171,14 +171,19 @@ impl LcmAssign<Natural> for Natural {
     /// assert_eq!(x, 180);
     /// ```
     #[inline]
-    fn lcm_assign(&mut self, other: Natural) {
+    fn lcm_assign(&mut self, mut other: Natural) {
         if *self == 0 {
             return;
         } else if other == 0 {
             *self = Natural::ZERO;
             return;
         }
-        self.div_exact_assign((&*self).gcd(&other));
+        let gcd = (&*self).gcd(&other);
+        if *self >= other {
+            other.div_exact_assign(gcd);
+        } else {
+            self.div_exact_assign(gcd);
+        }
         *self *= other;
     }
 }

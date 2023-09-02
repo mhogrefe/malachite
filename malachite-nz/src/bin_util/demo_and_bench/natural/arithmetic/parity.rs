@@ -13,31 +13,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_odd);
 }
 
-fn demo_natural_even(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_even(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         if n.even() {
-            println!("{} is even", n);
+            println!("{n} is even");
         } else {
-            println!("{} is not even", n);
+            println!("{n} is not even");
         }
     }
 }
 
-fn demo_natural_odd(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_odd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         if n.odd() {
-            println!("{} is odd", n);
+            println!("{n} is odd");
         } else {
-            println!("{} is not odd", n);
+            println!("{n} is not odd");
         }
     }
 }
 
-fn benchmark_natural_even(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_even(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.even()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -46,11 +46,11 @@ fn benchmark_natural_even(gm: GenMode, config: GenConfig, limit: usize, file_nam
     );
 }
 
-fn benchmark_natural_odd(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_odd(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.odd()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

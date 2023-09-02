@@ -11,20 +11,25 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_iter);
 }
 
-fn demo_rational_sequence_iter(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_iter(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} = {}", xs, prefix_to_string(xs.iter(), 20));
     }
 }
 
-fn benchmark_rational_sequence_iter(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_sequence_iter(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "RationalSequence.iter()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

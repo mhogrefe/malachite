@@ -72,7 +72,7 @@ impl<'a> FloorSqrt for &'a Integer {
         if *self >= 0 {
             Integer::from(self.unsigned_abs_ref().floor_sqrt())
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }
@@ -122,7 +122,7 @@ impl FloorSqrtAssign for Integer {
         if *self >= 0 {
             self.mutate_unsigned_abs(Natural::floor_sqrt_assign);
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }
@@ -195,7 +195,7 @@ impl<'a> CeilingSqrt for &'a Integer {
         if *self >= 0 {
             Integer::from(self.unsigned_abs_ref().ceiling_sqrt())
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }
@@ -245,7 +245,7 @@ impl CeilingSqrtAssign for Integer {
         if *self >= 0 {
             self.mutate_unsigned_abs(Natural::ceiling_sqrt_assign);
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }
@@ -290,7 +290,7 @@ impl CheckedSqrt for Integer {
         if self >= 0 {
             self.unsigned_abs().checked_sqrt().map(Integer::from)
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }
@@ -338,7 +338,7 @@ impl<'a> CheckedSqrt for &'a Integer {
         if *self >= 0 {
             self.unsigned_abs_ref().checked_sqrt().map(Integer::from)
         } else {
-            panic!("Cannot take square root of {}", self)
+            panic!("Cannot take square root of {self}")
         }
     }
 }

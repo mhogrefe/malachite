@@ -1,4 +1,3 @@
-use crate::malachite_base::num::factorization::traits::Primes;
 use crate::natural::arithmetic::factorial::log_n_max;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::Natural;
@@ -11,6 +10,7 @@ use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
 use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
+use malachite_base::num::factorization::traits::Primes;
 
 #[cfg(feature = "32_bit_limbs")]
 const SMALL_PRIMORIAL_LIMIT: u64 = 29;

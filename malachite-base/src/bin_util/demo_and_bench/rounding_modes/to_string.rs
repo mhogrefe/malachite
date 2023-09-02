@@ -6,8 +6,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rounding_mode_to_string);
 }
 
-fn demo_rounding_mode_to_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for rm in rounding_mode_gen().get(gm, &config).take(limit) {
-        println!("{}", rm);
+fn demo_rounding_mode_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for rm in rounding_mode_gen().get(gm, config).take(limit) {
+        println!("{rm}");
     }
 }

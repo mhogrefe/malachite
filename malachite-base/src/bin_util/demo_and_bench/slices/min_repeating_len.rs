@@ -10,17 +10,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_min_repeating_len);
 }
 
-fn demo_min_repeating_len(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_4::<u8>().get(gm, &config).take(limit) {
+fn demo_min_repeating_len(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_4::<u8>().get(gm, config).take(limit) {
         println!("min_repeating_len({:?}) = {}", xs, min_repeating_len(&xs));
     }
 }
 
-fn benchmark_min_repeating_len(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_min_repeating_len(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "min_repeating_len(&[T])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_4::<u8>().get(gm, &config),
+        unsigned_vec_gen_var_4::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

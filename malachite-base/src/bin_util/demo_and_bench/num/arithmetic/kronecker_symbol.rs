@@ -45,11 +45,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_jacobi_symbol_unsigned_double_fast_1<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x1, x0, y1, y0) in unsigned_quadruple_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -65,11 +65,11 @@ fn demo_jacobi_symbol_unsigned_double_fast_1<T: PrimitiveUnsigned>(
 
 fn demo_jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x1, x0, y1, y0) in unsigned_quadruple_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -83,8 +83,12 @@ fn demo_jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_jacobi_symbol_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_40::<T>().get(gm, &config).take(limit) {
+fn demo_jacobi_symbol_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in unsigned_pair_gen_var_40::<T>().get(gm, config).take(limit) {
         println!("{}.jacobi_symbol({}) = {}", x, y, x.jacobi_symbol(y));
     }
 }
@@ -94,26 +98,26 @@ fn demo_jacobi_symbol_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in signed_pair_gen_var_8::<U, S>().get(gm, &config).take(limit) {
+    for (x, y) in signed_pair_gen_var_8::<U, S>().get(gm, config).take(limit) {
         println!("({}).jacobi_symbol({}) = {}", x, y, x.jacobi_symbol(y));
     }
 }
 
 fn demo_kronecker_symbol_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.kronecker_symbol({}) = {}", x, y, x.kronecker_symbol(y));
     }
 }
 
-fn demo_kronecker_symbol_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_kronecker_symbol_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!(
             "({}).kronecker_symbol({}) = {}",
             x,
@@ -125,14 +129,14 @@ fn demo_kronecker_symbol_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConf
 
 fn benchmark_jacobi_symbol_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.jacobi_symbol({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_40::<T>().get(gm, &config),
+        unsigned_pair_gen_var_40::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -166,7 +170,7 @@ fn benchmark_jacobi_symbol_unsigned_double_algorithms<
     D: HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -179,7 +183,7 @@ fn benchmark_jacobi_symbol_unsigned_double_algorithms<
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_quadruple_gen_var_12::<T>().get(gm, &config),
+        unsigned_quadruple_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -203,14 +207,14 @@ fn benchmark_jacobi_symbol_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.jacobi_symbol({})", S::NAME, S::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_8::<U, S>().get(gm, &config),
+        signed_pair_gen_var_8::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -221,14 +225,14 @@ fn benchmark_jacobi_symbol_signed<
 
 fn benchmark_kronecker_symbol_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.kronecker_symbol({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -239,14 +243,14 @@ fn benchmark_kronecker_symbol_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_kronecker_symbol_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.kronecker_symbol({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

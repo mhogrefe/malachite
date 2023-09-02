@@ -1010,7 +1010,7 @@ pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1056,7 +1056,7 @@ pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     let mut root = u64::rounding_from(
         (((n / x.saturating_pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1101,7 +1101,7 @@ pub_test! {fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1150,7 +1150,7 @@ pub_test! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1199,7 +1199,7 @@ pub_test! {fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1248,7 +1248,7 @@ pub_test! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1298,7 +1298,7 @@ pub_test! {fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1344,7 +1344,7 @@ pub_test! {fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
         RoundingMode::Down,
-    );
+    ).0;
     if root >= upper_limit {
         root = upper_limit - 1;
     }
@@ -1377,7 +1377,7 @@ pub fn floor_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
         if bits <= exp {
             T::ONE
         } else {
-            let p = T::power_of_2(bits.div_round(exp, RoundingMode::Ceiling));
+            let p = T::power_of_2(bits.div_round(exp, RoundingMode::Ceiling).0);
             floor_inverse_checked_binary(|i| i.checked_pow(exp), x, p >> 1, p)
         }
     }

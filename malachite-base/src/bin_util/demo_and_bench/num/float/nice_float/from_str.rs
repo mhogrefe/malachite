@@ -14,11 +14,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_nice_float_from_str);
 }
 
-fn demo_nice_float_from_str<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_nice_float_from_str<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     <T as FromStr>::Err: Debug,
 {
-    for s in string_gen().get(gm, &config).take(limit) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!(
             "NiceFloat::from_str({:?}) = {:?}",
             s,
@@ -29,12 +29,12 @@ where
 
 fn demo_nice_float_from_str_targeted<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     <T as FromStr>::Err: Debug,
 {
-    for s in string_gen_var_10().get(gm, &config).take(limit) {
+    for s in string_gen_var_10().get(gm, config).take(limit) {
         println!(
             "NiceFloat::from_str({:?}) = {:?}",
             s,
@@ -46,14 +46,14 @@ fn demo_nice_float_from_str_targeted<T: PrimitiveFloat>(
 #[allow(unused_must_use)]
 fn benchmark_nice_float_from_str<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("NiceFloat::<{}>::from_str(&str)", T::NAME),
         BenchmarkType::Single,
-        string_gen().get(gm, &config),
+        string_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

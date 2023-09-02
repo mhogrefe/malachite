@@ -690,11 +690,11 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, mut exp: Natural, mut m: Natural) -> Natural {
         match (self, &exp, &m) {
-            (_, _, natural_one!()) => Natural::ZERO,
-            (_, natural_zero!(), _) => Natural::ONE,
-            (natural_zero!(), _, _) => Natural::ZERO,
-            (x, natural_one!(), _) => x.clone(),
-            (natural_one!(), _, _) => Natural::ONE,
+            (_, _, &Natural::ONE) => Natural::ZERO,
+            (_, &Natural::ZERO, _) => Natural::ONE,
+            (&Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _) => x.clone(),
+            (&Natural::ONE, _, _) => Natural::ONE,
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -744,11 +744,11 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, mut exp: Natural, m: &'b Natural) -> Natural {
         match (self, &exp, m) {
-            (_, _, natural_one!()) => Natural::ZERO,
-            (_, natural_zero!(), _) => Natural::ONE,
-            (natural_zero!(), _, _) => Natural::ZERO,
-            (x, natural_one!(), _) => x.clone(),
-            (natural_one!(), _, _) => Natural::ONE,
+            (_, _, &Natural::ONE) => Natural::ZERO,
+            (_, &Natural::ZERO, _) => Natural::ONE,
+            (&Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _) => x.clone(),
+            (&Natural::ONE, _, _) => Natural::ONE,
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -798,11 +798,11 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, exp: &'b Natural, mut m: Natural) -> Natural {
         match (self, exp, &m) {
-            (_, _, natural_one!()) => Natural::ZERO,
-            (_, natural_zero!(), _) => Natural::ONE,
-            (natural_zero!(), _, _) => Natural::ZERO,
-            (x, natural_one!(), _) => x.clone(),
-            (natural_one!(), _, _) => Natural::ONE,
+            (_, _, &Natural::ONE) => Natural::ZERO,
+            (_, &Natural::ZERO, _) => Natural::ONE,
+            (&Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _) => x.clone(),
+            (&Natural::ONE, _, _) => Natural::ONE,
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -851,11 +851,11 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, exp: &'b Natural, m: &'c Natural) -> Natural {
         match (self, exp, m) {
-            (_, _, natural_one!()) => Natural::ZERO,
-            (_, natural_zero!(), _) => Natural::ONE,
-            (natural_zero!(), _, _) => Natural::ZERO,
-            (x, natural_one!(), _) => x.clone(),
-            (natural_one!(), _, _) => Natural::ONE,
+            (_, _, &Natural::ONE) => Natural::ZERO,
+            (_, &Natural::ZERO, _) => Natural::ONE,
+            (&Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _) => x.clone(),
+            (&Natural::ONE, _, _) => Natural::ONE,
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -902,9 +902,9 @@ impl ModPowAssign<Natural, Natural> for Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, mut exp: Natural, mut m: Natural) {
         match (&mut *self, &exp, &m) {
-            (_, _, natural_one!()) => *self = Natural::ZERO,
-            (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
+            (_, _, &Natural::ONE) => *self = Natural::ZERO,
+            (_, &Natural::ZERO, _) => *self = Natural::ONE,
+            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -956,9 +956,9 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, mut exp: Natural, m: &'a Natural) {
         match (&mut *self, &exp, m) {
-            (_, _, natural_one!()) => *self = Natural::ZERO,
-            (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
+            (_, _, &Natural::ONE) => *self = Natural::ZERO,
+            (_, &Natural::ZERO, _) => *self = Natural::ONE,
+            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -1010,9 +1010,9 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, exp: &'a Natural, mut m: Natural) {
         match (&mut *self, exp, &m) {
-            (_, _, natural_one!()) => *self = Natural::ZERO,
-            (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
+            (_, _, &Natural::ONE) => *self = Natural::ZERO,
+            (_, &Natural::ZERO, _) => *self = Natural::ONE,
+            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -1059,9 +1059,9 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, exp: &'a Natural, m: &'b Natural) {
         match (&mut *self, exp, m) {
-            (_, _, natural_one!()) => *self = Natural::ZERO,
-            (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
+            (_, _, &Natural::ONE) => *self = Natural::ZERO,
+            (_, &Natural::ZERO, _) => *self = Natural::ONE,
+            (&mut Natural::ZERO, _, _) | (_, &Natural::ONE, _) | (&mut Natural::ONE, _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {

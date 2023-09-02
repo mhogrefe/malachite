@@ -276,7 +276,9 @@ fn exp_predecessor(exp: u64) -> u64 {
 #[cfg(feature = "test_build")]
 fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
     usize::exact_from(
-        (x.significant_bits() * exp).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling),
+        (x.significant_bits() * exp)
+            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+            .0,
     )
 }
 
@@ -374,7 +376,9 @@ fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
 #[cfg(feature = "test_build")]
 fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
     usize::exact_from(
-        (limbs_significant_bits(xs) * exp).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling),
+        (limbs_significant_bits(xs) * exp)
+            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+            .0,
     )
 }
 
@@ -477,8 +481,8 @@ fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
 impl Natural {
     pub fn pow_ref_alt(&self, exp: u64) -> Natural {
         match (self, exp) {
-            (_, 0) | (natural_one!(), _) => Natural::ONE,
-            (natural_zero!(), _) => Natural::ZERO,
+            (_, 0) | (&Natural::ONE, _) => Natural::ONE,
+            (&Natural::ZERO, _) => Natural::ZERO,
             (x, 1) => x.clone(),
             (x, 2) => x.square(),
             (x, exp) if x.is_power_of_2() => Natural::power_of_2((x.significant_bits() - 1) * exp),
@@ -498,7 +502,7 @@ impl Natural {
     pub fn pow_assign_alt(&mut self, exp: u64) {
         match (&mut *self, exp) {
             (x, 0) => *x = Natural::ONE,
-            (_, 1) | (natural_zero!(), _) | (natural_one!(), _) => {}
+            (_, 1) | (&mut Natural::ZERO, _) | (&mut Natural::ONE, _) => {}
             (x, 2) => x.square_assign(),
             (x, exp) if x.is_power_of_2() => {
                 *x = Natural::power_of_2((x.significant_bits() - 1) * exp)
@@ -587,8 +591,8 @@ impl<'a> Pow<u64> for &'a Natural {
     #[inline]
     fn pow(self, exp: u64) -> Natural {
         match (self, exp) {
-            (_, 0) | (natural_one!(), _) => Natural::ONE,
-            (natural_zero!(), _) => Natural::ZERO,
+            (_, 0) | (&Natural::ONE, _) => Natural::ONE,
+            (&Natural::ZERO, _) => Natural::ZERO,
             (x, 1) => x.clone(),
             (x, 2) => x.square(),
             (Natural(Small(small)), exp) => {
@@ -639,7 +643,7 @@ impl PowAssign<u64> for Natural {
     fn pow_assign(&mut self, exp: u64) {
         match (&mut *self, exp) {
             (x, 0) => *x = Natural::ONE,
-            (_, 1) | (natural_zero!(), _) | (natural_one!(), _) => {}
+            (_, 1) | (&mut Natural::ZERO, _) | (&mut Natural::ONE, _) => {}
             (x, 2) => x.square_assign(),
             (Natural(Small(ref mut small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {

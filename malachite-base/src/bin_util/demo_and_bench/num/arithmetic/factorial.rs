@@ -34,38 +34,38 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_checked_subfactorial);
 }
 
-fn demo_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_23::<T>().get(gm, &config).take(limit) {
+fn demo_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_23::<T>().get(gm, config).take(limit) {
         println!("{}! = {}", n, T::factorial(n));
     }
 }
 
-fn demo_checked_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen().get(gm, &config).take(limit) {
+fn demo_checked_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen().get(gm, config).take(limit) {
         println!("{}! = {:?}", n, T::checked_factorial(n));
     }
 }
 
-fn demo_double_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_24::<T>().get(gm, &config).take(limit) {
+fn demo_double_factorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_24::<T>().get(gm, config).take(limit) {
         println!("{}!! = {}", n, T::double_factorial(n));
     }
 }
 
 fn demo_checked_double_factorial<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in unsigned_gen().get(gm, &config).take(limit) {
+    for n in unsigned_gen().get(gm, config).take(limit) {
         println!("{}!! = {:?}", n, T::checked_double_factorial(n));
     }
 }
 
-fn demo_multifactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in unsigned_pair_gen_var_43::<T>().get(gm, &config).take(limit) {
+fn demo_multifactorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in unsigned_pair_gen_var_43::<T>().get(gm, config).take(limit) {
         if m <= 5 {
-            print!("{}", n);
+            print!("{n}");
             for _ in 0..m {
                 print!("!");
             }
@@ -76,13 +76,17 @@ fn demo_multifactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn demo_checked_multifactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_checked_multifactorial<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (n, m) in unsigned_pair_gen_var_12::<u64, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if m <= 5 {
-            print!("{}", n);
+            print!("{n}");
             for _ in 0..m {
                 print!("!");
             }
@@ -93,28 +97,28 @@ fn demo_checked_multifactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenCon
     }
 }
 
-fn demo_subfactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_25::<T>().get(gm, &config).take(limit) {
+fn demo_subfactorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_25::<T>().get(gm, config).take(limit) {
         println!("!{} = {}", n, T::subfactorial(n));
     }
 }
 
-fn demo_checked_subfactorial<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen().get(gm, &config).take(limit) {
+fn demo_checked_subfactorial<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen().get(gm, config).take(limit) {
         println!("!{} = {:?}", n, T::checked_subfactorial(n));
     }
 }
 
 fn benchmark_factorial_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::factorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_23::<T>().get(gm, &config),
+        unsigned_gen_var_23::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -130,14 +134,14 @@ fn benchmark_factorial_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_factorial<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::checked_factorial(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen().get(gm, &config),
+        unsigned_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -148,14 +152,14 @@ fn benchmark_checked_factorial<T: PrimitiveUnsigned>(
 
 fn benchmark_double_factorial_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::double_factorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_24::<T>().get(gm, &config),
+        unsigned_gen_var_24::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -171,14 +175,14 @@ fn benchmark_double_factorial_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_double_factorial<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::checked_double_factorial(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen().get(gm, &config),
+        unsigned_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -191,14 +195,14 @@ fn benchmark_checked_double_factorial<T: PrimitiveUnsigned>(
 
 fn benchmark_multifactorial_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::multifactorial(u64, u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_43::<T>().get(gm, &config),
+        unsigned_pair_gen_var_43::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -214,14 +218,14 @@ fn benchmark_multifactorial_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_multifactorial<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::checked_multifactorial(u64, u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12().get(gm, &config),
+        unsigned_pair_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -234,14 +238,14 @@ fn benchmark_checked_multifactorial<T: PrimitiveUnsigned>(
 
 fn benchmark_subfactorial_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::subfactorial(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_25::<T>().get(gm, &config),
+        unsigned_gen_var_25::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -257,14 +261,14 @@ fn benchmark_subfactorial_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_subfactorial<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::checked_subfactorial(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen().get(gm, &config),
+        unsigned_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

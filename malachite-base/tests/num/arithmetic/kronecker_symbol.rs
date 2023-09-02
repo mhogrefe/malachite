@@ -546,8 +546,8 @@ fn jacobi_symbol_properties_double_helper_unsigned<
 >() {
     unsigned_quadruple_gen_var_12::<T>().test_properties(|(x_1, x_0, y_1, y_0)| {
         let s = jacobi_symbol_unsigned_double_simple::<T, D>(x_1, x_0, y_1, y_0);
-        assert_eq!(jacobi_symbol_unsigned_double_fast_1(x_1, x_0, y_1, y_0), s,);
-        assert_eq!(jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0), s,);
+        assert_eq!(jacobi_symbol_unsigned_double_fast_1(x_1, x_0, y_1, y_0), s);
+        assert_eq!(jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0), s);
     });
 }
 

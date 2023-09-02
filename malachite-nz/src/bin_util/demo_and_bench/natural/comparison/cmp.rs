@@ -33,8 +33,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_cmp_normalized_algorithms);
 }
 
-fn demo_limbs_cmp_same_length(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_limbs_cmp_same_length(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, config).take(limit) {
         println!(
             "limbs_cmp_same_length({:?}, {:?}) = {:?}",
             xs,
@@ -44,14 +44,14 @@ fn demo_limbs_cmp_same_length(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_cmp(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_limbs_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_7().get(gm, config).take(limit) {
         println!("limbs_cmp({:?}, {:?}) = {:?}", xs, ys, limbs_cmp(&xs, &ys));
     }
 }
 
-fn demo_limbs_cmp_normalized(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_19().get(gm, &config).take(limit) {
+fn demo_limbs_cmp_normalized(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_19().get(gm, config).take(limit) {
         println!(
             "limbs_cmp_normalized({:?}, {:?}) = {:?}",
             xs,
@@ -61,27 +61,27 @@ fn demo_limbs_cmp_normalized(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_cmp(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         match x.cmp(&y) {
-            Ordering::Less => println!("{} < {}", x, y),
-            Ordering::Equal => println!("{} = {}", x, y),
-            Ordering::Greater => println!("{} > {}", x, y),
+            Ordering::Less => println!("{x} < {y}"),
+            Ordering::Equal => println!("{x} = {y}"),
+            Ordering::Greater => println!("{x} > {y}"),
         }
     }
 }
 
-fn demo_natural_cmp_normalized(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_9().get(gm, &config).take(limit) {
+fn demo_natural_cmp_normalized(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_9().get(gm, config).take(limit) {
         println!("cmp_normalized({}, {}) = {:?}", x, y, x.cmp_normalized(&y));
     }
 }
 
-fn benchmark_limbs_cmp_same_length(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_cmp_same_length(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_cmp_same_length(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_6().get(gm, &config),
+        unsigned_vec_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -92,11 +92,11 @@ fn benchmark_limbs_cmp_same_length(gm: GenMode, config: GenConfig, limit: usize,
     );
 }
 
-fn benchmark_limbs_cmp(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_cmp(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_cmp(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_7().get(gm, &config),
+        unsigned_vec_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -105,11 +105,11 @@ fn benchmark_limbs_cmp(gm: GenMode, config: GenConfig, limit: usize, file_name: 
     );
 }
 
-fn benchmark_limbs_cmp_normalized(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_cmp_normalized(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_cmp_normalized(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_19().get(gm, &config),
+        unsigned_vec_pair_gen_var_19().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -123,14 +123,14 @@ fn benchmark_limbs_cmp_normalized(gm: GenMode, config: GenConfig, limit: usize, 
 #[allow(unused_must_use)]
 fn benchmark_natural_cmp_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.cmp(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_nrm().get(gm, &config),
+        natural_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -145,14 +145,14 @@ fn benchmark_natural_cmp_library_comparison(
 
 fn benchmark_natural_cmp_normalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.cmp_normalized(&Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_9().get(gm, &config),
+        natural_pair_gen_var_9().get(gm, config),
         gm.name(),
         limit,
         file_name,

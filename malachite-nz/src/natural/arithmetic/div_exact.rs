@@ -71,8 +71,7 @@ pub fn test_invert_limb_table() {
         let product = value.wrapping_mul(inv);
         assert_eq!(
             product, 1,
-            "INVERT_LIMB_TABLE gives incorrect inverse, {}, for value {}",
-            inv, value
+            "INVERT_LIMB_TABLE gives incorrect inverse, {inv}, for value {value}",
         );
     }
 }
@@ -227,7 +226,7 @@ pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) 
         let mut q = ns_head.wrapping_mul(d_inv);
         *ns_head = q;
         let mut previous_carry = false;
-        for n in ns_tail.iter_mut() {
+        for n in &mut *ns_tail {
             let mut upper_half = (DoubleLimb::from(q) * d).upper_half();
             if previous_carry {
                 upper_half += 1;
@@ -403,7 +402,7 @@ pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
         itch_local,
         n,
-        n.shr_round(1, RoundingMode::Ceiling),
+        n.shr_round(1, RoundingMode::Ceiling).0,
     );
     itch_local + itch_out
 }}
@@ -1985,9 +1984,9 @@ impl<'a> DivExact<Natural> for &'a Natural {
             return Natural::ONE;
         }
         match (self, &mut other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => n.clone(),
-            (natural_zero!(), _) => Natural::ZERO,
+            (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (n, &mut Natural::ONE) => n.clone(),
+            (&Natural::ZERO, _) => Natural::ZERO,
             (n, &mut Natural(Small(d))) => n.div_exact_limb_ref(d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
@@ -2052,9 +2051,9 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
             return Natural::ONE;
         }
         match (self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => n.clone(),
-            (natural_zero!(), _) => Natural::ZERO,
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (n, &Natural::ONE) => n.clone(),
+            (&Natural::ZERO, _) => Natural::ZERO,
             (n, Natural(Small(d))) => n.div_exact_limb_ref(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref ns)), Natural(Large(ref ds))) => {
@@ -2118,8 +2117,8 @@ impl DivExactAssign<Natural> for Natural {
             return;
         }
         match (&mut *self, &mut other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) | (natural_zero!(), _) => {}
+            (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (_, &mut Natural::ONE) | (&mut Natural::ZERO, _) => {}
             (n, &mut Natural(Small(d))) => n.div_exact_assign_limb(d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref mut ns)), &mut Natural(Large(ref mut ds))) => {
@@ -2184,8 +2183,8 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
             return;
         }
         match (&mut *self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) | (natural_zero!(), _) => {}
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Natural::ONE) | (&mut Natural::ZERO, _) => {}
             (_, Natural(Small(d))) => self.div_exact_assign_limb(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {

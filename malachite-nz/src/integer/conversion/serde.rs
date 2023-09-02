@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 impl From<Integer> for SerdeInteger {
     #[inline]
     fn from(x: Integer) -> SerdeInteger {
-        SerdeInteger(format!("{:#x}", x))
+        SerdeInteger(format!("{x:#x}"))
     }
 }
 

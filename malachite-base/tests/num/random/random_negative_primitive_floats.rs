@@ -109,7 +109,7 @@ fn test_random_negative_primitive_floats() {
     let sample_median = (-1.5131202036927989, Some(-1.5119179328033963));
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(-1.324453738346271e305),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

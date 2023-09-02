@@ -56,13 +56,7 @@ fn mod_power_of_2_inverse_properties() {
         assert!(result_ref.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(result_ref, result);
 
-        assert_eq!(
-            (&n).mod_inverse(Natural::power_of_2(pow)),
-            result,
-            "{} {}",
-            n,
-            pow
-        );
+        assert_eq!((&n).mod_inverse(Natural::power_of_2(pow)), result);
         assert_eq!(result.is_some(), n.odd());
         if let Some(inverse) = result {
             assert!(inverse.mod_power_of_2_is_reduced(pow));

@@ -10,26 +10,23 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_vec_pad_left);
 }
 
-fn demo_vec_pad_left(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_vec_pad_left(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, pad_size, pad_value) in
         unsigned_vec_unsigned_unsigned_triple_gen_var_1::<u8, usize, u8>()
-            .get(gm, &config)
+            .get(gm, config)
             .take(limit)
     {
         let old_xs = xs.clone();
         vec_pad_left(&mut xs, pad_size, pad_value);
-        println!(
-            "xs := {:?}; vec_pad_left(&mut xs, {}, {}); xs = {:?}",
-            old_xs, pad_size, pad_value, xs
-        );
+        println!("xs := {old_xs:?}; vec_pad_left(&mut xs, {pad_size}, {pad_value}); xs = {xs:?}");
     }
 }
 
-fn benchmark_vec_pad_left(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_vec_pad_left(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "vec_pad_left(&mut [T], usize, T)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_1::<u8, usize, u8>().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_1::<u8, usize, u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

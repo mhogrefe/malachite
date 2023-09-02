@@ -14,14 +14,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_from_str_library_comparison);
 }
 
-fn demo_rational_from_str(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_rational_from_str(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!("Rational::from_str({}) = {:?}", s, Rational::from_str(&s));
     }
 }
 
-fn demo_rational_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_12().get(gm, &config).take(limit) {
+fn demo_rational_from_str_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_12().get(gm, config).take(limit) {
         println!(
             "Rational::from_str({}) = {}",
             s,
@@ -32,14 +32,14 @@ fn demo_rational_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize)
 
 fn benchmark_rational_from_str_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_str(&str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_12().get(gm, &config),
+        string_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -1,4 +1,3 @@
-use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
@@ -192,7 +191,7 @@ fn test_random_nonzero_rationals() {
     );
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(-5.683252966255455e252),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

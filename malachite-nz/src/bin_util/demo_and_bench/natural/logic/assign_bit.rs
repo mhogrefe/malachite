@@ -13,30 +13,27 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_assign_bit_library_comparison);
 }
 
-fn demo_natural_assign_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_assign_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index, bit) in natural_unsigned_bool_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.assign_bit(index, bit);
-        println!(
-            "x := {}; x.assign_bit({}, {}); x = {}",
-            n_old, index, bit, n
-        );
+        println!("x := {n_old}; x.assign_bit({index}, {bit}); x = {n}");
     }
 }
 
 fn benchmark_natural_assign_bit_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.assign_bit(u64, bool)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_bool_triple_gen_var_1_rm().get(gm, &config),
+        natural_unsigned_bool_triple_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

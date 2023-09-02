@@ -42,7 +42,7 @@ pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     let mut out = if start >= Limb::WIDTH {
         vec![
             Limb::MAX;
-            usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
+            usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0)
         ]
     } else {
         let mut out = vec![x >> start];
@@ -87,7 +87,7 @@ pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Li
         let mut out =
             vec![
                 Limb::MAX;
-                usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
+                usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0)
             ];
         limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
         return out;
@@ -141,7 +141,7 @@ pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Ve
     if start_i >= len {
         xs = vec![
             Limb::MAX;
-            usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
+            usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0)
         ];
         limbs_vec_mod_power_of_2_in_place(&mut xs, bit_len);
         return xs;

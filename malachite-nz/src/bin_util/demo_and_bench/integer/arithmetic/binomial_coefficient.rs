@@ -22,8 +22,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_binomial_coefficient(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in integer_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_integer_binomial_coefficient(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in integer_pair_gen_var_7().get(gm, config).take(limit) {
         let n_orig = n.clone();
         let k_orig = k.clone();
         println!(
@@ -35,8 +35,8 @@ fn demo_integer_binomial_coefficient(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_integer_binomial_coefficient_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, k) in integer_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_integer_binomial_coefficient_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, k) in integer_pair_gen_var_7().get(gm, config).take(limit) {
         println!(
             "C({}, {}) = {}",
             n,
@@ -48,14 +48,14 @@ fn demo_integer_binomial_coefficient_ref(gm: GenMode, config: GenConfig, limit: 
 
 fn benchmark_integer_binomial_coefficient_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.binomial_coefficient(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_7().get(gm, &config),
+        integer_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -76,14 +76,14 @@ fn benchmark_integer_binomial_coefficient_evaluation_strategy(
 #[allow(unused_must_use)]
 fn benchmark_integer_binomial_coefficient_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.binomial_coefficient(Integer, Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_7_rm().get(gm, &config),
+        integer_pair_gen_var_7_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

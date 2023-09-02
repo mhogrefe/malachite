@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2MulAssign, PowerOf2, XMulYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 
@@ -137,7 +137,7 @@ pub enum ModMulData {
 
 fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
     match *m {
-        natural_zero!() => panic!("division by zero"),
+        Natural::ZERO => panic!("division by zero"),
         Natural(Small(ref x)) => ModMulData::OneLimb(Limb::precompute_mod_mul_data(x)),
         Natural(Large(ref xs)) => match xs[..] {
             [0, 1] => ModMulData::MinTwoLimbs,
@@ -569,9 +569,9 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     /// taken by reference and `c` and `m` are taken by value.
     fn mod_mul_precomputed(self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
-            (&natural_zero!(), _, _, _) | (_, natural_zero!(), _, _) => Natural::ZERO,
-            (x, natural_one!(), _, _) => x.clone(),
-            (&natural_one!(), y, _, _) => y,
+            (&Natural::ZERO, _, _, _) | (_, Natural::ZERO, _, _) => Natural::ZERO,
+            (x, Natural::ONE, _, _) => x.clone(),
+            (&Natural::ONE, y, _, _) => y,
             (
                 &Natural(Small(x)),
                 Natural(Small(y)),
@@ -725,9 +725,9 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     /// `c` are taken by reference and `m` is taken by value.
     fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
-            (&natural_zero!(), _, _, _) | (_, &natural_zero!(), _, _) => Natural::ZERO,
-            (x, &natural_one!(), _, _) => x.clone(),
-            (&natural_one!(), y, _, _) => y.clone(),
+            (&Natural::ZERO, _, _, _) | (_, &Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _, _) => x.clone(),
+            (&Natural::ONE, y, _, _) => y.clone(),
             (
                 &Natural(Small(x)),
                 &Natural(Small(y)),
@@ -809,9 +809,9 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     /// and `m` are taken by reference.
     fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
-            (&natural_zero!(), _, _, _) | (_, &natural_zero!(), _, _) => Natural::ZERO,
-            (x, &natural_one!(), _, _) => x.clone(),
-            (&natural_one!(), y, _, _) => y.clone(),
+            (&Natural::ZERO, _, _, _) | (_, &Natural::ZERO, _, _) => Natural::ZERO,
+            (x, &Natural::ONE, _, _) => x.clone(),
+            (&Natural::ONE, y, _, _) => y.clone(),
             (
                 &Natural(Small(x)),
                 &Natural(Small(y)),
@@ -867,9 +867,9 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
     /// and `m` are taken by value and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
-            (&mut natural_zero!(), _, _, _) | (_, natural_one!(), _, _) => {}
-            (x, natural_zero!(), _, _) => *x = Natural::ZERO,
-            (&mut natural_one!(), y, _, _) => *self = y,
+            (&mut Natural::ZERO, _, _, _) | (_, Natural::ONE, _, _) => {}
+            (x, Natural::ZERO, _, _) => *x = Natural::ZERO,
+            (&mut Natural::ONE, y, _, _) => *self = y,
             (
                 &mut Natural(Small(x)),
                 Natural(Small(y)),
@@ -928,9 +928,9 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     /// `c` are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: &'a Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
-            (&mut natural_zero!(), _, _, _) | (_, natural_one!(), _, _) => {}
-            (x, natural_zero!(), _, _) => *x = Natural::ZERO,
-            (&mut natural_one!(), y, _, _) => *self = y,
+            (&mut Natural::ZERO, _, _, _) | (_, Natural::ONE, _, _) => {}
+            (x, Natural::ZERO, _, _) => *x = Natural::ZERO,
+            (&mut Natural::ONE, y, _, _) => *self = y,
             (
                 &mut Natural(Small(x)),
                 Natural(Small(y)),
@@ -989,9 +989,9 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     /// `m` are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: &'a Natural, m: Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
-            (&mut natural_zero!(), _, _, _) | (_, &natural_one!(), _, _) => {}
-            (x, &natural_zero!(), _, _) => *x = Natural::ZERO,
-            (&mut natural_one!(), y, _, _) => *self = y.clone(),
+            (&mut Natural::ZERO, _, _, _) | (_, &Natural::ONE, _, _) => {}
+            (x, &Natural::ZERO, _, _) => *x = Natural::ZERO,
+            (&mut Natural::ONE, y, _, _) => *self = y.clone(),
             (
                 &mut Natural(Small(x)),
                 &Natural(Small(y)),
@@ -1055,9 +1055,9 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
         data: &ModMulData,
     ) {
         match (&mut *self, other, m, data) {
-            (&mut natural_zero!(), _, _, _) | (_, &natural_one!(), _, _) => {}
-            (x, &natural_zero!(), _, _) => *x = Natural::ZERO,
-            (&mut natural_one!(), y, _, _) => *self = y.clone(),
+            (&mut Natural::ZERO, _, _, _) | (_, &Natural::ONE, _, _) => {}
+            (x, &Natural::ZERO, _, _) => *x = Natural::ZERO,
+            (&mut Natural::ONE, y, _, _) => *self = y.clone(),
             (
                 &mut Natural(Small(x)),
                 &Natural(Small(y)),

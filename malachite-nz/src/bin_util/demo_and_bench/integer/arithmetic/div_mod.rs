@@ -55,110 +55,98 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_div_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.div_mod({}) = {:?}", x_old, y_old, x.div_mod(y));
     }
 }
 
-fn demo_integer_div_mod_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_mod_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.div_mod(&{}) = {:?}", x_old, y, x.div_mod(&y));
     }
 }
 
-fn demo_integer_div_mod_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_mod_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).div_mod({}) = {:?}", x, y_old, (&x).div_mod(y));
     }
 }
 
-fn demo_integer_div_mod_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_mod_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         println!("(&{}).div_mod(&{}) = {:?}", x, y, (&x).div_mod(&y));
     }
 }
 
-fn demo_integer_div_assign_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_assign_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let remainder = x.div_assign_mod(y);
-        println!(
-            "x := {}; x.div_assign_mod({}) = {}; x = {}",
-            x_old, y_old, remainder, x
-        );
+        println!("x := {x_old}; x.div_assign_mod({y_old}) = {remainder}; x = {x}");
     }
 }
 
-fn demo_integer_div_assign_mod_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_assign_mod_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let remainder = x.div_assign_mod(&y);
-        println!(
-            "x := {}; x.div_assign_mod(&{}) = {}; x = {}",
-            x_old, y, remainder, x
-        );
+        println!("x := {x_old}; x.div_assign_mod(&{y}) = {remainder}; x = {x}");
     }
 }
 
-fn demo_integer_div_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.div_rem({}) = {:?}", x_old, y_old, x.div_rem(y));
     }
 }
 
-fn demo_integer_div_rem_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_rem_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.div_rem(&{}) = {:?}", x_old, y, x.div_rem(&y));
     }
 }
 
-fn demo_integer_div_rem_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_rem_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).div_rem({}) = {:?}", x, y_old, (&x).div_rem(y));
     }
 }
 
-fn demo_integer_div_rem_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_rem_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         println!("(&{}).div_rem(&{}) = {:?}", x, y, (&x).div_rem(&y));
     }
 }
 
-fn demo_integer_div_assign_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_assign_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let remainder = x.div_assign_rem(y);
-        println!(
-            "x := {}; x.div_assign_rem({}) = {}; x = {}",
-            x_old, y_old, remainder, x
-        );
+        println!("x := {x_old}; x.div_assign_rem({y_old}) = {remainder}; x = {x}");
     }
 }
 
-fn demo_integer_div_assign_rem_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_div_assign_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let remainder = x.div_assign_rem(&y);
-        println!(
-            "x := {}; x.div_assign_rem(&{}) = {}; x = {}",
-            x_old, y, remainder, x
-        );
+        println!("x := {x_old}; x.div_assign_rem(&{y}) = {remainder}; x = {x}");
     }
 }
 
-fn demo_integer_ceiling_div_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -170,8 +158,8 @@ fn demo_integer_ceiling_div_mod(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_ceiling_div_mod_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_mod_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "{}.ceiling_div_mod(&{}) = {:?}",
@@ -182,8 +170,8 @@ fn demo_integer_ceiling_div_mod_val_ref(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_integer_ceiling_div_mod_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_mod_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).ceiling_div_mod({}) = {:?}",
@@ -194,8 +182,8 @@ fn demo_integer_ceiling_div_mod_ref_val(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_integer_ceiling_div_mod_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_mod_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "(&{}).ceiling_div_mod(&{}) = {:?}",
             x,
@@ -205,39 +193,33 @@ fn demo_integer_ceiling_div_mod_ref_ref(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_integer_ceiling_div_assign_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_assign_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let remainder = x.ceiling_div_assign_mod(y);
-        println!(
-            "x := {}; x.ceiling_div_assign_mod({}) = {}; x = {}",
-            x_old, y_old, remainder, x
-        );
+        println!("x := {x_old}; x.ceiling_div_assign_mod({y_old}) = {remainder}; x = {x}");
     }
 }
 
-fn demo_integer_ceiling_div_assign_mod_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_div_assign_mod_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let remainder = x.ceiling_div_assign_mod(&y);
-        println!(
-            "x := {}; x.ceiling_div_assign_mod(&{}) = {}; x = {}",
-            x_old, y, remainder, x
-        );
+        println!("x := {x_old}; x.ceiling_div_assign_mod(&{y}) = {remainder}; x = {x}");
     }
 }
 
 fn benchmark_integer_div_mod_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_nrm().get(gm, &config),
+        integer_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -253,14 +235,14 @@ fn benchmark_integer_div_mod_library_comparison(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_div_mod_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -276,14 +258,14 @@ fn benchmark_integer_div_mod_algorithms(
 
 fn benchmark_integer_div_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -307,14 +289,14 @@ fn benchmark_integer_div_mod_evaluation_strategy(
 
 fn benchmark_integer_div_assign_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_assign_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -332,14 +314,14 @@ fn benchmark_integer_div_assign_mod_evaluation_strategy(
 
 fn benchmark_integer_div_rem_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_nrm().get(gm, &config),
+        integer_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -354,14 +336,14 @@ fn benchmark_integer_div_rem_library_comparison(
 #[allow(clippy::no_effect)]
 fn benchmark_integer_div_rem_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -375,14 +357,14 @@ fn benchmark_integer_div_rem_algorithms(
 
 fn benchmark_integer_div_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -406,14 +388,14 @@ fn benchmark_integer_div_rem_evaluation_strategy(
 
 fn benchmark_integer_div_assign_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_assign_rem(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -431,14 +413,14 @@ fn benchmark_integer_div_assign_rem_evaluation_strategy(
 
 fn benchmark_integer_ceiling_div_mod_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_rm().get(gm, &config),
+        integer_pair_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -456,14 +438,14 @@ fn benchmark_integer_ceiling_div_mod_library_comparison(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_ceiling_div_mod_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -479,14 +461,14 @@ fn benchmark_integer_ceiling_div_mod_algorithms(
 
 fn benchmark_integer_ceiling_div_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -510,14 +492,14 @@ fn benchmark_integer_ceiling_div_mod_evaluation_strategy(
 
 fn benchmark_integer_ceiling_div_assign_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_div_assign_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -14,20 +14,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_abs_assign_primitive_float);
 }
 
-fn demo_abs_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut i in signed_gen_var_1::<T>().get(gm, &config).take(limit) {
+fn demo_abs_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut i in signed_gen_var_1::<T>().get(gm, config).take(limit) {
         let old_i = i;
         i.abs_assign();
-        println!("i := {}; i.abs_assign(); i = {}", old_i, i);
+        println!("i := {old_i}; i.abs_assign(); i = {i}");
     }
 }
 
 fn demo_abs_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+    for mut f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         let old_f = f;
         f.abs_assign();
         println!(
@@ -40,14 +40,14 @@ fn demo_abs_assign_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_abs_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.abs_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_1::<T>().get(gm, &config),
+        signed_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -58,14 +58,14 @@ fn benchmark_abs_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_abs_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.abs_assign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

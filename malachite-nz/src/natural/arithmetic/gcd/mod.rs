@@ -8,6 +8,7 @@ use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
@@ -234,8 +235,8 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     #[inline]
     fn gcd(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, natural_zero!()) => x.clone(),
-            (natural_zero!(), y) => y.clone(),
+            (x, &Natural::ZERO) => x.clone(),
+            (&Natural::ZERO, y) => y.clone(),
             (x, y) if std::ptr::eq(x, y) => x.clone(),
             (Natural(Small(x)), Natural(Small(y))) => Natural::from(x.gcd(*y)),
             (Natural(Large(ref xs)), Natural(Small(y))) => Natural::from(limbs_gcd_limb(xs, *y)),
@@ -290,8 +291,8 @@ impl GcdAssign<Natural> for Natural {
     #[inline]
     fn gcd_assign(&mut self, other: Natural) {
         match (&mut *self, other) {
-            (_, natural_zero!()) => {}
-            (natural_zero!(), y) => *self = y,
+            (_, Natural::ZERO) => {}
+            (&mut Natural::ZERO, y) => *self = y,
             (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(y),
             (Natural(Large(ref xs)), Natural(Small(y))) => {
                 *self = Natural::from(limbs_gcd_limb(xs, y))
@@ -347,8 +348,8 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     #[inline]
     fn gcd_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
-            (_, natural_zero!()) => {}
-            (natural_zero!(), y) => self.clone_from(y),
+            (_, &Natural::ZERO) => {}
+            (&mut Natural::ZERO, y) => self.clone_from(y),
             (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(*y),
             (Natural(Large(ref xs)), Natural(Small(y))) => {
                 *self = Natural::from(limbs_gcd_limb(xs, *y))

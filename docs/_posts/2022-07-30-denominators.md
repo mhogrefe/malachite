@@ -62,7 +62,7 @@ For the remainder of this post, I'll prove that a $$D$$ exists for any interval 
 
 Let $$s = b - a$$ be the diameter of $$[a, b]$$. If $$s \geq 1$$, then we can take $$D = 1$$: $$[a, b]$$ contains all denominators in $$\N^+$$. (For any denominator $$d$$, $$k + 1/d$$ is in $$[a, b]$$ for some integer $$k$$.)
 
-What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must contain some rational with denominator $$d$$, but this is not the case. For example, an interval with $$s < 2/3$$ might not contain any sixths:
+What if $$s < 1$$? We might think that if $$s \geq 1/d$$ then $$[a, b]$$ must contain some rational with denominator $$d$$, but this is not the case. For example, an interval with $$s > 1/6$$ might not contain any sixths:
 
 <p align="center">
   <img width="500" src="/assets/denominators/sixths.svg" alt="The largest gap between sixths">

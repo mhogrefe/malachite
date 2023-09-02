@@ -8,16 +8,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rounding_mode_neg);
 }
 
-fn demo_rounding_mode_neg_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut rm in rounding_mode_gen().get(gm, &config).take(limit) {
+fn demo_rounding_mode_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut rm in rounding_mode_gen().get(gm, config).take(limit) {
         let rm_old = rm;
         rm.neg_assign();
-        println!("rm := {}; r.neg_assign(); rm = {}", rm_old, rm);
+        println!("rm := {rm_old}; r.neg_assign(); rm = {rm}");
     }
 }
 
-fn demo_rounding_mode_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for rm in rounding_mode_gen().get(gm, &config).take(limit) {
+fn demo_rounding_mode_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for rm in rounding_mode_gen().get(gm, config).take(limit) {
         println!("-{} = {}", rm, -rm);
     }
 }

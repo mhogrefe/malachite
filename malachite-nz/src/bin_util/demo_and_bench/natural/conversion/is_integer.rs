@@ -10,21 +10,21 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_is_integer);
 }
 
-fn demo_natural_is_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_is_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         if n.is_integer() {
-            println!("{} is an integer", n);
+            println!("{n} is an integer");
         } else {
-            println!("{} is not an integer", n);
+            println!("{n} is not an integer");
         }
     }
 }
 
-fn benchmark_natural_is_integer(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_is_integer(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.is_integer()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

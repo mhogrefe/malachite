@@ -18,28 +18,28 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_to_bits_desc_algorithms);
 }
 
-fn demo_natural_to_bits_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_to_bits_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("to_bits_asc({}) = {:?}", n, n.to_bits_asc());
     }
 }
 
-fn demo_natural_to_bits_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_to_bits_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("to_bits_desc({}) = {:?}", n, n.to_bits_desc());
     }
 }
 
 fn benchmark_natural_to_bits_asc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -55,14 +55,14 @@ fn benchmark_natural_to_bits_asc_evaluation_strategy(
 
 fn benchmark_natural_to_bits_asc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_bits_asc()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -77,14 +77,14 @@ fn benchmark_natural_to_bits_asc_algorithms(
 
 fn benchmark_natural_to_bits_desc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -100,14 +100,14 @@ fn benchmark_natural_to_bits_desc_evaluation_strategy(
 
 fn benchmark_natural_to_bits_desc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_bits_desc()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

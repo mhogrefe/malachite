@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{unsigned_gen_var_13, unsigned_pair_gen_var_22};
 use std::panic::catch_unwind;
@@ -33,7 +34,7 @@ pub fn test_from_ordered_representation() {
     test::<f32>(3217625053, 3.141593);
     test::<f32>(3231711233, 10.0);
     test::<f32>(4278190080, f32::MAX_FINITE);
-    test::<f32>(4278190081, f32::POSITIVE_INFINITY);
+    test::<f32>(4278190081, f32::INFINITY);
 
     test::<f64>(0, f64::NEGATIVE_INFINITY);
     test::<f64>(1, -f64::MAX_FINITE);
@@ -59,7 +60,7 @@ pub fn test_from_ordered_representation() {
     test::<f64>(13833125093779451162, 3.1415926535897936);
     test::<f64>(13840687554816376833, 10.0);
     test::<f64>(18437736874454810624, f64::MAX_FINITE);
-    test::<f64>(18437736874454810625, f64::POSITIVE_INFINITY);
+    test::<f64>(18437736874454810625, f64::INFINITY);
 }
 
 #[test]

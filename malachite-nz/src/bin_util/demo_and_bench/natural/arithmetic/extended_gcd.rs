@@ -26,22 +26,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_extended_gcd_evaluation_strategy);
 }
 
-fn demo_limbs_extended_gcd(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_limbs_extended_gcd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_11().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let ys_old = ys.clone();
         let mut gs = vec![0; ys.len()];
         let mut ss = vec![0; ys.len() + 1];
         let result = limbs_extended_gcd(&mut gs, &mut ss, &mut xs, &mut ys);
         println!(
-            "limbs_gcd_extended_gcd(&mut gs, &mut ss, {:?}, {:?}) = {:?}; gs = {:?}, ss = {:?}",
-            xs_old, ys_old, result, gs, ss
+            "limbs_gcd_extended_gcd(&mut gs, &mut ss, {xs_old:?}, {ys_old:?}) = {result:?}; \
+            gs = {gs:?}, ss = {ss:?}",
         );
     }
 }
 
-fn demo_natural_extended_gcd(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_extended_gcd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -53,15 +53,15 @@ fn demo_natural_extended_gcd(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_extended_gcd_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_extended_gcd_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.extended_gcd(&{}) = {:?}", x_old, y, x.extended_gcd(&y));
     }
 }
 
-fn demo_natural_extended_gcd_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_extended_gcd_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).extended_gcd({}) = {:?}",
@@ -72,8 +72,8 @@ fn demo_natural_extended_gcd_ref_val(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_natural_extended_gcd_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_extended_gcd_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         println!(
             "(&{}).extended_gcd(&{}) = {:?}",
             x,
@@ -83,11 +83,11 @@ fn demo_natural_extended_gcd_ref_ref(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn benchmark_limbs_extended_gcd(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_extended_gcd(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_extended_gcd(&mut [Limb], &mut [Limb], &mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_11().get(gm, &config),
+        unsigned_vec_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -102,14 +102,14 @@ fn benchmark_limbs_extended_gcd(gm: GenMode, config: GenConfig, limit: usize, fi
 
 fn benchmark_natural_extended_gcd_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.extended_gcd(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -128,14 +128,14 @@ fn benchmark_natural_extended_gcd_algorithms(
 
 fn benchmark_natural_extended_gcd_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.extended_gcd(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_rm().get(gm, &config),
+        natural_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -151,14 +151,14 @@ fn benchmark_natural_extended_gcd_library_comparison(
 
 fn benchmark_natural_extended_gcd_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.extended_gcd(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

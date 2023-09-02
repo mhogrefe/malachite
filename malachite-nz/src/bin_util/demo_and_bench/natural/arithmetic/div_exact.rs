@@ -103,8 +103,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_div_exact_evaluation_strategy);
 }
 
-fn demo_limbs_modular_invert_limb(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen_var_22().get(gm, &config).take(limit) {
+fn demo_limbs_modular_invert_limb(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen_var_22().get(gm, config).take(limit) {
         println!(
             "limbs_modular_invert_limb({}) = {}",
             x,
@@ -113,9 +113,9 @@ fn demo_limbs_modular_invert_limb(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_limbs_div_exact_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_div_exact_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen_var_29()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -127,106 +127,93 @@ fn demo_limbs_div_exact_limb(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_div_exact_limb_to_out(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_div_exact_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut out, xs, y) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let out_old = out.clone();
         limbs_div_exact_limb_to_out(&mut out, &xs, y);
         println!(
-            "out := {:?}; limbs_exact_div_limb_to_out(&mut out, {:?}, {}); \
-             out = {:?}",
-            out_old, xs, y, out
+            "out := {out_old:?}; limbs_exact_div_limb_to_out(&mut out, {xs:?}, {y}); \
+             out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_div_exact_limb_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_div_exact_limb_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, y) in unsigned_vec_unsigned_pair_gen_var_29()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         limbs_div_exact_limb_in_place(&mut xs, y);
-        println!(
-            "xs := {:?}; limbs_div_exact_limb_in_place(&mut xs, {}); xs = {:?}",
-            xs_old, y, xs
-        );
+        println!("xs := {xs_old:?}; limbs_div_exact_limb_in_place(&mut xs, {y}); xs = {xs:?}");
     }
 }
 
-fn demo_limbs_div_exact_3(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_5().get(gm, &config).take(limit) {
+fn demo_limbs_div_exact_3(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_5().get(gm, config).take(limit) {
         println!("limbs_div_exact_3({:?}) = {:?}", xs, limbs_div_exact_3(&xs));
     }
 }
 
-fn demo_limbs_div_exact_3_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_13().get(gm, &config).take(limit) {
+fn demo_limbs_div_exact_3_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_13().get(gm, config).take(limit) {
         let out_old = out.clone();
         limbs_div_exact_3_to_out(&mut out, &xs);
-        println!(
-            "out := {:?}; limbs_exact_div_3_to_out(&mut out, {:?}); out = {:?}",
-            out_old, xs, out
-        );
+        println!("out := {out_old:?}; limbs_exact_div_3_to_out(&mut out, {xs:?}); out = {out:?}");
     }
 }
 
-fn demo_limbs_div_exact_3_in_place(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut xs in unsigned_vec_gen_var_5().get(gm, &config).take(limit) {
+fn demo_limbs_div_exact_3_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut xs in unsigned_vec_gen_var_5().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         limbs_div_exact_3_in_place(&mut xs);
-        println!(
-            "xs := {:?}; limbs_div_exact_3_in_place(&mut xs); xs = {:?}",
-            xs_old, xs
-        );
+        println!("xs := {xs_old:?}; limbs_div_exact_3_in_place(&mut xs); xs = {xs:?}");
     }
 }
 
-fn demo_limbs_modular_invert(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut is, ds) in unsigned_vec_pair_gen_var_12().get(gm, &config).take(limit) {
+fn demo_limbs_modular_invert(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut is, ds) in unsigned_vec_pair_gen_var_12().get(gm, config).take(limit) {
         let old_is = is.clone();
         let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
         limbs_modular_invert(&mut is, &ds, &mut scratch);
         println!(
-            "is := {:?}; limbs_modular_invert(&mut is, {:?}, &mut scratch); is = {:?}, ",
-            old_is, ds, is,
+            "is := {old_is:?}; limbs_modular_invert(&mut is, {ds:?}, &mut scratch); is = {is:?}, "
         );
     }
 }
 
-fn demo_limbs_modular_div_mod_schoolbook(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_14().get(gm, &config).take(limit) {
+fn demo_limbs_modular_div_mod_schoolbook(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_14().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
         let borrow = limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; \
-             limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; qs = {:?}; \
-             ns = {:?}",
-            qs_old, ns_old, ds, inverse, borrow, qs, ns
+            "qs := {qs_old:?}; ns := {ns_old:?}; \
+             limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, {ds:?}, {inverse}) = {borrow}; \
+             qs = {qs:?}; ns = {ns:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_mod_divide_and_conquer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_15().get(gm, &config).take(limit) {
+fn demo_limbs_modular_div_mod_divide_and_conquer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_15().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
         let borrow = limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; \
-             limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
-             qs = {:?}; ns = {:?}",
-            qs_old, ns_old, ds, inverse, borrow, qs, ns
+            "qs := {qs_old:?}; ns := {ns_old:?}; \
+             limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, {ds:?}, {inverse}) = \
+             {borrow}; qs = {qs:?}; ns = {ns:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_mod_barrett(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_modular_div_mod_barrett(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut qs, mut rs, ns, ds) in unsigned_vec_quadruple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let qs_old = qs.clone();
@@ -234,87 +221,77 @@ fn demo_limbs_modular_div_mod_barrett(gm: GenMode, config: GenConfig, limit: usi
         let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
         let borrow = limbs_modular_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; rs := {:?}; limbs_modular_div_mod_divide_and_conquer(\
-             &mut qs, &mut rs, {:?}, {:?} &mut scratch) = {}; qs = {:?}; rs = {:?}",
-            qs_old, rs_old, ns, ds, borrow, qs, rs
+            "qs := {qs_old:?}; rs := {rs_old:?}; limbs_modular_div_mod_divide_and_conquer(\
+             &mut qs, &mut rs, {ns:?}, {ds:?} &mut scratch) = {borrow}; qs = {qs:?}; rs = {rs:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_schoolbook(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_13().get(gm, &config).take(limit) {
+fn demo_limbs_modular_div_schoolbook(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_13().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
         limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; limbs_modular_div_schoolbook(&mut qs, &mut ns, {:?}, {}); \
-             qs = {:?}",
-            qs_old, ns_old, ds, inverse, qs
+            "qs := {qs_old:?}; \
+            ns := {ns_old:?}; limbs_modular_div_schoolbook(&mut qs, &mut ns, {ds:?}, {inverse}); \
+             qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_divide_and_conquer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_16().get(gm, &config).take(limit) {
+fn demo_limbs_modular_div_divide_and_conquer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_16().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
         limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; \
-             limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); qs = {:?}",
-            qs_old, ns_old, ds, inverse, qs
+            "qs := {qs_old:?}; ns := {ns_old:?}; \
+             limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, {ds:?}, {inverse}); \
+             qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_barrett(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_46()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_modular_div_barrett(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_46().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let mut scratch = vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
         limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; limbs_modular_div_barrett(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
-            qs_old, ns, ds, qs
+            "qs := {qs_old:?}; limbs_modular_div_barrett(&mut qs, {ns:?}, {ds:?} &mut scratch); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds) in unsigned_vec_triple_gen_var_47()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_modular_div(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds) in unsigned_vec_triple_gen_var_47().get(gm, config).take(limit) {
         let ns_old = ns.clone();
         let qs_old = qs.clone();
         let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
         limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; limbs_modular_div(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
-            qs_old, ns_old, ds, qs
+            "qs := {qs_old:?}; limbs_modular_div(&mut qs, {ns_old:?}, {ds:?} &mut scratch); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_modular_div_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_47()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_modular_div_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_47().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
         limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; limbs_modular_div_ref(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
-            qs_old, ns, ds, qs
+            "qs := {qs_old:?}; limbs_modular_div_ref(&mut qs, {ns:?}, {ds:?} &mut scratch); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_div_exact(gm: GenMode, config: GenConfig, limit: usize) {
-    for (ns, ds) in unsigned_vec_pair_gen_var_14().get(gm, &config).take(limit) {
+fn demo_limbs_div_exact(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (ns, ds) in unsigned_vec_pair_gen_var_14().get(gm, config).take(limit) {
         println!(
             "limbs_div_exact({:?}, {:?}) = {:?}",
             ns,
@@ -324,121 +301,109 @@ fn demo_limbs_div_exact(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_div_exact_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, mut ds) in unsigned_vec_triple_gen_var_48()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_div_exact_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, mut ds) in unsigned_vec_triple_gen_var_48().get(gm, config).take(limit) {
         let ns_old = ns.clone();
         let ds_old = ds.clone();
         let qs_old = qs.clone();
         limbs_div_exact_to_out(&mut qs, &mut ns, &mut ds);
         println!(
-            "qs := {:?}; limbs_div_exact_to_out(&mut qs, {:?}, {:?}); qs = {:?}",
-            qs_old, ns_old, ds_old, qs
+            "qs := {qs_old:?}; limbs_div_exact_to_out(&mut qs, {ns_old:?}, {ds_old:?}); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_div_exact_to_out_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds) in unsigned_vec_triple_gen_var_48()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_div_exact_to_out_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds) in unsigned_vec_triple_gen_var_48().get(gm, config).take(limit) {
         let ns_old = ns.clone();
         let qs_old = qs.clone();
         limbs_div_exact_to_out_val_ref(&mut qs, &mut ns, &ds);
         println!(
-            "qs := {:?}; limbs_div_exact_to_out_val_ref(&mut qs, {:?}, {:?}); qs = {:?}",
-            qs_old, ns_old, ds, qs
+            "qs := {qs_old:?}; limbs_div_exact_to_out_val_ref(&mut qs, {ns_old:?}, {ds:?}); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_div_exact_to_out_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, ns, mut ds) in unsigned_vec_triple_gen_var_48()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_div_exact_to_out_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, ns, mut ds) in unsigned_vec_triple_gen_var_48().get(gm, config).take(limit) {
         let ds_old = ds.clone();
         let qs_old = qs.clone();
         limbs_div_exact_to_out_ref_val(&mut qs, &ns, &mut ds);
         println!(
-            "qs := {:?}; limbs_div_exact_to_out_ref_val(&mut qs, {:?}, {:?}); qs = {:?}",
-            qs_old, ns, ds_old, qs
+            "qs := {qs_old:?}; limbs_div_exact_to_out_ref_val(&mut qs, {ns:?}, {ds_old:?}); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_limbs_div_exact_to_out_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_48()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_div_exact_to_out_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, ns, ds) in unsigned_vec_triple_gen_var_48().get(gm, config).take(limit) {
         let qs_old = qs.clone();
         limbs_div_exact_to_out_ref_ref(&mut qs, &ns, &ds);
         println!(
-            "qs := {:?}; limbs_div_exact_to_out_ref_ref(&mut qs, {:?}, {:?}); qs = {:?}",
-            qs_old, ns, ds, qs
+            "qs := {qs_old:?}; limbs_div_exact_to_out_ref_ref(&mut qs, {ns:?}, {ds:?}); \
+            qs = {qs:?}",
         );
     }
 }
 
-fn demo_natural_div_exact_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.div_exact_assign(y);
-        println!("x := {}; x.div_exact_assign({}); x = {}", x_old, y_old, x);
+        println!("x := {x_old}; x.div_exact_assign({y_old}); x = {x}");
     }
 }
 
-fn demo_natural_div_exact_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.div_exact_assign(&y);
-        println!("x := {}; x.div_exact_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.div_exact_assign(&{y}); x = {x}");
     }
 }
 
-fn demo_natural_div_exact(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.div_exact({}) = {}", x_old, y_old, x.div_exact(y));
     }
 }
 
-fn demo_natural_div_exact_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.div_exact(&{}) = {}", x_old, y, x.div_exact(&y));
     }
 }
 
-fn demo_natural_div_exact_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).div_exact({}) = {}", x, y_old, (&x).div_exact(y));
     }
 }
 
-fn demo_natural_div_exact_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_natural_div_exact_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_6().get(gm, config).take(limit) {
         println!("(&{}).div_exact(&{}) = {}", x, y, (&x).div_exact(&y));
     }
 }
 
 fn benchmark_limbs_modular_invert_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_invert_limb(Limb)",
         BenchmarkType::Single,
-        unsigned_gen_var_22().get(gm, &config),
+        unsigned_gen_var_22().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -449,14 +414,14 @@ fn benchmark_limbs_modular_invert_limb(
 
 fn benchmark_limbs_div_exact_limb_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_29().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_29().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -472,14 +437,14 @@ fn benchmark_limbs_div_exact_limb_algorithms(
 
 fn benchmark_limbs_div_exact_limb_to_out_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_limb_to_out(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -497,14 +462,14 @@ fn benchmark_limbs_div_exact_limb_to_out_algorithms(
 
 fn benchmark_limbs_div_exact_limb_in_place_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_limb_in_place(&mut [Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_29().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_29().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -522,14 +487,14 @@ fn benchmark_limbs_div_exact_limb_in_place_algorithms(
 
 fn benchmark_limbs_div_exact_3_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_3(&[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_gen_var_5().get(gm, &config),
+        unsigned_vec_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -547,14 +512,14 @@ fn benchmark_limbs_div_exact_3_algorithms(
 
 fn benchmark_limbs_div_exact_3_to_out_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_limb_to_out(&mut [Limb], 3)",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_13().get(gm, &config),
+        unsigned_vec_pair_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -576,14 +541,14 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
 
 fn benchmark_limbs_div_exact_3_in_place_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_limb_in_place(&mut [Limb], 3)",
         BenchmarkType::Algorithms,
-        unsigned_vec_gen_var_5().get(gm, &config),
+        unsigned_vec_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -606,14 +571,14 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
 // use large params
 fn benchmark_limbs_modular_invert_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_invert(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        large_type_gen_var_17().get(gm, &config),
+        large_type_gen_var_17().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -637,14 +602,14 @@ fn benchmark_limbs_modular_invert_algorithms(
 
 fn benchmark_limbs_modular_div_mod_schoolbook(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_mod_schoolbook(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        large_type_gen_var_14().get(gm, &config),
+        large_type_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -660,14 +625,14 @@ fn benchmark_limbs_modular_div_mod_schoolbook(
 // use large params
 fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        large_type_gen_var_15().get(gm, &config),
+        large_type_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -694,14 +659,14 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
 
 fn benchmark_limbs_modular_div_mod_barrett_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_quadruple_gen_var_3().get(gm, &config),
+        unsigned_vec_quadruple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -730,14 +695,14 @@ fn benchmark_limbs_modular_div_mod_barrett_algorithms(
 
 fn benchmark_limbs_modular_div_schoolbook(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_schoolbook(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        large_type_gen_var_13().get(gm, &config),
+        large_type_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -751,14 +716,14 @@ fn benchmark_limbs_modular_div_schoolbook(
 // use large params
 fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        large_type_gen_var_16().get(gm, &config),
+        large_type_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -781,14 +746,14 @@ fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
 
 fn benchmark_limbs_modular_div_barrett_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_triple_gen_var_46().get(gm, &config),
+        unsigned_vec_triple_gen_var_46().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -810,14 +775,14 @@ fn benchmark_limbs_modular_div_barrett_algorithms(
 // use large params
 fn benchmark_limbs_modular_div_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_modular_div(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_triple_gen_var_47().get(gm, &config),
+        unsigned_vec_triple_gen_var_47().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -844,14 +809,14 @@ fn benchmark_limbs_modular_div_evaluation_strategy(
 
 fn benchmark_limbs_div_exact_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_14().get(gm, &config),
+        unsigned_vec_pair_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -867,14 +832,14 @@ fn benchmark_limbs_div_exact_algorithms(
 
 fn benchmark_limbs_div_exact_to_out_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_to_out(&mut [Limb], &mut [Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_triple_gen_var_49().get(gm, &config),
+        unsigned_vec_triple_gen_var_49().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -892,14 +857,14 @@ fn benchmark_limbs_div_exact_to_out_algorithms(
 
 fn benchmark_limbs_div_exact_to_out_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_div_exact_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_triple_gen_var_49().get(gm, &config),
+        unsigned_vec_triple_gen_var_49().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -928,14 +893,14 @@ fn benchmark_limbs_div_exact_to_out_evaluation_strategy(
 // use large params
 fn benchmark_natural_div_exact_assign_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_exact_assign(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_6().get(gm, &config),
+        natural_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -950,14 +915,14 @@ fn benchmark_natural_div_exact_assign_algorithms(
 // use large params
 fn benchmark_natural_div_exact_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_exact_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_6().get(gm, &config),
+        natural_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -977,14 +942,14 @@ fn benchmark_natural_div_exact_assign_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_div_exact_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_exact(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_6_nrm().get(gm, &config),
+        natural_pair_gen_var_6_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1001,14 +966,14 @@ fn benchmark_natural_div_exact_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_div_exact_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_exact(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_6().get(gm, &config),
+        natural_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1023,14 +988,14 @@ fn benchmark_natural_div_exact_algorithms(
 // use large params
 fn benchmark_natural_div_exact_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_exact(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_6().get(gm, &config),
+        natural_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,

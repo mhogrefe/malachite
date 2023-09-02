@@ -39,9 +39,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_mul(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, mut ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
@@ -56,9 +56,9 @@ fn demo_limbs_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_mul_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
@@ -72,9 +72,9 @@ fn demo_limbs_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_limbs_mod_power_of_2_mul_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_mul_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -87,38 +87,32 @@ fn demo_limbs_mod_power_of_2_mul_ref_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_natural_mod_power_of_2_mul_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         x.mod_power_of_2_mul_assign(y, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_mul_assign({}, {}); x = {}",
-            x_old, y_old, pow, x
-        );
+        println!("x := {x_old}; x.mod_power_of_2_mul_assign({y_old}, {pow}); x = {x}");
     }
 }
 
-fn demo_natural_mod_power_of_2_mul_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         x.mod_power_of_2_mul_assign(&y, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_mul_assign(&{}, {}); x = {}",
-            x_old, y, pow, x
-        );
+        println!("x := {x_old}; x.mod_power_of_2_mul_assign(&{y}, {pow}); x = {x}");
     }
 }
 
-fn demo_natural_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
@@ -133,9 +127,9 @@ fn demo_natural_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
@@ -149,9 +143,9 @@ fn demo_natural_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_natural_mod_power_of_2_mul_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
@@ -165,9 +159,9 @@ fn demo_natural_mod_power_of_2_mul_ref_val(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_natural_mod_power_of_2_mul_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_mul_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -182,14 +176,14 @@ fn demo_natural_mod_power_of_2_mul_ref_ref(gm: GenMode, config: GenConfig, limit
 
 fn benchmark_limbs_mod_power_of_2_mul_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_mul(&[Limb], &[Limb], u64)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -222,14 +216,14 @@ fn benchmark_limbs_mod_power_of_2_mul_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_mul_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_mul_assign(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -249,14 +243,14 @@ fn benchmark_natural_mod_power_of_2_mul_assign_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_mul(Natural, u64)",
         BenchmarkType::Algorithms,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -277,14 +271,14 @@ fn benchmark_natural_mod_power_of_2_mul_algorithms(
 
 fn benchmark_natural_mod_power_of_2_mul_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_mul(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

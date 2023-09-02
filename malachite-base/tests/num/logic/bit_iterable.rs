@@ -1,11 +1,14 @@
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::BitIterable;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
+use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::{
     signed_bool_vec_pair_gen_var_1, signed_gen, signed_unsigned_pair_gen_var_1,
     unsigned_bool_vec_pair_gen_var_1, unsigned_gen, unsigned_gen_var_5, unsigned_pair_gen_var_2,
 };
+use std::cmp::Ordering;
 use std::ops::Index;
 
 #[test]
@@ -79,14 +82,10 @@ pub fn test_bits() {
 
 fn bits_properties_helper_unsigned<T: PrimitiveUnsigned>()
 where
-    T::BitIterator: Index<u64, Output = bool>,
+    T::BitIterator: Clone + Index<u64, Output = bool>,
 {
     unsigned_gen::<T>().test_properties(|n| {
-        let significant_bits = usize::exact_from(n.significant_bits());
-        assert_eq!(
-            n.bits().size_hint(),
-            (significant_bits, Some(significant_bits))
-        );
+        test_double_ended_iterator_size_hint(n.bits(), usize::exact_from(n.significant_bits()));
     });
 
     unsigned_bool_vec_pair_gen_var_1::<T>().test_properties(|(n, bs)| {
@@ -121,10 +120,17 @@ where
 
 fn bits_properties_helper_signed<T: PrimitiveSigned>()
 where
-    T::BitIterator: Index<u64, Output = bool>,
+    T::BitIterator: Clone + Index<u64, Output = bool>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned + WrappingFrom<T>,
 {
     signed_gen::<T>().test_properties(|i| {
-        i.bits();
+        let unsigned = <T as UnsignedAbs>::Output::wrapping_from(i);
+        let significant_bits = match i.sign() {
+            Ordering::Equal => 0,
+            Ordering::Greater => unsigned.significant_bits() + 1,
+            Ordering::Less => (!unsigned).significant_bits() + 1,
+        };
+        test_double_ended_iterator_size_hint(i.bits(), usize::exact_from(significant_bits));
     });
 
     signed_bool_vec_pair_gen_var_1::<T>().test_properties(|(n, bs)| {

@@ -259,7 +259,7 @@ pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &
 }}
 
 fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
-    panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);
+    panic!("Cannot perform sub_mul. a: {a}, b: {b}, c: {c}");
 }
 
 impl SubMul<Natural, Natural> for Natural {

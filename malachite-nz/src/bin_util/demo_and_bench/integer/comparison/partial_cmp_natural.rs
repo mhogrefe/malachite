@@ -18,22 +18,22 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_partial_cmp_natural(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_partial_cmp_natural(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp(&y).unwrap() {
-            Ordering::Less => println!("{} < {}", x, y),
-            Ordering::Equal => println!("{} = {}", x, y),
-            Ordering::Greater => println!("{} > {}", x, y),
+            Ordering::Less => println!("{x} < {y}"),
+            Ordering::Equal => println!("{x} = {y}"),
+            Ordering::Greater => println!("{x} > {y}"),
         }
     }
 }
 
-fn demo_natural_partial_cmp_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_partial_cmp_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         match y.partial_cmp(&x).unwrap() {
-            Ordering::Less => println!("{} < {}", y, x),
-            Ordering::Equal => println!("{} = {}", y, x),
-            Ordering::Greater => println!("{} > {}", y, x),
+            Ordering::Less => println!("{y} < {x}"),
+            Ordering::Equal => println!("{y} = {x}"),
+            Ordering::Greater => println!("{y} > {x}"),
         }
     }
 }
@@ -41,14 +41,14 @@ fn demo_natural_partial_cmp_integer(gm: GenMode, config: GenConfig, limit: usize
 #[allow(unused_must_use)]
 fn benchmark_integer_partial_cmp_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.partial_cmp(&Natural)",
         BenchmarkType::LibraryComparison,
-        integer_natural_pair_gen_rm().get(gm, &config),
+        integer_natural_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -63,14 +63,14 @@ fn benchmark_integer_partial_cmp_natural_library_comparison(
 #[allow(unused_must_use)]
 fn benchmark_natural_partial_cmp_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.partial_cmp(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_natural_pair_gen_rm().get(gm, &config),
+        integer_natural_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

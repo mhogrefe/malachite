@@ -17,23 +17,23 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_low_mask_algorithms);
 }
 
-fn demo_limbs_low_mask(gm: GenMode, config: GenConfig, limit: usize) {
-    for bits in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_limbs_low_mask(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bits in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("limbs_low_mask({}) = {:?}", bits, limbs_low_mask(bits));
     }
 }
 
-fn demo_natural_low_mask(gm: GenMode, config: GenConfig, limit: usize) {
-    for bits in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_low_mask(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bits in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("Natural::low_mask({}) = {}", bits, Natural::low_mask(bits));
     }
 }
 
-fn benchmark_limbs_low_mask(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_low_mask(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_low_mask(u64)",
         BenchmarkType::Single,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -45,14 +45,14 @@ fn benchmark_limbs_low_mask(gm: GenMode, config: GenConfig, limit: usize, file_n
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_low_mask_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.low_mask(u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

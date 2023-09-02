@@ -1,6 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{

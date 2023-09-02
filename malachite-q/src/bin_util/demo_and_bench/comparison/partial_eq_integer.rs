@@ -17,22 +17,22 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_partial_eq_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_partial_eq_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_integer_pair_gen().get(gm, config).take(limit) {
         if x == y {
-            println!("{} = {}", x, y);
+            println!("{x} = {y}");
         } else {
-            println!("{} ≠ {}", x, y);
+            println!("{x} ≠ {y}");
         }
     }
 }
 
-fn demo_integer_partial_eq_rational(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_partial_eq_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_integer_pair_gen().get(gm, config).take(limit) {
         if y == x {
-            println!("{} = {}", y, x);
+            println!("{y} = {x}");
         } else {
-            println!("{} ≠ {}", y, x);
+            println!("{y} ≠ {x}");
         }
     }
 }
@@ -40,14 +40,14 @@ fn demo_integer_partial_eq_rational(gm: GenMode, config: GenConfig, limit: usize
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_partial_eq_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational == Integer",
         BenchmarkType::LibraryComparison,
-        rational_integer_pair_gen_rm().get(gm, &config),
+        rational_integer_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -62,14 +62,14 @@ fn benchmark_rational_partial_eq_integer_library_comparison(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_integer_partial_eq_rational_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer == Rational",
         BenchmarkType::LibraryComparison,
-        rational_integer_pair_gen_rm().get(gm, &config),
+        rational_integer_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

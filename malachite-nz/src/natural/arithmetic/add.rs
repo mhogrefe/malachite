@@ -89,7 +89,7 @@ pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
     xs: &mut [T],
     mut y: T
 ) -> bool {
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         if x.overflowing_add_assign(y) {
             y = T::ONE;
         } else {
@@ -532,7 +532,7 @@ impl Natural {
     fn add_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => {}
-            (&mut natural_zero!(), _) => *self = Natural::from(other),
+            (&mut Natural::ZERO, _) => *self = Natural::from(other),
             (&mut Natural(Small(ref mut small)), other) => {
                 let (sum, overflow) = small.overflowing_add(other);
                 if overflow {
@@ -544,6 +544,21 @@ impl Natural {
             (&mut Natural(Large(ref mut limbs)), other) => {
                 limbs_vec_add_limb_in_place(limbs, other);
             }
+        }
+    }
+
+    #[cfg(feature = "float_helpers")]
+    pub fn add_assign_at_limb(&mut self, i: usize, y: Limb) {
+        if i == 0 {
+            *self += Natural::from(y);
+            return;
+        }
+        let xs = self.promote_in_place();
+        if xs.len() <= i {
+            xs.resize(i + 1, 0);
+        }
+        if limbs_slice_add_limb_in_place(&mut xs[i..], y) {
+            xs.push(1);
         }
     }
 }

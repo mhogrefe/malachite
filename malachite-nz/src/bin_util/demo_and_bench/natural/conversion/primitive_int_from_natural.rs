@@ -66,46 +66,46 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_primitive_int_try_from_natural<T: for<'a> TryFrom<&'a Natural> + PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> <T as TryFrom<&'a Natural>>::Error: Debug,
 {
-    for n in natural_gen().get(gm, &config).take(limit) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("{}::try_from(&{}) = {:?}", T::NAME, n, T::try_from(&n));
     }
 }
 
 fn demo_unsigned_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: From<T>,
 {
-    for n in natural_gen_var_6::<T>().get(gm, &config).take(limit) {
+    for n in natural_gen_var_6::<T>().get(gm, config).take(limit) {
         println!("{}::exact_from(&{}) = {}", T::NAME, n, T::exact_from(&n));
     }
 }
 
 fn demo_signed_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ExactFrom<T>,
 {
-    for n in natural_gen_var_7::<T>().get(gm, &config).take(limit) {
+    for n in natural_gen_var_7::<T>().get(gm, config).take(limit) {
         println!("{}::exact_from(&{}) = {}", T::NAME, n, T::exact_from(&n));
     }
 }
 
 fn demo_primitive_int_wrapping_from_natural<T: for<'a> WrappingFrom<&'a Natural> + PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!(
             "{}::wrapping_from(&{}) = {}",
             T::NAME,
@@ -119,10 +119,10 @@ fn demo_primitive_int_saturating_from_natural<
     T: for<'a> SaturatingFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!(
             "{}::saturating_from(&{}) = {}",
             T::NAME,
@@ -136,10 +136,10 @@ fn demo_primitive_int_overflowing_from_natural<
     T: for<'a> OverflowingFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!(
             "{}::overflowing_from(&{}) = {:?}",
             T::NAME,
@@ -153,10 +153,10 @@ fn demo_primitive_int_convertible_from_natural<
     T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             n,
@@ -170,14 +170,14 @@ fn benchmark_primitive_int_try_from_natural_algorithms<
     T: for<'a> TryFrom<&'a Natural> + for<'a> OverflowingFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::try_from(&Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -198,7 +198,7 @@ fn benchmark_primitive_int_try_from_natural_algorithms<
 
 fn benchmark_unsigned_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -207,7 +207,7 @@ fn benchmark_unsigned_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + Pri
     run_benchmark(
         &format!("{}::exact_from(&Natural)", T::NAME),
         BenchmarkType::Single,
-        natural_gen_var_6::<T>().get(gm, &config),
+        natural_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -218,7 +218,7 @@ fn benchmark_unsigned_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + Pri
 
 fn benchmark_signed_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -227,7 +227,7 @@ fn benchmark_signed_exact_from_natural<T: for<'a> ExactFrom<&'a Natural> + Primi
     run_benchmark(
         &format!("{}::exact_from(&Natural)", T::NAME),
         BenchmarkType::Single,
-        natural_gen_var_7::<T>().get(gm, &config),
+        natural_gen_var_7::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -241,14 +241,14 @@ fn benchmark_primitive_int_wrapping_from_natural_algorithms<
     T: for<'a> OverflowingFrom<&'a Natural> + PrimitiveInt + for<'a> WrappingFrom<&'a Natural>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::wrapping_from(&Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -266,14 +266,14 @@ fn benchmark_primitive_int_saturating_from_natural<
     T: PrimitiveInt + for<'a> SaturatingFrom<&'a Natural>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::saturating_from(&Natural)", T::NAME),
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -290,14 +290,14 @@ fn benchmark_primitive_int_overflowing_from_natural_algorithms<
         + for<'a> WrappingFrom<&'a Natural>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::overflowing_from(&Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -316,14 +316,14 @@ fn benchmark_primitive_int_convertible_from_natural_algorithms<
     T: for<'a> TryFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::convertible_from(&Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -337,14 +337,14 @@ fn benchmark_primitive_int_convertible_from_natural_algorithms<
 
 fn benchmark_u32_try_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -358,14 +358,14 @@ fn benchmark_u32_try_from_natural_library_comparison(
 
 fn benchmark_u32_wrapping_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -379,14 +379,14 @@ fn benchmark_u32_wrapping_from_natural_library_comparison(
 
 fn benchmark_u64_try_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -400,14 +400,14 @@ fn benchmark_u64_try_from_natural_library_comparison(
 
 fn benchmark_u64_wrapping_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -421,14 +421,14 @@ fn benchmark_u64_wrapping_from_natural_library_comparison(
 
 fn benchmark_i32_try_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i32::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -442,14 +442,14 @@ fn benchmark_i32_try_from_natural_library_comparison(
 
 fn benchmark_i32_wrapping_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i32::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -463,14 +463,14 @@ fn benchmark_i32_wrapping_from_natural_library_comparison(
 
 fn benchmark_i64_try_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i64::try_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -484,14 +484,14 @@ fn benchmark_i64_try_from_natural_library_comparison(
 
 fn benchmark_i64_wrapping_from_natural_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i64::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

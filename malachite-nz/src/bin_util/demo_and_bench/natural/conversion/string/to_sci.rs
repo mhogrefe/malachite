@@ -19,28 +19,28 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_to_sci_with_options);
 }
 
-fn demo_natural_to_sci(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_to_sci(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 
-fn demo_natural_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_fmt_sci_valid(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, options) in natural_to_sci_options_pair_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.fmt_sci_valid(options) {
-            println!("{} can be converted to sci using {:?}", x, options);
+            println!("{x} can be converted to sci using {options:?}");
         } else {
-            println!("{} cannot be converted to sci using {:?}", x, options);
+            println!("{x} cannot be converted to sci using {options:?}");
         }
     }
 }
 
-fn demo_natural_to_sci_with_options(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_to_sci_with_options(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, options) in natural_to_sci_options_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -52,11 +52,11 @@ fn demo_natural_to_sci_with_options(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn benchmark_natural_to_sci(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_to_sci(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.to_sci()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -65,11 +65,11 @@ fn benchmark_natural_to_sci(gm: GenMode, config: GenConfig, limit: usize, file_n
     );
 }
 
-fn benchmark_natural_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_fmt_sci_valid(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.fmt_sci_valid(ToSciOptions)",
         BenchmarkType::Single,
-        natural_to_sci_options_pair_gen().get(gm, &config),
+        natural_to_sci_options_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -82,14 +82,14 @@ fn benchmark_natural_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_natural_to_sci_with_options(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.to_sci_with_options(ToSciOptions)",
         BenchmarkType::Single,
-        natural_to_sci_options_pair_gen_var_1().get(gm, &config),
+        natural_to_sci_options_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

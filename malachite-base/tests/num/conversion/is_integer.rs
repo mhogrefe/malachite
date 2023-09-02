@@ -1,5 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 
@@ -35,7 +36,7 @@ pub fn test_is_integer() {
     test_f::<f32>(-0.1, false);
     test_f::<f32>(-100.1, false);
     test_f::<f32>(f32::NAN, false);
-    test_f::<f32>(f32::POSITIVE_INFINITY, false);
+    test_f::<f32>(f32::INFINITY, false);
     test_f::<f32>(f32::NEGATIVE_INFINITY, false);
 }
 

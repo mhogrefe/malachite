@@ -28,9 +28,9 @@ macro_rules! split_into_chunks_helper {
    }}
 }
 
-fn demo_split_into_chunks(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_split_into_chunks(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, len, n) in unsigned_vec_unsigned_unsigned_triple_gen_var_2::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n {
@@ -72,9 +72,9 @@ macro_rules! split_into_chunks_mut_helper {
    }}
 }
 
-fn demo_split_into_chunks_mut(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_split_into_chunks_mut(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, len, n) in unsigned_vec_unsigned_unsigned_triple_gen_var_2::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n {

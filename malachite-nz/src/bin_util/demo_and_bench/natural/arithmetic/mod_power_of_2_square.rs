@@ -48,44 +48,38 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_power_of_2_square_algorithms);
 }
 
-fn demo_limbs_square_low_basecase(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_21().get(gm, &config).take(limit) {
+fn demo_limbs_square_low_basecase(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_21().get(gm, config).take(limit) {
         let out_old = out.clone();
         limbs_square_low_basecase(&mut out, &xs);
-        println!(
-            "out := {:?}; limbs_square_low_basecase(&mut out, {:?}); out = {:?}",
-            out_old, xs, out
-        );
+        println!("out := {out_old:?}; limbs_square_low_basecase(&mut out, {xs:?}); out = {out:?}");
     }
 }
 
-fn demo_limbs_square_low_divide_and_conquer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_20().get(gm, &config).take(limit) {
+fn demo_limbs_square_low_divide_and_conquer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_20().get(gm, config).take(limit) {
         let out_old = out.clone();
         let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
         limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch);
         println!(
-            "out := {:?}; limbs_square_low_divide_and_conquer(&mut out, {:?}, &mut scratch); \
-            out = {:?}",
-            out_old, xs, out
+            "out := {out_old:?}; \
+            limbs_square_low_divide_and_conquer(&mut out, {xs:?}, &mut scratch); \
+            out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_square_low(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_square_low(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_1().get(gm, config).take(limit) {
         let out_old = out.clone();
         limbs_square_low(&mut out, &xs);
-        println!(
-            "out := {:?}; limbs_square_low(&mut out, {:?}); out = {:?}",
-            out_old, xs, out
-        );
+        println!("out := {out_old:?}; limbs_square_low(&mut out, {xs:?}); out = {out:?}");
     }
 }
 
-fn demo_limbs_mod_power_of_2_square(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_square(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, pow) in unsigned_vec_unsigned_pair_gen_var_30()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
@@ -98,9 +92,9 @@ fn demo_limbs_mod_power_of_2_square(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_limbs_mod_power_of_2_square_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_square_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_30()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -112,23 +106,20 @@ fn demo_limbs_mod_power_of_2_square_ref(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_natural_mod_power_of_2_square_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_square_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_power_of_2_square_assign(pow);
-        println!(
-            "x := {}; x.mod_power_of_2_square_assign({}); x = {}",
-            n_old, pow, n
-        );
+        println!("x := {n_old}; x.mod_power_of_2_square_assign({pow}); x = {n}");
     }
 }
 
-fn demo_natural_mod_power_of_2_square(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_square(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -141,9 +132,9 @@ fn demo_natural_mod_power_of_2_square(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_natural_mod_power_of_2_square_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_square_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -157,14 +148,14 @@ fn demo_natural_mod_power_of_2_square_ref(gm: GenMode, config: GenConfig, limit:
 
 fn benchmark_limbs_square_low_basecase(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_low_basecase(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_21().get(gm, &config),
+        unsigned_vec_pair_gen_var_21().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -177,14 +168,14 @@ fn benchmark_limbs_square_low_basecase(
 
 fn benchmark_limbs_square_low_divide_and_conquer_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_low_divide_and_conquer(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -201,11 +192,11 @@ fn benchmark_limbs_square_low_divide_and_conquer_algorithms(
     );
 }
 
-fn benchmark_limbs_square_low(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_square_low(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_square_low(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_1().get(gm, &config),
+        unsigned_vec_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -218,14 +209,14 @@ fn benchmark_limbs_square_low(gm: GenMode, config: GenConfig, limit: usize, file
 
 fn benchmark_limbs_mod_power_of_2_square_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_square(&[Limb], u64)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_pair_gen_var_30().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_30().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -246,14 +237,14 @@ fn benchmark_limbs_mod_power_of_2_square_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_square_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_square_assign(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -267,14 +258,14 @@ fn benchmark_natural_mod_power_of_2_square_assign(
 
 fn benchmark_natural_mod_power_of_2_square_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_square(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -292,14 +283,14 @@ fn benchmark_natural_mod_power_of_2_square_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_square_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_square(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,

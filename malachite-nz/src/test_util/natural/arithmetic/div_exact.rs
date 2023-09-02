@@ -45,7 +45,7 @@ pub fn limbs_div_exact_3_in_place_alt(ns: &mut [Limb]) {
     assert_ne!(len, 0);
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let mut big_carry = 0;
-    for n in ns_init.iter_mut() {
+    for n in &mut *ns_init {
         let (diff, carry) = n.overflowing_sub(big_carry);
         big_carry = Limb::from(carry);
         let q = diff.wrapping_mul(MODLIMB_INVERSE_3);

@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
@@ -17,10 +18,7 @@ fn test_try_from_f32_simplest() {
         }
     };
     test(f32::NAN, "Err(RationalFromPrimitiveFloatError)");
-    test(
-        f32::POSITIVE_INFINITY,
-        "Err(RationalFromPrimitiveFloatError)",
-    );
+    test(f32::INFINITY, "Err(RationalFromPrimitiveFloatError)");
     test(
         f32::NEGATIVE_INFINITY,
         "Err(RationalFromPrimitiveFloatError)",
@@ -105,10 +103,7 @@ fn test_try_from_f64_simplest() {
         }
     };
     test(f64::NAN, "Err(RationalFromPrimitiveFloatError)");
-    test(
-        f64::POSITIVE_INFINITY,
-        "Err(RationalFromPrimitiveFloatError)",
-    );
+    test(f64::INFINITY, "Err(RationalFromPrimitiveFloatError)");
     test(
         f64::NEGATIVE_INFINITY,
         "Err(RationalFromPrimitiveFloatError)",
@@ -245,7 +240,7 @@ where
         // This only works for simple `Rational`s, i.e. those `Rational`s q that round to a float
         // x such that no simpler `Rational` rounds to x.
         assert_eq!(
-            Rational::try_from_float_simplest(T::rounding_from(&q, RoundingMode::Nearest)),
+            Rational::try_from_float_simplest(T::rounding_from(&q, RoundingMode::Nearest).0),
             Ok(q)
         );
     });

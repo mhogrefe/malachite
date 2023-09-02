@@ -138,7 +138,7 @@ where
     Limb: Shr<T, Output = Limb>,
 {
     match (x, bits) {
-        (natural_zero!(), _) => x.clone(),
+        (&Natural::ZERO, _) => x.clone(),
         (_, bits) if bits == T::ZERO => x.clone(),
         (Natural(Small(_)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => Natural::ZERO,
         (Natural(Small(small)), bits) => Natural(Small(*small >> bits)),
@@ -154,7 +154,7 @@ where
     Limb: ShrAssign<T>,
 {
     match (&mut *x, bits) {
-        (natural_zero!(), _) => {}
+        (&mut Natural::ZERO, _) => {}
         (_, bits) if bits == T::ZERO => {}
         (Natural(Small(ref mut small)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => {
             *small = 0;

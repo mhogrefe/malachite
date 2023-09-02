@@ -551,7 +551,7 @@ pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     let mut out = vec![
         0;
         xs.len()
-            .div_round(usize::exact_from(exp), RoundingMode::Ceiling)
+            .div_round(usize::exact_from(exp), RoundingMode::Ceiling).0
     ];
     let inexact = limbs_floor_root_to_out(&mut out, xs, exp);
     (out, inexact)
@@ -567,7 +567,7 @@ pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut root_out = vec![
         0;
         xs.len()
-            .div_round(usize::exact_from(exp), RoundingMode::Ceiling)
+            .div_round(usize::exact_from(exp), RoundingMode::Ceiling).0
     ];
     let mut rem_out = vec![0; xs.len()];
     let rem_len = limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);

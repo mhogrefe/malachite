@@ -10,24 +10,24 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_saturating_neg_assign);
 }
 
-fn demo_saturating_neg_assign<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_saturating_neg_assign<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut i in signed_gen::<T>().get(gm, config).take(limit) {
         let old_i = i;
         i.saturating_neg_assign();
-        println!("i := {}; i.saturating_neg_assign(); i = {}", old_i, i);
+        println!("i := {old_i}; i.saturating_neg_assign(); i = {i}");
     }
 }
 
 fn benchmark_saturating_neg_assign<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_neg_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

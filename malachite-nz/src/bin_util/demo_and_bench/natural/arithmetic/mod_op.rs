@@ -123,9 +123,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_neg_mod_evaluation_strategy);
 }
 
-fn demo_limbs_mod_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_22()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -137,9 +137,9 @@ fn demo_limbs_mod_limb(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_mod_limb_small_normalized(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_small_normalized(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_26()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -151,9 +151,9 @@ fn demo_limbs_mod_limb_small_normalized(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_limbs_mod_limb_small_unnormalized(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_small_unnormalized(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_27()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -165,9 +165,9 @@ fn demo_limbs_mod_limb_small_unnormalized(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_22()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -179,9 +179,9 @@ fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_22()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -193,9 +193,9 @@ fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_27()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -207,9 +207,9 @@ fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenMode, config: GenConfig, l
     }
 }
 
-fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ns, d) in unsigned_vec_unsigned_pair_gen_var_28()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -221,9 +221,8 @@ fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenMode, config: GenConfig, 
     }
 }
 
-fn demo_limbs_mod_three_limb_by_two_limb(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n2, n1, n0, d1, d0, inverse) in unsigned_sextuple_gen_var_2().get(gm, &config).take(limit)
-    {
+fn demo_limbs_mod_three_limb_by_two_limb(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n2, n1, n0, d1, d0, inverse) in unsigned_sextuple_gen_var_2().get(gm, config).take(limit) {
         println!(
             "limbs_mod_three_limb_by_two_limb({}, {}, {}, {}, {}, {}) = {}",
             n2,
@@ -237,8 +236,8 @@ fn demo_limbs_mod_three_limb_by_two_limb(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_limbs_mod_by_two_limb_normalized(gm: GenMode, config: GenConfig, limit: usize) {
-    for (ns, ds) in unsigned_vec_pair_gen_var_18().get(gm, &config).take(limit) {
+fn demo_limbs_mod_by_two_limb_normalized(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (ns, ds) in unsigned_vec_pair_gen_var_18().get(gm, config).take(limit) {
         println!(
             "limbs_mod_by_two_limb_normalized({:?}, {:?}) = {:?}",
             ns,
@@ -248,36 +247,32 @@ fn demo_limbs_mod_by_two_limb_normalized(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_limbs_mod_schoolbook(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_schoolbook(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut ns, ds, inverse) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_ns = ns.clone();
         limbs_mod_schoolbook(&mut ns, &ds, inverse);
-        println!(
-            "ns := {:?}; limbs_mod_schoolbook(&mut ns, {:?}, {}); ns = {:?}",
-            old_ns, ds, inverse, ns
-        );
+        println!("ns := {old_ns:?}; limbs_mod_schoolbook(&mut ns, {ds:?}, {inverse}); ns = {ns:?}");
     }
 }
 
-fn demo_limbs_mod_divide_and_conquer(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_12().get(gm, &config).take(limit) {
+fn demo_limbs_mod_divide_and_conquer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in large_type_gen_var_12().get(gm, config).take(limit) {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
         limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; \
-             limbs_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); ns = {:?}",
-            old_qs, old_ns, ds, inverse, ns
+            "qs := {old_qs:?}; ns := {old_ns:?}; \
+             limbs_mod_divide_and_conquer(&mut qs, &mut ns, {ds:?}, {inverse}); ns = {ns:?}",
         );
     }
 }
 
-fn demo_limbs_mod_barrett(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_barrett(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut qs, mut rs, ns, ds) in unsigned_vec_quadruple_gen_var_5()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_qs = qs.clone();
@@ -285,177 +280,171 @@ fn demo_limbs_mod_barrett(gm: GenMode, config: GenConfig, limit: usize) {
         let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
         limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; rs := {:?}; limbs_mod_barrett(&mut qs, &mut ns, {:?}, {:?}); rs = {:?}",
-            old_qs, old_rs, ns, ds, rs
+            "qs := {old_qs:?}; \
+            rs := {old_rs:?}; limbs_mod_barrett(&mut qs, &mut ns, {ns:?}, {ds:?}); rs = {rs:?}",
         );
     }
 }
 
-fn demo_limbs_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (ns, ds) in unsigned_vec_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_limbs_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (ns, ds) in unsigned_vec_pair_gen_var_11().get(gm, config).take(limit) {
         println!("limbs_mod({:?}, {:?}) = {:?}", ns, ds, limbs_mod(&ns, &ds));
     }
 }
 
-fn demo_limbs_mod_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut rs, ns, ds) in unsigned_vec_triple_gen_var_57()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_mod_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut rs, ns, ds) in unsigned_vec_triple_gen_var_57().get(gm, config).take(limit) {
         let old_rs = rs.clone();
         limbs_mod_to_out(&mut rs, &ns, &ds);
-        println!(
-            "rs := {:?}; limbs_mod_to_out(&mut rs, {:?}, {:?}); rs = {:?}",
-            old_rs, ns, ds, rs
-        );
+        println!("rs := {old_rs:?}; limbs_mod_to_out(&mut rs, {ns:?}, {ds:?}); rs = {rs:?}");
     }
 }
 
-fn demo_natural_mod_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.mod_assign(y);
-        println!("x := {}; x.mod_assign({}); x = {}", x_old, y_old, x);
+        println!("x := {x_old}; x.mod_assign({y_old}); x = {x}");
     }
 }
 
-fn demo_natural_mod_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.mod_assign(&y);
-        println!("x := {}; x.mod_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.mod_assign(&{y}); x = {x}");
     }
 }
 
-fn demo_natural_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.mod_op({}) = {}", x_old, y_old, x.mod_op(y));
     }
 }
 
-fn demo_natural_mod_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.mod_op(&{}) = {}", x_old, y, x.mod_op(&y));
     }
 }
 
-fn demo_natural_mod_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).mod_op({}) = {:?}", x, y_old, (&x).mod_op(y));
     }
 }
 
-fn demo_natural_mod_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         println!("(&{}).mod_op(&{}) = {:?}", x, y, (&x).mod_op(&y));
     }
 }
 
-fn demo_natural_rem_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x %= y;
-        println!("x := {}; x %= {}; x = {}", x_old, y_old, x);
+        println!("x := {x_old}; x %= {y_old}; x = {x}");
     }
 }
 
-fn demo_natural_rem_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         x %= &y;
-        println!("x := {}; x %= &{}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x %= &{y}; x = {x}");
     }
 }
 
-fn demo_natural_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} % {} = {:?}", x_old, y_old, x % y);
     }
 }
 
-fn demo_natural_rem_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} % &{} = {:?}", x_old, y, x % &y);
     }
 }
 
-fn demo_natural_rem_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("&{} % {} = {:?}", x, y_old, &x % y);
     }
 }
 
-fn demo_natural_rem_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_rem_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         println!("&{} % &{} = {:?}", x, y, &x % &y);
     }
 }
 
-fn demo_natural_neg_mod_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.neg_mod_assign(y);
-        println!("x := {}; x.neg_mod_assign({}); x = {}", x_old, y_old, x);
+        println!("x := {x_old}; x.neg_mod_assign({y_old}); x = {x}");
     }
 }
 
-fn demo_natural_neg_mod_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.neg_mod_assign(&y);
-        println!("x := {}; x.neg_mod_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.neg_mod_assign(&{y}); x = {x}");
     }
 }
 
-fn demo_natural_neg_mod(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.neg_mod({}) = {}", x_old, y_old, x.neg_mod(y));
     }
 }
 
-fn demo_natural_neg_mod_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.neg_mod(&{}) = {}", x_old, y, x.neg_mod(&y));
     }
 }
 
-fn demo_natural_neg_mod_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).neg_mod({}) = {}", x, y_old, (&x).neg_mod(y));
     }
 }
 
-fn demo_natural_neg_mod_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_neg_mod_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         println!("(&{}).neg_mod(&{}) = {}", x, y, (&x).neg_mod(&y));
     }
 }
 
 fn benchmark_limbs_mod_limb_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_22().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_22().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -482,14 +471,14 @@ fn benchmark_limbs_mod_limb_algorithms(
 
 fn benchmark_limbs_mod_limb_small_normalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_small_normalized(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_26().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_26().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -525,14 +514,14 @@ fn benchmark_limbs_mod_limb_small_normalized_algorithms(
 
 fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_small_unnormalized(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_27().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_27().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -570,14 +559,14 @@ fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
 
 fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from normalized",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_24().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_24().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -595,14 +584,14 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
 
 fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from unnormalized",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_25().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_25().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -620,14 +609,14 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
 
 fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_25().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_25().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -645,14 +634,14 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
 
 fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_limb_at_least_2_leading_zeros(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_28().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -670,14 +659,14 @@ fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
 
 fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_by_two_limb_normalized(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_triple_gen_var_56().get(gm, &config),
+        unsigned_vec_triple_gen_var_56().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -695,14 +684,14 @@ fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
 
 fn benchmark_limbs_mod_schoolbook_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_schoolbook(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        large_type_gen_var_11().get(gm, &config),
+        large_type_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -721,14 +710,14 @@ fn benchmark_limbs_mod_schoolbook_algorithms(
 // use large params
 fn benchmark_limbs_mod_divide_and_conquer_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        large_type_gen_var_12().get(gm, &config),
+        large_type_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -761,14 +750,14 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
 
 fn benchmark_limbs_mod_barrett_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_quadruple_gen_var_5().get(gm, &config),
+        unsigned_vec_quadruple_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -786,11 +775,11 @@ fn benchmark_limbs_mod_barrett_algorithms(
     );
 }
 
-fn benchmark_limbs_mod(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_11().get(gm, &config),
+        unsigned_vec_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -801,14 +790,14 @@ fn benchmark_limbs_mod(gm: GenMode, config: GenConfig, limit: usize, file_name: 
 
 fn benchmark_limbs_mod_to_out_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_quadruple_gen_var_1().get(gm, &config),
+        unsigned_vec_quadruple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -828,14 +817,14 @@ fn benchmark_limbs_mod_to_out_algorithms(
 
 fn benchmark_natural_mod_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -853,14 +842,14 @@ fn benchmark_natural_mod_assign_evaluation_strategy(
 
 fn benchmark_natural_mod_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_op(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_nrm().get(gm, &config),
+        natural_pair_gen_var_5_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -874,11 +863,16 @@ fn benchmark_natural_mod_library_comparison(
 }
 
 #[allow(clippy::unnecessary_operation)]
-fn benchmark_natural_mod_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_mod_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Natural.mod_op(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -892,14 +886,14 @@ fn benchmark_natural_mod_algorithms(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_natural_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_op(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -924,14 +918,14 @@ fn benchmark_natural_mod_evaluation_strategy(
 
 fn benchmark_natural_rem_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural %= Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -946,14 +940,14 @@ fn benchmark_natural_rem_assign_evaluation_strategy(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_rem_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural % Natural",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_nrm().get(gm, &config),
+        natural_pair_gen_var_5_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -969,14 +963,14 @@ fn benchmark_natural_rem_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural % Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -992,14 +986,14 @@ fn benchmark_natural_rem_evaluation_strategy(
 
 fn benchmark_natural_neg_mod_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.neg_mod_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1017,14 +1011,14 @@ fn benchmark_natural_neg_mod_assign_evaluation_strategy(
 
 fn benchmark_natural_neg_mod_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.neg_mod(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_rm().get(gm, &config),
+        natural_pair_gen_var_5_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1039,14 +1033,14 @@ fn benchmark_natural_neg_mod_library_comparison(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_natural_neg_mod_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.neg_mod(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1062,14 +1056,14 @@ fn benchmark_natural_neg_mod_algorithms(
 
 fn benchmark_natural_neg_mod_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

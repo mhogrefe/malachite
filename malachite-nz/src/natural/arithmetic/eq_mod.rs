@@ -16,6 +16,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_trailing_zeros;
@@ -749,9 +750,9 @@ impl EqMod<Natural, Natural> for Natural {
     /// ```
     fn eq_mod(self, other: Natural, m: Natural) -> bool {
         match (self, other, m) {
-            (x, y, natural_zero!()) => x == y,
-            (x, natural_zero!(), m) => x.divisible_by(m),
-            (natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, Natural::ZERO) => x == y,
+            (x, Natural::ZERO, m) => x.divisible_by(m),
+            (Natural::ZERO, y, m) => y.divisible_by(m),
             (ref x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -817,9 +818,9 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     /// ```
     fn eq_mod(self, other: Natural, m: &'a Natural) -> bool {
         match (self, other, m) {
-            (x, y, &natural_zero!()) => x == y,
-            (x, natural_zero!(), m) => x.divisible_by(m),
-            (natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, &Natural::ZERO) => x == y,
+            (x, Natural::ZERO, m) => x.divisible_by(m),
+            (Natural::ZERO, y, m) => y.divisible_by(m),
             (ref x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -885,9 +886,9 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     /// ```
     fn eq_mod(self, other: &'a Natural, m: Natural) -> bool {
         match (self, other, m) {
-            (x, y, natural_zero!()) => x == *y,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, Natural::ZERO) => x == *y,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (Natural::ZERO, y, m) => y.divisible_by(m),
             (ref x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -953,9 +954,9 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     /// ```
     fn eq_mod(self, other: &'a Natural, m: &'b Natural) -> bool {
         match (self, other, m) {
-            (x, y, &natural_zero!()) => x == *y,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, &Natural::ZERO) => x == *y,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (Natural::ZERO, y, m) => y.divisible_by(m),
             (ref x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -1021,9 +1022,9 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: Natural, m: Natural) -> bool {
         match (self, other, m) {
-            (x, y, natural_zero!()) => *x == y,
-            (x, natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, Natural::ZERO) => *x == y,
+            (x, Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -1089,9 +1090,9 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: Natural, m: &'b Natural) -> bool {
         match (self, other, m) {
-            (x, y, &natural_zero!()) => *x == y,
-            (x, natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, &Natural::ZERO) => *x == y,
+            (x, Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -1157,9 +1158,9 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: &'b Natural, m: Natural) -> bool {
         match (self, other, m) {
-            (x, y, natural_zero!()) => x == y,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, Natural::ZERO) => x == y,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -1225,9 +1226,9 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: &'b Natural, m: &'c Natural) -> bool {
         match (self, other, m) {
-            (x, y, &natural_zero!()) => x == y,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, y, &Natural::ZERO) => x == y,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
             (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,

@@ -18,7 +18,9 @@ impl<'a> IsInteger for &'a Rational {
     /// assert_eq!(Rational::ZERO.is_integer(), true);
     /// assert_eq!(Rational::ONE.is_integer(), true);
     /// assert_eq!(Rational::from(100).is_integer(), true);
+    /// assert_eq!(Rational::from(-100).is_integer(), true);
     /// assert_eq!(Rational::from_signeds(22, 7).is_integer(), false);
+    /// assert_eq!(Rational::from_signeds(-22, 7).is_integer(), false);
     /// ```
     #[inline]
     fn is_integer(self) -> bool {

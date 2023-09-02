@@ -73,8 +73,8 @@ impl OrdAbs for Rational {
         }
         // Then compare floor ∘ log_2 ∘ abs
         let log_cmp = self
-            .floor_log_base_2_of_abs()
-            .cmp(&other.floor_log_base_2_of_abs());
+            .floor_log_base_2_abs()
+            .cmp(&other.floor_log_base_2_abs());
         if log_cmp != Ordering::Equal {
             return log_cmp;
         }

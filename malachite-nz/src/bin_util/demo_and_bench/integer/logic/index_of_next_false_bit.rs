@@ -17,9 +17,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_index_of_next_false_bit_algorithms);
 }
 
-fn demo_limbs_index_of_next_false_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_index_of_next_false_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, u) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -31,9 +31,9 @@ fn demo_limbs_index_of_next_false_bit_neg(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_index_of_next_false_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -47,14 +47,14 @@ fn demo_integer_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: u
 
 fn benchmark_limbs_index_of_next_false_bit_neg(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_index_of_next_false_bit_neg(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -68,14 +68,14 @@ fn benchmark_limbs_index_of_next_false_bit_neg(
 #[allow(clippy::needless_borrow)]
 fn benchmark_integer_index_of_next_false_bit_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.index_of_next_false_bit(u64)",
         BenchmarkType::Algorithms,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

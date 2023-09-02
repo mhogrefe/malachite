@@ -21,10 +21,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_is_integer_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         if x.is_integer() {
             println!("{} is an integer", NiceFloat(x));
         } else {
@@ -33,36 +33,36 @@ fn demo_is_integer_primitive_float<T: PrimitiveFloat>(
     }
 }
 
-fn demo_is_integer_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_is_integer_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
         if x.is_integer() {
-            println!("{} is an integer", x);
+            println!("{x} is an integer");
         } else {
-            println!("{} is not an integer", x);
+            println!("{x} is not an integer");
         }
     }
 }
 
-fn demo_is_integer_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_is_integer_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen::<T>().get(gm, config).take(limit) {
         if x.is_integer() {
-            println!("{} is an integer", x);
+            println!("{x} is an integer");
         } else {
-            println!("{} is not an integer", x);
+            println!("{x} is not an integer");
         }
     }
 }
 
 fn benchmark_is_integer_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.is_integer()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -73,14 +73,14 @@ fn benchmark_is_integer_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_is_integer_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.is_integer()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -91,14 +91,14 @@ fn benchmark_is_integer_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_is_integer_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.is_integer()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

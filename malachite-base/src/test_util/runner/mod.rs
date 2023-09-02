@@ -1,8 +1,8 @@
 use crate::test_util::generators::common::{GenConfig, GenMode};
 use std::collections::HashMap;
 
-pub type DemoFn = &'static dyn Fn(GenMode, GenConfig, usize);
-pub type BenchFn = &'static dyn Fn(GenMode, GenConfig, usize, &str);
+pub type DemoFn = &'static dyn Fn(GenMode, &GenConfig, usize);
+pub type BenchFn = &'static dyn Fn(GenMode, &GenConfig, usize, &str);
 
 pub struct Runner {
     demo_map: HashMap<&'static str, DemoFn>,
@@ -17,7 +17,7 @@ impl Runner {
         }
     }
 
-    pub fn run_demo(&self, key: &str, gm: GenMode, config: GenConfig, limit: usize) {
+    pub fn run_demo(&self, key: &str, gm: GenMode, config: &GenConfig, limit: usize) {
         self.demo_map.get(key).expect("Invalid demo key")(gm, config, limit);
     }
 
@@ -25,7 +25,7 @@ impl Runner {
         &self,
         key: &str,
         gm: GenMode,
-        config: GenConfig,
+        config: &GenConfig,
         limit: usize,
         file_name: &str,
     ) {
@@ -35,16 +35,14 @@ impl Runner {
     pub fn register_demo(&mut self, key: &'static str, f: DemoFn) {
         assert!(
             self.demo_map.insert(key, f).is_none(),
-            "Duplicate demo with key {}",
-            key
+            "Duplicate demo with key {key}",
         );
     }
 
     pub fn register_bench(&mut self, key: &'static str, f: BenchFn) {
         assert!(
             self.bench_map.insert(key, f).is_none(),
-            "Duplicate bench with key {}",
-            key
+            "Duplicate bench with key {key}",
         );
     }
 }

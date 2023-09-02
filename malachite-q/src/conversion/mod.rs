@@ -18,8 +18,10 @@ pub mod from_natural;
 /// Functions for constructing a [`Rational`](crate::Rational) from a numerator and denominator,
 /// or from a sign, numerator, and denominator.
 pub mod from_numerator_and_denominator;
-/// An implementation of the [`TryFrom`] trait for converting a primitive float to a
-/// [`Rational`](crate::Rational).
+/// Implementations of traits for converting a primitive float to a [`Rational`](crate::Rational).
+///
+/// The traits are [`TryFrom`]
+/// and [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
 ///
 /// # try_from
 /// ```
@@ -32,6 +34,20 @@ pub mod from_numerator_and_denominator;
 /// assert_eq!(Rational::try_from(-1.5).to_debug_string(), "Ok(-3/2)");
 /// assert_eq!(Rational::try_from(0.1f32).to_debug_string(), "Ok(13421773/134217728)");
 /// assert_eq!(Rational::try_from(f32::NAN), Err(RationalFromPrimitiveFloatError));
+/// ```
+///
+/// # convertible_from
+/// ```
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(Rational::convertible_from(0.0), true);
+/// assert_eq!(Rational::convertible_from(1.5), true);
+/// assert_eq!(Rational::convertible_from(-1.5), true);
+/// assert_eq!(Rational::convertible_from(0.1f32), true);
+///
+/// assert_eq!(Rational::convertible_from(f32::NAN), false);
+/// assert_eq!(Rational::convertible_from(f32::INFINITY), false);
 /// ```
 pub mod from_primitive_float;
 /// Implementations of the [`From`] trait for converting a primitive integer to a
@@ -138,64 +154,103 @@ pub mod natural_from_rational;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_q::Rational;
+/// use std::cmp::Ordering;
 ///
 /// let one_third = Rational::from_signeds(1i8, 3);
-/// assert_eq!(f32::rounding_from(one_third.clone(), RoundingMode::Floor), 0.3333333);
-/// assert_eq!(f32::rounding_from(one_third, RoundingMode::Ceiling), 0.33333334);
-/// assert_eq!(f32::rounding_from(Rational::ONE_HALF, RoundingMode::Exact), 0.5);
+/// assert_eq!(
+///     f32::rounding_from(one_third.clone(), RoundingMode::Floor),
+///     (0.3333333, Ordering::Less)
+/// );
+/// assert_eq!(
+///     f32::rounding_from(one_third, RoundingMode::Ceiling),
+///     (0.33333334, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     f32::rounding_from(Rational::ONE_HALF, RoundingMode::Exact),
+///     (0.5, Ordering::Equal)
+/// );
 /// let big = Rational::power_of_2(200u64);
-/// assert_eq!(f32::rounding_from(big.clone(), RoundingMode::Down), f32::MAX_FINITE);
-/// assert_eq!(f32::rounding_from(big, RoundingMode::Up), f32::POSITIVE_INFINITY);
+/// assert_eq!(
+///     f32::rounding_from(big.clone(), RoundingMode::Down),
+///     (f32::MAX_FINITE, Ordering::Less)
+/// );
+/// assert_eq!(f32::rounding_from(big, RoundingMode::Up), (f32::INFINITY, Ordering::Greater));
 /// let small = Rational::power_of_2(-200i64);
-/// assert_eq!(NiceFloat(f32::rounding_from(small.clone(), RoundingMode::Down)), NiceFloat(0.0));
-/// assert_eq!(f32::rounding_from(small.clone(), RoundingMode::Up), f32::MIN_POSITIVE_SUBNORMAL);
-/// assert_eq!(NiceFloat(f32::rounding_from(-&small, RoundingMode::Down)), NiceFloat(-0.0));
-/// assert_eq!(f32::rounding_from(-small, RoundingMode::Up), -f32::MIN_POSITIVE_SUBNORMAL);
+/// let (rounded, o) = f32::rounding_from(small.clone(), RoundingMode::Down);
+/// assert_eq!(NiceFloat(rounded), NiceFloat(0.0));
+/// assert_eq!(o, Ordering::Less);
+/// assert_eq!(
+///     f32::rounding_from(small.clone(), RoundingMode::Up),
+///     (f32::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
+/// );
+/// let (rounded, o) = f32::rounding_from(-&small, RoundingMode::Down);
+/// assert_eq!(NiceFloat(rounded), NiceFloat(-0.0));
+/// assert_eq!(o, Ordering::Greater);
+/// assert_eq!(
+///     f32::rounding_from(-small, RoundingMode::Up),
+///     (-f32::MIN_POSITIVE_SUBNORMAL, Ordering::Less)
+/// );
 ///
 /// let one_third = Rational::from_signeds(1i8, 3);
-/// assert_eq!(f32::rounding_from(&one_third, RoundingMode::Floor), 0.3333333);
-/// assert_eq!(f32::rounding_from(&one_third, RoundingMode::Ceiling), 0.33333334);
-/// assert_eq!(f32::rounding_from(&Rational::ONE_HALF, RoundingMode::Exact), 0.5);
+/// assert_eq!(f32::rounding_from(&one_third, RoundingMode::Floor), (0.3333333, Ordering::Less));
+/// assert_eq!(
+///     f32::rounding_from(&one_third, RoundingMode::Ceiling),
+///     (0.33333334, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     f32::rounding_from(&Rational::ONE_HALF, RoundingMode::Exact),
+///     (0.5, Ordering::Equal)
+/// );
 /// let big = Rational::power_of_2(200u64);
-/// assert_eq!(f32::rounding_from(&big, RoundingMode::Down), f32::MAX_FINITE);
-/// assert_eq!(f32::rounding_from(&big, RoundingMode::Up), f32::POSITIVE_INFINITY);
+/// assert_eq!(f32::rounding_from(&big, RoundingMode::Down), (f32::MAX_FINITE, Ordering::Less));
+/// assert_eq!(f32::rounding_from(&big, RoundingMode::Up), (f32::INFINITY, Ordering::Greater));
 /// let small = Rational::power_of_2(-200i64);
-/// assert_eq!(NiceFloat(f32::rounding_from(&small, RoundingMode::Down)), NiceFloat(0.0));
-/// assert_eq!(f32::rounding_from(&small, RoundingMode::Up), f32::MIN_POSITIVE_SUBNORMAL);
-/// assert_eq!(NiceFloat(f32::rounding_from(&-&small, RoundingMode::Down)), NiceFloat(-0.0));
-/// assert_eq!(f32::rounding_from(&-small, RoundingMode::Up), -f32::MIN_POSITIVE_SUBNORMAL);
+/// let (rounded, o) = f32::rounding_from(small.clone(), RoundingMode::Down);
+/// assert_eq!(NiceFloat(rounded), NiceFloat(0.0));
+/// assert_eq!(o, Ordering::Less);
+/// assert_eq!(
+///     f32::rounding_from(&small, RoundingMode::Up),
+///     (f32::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
+/// );
+/// let (rounded, o) = f32::rounding_from(-&small, RoundingMode::Down);
+/// assert_eq!(NiceFloat(rounded), NiceFloat(-0.0));
+/// assert_eq!(o, Ordering::Greater);
+/// assert_eq!(
+///     f32::rounding_from(&-small, RoundingMode::Up),
+///     (-f32::MIN_POSITIVE_SUBNORMAL, Ordering::Less)
+/// );
 /// ```
 ///
 /// # try_from
 /// ```
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
+/// use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
 ///     f32::try_from(Rational::from_signeds(1i8, 3)),
-///     Err(PrimitiveFloatFromRationalError)
+///     Err(FloatFromRationalError)
 /// );
 /// assert_eq!(f32::try_from(Rational::ONE_HALF), Ok(0.5));
-/// assert_eq!(f32::try_from(Rational::power_of_2(200u64)), Err(PrimitiveFloatFromRationalError));
-/// assert_eq!(f32::try_from(Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError));
+/// assert_eq!(f32::try_from(Rational::power_of_2(200u64)), Err(FloatFromRationalError));
+/// assert_eq!(f32::try_from(Rational::power_of_2(-200i64)), Err(FloatFromRationalError));
 /// assert_eq!(
 ///     f32::try_from(-Rational::power_of_2(-200i64)),
-///     Err(PrimitiveFloatFromRationalError)
+///     Err(FloatFromRationalError)
 /// );
 ///
 /// assert_eq!(
 ///     f32::try_from(&Rational::from_signeds(1i8, 3)),
-///     Err(PrimitiveFloatFromRationalError)
+///     Err(FloatFromRationalError)
 /// );
 /// assert_eq!(f32::try_from(&Rational::ONE_HALF), Ok(0.5));
-/// assert_eq!(f32::try_from(&Rational::power_of_2(200u64)), Err(PrimitiveFloatFromRationalError));
+/// assert_eq!(f32::try_from(&Rational::power_of_2(200u64)), Err(FloatFromRationalError));
 /// assert_eq!(
-///     f32::try_from(&Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError)
+///     f32::try_from(&Rational::power_of_2(-200i64)), Err(FloatFromRationalError)
 /// );
 /// assert_eq!(
-///     f32::try_from(&-Rational::power_of_2(-200i64)), Err(PrimitiveFloatFromRationalError)
+///     f32::try_from(&-Rational::power_of_2(-200i64)), Err(FloatFromRationalError)
 /// );
 /// ```
 ///
@@ -279,44 +334,132 @@ pub mod primitive_float_from_rational;
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_q::Rational;
+/// use std::cmp::Ordering;
 ///
-/// assert_eq!(u32::rounding_from(&Rational::from(123), RoundingMode::Exact), 123);
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from(123), RoundingMode::Exact),
+///     (123, Ordering::Equal)
+/// );
 ///
-/// assert_eq!(u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
-/// assert_eq!(u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down), 3);
-/// assert_eq!(u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling), 4);
-/// assert_eq!(u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up), 4);
-/// assert_eq!(u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest), 3);
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor),
+///     (3, Ordering::Less)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down),
+///     (3, Ordering::Less)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling),
+///     (4, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up),
+///     (4, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest),
+///     (3, Ordering::Less)
+/// );
 ///
-/// assert_eq!(u32::rounding_from(&Rational::from(-123), RoundingMode::Down), 0);
-/// assert_eq!(u32::rounding_from(&Rational::from(-123), RoundingMode::Ceiling), 0);
-/// assert_eq!(u32::rounding_from(&Rational::from(-123), RoundingMode::Nearest), 0);
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from(-123), RoundingMode::Down),
+///     (0, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from(-123), RoundingMode::Ceiling),
+///     (0, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     u32::rounding_from(&Rational::from(-123), RoundingMode::Nearest),
+///     (0, Ordering::Greater)
+/// );
 ///
-/// assert_eq!(u8::rounding_from(&Rational::from(1000), RoundingMode::Down), 255);
-/// assert_eq!(u8::rounding_from(&Rational::from(1000), RoundingMode::Floor), 255);
-/// assert_eq!(u8::rounding_from(&Rational::from(1000), RoundingMode::Nearest), 255);
+/// assert_eq!(
+///     u8::rounding_from(&Rational::from(1000), RoundingMode::Down),
+///     (255, Ordering::Less)
+/// );
+/// assert_eq!(
+///     u8::rounding_from(&Rational::from(1000), RoundingMode::Floor),
+///     (255, Ordering::Less)
+/// );
+/// assert_eq!(
+///     u8::rounding_from(&Rational::from(1000), RoundingMode::Nearest),
+///     (255, Ordering::Less)
+/// );
 ///
-/// assert_eq!(i32::rounding_from(&Rational::from(-123), RoundingMode::Exact), -123);
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from(-123), RoundingMode::Exact),
+///     (-123, Ordering::Equal)
+/// );
 ///
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down), 3);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling), 4);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up), 4);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest), 3);
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor),
+///     (3, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down),
+///     (3, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling),
+///     (4, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up),
+///     (4, Ordering::Greater))
+/// ;
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest),
+///     (3, Ordering::Less)
+/// );
 ///
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Floor), -4);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Down), -3);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Ceiling), -3);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Up), -4);
-/// assert_eq!(i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Nearest), -3);
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Floor),
+///     (-4, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Down),
+///     (-3, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Ceiling),
+///     (-3, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Up),
+///     (-4, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i32::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Nearest),
+///     (-3, Ordering::Greater)
+/// );
 ///
-/// assert_eq!(i8::rounding_from(&Rational::from(-1000), RoundingMode::Down), -128);
-/// assert_eq!(i8::rounding_from(&Rational::from(-1000), RoundingMode::Ceiling), -128);
-/// assert_eq!(i8::rounding_from(&Rational::from(-1000), RoundingMode::Nearest), -128);
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(-1000), RoundingMode::Down),
+///     (-128, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(-1000), RoundingMode::Ceiling),
+///     (-128, Ordering::Greater)
+/// );
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(-1000), RoundingMode::Nearest),
+///     (-128, Ordering::Greater)
+/// );
 ///
-/// assert_eq!(i8::rounding_from(&Rational::from(1000), RoundingMode::Down), 127);
-/// assert_eq!(i8::rounding_from(&Rational::from(1000), RoundingMode::Floor), 127);
-/// assert_eq!(i8::rounding_from(&Rational::from(1000), RoundingMode::Nearest), 127);
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(1000), RoundingMode::Down),
+///     (127, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(1000), RoundingMode::Floor),
+///     (127, Ordering::Less)
+/// );
+/// assert_eq!(
+///     i8::rounding_from(&Rational::from(1000), RoundingMode::Nearest),
+///     (127, Ordering::Less)
+/// );
 /// ```
 pub mod primitive_int_from_rational;
 /// Implementations of traits for converting [`Rational`](crate::Rational)s to and from

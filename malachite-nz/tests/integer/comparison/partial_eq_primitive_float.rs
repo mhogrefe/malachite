@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
@@ -25,10 +26,10 @@ fn test_partial_eq() {
         assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
     };
     test("5", f32::NAN, false);
-    test("5", f32::POSITIVE_INFINITY, false);
+    test("5", f32::INFINITY, false);
     test("5", f32::NEGATIVE_INFINITY, false);
     test("-5", f32::NAN, false);
-    test("-5", f32::POSITIVE_INFINITY, false);
+    test("-5", f32::INFINITY, false);
     test("-5", f32::NEGATIVE_INFINITY, false);
 
     test("0", 0.0, true);

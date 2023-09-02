@@ -29,30 +29,29 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_round_to_multiple_of_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow, rm) in rational_signed_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.round_to_multiple_of_power_of_2_assign(pow, rm);
+        let o = n.round_to_multiple_of_power_of_2_assign(pow, rm);
         println!(
-            "x := {}; x.round_to_multiple_of_power_of_2_assign({}, {}); x = {}",
-            n_old, pow, rm, n
+            "x := {n_old}; x.round_to_multiple_of_power_of_2_assign({pow}, {rm}) = {o:?}; x = {n}"
         );
     }
 }
 
-fn demo_rational_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_round_to_multiple_of_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow, rm) in rational_signed_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "({}).round_to_multiple_of_power_of_2({}, {}) = {}",
+            "({}).round_to_multiple_of_power_of_2({}, {}) = {:?}",
             n_old,
             pow,
             rm,
@@ -61,13 +60,17 @@ fn demo_rational_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig,
     }
 }
 
-fn demo_rational_round_to_multiple_of_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_round_to_multiple_of_power_of_2_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (n, pow, rm) in rational_signed_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).round_to_multiple_of_power_of_2({}, {}) = {}",
+            "(&{}).round_to_multiple_of_power_of_2({}, {}) = {:?}",
             n,
             pow,
             rm,
@@ -78,20 +81,20 @@ fn demo_rational_round_to_multiple_of_power_of_2_ref(gm: GenMode, config: GenCon
 
 fn benchmark_rational_round_to_multiple_of_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.round_to_multiple_of_power_of_2_assign(u64, RoundingMode)",
         BenchmarkType::Single,
-        rational_signed_rounding_mode_triple_gen_var_1().get(gm, &config),
+        rational_signed_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_2_rational_bit_i64_max_bucketer("n", "pow"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_of_power_of_2_assign(y, rm)
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
         })],
     );
 }
@@ -99,14 +102,14 @@ fn benchmark_rational_round_to_multiple_of_power_of_2_assign(
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_round_to_multiple_of_power_of_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.round_to_multiple_of_power_of_2(u64, RoundingMode)",
         BenchmarkType::Algorithms,
-        rational_signed_rounding_mode_triple_gen_var_1().get(gm, &config),
+        rational_signed_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -124,14 +127,14 @@ fn benchmark_rational_round_to_multiple_of_power_of_2_algorithms(
 
 fn benchmark_rational_round_to_multiple_of_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.round_to_multiple_of_power_of_2(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        rational_signed_rounding_mode_triple_gen_var_1().get(gm, &config),
+        rational_signed_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

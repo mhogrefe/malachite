@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::bucketers::{
@@ -10,7 +11,6 @@ use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_2, primitive_float_rounding_mode_pair_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use malachite_nz::natural::Natural;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -25,16 +25,19 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_natural_convertible_from_float_algorithms);
 }
 
-fn demo_natural_rounding_from_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_natural_rounding_from_float<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     Natural: RoundingFrom<T>,
 {
     for (f, rm) in primitive_float_rounding_mode_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "Natural::rounding_from({}, {}) = {}",
+            "Natural::rounding_from({}, {}) = {:?}",
             NiceFloat(f),
             rm,
             Natural::rounding_from(f, rm)
@@ -42,11 +45,11 @@ where
     }
 }
 
-fn demo_natural_try_from_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_try_from_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!(
             "Natural::try_from({}) = {:?}",
             NiceFloat(f),
@@ -55,14 +58,11 @@ where
     }
 }
 
-fn demo_natural_exact_from_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_exact_from_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: ExactFrom<T>,
 {
-    for f in primitive_float_gen_var_2::<T>()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for f in primitive_float_gen_var_2::<T>().get(gm, config).take(limit) {
         println!(
             "Natural::exact_from({}) = {}",
             NiceFloat(f),
@@ -73,12 +73,12 @@ where
 
 fn demo_natural_convertible_from_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ConvertibleFrom<T>,
 {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         if Natural::convertible_from(f) {
             println!("{} is convertible to a Natural", NiceFloat(f));
         } else {
@@ -89,7 +89,7 @@ fn demo_natural_convertible_from_float<T: PrimitiveFloat>(
 
 fn benchmark_natural_rounding_from_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -98,7 +98,7 @@ fn benchmark_natural_rounding_from_float<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural::rounding_from({}, RoundingMode)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_rounding_mode_pair_gen_var_1::<T>().get(gm, &config),
+        primitive_float_rounding_mode_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -111,7 +111,7 @@ fn benchmark_natural_rounding_from_float<T: PrimitiveFloat>(
 
 fn benchmark_natural_try_from_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -120,7 +120,7 @@ fn benchmark_natural_try_from_float<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural::try_from({})", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -131,7 +131,7 @@ fn benchmark_natural_try_from_float<T: PrimitiveFloat>(
 
 fn benchmark_natural_exact_from_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -140,7 +140,7 @@ fn benchmark_natural_exact_from_float<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural::exact_from({})", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_2::<T>().get(gm, &config),
+        primitive_float_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -152,7 +152,7 @@ fn benchmark_natural_exact_from_float<T: PrimitiveFloat>(
 #[allow(unused_must_use)]
 fn benchmark_natural_convertible_from_float_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -161,7 +161,7 @@ fn benchmark_natural_convertible_from_float_algorithms<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural::convertible_from({})", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

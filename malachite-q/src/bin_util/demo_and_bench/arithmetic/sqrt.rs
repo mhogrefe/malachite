@@ -12,28 +12,28 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_checked_sqrt_evaluation_strategy);
 }
 
-fn demo_rational_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen_var_3().get(gm, &config).take(limit) {
+fn demo_rational_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen_var_3().get(gm, config).take(limit) {
         println!("({}).checked_sqrt() = {:?}", x, x.clone().checked_sqrt());
     }
 }
 
-fn demo_rational_checked_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen_var_3().get(gm, &config).take(limit) {
+fn demo_rational_checked_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen_var_3().get(gm, config).take(limit) {
         println!("(&{}).checked_sqrt() = {:?}", x, (&x).checked_sqrt());
     }
 }
 
 fn benchmark_rational_checked_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.checked_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen_var_3().get(gm, &config),
+        rational_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

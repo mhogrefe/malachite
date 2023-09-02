@@ -15,44 +15,38 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_assign_bit_signed);
 }
 
-fn demo_assign_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_assign_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index, bit) in unsigned_unsigned_bool_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n;
         n.assign_bit(index, bit);
-        println!(
-            "x := {}; x.assign_bit({}, {}); x = {}",
-            n_old, index, bit, n
-        );
+        println!("x := {n_old}; x.assign_bit({index}, {bit}); x = {n}");
     }
 }
 
-fn demo_assign_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_assign_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index, bit) in signed_unsigned_bool_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n;
         n.assign_bit(index, bit);
-        println!(
-            "x := {}; x.assign_bit({}, {}); x = {}",
-            n_old, index, bit, n
-        );
+        println!("x := {n_old}; x.assign_bit({index}, {bit}); x = {n}");
     }
 }
 
 fn benchmark_assign_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.assign_bit(u64, bool)", T::NAME),
         BenchmarkType::Single,
-        unsigned_unsigned_bool_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_unsigned_bool_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -65,14 +59,14 @@ fn benchmark_assign_bit_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_assign_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.assign_bit(u64, bool)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_bool_triple_gen_var_1::<T>().get(gm, &config),
+        signed_unsigned_bool_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

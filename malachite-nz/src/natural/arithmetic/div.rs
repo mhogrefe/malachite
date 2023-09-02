@@ -96,7 +96,7 @@ pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_in_place(
     mut carry: Limb,
 ) -> Limb {
     let d = DoubleLimb::from(d);
-    for n in ns.iter_mut() {
+    for n in &mut *ns {
         let (hi, lo) = (DoubleLimb::from(*n) * d).split_in_half();
         let inner_carry = carry < lo;
         carry.wrapping_sub_assign(lo);
@@ -913,7 +913,7 @@ fn limbs_div_divide_and_conquer_approx_helper(
         limbs_div_divide_and_conquer_approx_helper(qs, &mut ns_hi[lo >> 1..], ds_hi, d_inv, scratch)
     };
     if q_lo {
-        for q in qs[..lo].iter_mut() {
+        for q in &mut qs[..lo] {
             *q = Limb::MAX;
         }
     }
@@ -1299,7 +1299,7 @@ fn limbs_div_barrett_approx_preinverted(
     if limbs_slice_add_limb_in_place(qs, 3) || carry {
         if highest_q {
             // Return a quotient of just 1-bits, with highest_q set.
-            for q in qs.iter_mut() {
+            for q in &mut *qs {
                 *q = Limb::MAX;
             }
         }
@@ -1683,7 +1683,7 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
             fail_on_untested_path("limbs_div_to_out_balanced, highest_q");
             // This happens only when the quotient is close to B ^ n and one of the approximate
             // division functions returned B ^ n.
-            for s in scratch_2[..new_n_len - q_len_plus_1].iter_mut() {
+            for s in &mut scratch_2[..new_n_len - q_len_plus_1] {
                 *s = Limb::MAX;
             }
         }
@@ -2092,8 +2092,8 @@ impl<'a> Div<Natural> for &'a Natural {
             return Natural::ONE;
         }
         match (self, &mut other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => n.clone(),
+            (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (n, &mut Natural::ONE) => n.clone(),
             (n, &mut Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
             (&Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
@@ -2149,8 +2149,8 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
             return Natural::ONE;
         }
         match (self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => n.clone(),
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (n, &Natural::ONE) => n.clone(),
             (n, &Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
             (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => {
@@ -2200,8 +2200,8 @@ impl DivAssign<Natural> for Natural {
             return;
         }
         match (&mut *self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => {}
+            (_, Natural::ZERO) => panic!("division by zero"),
+            (_, Natural::ONE) => {}
             (n, Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
             (&mut Natural(Large(ref mut ns)), Natural(Large(ref mut ds))) => {
@@ -2256,8 +2256,8 @@ impl<'a> DivAssign<&'a Natural> for Natural {
             return;
         }
         match (&mut *self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => {}
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Natural::ONE) => {}
             (n, &Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
             (&mut Natural(Large(ref mut ns)), Natural(Large(ref ds))) => {

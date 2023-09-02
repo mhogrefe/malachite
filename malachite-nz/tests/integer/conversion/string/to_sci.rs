@@ -729,7 +729,7 @@ fn to_sci_properties() {
                 let pow = powers_of_10
                     .entry(log - default_p + 1)
                     .or_insert_with_key(|&p| (&ten).pow(p));
-                assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest), x_from);
+                assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest).0, x_from);
             }
         }
     });
@@ -808,7 +808,7 @@ fn to_sci_with_options_properties() {
                     .entry((base.clone(), scale))
                     .or_insert_with(|| base.pow(scale));
                 assert_eq!(
-                    x.round_to_multiple(&*pow, options.get_rounding_mode()),
+                    x.round_to_multiple(&*pow, options.get_rounding_mode()).0,
                     x_from
                 );
             } else {

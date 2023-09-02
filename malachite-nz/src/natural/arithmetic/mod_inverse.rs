@@ -58,7 +58,7 @@ impl ModInverse for Natural {
         assert_ne!(self, 0u32);
         assert!(self < m);
         match (self, m) {
-            (x @ natural_one!(), _) => Some(x),
+            (x @ Natural::ONE, _) => Some(x),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
             (a, b) => mod_inverse_helper(a, b),
         }
@@ -99,7 +99,7 @@ impl<'a> ModInverse<&'a Natural> for Natural {
         assert_ne!(self, 0u32);
         assert!(self < *m);
         match (self, m) {
-            (x @ natural_one!(), _) => Some(x),
+            (x @ Natural::ONE, _) => Some(x),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(*y).map(Natural::from),
             (a, b) => mod_inverse_helper(a, b.clone()),
         }
@@ -140,7 +140,7 @@ impl<'a> ModInverse<Natural> for &'a Natural {
         assert_ne!(*self, 0u32);
         assert!(*self < m);
         match (self, m) {
-            (natural_one!(), _) => Some(Natural::ONE),
+            (&Natural::ONE, _) => Some(Natural::ONE),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
             (a, b) => mod_inverse_helper(a.clone(), b),
         }
@@ -181,7 +181,7 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
         assert_ne!(*self, 0u32);
         assert!(self < m);
         match (self, m) {
-            (natural_one!(), _) => Some(Natural::ONE),
+            (&Natural::ONE, _) => Some(Natural::ONE),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(*y).map(Natural::from),
             (a, b) => mod_inverse_helper(a.clone(), b.clone()),
         }

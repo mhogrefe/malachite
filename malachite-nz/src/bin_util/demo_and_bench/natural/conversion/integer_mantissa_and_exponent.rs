@@ -19,8 +19,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_from_integer_mantissa_and_exponent);
 }
 
-fn demo_natural_integer_mantissa_and_exponent(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_integer_mantissa_and_exponent(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!(
             "{}.integer_mantissa_and_exponent() = {:?}",
             n,
@@ -29,21 +29,21 @@ fn demo_natural_integer_mantissa_and_exponent(gm: GenMode, config: GenConfig, li
     }
 }
 
-fn demo_natural_integer_mantissa(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_integer_mantissa(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("{}.integer_mantissa() = {}", n, n.integer_mantissa());
     }
 }
 
-fn demo_natural_integer_exponent(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_integer_exponent(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("{}.integer_exponent() = {}", n, n.integer_exponent());
     }
 }
 
-fn demo_natural_from_integer_mantissa_and_exponent(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_from_integer_mantissa_and_exponent(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mantissa, exponent) in natural_unsigned_pair_gen_var_4::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n = <&Natural as IntegerMantissaAndExponent::<Natural, u64, Natural>>
@@ -59,14 +59,14 @@ fn demo_natural_from_integer_mantissa_and_exponent(gm: GenMode, config: GenConfi
 
 fn benchmark_natural_integer_mantissa_and_exponent(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.integer_mantissa_and_exponent()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -79,14 +79,14 @@ fn benchmark_natural_integer_mantissa_and_exponent(
 
 fn benchmark_natural_integer_mantissa(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.integer_mantissa()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -97,14 +97,14 @@ fn benchmark_natural_integer_mantissa(
 
 fn benchmark_natural_integer_exponent(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.integer_exponent()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -115,14 +115,14 @@ fn benchmark_natural_integer_exponent(
 
 fn benchmark_natural_from_integer_mantissa_and_exponent(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_integer_mantissa_and_exponent(Natural, u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4::<u64>().get(gm, &config),
+        natural_unsigned_pair_gen_var_4::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

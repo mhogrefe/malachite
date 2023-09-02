@@ -19,14 +19,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_checked_log_base);
 }
 
-fn demo_rational_approx_log(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen_var_2().get(gm, &config).take(limit) {
+fn demo_rational_approx_log(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen_var_2().get(gm, config).take(limit) {
         println!("log({}) ≈ {}", n, NiceFloat(n.approx_log()));
     }
 }
 
-fn demo_rational_floor_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in rational_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_rational_floor_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in rational_pair_gen_var_7().get(gm, config).take(limit) {
         println!(
             "floor_log_base({}, {}) = {}",
             n,
@@ -36,8 +36,8 @@ fn demo_rational_floor_log_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_ceiling_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in rational_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_rational_ceiling_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in rational_pair_gen_var_7().get(gm, config).take(limit) {
         println!(
             "ceiling_log_base({}, {}) = {}",
             n,
@@ -47,8 +47,8 @@ fn demo_rational_ceiling_log_base(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_rational_checked_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in rational_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_rational_checked_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in rational_pair_gen_var_7().get(gm, config).take(limit) {
         println!(
             "checked_log_base({}, {}) = {:?}",
             n,
@@ -58,11 +58,11 @@ fn demo_rational_checked_log_base(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn benchmark_approx_log(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_approx_log(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "(&Rational).approx_log()",
         BenchmarkType::Single,
-        rational_gen_var_2().get(gm, &config),
+        rational_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -73,14 +73,14 @@ fn benchmark_approx_log(gm: GenMode, config: GenConfig, limit: usize, file_name:
 
 fn benchmark_rational_floor_log_base(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Rational).floor_log_base(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen_var_7().get(gm, &config),
+        rational_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_rational_floor_log_base(
 
 fn benchmark_rational_ceiling_log_base(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Rational).ceiling_log_base(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen_var_7().get(gm, &config),
+        rational_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -113,14 +113,14 @@ fn benchmark_rational_ceiling_log_base(
 
 fn benchmark_rational_checked_log_base(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Rational).checked_log_base(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen_var_7().get(gm, &config),
+        rational_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,

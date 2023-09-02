@@ -24,15 +24,15 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_round_to_multiple_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, y, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "{}.round_to_multiple({}, {}) = {}",
+            "{}.round_to_multiple({}, {}) = {:?}",
             x,
             y,
             rm,
@@ -43,19 +43,16 @@ fn demo_round_to_multiple_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.round_to_multiple_assign(y, rm);
-        println!(
-            "x := {}; x.round_to_multiple_assign({}, {}); x = {}",
-            old_x, y, rm, x
-        );
+        let o = x.round_to_multiple_assign(y, rm);
+        println!("x := {old_x}; x.round_to_multiple_assign({y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
@@ -64,15 +61,15 @@ fn demo_round_to_multiple_signed<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, y, rm) in signed_signed_rounding_mode_triple_gen_var_2::<U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "({}).round_to_multiple({}, {}) = {}",
+            "({}).round_to_multiple({}, {}) = {:?}",
             x,
             y,
             rm,
@@ -86,32 +83,29 @@ fn demo_round_to_multiple_assign_signed<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y, rm) in signed_signed_rounding_mode_triple_gen_var_2::<U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.round_to_multiple_assign(y, rm);
-        println!(
-            "x := {}; x.round_to_multiple_assign({}, {}); x = {}",
-            old_x, y, rm, x
-        );
+        let o = x.round_to_multiple_assign(y, rm);
+        println!("x := {old_x}; x.round_to_multiple_assign({y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
 fn benchmark_round_to_multiple_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.round_to_multiple({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -124,7 +118,7 @@ fn benchmark_round_to_multiple_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -135,13 +129,13 @@ fn benchmark_round_to_multiple_assign_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_assign(y, rm)
+            no_out!(x.round_to_multiple_assign(y, rm))
         })],
     );
 }
@@ -151,14 +145,14 @@ fn benchmark_round_to_multiple_signed<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.round_to_multiple({}, RoundingMode)", S::NAME, S::NAME),
         BenchmarkType::Single,
-        signed_signed_rounding_mode_triple_gen_var_2::<U, S>().get(gm, &config),
+        signed_signed_rounding_mode_triple_gen_var_2::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -174,7 +168,7 @@ fn benchmark_round_to_multiple_assign_signed<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -185,13 +179,13 @@ fn benchmark_round_to_multiple_assign_signed<
             S::NAME
         ),
         BenchmarkType::Single,
-        signed_signed_rounding_mode_triple_gen_var_2::<U, S>().get(gm, &config),
+        signed_signed_rounding_mode_triple_gen_var_2::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_assign(y, rm)
+            no_out!(x.round_to_multiple_assign(y, rm))
         })],
     );
 }

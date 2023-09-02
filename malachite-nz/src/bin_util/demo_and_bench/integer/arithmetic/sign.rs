@@ -12,26 +12,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_sign_library_comparison);
 }
 
-fn demo_integer_sign(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_sign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         match n.sign() {
-            Ordering::Less => println!("{} is negative", n),
-            Ordering::Equal => println!("{} is zero", n),
-            Ordering::Greater => println!("{} is positive", n),
+            Ordering::Less => println!("{n} is negative"),
+            Ordering::Equal => println!("{n} is zero"),
+            Ordering::Greater => println!("{n} is positive"),
         }
     }
 }
 
 fn benchmark_integer_sign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sign()",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

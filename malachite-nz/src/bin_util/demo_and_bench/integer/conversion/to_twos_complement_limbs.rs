@@ -58,8 +58,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_twos_complement(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_2().get(gm, &config).take(limit) {
+fn demo_limbs_twos_complement(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_2().get(gm, config).take(limit) {
         println!(
             "limbs_twos_complement({:?}) = {:?}",
             xs,
@@ -70,48 +70,45 @@ fn demo_limbs_twos_complement(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn demo_limbs_maybe_sign_extend_non_negative_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         let mut mut_xs = xs.clone();
         limbs_maybe_sign_extend_non_negative_in_place(&mut mut_xs);
         println!(
-            "xs := {:?}; limbs_maybe_sign_extend_non_negative_in_place(&mut xs); xs = {:?}",
-            xs, mut_xs
+            "xs := {xs:?}; limbs_maybe_sign_extend_non_negative_in_place(&mut xs); xs = {mut_xs:?}",
         );
     }
 }
 
-fn demo_limbs_twos_complement_in_place(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_limbs_twos_complement_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         let mut mut_xs = xs.clone();
         let carry = limbs_twos_complement_in_place(&mut mut_xs);
         println!(
-            "xs := {:?}; limbs_twos_complement_in_place(&mut xs) = {}; xs = {:?}",
-            xs, carry, mut_xs
+            "xs := {xs:?}; limbs_twos_complement_in_place(&mut xs) = {carry}; xs = {mut_xs:?}",
         );
     }
 }
 
 fn demo_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for xs in unsigned_vec_gen_var_2().get(gm, &config).take(limit) {
+    for xs in unsigned_vec_gen_var_2().get(gm, config).take(limit) {
         let mut mut_xs = xs.clone();
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_xs);
         println!(
-            "xs := {:?}; limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs); \
-            xs = {:?}",
-            xs, mut_xs
+            "xs := {xs:?}; limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs); \
+            xs = {mut_xs:?}",
         );
     }
 }
 
-fn demo_integer_to_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_to_twos_complement_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "to_twos_complement_limbs_asc({}) = {:?}",
             n,
@@ -120,8 +117,8 @@ fn demo_integer_to_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn demo_integer_to_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_to_twos_complement_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "to_twos_complement_limbs_desc({}) = {:?}",
             n,
@@ -130,8 +127,8 @@ fn demo_integer_to_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, li
     }
 }
 
-fn demo_integer_into_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_into_twos_complement_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "into_twos_complement_limbs_asc({}) = {:?}",
             n,
@@ -140,8 +137,8 @@ fn demo_integer_into_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, l
     }
 }
 
-fn demo_integer_into_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_into_twos_complement_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "into_twos_complement_limbs_desc({}) = {:?}",
             n,
@@ -150,8 +147,8 @@ fn demo_integer_into_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, 
     }
 }
 
-fn demo_integer_twos_complement_limbs(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_twos_complement_limbs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "twos_complement_limbs({}) = {:?}",
             n,
@@ -160,8 +157,8 @@ fn demo_integer_twos_complement_limbs(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_integer_twos_complement_limbs_rev(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_twos_complement_limbs_rev(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "twos_complement_limbs({}).rev() = {:?}",
             n,
@@ -170,9 +167,9 @@ fn demo_integer_twos_complement_limbs_rev(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_twos_complement_limbs_get(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_twos_complement_limbs_get(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, i) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -184,11 +181,11 @@ fn demo_integer_twos_complement_limbs_get(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn benchmark_limbs_twos_complement(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_twos_complement(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_twos_complement(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_2().get(gm, &config),
+        unsigned_vec_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -199,14 +196,14 @@ fn benchmark_limbs_twos_complement(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_maybe_sign_extend_non_negative_in_place(&mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -219,14 +216,14 @@ fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(
 
 fn benchmark_limbs_twos_complement_in_place_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_twos_complement_in_place(&mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_gen_var_2().get(gm, &config),
+        unsigned_vec_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -247,14 +244,14 @@ fn benchmark_limbs_twos_complement_in_place_algorithms(
 
 fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_2().get(gm, &config),
+        unsigned_vec_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -267,14 +264,14 @@ fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
 
 fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_twos_complement_limbs_asc()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -295,14 +292,14 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
 
 fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_twos_complement_limbs_desc()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -324,14 +321,14 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
 
 fn benchmark_integer_twos_complement_limbs_get_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.twos_complement_limbs().get()",
         BenchmarkType::Algorithms,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

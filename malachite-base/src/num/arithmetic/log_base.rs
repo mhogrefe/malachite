@@ -1,23 +1,6 @@
 use crate::num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
-pub_test! {floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
-    assert_ne!(x, T::ZERO);
-    assert!(base > T::ONE);
-    let mut result = 0;
-    let mut p = T::ONE;
-    // loop always executes at least once
-    while p <= x {
-        result += 1;
-        if let Some(next_p) = p.checked_mul(base) {
-            p = next_p;
-        } else {
-            break;
-        }
-    }
-    result - 1
-}}
-
 pub_test! {ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
@@ -53,14 +36,6 @@ pub_test! {checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option
         None
     }
 }}
-
-fn floor_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
-    if let Some(log_base) = base.checked_log_base_2() {
-        x.floor_log_base_power_of_2(log_base)
-    } else {
-        floor_log_base_naive(x, base)
-    }
-}
 
 fn ceiling_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {
@@ -102,7 +77,7 @@ macro_rules! impl_log_base_unsigned {
             /// See [here](super::log_base#floor_log_base).
             #[inline]
             fn floor_log_base(self, base: $t) -> u64 {
-                floor_log_base(self, base)
+                u64::from(self.ilog(base))
             }
         }
 

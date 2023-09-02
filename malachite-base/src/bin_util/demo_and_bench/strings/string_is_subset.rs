@@ -11,8 +11,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_string_is_subset);
 }
 
-fn demo_string_is_subset(gm: GenMode, config: GenConfig, limit: usize) {
-    for (s, t) in string_pair_gen().get(gm, &config).take(limit) {
+fn demo_string_is_subset(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (s, t) in string_pair_gen().get(gm, config).take(limit) {
         println!(
             "{:?} is {}a subset of {:?}",
             s,
@@ -22,8 +22,8 @@ fn demo_string_is_subset(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_string_is_subset_ascii(gm: GenMode, config: GenConfig, limit: usize) {
-    for (s, t) in string_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_string_is_subset_ascii(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (s, t) in string_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "{:?} is {}a subset of {:?}",
             s,
@@ -33,15 +33,15 @@ fn demo_string_is_subset_ascii(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_string_is_subset(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_string_is_subset(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "string_is_subset(&str, &str)",
         BenchmarkType::Single,
-        string_pair_gen().get(gm, &config),
+        string_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
-        &pair_string_max_len_bucketer(),
+        &pair_string_max_len_bucketer("s", "t"),
         &mut [("Malachite", &mut |(s, t)| no_out!(string_is_subset(&s, &t)))],
     );
 }

@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::generators::{primitive_float_gen, unsigned_pair_gen_var_26};
@@ -16,7 +17,7 @@ pub fn test_raw_mantissa_and_exponent() {
     test::<f32>(0.0, 0, 0);
     test::<f32>(-0.0, 0, 0);
     test::<f32>(f32::NAN, 0x400000, 255);
-    test::<f32>(f32::POSITIVE_INFINITY, 0, 255);
+    test::<f32>(f32::INFINITY, 0, 255);
     test::<f32>(f32::NEGATIVE_INFINITY, 0, 255);
     test::<f32>(1.0, 0, 127);
     test::<f32>(core::f32::consts::PI, 4788187, 128);
@@ -30,7 +31,7 @@ pub fn test_raw_mantissa_and_exponent() {
     test::<f64>(0.0, 0, 0);
     test::<f64>(-0.0, 0, 0);
     test::<f64>(f64::NAN, 0x8000000000000, 2047);
-    test::<f64>(f64::POSITIVE_INFINITY, 0, 2047);
+    test::<f64>(f64::INFINITY, 0, 2047);
     test::<f64>(f64::NEGATIVE_INFINITY, 0, 2047);
     test::<f64>(1.0, 0, 1023);
     test::<f64>(core::f64::consts::PI, 2570638124657944, 1024);
@@ -51,7 +52,7 @@ pub fn test_raw_exponent() {
     test::<f32>(0.0, 0);
     test::<f32>(-0.0, 0);
     test::<f32>(f32::NAN, 255);
-    test::<f32>(f32::POSITIVE_INFINITY, 255);
+    test::<f32>(f32::INFINITY, 255);
     test::<f32>(f32::NEGATIVE_INFINITY, 255);
     test::<f32>(1.0, 127);
     test::<f32>(core::f32::consts::PI, 128);
@@ -65,7 +66,7 @@ pub fn test_raw_exponent() {
     test::<f64>(0.0, 0);
     test::<f64>(-0.0, 0);
     test::<f64>(f64::NAN, 2047);
-    test::<f64>(f64::POSITIVE_INFINITY, 2047);
+    test::<f64>(f64::INFINITY, 2047);
     test::<f64>(f64::NEGATIVE_INFINITY, 2047);
     test::<f64>(1.0, 1023);
     test::<f64>(core::f64::consts::PI, 1024);
@@ -86,7 +87,7 @@ pub fn test_from_raw_mantissa_and_exponent() {
     }
     test::<f32>(0, 0, 0.0);
     test::<f32>(0x400000, 255, f32::NAN);
-    test::<f32>(0, 255, f32::POSITIVE_INFINITY);
+    test::<f32>(0, 255, f32::INFINITY);
     test::<f32>(0, 127, 1.0);
     test::<f32>(4788187, 128, core::f32::consts::PI);
     test::<f32>(5033165, 123, 0.1);
@@ -98,7 +99,7 @@ pub fn test_from_raw_mantissa_and_exponent() {
 
     test::<f64>(0, 0, 0.0);
     test::<f64>(0x8000000000000, 2047, f64::NAN);
-    test::<f64>(0, 2047, f64::POSITIVE_INFINITY);
+    test::<f64>(0, 2047, f64::INFINITY);
     test::<f64>(0, 1023, 1.0);
     test::<f64>(2570638124657944, 1024, core::f64::consts::PI);
     test::<f64>(2702159776422298, 1019, 0.1);

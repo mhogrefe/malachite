@@ -12,10 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_max_precision_for_sci_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for exp in signed_gen_var_11::<T>().get(gm, &config).take(limit) {
+    for exp in signed_gen_var_11::<T>().get(gm, config).take(limit) {
         println!(
             "{}.max_precision_for_sci_exponent() = {}",
             exp,
@@ -26,14 +26,14 @@ fn demo_max_precision_for_sci_exponent<T: PrimitiveFloat>(
 
 fn benchmark_max_precision_for_sci_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::max_precision_for_sci_exponent(i64)", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_11::<T>().get(gm, &config),
+        signed_gen_var_11::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

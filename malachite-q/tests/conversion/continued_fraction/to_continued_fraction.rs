@@ -20,7 +20,7 @@ fn test_continued_fraction() {
         assert_eq!(continued_fraction, continued_fraction_alt);
         let continued_fraction = continued_fraction.collect_vec();
         let s = if continued_fraction.is_empty() {
-            format!("[{}]", floor)
+            format!("[{floor}]")
         } else {
             let s = continued_fraction.to_debug_string();
             format!("[{}; {}]", floor, &s[1..s.len() - 1])

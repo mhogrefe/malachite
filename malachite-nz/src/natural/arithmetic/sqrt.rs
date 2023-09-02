@@ -381,11 +381,11 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
             };
         }
         _ if xs_len > 8 => {
-            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
             limbs_sqrt_helper(&mut out[..out_len], xs, shift, xs_len.odd());
         }
         _ => {
-            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
             let out = &mut out[..out_len];
             if xs_len.odd() || shift != 0 {
                 let scratch_1_len = out_len << 1;
@@ -479,7 +479,7 @@ pub_test! {limbs_sqrt_rem_to_out(
             }
         }
         _ => {
-            let mut out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let mut out_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
             let out_sqrt = &mut out_sqrt[..out_len];
             if xs_len.odd() || shift != 0 {
                 let scratch_1_len = out_len << 1;
@@ -558,7 +558,7 @@ pub_test! {limbs_sqrt_rem_to_out(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
-    let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+    let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling).0];
     limbs_sqrt_to_out(&mut out, xs);
     out
 }}
@@ -574,7 +574,7 @@ pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // TODO
 pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     if !slice_test_zero(&out_rem[..rem_len]) {
@@ -606,7 +606,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     if slice_test_zero(&out_rem[..rem_len]) {
@@ -634,7 +634,7 @@ pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     out_rem.truncate(rem_len);

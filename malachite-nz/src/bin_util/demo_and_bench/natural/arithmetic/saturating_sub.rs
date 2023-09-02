@@ -20,8 +20,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_saturating_sub_evaluation_strategy);
 }
 
-fn demo_natural_saturating_sub(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -33,8 +33,8 @@ fn demo_natural_saturating_sub(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_saturating_sub_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "{}.saturating_sub(&{}) = {:?}",
@@ -45,8 +45,8 @@ fn demo_natural_saturating_sub_val_ref(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_natural_saturating_sub_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).saturating_sub({}) = {:?}",
@@ -57,8 +57,8 @@ fn demo_natural_saturating_sub_ref_val(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_natural_saturating_sub_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         println!(
             "(&{}).saturating_sub(&{}) = {:?}",
             x,
@@ -68,36 +68,33 @@ fn demo_natural_saturating_sub_ref_ref(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_natural_saturating_sub_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.saturating_sub_assign(y);
-        println!(
-            "x := {}; x.saturating_sub_assign({}); x = {}",
-            x_old, y_old, x
-        );
+        println!("x := {x_old}; x.saturating_sub_assign({y_old}); x = {x}");
     }
 }
 
-fn demo_natural_saturating_sub_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_sub_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.saturating_sub_assign(&y);
-        println!("x := {}; x.saturating_sub_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.saturating_sub_assign(&{y}); x = {x}");
     }
 }
 
 fn benchmark_natural_saturating_sub_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.saturating_sub_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -117,14 +114,14 @@ fn benchmark_natural_saturating_sub_assign_evaluation_strategy(
 
 fn benchmark_natural_saturating_sub_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.saturating_sub(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

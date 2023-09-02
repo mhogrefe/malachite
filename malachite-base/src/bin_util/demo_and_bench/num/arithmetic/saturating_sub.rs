@@ -20,54 +20,54 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_saturating_sub_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.saturating_sub({}) = {}", x, y, x.saturating_sub(y));
     }
 }
 
-fn demo_saturating_sub_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_saturating_sub_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).saturating_sub({}) = {}", x, y, x.saturating_sub(y));
     }
 }
 
 fn demo_saturating_sub_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.saturating_sub_assign(y);
-        println!("x := {}; x.saturating_sub_assign({}); x = {}", old_x, y, x);
+        println!("x := {old_x}; x.saturating_sub_assign({y}); x = {x}");
     }
 }
 
 fn demo_saturating_sub_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.saturating_sub_assign(y);
-        println!("x := {}; x.saturating_sub_assign({}); x = {}", old_x, y, x);
+        println!("x := {old_x}; x.saturating_sub_assign({y}); x = {x}");
     }
 }
 
 fn benchmark_saturating_sub_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_sub({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -78,14 +78,14 @@ fn benchmark_saturating_sub_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_saturating_sub_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_sub({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -96,14 +96,14 @@ fn benchmark_saturating_sub_signed<T: PrimitiveSigned>(
 
 fn benchmark_saturating_sub_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_sub_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -114,14 +114,14 @@ fn benchmark_saturating_sub_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_saturating_sub_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_sub_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

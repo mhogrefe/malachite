@@ -24,7 +24,7 @@ use crate::num::arithmetic::traits::{
     WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign, WrappingSquare,
     WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
-use crate::num::basic::traits::{Iverson, One, Two, Zero};
+use crate::num::basic::traits::{One, Two, Zero};
 use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase, IsInteger,
@@ -180,7 +180,6 @@ pub trait PrimitiveInt:
     + HasRandomPrimitiveInts
     + Hash
     + IsInteger
-    + Iverson
     + JacobiSymbol<Self>
     + KroneckerSymbol<Self>
     + LeadingZeros

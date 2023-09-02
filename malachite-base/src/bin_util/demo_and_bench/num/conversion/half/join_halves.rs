@@ -12,12 +12,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_generic_benches!(runner, benchmark_join_halves, u16, u32, u64, u128);
 }
 
-fn demo_join_halves<T: JoinHalves + PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_join_halves<T: JoinHalves + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     T::Half: PrimitiveUnsigned,
 {
     for (x, y) in unsigned_pair_gen_var_27::<T::Half>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -32,7 +35,7 @@ where
 
 fn benchmark_join_halves<T: JoinHalves + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -46,7 +49,7 @@ fn benchmark_join_halves<T: JoinHalves + PrimitiveUnsigned>(
             T::Half::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T::Half>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T::Half>().get(gm, config),
         gm.name(),
         limit,
         file_name,

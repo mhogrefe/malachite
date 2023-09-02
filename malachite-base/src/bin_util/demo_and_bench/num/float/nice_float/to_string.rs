@@ -11,22 +11,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_nice_float_to_string_algorithms);
 }
 
-fn demo_nice_float_to_string<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_nice_float_to_string<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!("{}", NiceFloat(f));
     }
 }
 
 fn benchmark_nice_float_to_string_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("NiceFloat::<{}>.to_string()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

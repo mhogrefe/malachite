@@ -12,8 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_from_sign_and_abs_evaluation_strategy);
 }
 
-fn demo_from_sign_and_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (abs, sign) in natural_bool_pair_gen().get(gm, &config).take(limit) {
+fn demo_from_sign_and_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (abs, sign) in natural_bool_pair_gen().get(gm, config).take(limit) {
         let abs_old = abs.clone();
         println!(
             "Integer::from_sign_and_abs({}, {}) = {}",
@@ -24,8 +24,8 @@ fn demo_from_sign_and_abs(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_sign_and_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (abs, sign) in natural_bool_pair_gen().get(gm, &config).take(limit) {
+fn demo_from_sign_and_abs_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (abs, sign) in natural_bool_pair_gen().get(gm, config).take(limit) {
         println!(
             "Integer::from_sign_and_abs_ref({}, {}) = {}",
             sign,
@@ -37,14 +37,14 @@ fn demo_from_sign_and_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_from_sign_and_abs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::from_sign_and_abs(bool, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_bool_pair_gen().get(gm, &config),
+        natural_bool_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

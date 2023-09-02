@@ -948,7 +948,7 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     geometric_random_natural_values_range(seed, a, b - T::ONE, um_numerator, um_denominator)
 }
@@ -1029,7 +1029,7 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     geometric_random_natural_values_range(seed, a, b, um_numerator, um_denominator)
 }
@@ -1126,7 +1126,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomSignedRange<T> {
     if a >= b {
-        panic!("a must be less than b. a: {}, b: {}", a, b);
+        panic!("a must be less than b. a: {a}, b: {b}");
     }
     if a >= T::ZERO {
         GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
@@ -1247,7 +1247,7 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomSignedRange<T> {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a >= T::ZERO {
         GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(

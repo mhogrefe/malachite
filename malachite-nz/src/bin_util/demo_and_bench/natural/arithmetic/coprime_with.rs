@@ -18,46 +18,46 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_coprime_with_evaluation_strategy);
 }
 
-fn demo_natural_coprime_with(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_coprime_with(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         if x.coprime_with(y) {
-            println!("{} is coprime with {}", x_old, y_old);
+            println!("{x_old} is coprime with {y_old}");
         } else {
-            println!("{} is not coprime with {}", x_old, y_old);
+            println!("{x_old} is not coprime with {y_old}");
         }
     }
 }
 
-fn demo_natural_coprime_with_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_coprime_with_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         if x.coprime_with(&y) {
-            println!("{} is coprime with {}", x_old, y);
+            println!("{x_old} is coprime with {y}");
         } else {
-            println!("{} is not coprime with {}", x_old, y);
+            println!("{x_old} is not coprime with {y}");
         }
     }
 }
 
-fn demo_natural_coprime_with_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_coprime_with_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         if (&x).coprime_with(y) {
-            println!("{} is coprime with {}", x, y_old);
+            println!("{x} is coprime with {y_old}");
         } else {
-            println!("{} is not coprime with {}", x, y_old);
+            println!("{x} is not coprime with {y_old}");
         }
     }
 }
 
-fn demo_natural_coprime_with_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_coprime_with_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         if (&x).coprime_with(&y) {
-            println!("{} is coprime with {}", x, y);
+            println!("{x} is coprime with {y}");
         } else {
-            println!("{} is not coprime with {}", x, y);
+            println!("{x} is not coprime with {y}");
         }
     }
 }
@@ -65,14 +65,14 @@ fn demo_natural_coprime_with_ref_ref(gm: GenMode, config: GenConfig, limit: usiz
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_coprime_with_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.coprime_with(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -97,14 +97,14 @@ fn benchmark_natural_coprime_with_algorithms(
 
 fn benchmark_natural_coprime_with_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.coprime_with(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

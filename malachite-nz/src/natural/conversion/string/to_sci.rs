@@ -27,7 +27,7 @@ where
     if options.get_lowercase() {
         Display::fmt(&w, f)
     } else {
-        write!(f, "{:#}", w)
+        write!(f, "{w:#}")
     }
 }
 
@@ -189,6 +189,7 @@ impl ToSci for Natural {
                     let scale = log - precision + 1;
                     let shifted = if let Some(base_log) = base_log {
                         self.shr_round(base_log * scale, options.get_rounding_mode())
+                            .0
                     } else {
                         let n = if precision > log >> 1 {
                             n_base.pow(scale)
@@ -199,7 +200,7 @@ impl ToSci for Natural {
                             assert!(p == scale + 1);
                             power * n_base
                         };
-                        self.div_round(n, options.get_rounding_mode())
+                        self.div_round(n, options.get_rounding_mode()).0
                     };
                     let mut chars = shifted.to_digits_desc(&options.get_base());
                     let mut len = chars.len();

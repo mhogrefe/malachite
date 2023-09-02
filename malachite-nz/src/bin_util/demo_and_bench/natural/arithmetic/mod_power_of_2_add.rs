@@ -65,9 +65,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_mod_power_of_2_add_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_add_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -80,38 +80,42 @@ fn demo_limbs_mod_power_of_2_add_limb(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_limbs_slice_mod_power_of_2_add_limb_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_mod_power_of_2_add_limb_in_place(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (mut xs, y, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let carry = limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, y, pow);
         println!(
-            "xs := {:?}; limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, {}, {}) = {}; \
-            xs = {:?}",
-            xs_old, y, pow, carry, xs
+            "xs := {xs_old:?}; \
+            limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, {y}, {pow}) = {carry}; \
+            xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_mod_power_of_2_add_limb_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_mod_power_of_2_add_limb_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, y, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_15()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, y, pow);
         println!(
-            "xs := {:?}; limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, {}, {}); xs = {:?}",
-            xs_old, y, pow, xs
+            "xs := {xs_old:?}; \
+            limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, {y}, {pow}); xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_mod_power_of_2_add_greater(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_add_greater(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -124,9 +128,9 @@ fn demo_limbs_mod_power_of_2_add_greater(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_limbs_mod_power_of_2_add(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_add(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -141,86 +145,80 @@ fn demo_limbs_mod_power_of_2_add(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn demo_limbs_slice_mod_power_of_2_add_greater_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let carry = limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut xs, &ys, pow);
         println!(
-            "xs := {:?}; limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut xs, {:?}, {}) \
-            = {}; xs = {:?}",
-            xs_old, ys, pow, carry, xs
+            "xs := {xs_old:?}; \
+            limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut xs, {ys:?}, {pow}) \
+            = {carry}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_mod_power_of_2_add_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_mod_power_of_2_add_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, &ys, pow);
         println!(
-            "xs := {:?}; limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, {:?}, {}); \
-            xs = {:?}",
-            xs_old, ys, pow, xs
+            "xs := {xs_old:?}; \
+            limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, {ys:?}, {pow}); \
+            xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_mod_power_of_2_add_in_place_either(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_mod_power_of_2_add_in_place_either(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, mut ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let ys_old = ys.clone();
         let right = limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, pow);
         println!(
-            "xs := {:?}; ys := {:?}; limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, \
-            {}) = {}; xs = {:?}; ys = {:?}",
-            xs_old, ys_old, pow, right, xs, ys
+            "xs := {xs_old:?}; \
+            ys := {ys_old:?}; limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, \
+            {pow}) = {right}; xs = {xs:?}; ys = {ys:?}",
         );
     }
 }
 
-fn demo_natural_mod_power_of_2_add_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         x.mod_power_of_2_add_assign(y, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_add_assign({}, {}); x = {}",
-            x_old, y_old, pow, x
-        );
+        println!("x := {x_old}; x.mod_power_of_2_add_assign({y_old}, {pow}); x = {x}");
     }
 }
 
-fn demo_natural_mod_power_of_2_add_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         x.mod_power_of_2_add_assign(&y, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_add_assign(&{}, {}); x = {}",
-            x_old, y, pow, x
-        );
+        println!("x := {x_old}; x.mod_power_of_2_add_assign(&{y}, {pow}); x = {x}");
     }
 }
 
-fn demo_natural_mod_power_of_2_add(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
@@ -235,9 +233,9 @@ fn demo_natural_mod_power_of_2_add(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_mod_power_of_2_add_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
@@ -251,9 +249,9 @@ fn demo_natural_mod_power_of_2_add_val_ref(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_natural_mod_power_of_2_add_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
@@ -267,9 +265,9 @@ fn demo_natural_mod_power_of_2_add_ref_val(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_natural_mod_power_of_2_add_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_add_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -284,14 +282,14 @@ fn demo_natural_mod_power_of_2_add_ref_ref(gm: GenMode, config: GenConfig, limit
 
 fn benchmark_limbs_mod_power_of_2_add_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_add_limb(&[Limb], Limb, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -304,14 +302,14 @@ fn benchmark_limbs_mod_power_of_2_add_limb(
 
 fn benchmark_limbs_slice_mod_power_of_2_add_limb_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_mod_power_of_2_add_limb_in_place(&mut [Limb], Limb, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -326,14 +324,14 @@ fn benchmark_limbs_slice_mod_power_of_2_add_limb_in_place(
 
 fn benchmark_limbs_vec_mod_power_of_2_add_limb_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_mod_power_of_2_add_limb_in_place(&mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -346,14 +344,14 @@ fn benchmark_limbs_vec_mod_power_of_2_add_limb_in_place(
 
 fn benchmark_limbs_mod_power_of_2_add_greater(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_add_greater(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -366,14 +364,14 @@ fn benchmark_limbs_mod_power_of_2_add_greater(
 
 fn benchmark_limbs_mod_power_of_2_add(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_add(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -386,14 +384,14 @@ fn benchmark_limbs_mod_power_of_2_add(
 
 fn benchmark_limbs_slice_mod_power_of_2_add_greater_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -408,14 +406,14 @@ fn benchmark_limbs_slice_mod_power_of_2_add_greater_in_place_left(
 
 fn benchmark_limbs_vec_mod_power_of_2_add_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_mod_power_of_2_add_in_place_left(&Vec<Limb>, &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -430,14 +428,14 @@ fn benchmark_limbs_vec_mod_power_of_2_add_in_place_left(
 
 fn benchmark_limbs_mod_power_of_2_add_in_place_either(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_add_in_place_either(&mut [Limb], &mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -452,14 +450,14 @@ fn benchmark_limbs_mod_power_of_2_add_in_place_either(
 
 fn benchmark_natural_mod_power_of_2_add_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_add_assign(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -479,14 +477,14 @@ fn benchmark_natural_mod_power_of_2_add_assign_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_add_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_add(Natural, u64)",
         BenchmarkType::Algorithms,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -511,14 +509,14 @@ fn benchmark_natural_mod_power_of_2_add_algorithms(
 
 fn benchmark_natural_mod_power_of_2_add_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_add(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

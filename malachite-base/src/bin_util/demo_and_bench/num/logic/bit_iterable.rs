@@ -24,46 +24,46 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_bits_get_algorithms_signed);
 }
 
-fn demo_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("bits({}) = {:?}", u, u.bits().collect_vec());
     }
 }
 
-fn demo_bits_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_bits_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("bits({}) = {:?}", i, i.bits().collect_vec());
     }
 }
 
-fn demo_bits_rev_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_bits_rev_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("bits({}).rev() = {:?}", u, u.bits().rev().collect_vec());
     }
 }
 
-fn demo_bits_rev_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_bits_rev_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("bits({}).rev() = {:?}", i, i.bits().rev().collect_vec());
     }
 }
 
 fn demo_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("bits({}).size_hint() = {:?}", u, u.bits().size_hint());
     }
 }
 
-fn demo_bits_index_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_bits_index_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     T::BitIterator: Index<u64, Output = bool>,
 {
     for (n, i) in signed_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("bits({})[{}] = {:?}", n, i, n.bits()[i]);
@@ -72,14 +72,14 @@ where
 
 fn benchmark_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.bits().size_hint()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,7 +93,7 @@ fn benchmark_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_bits_get_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -102,7 +102,7 @@ fn benchmark_bits_get_algorithms_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.bits()[u64]", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -127,7 +127,7 @@ fn benchmark_bits_get_algorithms_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_bits_get_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -136,7 +136,7 @@ fn benchmark_bits_get_algorithms_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.bits()[u64]", T::NAME),
         BenchmarkType::Algorithms,
-        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

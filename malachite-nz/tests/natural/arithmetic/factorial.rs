@@ -2159,7 +2159,8 @@ fn factorial_properties() {
         assert_ne!(f, 0u32);
         if n != 0 {
             assert_eq!(
-                f.div_round(Natural::factorial(n - 1), RoundingMode::Exact),
+                f.div_round(Natural::factorial(n - 1), RoundingMode::Exact)
+                    .0,
                 n
             );
         }
@@ -2184,7 +2185,8 @@ fn double_factorial_properties() {
         assert_ne!(f, 0);
         if n > 1 {
             assert_eq!(
-                f.div_round(Natural::double_factorial(n - 2), RoundingMode::Exact),
+                f.div_round(Natural::double_factorial(n - 2), RoundingMode::Exact)
+                    .0,
                 n
             );
         }
@@ -2210,7 +2212,8 @@ fn multifactorial_properties() {
         assert_ne!(f, 0u32);
         if n >= m {
             assert_eq!(
-                f.div_round(Natural::multifactorial(n - m, m), RoundingMode::Exact),
+                f.div_round(Natural::multifactorial(n - m, m), RoundingMode::Exact)
+                    .0,
                 n
             );
         }
@@ -2237,7 +2240,8 @@ fn subfactorial_properties() {
                 f + Natural::ONE
             };
             assert_eq!(
-                g.div_round(Natural::subfactorial(n - 1), RoundingMode::Exact),
+                g.div_round(Natural::subfactorial(n - 1), RoundingMode::Exact)
+                    .0,
                 n
             );
         }

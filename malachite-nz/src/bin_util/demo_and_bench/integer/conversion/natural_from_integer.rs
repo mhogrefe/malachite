@@ -38,8 +38,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_try_from_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_try_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         let n_clone = n.clone();
         println!(
             "Natural::try_from({}) = {:?}",
@@ -49,14 +49,14 @@ fn demo_natural_try_from_integer(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_try_from_integer_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_try_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("Natural::try_from(&{}) = {:?}", n, Natural::try_from(&n));
     }
 }
 
-fn demo_natural_exact_from_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_natural_exact_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen_var_4().get(gm, config).take(limit) {
         let n_clone = n.clone();
         println!(
             "Natural::exact_from({}) = {}",
@@ -66,14 +66,14 @@ fn demo_natural_exact_from_integer(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_exact_from_integer_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_natural_exact_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen_var_4().get(gm, config).take(limit) {
         println!("Natural::exact_from(&{}) = {}", n, Natural::exact_from(&n));
     }
 }
 
-fn demo_natural_saturating_from_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         let n_clone = n.clone();
         println!(
             "Natural::saturating_from({}) = {}",
@@ -83,8 +83,8 @@ fn demo_natural_saturating_from_integer(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_natural_saturating_from_integer_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_saturating_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "Natural::saturating_from(&{}) = {}",
             n,
@@ -93,8 +93,8 @@ fn demo_natural_saturating_from_integer_ref(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_natural_convertible_from_integer(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_convertible_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         let n_clone = n.clone();
         println!(
             "{} is {}convertible to a Natural",
@@ -108,8 +108,8 @@ fn demo_natural_convertible_from_integer(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_natural_convertible_from_integer_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_natural_convertible_from_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a Natural",
             n,
@@ -124,14 +124,14 @@ fn demo_natural_convertible_from_integer_ref(gm: GenMode, config: GenConfig, lim
 
 fn benchmark_natural_try_from_integer_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::try_from(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -149,14 +149,14 @@ fn benchmark_natural_try_from_integer_evaluation_strategy(
 
 fn benchmark_natural_exact_from_integer_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::exact_from(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -174,14 +174,14 @@ fn benchmark_natural_exact_from_integer_evaluation_strategy(
 
 fn benchmark_natural_saturating_from_integer_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::saturating_from(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -199,14 +199,14 @@ fn benchmark_natural_saturating_from_integer_evaluation_strategy(
 
 fn benchmark_natural_convertible_from_integer_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::convertible_from(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -225,14 +225,14 @@ fn benchmark_natural_convertible_from_integer_evaluation_strategy(
 #[allow(unused_must_use)]
 fn benchmark_natural_convertible_from_integer_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::convertible_from(Integer)",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

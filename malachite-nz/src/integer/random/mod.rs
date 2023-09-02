@@ -62,12 +62,12 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if after being reduced
@@ -120,12 +120,12 @@ pub fn random_natural_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -178,12 +178,12 @@ pub fn random_positive_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -237,12 +237,12 @@ pub fn random_negative_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -296,12 +296,12 @@ pub fn random_nonzero_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if after being reduced
@@ -369,12 +369,12 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -429,12 +429,12 @@ pub fn striped_random_natural_integers(
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -489,12 +489,12 @@ pub fn striped_random_positive_integers(
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -552,12 +552,12 @@ pub fn striped_random_negative_integers(
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -614,12 +614,12 @@ pub fn striped_random_nonzero_integers(
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -851,13 +851,12 @@ impl Iterator for RandomIntegerRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and
-/// $m$ is `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
@@ -908,13 +907,12 @@ pub fn random_integer_range_to_infinity(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a < 0$ and their ratio
@@ -1442,13 +1440,12 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -1530,13 +1527,12 @@ pub fn striped_random_integer_range_to_infinity(
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if

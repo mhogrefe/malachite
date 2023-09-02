@@ -21,23 +21,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_power_of_2_neg_algorithms);
 }
 
-fn demo_natural_mod_power_of_2_neg_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_power_of_2_neg_assign(pow);
-        println!(
-            "x := {}; x.mod_power_of_2_neg_assign({}); x = {}",
-            n_old, pow, n
-        );
+        println!("x := {n_old}; x.mod_power_of_2_neg_assign({pow}); x = {n}");
     }
 }
 
-fn demo_natural_mod_power_of_2_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -45,9 +42,9 @@ fn demo_natural_mod_power_of_2_neg(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_mod_power_of_2_neg_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_neg_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_11()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -62,14 +59,14 @@ fn demo_natural_mod_power_of_2_neg_ref(gm: GenMode, config: GenConfig, limit: us
 
 fn benchmark_natural_mod_power_of_2_neg_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_neg_assign(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -85,14 +82,14 @@ fn benchmark_natural_mod_power_of_2_neg_assign(
 
 fn benchmark_natural_mod_power_of_2_neg_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_neg(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,14 +107,14 @@ fn benchmark_natural_mod_power_of_2_neg_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_neg_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_neg(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_11().get(gm, &config),
+        natural_unsigned_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,

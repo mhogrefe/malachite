@@ -6,6 +6,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
+use malachite_base::num::basic::traits::Zero;
 
 macro_rules! large_left {
     ($a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {
@@ -31,7 +32,7 @@ macro_rules! large_right {
 impl Natural {
     fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
         match (self, b, c) {
-            (a, _, 0) | (a, natural_zero!(), _) => Some(a.clone()),
+            (a, _, 0) | (a, &Natural::ZERO, _) => Some(a.clone()),
             (a, b @ Natural(Small(_)), c) => a.checked_sub(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => None,
             (&Natural(Large(ref a_limbs)), &Natural(Large(ref b_limbs)), c) => {
@@ -47,7 +48,7 @@ impl Natural {
 
     fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
         match (&mut *self, b, c) {
-            (_, _, 0) | (_, natural_zero!(), _) => false,
+            (_, _, 0) | (_, Natural::ZERO, _) => false,
             (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => true,
             (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {
@@ -63,7 +64,7 @@ impl Natural {
 
     fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
         match (&mut *self, b, c) {
-            (_, _, 0) | (_, natural_zero!(), _) => false,
+            (_, _, 0) | (_, &Natural::ZERO, _) => false,
             (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => true,
             (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {

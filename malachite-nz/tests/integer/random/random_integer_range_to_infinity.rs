@@ -1,4 +1,3 @@
-use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
@@ -265,7 +264,7 @@ fn test_random_integer_range_to_infinity() {
     let sample_median = ("293781", Some("293783"));
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(6.04296612240715e153),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
@@ -447,7 +446,7 @@ fn test_random_integer_range_to_infinity() {
     let sample_median = ("24", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(1.2795558914963709e155),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

@@ -20,11 +20,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_get_bits_unsigned<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, start, end) in unsigned_triple_gen_var_5::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -42,13 +42,13 @@ fn demo_get_bits_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     S::Bits: PrimitiveUnsigned,
 {
     for (n, start, end) in signed_unsigned_unsigned_triple_gen_var_2::<U, S, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -63,14 +63,14 @@ fn demo_get_bits_signed<
 
 fn benchmark_get_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.get_bits(u64, u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_5::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_5::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -91,14 +91,14 @@ fn benchmark_get_bits_algorithms_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.get_bits(u64, u64)", S::NAME),
         BenchmarkType::Algorithms,
-        signed_unsigned_unsigned_triple_gen_var_2::<U, S, u64>().get(gm, &config),
+        signed_unsigned_unsigned_triple_gen_var_2::<U, S, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

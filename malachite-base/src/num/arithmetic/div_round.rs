@@ -3,30 +3,27 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
-fn div_round_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> T {
+fn div_round_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> (T, Ordering) {
     let quotient = x / other;
-    if rm == RoundingMode::Down || rm == RoundingMode::Floor {
-        quotient
-    } else {
-        let remainder = x - quotient * other;
-        match rm {
-            _ if remainder == T::ZERO => quotient,
-            RoundingMode::Up | RoundingMode::Ceiling => quotient + T::ONE,
-            RoundingMode::Nearest => {
-                let shifted_other = other >> 1;
-                if remainder > shifted_other
-                    || remainder == shifted_other && other.even() && quotient.odd()
-                {
-                    quotient + T::ONE
-                } else {
-                    quotient
-                }
+    let remainder = x - quotient * other;
+    match rm {
+        _ if remainder == T::ZERO => (quotient, Ordering::Equal),
+        RoundingMode::Down | RoundingMode::Floor => (quotient, Ordering::Less),
+        RoundingMode::Up | RoundingMode::Ceiling => (quotient + T::ONE, Ordering::Greater),
+        RoundingMode::Nearest => {
+            let shifted_other = other >> 1;
+            if remainder > shifted_other
+                || remainder == shifted_other && other.even() && quotient.odd()
+            {
+                (quotient + T::ONE, Ordering::Greater)
+            } else {
+                (quotient, Ordering::Less)
             }
-            RoundingMode::Exact => {
-                panic!("Division is not exact: {} / {}", x, other);
-            }
-            _ => unreachable!(),
+        }
+        RoundingMode::Exact => {
+            panic!("Division is not exact: {x} / {other}");
         }
     }
 }
@@ -37,19 +34,22 @@ macro_rules! impl_div_round_unsigned {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
+            /// An [`Ordering`] is also returned, indicating whether the returned value is less
+            /// than, equal to, or greater than the exact value.
             ///
-            /// Let $q = \frac{x}{y}$:
-            ///
-            /// $$
-            /// f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
-            /// $$
-            ///
-            /// $$
-            /// f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
-            /// $$
+            /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $$
-            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            /// g(x, y, \mathrm{Down}) = g(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+            /// $$
+            ///
+            /// $$
+            /// g(x, y, \mathrm{Up}) = g(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+            /// $$
+            ///
+            /// $$
+            /// g(x, y, \mathrm{Nearest}) = \begin{cases}
             ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
             ///     \lceil q \rceil & \text{if} \\quad  q - \lfloor q \rfloor > \frac{1}{2}, \\\\
             ///     \lfloor q \rfloor &
@@ -61,7 +61,11 @@ macro_rules! impl_div_round_unsigned {
             /// \end{cases}
             /// $$
             ///
-            /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -73,14 +77,15 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// See [here](super::div_round#div_round).
             #[inline]
-            fn div_round(self, other: $t, rm: RoundingMode) -> $t {
+            fn div_round(self, other: $t, rm: RoundingMode) -> ($t, Ordering) {
                 div_round_unsigned(self, other, rm)
             }
         }
 
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
-            /// rounding mode.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
+            /// is less than, equal to, or greater than the exact value.
             ///
             /// See the [`DivRound`](super::traits::DivRound) documentation for details.
             ///
@@ -94,8 +99,10 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// See [here](super::div_round#div_round_assign).
             #[inline]
-            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                *self = self.div_round(other, rm);
+            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) -> Ordering {
+                let o;
+                (*self, o) = self.div_round(other, rm);
+                o
             }
         }
     };
@@ -109,12 +116,14 @@ fn div_round_signed<
     x: S,
     other: S,
     rm: RoundingMode,
-) -> S {
+) -> (S, Ordering) {
     if (x >= S::ZERO) == (other >= S::ZERO) {
-        S::exact_from(x.unsigned_abs().div_round(other.unsigned_abs(), rm))
+        let (q, o) = x.unsigned_abs().div_round(other.unsigned_abs(), rm);
+        (S::exact_from(q), o)
     } else {
         // Has to be wrapping so that (self, other) == (T::MIN, 1) works
-        S::wrapping_from(x.unsigned_abs().div_round(other.unsigned_abs(), -rm)).wrapping_neg()
+        let (q, o) = x.unsigned_abs().div_round(other.unsigned_abs(), -rm);
+        (S::wrapping_from(q).wrapping_neg(), o.reverse())
     }
 }
 
@@ -124,27 +133,30 @@ macro_rules! impl_div_round_signed {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
+            /// An [`Ordering`] is also returned, indicating whether the returned value is less
+            /// than, equal to, or greater than the exact value.
             ///
-            /// Let $q = \frac{x}{y}$:
-            ///
-            /// $$
-            /// f(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
-            /// $$
-            ///
-            /// $$
-            /// f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.
-            /// $$
+            /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $$
-            /// f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+            /// g(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
             /// $$
             ///
             /// $$
-            /// f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+            /// g(x, y, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.
             /// $$
             ///
             /// $$
-            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            /// g(x, y, \mathrm{Floor}) = \lfloor q \rfloor.
+            /// $$
+            ///
+            /// $$
+            /// g(x, y, \mathrm{Ceiling}) = \lceil q \rceil.
+            /// $$
+            ///
+            /// $$
+            /// g(x, y, \mathrm{Nearest}) = \begin{cases}
             ///     \lfloor q \rfloor & \text{if} \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
             ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2}, \\\\
             ///     \lfloor q \rfloor &
@@ -156,7 +168,11 @@ macro_rules! impl_div_round_signed {
             /// \end{cases}
             /// $$
             ///
-            /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
+            /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
+            ///
+            /// Then
+            ///
+            /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -167,14 +183,15 @@ macro_rules! impl_div_round_signed {
             ///
             /// # Examples
             /// See [here](super::div_round#div_round).
-            fn div_round(self, other: $t, rm: RoundingMode) -> $t {
+            fn div_round(self, other: $t, rm: RoundingMode) -> ($t, Ordering) {
                 div_round_signed(self, other, rm)
             }
         }
 
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
-            /// rounding mode.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
+            /// is less than, equal to, or greater than the exact value.
             ///
             /// See the [`DivRound`](super::traits::DivRound) documentation for details.
             ///
@@ -188,8 +205,10 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// See [here](super::div_round#div_round_assign).
             #[inline]
-            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                *self = self.div_round(other, rm);
+            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) -> Ordering {
+                let o;
+                (*self, o) = self.div_round(other, rm);
+                o
             }
         }
     };

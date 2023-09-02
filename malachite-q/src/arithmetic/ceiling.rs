@@ -37,7 +37,8 @@ impl Ceiling for Rational {
         if self.sign {
             Integer::from(
                 self.numerator
-                    .div_round(self.denominator, RoundingMode::Ceiling),
+                    .div_round(self.denominator, RoundingMode::Ceiling)
+                    .0,
             )
         } else {
             Integer::from_sign_and_abs(false, self.numerator / self.denominator)
@@ -74,7 +75,11 @@ impl<'a> Ceiling for &'a Rational {
     /// ```
     fn ceiling(self) -> Integer {
         if self.sign {
-            Integer::from((&self.numerator).div_round(&self.denominator, RoundingMode::Ceiling))
+            Integer::from(
+                (&self.numerator)
+                    .div_round(&self.denominator, RoundingMode::Ceiling)
+                    .0,
+            )
         } else {
             Integer::from_sign_and_abs(false, &self.numerator / &self.denominator)
         }

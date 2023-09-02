@@ -23,30 +23,30 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_mod_power_of_2_shr_assign<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ModPowerOf2ShrAssign<T>,
 {
     for (mut n, i, pow) in natural_signed_unsigned_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_power_of_2_shr_assign(i, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_shr_assign({}, {}); x = {}",
-            n_old, i, pow, n
-        );
+        println!("x := {n_old}; x.mod_power_of_2_shr_assign({i}, {pow}); x = {n}");
     }
 }
 
-fn demo_natural_mod_power_of_2_shr<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_natural_mod_power_of_2_shr<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     Natural: ModPowerOf2Shr<T, Output = Natural>,
 {
     for (n, i, pow) in natural_signed_unsigned_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -62,13 +62,13 @@ where
 
 fn demo_natural_mod_power_of_2_shr_ref<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: ModPowerOf2Shr<T, Output = Natural>,
 {
     for (n, i, pow) in natural_signed_unsigned_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -84,7 +84,7 @@ fn demo_natural_mod_power_of_2_shr_ref<T: PrimitiveSigned>(
 
 fn benchmark_natural_mod_power_of_2_shr_assign<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -93,7 +93,7 @@ fn benchmark_natural_mod_power_of_2_shr_assign<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.mod_power_of_2_shr_assign({}, u64)", T::NAME),
         BenchmarkType::Single,
-        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, &config),
+        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -106,7 +106,7 @@ fn benchmark_natural_mod_power_of_2_shr_assign<T: PrimitiveSigned>(
 
 fn benchmark_natural_mod_power_of_2_shr_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -116,7 +116,7 @@ fn benchmark_natural_mod_power_of_2_shr_evaluation_strategy<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.mod_power_of_2_shr_assign({}, u64)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, &config),
+        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -136,7 +136,7 @@ fn benchmark_natural_mod_power_of_2_shr_evaluation_strategy<T: PrimitiveSigned>(
 
 fn benchmark_natural_mod_power_of_2_shr_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -145,7 +145,7 @@ fn benchmark_natural_mod_power_of_2_shr_algorithms<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.mod_power_of_2_shr_assign({}, u64)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, &config),
+        natural_signed_unsigned_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

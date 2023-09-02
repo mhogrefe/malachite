@@ -15,10 +15,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_vec_from_other_type<T: Debug + VecFromOtherType<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<U>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{}::vec_from_other_type({}) = {:?}",
             T::NAME,
@@ -30,14 +30,14 @@ fn demo_vec_from_other_type<T: Debug + VecFromOtherType<U> + Named, U: Primitive
 
 fn benchmark_vec_from_other_type<T: VecFromOtherType<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.vec_from_other_type({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

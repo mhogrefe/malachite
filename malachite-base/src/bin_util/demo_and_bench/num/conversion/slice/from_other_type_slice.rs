@@ -15,10 +15,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_from_other_type_slice<T: Display + FromOtherTypeSlice<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for xs in unsigned_vec_gen::<U>().get(gm, &config).take(limit) {
+    for xs in unsigned_vec_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{}::from_other_type_slice({:?}) = {}",
             T::NAME,
@@ -30,14 +30,14 @@ fn demo_from_other_type_slice<T: Display + FromOtherTypeSlice<U> + Named, U: Pri
 
 fn benchmark_from_other_type_slice<T: FromOtherTypeSlice<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.from_other_type_slice(&[{}])", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_vec_gen::<U>().get(gm, &config),
+        unsigned_vec_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -4,6 +4,7 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 use std::ops::{Shl, ShlAssign};
 
 fn shl_round<
@@ -14,14 +15,17 @@ fn shl_round<
     x: T,
     bits: S,
     rm: RoundingMode,
-) -> T {
+) -> (T, Ordering) {
     if bits >= S::ZERO {
         let width = S::wrapping_from(T::WIDTH);
-        if width >= S::ZERO && bits >= width {
-            T::ZERO
-        } else {
-            x << bits.unsigned_abs()
-        }
+        (
+            if width >= S::ZERO && bits >= width {
+                T::ZERO
+            } else {
+                x << bits.unsigned_abs()
+            },
+            Ordering::Equal,
+        )
     } else {
         x.shr_round(bits.unsigned_abs(), rm)
     }
@@ -35,7 +39,7 @@ fn shl_round_assign<
     x: &mut T,
     bits: S,
     rm: RoundingMode,
-) {
+) -> Ordering {
     if bits >= S::ZERO {
         let width = S::wrapping_from(T::WIDTH);
         if width >= S::ZERO && bits >= width {
@@ -43,8 +47,9 @@ fn shl_round_assign<
         } else {
             *x <<= bits.unsigned_abs();
         }
+        Ordering::Equal
     } else {
-        x.shr_round_assign(bits.unsigned_abs(), rm);
+        x.shr_round_assign(bits.unsigned_abs(), rm)
     }
 }
 
@@ -57,21 +62,25 @@ macro_rules! impl_shl_round {
 
                     /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
                     /// power of 2 and takes the floor) and rounds according to the specified
-                    /// rounding mode.
+                    /// rounding mode. An [`Ordering`] is also returned, indicating whether the
+                    /// returned value is less than, equal to, or greater than the exact value. If
+                    /// `bits` is non-negative, then the returned [`Ordering`] is always `Equal`,
+                    /// even if the higher bits of the result are lost.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
                     /// necessary if `bits` is negative.
                     ///
-                    /// Let $q = x2^k$:
+                    /// Let $q = x2^k$, and let $g$ be the function that just returns the first
+                    /// element of the pair, without the [`Ordering`]:
                     ///
-                    /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+                    /// $g(x, k, \mathrm{Down}) = g(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
                     ///
-                    /// $f(x, k, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+                    /// $g(x, k, \mathrm{Up}) = g(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
                     ///
                     /// $$
-                    /// f(x, k, \mathrm{Nearest}) = \begin{cases}
+                    /// g(x, k, \mathrm{Nearest}) = \begin{cases}
                     ///     \lfloor q \rfloor & \text{if}
                     ///         \\quad q - \lfloor q \rfloor < \frac{1}{2}, \\\\
                     ///     \lceil q \rceil & \text{if}
@@ -85,7 +94,11 @@ macro_rules! impl_shl_round {
                     /// \end{cases}
                     /// $$
                     ///
-                    /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+                    /// $g(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+                    ///
+                    /// Then
+                    ///
+                    /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -97,7 +110,7 @@ macro_rules! impl_shl_round {
                     /// # Examples
                     /// See [here](super::shl_round#shl_round).
                     #[inline]
-                    fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
+                    fn shl_round(self, bits: $u, rm: RoundingMode) -> ($t, Ordering) {
                         shl_round(self, bits, rm)
                     }
                 }
@@ -105,7 +118,10 @@ macro_rules! impl_shl_round {
                 impl ShlRoundAssign<$u> for $t {
                     /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
                     /// power of 2 and takes the floor) and rounds according to the specified
-                    /// rounding mode, in place.
+                    /// rounding mode, in place. An [`Ordering`] is returned, indicating whether
+                    /// the assigned value is less than, equal to, or greater than the exact value.
+                    /// If `bits` is non-negative, then the returned [`Ordering`] is always
+                    /// `Equal`, even if the higher bits of the result are lost.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
@@ -124,7 +140,7 @@ macro_rules! impl_shl_round {
                     /// # Examples
                     /// See [here](super::shl_round#shl_round_assign).
                     #[inline]
-                    fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) {
+                    fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) -> Ordering {
                         shl_round_assign(self, bits, rm)
                     }
                 }

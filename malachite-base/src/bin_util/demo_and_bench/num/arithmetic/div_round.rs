@@ -20,66 +20,66 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_div_round_assign_signed);
 }
 
-fn demo_div_round_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_div_round_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
-        println!("{}.div_round({}, {}) = {}", x, y, rm, x.div_round(y, rm));
+        println!("{}.div_round({}, {}) = {:?}", x, y, rm, x.div_round(y, rm));
     }
 }
 
-fn demo_div_round_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_div_round_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in signed_signed_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
-        println!("({}).div_round({}, {}) = {}", x, y, rm, x.div_round(y, rm));
+        println!(
+            "({}).div_round({}, {}) = {:?}",
+            x,
+            y,
+            rm,
+            x.div_round(y, rm)
+        );
     }
 }
 
 fn demo_div_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.div_round_assign(y, rm);
-        println!(
-            "x := {}; x.div_round_assign({}, {}); x = {}",
-            old_x, y, rm, x
-        );
+        let o = x.div_round_assign(y, rm);
+        println!("x := {old_x}; x.div_round_assign({y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
-fn demo_div_round_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_div_round_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, rm) in signed_signed_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.div_round_assign(y, rm);
-        println!(
-            "x := {}; x.div_round_assign({}, {}); x = {}",
-            old_x, y, rm, x
-        );
+        let o = x.div_round_assign(y, rm);
+        println!("x := {old_x}; x.div_round_assign({y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
 fn benchmark_div_round_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_round({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -90,14 +90,14 @@ fn benchmark_div_round_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_div_round_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_round({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_signed_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        signed_signed_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -108,36 +108,40 @@ fn benchmark_div_round_signed<T: PrimitiveSigned>(
 
 fn benchmark_div_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_round_assign({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.div_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.div_round_assign(y, rm))
+        })],
     );
 }
 
 fn benchmark_div_round_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_round_assign({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_signed_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        signed_signed_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.div_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.div_round_assign(y, rm))
+        })],
     );
 }

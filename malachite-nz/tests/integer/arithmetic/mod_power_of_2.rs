@@ -355,7 +355,10 @@ fn rem_power_of_2_properties() {
         assert_eq!(result_alt, result);
 
         assert!(result.le_abs(&n));
-        assert_eq!((((&n).shr_round(u, RoundingMode::Down) << u) + &result), n);
+        assert_eq!(
+            (((&n).shr_round(u, RoundingMode::Down).0 << u) + &result),
+            n
+        );
         assert!(result.lt_abs(&Natural::power_of_2(u)));
         assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
         assert_eq!((&result).rem_power_of_2(u), result);
@@ -414,7 +417,7 @@ fn ceiling_mod_power_of_2_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!(
-            (((&n).shr_round(u, RoundingMode::Ceiling) << u) + &result),
+            (((&n).shr_round(u, RoundingMode::Ceiling).0 << u) + &result),
             n
         );
         assert!(result <= 0);

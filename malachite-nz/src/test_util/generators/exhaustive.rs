@@ -55,7 +55,6 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
-use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
     exhaustive_positive_naturals, ExhaustiveNaturalRange,
@@ -88,6 +87,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{
@@ -146,7 +146,7 @@ pub fn exhaustive_integer_gen() -> It<Integer> {
 
 pub fn exhaustive_integer_gen_var_1<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Box::new(
         once(Integer::ZERO).chain(
@@ -169,7 +169,7 @@ pub fn exhaustive_integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_integer_gen_var_3<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Box::new(
         lex_pairs(exhaustive_natural_gen_var_5::<T>(), exhaustive_bools())
@@ -321,7 +321,7 @@ pub fn exhaustive_integer_integer_natural_triple_gen_var_1() -> It<(Integer, Int
 pub fn exhaustive_integer_integer_natural_triple_gen_var_2() -> It<(Integer, Integer, Natural)> {
     Box::new(
         exhaustive_triples_xxy(exhaustive_integers(), exhaustive_naturals())
-            .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+            .filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -519,6 +519,22 @@ pub fn exhaustive_integer_signed_signed_triple_gen<T: PrimitiveSigned>() -> It<(
     ))
 }
 
+// -- (Integer, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Integer, T, U)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_integers(),
+        exhaustive_signeds::<T>(),
+        exhaustive_positive_primitive_ints::<U>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
 // -- (Integer, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -638,6 +654,13 @@ pub fn exhaustive_integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> It<
         exhaustive_pairs_big_tiny(exhaustive_integers(), exhaustive_unsigneds::<T>())
             .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
     )
+}
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_positive_primitive_ints(),
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned, bool) --
@@ -760,6 +783,8 @@ where
         .map(|((n, u), rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
     )
 }
+
+// var 3 is in malachite-float.
 
 // -- (Integer, RoundingMode) --
 
@@ -916,7 +941,7 @@ fn exhaustive_positive_float_naturals<T: PrimitiveFloat>(
     start_exponent: i64,
 ) -> ExhaustivePositiveFloatNaturals<T>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     ExhaustivePositiveFloatNaturals {
         phantom: PhantomData,
@@ -934,7 +959,7 @@ where
 
 pub fn exhaustive_natural_gen_var_3<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Box::new(once(Natural::ZERO).chain(exhaustive_positive_float_naturals::<T>(0)))
 }
@@ -951,7 +976,7 @@ pub fn exhaustive_natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_natural_gen_var_5<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Box::new(
         iter_windows(2, exhaustive_positive_float_naturals::<T>(1)).filter_map(|xs| {
@@ -1124,8 +1149,7 @@ pub fn exhaustive_natural_triple_gen_var_1() -> It<(Natural, Natural, Natural)> 
 
 pub fn exhaustive_natural_triple_gen_var_2() -> It<(Natural, Natural, Natural)> {
     Box::new(
-        exhaustive_triples_from_single(exhaustive_naturals())
-            .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+        exhaustive_triples_from_single(exhaustive_naturals()).filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -1526,6 +1550,30 @@ pub fn exhaustive_natural_signed_pair_gen_var_3<T: PrimitiveSigned>() -> It<(Nat
     ))
 }
 
+struct NaturalBitsMultipleOfLimbBitsGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<u64, Natural, It<Natural>>
+    for NaturalBitsMultipleOfLimbBitsGenerator
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<Natural> {
+        let p = Natural::power_of_2(pow << Limb::LOG_WIDTH);
+        Box::new(exhaustive_natural_range(&p >> 1u32, p))
+    }
+}
+
+pub fn exhaustive_natural_signed_pair_gen_var_4<T: PrimitiveSigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_positive_primitive_ints(),
+            NaturalBitsMultipleOfLimbBitsGenerator,
+        )
+        .map(|p| p.1),
+        exhaustive_signeds(),
+    ))
+}
+
 // -- (Natural, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_natural_signed_signed_triple_gen<T: PrimitiveSigned>() -> It<(Natural, T, T)> {
@@ -1553,6 +1601,20 @@ pub fn exhaustive_natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>(
             (x, y, m)
         }),
     )
+}
+
+pub fn exhaustive_natural_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Natural, T, U)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_naturals(),
+        exhaustive_signeds::<T>(),
+        exhaustive_positive_primitive_ints::<U>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
 }
 
 // -- (Natural, PrimitiveSigned, RoundingMode) --
@@ -1831,6 +1893,8 @@ where
     )
 }
 
+// var 2 is in malachite-float
+
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecPairGenerator;
@@ -1845,7 +1909,7 @@ impl
     #[inline]
     fn get_ys(&self, p: &(Natural, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
         lex_vecs_fixed_length_from_single(
-            p.0.significant_bits().div_round(p.1, RoundingMode::Up),
+            p.0.significant_bits().div_round(p.1, RoundingMode::Up).0,
             exhaustive_bools(),
         )
     }

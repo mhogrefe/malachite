@@ -15,47 +15,41 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_overflowing_pow_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen::<T, u64>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen::<T, u64>().get(gm, config).take(limit) {
         let old_x = x;
         let overflow = x.overflowing_pow_assign(y);
-        println!(
-            "x := {}; x.overflowing_pow_assign({}) = {}; x = {}",
-            old_x, y, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_pow_assign({y}) = {overflow}; x = {x}");
     }
 }
 
 fn demo_overflowing_pow_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y) in signed_unsigned_pair_gen::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         let overflow = x.overflowing_pow_assign(y);
-        println!(
-            "x := {}; x.overflowing_pow_assign({}) = {}; x = {}",
-            old_x, y, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_pow_assign({y}) = {overflow}; x = {x}");
     }
 }
 
 fn benchmark_overflowing_pow_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen::<T, u64>().get(gm, &config),
+        unsigned_pair_gen::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -68,14 +62,14 @@ fn benchmark_overflowing_pow_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_pow_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

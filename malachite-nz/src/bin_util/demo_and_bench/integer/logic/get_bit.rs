@@ -18,9 +18,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_get_bit_library_comparison);
 }
 
-fn demo_limbs_get_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_get_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, index) in unsigned_vec_unsigned_pair_gen_var_18()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -32,20 +32,20 @@ fn demo_limbs_get_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_get_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_get_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, index) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("get_bit({}, {}) = {}", n, index, n.get_bit(index));
     }
 }
 
-fn benchmark_limbs_get_bit_neg(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_get_bit_neg(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_get_bit_neg(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_18().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -58,14 +58,14 @@ fn benchmark_limbs_get_bit_neg(gm: GenMode, config: GenConfig, limit: usize, fil
 
 fn benchmark_integer_get_bit_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.get_bit(u64)",
         BenchmarkType::LibraryComparison,
-        integer_unsigned_pair_gen_var_2_rm().get(gm, &config),
+        integer_unsigned_pair_gen_var_2_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

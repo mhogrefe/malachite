@@ -15,8 +15,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_sequence_from_vecs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_rational_sequence_from_vecs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen::<u8>().get(gm, config).take(limit) {
         println!(
             "from_vecs({:?}, {:?}) = {}",
             xs.clone(),
@@ -26,8 +26,8 @@ fn demo_rational_sequence_from_vecs(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_rational_sequence_from_slices(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_rational_sequence_from_slices(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen::<u8>().get(gm, config).take(limit) {
         println!(
             "from_slices(&{:?}, &{:?}) = {}",
             xs,
@@ -39,14 +39,14 @@ fn demo_rational_sequence_from_slices(gm: GenMode, config: GenConfig, limit: usi
 
 fn benchmark_rational_sequence_from_vecs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence::from_vecs(Vec<T>, Vec<T>)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_pair_gen::<u8>().get(gm, &config),
+        unsigned_vec_pair_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

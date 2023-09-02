@@ -14,8 +14,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_convergents_evaluation_strategy);
 }
 
-fn demo_rational_convergents(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_convergents(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "convergents({}) = {:?}",
             x.clone(),
@@ -24,8 +24,8 @@ fn demo_rational_convergents(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_convergents_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_convergents_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "convergents(&{}) = {:?}",
             x,
@@ -36,14 +36,14 @@ fn demo_rational_convergents_ref(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_rational_convergents_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.convergents()",
         BenchmarkType::Algorithms,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -57,14 +57,14 @@ fn benchmark_rational_convergents_algorithms(
 
 fn benchmark_rational_convergents_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.convergents()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

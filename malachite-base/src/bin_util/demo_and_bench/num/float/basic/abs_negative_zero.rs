@@ -13,8 +13,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_abs_negative_zero_assign);
 }
 
-fn demo_abs_negative_zero<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_abs_negative_zero<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!(
             "abs_negative_zero({}) = {}",
             NiceFloat(x),
@@ -23,8 +23,8 @@ fn demo_abs_negative_zero<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn demo_abs_negative_zero_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_abs_negative_zero_assign<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.abs_negative_zero_assign();
         println!(
@@ -37,14 +37,14 @@ fn demo_abs_negative_zero_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConf
 
 fn benchmark_abs_negative_zero<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.abs_negative_zero()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -55,14 +55,14 @@ fn benchmark_abs_negative_zero<T: PrimitiveFloat>(
 
 fn benchmark_abs_negative_zero_assign<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.abs_negative_zero_assign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

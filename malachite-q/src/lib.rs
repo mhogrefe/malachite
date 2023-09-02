@@ -29,12 +29,12 @@
 //!   addition algorithms:
 //!   ```text
 //!   cargo run --features bin_build --release -- -l 1000000 -m random -b \
-//!       benchmark_rational_add_algorithms -o gcd-bench.gp
+//!       benchmark_rational_add_algorithms -o add-bench.gp
 //!   ```
-//!   or GCD implementations of other libraries:
+//!   or addition implementations of other libraries:
 //!   ```text
 //!   cargo run --features bin_build --release -- -l 1000000 -m random -b \
-//!       benchmark_rational_add_assign_library_comparison -o gcd-bench.gp
+//!       benchmark_rational_add_assign_library_comparison -o add-bench.gp
 //!   ```
 //!   This creates a file called gcd-bench.gp. You can use gnuplot to create an SVG from it like
 //!   so:
@@ -90,6 +90,7 @@
     clippy::single_match_else,
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
+    clippy::uninlined_format_args,
     clippy::unused_self
 )]
 
@@ -115,6 +116,10 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
 /// A rational number.
+///
+/// `Rational`s whose numerator and denominator have 64 significant bits or fewer can be
+/// represented without any memory allocation. (Unless Malachite is compiled with `32_bit_limbs`,
+/// in which case the limit is 32).
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Rational {

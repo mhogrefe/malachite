@@ -24,11 +24,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_from_string_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, s) in unsigned_string_pair_gen_var_2()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_integer_from_string_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, s) in unsigned_string_pair_gen_var_2().get(gm, config).take(limit) {
         println!(
             "Integer::from_string_base({}, {}) = {:?}",
             base,
@@ -38,11 +35,8 @@ fn demo_integer_from_string_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_from_string_base_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, s) in unsigned_string_pair_gen_var_3()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_integer_from_string_base_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, s) in unsigned_string_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "Integer::from_string_base({}, {}) = {}",
             base,
@@ -52,14 +46,14 @@ fn demo_integer_from_string_base_targeted(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_from_str(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_integer_from_str(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!("Integer::from_str({}) = {:?}", s, Integer::from_str(&s));
     }
 }
 
-fn demo_integer_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_from_str_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_4().get(gm, config).take(limit) {
         println!(
             "Integer::from_str({}) = {}",
             s,
@@ -70,14 +64,14 @@ fn demo_integer_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) 
 
 fn benchmark_integer_from_str_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::from_str(&str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_4().get(gm, &config),
+        string_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -95,14 +89,14 @@ fn benchmark_integer_from_str_library_comparison(
 
 fn benchmark_integer_from_string_base_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::from_string_base(u64, &str)",
         BenchmarkType::LibraryComparison,
-        unsigned_string_pair_gen_var_3().get(gm, &config),
+        unsigned_string_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

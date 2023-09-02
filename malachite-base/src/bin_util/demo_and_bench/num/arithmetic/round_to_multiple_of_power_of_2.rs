@@ -29,15 +29,15 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, pow, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "{}.round_to_multiple_of_power_of_2({}, {}) = {}",
+            "{}.round_to_multiple_of_power_of_2({}, {}) = {:?}",
             x,
             pow,
             rm,
@@ -48,33 +48,32 @@ fn demo_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_round_to_multiple_of_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, pow, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.round_to_multiple_of_power_of_2_assign(pow, rm);
+        let o = x.round_to_multiple_of_power_of_2_assign(pow, rm);
         println!(
-            "x := {}; x.round_to_multiple_of_power_of_2_assign({}, {}); x = {}",
-            old_x, pow, rm, x
+            "x := {old_x}; x.round_to_multiple_of_power_of_2_assign({pow}, {rm}) = {o:?}; x = {x}"
         );
     }
 }
 
 fn demo_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "({}).round_to_multiple_of_power_of_2({}, {}) = {}",
+            "({}).round_to_multiple_of_power_of_2({}, {}) = {:?}",
             x,
             pow,
             rm,
@@ -85,25 +84,24 @@ fn demo_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
 
 fn demo_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
-        x.round_to_multiple_of_power_of_2_assign(pow, rm);
+        let o = x.round_to_multiple_of_power_of_2_assign(pow, rm);
         println!(
-            "x := {}; x.round_to_multiple_of_power_of_2_assign({}, {}); x = {}",
-            old_x, pow, rm, x
+            "x := {old_x}; x.round_to_multiple_of_power_of_2_assign({pow}, {rm}) = {o:?}; x = {x}"
         );
     }
 }
 
 fn benchmark_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -114,7 +112,7 @@ fn benchmark_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -127,7 +125,7 @@ fn benchmark_round_to_multiple_of_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_round_to_multiple_of_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -138,20 +136,20 @@ fn benchmark_round_to_multiple_of_power_of_2_assign_unsigned<T: PrimitiveUnsigne
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, &config),
+        unsigned_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_of_power_of_2_assign(y, rm)
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
         })],
     );
 }
 
 fn benchmark_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -162,7 +160,7 @@ fn benchmark_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -175,7 +173,7 @@ fn benchmark_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
 
 fn benchmark_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -186,13 +184,13 @@ fn benchmark_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_of_power_of_2_assign(y, rm)
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
         })],
     );
 }

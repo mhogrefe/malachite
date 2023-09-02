@@ -1,10 +1,9 @@
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShr, ModShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 
@@ -22,7 +21,7 @@ where
         Ordering::Equal => x.clone(),
         Ordering::Greater => x >> bits_abs,
         Ordering::Less => match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            Natural::ONE | Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
     }
@@ -42,7 +41,7 @@ where
         Ordering::Equal => x.clone(),
         Ordering::Greater => x >> bits_abs,
         Ordering::Less => match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },
     }
@@ -60,7 +59,7 @@ fn mod_shr_assign<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
         Ordering::Equal => {}
         Ordering::Greater => *x >>= bits_abs,
         Ordering::Less => match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            Natural::ONE | Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
     }
@@ -78,7 +77,7 @@ fn mod_shr_assign_ref<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
         Ordering::Equal => {}
         Ordering::Greater => *x >>= bits_abs,
         Ordering::Less => match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },
     }

@@ -1,5 +1,5 @@
-use crate::malachite_base::num::factorization::traits::Primes;
 use itertools::Itertools;
+use malachite_base::num::factorization::traits::Primes;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -19,8 +19,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_primes_less_than(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_9().get(gm, &config).take(limit) {
+fn demo_natural_primes_less_than(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_9().get(gm, config).take(limit) {
         println!(
             "primes_less_than({}) = {:?}",
             n,
@@ -29,8 +29,8 @@ fn demo_natural_primes_less_than(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_primes_less_than_or_equal_to(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_9().get(gm, &config).take(limit) {
+fn demo_natural_primes_less_than_or_equal_to(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_9().get(gm, config).take(limit) {
         println!(
             "primes_less_than_or_equal_to({}) = {:?}",
             n,
@@ -38,22 +38,22 @@ fn demo_natural_primes_less_than_or_equal_to(gm: GenMode, config: GenConfig, lim
         );
     }
 }
-fn demo_natural_primes(_gm: GenMode, _config: GenConfig, limit: usize) {
+fn demo_natural_primes(_gm: GenMode, _config: &GenConfig, limit: usize) {
     for p in Natural::primes().take(limit) {
-        println!("{}", p);
+        println!("{p}");
     }
 }
 
 fn benchmark_natural_primes_less_than_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::primes_less_than(&Natural)",
         BenchmarkType::Algorithms,
-        natural_gen_var_9().get(gm, &config),
+        natural_gen_var_9().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -71,14 +71,14 @@ fn benchmark_natural_primes_less_than_algorithms(
 
 fn benchmark_natural_primes_less_than_or_equal_to_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::primes_less_than_or_equal_to(&Natural)",
         BenchmarkType::Algorithms,
-        natural_gen_var_9().get(gm, &config),
+        natural_gen_var_9().get(gm, config),
         gm.name(),
         limit,
         file_name,

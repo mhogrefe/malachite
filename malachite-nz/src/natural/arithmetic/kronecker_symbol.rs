@@ -16,6 +16,7 @@ use malachite_base::num::arithmetic::traits::{
     DivMod, JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, Parity, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{JoinHalves, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_trailing_zeros;
@@ -392,10 +393,10 @@ fn limbs_half_gcd_jacobi_step(
 //
 // This is equivalent to `mpn_hgcd_jacobi` from `mpn/hgcd_jacobi.c`, GMP 6.2.1, where `bitsp` is
 // also returned.
-fn limbs_half_gcd_jacobi<'a>(
+fn limbs_half_gcd_jacobi(
     xs: &mut [Limb],
     ys: &mut [Limb],
-    m: &mut HalfGcdMatrix<'a>,
+    m: &mut HalfGcdMatrix<'_>,
     mut bits: u8,
     scratch: &mut [Limb],
 ) -> (u8, usize) {
@@ -1087,8 +1088,8 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     /// ```
     fn kronecker_symbol(self, other: &'a Natural) -> i8 {
         match (self, other) {
-            (x, natural_zero!()) => i8::from(*x == 1u32),
-            (natural_zero!(), y) => i8::from(*y == 1u32),
+            (x, &Natural::ZERO) => i8::from(*x == 1u32),
+            (&Natural::ZERO, y) => i8::from(*y == 1u32),
             (Natural(Small(x)), Natural(Small(y))) => {
                 limbs_kronecker_symbol_single(true, *x, true, *y)
             }

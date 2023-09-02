@@ -73,7 +73,7 @@ fn test_div_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        let (q, r) = ((&u).div_round(&v, RoundingMode::Floor), u.mod_op(v));
+        let (q, r) = ((&u).div_round(&v, RoundingMode::Floor).0, u.mod_op(v));
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
     };
@@ -1028,7 +1028,7 @@ fn test_ceiling_div_mod() {
         assert_eq!(r.to_string(), remainder);
 
         let (q, r) = (
-            u.clone().div_round(v.clone(), RoundingMode::Ceiling),
+            u.clone().div_round(v.clone(), RoundingMode::Ceiling).0,
             u.ceiling_mod(v),
         );
         assert_eq!(q.to_string(), quotient);
@@ -1500,7 +1500,7 @@ fn div_mod_properties_helper(x: Integer, y: Integer) {
     assert!(r_alt.is_valid());
     assert_eq!(r_alt, r);
 
-    let (q_alt, r_alt) = ((&x).div_round(&y, RoundingMode::Floor), (&x).mod_op(&y));
+    let (q_alt, r_alt) = ((&x).div_round(&y, RoundingMode::Floor).0, (&x).mod_op(&y));
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
 
@@ -1727,7 +1727,7 @@ fn ceiling_div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(r_alt, r);
 
     let (q_alt, r_alt) = (
-        (&x).div_round(&y, RoundingMode::Ceiling),
+        (&x).div_round(&y, RoundingMode::Ceiling).0,
         (&x).ceiling_mod(&y),
     );
     assert_eq!(q_alt, q);

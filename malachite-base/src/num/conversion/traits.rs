@@ -1,6 +1,7 @@
 use crate::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use crate::num::conversion::string::to_sci::SciWrapper;
 use crate::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 use std::fmt::{Formatter, Result};
 
 /// Expresses a value as a [`Vec`] of digits, or reads a value from an iterator of digits.
@@ -229,23 +230,27 @@ impl<T, U: OverflowingFrom<T>> OverflowingInto<U> for T {
 }
 
 /// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode).
+/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is also
+/// returned, indicating whether the returned value is less than, equal to, or greater than the
+/// original value.
 pub trait RoundingFrom<T>: Sized {
-    fn rounding_from(value: T, rm: RoundingMode) -> Self;
+    fn rounding_from(value: T, rm: RoundingMode) -> (Self, Ordering);
 }
 
 /// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode).
+/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is also
+/// returned, indicating whether the returned value is less than, equal to, or greater than the
+/// original value.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when [`RoundingFrom`] is implemented.
 pub trait RoundingInto<T>: Sized {
-    fn rounding_into(self, rm: RoundingMode) -> T;
+    fn rounding_into(self, rm: RoundingMode) -> (T, Ordering);
 }
 
 impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
     #[inline]
-    fn rounding_into(self, rm: RoundingMode) -> U {
+    fn rounding_into(self, rm: RoundingMode) -> (U, Ordering) {
         U::rounding_from(self, rm)
     }
 }

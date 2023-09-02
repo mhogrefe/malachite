@@ -15,31 +15,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_square_evaluation_strategy);
 }
 
-fn demo_integer_square_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_square_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in integer_gen().get(gm, config).take(limit) {
         let old_n = n.clone();
         n.square_assign();
-        println!("n := {}; n.square_assign(); n = {}", n, old_n);
+        println!("n := {n}; n.square_assign(); n = {old_n}");
     }
 }
 
-fn demo_integer_square(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("({}) ^ 2 = {}", n.clone(), n.square());
     }
 }
 
-fn demo_integer_square_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_square_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("&{} ^ 2 = {}", n, (&n).square());
     }
 }
 
-fn benchmark_integer_square_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_square_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.square_assign()",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -51,14 +51,14 @@ fn benchmark_integer_square_assign(gm: GenMode, config: GenConfig, limit: usize,
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_square_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.square()",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -72,14 +72,14 @@ fn benchmark_integer_square_algorithms(
 
 fn benchmark_integer_square_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.square()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

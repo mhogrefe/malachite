@@ -22,12 +22,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_primitive_int_try_from_rational<T: for<'a> TryFrom<&'a Rational> + PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> <T as TryFrom<&'a Rational>>::Error: Debug,
 {
-    for x in rational_gen().get(gm, &config).take(limit) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!("{}::try_from({}) = {:?}", T::NAME, x, T::try_from(&x));
     }
 }
@@ -36,10 +36,10 @@ fn demo_primitive_int_convertible_from_rational<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             x,
@@ -53,17 +53,17 @@ fn demo_primitive_int_rounding_from_rational<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt + for<'a> RoundingFrom<&'a Rational>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: PartialOrd<T>,
 {
     for (x, rm) in rational_rounding_mode_pair_gen_var_3::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "{}::rounding_from({}, {}) = {}",
+            "{}::rounding_from({}, {}) = {:?}",
             T::NAME,
             x,
             rm,
@@ -74,14 +74,14 @@ fn demo_primitive_int_rounding_from_rational<
 
 fn benchmark_primitive_int_try_from_rational<T: for<'a> TryFrom<&'a Rational> + PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::try_from(Rational)", T::NAME),
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -94,14 +94,14 @@ fn benchmark_primitive_int_convertible_from_rational<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::convertible_from(Rational)", T::NAME),
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -114,7 +114,7 @@ fn benchmark_primitive_int_rounding_from_rational<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt + for<'a> RoundingFrom<&'a Rational>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -123,7 +123,7 @@ fn benchmark_primitive_int_rounding_from_rational<
     run_benchmark(
         &format!("{}::rounding_from(Rational)", T::NAME),
         BenchmarkType::Single,
-        rational_rounding_mode_pair_gen_var_3::<T>().get(gm, &config),
+        rational_rounding_mode_pair_gen_var_3::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

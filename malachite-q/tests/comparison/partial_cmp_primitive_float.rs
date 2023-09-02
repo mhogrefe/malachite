@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::test_util::generators::{
     rational_gen, rational_primitive_float_pair_gen,
@@ -28,10 +29,10 @@ fn test_partial_cmp_primitive_float() {
         assert_eq!(v.partial_cmp(&rug::Rational::from_str(u).unwrap()), out_rev);
     };
     test("2/3", f32::NAN, None);
-    test("2/3", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("2/3", f32::INFINITY, Some(Ordering::Less));
     test("2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
     test("-2/3", f32::NAN, None);
-    test("-2/3", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("-2/3", f32::INFINITY, Some(Ordering::Less));
     test("-2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
 
     test("0", 0.0, Some(Ordering::Equal));
@@ -94,7 +95,7 @@ where
 
     rational_gen().test_properties(|x| {
         assert!(x > T::NEGATIVE_INFINITY);
-        assert!(x < T::POSITIVE_INFINITY);
+        assert!(x < T::INFINITY);
     });
 }
 

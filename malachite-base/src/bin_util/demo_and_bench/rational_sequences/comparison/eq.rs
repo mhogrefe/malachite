@@ -9,25 +9,25 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_eq);
 }
 
-fn demo_rational_sequence_eq(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_eq(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys) in unsigned_rational_sequence_pair_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if xs == ys {
-            println!("{} = {}", xs, ys);
+            println!("{xs} = {ys}");
         } else {
-            println!("{} ≠ {}", xs, ys);
+            println!("{xs} ≠ {ys}");
         }
     }
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
-fn benchmark_rational_sequence_eq(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_sequence_eq(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "RationalSequence == RationalSequence",
         BenchmarkType::Single,
-        unsigned_rational_sequence_pair_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_pair_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

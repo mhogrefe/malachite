@@ -16,7 +16,7 @@ use std::ops::Index;
 pub struct NaturalBitIterator<'a> {
     pub(crate) significant_bits: u64,
     pub(crate) limbs: LimbIterator<'a>,
-    some_remaining: bool,
+    remaining: usize,
     indices_are_in_same_limb: bool,
     current_limb_forward: Limb,
     current_limb_back: Limb,
@@ -32,11 +32,8 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let bit = self.current_limb_forward & self.i_mask != 0;
-            if self.indices_are_in_same_limb && self.i_mask == self.j_mask {
-                self.some_remaining = false;
-            }
             self.i_mask <<= 1;
             if self.i_mask == 0 {
                 self.i_mask = 1;
@@ -47,6 +44,7 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
                     self.indices_are_in_same_limb = true;
                 }
             }
+            self.remaining -= 1;
             Some(bit)
         } else {
             None
@@ -54,17 +52,13 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_bits = usize::exact_from(self.significant_bits);
-        (significant_bits, Some(significant_bits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
     fn next_back(&mut self) -> Option<bool> {
-        if self.some_remaining {
-            if self.indices_are_in_same_limb && self.i_mask == self.j_mask {
-                self.some_remaining = false;
-            }
+        if self.remaining != 0 {
             let bit = self.current_limb_back & self.j_mask != 0;
             self.j_mask >>= 1;
             if self.j_mask == 0 {
@@ -76,6 +70,7 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
                     self.indices_are_in_same_limb = true;
                 }
             }
+            self.remaining -= 1;
             Some(bit)
         } else {
             None
@@ -169,7 +164,7 @@ impl<'a> BitIterable for &'a Natural {
         let mut bits = NaturalBitIterator {
             significant_bits,
             limbs: self.limbs(),
-            some_remaining: significant_bits != 0,
+            remaining: usize::exact_from(significant_bits),
             indices_are_in_same_limb: significant_bits <= Limb::WIDTH,
             current_limb_forward: 0,
             current_limb_back: 0,

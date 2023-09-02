@@ -10,7 +10,12 @@ use std::cmp::Ordering;
 
 impl Rational {
     /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by
-    /// value.
+    /// value. An [`Ordering`] is also returned, indicating whether the returned mantissa and
+    /// exponent represent a value that is less than, equal to, or greater than the absolute value
+    /// of the [`Rational`].
+    ///
+    /// The [`Rational`]'s sign is ignored. This means that, for example, that rounding using
+    /// `Floor` is  equivalent to rounding using `Down`, even if the [`Rational] is negative.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -35,31 +40,87 @@ impl Rational {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
+    /// use std::cmp::Ordering;
     ///
-    /// let test = |n: Rational, rm: RoundingMode, out: Option<(f32, i64)>| {
+    /// let test = |n: Rational, rm: RoundingMode, out: Option<(f32, i64, Ordering)>| {
     ///     assert_eq!(
-    ///         n.sci_mantissa_and_exponent_with_rounding(rm)
-    ///             .map(|(m, e)| (NiceFloat(m), e)),
-    ///         out.map(|(m, e)| (NiceFloat(m), e))
+    ///         n.sci_mantissa_and_exponent_round(rm)
+    ///             .map(|(m, e, o)| (NiceFloat(m), e, o)),
+    ///         out.map(|(m, e, o)| (NiceFloat(m), e, o))
     ///     );
     /// };
-    /// test(Rational::from(3u32), RoundingMode::Down, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Ceiling, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Up, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Nearest, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Exact, Some((1.5, 1)));
+    /// test(Rational::from(3u32), RoundingMode::Down, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Ceiling, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Up, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Nearest, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Exact, Some((1.5, 1, Ordering::Equal)));
     ///
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Floor, Some((1.3333333, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Down, Some((1.3333333, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Ceiling, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Up, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Nearest, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Exact, None);
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Floor,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Down,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Ceiling,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Up,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Exact,
+    ///     None
+    /// );
+    ///
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Floor,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Down,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Ceiling,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Up,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(-1, 3),
+    ///     RoundingMode::Exact,
+    ///     None
+    /// );
     /// ```
-    pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+    pub fn sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
         mut self,
         rm: RoundingMode,
-    ) -> Option<(T, i64)> {
+    ) -> Option<(T, i64, Ordering)> {
         assert!(self != 0);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
@@ -71,7 +132,7 @@ impl Rational {
         if rm == RoundingMode::Exact && d != 1u32 {
             return None;
         }
-        let mut mantissa = n.div_round(d, rm);
+        let (mut mantissa, o) = n.div_round(d, rm);
         let mut bits = mantissa.significant_bits();
         if bits > T::MANTISSA_WIDTH + 1 {
             bits -= 1;
@@ -86,11 +147,13 @@ impl Rational {
                 u64::wrapping_from(T::MAX_EXPONENT),
             ),
             exponent,
+            o,
         ))
     }
 
     /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by
-    /// reference.
+    /// reference. An [`Ordering`] is also returned, indicating whether the returned mantissa and
+    /// exponent represent a value that is less than, equal to, or greater than the original value.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -115,31 +178,56 @@ impl Rational {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
+    /// use std::cmp::Ordering;
     ///
-    /// let test = |n: Rational, rm: RoundingMode, out: Option<(f32, i64)>| {
+    /// let test = |n: Rational, rm: RoundingMode, out: Option<(f32, i64, Ordering)>| {
     ///     assert_eq!(
-    ///         (&n).sci_mantissa_and_exponent_with_rounding_ref(rm)
-    ///             .map(|(m, e)| (NiceFloat(m), e)),
-    ///         out.map(|(m, e)| (NiceFloat(m), e))
+    ///         n.sci_mantissa_and_exponent_round_ref(rm)
+    ///             .map(|(m, e, o)| (NiceFloat(m), e, o)),
+    ///         out.map(|(m, e, o)| (NiceFloat(m), e, o))
     ///     );
     /// };
-    /// test(Rational::from(3u32), RoundingMode::Down, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Ceiling, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Up, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Nearest, Some((1.5, 1)));
-    /// test(Rational::from(3u32), RoundingMode::Exact, Some((1.5, 1)));
+    /// test(Rational::from(3u32), RoundingMode::Down, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Ceiling, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Up, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Nearest, Some((1.5, 1, Ordering::Equal)));
+    /// test(Rational::from(3u32), RoundingMode::Exact, Some((1.5, 1, Ordering::Equal)));
     ///
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Floor, Some((1.3333333, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Down, Some((1.3333333, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Ceiling, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Up, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Nearest, Some((1.3333334, -2)));
-    /// test(Rational::from_signeds(1, 3), RoundingMode::Exact, None);
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Floor,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Down,
+    ///     Some((1.3333333, -2, Ordering::Less))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Ceiling,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Up,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.3333334, -2, Ordering::Greater))
+    /// );
+    /// test(
+    ///     Rational::from_signeds(1, 3),
+    ///     RoundingMode::Exact,
+    ///     None
+    /// );
     /// ```
-    pub fn sci_mantissa_and_exponent_with_rounding_ref<T: PrimitiveFloat>(
+    pub fn sci_mantissa_and_exponent_round_ref<T: PrimitiveFloat>(
         &self,
         rm: RoundingMode,
-    ) -> Option<(T, i64)> {
+    ) -> Option<(T, i64, Ordering)> {
         assert!(*self != 0);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
@@ -151,7 +239,7 @@ impl Rational {
         if rm == RoundingMode::Exact && d != 1u32 {
             return None;
         }
-        let mut mantissa = n.div_round(d, rm);
+        let (mut mantissa, o) = n.div_round(d, rm);
         let mut bits = mantissa.significant_bits();
         if bits > T::MANTISSA_WIDTH + 1 {
             bits -= 1;
@@ -166,6 +254,7 @@ impl Rational {
                 u64::wrapping_from(T::MAX_EXPONENT),
             ),
             exponent,
+            o,
         ))
     }
 }
@@ -180,7 +269,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
+            /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$
@@ -196,8 +285,10 @@ macro_rules! impl_mantissa_and_exponent {
             /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
-                self.sci_mantissa_and_exponent_with_rounding(RoundingMode::Nearest)
-                    .unwrap()
+                let (m, e, _) = self
+                    .sci_mantissa_and_exponent_round(RoundingMode::Nearest)
+                    .unwrap();
+                (m, e)
             }
 
             /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by value.
@@ -206,7 +297,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
+            /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.
             /// $$
@@ -229,7 +320,8 @@ macro_rules! impl_mantissa_and_exponent {
                 }
                 self >>= exponent - i64::wrapping_from($t::MANTISSA_WIDTH);
                 let (n, d) = self.into_numerator_and_denominator();
-                if n.div_round(d, RoundingMode::Nearest).significant_bits() > $t::MANTISSA_WIDTH + 1
+                if n.div_round(d, RoundingMode::Nearest).0.significant_bits()
+                    > $t::MANTISSA_WIDTH + 1
                 {
                     exponent + 1
                 } else {
@@ -283,7 +375,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
+            /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$
@@ -299,8 +391,10 @@ macro_rules! impl_mantissa_and_exponent {
             /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
-                self.sci_mantissa_and_exponent_with_rounding_ref(RoundingMode::Nearest)
-                    .unwrap()
+                let (m, e, _) = self
+                    .sci_mantissa_and_exponent_round_ref(RoundingMode::Nearest)
+                    .unwrap();
+                (m, e)
             }
 
             /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by reference.
@@ -309,7 +403,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// [`sci_mantissa_and_exponent_with_rounding`](Rational::sci_mantissa_and_exponent_with_rounding).
+            /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.
             /// $$
@@ -329,7 +423,8 @@ macro_rules! impl_mantissa_and_exponent {
                 }
                 let x = self >> exponent - i64::wrapping_from($t::MANTISSA_WIDTH);
                 let (n, d) = x.into_numerator_and_denominator();
-                if n.div_round(d, RoundingMode::Nearest).significant_bits() > $t::MANTISSA_WIDTH + 1
+                if n.div_round(d, RoundingMode::Nearest).0.significant_bits()
+                    > $t::MANTISSA_WIDTH + 1
                 {
                     exponent + 1
                 } else {

@@ -50,7 +50,7 @@ pub_crate_test! {limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
 //
 // This is equivalent to `mpn_com` from `mpn/generic/com.c`, GMP 6.2.1, where `rp == up`.
 pub_crate_test! {limbs_not_in_place(xs: &mut [Limb]) {
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         x.not_assign();
     }
 }}

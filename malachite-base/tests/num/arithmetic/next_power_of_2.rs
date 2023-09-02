@@ -53,7 +53,7 @@ fn test_next_power_of_2() {
 
 fn next_power_of_2_fail_helper_primitive_float<T: PrimitiveFloat>() {
     assert_panic!(T::NEGATIVE_ZERO.next_power_of_2());
-    assert_panic!(T::POSITIVE_INFINITY.next_power_of_2());
+    assert_panic!(T::INFINITY.next_power_of_2());
     assert_panic!(T::NEGATIVE_INFINITY.next_power_of_2());
     assert_panic!(T::NAN.next_power_of_2());
     assert_panic!(T::NEGATIVE_ONE.next_power_of_2());
@@ -64,7 +64,7 @@ fn next_power_of_2_fail_helper_primitive_float<T: PrimitiveFloat>() {
         x.next_power_of_2_assign();
     };
     assert_panic!(test(T::NEGATIVE_ZERO));
-    assert_panic!(test(T::POSITIVE_INFINITY));
+    assert_panic!(test(T::INFINITY));
     assert_panic!(test(T::NEGATIVE_INFINITY));
     assert_panic!(test(T::NAN));
     assert_panic!(test(T::NEGATIVE_ONE));

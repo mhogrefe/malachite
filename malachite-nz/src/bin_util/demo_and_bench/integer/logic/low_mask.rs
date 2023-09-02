@@ -11,17 +11,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_low_mask);
 }
 
-fn demo_integer_low_mask(gm: GenMode, config: GenConfig, limit: usize) {
-    for bits in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_integer_low_mask(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bits in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("Integer::low_mask({}) = {}", bits, Integer::low_mask(bits));
     }
 }
 
-fn benchmark_integer_low_mask(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_low_mask(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.low_mask(u64)",
         BenchmarkType::Single,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

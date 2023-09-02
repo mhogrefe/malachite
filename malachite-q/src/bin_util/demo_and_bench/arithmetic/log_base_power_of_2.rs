@@ -16,11 +16,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_checked_log_base_power_of_2);
 }
 
-fn demo_rational_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in rational_signed_pair_gen_var_5()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_rational_floor_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in rational_signed_pair_gen_var_5().get(gm, config).take(limit) {
         println!(
             "floor_log_base_power_of_2({}, {}) = {}",
             n,
@@ -30,11 +27,8 @@ fn demo_rational_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_rational_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in rational_signed_pair_gen_var_5()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_rational_ceiling_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in rational_signed_pair_gen_var_5().get(gm, config).take(limit) {
         println!(
             "ceiling_log_base_power_of_2({}, {}) = {}",
             n,
@@ -44,11 +38,8 @@ fn demo_rational_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn demo_rational_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in rational_signed_pair_gen_var_5()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_rational_checked_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in rational_signed_pair_gen_var_5().get(gm, config).take(limit) {
         println!(
             "checked_log_base_power_of_2({}, {}) = {:?}",
             n,
@@ -60,14 +51,14 @@ fn demo_rational_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, lim
 
 fn benchmark_rational_floor_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.floor_log_base_power_of_2(u64)",
         BenchmarkType::Single,
-        rational_signed_pair_gen_var_5().get(gm, &config),
+        rational_signed_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -80,14 +71,14 @@ fn benchmark_rational_floor_log_base_power_of_2(
 
 fn benchmark_rational_ceiling_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.ceiling_log_base_power_of_2(u64)",
         BenchmarkType::Single,
-        rational_signed_pair_gen_var_5().get(gm, &config),
+        rational_signed_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -100,14 +91,14 @@ fn benchmark_rational_ceiling_log_base_power_of_2(
 
 fn benchmark_rational_checked_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.floor_log_base_power_of_2(u64)",
         BenchmarkType::Single,
-        rational_signed_pair_gen_var_5().get(gm, &config),
+        rational_signed_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

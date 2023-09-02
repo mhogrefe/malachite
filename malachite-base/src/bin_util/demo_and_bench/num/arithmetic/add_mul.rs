@@ -28,24 +28,21 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_add_mul_assign_primitive_float);
 }
 
-fn demo_add_mul_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in unsigned_triple_gen_var_1::<T>()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_add_mul_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in unsigned_triple_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("{}.add_mul({}, {}) = {}", x, y, z, x.add_mul(y, z));
     }
 }
 
-fn demo_add_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in signed_triple_gen_var_1::<T>().get(gm, &config).take(limit) {
+fn demo_add_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in signed_triple_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("({}).add_mul({}, {}) = {}", x, y, z, x.add_mul(y, z));
     }
 }
 
-fn demo_add_mul_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_add_mul_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z) in primitive_float_triple_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -60,34 +57,31 @@ fn demo_add_mul_primitive_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfi
 
 fn demo_add_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y, z) in unsigned_triple_gen_var_1::<T>()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (mut x, y, z) in unsigned_triple_gen_var_1::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.add_mul_assign(y, z);
-        println!("x := {}; x.add_mul_assign({}, {}); x = {}", old_x, y, z, x);
+        println!("x := {old_x}; x.add_mul_assign({y}, {z}); x = {x}");
     }
 }
 
-fn demo_add_mul_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, z) in signed_triple_gen_var_1::<T>().get(gm, &config).take(limit) {
+fn demo_add_mul_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, z) in signed_triple_gen_var_1::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.add_mul_assign(y, z);
-        println!("x := {}; x.add_mul_assign({}, {}); x = {}", old_x, y, z, x);
+        println!("x := {old_x}; x.add_mul_assign({y}, {z}); x = {x}");
     }
 }
 
 fn demo_add_mul_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y, z) in primitive_float_triple_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
@@ -104,14 +98,14 @@ fn demo_add_mul_assign_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_add_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -122,14 +116,14 @@ fn benchmark_add_mul_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_add_mul_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_triple_gen_var_1::<T>().get(gm, &config),
+        signed_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -140,14 +134,14 @@ fn benchmark_add_mul_signed<T: PrimitiveSigned>(
 
 fn benchmark_add_mul_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        primitive_float_triple_gen::<T>().get(gm, &config),
+        primitive_float_triple_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -158,14 +152,14 @@ fn benchmark_add_mul_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_add_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul_assign({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -176,14 +170,14 @@ fn benchmark_add_mul_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_add_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul_assign({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_triple_gen_var_1::<T>().get(gm, &config),
+        signed_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -194,14 +188,14 @@ fn benchmark_add_mul_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_add_mul_assign_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.add_mul_assign({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        primitive_float_triple_gen::<T>().get(gm, &config),
+        primitive_float_triple_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

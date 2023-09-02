@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::generators::primitive_float_gen;
@@ -12,7 +13,7 @@ pub fn test_to_string() {
         assert_eq!(NiceFloat(x).to_string(), out);
     }
     test::<f32>(f32::NAN, "NaN");
-    test::<f32>(f32::POSITIVE_INFINITY, "Infinity");
+    test::<f32>(f32::INFINITY, "Infinity");
     test::<f32>(f32::NEGATIVE_INFINITY, "-Infinity");
     test::<f32>(0.0, "0.0");
     test::<f32>(-0.0, "-0.0");
@@ -32,7 +33,7 @@ pub fn test_to_string() {
     test::<f32>(std::f32::consts::PI, "3.1415927");
 
     test::<f64>(f64::NAN, "NaN");
-    test::<f64>(f64::POSITIVE_INFINITY, "Infinity");
+    test::<f64>(f64::INFINITY, "Infinity");
     test::<f64>(f64::NEGATIVE_INFINITY, "-Infinity");
     test::<f64>(0.0, "0.0");
     test::<f64>(-0.0, "-0.0");

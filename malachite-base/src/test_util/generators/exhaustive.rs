@@ -156,7 +156,7 @@ pub fn exhaustive_primitive_float_gen<T: PrimitiveFloat>() -> It<T> {
 pub fn exhaustive_primitive_float_gen_var_1<T: PrimitiveFloat>() -> It<T> {
     Box::new(exhaustive_primitive_float_range(
         T::NEGATIVE_ONE / T::TWO,
-        T::POSITIVE_INFINITY,
+        T::INFINITY,
     ))
 }
 
@@ -254,9 +254,7 @@ pub fn exhaustive_primitive_float_gen_var_8<T: PrimitiveFloat>() -> It<T> {
 }
 
 pub fn exhaustive_primitive_float_gen_var_9<T: PrimitiveFloat>() -> It<T> {
-    Box::new(
-        exhaustive_primitive_floats::<T>().filter(|&f| !f.is_nan() && f != T::POSITIVE_INFINITY),
-    )
+    Box::new(exhaustive_primitive_floats::<T>().filter(|&f| !f.is_nan() && f != T::INFINITY))
 }
 
 pub fn exhaustive_primitive_float_gen_var_10<T: PrimitiveFloat>() -> It<T> {
@@ -303,7 +301,7 @@ pub fn exhaustive_primitive_float_gen_var_16<
     U: PrimitiveUnsigned,
 >() -> It<T> {
     let limit = min(
-        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down)),
+        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down).0),
         NiceFloat(
             T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
                 .unwrap(),
@@ -322,7 +320,7 @@ pub fn exhaustive_primitive_float_gen_var_17<
     U: PrimitiveSigned,
 >() -> It<T> {
     let min_limit = min(
-        NiceFloat(-T::rounding_from(U::MIN, RoundingMode::Down)),
+        NiceFloat(-T::rounding_from(U::MIN, RoundingMode::Down).0),
         NiceFloat(
             T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
                 .unwrap(),
@@ -330,7 +328,7 @@ pub fn exhaustive_primitive_float_gen_var_17<
     )
     .0;
     let max_limit = min(
-        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down)),
+        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down).0),
         NiceFloat(
             T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
                 .unwrap(),
@@ -418,6 +416,34 @@ pub fn exhaustive_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>() -> 
     )
 }
 
+pub fn exhaustive_primitive_float_signed_pair_gen_var_3<T: PrimitiveFloat>() -> It<(T, i64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_primitive_float_range(T::ONE, T::TWO),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_primitive_float_signed_pair_gen_var_4<T: PrimitiveFloat, U: PrimitiveSigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_primitive_floats(),
+        exhaustive_signeds(),
+    ))
+}
+
+// -- (PrimitiveFloat, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_primitive_float_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
+        exhaustive_primitive_floats(),
+        exhaustive_pairs(exhaustive_signeds(), exhaustive_positive_primitive_ints()),
+    )))
+}
+
 // -- (PrimitiveFloat, PrimitiveUnsigned) --
 
 pub fn exhaustive_primitive_float_unsigned_pair_gen_var_1<
@@ -434,6 +460,16 @@ pub fn exhaustive_primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>() -
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_primitive_float_range(T::ONE, T::TWO),
         exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_primitive_float_unsigned_pair_gen_var_3<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_primitive_floats(),
+        exhaustive_positive_primitive_ints(),
     ))
 }
 
@@ -462,6 +498,8 @@ pub fn exhaustive_primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: Pri
         exhaustive_rounding_modes(),
     )))
 }
+
+// var 3 is in malachite-float.
 
 // -- (PrimitiveFloat, RoundingMode) --
 
@@ -501,8 +539,8 @@ pub fn exhaustive_primitive_float_rounding_mode_pair_gen_var_3<
     T: PrimitiveFloat + RoundingFrom<U>,
     U: ConvertibleFrom<T> + PrimitiveInt,
 >() -> It<(T, RoundingMode)> {
-    let f_min = T::rounding_from(U::MIN, RoundingMode::Down);
-    let f_max = T::rounding_from(U::MAX, RoundingMode::Down);
+    let f_min = T::rounding_from(U::MIN, RoundingMode::Down).0;
+    let f_max = T::rounding_from(U::MAX, RoundingMode::Down).0;
     Box::new(
         lex_pairs(
             exhaustive_primitive_floats::<T>().filter(|f| !f.is_nan()),
@@ -1149,6 +1187,30 @@ pub fn exhaustive_signed_signed_unsigned_triple_gen_var_1<
     ))))
 }
 
+pub fn exhaustive_signed_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned>() -> It<(T, T, u64)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_signeds::<T>(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter(|&(x, y, pow)| !x.eq_mod_power_of_2(y, pow)),
+    )
+}
+
+pub fn exhaustive_signed_signed_unsigned_triple_gen_var_3<
+    T: PrimitiveSigned,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
+        exhaustive_signeds(),
+        exhaustive_pairs(exhaustive_signeds(), exhaustive_positive_primitive_ints()),
+    )))
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -1171,7 +1233,7 @@ fn round_to_multiple_unsigned_helper<T: PrimitiveUnsigned>(x: T, y: T, rm: Round
     } else if y == T::ZERO {
         rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest
     } else {
-        x.div_round(y, rm).checked_mul(y).is_some()
+        x.div_round(y, rm).0.checked_mul(y).is_some()
     }
 }
 
@@ -1187,11 +1249,11 @@ fn round_to_multiple_signed_helper<
     let y_abs = y.unsigned_abs();
     if x >= S::ZERO {
         round_to_multiple_unsigned_helper(x_abs, y_abs, rm)
-            && S::convertible_from(x_abs.round_to_multiple(y_abs, rm))
+            && S::convertible_from(x_abs.round_to_multiple(y_abs, rm).0)
     } else if !round_to_multiple_unsigned_helper(x_abs, y_abs, -rm) {
         false
     } else {
-        let abs_result = x_abs.round_to_multiple(y_abs, -rm);
+        let abs_result = x_abs.round_to_multiple(y_abs, -rm).0;
         abs_result == S::MIN.unsigned_abs()
             || S::try_from(abs_result)
                 .ok()
@@ -1465,6 +1527,22 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_17<T: PrimitiveSigned, U: Primiti
     )
 }
 
+pub fn exhaustive_signed_unsigned_pair_gen_var_18<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_19<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_signeds(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, u64, bool)>
@@ -1547,19 +1625,6 @@ pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_4<
     ))
 }
 
-pub fn exhaustive_signed_signed_unsigned_triple_gen_var_5<T: PrimitiveSigned>() -> It<(T, T, u64)> {
-    Box::new(
-        exhaustive_triples_xxy_custom_output(
-            exhaustive_signeds::<T>(),
-            exhaustive_unsigneds(),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        )
-        .filter(|&(x, y, pow)| !x.eq_mod_power_of_2(y, pow)),
-    )
-}
-
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
@@ -1615,6 +1680,8 @@ pub fn exhaustive_signed_unsigned_rounding_mode_triple_gen_var_2<
         }),
     ))
 }
+
+// var 3 is in malachite-float.
 
 // -- (PrimitiveSigned, RoundingMode) --
 
@@ -2024,6 +2091,17 @@ pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_3<
             |(x, y, z): (T, U, T)| Some((x, y, x.checked_add(z)?.checked_add(T::ONE)?)),
         ),
     )
+}
+
+pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
+        exhaustive_unsigneds(),
+        exhaustive_pairs(exhaustive_signeds(), exhaustive_positive_primitive_ints()),
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveSigned, RoundingMode) --
@@ -3058,7 +3136,7 @@ pub(crate) fn round_to_multiple_unsigned_filter_map<T: PrimitiveUnsigned>(
             None
         }
     } else if rm != RoundingMode::Exact {
-        x.div_round(y, rm).checked_mul(y).map(|_| (x, y, rm))
+        x.div_round(y, rm).0.checked_mul(y).map(|_| (x, y, rm))
     } else {
         x.checked_mul(y).map(|product| (product, y, rm))
     }
@@ -3071,6 +3149,7 @@ pub(crate) fn round_to_multiple_of_power_of_2_filter_map<T: PrimitiveInt>(
 ) -> Option<(T, u64, RoundingMode)> {
     if n == T::ZERO || rm != RoundingMode::Exact {
         n.shr_round(u, rm)
+            .0
             .arithmetic_checked_shl(u)
             .map(|_| (n, u, rm))
     } else {
@@ -3118,6 +3197,8 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_5<
     ))
 }
 
+// var 6 is in malachite-float.
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 
 struct UnsignedUnsignedBoolVecTripleGeneratorVar1;
@@ -3133,7 +3214,8 @@ impl<T: PrimitiveUnsigned>
     fn get_ys(&self, &(x, log_base): &(T, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
         lex_vecs_fixed_length_from_single(
             x.significant_bits()
-                .div_round(log_base, RoundingMode::Ceiling),
+                .div_round(log_base, RoundingMode::Ceiling)
+                .0,
             exhaustive_bools(),
         )
     }
@@ -3466,7 +3548,7 @@ pub fn exhaustive_string_gen_var_8() -> It<String> {
             1,
             lex_union3s('0'..='9', 'a'..='f', 'A'..='F').map(Union3::unwrap),
         ))
-        .map(|s| format!("\"0x{}\"", s)),
+        .map(|s| format!("\"0x{s}\"")),
     )
 }
 
@@ -3755,7 +3837,7 @@ pub fn exhaustive_bool_vec_gen_var_3<T: PrimitiveUnsigned>() -> It<Vec<bool>> {
                 lex_vecs_fixed_length_from_single(T::WIDTH, exhaustive_bools()),
                 exhaustive_positive_primitive_ints(),
             )
-            .map(|(bs, n)| repeat_n(false, n).chain(bs.into_iter()).collect()),
+            .map(|(bs, n)| repeat_n(false, n).chain(bs).collect()),
         ),
     )
 }
@@ -3767,11 +3849,7 @@ pub fn exhaustive_bool_vec_gen_var_4<T: PrimitiveSigned>() -> It<Vec<bool>> {
                 lex_vecs_fixed_length_from_single(T::WIDTH - 1, exhaustive_bools()),
                 exhaustive_nonzero_signeds::<isize>(),
             )
-            .map(|(bs, n)| {
-                repeat_n(n < 0, n.unsigned_abs())
-                    .chain(bs.into_iter())
-                    .collect()
-            }),
+            .map(|(bs, n)| repeat_n(n < 0, n.unsigned_abs()).chain(bs).collect()),
         ),
     )
 }
@@ -3986,7 +4064,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         Box::new(
             exhaustive_vecs_length_inclusive_range(
                 0,
-                T::WIDTH.div_round(log_base, RoundingMode::Ceiling),
+                T::WIDTH.div_round(log_base, RoundingMode::Ceiling).0,
                 primitive_int_increasing_inclusive_range(
                     U::ZERO,
                     U::low_mask(min(T::WIDTH, log_base)),
@@ -4523,7 +4601,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<(Vec
 pub fn exhaustive_unsigned_vec_pair_gen_var_4<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
     Box::new(
         exhaustive_pairs_from_single(exhaustive_vecs_min_length(1, exhaustive_unsigneds())).filter(
-            |&(ref xs, ref es)| {
+            |(ref xs, ref es)| {
                 !xs.is_empty()
                     && (es.len() > 1 || es.len() == 1 && es[0] > T::ONE)
                     && *es.last().unwrap() != T::ZERO
@@ -4606,7 +4684,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(Vec
             ),
             exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
                 let in_len = x.checked_add(1)?;
-                let mut out_len: u64 = in_len.shr_round(1, RoundingMode::Ceiling);
+                let mut out_len: u64 = in_len.shr_round(1, RoundingMode::Ceiling).0;
                 out_len = out_len.checked_add(y)?;
                 Some((out_len, in_len))
             }),
@@ -5450,7 +5528,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_28<T: PrimitiveUnsigned>(
             ),
             exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
                 let in_len = x.checked_add(1)?;
-                let mut out_len: u64 = in_len.shr_round(1, RoundingMode::Ceiling);
+                let mut out_len: u64 = in_len.shr_round(1, RoundingMode::Ceiling).0;
                 out_len = out_len.checked_add(y)?;
                 let rem_len = in_len.checked_add(z)?;
                 Some((out_len, rem_len, in_len))
@@ -5904,7 +5982,7 @@ pub fn exhaustive_large_type_gen_var_2<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
             ),
             Box::new(exhaustive_unsigneds::<u64>().flat_map(|x| {
                 let len = x.checked_add(9)?;
-                let n = len.shr_round(1, RoundingMode::Ceiling);
+                let n = len.shr_round(1, RoundingMode::Ceiling).0;
                 Some((n, len))
             })),
             UnsignedVecSqrtRemGenerator2,

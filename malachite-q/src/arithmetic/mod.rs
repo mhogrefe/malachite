@@ -10,7 +10,8 @@ pub mod approximate;
 /// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking
 /// the ceiling of a number.
 pub mod ceiling;
-/// TODOOOO
+/// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
+/// interval.
 pub mod denominators_in_closed_interval;
 /// Division of [`Rational`](super::Rational)s.
 pub mod div;
@@ -18,8 +19,8 @@ pub mod div;
 /// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the
 /// floor of a number.
 pub mod floor;
-/// Implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a trait
-/// for determining whether a number is an integer power of 2.
+/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
+/// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
 /// Implementations of traits for taking the base-$b$ logarithm of a number.
 ///
@@ -43,7 +44,7 @@ pub mod log_base_2;
 pub mod log_base_power_of_2;
 /// Multiplication of [`Rational`](super::Rational)s.
 pub mod mul;
-/// Negation of a [`Rational`](super::Rational).
+/// Negation of [`Rational`](super::Rational)s.
 pub mod neg;
 /// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and
 /// [`NextPowerOf2Assign`](malachite_base::num::arithmetic::traits::NextPowerOf2Assign), traits for
@@ -206,7 +207,7 @@ pub mod shl;
 /// assert_eq!(x.to_string(), "14/11");
 /// ```
 pub mod shr;
-/// Implementations of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
+/// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
 /// determining the sign of a number.
 pub mod sign;
 /// Functions for finding the simplest (lowest-denominator) [`Rational`](super::Rational) in an

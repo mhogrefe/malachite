@@ -10,12 +10,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_cmp_library_comparison);
 }
 
-fn demo_rational_cmp(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         match x.cmp(&y) {
-            Ordering::Less => println!("{} < {}", x, y),
-            Ordering::Equal => println!("{} = {}", x, y),
-            Ordering::Greater => println!("{} > {}", x, y),
+            Ordering::Less => println!("{x} < {y}"),
+            Ordering::Equal => println!("{x} = {y}"),
+            Ordering::Greater => println!("{x} > {y}"),
         }
     }
 }
@@ -23,14 +23,14 @@ fn demo_rational_cmp(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(unused_must_use)]
 fn benchmark_rational_cmp_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.cmp(&Rational)",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_nrm().get(gm, &config),
+        rational_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

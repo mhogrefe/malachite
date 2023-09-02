@@ -44,15 +44,13 @@ fn digit_from_display_byte_properties() {
     unsigned_gen().test_properties(|b| {
         assert_eq!(
             digit_from_display_byte(b).is_some(),
-            (b'0'..=b'9').contains(&b) || (b'a'..=b'z').contains(&b) || (b'A'..=b'Z').contains(&b)
+            b.is_ascii_alphanumeric()
         );
     });
 
     unsigned_gen_var_10().test_properties(|b| {
         let digit = digit_from_display_byte(b).unwrap();
-        assert!(
-            (b'0'..=b'9').contains(&b) || (b'a'..=b'z').contains(&b) || (b'A'..=b'Z').contains(&b)
-        );
+        assert!(b.is_ascii_alphanumeric());
         // Both of the following conditions include numeric chars.
         if !char::from(b).is_uppercase() {
             assert_eq!(digit_to_display_byte_lower(digit), Some(b));

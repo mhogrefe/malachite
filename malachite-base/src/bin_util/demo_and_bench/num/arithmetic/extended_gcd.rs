@@ -23,20 +23,20 @@ fn demo_extended_gcd_unsigned<
     S: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<U>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<U>().get(gm, config).take(limit) {
         println!("{}.extended_gcd({}) = {:?}", x, y, x.extended_gcd(y));
     }
 }
 
 fn demo_extended_gcd_signed<U: PrimitiveUnsigned, S: ExtendedGcd<Gcd = U> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in signed_pair_gen::<S>().get(gm, &config).take(limit) {
+    for (x, y) in signed_pair_gen::<S>().get(gm, config).take(limit) {
         println!("{}.extended_gcd({}) = {:?}", x, y, x.extended_gcd(y));
     }
 }
@@ -46,14 +46,14 @@ fn benchmark_extended_gcd_algorithms_unsigned<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.extended_gcd({})", U::NAME, U::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_27::<U>().get(gm, &config),
+        unsigned_pair_gen_var_27::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -72,14 +72,14 @@ fn benchmark_extended_gcd_algorithms_unsigned<
 
 fn benchmark_extended_gcd_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.extended_gcd({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

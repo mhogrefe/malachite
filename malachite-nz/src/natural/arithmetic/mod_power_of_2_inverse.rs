@@ -76,19 +76,21 @@ impl ModPowerOf2Inverse for Natural {
         assert_ne!(self, 0u32);
         assert!(self.significant_bits() <= pow);
         match (self, pow) {
-            (natural_one!(), _) => Some(Natural::ONE),
+            (Natural::ONE, _) => Some(Natural::ONE),
             (x, _) if x.even() => None,
             (Natural(Small(x)), pow) if pow <= Limb::WIDTH => {
                 x.mod_power_of_2_inverse(pow).map(Natural::from)
             }
             (Natural(Small(x)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+                let len =
+                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
                 let mut xs = vec![0; len];
                 xs[0] = x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Natural(Large(mut xs)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+                let len =
+                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
@@ -125,19 +127,21 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
         assert_ne!(*self, 0u32);
         assert!(self.significant_bits() <= pow);
         match (self, pow) {
-            (natural_one!(), _) => Some(Natural::ONE),
+            (&Natural::ONE, _) => Some(Natural::ONE),
             (x, _) if x.even() => None,
             (Natural(Small(x)), pow) if pow <= Limb::WIDTH => {
                 x.mod_power_of_2_inverse(pow).map(Natural::from)
             }
             (Natural(Small(x)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+                let len =
+                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
                 let mut xs = vec![0; len];
                 xs[0] = *x;
                 mod_power_of_2_inverse_helper(&xs, pow)
             }
             (Natural(Large(xs)), pow) => {
-                let len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+                let len =
+                    usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
                 let mut xs = xs.clone();
                 xs.resize(len, 0);
                 mod_power_of_2_inverse_helper(&xs, pow)

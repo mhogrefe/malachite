@@ -6,10 +6,10 @@ autobenches = false
 edition = "2021"
 
 [dependencies]
-malachite-base = { workspace = true }
-malachite-nz = { workspace = true, default_features = false }
-num = "0.4.0"
-rug = { version = "1.14.1", default-features = false, features = ["integer", "serde"] }
+malachite-base = { path = "../malachite-base" }
+malachite-nz = { path = "../malachite-nz", default_features = false }
+num = "0.4.1"
+rug = { version = "1.21.0", default-features = false, features = ["integer", "serde"] }
 
 [dev-dependencies]
 criterion = "0.3"

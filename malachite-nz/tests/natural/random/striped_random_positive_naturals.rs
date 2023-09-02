@@ -1,4 +1,3 @@
-use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
@@ -187,7 +186,7 @@ fn test_striped_random_positive_naturals() {
     let sample_median = ("17592186044416", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(7.796251092974677e283),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };

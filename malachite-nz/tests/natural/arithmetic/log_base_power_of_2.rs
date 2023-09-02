@@ -59,13 +59,7 @@ fn limbs_floor_log_base_power_of_2_fail() {
 #[test]
 fn test_limbs_ceiling_log_base_power_of_2() {
     let test = |xs: &[Limb], pow, out| {
-        assert_eq!(
-            limbs_ceiling_log_base_power_of_2(xs, pow),
-            out,
-            "{:?} {}",
-            xs,
-            pow
-        );
+        assert_eq!(limbs_ceiling_log_base_power_of_2(xs, pow), out);
     };
     test(&[0b1], 1, 0);
     test(&[0b1], 5, 0);

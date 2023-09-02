@@ -274,7 +274,7 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if max_len > len << 1 {
         return limbs_square(xs);
     }
@@ -310,7 +310,7 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if max_len > len << 1 {
         return limbs_square(xs);
     }
@@ -404,7 +404,7 @@ impl<'a> ModPowerOf2Square for &'a Natural {
     #[inline]
     fn mod_power_of_2_square(self, pow: u64) -> Natural {
         match self {
-            &natural_zero!() => Natural::ZERO,
+            &Natural::ZERO => Natural::ZERO,
             Natural(Small(x)) if pow <= Limb::WIDTH => Natural(Small(x.mod_power_of_2_square(pow))),
             Natural(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);
@@ -456,7 +456,7 @@ impl ModPowerOf2SquareAssign for Natural {
     #[inline]
     fn mod_power_of_2_square_assign(&mut self, pow: u64) {
         match self {
-            natural_zero!() => {}
+            &mut Natural::ZERO => {}
             Natural(Small(ref mut x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
             Natural(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);

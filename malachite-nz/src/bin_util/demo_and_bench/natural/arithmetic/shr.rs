@@ -50,81 +50,77 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_natural_shr_signed_evaluation_strategy);
 }
 
-fn demo_limbs_shr(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, bits) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("limbs_shr({:?}, {}) = {:?}", xs, bits, limbs_shr(&xs, bits));
     }
 }
 
-fn demo_limbs_shr_to_out(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
     for (out, xs, bits) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23::<Limb, Limb>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let mut out = out.to_vec();
         let out_old = out.clone();
         let carry = limbs_shr_to_out(&mut out, &xs, bits);
         println!(
-            "out := {:?}; limbs_shr_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
-            out_old, xs, bits, carry, out
+            "out := {out_old:?}; \
+            limbs_shr_to_out(&mut out, {xs:?}, {bits}) = {carry}; out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_slice_shr_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_shr_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits) in unsigned_vec_unsigned_pair_gen_var_33::<Limb, Limb>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let carry = limbs_slice_shr_in_place(&mut xs, bits);
         println!(
-            "xs := {:?}; limbs_slice_shr_in_place(&mut xs, {}) = {}; xs = {:?}",
-            xs_old, bits, carry, xs
+            "xs := {xs_old:?}; limbs_slice_shr_in_place(&mut xs, {bits}) = {carry}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_shr_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_shr_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         limbs_vec_shr_in_place(&mut xs, bits);
-        println!(
-            "xs := {:?}; limbs_vec_shr_in_place(&mut xs, {}); xs = {:?}",
-            xs_old, bits, xs
-        );
+        println!("xs := {xs_old:?}; limbs_vec_shr_in_place(&mut xs, {bits}); xs = {xs:?}");
     }
 }
 
 fn demo_natural_shr_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ShrAssign<T>,
 {
     for (mut n, u) in natural_unsigned_pair_gen_var_4::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n >>= u;
-        println!("x := {}; x >>= {}; x = {}", n_old, u, n);
+        println!("x := {n_old}; x >>= {u}; x = {n}");
     }
 }
 
-fn demo_natural_shr_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shr_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: Shr<T, Output = Natural>,
 {
     for (n, u) in natural_unsigned_pair_gen_var_4::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -132,38 +128,41 @@ where
     }
 }
 
-fn demo_natural_shr_unsigned_ref<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_natural_shr_unsigned_ref<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     for<'a> &'a Natural: Shr<T, Output = Natural>,
 {
     for (n, u) in natural_unsigned_pair_gen_var_4::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("&{} >> {} = {}", n, u, &n >> u);
     }
 }
 
-fn demo_natural_shr_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shr_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: ShrAssign<T>,
 {
     for (mut n, u) in natural_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n >>= u;
-        println!("x := {}; x >>= {}; x = {}", n_old, u, n);
+        println!("x := {n_old}; x >>= {u}; x = {n}");
     }
 }
 
-fn demo_natural_shr_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shr_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: Shr<T, Output = Natural>,
 {
     for (n, u) in natural_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -171,23 +170,23 @@ where
     }
 }
 
-fn demo_natural_shr_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shr_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Natural: Shr<T, Output = Natural>,
 {
     for (n, u) in natural_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("&{} >> {} = {}", n, u, &n >> u);
     }
 }
 
-fn benchmark_limbs_shr(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_shr(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -196,11 +195,11 @@ fn benchmark_limbs_shr(gm: GenMode, config: GenConfig, limit: usize, file_name: 
     );
 }
 
-fn benchmark_limbs_shr_to_out(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr_to_out(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_shr_to_out(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23::<Limb, Limb>().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23::<Limb, Limb>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -213,14 +212,14 @@ fn benchmark_limbs_shr_to_out(gm: GenMode, config: GenConfig, limit: usize, file
 
 fn benchmark_limbs_slice_shr_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_shr_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_33::<Limb, Limb>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_33::<Limb, Limb>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -231,11 +230,16 @@ fn benchmark_limbs_slice_shr_in_place(
     );
 }
 
-fn benchmark_limbs_vec_shr_in_place(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_vec_shr_in_place(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "limbs_vec_shr_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16::<Limb, u64>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16::<Limb, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -248,14 +252,14 @@ fn benchmark_limbs_vec_shr_in_place(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_natural_shr_assign_u32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural >>= u32",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_4_rm::<u32>().get(gm, &config),
+        natural_unsigned_pair_gen_var_4_rm::<u32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -270,14 +274,14 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_shr_u32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural >> u32",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_4_rm::<u32>().get(gm, &config),
+        natural_unsigned_pair_gen_var_4_rm::<u32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -291,14 +295,14 @@ fn benchmark_natural_shr_u32_library_comparison(
 
 fn benchmark_natural_shr_assign_i32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural >>= u32",
         BenchmarkType::LibraryComparison,
-        natural_signed_pair_gen_var_2_rm::<i32>().get(gm, &config),
+        natural_signed_pair_gen_var_2_rm::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -313,14 +317,14 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_shr_i32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural >> i32",
         BenchmarkType::LibraryComparison,
-        natural_signed_pair_gen_var_2_rm::<i32>().get(gm, &config),
+        natural_signed_pair_gen_var_2_rm::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -334,7 +338,7 @@ fn benchmark_natural_shr_i32_library_comparison(
 
 fn benchmark_natural_shr_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -343,7 +347,7 @@ fn benchmark_natural_shr_assign_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural >>= {}", T::NAME),
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4::<T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -355,7 +359,7 @@ fn benchmark_natural_shr_assign_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -365,7 +369,7 @@ fn benchmark_natural_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural >> {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_4::<T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -383,7 +387,7 @@ fn benchmark_natural_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
 
 fn benchmark_natural_shr_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -392,7 +396,7 @@ fn benchmark_natural_shr_assign_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural >>= {}", T::NAME),
         BenchmarkType::Single,
-        natural_signed_pair_gen_var_2::<T>().get(gm, &config),
+        natural_signed_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -404,7 +408,7 @@ fn benchmark_natural_shr_assign_signed<T: PrimitiveSigned>(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -414,7 +418,7 @@ fn benchmark_natural_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural >> {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_signed_pair_gen_var_2::<T>().get(gm, &config),
+        natural_signed_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

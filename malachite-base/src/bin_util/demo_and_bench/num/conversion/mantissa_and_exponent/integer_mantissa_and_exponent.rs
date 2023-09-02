@@ -73,10 +73,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!(
             "integer_mantissa_and_exponent({}) = {:?}",
             x,
@@ -87,31 +87,31 @@ fn demo_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_integer_mantissa_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("integer_mantissa({}) = {}", x, x.integer_mantissa());
     }
 }
 
 fn demo_integer_exponent_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("integer_exponent({}) = {}", x, x.integer_exponent());
     }
 }
 
 fn demo_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -126,10 +126,10 @@ fn demo_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in unsigned_pair_gen_var_30::<T>().get(gm, &config).take(limit) {
+    for (mantissa, exponent) in unsigned_pair_gen_var_30::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_integer_mantissa_and_exponent({}, {}) = {}",
             T::NAME,
@@ -142,11 +142,11 @@ fn demo_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUnsigne
 
 fn demo_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -159,11 +159,11 @@ fn demo_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_integer_mantissa_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -176,11 +176,11 @@ fn demo_integer_mantissa_primitive_float<T: PrimitiveFloat>(
 
 fn demo_integer_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -193,13 +193,10 @@ fn demo_integer_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in unsigned_signed_pair_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (mantissa, exponent) in unsigned_signed_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "{}::from_integer_mantissa_and_exponent({}, {}) = {:?}",
             T::NAME,
@@ -212,11 +209,11 @@ fn demo_from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_from_integer_mantissa_and_exponent_targeted_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in unsigned_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -232,14 +229,14 @@ fn demo_from_integer_mantissa_and_exponent_targeted_primitive_float<T: Primitive
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_mantissa_and_exponent_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_mantissa_and_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -258,14 +255,14 @@ fn benchmark_integer_mantissa_and_exponent_algorithms_unsigned<T: PrimitiveUnsig
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_mantissa_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_mantissa()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -280,14 +277,14 @@ fn benchmark_integer_mantissa_algorithms_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_exponent_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -301,7 +298,7 @@ fn benchmark_integer_exponent_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -312,7 +309,7 @@ fn benchmark_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -325,7 +322,7 @@ fn benchmark_from_integer_mantissa_and_exponent_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -336,7 +333,7 @@ fn benchmark_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUn
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_30::<T>().get(gm, &config),
+        unsigned_pair_gen_var_30::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -350,14 +347,14 @@ fn benchmark_from_integer_mantissa_and_exponent_targeted_unsigned<T: PrimitiveUn
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_mantissa_and_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_mantissa_and_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -376,14 +373,14 @@ fn benchmark_integer_mantissa_and_exponent_algorithms_primitive_float<T: Primiti
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_mantissa_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_mantissa()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -398,14 +395,14 @@ fn benchmark_integer_mantissa_algorithms_primitive_float<T: PrimitiveFloat>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.integer_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -419,14 +416,14 @@ fn benchmark_integer_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_integer_mantissa_and_exponent(u64, u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_signed_pair_gen_var_1().get(gm, &config),
+        unsigned_signed_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -439,14 +436,14 @@ fn benchmark_from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloa
 
 fn benchmark_from_integer_mantissa_and_exponent_targeted_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_integer_mantissa_and_exponent(u64, u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_signed_pair_gen_var_2::<T>().get(gm, &config),
+        unsigned_signed_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

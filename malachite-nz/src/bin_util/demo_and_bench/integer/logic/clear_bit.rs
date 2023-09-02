@@ -21,55 +21,49 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_clear_bit);
 }
 
-fn demo_limbs_slice_clear_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_clear_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, index) in unsigned_vec_unsigned_pair_gen_var_21()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         limbs_slice_clear_bit_neg(&mut xs, index);
-        println!(
-            "xs := {:?}; limbs_slice_clear_bit_neg(&mut xs, {}); xs = {:?}",
-            xs_old, index, xs
-        );
+        println!("xs := {xs_old:?}; limbs_slice_clear_bit_neg(&mut xs, {index}); xs = {xs:?}");
     }
 }
 
-fn demo_limbs_vec_clear_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_clear_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, index) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_xs = xs.clone();
         limbs_vec_clear_bit_neg(&mut xs, index);
-        println!(
-            "xs := {:?}; limbs_vec_clear_bit_neg(&mut xs, {}); xs = {:?}",
-            old_xs, index, xs
-        );
+        println!("xs := {old_xs:?}; limbs_vec_clear_bit_neg(&mut xs, {index}); xs = {xs:?}");
     }
 }
 
-fn demo_integer_clear_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_clear_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.clear_bit(index);
-        println!("x := {}; x.clear_bit({}); x = {}", n_old, index, n);
+        println!("x := {n_old}; x.clear_bit({index}); x = {n}");
     }
 }
 
 fn benchmark_limbs_slice_clear_bit_neg(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_clear_bit_neg(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_21().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_21().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -82,14 +76,14 @@ fn benchmark_limbs_slice_clear_bit_neg(
 
 fn benchmark_limbs_vec_clear_bit_neg(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_clear_bit_neg(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -100,11 +94,11 @@ fn benchmark_limbs_vec_clear_bit_neg(
     );
 }
 
-fn benchmark_integer_clear_bit(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_clear_bit(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.clear_bit(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -55,59 +55,59 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut out, len, xs, base) in
         unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>()
-            .get(gm, &config)
+            .get(gm, config)
             .take(limit)
     {
         let old_out = out.to_vec();
         let out_len = limbs_to_digits_small_base_basecase(&mut out, len, &xs, base);
         println!(
-            "out := {:?}; limbs_to_digits_small_base_basecase(&mut out, {}, {:?}, {}) = {}; \
-            out = {:?}",
-            old_out, len, xs, base, out_len, out
+            "out := {old_out:?}; \
+            limbs_to_digits_small_base_basecase(&mut out, {len}, {xs:?}, {base}) = {out_len}; \
+            out = {out:?}",
         );
     }
 }
 
 fn demo_limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut out, base, mut xs) in unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_out = out.to_vec();
         let out_len = limbs_to_digits_small_base(&mut out, base, &mut xs, None);
         println!(
-            "out := {:?}; limbs_to_digits_small_base(&mut out, {}, {:?}) = {}; out = {:?}",
-            old_out, base, xs, out_len, out
+            "out := {old_out:?}; \
+            limbs_to_digits_small_base(&mut out, {base}, {xs:?}) = {out_len}; out = {out:?}",
         );
     }
 }
 
 fn demo_limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Limb: SaturatingFrom<T>,
 {
     for (mut xs, base) in unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let mut digits = Vec::new();
         limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
         println!(
-            "limbs_to_digits_basecase(&mut digits, &{:?}, {}); digits = {:?}",
-            xs_old, base, digits,
+            "limbs_to_digits_basecase(&mut digits, &{xs_old:?}, {base}); \
+            digits = {digits:?}"
         );
     }
 }
@@ -116,14 +116,14 @@ fn demo_to_digits_asc_limb<
     T: ConvertibleFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_1::<Limb, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -139,14 +139,14 @@ fn demo_to_digits_desc_limb<
     T: ConvertibleFrom<Limb> + for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_1::<Limb, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -158,8 +158,8 @@ fn demo_to_digits_desc_limb<
     }
 }
 
-fn demo_to_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, base) in natural_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_to_digits_asc_large(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in natural_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "to_digits_asc_large({}, {}) = {:?}",
             x,
@@ -169,8 +169,8 @@ fn demo_to_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, base) in natural_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_to_digits_desc_large(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in natural_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "to_digits_asc_large({}, {}) = {:?}",
             x,
@@ -180,12 +180,12 @@ fn demo_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_to_digits_asc<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_to_digits_asc<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -197,12 +197,12 @@ where
     }
 }
 
-fn demo_to_digits_desc<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_to_digits_desc<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -214,8 +214,8 @@ where
     }
 }
 
-fn demo_to_digits_asc_natural(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, base) in natural_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_to_digits_asc_natural(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in natural_pair_gen_var_2().get(gm, config).take(limit) {
         println!(
             "to_digits_asc({}, {}) = {:?}",
             x,
@@ -225,8 +225,8 @@ fn demo_to_digits_asc_natural(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_to_digits_desc_natural(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, base) in natural_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_to_digits_desc_natural(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in natural_pair_gen_var_2().get(gm, config).take(limit) {
         println!(
             "to_digits_desc({}, {}) = {:?}",
             x,
@@ -238,7 +238,7 @@ fn demo_to_digits_desc_natural(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_to_digits_small_base_basecase_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -248,7 +248,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms<T: PrimitiveUnsigned
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -273,7 +273,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms<T: PrimitiveUnsigned
 
 fn benchmark_limbs_to_digits_small_base_basecase_algorithms_2<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -283,7 +283,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms_2<T: PrimitiveUnsign
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -311,7 +311,7 @@ fn benchmark_limbs_to_digits_small_base_basecase_algorithms_2<T: PrimitiveUnsign
 
 fn benchmark_limbs_to_digits_small_base_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -321,7 +321,7 @@ fn benchmark_limbs_to_digits_small_base_algorithms<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1::<T>().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -346,7 +346,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
     T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -356,7 +356,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
     run_benchmark(
         "limbs_to_digits_basecase(&mut [Limb], u64)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -377,7 +377,7 @@ fn benchmark_to_digits_asc_limb<
     T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -387,7 +387,7 @@ fn benchmark_to_digits_asc_limb<
     run_benchmark(
         "to_digits_asc_limb(&Natural, Limb)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_1::<Limb, T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_1::<Limb, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -402,7 +402,7 @@ fn benchmark_to_digits_desc_limb<
     T: for<'a> TryFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -412,7 +412,7 @@ fn benchmark_to_digits_desc_limb<
     run_benchmark(
         "to_digits_desc_limb(&Natural, Limb)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_1::<Limb, T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_1::<Limb, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -423,11 +423,11 @@ fn benchmark_to_digits_desc_limb<
     );
 }
 
-fn benchmark_to_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_to_digits_asc_large(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "to_digits_asc_large(&Natural, &Natural)",
         BenchmarkType::Single,
-        natural_pair_gen_var_1().get(gm, &config),
+        natural_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -438,11 +438,11 @@ fn benchmark_to_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize, f
     );
 }
 
-fn benchmark_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_to_digits_desc_large(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "to_digits_desc_large(&Natural, &Natural)",
         BenchmarkType::Single,
-        natural_pair_gen_var_1().get(gm, &config),
+        natural_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -455,7 +455,7 @@ fn benchmark_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize, 
 
 fn benchmark_to_digits_asc_algorithms<T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -464,7 +464,7 @@ fn benchmark_to_digits_asc_algorithms<T: for<'a> TryFrom<&'a Natural> + Primitiv
     run_benchmark(
         &format!("Natural.to_digits_asc(&{})", T::NAME),
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_2::<T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -483,7 +483,7 @@ fn benchmark_to_digits_asc_algorithms<T: for<'a> TryFrom<&'a Natural> + Primitiv
 
 fn benchmark_to_digits_desc<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -492,7 +492,7 @@ fn benchmark_to_digits_desc<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural.to_digits_desc(&{})", T::NAME),
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_2::<T>().get(gm, &config),
+        natural_unsigned_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -505,14 +505,14 @@ fn benchmark_to_digits_desc<T: PrimitiveUnsigned>(
 
 fn benchmark_to_digits_asc_natural_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "to_digits_asc::<Natural, Natural>(&Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_2().get(gm, &config),
+        natural_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -527,11 +527,16 @@ fn benchmark_to_digits_asc_natural_algorithms(
     );
 }
 
-fn benchmark_to_digits_desc_natural(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_to_digits_desc_natural(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "to_digits_desc::<Natural, Natural>(&Natural, &Natural)",
         BenchmarkType::Single,
-        natural_pair_gen_var_2().get(gm, &config),
+        natural_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_gen_var_9;
 use std::panic::catch_unwind;
@@ -32,7 +33,7 @@ pub fn test_next_higher() {
     test::<f32>(core::f32::consts::PI, 3.141593);
     test::<f32>(3.141593, 3.1415932);
     test::<f32>(10.0, 10.000001);
-    test::<f32>(f32::MAX_FINITE, f32::POSITIVE_INFINITY);
+    test::<f32>(f32::MAX_FINITE, f32::INFINITY);
 
     test::<f64>(f64::NEGATIVE_INFINITY, -f64::MAX_FINITE);
     test::<f64>(-f64::MAX_FINITE, -1.7976931348623155e308);
@@ -57,12 +58,12 @@ pub fn test_next_higher() {
     test::<f64>(core::f64::consts::PI, 3.1415926535897936);
     test::<f64>(3.1415926535897936, 3.141592653589794);
     test::<f64>(10.0, 10.000000000000002);
-    test::<f64>(f64::MAX_FINITE, f64::POSITIVE_INFINITY);
+    test::<f64>(f64::MAX_FINITE, f64::INFINITY);
 }
 
 fn next_higher_fail_helper<T: PrimitiveFloat>() {
     assert_panic!(T::NAN.next_higher());
-    assert_panic!(T::POSITIVE_INFINITY.next_higher());
+    assert_panic!(T::INFINITY.next_higher());
 }
 
 #[test]

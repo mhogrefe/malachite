@@ -17,12 +17,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_limbs_prime_sieve_u64_algorithms);
 }
 
-fn demo_limbs_prime_sieve_u32(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_26().get(gm, &config).take(limit) {
+fn demo_limbs_prime_sieve_u32(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_26().get(gm, config).take(limit) {
         let len = limbs_prime_sieve_size::<u32>(n);
         let mut sieve = vec![0; len];
         limbs_prime_sieve_u32(&mut sieve, n);
-        print!("limbs_prime_sieve_u32({}): ", n);
+        print!("limbs_prime_sieve_u32({n}): ");
         let mut first = true;
         for s in sieve {
             if first {
@@ -30,18 +30,18 @@ fn demo_limbs_prime_sieve_u32(gm: GenMode, config: GenConfig, limit: usize) {
             } else {
                 print!(", ");
             }
-            print!("{:b}", s);
+            print!("{s:b}");
         }
         println!();
     }
 }
 
-fn demo_limbs_prime_sieve_u64(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_26().get(gm, &config).take(limit) {
+fn demo_limbs_prime_sieve_u64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_26().get(gm, config).take(limit) {
         let len = limbs_prime_sieve_size::<u64>(n);
         let mut sieve = vec![0; len];
         limbs_prime_sieve_u64(&mut sieve, n);
-        print!("limbs_prime_sieve_u64({}): ", n);
+        print!("limbs_prime_sieve_u64({n}): ");
         let mut first = true;
         for s in sieve {
             if first {
@@ -49,7 +49,7 @@ fn demo_limbs_prime_sieve_u64(gm: GenMode, config: GenConfig, limit: usize) {
             } else {
                 print!(", ");
             }
-            print!("{:b}", s);
+            print!("{s:b}");
         }
         println!();
     }
@@ -57,14 +57,14 @@ fn demo_limbs_prime_sieve_u64(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_prime_sieve_u32_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_prime_sieve_u32(&mut [Limb], u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_26().get(gm, &config),
+        unsigned_gen_var_26().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -91,14 +91,14 @@ fn benchmark_limbs_prime_sieve_u32_algorithms(
 
 fn benchmark_limbs_prime_sieve_u64_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_prime_sieve_u64(&mut [Limb], u64)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_26().get(gm, &config),
+        unsigned_gen_var_26().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
 use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 
@@ -9,7 +10,7 @@ fn exhaustive_nonzero_primitive_floats_helper<T: PrimitiveFloat>(out: &[T]) {
 #[test]
 fn test_exhaustive_nonzero_primitive_floats() {
     exhaustive_nonzero_primitive_floats_helper::<f32>(&[
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         f32::NEGATIVE_INFINITY,
         1.0,
         -1.0,
@@ -61,7 +62,7 @@ fn test_exhaustive_nonzero_primitive_floats() {
         -6.0,
     ]);
     exhaustive_nonzero_primitive_floats_helper::<f64>(&[
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         f64::NEGATIVE_INFINITY,
         1.0,
         -1.0,

@@ -73,11 +73,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_sub_evaluation_strategy);
 }
 
-fn demo_limbs_sub_limb(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, y) in unsigned_vec_unsigned_pair_gen()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_sub_limb(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, y) in unsigned_vec_unsigned_pair_gen().get(gm, config).take(limit) {
         println!(
             "limbs_sub_limb({:?}, {}) = {:?}",
             xs,
@@ -87,200 +84,192 @@ fn demo_limbs_sub_limb(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_sub_limb_to_out(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_sub_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut out, xs, y) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let out_old = out.clone();
         let borrow = limbs_sub_limb_to_out(&mut out, &xs, y);
         println!(
-            "out := {:?}; limbs_sub_limb_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
-            out_old, xs, y, borrow, out
+            "out := {out_old:?}; \
+            limbs_sub_limb_to_out(&mut out, {xs:?}, {y}) = {borrow}; out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_sub_limb_in_place(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, y) in unsigned_vec_unsigned_pair_gen()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_sub_limb_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, y) in unsigned_vec_unsigned_pair_gen().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let borrow = limbs_sub_limb_in_place(&mut xs, y);
         println!(
-            "xs := {:?}; limbs_sub_limb_in_place(&mut xs, {}) = {}; xs = {:?}",
-            xs_old, y, borrow, xs
+            "xs := {xs_old:?}; \
+            limbs_sub_limb_in_place(&mut xs, {y}) = {borrow}; xs = {xs:?}"
         );
     }
 }
 
-fn demo_limbs_sub(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, &config).take(limit) {
+fn demo_limbs_sub(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, config).take(limit) {
         println!("limbs_sub({:?}, {:?}) = {:?}", xs, ys, limbs_sub(&xs, &ys));
     }
 }
 
-fn demo_limbs_sub_same_length_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_31()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_sub_same_length_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_31().get(gm, config).take(limit) {
         let out_old = out.clone();
         let borrow = limbs_sub_same_length_to_out(&mut out, &xs, &ys);
         println!(
-            "out := {:?}; limbs_sub_same_length_to_out(&mut out, {:?}, {:?}) = {}; out = {:?}",
-            out_old, xs, ys, borrow, out
+            "out := {out_old:?}; \
+            limbs_sub_same_length_to_out(&mut out, {xs:?}, {ys:?}) = {borrow}; out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_sub_greater_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_40()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_sub_greater_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_40().get(gm, config).take(limit) {
         let out_old = out.clone();
         let borrow = limbs_sub_greater_to_out(&mut out, &xs, &ys);
         println!(
-            "out := {:?}; limbs_sub_greater_to_out(&mut out, {:?}, {:?}) = {}; out = {:?}",
-            out_old, xs, ys, borrow, out
+            "out := {out_old:?}; \
+            limbs_sub_greater_to_out(&mut out, {xs:?}, {ys:?}) = {borrow}; out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_sub_same_length_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_limbs_sub_same_length_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let borrow = limbs_sub_same_length_in_place_left(&mut xs, &ys);
         println!(
-            "xs := {:?}; limbs_sub_same_length_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
-            xs_old, ys, borrow, xs
+            "xs := {xs_old:?}; \
+            limbs_sub_same_length_in_place_left(&mut xs, {ys:?}) = {borrow}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_sub_greater_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, &config).take(limit) {
+fn demo_limbs_sub_greater_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let borrow = limbs_sub_greater_in_place_left(&mut xs, &ys);
         println!(
-            "xs := {:?}; limbs_sub_greater_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
-            xs_old, ys, borrow, xs
+            "xs := {xs_old:?}; \
+            limbs_sub_greater_in_place_left(&mut xs, {ys:?}) = {borrow}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_sub_same_length_in_place_right(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, mut ys) in unsigned_vec_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_limbs_sub_same_length_in_place_right(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, mut ys) in unsigned_vec_pair_gen_var_6().get(gm, config).take(limit) {
         let ys_old = ys.clone();
         let borrow = limbs_sub_same_length_in_place_right(&xs, &mut ys);
         println!(
-            "ys := {:?}; limbs_sub_same_length_in_place_right({:?}, &mut ys) = {}; ys = {:?}",
-            ys_old, xs, borrow, xs
+            "ys := {ys_old:?}; \
+            limbs_sub_same_length_in_place_right({xs:?}, &mut ys) = {borrow}; ys = {ys:?}",
         );
     }
 }
 
-fn demo_limbs_slice_sub_in_place_right(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_sub_in_place_right(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, mut ys, len) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let ys_old = ys.clone();
         let borrow = limbs_slice_sub_in_place_right(&xs, &mut ys, len);
         println!(
-            "ys := {:?}; limbs_slice_sub_in_place_right({:?}, &mut ys, {}) = {}; ys = {:?}",
-            ys_old, xs, len, borrow, ys
+            "ys := {ys_old:?}; \
+            limbs_slice_sub_in_place_right({xs:?}, &mut ys, {len}) = {borrow}; ys = {ys:?}",
         );
     }
 }
 
-fn demo_limbs_vec_sub_in_place_right(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, mut ys) in unsigned_vec_pair_gen_var_31().get(gm, &config).take(limit) {
+fn demo_limbs_vec_sub_in_place_right(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, mut ys) in unsigned_vec_pair_gen_var_31().get(gm, config).take(limit) {
         let ys_old = ys.clone();
         let borrow = limbs_vec_sub_in_place_right(&xs, &mut ys);
         println!(
-            "ys := {:?}; limbs_vec_sub_in_place_right({:?}, &mut ys) = {}; ys = {:?}",
-            ys_old, xs, borrow, ys
+            "ys := {ys_old:?}; \
+            limbs_vec_sub_in_place_right({xs:?}, &mut ys) = {borrow}; ys = {ys:?}",
         );
     }
 }
 
-fn demo_limbs_sub_same_length_in_place_with_overlap(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_sub_same_length_in_place_with_overlap(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, right_start) in unsigned_vec_unsigned_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let borrow = limbs_sub_same_length_in_place_with_overlap(&mut xs, right_start);
         println!(
-            "xs := {:?}; limbs_sub_same_length_in_place_with_overlap(&mut xs, {}) = {}; xs = {:?}",
-            xs_old, right_start, borrow, xs
+            "xs := {xs_old:?}; \
+            limbs_sub_same_length_in_place_with_overlap(&mut xs, {right_start}) = {borrow}; \
+            xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_sub_same_length_to_out_with_overlap(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, &config).take(limit) {
+fn demo_limbs_sub_same_length_to_out_with_overlap(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, ys) in unsigned_vec_pair_gen_var_31().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let borrow = limbs_sub_same_length_to_out_with_overlap(&mut xs, &ys);
         println!(
-            "xs := {:?}; limbs_sub_same_length_to_out_with_overlap(&mut xs, {:?}) = {}; xs = {:?}",
-            xs_old, ys, borrow, xs
+            "xs := {xs_old:?}; \
+            limbs_sub_same_length_to_out_with_overlap(&mut xs, {ys:?}) = {borrow}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_natural_sub_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         let x_old = x.clone();
         x -= y.clone();
-        println!("x := {}; x -= {}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x -= {y}; x = {x}");
     }
 }
 
-fn demo_natural_sub_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         let x_old = x.clone();
         x -= &y;
-        println!("x := {}; x -= &{}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x -= &{y}; x = {x}");
     }
 }
 
-fn demo_natural_sub(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} - {} = {}", x_old, y_old, x - y);
     }
 }
 
-fn demo_natural_sub_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} - &{} = {}", x_old, y, x - &y);
     }
 }
 
-fn demo_natural_sub_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("&{} - {} = {}", x, y_old, &x - y);
     }
 }
 
-fn demo_natural_sub_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_natural_sub_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_10().get(gm, config).take(limit) {
         println!("&{} - &{} = {}", x, y, &x - &y);
     }
 }
 
-fn benchmark_limbs_sub_limb(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sub_limb(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sub_limb(&[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -289,11 +278,11 @@ fn benchmark_limbs_sub_limb(gm: GenMode, config: GenConfig, limit: usize, file_n
     );
 }
 
-fn benchmark_limbs_sub_limb_to_out(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sub_limb_to_out(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sub_limb_to_out(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -306,14 +295,14 @@ fn benchmark_limbs_sub_limb_to_out(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_limbs_sub_limb_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_limb_in_place(&mut [Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -324,11 +313,11 @@ fn benchmark_limbs_sub_limb_in_place(
     );
 }
 
-fn benchmark_limbs_sub(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sub(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sub(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_31().get(gm, &config),
+        unsigned_vec_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -339,14 +328,14 @@ fn benchmark_limbs_sub(gm: GenMode, config: GenConfig, limit: usize, file_name: 
 
 fn benchmark_limbs_sub_same_length_to_out(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_31().get(gm, &config),
+        unsigned_vec_triple_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -359,14 +348,14 @@ fn benchmark_limbs_sub_same_length_to_out(
 
 fn benchmark_limbs_sub_greater_to_out(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_greater_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_40().get(gm, &config),
+        unsigned_vec_triple_gen_var_40().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -379,14 +368,14 @@ fn benchmark_limbs_sub_greater_to_out(
 
 fn benchmark_limbs_sub_same_length_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_same_length_in_place_left(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_6().get(gm, &config),
+        unsigned_vec_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -399,14 +388,14 @@ fn benchmark_limbs_sub_same_length_in_place_left(
 
 fn benchmark_limbs_sub_greater_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_greater_in_place_left(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_31().get(gm, &config),
+        unsigned_vec_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -419,14 +408,14 @@ fn benchmark_limbs_sub_greater_in_place_left(
 
 fn benchmark_limbs_sub_same_length_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_same_length_in_place_right(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_6().get(gm, &config),
+        unsigned_vec_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -439,14 +428,14 @@ fn benchmark_limbs_sub_same_length_in_place_right(
 
 fn benchmark_limbs_slice_sub_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_sub_in_place_right(&[Limb], &mut [Limb], usize)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -459,14 +448,14 @@ fn benchmark_limbs_slice_sub_in_place_right(
 
 fn benchmark_limbs_vec_sub_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_sub_in_place_right(&[Limb], &mut Vec<Limb>)",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_31().get(gm, &config),
+        unsigned_vec_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -479,14 +468,14 @@ fn benchmark_limbs_vec_sub_in_place_right(
 
 fn benchmark_limbs_sub_same_length_in_place_with_overlap_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_same_length_in_place_with_overlap(&mut [Limb], usize)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_1().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -510,14 +499,14 @@ fn benchmark_limbs_sub_same_length_in_place_with_overlap_algorithms(
 
 fn benchmark_limbs_sub_same_length_to_out_with_overlap_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_sub_same_length_to_out_with_overlap(&mut [Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_31().get(gm, &config),
+        unsigned_vec_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -537,14 +526,14 @@ fn benchmark_limbs_sub_same_length_to_out_with_overlap_algorithms(
 
 fn benchmark_natural_sub_assign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural -= Natural",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_10_rm().get(gm, &config),
+        natural_pair_gen_var_10_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -555,14 +544,14 @@ fn benchmark_natural_sub_assign_library_comparison(
 
 fn benchmark_natural_sub_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural -= Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_10().get(gm, &config),
+        natural_pair_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -577,14 +566,14 @@ fn benchmark_natural_sub_assign_evaluation_strategy(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_sub_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural - Natural",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_10_nrm().get(gm, &config),
+        natural_pair_gen_var_10_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -600,14 +589,14 @@ fn benchmark_natural_sub_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_sub_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural - Natural",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_10().get(gm, &config),
+        natural_pair_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,

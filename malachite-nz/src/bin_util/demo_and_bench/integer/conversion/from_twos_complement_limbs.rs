@@ -21,8 +21,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_from_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_integer_from_twos_complement_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_twos_complement_limbs_asc({:?}) = {:?}",
             xs,
@@ -31,8 +31,8 @@ fn demo_integer_from_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, l
     }
 }
 
-fn demo_integer_from_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_integer_from_twos_complement_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_twos_complement_limbs_desc({:?}) = {:?}",
             xs,
@@ -41,8 +41,12 @@ fn demo_integer_from_twos_complement_limbs_desc(gm: GenMode, config: GenConfig, 
     }
 }
 
-fn demo_integer_from_owned_twos_complement_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_integer_from_owned_twos_complement_limbs_asc(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_owned_twos_complement_limbs_asc({:?}) = {:?}",
             xs.clone(),
@@ -53,10 +57,10 @@ fn demo_integer_from_owned_twos_complement_limbs_asc(gm: GenMode, config: GenCon
 
 fn demo_integer_from_owned_twos_complement_limbs_desc(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_owned_twos_complement_limbs_desc({:?}) = {:?}",
             xs.clone(),
@@ -67,14 +71,14 @@ fn demo_integer_from_owned_twos_complement_limbs_desc(
 
 fn benchmark_integer_from_twos_complement_limbs_asc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::from_twos_complement_limbs_asc(&[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -94,14 +98,14 @@ fn benchmark_integer_from_twos_complement_limbs_asc_evaluation_strategy(
 
 fn benchmark_integer_from_twos_complement_limbs_desc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::from_twos_complement_limbs_desc(&[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
 use std::mem::swap;

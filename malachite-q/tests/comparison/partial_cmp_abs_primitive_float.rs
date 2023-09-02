@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
@@ -24,10 +25,10 @@ fn test_partial_cmp_abs_primitive_float() {
         assert_eq!(v.partial_cmp_abs(&Rational::from_str(u).unwrap()), out_rev);
     };
     test("2/3", f32::NAN, None);
-    test("2/3", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("2/3", f32::INFINITY, Some(Ordering::Less));
     test("2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Less));
     test("-2/3", f32::NAN, None);
-    test("-2/3", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("-2/3", f32::INFINITY, Some(Ordering::Less));
     test("-2/3", f32::NEGATIVE_INFINITY, Some(Ordering::Less));
 
     test("0", 0.0, Some(Ordering::Equal));
@@ -87,7 +88,7 @@ where
     rational_gen().test_properties(|x| {
         assert!(x.ge_abs(&T::ZERO));
         assert!(x.lt_abs(&T::NEGATIVE_INFINITY));
-        assert!(x.lt_abs(&T::POSITIVE_INFINITY));
+        assert!(x.lt_abs(&T::INFINITY));
     });
 }
 

@@ -4,6 +4,8 @@ use crate::platform::Limb;
 use embed_doc_image::embed_doc_image;
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
+#[cfg(feature = "float_helpers")]
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
 
@@ -39,30 +41,12 @@ pub(crate) enum InnerNatural {
 #[cfg_attr(feature = "serde", serde(transparent))]
 pub(crate) struct SerdeNatural(String);
 
-macro_rules! natural_zero {
-    () => {
-        Natural(Small(0))
-    };
-}
-
-macro_rules! natural_one {
-    () => {
-        Natural(Small(1))
-    };
-}
-
-macro_rules! natural_two {
-    () => {
-        Natural(Small(2))
-    };
-}
-
 impl Natural {
     // If a `Natural` is `Large` but is small enough to be `Small`, make it `Small`.
     fn demote_if_small(&mut self) {
         if let Natural(Large(ref limbs)) = self {
             match limbs.len() {
-                0 => *self = natural_zero!(),
+                0 => *self = Natural::ZERO,
                 1 => *self = Natural(Small(limbs[0])),
                 _ => {}
             }
@@ -107,22 +91,27 @@ impl Natural {
 
 /// The constant 0.
 impl Zero for Natural {
-    const ZERO: Natural = natural_zero!();
+    const ZERO: Natural = Natural(Small(0));
 }
 
 /// The constant 1.
 impl One for Natural {
-    const ONE: Natural = natural_one!();
+    const ONE: Natural = Natural(Small(1));
 }
 
 /// The constant 2.
 impl Two for Natural {
-    const TWO: Natural = natural_two!();
+    const TWO: Natural = Natural(Small(2));
 }
 
 /// The minimum value of a [`Natural`], 0.
 impl Min for Natural {
-    const MIN: Natural = natural_zero!();
+    const MIN: Natural = Natural::ZERO;
+}
+
+#[cfg(feature = "float_helpers")]
+impl Natural {
+    pub const HIGH_BIT: Natural = Natural(Small(1 << (Limb::WIDTH - 1)));
 }
 
 impl Default for Natural {

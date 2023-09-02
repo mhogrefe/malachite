@@ -14,30 +14,30 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_gcd_assign);
 }
 
-fn demo_gcd<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_gcd<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.gcd({}) = {}", x, y, x.gcd(y));
     }
 }
 
-fn demo_gcd_assign<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_gcd_assign<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.gcd_assign(y);
-        println!("x := {}; x.gcd_assign({}); x = {}", old_x, y, x);
+        println!("x := {old_x}; x.gcd_assign({y}); x = {x}");
     }
 }
 
 fn benchmark_gcd_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.gcd({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -54,14 +54,14 @@ fn benchmark_gcd_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_gcd_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.gcd_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

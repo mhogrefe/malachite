@@ -12,9 +12,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_mod_power_of_2_pow_assign);
 }
 
-fn demo_mod_power_of_2_pow<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_power_of_2_pow<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp, pow) in unsigned_triple_gen_var_16::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -29,32 +29,29 @@ fn demo_mod_power_of_2_pow<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
 
 fn demo_mod_power_of_2_pow_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, exp, pow) in unsigned_triple_gen_var_16::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.mod_power_of_2_pow_assign(exp, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_pow_assign({}, {}); x = {}",
-            old_x, exp, pow, x
-        );
+        println!("x := {old_x}; x.mod_power_of_2_pow_assign({exp}, {pow}); x = {x}");
     }
 }
 
 fn benchmark_mod_power_of_2_pow<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_pow(u64, u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_16::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_16::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -67,14 +64,14 @@ fn benchmark_mod_power_of_2_pow<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_power_of_2_pow_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_pow_assign({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_16::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_16::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

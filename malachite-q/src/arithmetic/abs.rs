@@ -32,7 +32,7 @@ impl Abs for Rational {
 impl<'a> Abs for &'a Rational {
     type Output = Rational;
 
-    /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by value.
+    /// Takes the absolute value of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// $$
     /// f(x) = |x|.

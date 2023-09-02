@@ -4,6 +4,7 @@ use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
@@ -87,7 +88,7 @@ pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         let previous_x = *x;
         *x = (previous_x << bits) | remaining_bits;
         remaining_bits = previous_x >> cobits;
@@ -167,7 +168,7 @@ where
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
 {
     match (x, bits) {
-        (natural_zero!(), _) => x.clone(),
+        (&Natural::ZERO, _) => x.clone(),
         (_, bits) if bits == T::ZERO => x.clone(),
         (Natural(Small(small)), bits) => {
             Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
@@ -188,7 +189,7 @@ where
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
 {
     match (&mut *x, bits) {
-        (natural_zero!(), _) => {}
+        (&mut Natural::ZERO, _) => {}
         (_, bits) if bits == T::ZERO => {}
         (Natural(Small(ref mut small)), bits) => {
             if let Some(shifted) = small.arithmetic_checked_shl(bits) {

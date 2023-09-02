@@ -10,29 +10,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_mod_is_reduced);
 }
 
-fn demo_mod_is_reduced<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_is_reduced<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, m) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if n.mod_is_reduced(&m) {
-            println!("{} is reduced mod {}", n, m);
+            println!("{n} is reduced mod {m}");
         } else {
-            println!("{} is not reduced mod {}", n, m);
+            println!("{n} is not reduced mod {m}");
         }
     }
 }
 
 fn benchmark_mod_is_reduced<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_is_reduced(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

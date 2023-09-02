@@ -12,8 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rounding_mode_from_str);
 }
 
-fn demo_rounding_mode_from_str(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_rounding_mode_from_str(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!(
             "RoundingMode::from_str({:?}) = {:?}",
             s,
@@ -22,8 +22,8 @@ fn demo_rounding_mode_from_str(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rounding_mode_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_2().get(gm, &config).take(limit) {
+fn demo_rounding_mode_from_str_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_2().get(gm, config).take(limit) {
         println!(
             "RoundingMode::from_str({:?}) = {:?}",
             s,
@@ -33,11 +33,16 @@ fn demo_rounding_mode_from_str_targeted(gm: GenMode, config: GenConfig, limit: u
 }
 
 #[allow(unused_must_use)]
-fn benchmark_rounding_mode_from_str(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rounding_mode_from_str(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "from_str(&str)",
         BenchmarkType::Single,
-        string_gen().get(gm, &config),
+        string_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

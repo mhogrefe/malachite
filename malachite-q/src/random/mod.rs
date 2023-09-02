@@ -716,7 +716,7 @@ pub fn random_rationals_with_denominator_range_to_infinity(
     RationalsWithDenominator {
         numerators: random_integer_range_to_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(d), RoundingMode::Ceiling),
+            Integer::rounding_from(a * Rational::from(d), RoundingMode::Ceiling).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -778,7 +778,7 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
     RationalsWithDenominator {
         numerators: random_integer_range_to_negative_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(d), RoundingMode::Floor),
+            Integer::rounding_from(a * Rational::from(d), RoundingMode::Floor).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -851,9 +851,9 @@ pub fn random_rationals_with_denominator_range(
     assert_ne!(*d, 0u32);
     assert!(a < b);
     let q_d = Rational::from(d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling);
+    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
     let upper_included = b.denominator_ref() == d;
-    let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor);
+    let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0;
     if !upper_included {
         b_i += Integer::ONE;
     }
@@ -933,8 +933,8 @@ pub fn random_rationals_with_denominator_inclusive_range(
     assert_ne!(*d, 0u32);
     assert!(a <= b);
     let q_d = Rational::from(d);
-    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling);
-    let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor) + Integer::ONE;
+    let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
+    let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0 + Integer::ONE;
     RationalsWithDenominator {
         numerators: random_integer_range(
             seed,

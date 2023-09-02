@@ -1,5 +1,6 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 impl Natural {
@@ -26,7 +27,7 @@ impl Natural {
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {
-            natural_zero!() => 0,
+            Natural::ZERO => 0,
             Natural(Small(_)) => 1,
             Natural(Large(ref limbs)) => u64::wrapping_from(limbs.len()),
         }

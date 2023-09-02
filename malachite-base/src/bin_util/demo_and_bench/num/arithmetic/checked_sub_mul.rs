@@ -16,11 +16,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_checked_sub_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, y, z) in unsigned_triple_gen_var_19::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -33,8 +33,8 @@ fn demo_checked_sub_mul_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_checked_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in signed_triple_gen::<T>().get(gm, &config).take(limit) {
+fn demo_checked_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in signed_triple_gen::<T>().get(gm, config).take(limit) {
         println!(
             "({}).checked_sub_mul({}, {}) = {:?}",
             x,
@@ -47,14 +47,14 @@ fn demo_checked_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfi
 
 fn benchmark_checked_sub_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_sub_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_19::<T>().get(gm, &config),
+        unsigned_triple_gen_var_19::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -67,14 +67,14 @@ fn benchmark_checked_sub_mul_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_sub_mul_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_sub_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_triple_gen::<T>().get(gm, &config),
+        signed_triple_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -228,7 +228,7 @@ fn exhaustive_nonzero_finite_primitive_floats_in_range_fail_helper<T: PrimitiveF
     ));
     assert_panic!(exhaustive_nonzero_finite_primitive_floats_in_range::<T>(
         T::ONE,
-        T::POSITIVE_INFINITY,
+        T::INFINITY,
     ));
     assert_panic!(exhaustive_nonzero_finite_primitive_floats_in_range::<T>(
         T::ONE,

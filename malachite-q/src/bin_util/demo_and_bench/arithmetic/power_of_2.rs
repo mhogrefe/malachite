@@ -14,28 +14,28 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_power_of_2_i64);
 }
 
-fn demo_rational_power_of_2_u64(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen_var_5::<u64>().get(gm, &config).take(limit) {
+fn demo_rational_power_of_2_u64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen_var_5::<u64>().get(gm, config).take(limit) {
         println!("Rational::power_of_2({}) = {}", x, Rational::power_of_2(x));
     }
 }
 
-fn demo_rational_power_of_2_i64(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in signed_gen_var_5::<i64>().get(gm, &config).take(limit) {
+fn demo_rational_power_of_2_i64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen_var_5::<i64>().get(gm, config).take(limit) {
         println!("Rational::power_of_2({}) = {}", x, Rational::power_of_2(x));
     }
 }
 
 fn benchmark_rational_power_of_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.power_of_2(u64)",
         BenchmarkType::Single,
-        unsigned_gen_var_5::<u64>().get(gm, &config),
+        unsigned_gen_var_5::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -46,14 +46,14 @@ fn benchmark_rational_power_of_2_u64(
 
 fn benchmark_rational_power_of_2_i64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.power_of_2(i64)",
         BenchmarkType::Single,
-        signed_gen_var_5::<i64>().get(gm, &config),
+        signed_gen_var_5::<i64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

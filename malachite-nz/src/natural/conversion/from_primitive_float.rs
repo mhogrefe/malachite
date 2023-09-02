@@ -1,24 +1,19 @@
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::ShlRound;
-use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum NaturalFromPrimitiveFloatError {
-    FloatInfiniteOrNan,
-    FloatNegative,
-    FloatNonInteger,
-}
+use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident) => {
         impl RoundingFrom<$f> for Natural {
             /// Converts a floating-point value to a [`Natural`], using the specified rounding
-            /// mode.
+            /// mode. An [`Ordering`] is also returned, indicating whether the returned value is
+            /// less than, equal to, or greater than the original value.
             ///
             /// The floating-point value cannot be NaN or infinite, and it cannot round to a
             /// negative integer.
@@ -36,17 +31,17 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::from_primitive_float#rounding_from).
-            fn rounding_from(value: $f, rm: RoundingMode) -> Self {
-                if value.is_nan() || value == $f::POSITIVE_INFINITY {
+            fn rounding_from(value: $f, rm: RoundingMode) -> (Self, Ordering) {
+                if value.is_nan() || value == $f::INFINITY {
                     panic!("Cannot convert {} to Natural", value);
                 } else if value == 0.0 {
-                    Natural::ZERO
+                    (Natural::ZERO, Ordering::Equal)
                 } else if value < 0.0 {
                     if rm == RoundingMode::Down
                         || rm == RoundingMode::Ceiling
                         || rm == RoundingMode::Nearest
                     {
-                        Natural::ZERO
+                        (Natural::ZERO, Ordering::Greater)
                     } else {
                         panic!("Result is negative and cannot be converted to a Natural");
                     }
@@ -58,7 +53,7 @@ macro_rules! float_impls {
         }
 
         impl TryFrom<$f> for Natural {
-            type Error = NaturalFromPrimitiveFloatError;
+            type Error = UnsignedFromFloatError;
 
             /// Converts a floating-point value to a [`Natural`].
             ///
@@ -75,9 +70,9 @@ macro_rules! float_impls {
             /// See [here](super::from_primitive_float#try_from).
             fn try_from(value: $f) -> Result<Natural, Self::Error> {
                 if value.is_nan() || value.is_infinite() {
-                    Err(NaturalFromPrimitiveFloatError::FloatInfiniteOrNan)
+                    Err(UnsignedFromFloatError::FloatInfiniteOrNan)
                 } else if value < 0.0 {
-                    Err(NaturalFromPrimitiveFloatError::FloatNegative)
+                    Err(UnsignedFromFloatError::FloatNegative)
                 } else if value == 0.0 {
                     Ok(Natural::ZERO)
                 } else {
@@ -85,7 +80,7 @@ macro_rules! float_impls {
                     if exponent >= 0 {
                         Ok(Natural::from(mantissa) << exponent)
                     } else {
-                        Err(NaturalFromPrimitiveFloatError::FloatNonInteger)
+                        Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
                     }
                 }
             }

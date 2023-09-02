@@ -25,56 +25,45 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_sub_evaluation_strategy);
 }
 
-fn demo_natural_mod_sub_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let m_old = m.clone();
         x.mod_sub_assign(y, m);
-        println!(
-            "x := {}; x.mod_sub_assign({}, {}); x = {}",
-            x_old, y_old, m_old, x
-        );
+        println!("x := {x_old}; x.mod_sub_assign({y_old}, {m_old}); x = {x}");
     }
 }
 
-fn demo_natural_mod_sub_assign_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
         let m_old = m.clone();
         let y_old = y.clone();
         x.mod_sub_assign(y, &m);
-        println!(
-            "x := {}; x.mod_sub_assign({}, &{}); x = {}",
-            x, y_old, m_old, x
-        );
+        println!("x := {x_old}; x.mod_sub_assign({y_old}, &{m_old}); x = {x}");
     }
 }
 
-fn demo_natural_mod_sub_assign_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         let m_old = m.clone();
         x.mod_sub_assign(&y, m);
-        println!(
-            "x := {}; x.mod_sub_assign(&{}, {}); x = {}",
-            x_old, y, m_old, x
-        );
+        println!("x := {x_old}; x.mod_sub_assign(&{y}, {m_old}); x = {x}");
     }
 }
 
-fn demo_natural_mod_sub_assign_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.mod_sub_assign(&y, &m);
-        println!(
-            "x := {}; x.mod_sub_assign(&{}, &{}); x = {}",
-            x_old, y, m, x
-        );
+        println!("x := {x_old}; x.mod_sub_assign(&{y}, &{m}); x = {x}");
     }
 }
 
-fn demo_natural_mod_sub(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let m_old = m.clone();
@@ -82,67 +71,67 @@ fn demo_natural_mod_sub(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_mod_sub_val_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} - {} ≡ {} mod {}", x_old, y_old, x.mod_sub(y, &m), m);
     }
 }
 
-fn demo_natural_mod_sub_val_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         let m_old = m.clone();
         println!("{} - {} ≡ {} mod {}", x_old, y, x.mod_sub(&y, m), m_old);
     }
 }
 
-fn demo_natural_mod_sub_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} - {} ≡ {} mod {}", x_old, y, x.mod_sub(&y, &m), m);
     }
 }
 
-fn demo_natural_mod_sub_ref_val_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let y_old = y.clone();
         let m_old = m.clone();
         println!("{} - {} ≡ {} mod {}", x, y_old, (&x).mod_sub(y, m), m_old);
     }
 }
 
-fn demo_natural_mod_sub_ref_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("{} - {} ≡ {} mod {}", x, y_old, (&x).mod_sub(y, &m), m);
     }
 }
 
-fn demo_natural_mod_sub_ref_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!("{} - {} ≡ {} mod {}", x, y, (&x).mod_sub(&y, m), m_old);
     }
 }
 
-fn demo_natural_mod_sub_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, m) in natural_triple_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_mod_sub_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
         println!("{} - {} ≡ {} mod {}", x, y, (&x).mod_sub(&y, &m), m);
     }
 }
 
 fn benchmark_natural_mod_sub_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_sub_assign(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen_var_3().get(gm, &config),
+        natural_triple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -171,14 +160,14 @@ fn benchmark_natural_mod_sub_assign_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_mod_sub_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_sub(Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen_var_3().get(gm, &config),
+        natural_triple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -194,14 +183,14 @@ fn benchmark_natural_mod_sub_algorithms(
 
 fn benchmark_natural_mod_sub_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_sub(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen_var_3().get(gm, &config),
+        natural_triple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

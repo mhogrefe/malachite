@@ -27,8 +27,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_get_bits_algorithms);
 }
 
-fn demo_limbs_neg_limb_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, start, end) in unsigned_triple_gen_var_20().get(gm, &config).take(limit) {
+fn demo_limbs_neg_limb_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, start, end) in unsigned_triple_gen_var_20().get(gm, config).take(limit) {
         println!(
             "limbs_neg_limb_get_bits({}, {}, {}) = {:?}",
             x,
@@ -39,9 +39,9 @@ fn demo_limbs_neg_limb_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_slice_neg_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_neg_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, start, end) in unsigned_vec_unsigned_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -54,9 +54,9 @@ fn demo_limbs_slice_neg_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_vec_neg_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_neg_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, start, end) in unsigned_vec_unsigned_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_xs = xs.clone();
@@ -70,9 +70,9 @@ fn demo_limbs_vec_neg_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, start, end) in integer_unsigned_unsigned_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -87,14 +87,14 @@ fn demo_integer_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_neg_limb_get_bits(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_neg_limb_get_bits(Limb, u64, u64)",
         BenchmarkType::Single,
-        unsigned_triple_gen_var_20().get(gm, &config),
+        unsigned_triple_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -107,14 +107,14 @@ fn benchmark_limbs_neg_limb_get_bits(
 
 fn benchmark_limbs_neg_get_bits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_neg_get_bits(&[Limb], u64, u64)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_4().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -132,14 +132,14 @@ fn benchmark_limbs_neg_get_bits_evaluation_strategy(
 
 fn benchmark_integer_get_bits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.get_bits(u64, u64)",
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_unsigned_triple_gen_var_2().get(gm, &config),
+        integer_unsigned_unsigned_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -157,14 +157,14 @@ fn benchmark_integer_get_bits_evaluation_strategy(
 
 fn benchmark_integer_get_bits_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.get_bits(u64, u64)",
         BenchmarkType::Algorithms,
-        integer_unsigned_unsigned_triple_gen_var_2().get(gm, &config),
+        integer_unsigned_unsigned_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

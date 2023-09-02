@@ -6,7 +6,10 @@ use crate::num::arithmetic::traits::{
     FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
     Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
-use crate::num::basic::traits::{Iverson, NegativeOne, One, OneHalf, Two, Zero};
+use crate::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
+};
+use crate::num::comparison::traits::PartialOrdAbs;
 use crate::num::conversion::traits::{
     ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger, RawMantissaAndExponent,
     RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
@@ -120,17 +123,20 @@ pub trait PrimitiveFloat:
     + FmtRyuString
     + From<f32>
     + FromStr
+    + Infinity
     + IntegerMantissaAndExponent<u64, i64>
     + Into<f64>
     + IsInteger
     + IsPowerOf2
-    + Iverson
     + LowerExp
     + Min
     + Max
     + Mul<Output = Self>
     + MulAssign<Self>
     + Named
+    + NaN
+    + NegativeInfinity
+    + NegativeZero
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
@@ -139,6 +145,7 @@ pub trait PrimitiveFloat:
     + One
     + PartialEq<Self>
     + PartialOrd<Self>
+    + PartialOrdAbs<Self>
     + Pow<i64, Output = Self>
     + Pow<Self, Output = Self>
     + PowAssign<i64>
@@ -232,10 +239,6 @@ pub trait PrimitiveFloat:
     /// - For [`f32`]s, this is $2^{127}(2-2^{-23})$, or `3.4028235e38`.
     /// - For [`f64`]s, this is $2^{1023}(2-2^{-52})$, or `1.7976931348623157e308`.
     const MAX_FINITE: Self;
-    const NEGATIVE_ZERO: Self;
-    const POSITIVE_INFINITY: Self;
-    const NEGATIVE_INFINITY: Self;
-    const NAN: Self;
     /// The smallest positive integer that cannot be represented as a float. This is $2^{M+1}+1$.
     /// - For [`f32`]s, this is $2^{24}+1$, or 16777217.
     /// - For [`f64`]s, this is $2^{53}+1$, or 9007199254740993.
@@ -254,6 +257,10 @@ pub trait PrimitiveFloat:
     fn is_finite(self) -> bool;
 
     fn is_normal(self) -> bool;
+
+    fn is_sign_positive(self) -> bool;
+
+    fn is_sign_negative(self) -> bool;
 
     fn classify(self) -> FpCategory;
 
@@ -274,7 +281,7 @@ pub trait PrimitiveFloat:
     /// assert!(!0.0.is_negative_zero());
     /// assert!(!1.0.is_negative_zero());
     /// assert!(!f32::NAN.is_negative_zero());
-    /// assert!(!f32::POSITIVE_INFINITY.is_negative_zero());
+    /// assert!(!f32::INFINITY.is_negative_zero());
     /// ```
     #[inline]
     fn is_negative_zero(self) -> bool {
@@ -367,7 +374,7 @@ pub trait PrimitiveFloat:
     fn next_higher(self) -> Self {
         assert!(!self.is_nan());
         if self.sign() == Ordering::Greater {
-            assert_ne!(self, Self::POSITIVE_INFINITY);
+            assert_ne!(self, Self::INFINITY);
             Self::from_bits(self.to_bits() + 1)
         } else if self == Self::ZERO {
             // negative zero -> positive zero
@@ -429,13 +436,14 @@ pub trait PrimitiveFloat:
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::basic::traits::NegativeInfinity;
     ///
     /// assert_eq!(f32::NEGATIVE_INFINITY.to_ordered_representation(), 0);
     /// assert_eq!((-0.0f32).to_ordered_representation(), 2139095040);
     /// assert_eq!(0.0f32.to_ordered_representation(), 2139095041);
     /// assert_eq!(1.0f32.to_ordered_representation(), 3204448257);
     /// assert_eq!(
-    ///     f32::POSITIVE_INFINITY.to_ordered_representation(),
+    ///     f32::INFINITY.to_ordered_representation(),
     ///     4278190081
     /// );
     /// ```
@@ -471,6 +479,7 @@ pub trait PrimitiveFloat:
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::basic::traits::NegativeInfinity;
     ///
     /// assert_eq!(f32::from_ordered_representation(0), f32::NEGATIVE_INFINITY);
     /// assert_eq!(f32::from_ordered_representation(2139095040), -0.0f32);
@@ -478,7 +487,7 @@ pub trait PrimitiveFloat:
     /// assert_eq!(f32::from_ordered_representation(3204448257), 1.0f32);
     /// assert_eq!(
     ///     f32::from_ordered_representation(4278190081),
-    ///     f32::POSITIVE_INFINITY
+    ///     f32::INFINITY
     /// );
     /// ```
     fn from_ordered_representation(n: u64) -> Self {
@@ -580,10 +589,6 @@ macro_rules! impl_basic_traits_primitive_float {
             const WIDTH: u64 = $width;
             const MANTISSA_WIDTH: u64 = (std::$t::MANTISSA_DIGITS as u64) - 1;
 
-            const POSITIVE_INFINITY: Self = std::$t::INFINITY;
-            const NEGATIVE_INFINITY: Self = std::$t::NEG_INFINITY;
-            const NEGATIVE_ZERO: Self = -0.0;
-            const NAN: Self = std::$t::NAN;
             const MAX_FINITE: Self = std::$t::MAX;
             const MIN_POSITIVE_SUBNORMAL: Self = $min_positive_subnormal;
             const MAX_SUBNORMAL: Self = $max_subnormal;
@@ -612,6 +617,16 @@ macro_rules! impl_basic_traits_primitive_float {
             #[inline]
             fn is_normal(self) -> bool {
                 $t::is_normal(self)
+            }
+
+            #[inline]
+            fn is_sign_positive(self) -> bool {
+                $t::is_sign_positive(self)
+            }
+
+            #[inline]
+            fn is_sign_negative(self) -> bool {
+                $t::is_sign_negative(self)
             }
 
             #[inline]
@@ -657,6 +672,26 @@ macro_rules! impl_basic_traits_primitive_float {
             const NEGATIVE_ONE: $t = -1.0;
         }
 
+        /// The constant -0.0 for primitive floating-point types.
+        impl NegativeZero for $t {
+            const NEGATIVE_ZERO: $t = -0.0;
+        }
+
+        /// The constant Infinity for primitive floating-point types.
+        impl Infinity for $t {
+            const INFINITY: $t = std::$t::INFINITY;
+        }
+
+        /// The constant -Infinity for primitive floating-point types.
+        impl NegativeInfinity for $t {
+            const NEGATIVE_INFINITY: $t = std::$t::NEG_INFINITY;
+        }
+
+        /// The constant NaN for primitive floating-point types.
+        impl NaN for $t {
+            const NAN: $t = std::$t::NAN;
+        }
+
         /// The lowest value representable by this type, negative infinity.
         impl Min for $t {
             const MIN: $t = $t::NEGATIVE_INFINITY;
@@ -664,7 +699,7 @@ macro_rules! impl_basic_traits_primitive_float {
 
         /// The highest value representable by this type, positive infinity.
         impl Max for $t {
-            const MAX: $t = $t::POSITIVE_INFINITY;
+            const MAX: $t = $t::INFINITY;
         }
     };
 }

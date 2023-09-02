@@ -27,40 +27,40 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_to_bits_desc_evaluation_strategy_signed);
 }
 
-fn demo_to_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_bits_asc() = {:?}", u, u.to_bits_asc());
     }
 }
 
-fn demo_to_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_bits_asc() = {:?}", i, i.to_bits_asc());
     }
 }
 
-fn demo_to_bits_desc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_bits_desc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_bits_desc() = {:?}", u, u.to_bits_desc());
     }
 }
 
-fn demo_to_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_bits_desc() = {:?}", i, i.to_bits_desc());
     }
 }
 
 fn benchmark_to_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -75,14 +75,14 @@ fn benchmark_to_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_bits_asc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -98,14 +98,14 @@ fn benchmark_to_bits_asc_algorithms_signed<T: PrimitiveSigned>(
 #[allow(unused_must_use)]
 fn benchmark_to_bits_asc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -124,14 +124,14 @@ fn benchmark_to_bits_asc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
 #[allow(unused_must_use)]
 fn benchmark_to_bits_asc_evaluation_strategy_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -149,14 +149,14 @@ fn benchmark_to_bits_asc_evaluation_strategy_signed<T: PrimitiveSigned>(
 
 fn benchmark_to_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -171,14 +171,14 @@ fn benchmark_to_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_bits_desc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::Algorithms,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -194,14 +194,14 @@ fn benchmark_to_bits_desc_algorithms_signed<T: PrimitiveSigned>(
 #[allow(unused_must_use)]
 fn benchmark_to_bits_desc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -221,14 +221,14 @@ fn benchmark_to_bits_desc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
 #[allow(unused_must_use)]
 fn benchmark_to_bits_desc_evaluation_strategy_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

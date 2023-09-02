@@ -1057,13 +1057,7 @@ fn limbs_xor_pos_neg_in_place_either_properties() {
             Integer::from(Natural::from_limbs_asc(&xs_old)) ^ -Natural::from_limbs_asc(&ys_old);
         if right {
             assert_eq!(xs, xs_old);
-            assert_eq!(
-                -Natural::from_owned_limbs_asc(ys),
-                expected,
-                "{:?} {:?}",
-                xs_old,
-                ys_old
-            );
+            assert_eq!(-Natural::from_owned_limbs_asc(ys), expected);
         } else {
             assert_eq!(-Natural::from_owned_limbs_asc(xs), expected);
             assert_eq!(ys, ys_old);

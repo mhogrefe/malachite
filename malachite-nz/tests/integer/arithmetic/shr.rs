@@ -329,7 +329,7 @@ where
         assert_eq!(shifted_alt, shifted);
 
         assert!(shifted.le_abs(&n));
-        assert_eq!((&n).shr_round(u, RoundingMode::Floor), shifted);
+        assert_eq!((&n).shr_round(u, RoundingMode::Floor).0, shifted);
     });
 
     integer_unsigned_unsigned_triple_gen_var_3::<T>().test_properties(|(n, u, v)| {
@@ -386,7 +386,7 @@ where
         assert_eq!(shifted_alt, shifted);
         assert!(shifted_alt.is_valid());
 
-        assert_eq!((&n).shr_round(i, RoundingMode::Floor), shifted);
+        assert_eq!((&n).shr_round(i, RoundingMode::Floor).0, shifted);
 
         if i >= T::ZERO {
             assert_eq!(n >> i.unsigned_abs(), shifted);

@@ -17,31 +17,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_not_evaluation_strategy);
 }
 
-fn demo_integer_not_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_not_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in integer_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.not_assign();
-        println!("n := {}; n.not_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.not_assign(); n = {n}");
     }
 }
 
-fn demo_integer_not(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_not(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("!({}) = {}", n.clone(), !n);
     }
 }
 
-fn demo_integer_not_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_not_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("!(&{}) = {}", n, !&n);
     }
 }
 
-fn benchmark_integer_not_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_not_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.not_assign()",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -53,14 +53,14 @@ fn benchmark_integer_not_assign(gm: GenMode, config: GenConfig, limit: usize, fi
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_integer_not_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.not()",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -72,14 +72,14 @@ fn benchmark_integer_not_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_not_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.not()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

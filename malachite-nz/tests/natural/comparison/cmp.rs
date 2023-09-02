@@ -115,6 +115,9 @@ fn test_cmp_normalized() {
     test("5", "6", Ordering::Less);
     test("3", "17", Ordering::Greater);
     test("9", "36", Ordering::Equal);
+    test("117886223846050103296", "409", Ordering::Equal);
+    test("117886223846050103295", "409", Ordering::Less);
+    test("117886223846050103297", "409", Ordering::Greater);
 }
 
 #[test]

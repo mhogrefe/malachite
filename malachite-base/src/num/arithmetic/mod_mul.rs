@@ -67,8 +67,7 @@ pub fn test_invert_u32_table() {
             / (u32::power_of_2(9) + u32::exact_from(i));
         assert_eq!(
             x, value,
-            "INVERT_U32_TABLE gives incorrect value, {}, for index {}",
-            x, i
+            "INVERT_U32_TABLE gives incorrect value, {x}, for index {i}"
         );
     }
 }
@@ -136,8 +135,7 @@ pub fn test_invert_u64_table() {
             / (u64::power_of_2(8) + u64::exact_from(i));
         assert_eq!(
             x, value,
-            "INVERT_U64_TABLE gives incorrect value, {}, for index {}",
-            x, i
+            "INVERT_U64_TABLE gives incorrect value, {x}, for index {i}"
         );
     }
 }

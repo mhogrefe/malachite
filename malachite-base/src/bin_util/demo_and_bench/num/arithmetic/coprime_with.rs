@@ -13,12 +13,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_coprime_with_algorithms);
 }
 
-fn demo_coprime_with<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_coprime_with<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         if x.coprime_with(y) {
-            println!("{} is coprime with {}", x, y);
+            println!("{x} is coprime with {y}");
         } else {
-            println!("{} is not coprime with {}", x, y);
+            println!("{x} is not coprime with {y}");
         }
     }
 }
@@ -26,14 +26,14 @@ fn demo_coprime_with<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_coprime_with_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.coprime_with({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

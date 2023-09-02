@@ -37,66 +37,66 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_partial_cmp_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: PartialOrd<T>,
 {
     for (n, u) in rational_unsigned_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n.partial_cmp(&u).unwrap() {
-            Ordering::Less => println!("{} < {}", n, u),
-            Ordering::Equal => println!("{} = {}", n, u),
-            Ordering::Greater => println!("{} > {}", n, u),
+            Ordering::Less => println!("{n} < {u}"),
+            Ordering::Equal => println!("{n} = {u}"),
+            Ordering::Greater => println!("{n} > {u}"),
         }
     }
 }
 
 fn demo_rational_partial_cmp_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: PartialOrd<T>,
 {
-    for (n, i) in rational_signed_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match n.partial_cmp(&i).unwrap() {
-            Ordering::Less => println!("{} < {}", n, i),
-            Ordering::Equal => println!("{} = {}", n, i),
-            Ordering::Greater => println!("{} > {}", n, i),
+            Ordering::Less => println!("{n} < {i}"),
+            Ordering::Equal => println!("{n} = {i}"),
+            Ordering::Greater => println!("{n} > {i}"),
         }
     }
 }
 
 fn demo_unsigned_partial_cmp_rational<T: PartialOrd<Rational> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, u) in rational_unsigned_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match u.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{} < {}", u, n),
-            Ordering::Equal => println!("{} = {}", u, n),
-            Ordering::Greater => println!("{} > {}", u, n),
+            Ordering::Less => println!("{u} < {n}"),
+            Ordering::Equal => println!("{u} = {n}"),
+            Ordering::Greater => println!("{u} > {n}"),
         }
     }
 }
 
 fn demo_signed_partial_cmp_rational<T: PartialOrd<Rational> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, i) in rational_signed_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (n, i) in rational_signed_pair_gen::<T>().get(gm, config).take(limit) {
         match i.partial_cmp(&n).unwrap() {
-            Ordering::Less => println!("{} < {}", i, n),
-            Ordering::Equal => println!("{} = {}", i, n),
-            Ordering::Greater => println!("{} > {}", i, n),
+            Ordering::Less => println!("{i} < {n}"),
+            Ordering::Equal => println!("{i} = {n}"),
+            Ordering::Greater => println!("{i} > {n}"),
         }
     }
 }
@@ -104,7 +104,7 @@ fn demo_signed_partial_cmp_rational<T: PartialOrd<Rational> + PrimitiveSigned>(
 #[allow(unused_must_use)]
 fn benchmark_rational_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -114,7 +114,7 @@ fn benchmark_rational_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsign
     run_benchmark(
         &format!("Rational.partial_cmp(&{})", T::NAME),
         BenchmarkType::LibraryComparison,
-        rational_unsigned_pair_gen_rm::<T>().get(gm, &config),
+        rational_unsigned_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -129,7 +129,7 @@ fn benchmark_rational_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsign
 #[allow(unused_must_use)]
 fn benchmark_rational_partial_cmp_signed_library_comparison<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -139,7 +139,7 @@ fn benchmark_rational_partial_cmp_signed_library_comparison<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Rational.partial_cmp(&{})", T::NAME),
         BenchmarkType::LibraryComparison,
-        rational_signed_pair_gen_rm::<T>().get(gm, &config),
+        rational_signed_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -156,14 +156,14 @@ fn benchmark_unsigned_partial_cmp_rational_library_comparison<
     T: PartialOrd<Rational> + PartialOrd<rug::Rational> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp(&Rational)", T::NAME),
         BenchmarkType::LibraryComparison,
-        rational_unsigned_pair_gen_rm::<T>().get(gm, &config),
+        rational_unsigned_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -180,14 +180,14 @@ fn benchmark_signed_partial_cmp_rational_library_comparison<
     T: PartialOrd<Rational> + PartialOrd<rug::Rational> + PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp(&Rational)", T::NAME),
         BenchmarkType::LibraryComparison,
-        rational_signed_pair_gen_rm::<T>().get(gm, &config),
+        rational_signed_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

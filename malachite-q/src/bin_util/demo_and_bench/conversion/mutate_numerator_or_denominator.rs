@@ -19,9 +19,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_mutate_numerator_and_denominator);
 }
 
-fn demo_rational_mutate_numerator(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_mutate_numerator(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut q, out, new_numerator) in rational_rational_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_q = q.clone();
@@ -32,15 +32,16 @@ fn demo_rational_mutate_numerator(gm: GenMode, config: GenConfig, limit: usize) 
             out
         });
         println!(
-            "q := {}; q.mutate_numerator(|x| {{ *x = {}; {} }}) = {}; q = {}",
-            old_q, old_new_numerator, old_out, actual_out, q
+            "q := {old_q}; \
+            q.mutate_numerator(|x| {{ *x = {old_new_numerator}; {old_out} }}) = {actual_out}; \
+            q = {q}",
         );
     }
 }
 
-fn demo_rational_mutate_denominator(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_mutate_denominator(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut q, out, new_denominator) in rational_rational_natural_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_q = q.clone();
@@ -51,16 +52,17 @@ fn demo_rational_mutate_denominator(gm: GenMode, config: GenConfig, limit: usize
             out
         });
         println!(
-            "q := {}; q.mutate_denominator(|x| {{ *x = {}; {} }}) = {}; q = {}",
-            old_q, old_new_denominator, old_out, actual_out, q
+            "q := {old_q}; \
+            q.mutate_denominator(|x| {{ *x = {old_new_denominator}; {old_out} }}) = {actual_out}; \
+            q = {q}",
         );
     }
 }
 
-fn demo_rational_mutate_numerator_and_denominator(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_mutate_numerator_and_denominator(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut q, out, new_numerator, new_denominator) in
         rational_rational_natural_natural_quadruple_gen_var_1()
-            .get(gm, &config)
+            .get(gm, config)
             .take(limit)
     {
         let old_q = q.clone();
@@ -73,23 +75,24 @@ fn demo_rational_mutate_numerator_and_denominator(gm: GenMode, config: GenConfig
             out
         });
         println!(
-            "q := {}; q.mutate_numerator_and_denominator(|x, y| {{ *x = {}; *y = {}; {} }}) = {}; \
-            q = {}",
-            old_q, old_new_numerator, old_new_denominator, old_out, actual_out, q
+            "q := {old_q}; \
+            q.mutate_numerator_and_denominator(|x, y| {{ *x = {old_new_numerator}; \
+            *y = {old_new_denominator}; {old_out} }}) = {actual_out}; \
+            q = {q}",
         );
     }
 }
 
 fn benchmark_rational_mutate_numerator(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.mutate_numerator(FnOnce(&mut Natural) -> T)",
         BenchmarkType::Single,
-        rational_rational_natural_triple_gen().get(gm, &config),
+        rational_rational_natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -105,14 +108,14 @@ fn benchmark_rational_mutate_numerator(
 
 fn benchmark_rational_mutate_denominator(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.mutate_denominator(FnOnce(&mut Natural) -> T)",
         BenchmarkType::Single,
-        rational_rational_natural_triple_gen_var_1().get(gm, &config),
+        rational_rational_natural_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -128,14 +131,14 @@ fn benchmark_rational_mutate_denominator(
 
 fn benchmark_rational_mutate_numerator_and_denominator(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.mutate_numerator_and_denominator(FnOnce(&mut Natural, &mut Natural) -> T)",
         BenchmarkType::Single,
-        rational_rational_natural_natural_quadruple_gen_var_1().get(gm, &config),
+        rational_rational_natural_natural_quadruple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

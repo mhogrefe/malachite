@@ -48,7 +48,7 @@ fn from_str_properties() {
     string_gen().test_properties_with_config(&config, |s| {
         assert_eq!(
             Natural::from_str(&s).is_ok(),
-            !s.is_empty() && s.chars().all(|c| ('0'..='9').contains(&c)),
+            !s.is_empty() && s.chars().all(|c| c.is_ascii_digit()),
         );
     });
 
@@ -130,6 +130,8 @@ fn test_from_string_base() {
     test_err(35, "$%^", true);
     test_err(35, "", true);
     test_err(35, "-", true);
+    test_err(16, "10000000z", true);
+    test_err(16, "1000000000000000z", true);
 }
 
 #[test]

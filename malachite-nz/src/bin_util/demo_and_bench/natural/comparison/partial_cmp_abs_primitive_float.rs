@@ -19,13 +19,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_partial_cmp_abs_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: PartialOrdAbs<T>,
 {
     for (n, f) in natural_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n.partial_cmp_abs(&f) {
@@ -39,11 +39,11 @@ fn demo_natural_partial_cmp_abs_float<T: PrimitiveFloat>(
 
 fn demo_float_partial_cmp_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, f) in natural_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match f.partial_cmp_abs(&n) {
@@ -57,7 +57,7 @@ fn demo_float_partial_cmp_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveFloat
 
 fn benchmark_natural_partial_cmp_abs_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -66,7 +66,7 @@ fn benchmark_natural_partial_cmp_abs_float<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural.partial_cmp_abs(&{})", T::NAME),
         BenchmarkType::Single,
-        natural_primitive_float_pair_gen::<T>().get(gm, &config),
+        natural_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -77,14 +77,14 @@ fn benchmark_natural_partial_cmp_abs_float<T: PrimitiveFloat>(
 
 fn benchmark_float_partial_cmp_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
-        natural_primitive_float_pair_gen::<T>().get(gm, &config),
+        natural_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

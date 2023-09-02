@@ -19,9 +19,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_from_continued_fraction(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_from_continued_fraction(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, floor) in natural_vec_integer_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -33,9 +33,9 @@ fn demo_rational_from_continued_fraction(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_rational_from_continued_fraction_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_from_continued_fraction_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, floor) in natural_vec_integer_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -49,14 +49,14 @@ fn demo_rational_from_continued_fraction_ref(gm: GenMode, config: GenConfig, lim
 
 fn benchmark_rational_from_continued_fraction_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_continued_fraction(&Integer, &[Natural])",
         BenchmarkType::Algorithms,
-        natural_vec_integer_pair_gen_var_1().get(gm, &config),
+        natural_vec_integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -74,14 +74,14 @@ fn benchmark_rational_from_continued_fraction_algorithms(
 
 fn benchmark_rational_from_continued_fraction_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_continued_fraction(&Integer, &[Natural])",
         BenchmarkType::EvaluationStrategy,
-        natural_vec_integer_pair_gen_var_1().get(gm, &config),
+        natural_vec_integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

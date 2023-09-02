@@ -60,20 +60,17 @@ fn odd_factorial_table() -> (u64, u64) {
         } else {
             print!(", ");
         }
-        print!("{:#x}", x);
+        print!("{x:#x}");
     }
     println!("];");
     limit -= 1;
     ext_limit -= 1;
     println!("// This is equivalent to `ODD_FACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1.");
-    println!("pub const ODD_FACTORIAL_TABLE_LIMIT: usize = {};", limit);
+    println!("pub const ODD_FACTORIAL_TABLE_LIMIT: usize = {limit};");
     println!(
         "// This is equivalent to `ODD_FACTORIAL_EXTTABLE_LIMIT` in `fac_table.h`, GMP 6.2.1."
     );
-    println!(
-        "pub const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = {};",
-        ext_limit
-    );
+    println!("pub const ODD_FACTORIAL_EXTTABLE_LIMIT: usize = {ext_limit};");
     println!("// This is equivalent to `ODD_FACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1.");
     println!(
         "pub const ODD_FACTORIAL_TABLE_MAX: Limb = {:#x};",
@@ -109,17 +106,14 @@ fn odd_double_factorial_table() {
         } else {
             print!(", ");
         }
-        print!("{:#x}", x);
+        print!("{x:#x}");
     }
     println!("];");
     limit -= 2;
     println!(
         "// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_LIMIT` in `fac_table.h`, GMP 6.2.1."
     );
-    println!(
-        "pub const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = {};",
-        limit
-    );
+    println!("pub const ODD_DOUBLEFACTORIAL_TABLE_LIMIT: usize = {limit};");
     println!(
         "// This is equivalent to `ODD_DOUBLEFACTORIAL_TABLE_MAX` in `fac_table.h`, GMP 6.2.1."
     );
@@ -185,7 +179,7 @@ fn factorial_2_count_table(limit: u64) {
 }
 
 fn odd_central_binomial_table(limit: u64) -> u64 {
-    println!("pub const ODD_CENTRAL_BINOMIAL_OFFSET: usize = {};", limit);
+    println!("pub const ODD_CENTRAL_BINOMIAL_OFFSET: usize = {limit};");
     println!();
     println!("// This table contains binomial(2k, k) / 2 ^ t.");
     println!("//");
@@ -214,7 +208,7 @@ fn odd_central_binomial_table(limit: u64) -> u64 {
         } else {
             print!(", ");
         }
-        print!("{:#x}", x);
+        print!("{x:#x}");
     }
     println!("];");
     u64::wrapping_from(binomial_limit)
@@ -222,10 +216,7 @@ fn odd_central_binomial_table(limit: u64) -> u64 {
 
 fn odd_central_binomial_inverse_table(limit: u64, binomial_limit: u64) {
     let binomial_limit = binomial_limit - 1;
-    println!(
-        "pub const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = {};",
-        binomial_limit
-    );
+    println!("pub const ODD_CENTRAL_BINOMIAL_TABLE_LIMIT: usize = {binomial_limit};");
     println!();
     println!("// This table contains the inverses of elements in the previous table.");
     println!("//");
@@ -250,7 +241,7 @@ fn odd_central_binomial_inverse_table(limit: u64, binomial_limit: u64) {
         } else {
             print!(", ");
         }
-        print!("{:#x}", x);
+        print!("{x:#x}");
     }
     println!("];");
 }
@@ -280,7 +271,7 @@ fn central_binomial_2_fac_table(limit: u64, binomial_limit: u64) {
         } else {
             print!(", ");
         }
-        print!("{}", x);
+        print!("{x}");
     }
     println!("];");
 }

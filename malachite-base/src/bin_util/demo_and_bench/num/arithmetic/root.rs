@@ -99,112 +99,116 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_root_rem_algorithms_2_u64);
 }
 
-fn demo_floor_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_floor_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("floor_root({}, 3) = {}", n, n.floor_root(3));
     }
 }
 
-fn demo_floor_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_floor_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen::<T>().get(gm, config).take(limit) {
         println!("floor_root({}, 3) = {}", n, n.floor_root(3));
     }
 }
 
 fn demo_floor_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.floor_root_assign(3);
-        println!("n := {}; n.floor_root_assign(3); n = {}", old_n, n);
+        println!("n := {old_n}; n.floor_root_assign(3); n = {n}");
     }
 }
 
-fn demo_floor_cbrt_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_floor_cbrt_assign_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut n in signed_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.floor_root_assign(3);
-        println!("n := {}; n.floor_root_assign(3); n = {}", old_n, n);
+        println!("n := {old_n}; n.floor_root_assign(3); n = {n}");
     }
 }
 
-fn demo_ceiling_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("ceiling_root({}, 3) = {}", n, n.ceiling_root(3));
     }
 }
 
-fn demo_ceiling_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen::<T>().get(gm, config).take(limit) {
         println!("ceiling_root({}, 3) = {}", n, n.ceiling_root(3));
     }
 }
 
 fn demo_ceiling_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.ceiling_root_assign(3);
-        println!("n := {}; n.ceiling_root_assign(3); n = {}", old_n, n);
+        println!("n := {old_n}; n.ceiling_root_assign(3); n = {n}");
     }
 }
 
 fn demo_ceiling_cbrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in signed_gen::<T>().get(gm, &config).take(limit) {
+    for mut n in signed_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.ceiling_root_assign(3);
-        println!("n := {}; n.ceiling_root_assign(3); n = {}", old_n, n);
+        println!("n := {old_n}; n.ceiling_root_assign(3); n = {n}");
     }
 }
 
-fn demo_checked_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_checked_cbrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("checked_root({}, 3) = {:?}", n, n.checked_root(3));
     }
 }
 
-fn demo_checked_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_checked_cbrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen::<T>().get(gm, config).take(limit) {
         println!("checked_root({}, 3) = {:?}", n, n.checked_root(3));
     }
 }
 
-fn demo_cbrt_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_cbrt_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("root_rem({}, 3) = {:?}", n, n.root_rem(3));
     }
 }
 
-fn demo_cbrt_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_cbrt_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         let rem = n.root_assign_rem(3);
-        println!("n := {}; n.root_assign_rem(3) = {}; n = {}", old_n, rem, n);
+        println!("n := {old_n}; n.root_assign_rem(3) = {rem}; n = {n}");
     }
 }
 
-fn demo_floor_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_floor_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("floor_root({}, {}) = {}", n, exp, n.floor_root(exp));
     }
 }
 
-fn demo_floor_root_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_floor_root_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in signed_unsigned_pair_gen_var_18::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("floor_root({}, {}) = {}", n, exp, n.floor_root(exp));
@@ -213,42 +217,46 @@ fn demo_floor_root_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, li
 
 fn demo_floor_root_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.floor_root_assign(exp);
-        println!("n := {}; n.floor_root_assign({}); n = {}", old_n, exp, n);
+        println!("n := {old_n}; n.floor_root_assign({exp}); n = {n}");
     }
 }
 
-fn demo_floor_root_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_floor_root_assign_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (mut n, exp) in signed_unsigned_pair_gen_var_18::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.floor_root_assign(exp);
-        println!("n := {}; n.floor_root_assign({}); n = {}", old_n, exp, n);
+        println!("n := {old_n}; n.floor_root_assign({exp}); n = {n}");
     }
 }
 
-fn demo_ceiling_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_ceiling_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("ceiling_root({}, {}) = {}", n, exp, n.ceiling_root(exp));
     }
 }
 
-fn demo_ceiling_root_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_ceiling_root_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in signed_unsigned_pair_gen_var_18::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("ceiling_root({}, {}) = {}", n, exp, n.ceiling_root(exp));
@@ -257,82 +265,79 @@ fn demo_ceiling_root_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, 
 
 fn demo_ceiling_root_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.floor_root_assign(exp);
-        println!("n := {}; n.ceiling_root_assign({}); n = {}", old_n, exp, n);
+        println!("n := {old_n}; n.ceiling_root_assign({exp}); n = {n}");
     }
 }
 
 fn demo_ceiling_root_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, exp) in signed_unsigned_pair_gen_var_18::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.floor_root_assign(exp);
-        println!("n := {}; n.ceiling_root_assign({}); n = {}", old_n, exp, n);
+        println!("n := {old_n}; n.ceiling_root_assign({exp}); n = {n}");
     }
 }
 
-fn demo_checked_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_checked_root_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("checked_root({}, {}) = {:?}", n, exp, n.checked_root(exp));
     }
 }
 
-fn demo_checked_root_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_checked_root_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in signed_unsigned_pair_gen_var_18::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("checked_root({}, {}) = {:?}", n, exp, n.checked_root(exp));
     }
 }
 
-fn demo_root_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_root_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("root_rem({}, {}) = {:?}", n, exp, n.root_rem(exp));
     }
 }
 
-fn demo_root_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_root_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, exp) in unsigned_pair_gen_var_32::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         let rem = n.root_assign_rem(exp);
-        println!(
-            "n := {}; n.root_assign_rem({}) = {}; n = {}",
-            old_n, exp, rem, n
-        );
+        println!("n := {old_n}; n.root_assign_rem({exp}) = {rem}; n = {n}");
     }
 }
 
 macro_rules! benchmark_floor_cbrt_algorithms_unsigned {
     ($t:ident, $f:ident) => {
-        fn $f(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+        fn $f(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
             run_benchmark(
                 &format!("{}.floor_root(3)", $t::NAME),
                 BenchmarkType::Algorithms,
-                unsigned_gen::<$t>().get(gm, &config),
+                unsigned_gen::<$t>().get(gm, config),
                 gm.name(),
                 limit,
                 file_name,
@@ -362,14 +367,14 @@ benchmark_floor_cbrt_algorithms_unsigned!(usize, benchmark_floor_cbrt_algorithms
 
 fn benchmark_floor_cbrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_root(3)", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -380,14 +385,14 @@ fn benchmark_floor_cbrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_floor_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_root_assign(3)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -398,14 +403,14 @@ fn benchmark_floor_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_cbrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_cbrt_assign(3)", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -416,14 +421,14 @@ fn benchmark_floor_cbrt_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root(3)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -437,14 +442,14 @@ fn benchmark_ceiling_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_cbrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root(3)", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -455,14 +460,14 @@ fn benchmark_ceiling_cbrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root_assign(3)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -473,14 +478,14 @@ fn benchmark_ceiling_cbrt_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_cbrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_cbrt_assign(3)", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -491,14 +496,14 @@ fn benchmark_ceiling_cbrt_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_checked_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_root(3)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -512,14 +517,14 @@ fn benchmark_checked_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_cbrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_roor(3)", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -530,14 +535,14 @@ fn benchmark_checked_cbrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_cbrt_rem_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.root_rem(3)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -551,14 +556,14 @@ fn benchmark_cbrt_rem_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_cbrt_assign_rem<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.root_assign_rem(3)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -569,11 +574,11 @@ fn benchmark_cbrt_assign_rem<T: PrimitiveUnsigned>(
 
 macro_rules! benchmark_floor_root_algorithms_unsigned {
     ($t:ident, $f:ident) => {
-        fn $f(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+        fn $f(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
             run_benchmark(
                 &format!("{}.floor_root(u64)", $t::NAME),
                 BenchmarkType::Algorithms,
-                unsigned_pair_gen_var_32::<$t, u64>().get(gm, &config),
+                unsigned_pair_gen_var_32::<$t, u64>().get(gm, config),
                 gm.name(),
                 limit,
                 file_name,
@@ -603,14 +608,14 @@ benchmark_floor_root_algorithms_unsigned!(usize, benchmark_floor_root_algorithms
 
 fn benchmark_floor_root_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_root(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -621,14 +626,14 @@ fn benchmark_floor_root_signed<T: PrimitiveSigned>(
 
 fn benchmark_floor_root_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_root_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -639,14 +644,14 @@ fn benchmark_floor_root_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_root_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_root_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -657,14 +662,14 @@ fn benchmark_floor_root_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_root_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -680,14 +685,14 @@ fn benchmark_ceiling_root_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_root_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -698,14 +703,14 @@ fn benchmark_ceiling_root_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_root_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -716,14 +721,14 @@ fn benchmark_ceiling_root_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_root_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_root_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -734,14 +739,14 @@ fn benchmark_ceiling_root_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_checked_root_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_root(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -757,14 +762,14 @@ fn benchmark_checked_root_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_root_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_root(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_18::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -775,14 +780,14 @@ fn benchmark_checked_root_signed<T: PrimitiveSigned>(
 
 fn benchmark_root_rem_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.root_rem(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -796,14 +801,14 @@ fn benchmark_root_rem_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_root_assign_rem<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.root_assign_rem(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_32::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -816,14 +821,14 @@ fn benchmark_root_assign_rem<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_cbrt_algorithms_2_u32(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32.floor_root(3)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<u32>().get(gm, &config),
+        unsigned_gen_var_1::<u32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -834,12 +839,7 @@ fn benchmark_floor_cbrt_algorithms_2_u32(
             ("fast", &mut |n| no_out!(fast_floor_cbrt_u32(n))),
             ("Chebyshev", &mut |n| no_out!(cbrt_chebyshev_approx_u32(n))),
             ("approx and refine", &mut |n| {
-                no_out!(floor_root_approx_and_refine(
-                    |x| x as f64,
-                    |f| f as u32,
-                    n,
-                    3
-                ))
+                no_out!(floor_root_approx_and_refine(f64::from, |f| f as u32, n, 3))
             }),
         ],
     );
@@ -847,14 +847,14 @@ fn benchmark_floor_cbrt_algorithms_2_u32(
 
 fn benchmark_floor_cbrt_algorithms_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64.floor_root(3)",
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<u64>().get(gm, &config),
+        unsigned_gen_var_1::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -878,14 +878,14 @@ fn benchmark_floor_cbrt_algorithms_2_u64(
 
 fn benchmark_floor_root_algorithms_2_u32(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32.floor_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u32, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u32, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -896,7 +896,7 @@ fn benchmark_floor_root_algorithms_2_u32(
             ("fast", &mut |(n, exp)| no_out!(fast_floor_root_u32(n, exp))),
             ("approx and refine", &mut |(n, exp)| {
                 no_out!(floor_root_approx_and_refine(
-                    |x| x as f64,
+                    f64::from,
                     |f| f as u32,
                     n,
                     exp
@@ -908,14 +908,14 @@ fn benchmark_floor_root_algorithms_2_u32(
 
 fn benchmark_floor_root_algorithms_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64.floor_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u64, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u64, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -938,14 +938,14 @@ fn benchmark_floor_root_algorithms_2_u64(
 
 fn benchmark_ceiling_root_algorithms_2_u32(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32.ceiling_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u32, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u32, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -964,14 +964,14 @@ fn benchmark_ceiling_root_algorithms_2_u32(
 
 fn benchmark_ceiling_root_algorithms_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64.ceiling_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u64, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u64, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -990,14 +990,14 @@ fn benchmark_ceiling_root_algorithms_2_u64(
 
 fn benchmark_checked_root_algorithms_2_u32(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32.checked_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u32, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u32, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1016,14 +1016,14 @@ fn benchmark_checked_root_algorithms_2_u32(
 
 fn benchmark_checked_root_algorithms_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64.checked_root(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u64, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u64, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1042,14 +1042,14 @@ fn benchmark_checked_root_algorithms_2_u64(
 
 fn benchmark_root_rem_algorithms_2_u32(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32.root_rem(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u32, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u32, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1064,14 +1064,14 @@ fn benchmark_root_rem_algorithms_2_u32(
 
 fn benchmark_root_rem_algorithms_2_u64(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64.root_rem(u64)",
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_32::<u64, u64>().get(gm, &config),
+        unsigned_pair_gen_var_32::<u64, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

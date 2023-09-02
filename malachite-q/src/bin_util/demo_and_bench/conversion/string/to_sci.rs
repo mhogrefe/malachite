@@ -22,9 +22,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_to_sci_with_options);
 }
 
-fn demo_length_after_point_in_small_base(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_length_after_point_in_small_base(gm: GenMode, config: &GenConfig, limit: usize) {
     for (q, base) in rational_unsigned_pair_gen_var_5()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -36,28 +36,28 @@ fn demo_length_after_point_in_small_base(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_rational_to_sci(gm: GenMode, config: GenConfig, limit: usize) {
-    for q in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_to_sci(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
         println!("{}.to_sci() = {}", q, q.to_sci());
     }
 }
 
-fn demo_rational_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_fmt_sci_valid(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, options) in rational_to_sci_options_pair_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.fmt_sci_valid(options) {
-            println!("{} can be converted to sci using {:?}", x, options);
+            println!("{x} can be converted to sci using {options:?}");
         } else {
-            println!("{} cannot be converted to sci using {:?}", x, options);
+            println!("{x} cannot be converted to sci using {options:?}");
         }
     }
 }
 
-fn demo_rational_to_sci_with_options(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_to_sci_with_options(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, options) in rational_to_sci_options_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -71,14 +71,14 @@ fn demo_rational_to_sci_with_options(gm: GenMode, config: GenConfig, limit: usiz
 
 fn benchmark_length_after_point_in_small_base(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.length_after_point_in_small_base(u8)",
         BenchmarkType::Single,
-        rational_unsigned_pair_gen_var_5().get(gm, &config),
+        rational_unsigned_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -89,11 +89,11 @@ fn benchmark_length_after_point_in_small_base(
     );
 }
 
-fn benchmark_rational_to_sci(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_to_sci(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.to_sci()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -102,11 +102,16 @@ fn benchmark_rational_to_sci(gm: GenMode, config: GenConfig, limit: usize, file_
     );
 }
 
-fn benchmark_rational_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_fmt_sci_valid(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Rational.fmt_sci_valid(ToSciOptions)",
         BenchmarkType::Single,
-        rational_to_sci_options_pair_gen().get(gm, &config),
+        rational_to_sci_options_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -119,14 +124,14 @@ fn benchmark_rational_fmt_sci_valid(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_rational_to_sci_with_options(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.to_sci_with_options(ToSciOptions)",
         BenchmarkType::Single,
-        rational_to_sci_options_pair_gen_var_1().get(gm, &config),
+        rational_to_sci_options_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

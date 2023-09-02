@@ -17,36 +17,33 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_assign_bits_algorithms);
 }
 
-fn demo_limbs_neg_assign_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, start, end, bits) in large_type_gen_var_4().get(gm, &config).take(limit) {
+fn demo_limbs_neg_assign_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, start, end, bits) in large_type_gen_var_4().get(gm, config).take(limit) {
         let old_xs = xs.clone();
         limbs_neg_assign_bits(&mut xs, start, end, &bits);
         println!(
-            "xs := {:?}; limbs_neg_assign_bits(&mut xs, {}, {}, &{:?}); limbs = {:?}",
-            old_xs, start, end, bits, xs
+            "xs := {old_xs:?}; \
+            limbs_neg_assign_bits(&mut xs, {start}, {end}, &{bits:?}); limbs = {xs:?}",
         );
     }
 }
 
-fn demo_integer_assign_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_assign_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, start, end, bits) in integer_unsigned_unsigned_natural_quadruple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n.clone();
         n.assign_bits(start, end, &bits);
-        println!(
-            "n := {}; n.assign_bits({}, {}, &{}); n = {}",
-            old_n, start, end, bits, n
-        );
+        println!("n := {old_n}; n.assign_bits({start}, {end}, &{bits}); n = {n}");
     }
 }
 
-fn benchmark_limbs_neg_assign_bits(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_neg_assign_bits(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_neg_assign_bits(&mut Vec<Limb>, u64, u64, &[Limb])",
         BenchmarkType::Single,
-        large_type_gen_var_4().get(gm, &config),
+        large_type_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -64,14 +61,14 @@ fn benchmark_limbs_neg_assign_bits(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_integer_assign_bits_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.assign_bits(u64, u64, &Natural)",
         BenchmarkType::Algorithms,
-        integer_unsigned_unsigned_natural_quadruple_gen_var_1().get(gm, &config),
+        integer_unsigned_unsigned_natural_quadruple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

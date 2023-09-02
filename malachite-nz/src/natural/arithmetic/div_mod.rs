@@ -895,7 +895,7 @@ pub_test! {limbs_invert_basecase_approx(
     } else {
         let scratch = &mut scratch[..d_len << 1];
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
-        for s in scratch_lo.iter_mut() {
+        for s in &mut *scratch_lo {
             *s = Limb::MAX;
         }
         limbs_not_to_out(scratch_hi, ds);
@@ -2039,8 +2039,8 @@ impl<'a> DivMod<Natural> for &'a Natural {
             return (Natural::ONE, Natural::ZERO);
         }
         match (self, &mut other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => (n.clone(), Natural::ZERO),
+            (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (n, &mut Natural::ONE) => (n.clone(), Natural::ZERO),
             (n, &mut Natural(Small(d))) => {
                 let (q, r) = n.div_mod_limb_ref(d);
                 (q, Natural(Small(r)))
@@ -2109,8 +2109,8 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
             return (Natural::ONE, Natural::ZERO);
         }
         match (self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (n, natural_one!()) => (n.clone(), Natural::ZERO),
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (n, &Natural::ONE) => (n.clone(), Natural::ZERO),
             (n, Natural(Small(d))) => {
                 let (q, r) = n.div_mod_limb_ref(*d);
                 (q, Natural(Small(r)))
@@ -2179,8 +2179,8 @@ impl DivAssignMod<Natural> for Natural {
             return Natural::ZERO;
         }
         match (&mut *self, &mut other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => Natural::ZERO,
+            (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (_, &mut Natural::ONE) => Natural::ZERO,
             (n, &mut Natural(Small(d))) => Natural(Small(n.div_assign_mod_limb(d))),
             (Natural(Small(_)), _) => {
                 let mut r = Natural::ZERO;
@@ -2256,8 +2256,8 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
             return Natural::ZERO;
         }
         match (&mut *self, other) {
-            (_, natural_zero!()) => panic!("division by zero"),
-            (_, natural_one!()) => Natural::ZERO,
+            (_, &Natural::ZERO) => panic!("division by zero"),
+            (_, &Natural::ONE) => Natural::ZERO,
             (_, Natural(Small(d))) => Natural(Small(self.div_assign_mod_limb(*d))),
             (Natural(Small(_)), _) => {
                 let mut r = Natural::ZERO;

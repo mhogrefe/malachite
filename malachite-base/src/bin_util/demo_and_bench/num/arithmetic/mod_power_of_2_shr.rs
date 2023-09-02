@@ -20,11 +20,11 @@ fn demo_mod_power_of_2_shr<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, u, pow) in unsigned_signed_unsigned_triple_gen_var_1::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -42,19 +42,16 @@ fn demo_mod_power_of_2_shr_assign<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, u, pow) in unsigned_signed_unsigned_triple_gen_var_1::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.mod_power_of_2_shr_assign(u, pow);
-        println!(
-            "x := {}; x.mod_power_of_2_shr_assign({}, {}); x = {}",
-            old_n, u, pow, n
-        );
+        println!("x := {old_n}; x.mod_power_of_2_shr_assign({u}, {pow}); x = {n}");
     }
 }
 
@@ -63,14 +60,14 @@ fn benchmark_mod_power_of_2_shr<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_shr({}, u64)", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_1::<T, U>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_1::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -86,14 +83,14 @@ fn benchmark_mod_power_of_2_shr_assign<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_shr_assign({}, u64)", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_1::<T, U>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_1::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

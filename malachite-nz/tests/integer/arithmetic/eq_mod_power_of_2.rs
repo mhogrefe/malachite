@@ -276,7 +276,7 @@ fn eq_mod_power_of_2_properties() {
     });
 
     integer_integer_unsigned_triple_gen_var_2().test_properties(|(x, y, pow)| {
-        assert!(x.eq_mod_power_of_2(&y, pow), "{} {} {}", x, y, pow);
+        assert!(x.eq_mod_power_of_2(&y, pow), "{x} {y} {pow}");
         #[cfg(feature = "32_bit_limbs")]
         assert!(rug::Integer::from(&x)
             .is_congruent_2pow(&rug::Integer::from(&y), Limb::exact_from(pow)));

@@ -70,9 +70,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_add_mul_ref_ref_ref_algorithms);
 }
 
-fn demo_limbs_add_mul_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_add_mul_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -87,91 +87,86 @@ fn demo_limbs_add_mul_limb(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn demo_limbs_slice_add_mul_limb_same_length_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut a, b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let a_old = a.clone();
         let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, &b, c);
         println!(
-            "a := {:?}; limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, {:?}, {}) = {}; \
-             a = {:?}",
-            a_old, b, c, carry, a,
+            "a := {a_old:?}; \
+            limbs_slice_add_mul_limb_same_length_in_place_left(&mut a, {b:?}, {c}) = {carry}; \
+             a = {a:?}",
         );
     }
 }
 
 fn demo_limbs_slice_add_mul_limb_same_length_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (a, mut b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let b_old = b.clone();
         let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&a, &mut b, c);
         println!(
-            "b := {:?}; limbs_slice_add_mul_limb_same_length_in_place_right({:?}, &mut b, {}) \
-             = {}; b = {:?}",
-            b_old, a, c, carry, b,
+            "b := {b_old:?}; \
+            limbs_slice_add_mul_limb_same_length_in_place_right({a:?}, &mut b, {c}) \
+             = {carry}; b = {b:?}",
         );
     }
 }
 
-fn demo_limbs_vec_add_mul_limb_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_add_mul_limb_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut a, b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let a_old = a.clone();
         limbs_vec_add_mul_limb_in_place_left(&mut a, &b, c);
         println!(
-            "a := {:?}; limbs_vec_add_mul_limb_in_place_left(&mut a, {:?}, {}); a = {:?}",
-            a_old, b, c, a,
+            "a := {a_old:?}; limbs_vec_add_mul_limb_in_place_left(&mut a, {b:?}, {c}); a = {a:?}",
         );
     }
 }
 
-fn demo_limbs_vec_add_mul_limb_in_place_right(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_add_mul_limb_in_place_right(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, mut b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let b_old = b.clone();
         limbs_vec_add_mul_limb_in_place_right(&a, &mut b, c);
         println!(
-            "b := {:?}; limbs_vec_add_mul_limb_in_place_right({:?}, &mut b, {}); b = {:?}",
-            b_old, a, c, b,
+            "b := {b_old:?}; limbs_vec_add_mul_limb_in_place_right({a:?}, &mut b, {c}); b = {b:?}",
         );
     }
 }
 
-fn demo_limbs_vec_add_mul_limb_in_place_either(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_add_mul_limb_in_place_either(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut a, mut b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let a_old = a.clone();
         let b_old = b.clone();
         limbs_vec_add_mul_limb_in_place_either(&mut a, &mut b, c);
         println!(
-            "a := {:?}; b := {:?}; limbs_vec_add_mul_limb_in_place_either(&mut a, &mut b, {}); \
-             a = {:?}; b = {:?}",
-            a_old, b_old, c, a, b,
+            "a := {a_old:?}; \
+            b := {b_old:?}; limbs_vec_add_mul_limb_in_place_either(&mut a, &mut b, {c}); \
+             a = {a:?}; b = {b:?}",
         );
     }
 }
 
-fn demo_limbs_add_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in unsigned_vec_triple_gen_var_41()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_add_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in unsigned_vec_triple_gen_var_41().get(gm, config).take(limit) {
         println!(
             "limbs_add_mul({:?}, {:?}, {:?}) = {:?}",
             a,
@@ -182,70 +177,52 @@ fn demo_limbs_add_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_add_mul_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in unsigned_vec_triple_gen_var_41()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_add_mul_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in unsigned_vec_triple_gen_var_41().get(gm, config).take(limit) {
         let a_old = a.clone();
         limbs_add_mul_in_place_left(&mut a, &b, &c);
-        println!(
-            "a := {:?}; limbs_add_mul_in_place_left(&mut a, {:?}, {:?}); a = {:?}",
-            a_old, b, c, a,
-        );
+        println!("a := {a_old:?}; limbs_add_mul_in_place_left(&mut a, {b:?}, {c:?}); a = {a:?}");
     }
 }
 
-fn demo_natural_add_mul_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         let c_old = c.clone();
         a.add_mul_assign(b, c);
-        println!(
-            "a := {}; x.add_mul_assign({}, {}); x = {}",
-            a_old, b_old, c_old, a
-        );
+        println!("a := {a_old}; x.add_mul_assign({b_old}, {c_old}); x = {a}");
     }
 }
 
-fn demo_natural_add_mul_assign_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         a.add_mul_assign(b, &c);
-        println!(
-            "a := {}; x.add_mul_assign({}, &{}); x = {}",
-            a_old, b_old, c, a
-        );
+        println!("a := {a_old}; x.add_mul_assign({b_old}, &{c}); x = {a}");
     }
 }
 
-fn demo_natural_add_mul_assign_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let c_old = c.clone();
         a.add_mul_assign(&b, c);
-        println!(
-            "a := {}; x.add_mul_assign(&{}, {}); x = {}",
-            a_old, b, c_old, a
-        );
+        println!("a := {a_old}; x.add_mul_assign(&{b}, {c_old}); x = {a}");
     }
 }
 
-fn demo_natural_add_mul_assign_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         a.add_mul_assign(&b, &c);
-        println!(
-            "a := {}; x.add_mul_assign(&{}, &{}); x = {}",
-            a_old, b, c, a
-        );
+        println!("a := {a_old}; x.add_mul_assign(&{b}, &{c}); x = {a}");
     }
 }
 
-fn demo_natural_add_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         let c_old = c.clone();
@@ -259,8 +236,8 @@ fn demo_natural_add_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_add_mul_val_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         println!(
@@ -273,8 +250,8 @@ fn demo_natural_add_mul_val_val_ref(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_natural_add_mul_val_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let c_old = c.clone();
         println!(
@@ -287,15 +264,15 @@ fn demo_natural_add_mul_val_ref_val(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_natural_add_mul_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         println!("{}.add_mul(&{}, &{}) = {}", a_old, b, c, a.add_mul(&b, &c));
     }
 }
 
-fn demo_natural_add_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_add_mul_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         println!(
             "(&{}).add_mul(&{}, &{}) = {}",
             a,
@@ -306,11 +283,11 @@ fn demo_natural_add_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn benchmark_limbs_add_mul_limb(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_add_mul_limb(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_add_mul_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -323,14 +300,14 @@ fn benchmark_limbs_add_mul_limb(gm: GenMode, config: GenConfig, limit: usize, fi
 
 fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_add_mul_limb_same_length_in_place_left(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -345,14 +322,14 @@ fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_left(
 
 fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_slice_add_mul_limb_same_length_in_place_left(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -367,14 +344,14 @@ fn benchmark_limbs_slice_add_mul_limb_same_length_in_place_right(
 
 fn benchmark_limbs_vec_add_mul_limb_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_add_mul_limb_in_place_left(&mut Vec<Limb>, &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -387,14 +364,14 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_left(
 
 fn benchmark_limbs_vec_add_mul_limb_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_add_mul_limb_in_place_left(&mut Vec<Limb>, &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -407,14 +384,14 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_right(
 
 fn benchmark_limbs_vec_add_mul_limb_in_place_either(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_add_mul_limb_in_place_either(&mut Vec<Limb>, &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -425,11 +402,11 @@ fn benchmark_limbs_vec_add_mul_limb_in_place_either(
     );
 }
 
-fn benchmark_limbs_add_mul(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_add_mul(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_add_mul(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_41().get(gm, &config),
+        unsigned_vec_triple_gen_var_41().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -442,14 +419,14 @@ fn benchmark_limbs_add_mul(gm: GenMode, config: GenConfig, limit: usize, file_na
 
 fn benchmark_limbs_add_mul_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_add_mul_in_place_left(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_41().get(gm, &config),
+        unsigned_vec_triple_gen_var_41().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -462,14 +439,14 @@ fn benchmark_limbs_add_mul_in_place_left(
 
 fn benchmark_natural_add_mul_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul_assign(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -497,14 +474,14 @@ fn benchmark_natural_add_mul_assign_evaluation_strategy(
 
 fn benchmark_natural_add_mul_assign_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul_assign(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -523,14 +500,14 @@ fn benchmark_natural_add_mul_assign_algorithms(
 
 fn benchmark_natural_add_mul_assign_val_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul_assign(Natural, &Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -549,14 +526,14 @@ fn benchmark_natural_add_mul_assign_val_ref_algorithms(
 
 fn benchmark_natural_add_mul_assign_ref_val_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul_assign(&Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -575,14 +552,14 @@ fn benchmark_natural_add_mul_assign_ref_val_algorithms(
 
 fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul_assign(&Natural, &Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -601,14 +578,14 @@ fn benchmark_natural_add_mul_assign_ref_ref_algorithms(
 
 fn benchmark_natural_add_mul_evaluation_stategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -637,14 +614,14 @@ fn benchmark_natural_add_mul_evaluation_stategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_add_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -663,14 +640,14 @@ fn benchmark_natural_add_mul_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_add_mul_val_val_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul(Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -689,14 +666,14 @@ fn benchmark_natural_add_mul_val_val_ref_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_add_mul_val_ref_val_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul(&Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -715,14 +692,14 @@ fn benchmark_natural_add_mul_val_ref_val_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_add_mul_val_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.add_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -741,14 +718,14 @@ fn benchmark_natural_add_mul_val_ref_ref_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_add_mul_ref_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Natural).add_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

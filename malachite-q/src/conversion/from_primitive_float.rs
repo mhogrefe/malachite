@@ -1,6 +1,6 @@
 use crate::Rational;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, IntegerMantissaAndExponent};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct RationalFromPrimitiveFloatError;
@@ -38,6 +38,20 @@ macro_rules! float_impls {
                     let x = Rational::from(mantissa) << exponent;
                     Ok(if value > 0.0 { x } else { -x })
                 }
+            }
+        }
+
+        impl ConvertibleFrom<$f> for Rational {
+            /// Determines whether a primitive float can be converted to a [`Rational`]. (It can if
+            /// it is finite.)
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::from_primitive_float#convertible_from).
+            fn convertible_from(x: $f) -> bool {
+                x.is_finite()
             }
         }
     };

@@ -120,7 +120,8 @@ pub(crate) fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Opt
         let mid: T = low
             .checked_add(high)
             .unwrap()
-            .shr_round(1, RoundingMode::Ceiling);
+            .shr_round(1, RoundingMode::Ceiling)
+            .0;
         match f(mid).map(|mid| mid.cmp(&x)) {
             Some(Ordering::Equal) => return mid,
             Some(Ordering::Less) => low = mid,
@@ -133,7 +134,7 @@ pub_test! {floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     if x < T::TWO {
         x
     } else {
-        let p = T::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling));
+        let p = T::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling).0);
         floor_inverse_checked_binary(T::checked_square, x, p >> 1, p)
     }
 }}
@@ -416,7 +417,8 @@ fn floor_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor);
+        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .0;
     sqrt_rem_newton::<U, S>(x << shift).0 >> (shift >> 1)
 }
 
@@ -431,7 +433,8 @@ fn ceiling_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor);
+        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .0;
     let (mut sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     sqrt >>= shift >> 1;
     if rem != U::ZERO {
@@ -451,7 +454,8 @@ fn checked_sqrt_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor);
+        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .0;
     let (sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     if rem == U::ZERO {
         Some(sqrt >> (shift >> 1))
@@ -471,7 +475,8 @@ fn sqrt_rem_newton_helper<
     }
     let shift = x
         .leading_zeros()
-        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor);
+        .round_to_multiple_of_power_of_2(1, RoundingMode::Floor)
+        .0;
     let (mut sqrt, rem) = sqrt_rem_newton::<U, S>(x << shift);
     if shift == 0 {
         (sqrt, rem)

@@ -114,7 +114,8 @@ macro_rules! impl_partial_ord_larger_than_limb {
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 let limb_count = other
                     .significant_bits()
-                    .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
+                    .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+                    .0;
                 let limb_count_cmp = self.limb_count().cmp(&limb_count);
                 if limb_count_cmp != Ordering::Equal || limb_count == 0 {
                     return Some(limb_count_cmp);

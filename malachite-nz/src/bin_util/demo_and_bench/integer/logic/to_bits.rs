@@ -33,62 +33,61 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_to_bits_desc_algorithms);
 }
 
-fn demo_bits_to_twos_complement_bits_non_negative(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut bits in bool_vec_gen().get(gm, &config).take(limit) {
+fn demo_bits_to_twos_complement_bits_non_negative(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut bits in bool_vec_gen().get(gm, config).take(limit) {
         let old_bits = bits.clone();
         bits_to_twos_complement_bits_non_negative(&mut bits);
         println!(
-            "bits := {:?}; bits_to_twos_complement_bits_non_negative(&mut bits); bits = {:?}",
-            old_bits, bits
+            "bits := {old_bits:?}; \
+            bits_to_twos_complement_bits_non_negative(&mut bits); bits = {bits:?}",
         );
     }
 }
 
-fn demo_bits_slice_to_twos_complement_bits_negative(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut bits in bool_vec_gen().get(gm, &config).take(limit) {
+fn demo_bits_slice_to_twos_complement_bits_negative(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut bits in bool_vec_gen().get(gm, config).take(limit) {
         let old_bits = bits.clone();
         let carry = bits_slice_to_twos_complement_bits_negative(&mut bits);
         println!(
-            "bits := {:?}; bits_slice_to_twos_complement_bits_negative(&mut bits) = {}; \
-             bits = {:?}",
-            old_bits, carry, bits
+            "bits := {old_bits:?}; \
+            bits_slice_to_twos_complement_bits_negative(&mut bits) = {carry}; bits = {bits:?}",
         );
     }
 }
 
-fn demo_bits_vec_to_twos_complement_bits_negative(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut bits in bool_vec_gen_var_5().get(gm, &config).take(limit) {
+fn demo_bits_vec_to_twos_complement_bits_negative(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut bits in bool_vec_gen_var_5().get(gm, config).take(limit) {
         let old_bits = bits.clone();
         bits_vec_to_twos_complement_bits_negative(&mut bits);
         println!(
-            "bits := {:?}; bits_vec_to_twos_complement_bits_negative(&mut bits); bits = {:?}",
-            old_bits, bits
+            "bits := {old_bits:?}; \
+            bits_vec_to_twos_complement_bits_negative(&mut bits); bits = {bits:?}",
         );
     }
 }
 
-fn demo_integer_to_bits_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_to_bits_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("to_bits_asc({}) = {:?}", n, n.to_bits_asc());
     }
 }
 
-fn demo_integer_to_bits_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_to_bits_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("to_bits_desc({}) = {:?}", n, n.to_bits_desc());
     }
 }
 
 fn benchmark_bits_to_twos_complement_bits_non_negative(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "bits_to_twos_complement_bits_non_negative(&mut [bool])",
         BenchmarkType::Single,
-        bool_vec_gen().get(gm, &config),
+        bool_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -101,14 +100,14 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
 
 fn benchmark_bits_slice_to_twos_complement_bits_negative(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "bits_slice_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
-        bool_vec_gen().get(gm, &config),
+        bool_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -121,14 +120,14 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
 
 fn benchmark_bits_vec_to_twos_complement_bits_negative(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "bits_vec_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
-        bool_vec_gen_var_5().get(gm, &config),
+        bool_vec_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -141,14 +140,14 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
 
 fn benchmark_integer_to_bits_asc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -164,14 +163,14 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
 
 fn benchmark_integer_to_bits_asc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_bits_asc()",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -186,14 +185,14 @@ fn benchmark_integer_to_bits_asc_algorithms(
 
 fn benchmark_integer_to_bits_desc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -209,14 +208,14 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
 
 fn benchmark_integer_to_bits_desc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.to_bits_desc()",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

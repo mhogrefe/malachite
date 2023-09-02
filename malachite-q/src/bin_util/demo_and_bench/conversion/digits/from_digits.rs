@@ -13,8 +13,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_from_digits_evaluation_strategy);
 }
 
-fn demo_rational_from_digits(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, before_point, after_point) in large_type_gen_var_25().get(gm, &config).take(limit) {
+fn demo_rational_from_digits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, before_point, after_point) in large_type_gen_var_25().get(gm, config).take(limit) {
         println!(
             "from_digits({}, {:?}, {}) = {}",
             base,
@@ -25,8 +25,8 @@ fn demo_rational_from_digits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_from_digits_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, before_point, after_point) in large_type_gen_var_25().get(gm, &config).take(limit) {
+fn demo_rational_from_digits_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, before_point, after_point) in large_type_gen_var_25().get(gm, config).take(limit) {
         println!(
             "from_digits_ref({}, {:?}, {:?}) = {}",
             base,
@@ -37,8 +37,8 @@ fn demo_rational_from_digits_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_from_digits_decimal(gm: GenMode, config: GenConfig, limit: usize) {
-    for (before_point, after_point) in large_type_gen_var_26().get(gm, &config).take(limit) {
+fn demo_rational_from_digits_decimal(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (before_point, after_point) in large_type_gen_var_26().get(gm, config).take(limit) {
         println!(
             "from_digits(1, {:?}, {}) = {}",
             before_point.clone(),
@@ -50,14 +50,14 @@ fn demo_rational_from_digits_decimal(gm: GenMode, config: GenConfig, limit: usiz
 
 fn benchmark_rational_from_digits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_digits(Natural, &[Natural], &RationalSequence<Natural>)",
         BenchmarkType::EvaluationStrategy,
-        large_type_gen_var_25().get(gm, &config),
+        large_type_gen_var_25().get(gm, config),
         gm.name(),
         limit,
         file_name,

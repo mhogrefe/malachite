@@ -36,58 +36,58 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sum_evaluation_strategy);
 }
 
-fn demo_rational_add(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} + {} = {}", x_old, y_old, x + y);
     }
 }
 
-fn demo_rational_add_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} + &{} = {}", x_old, y, x + &y);
     }
 }
 
-fn demo_rational_add_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("&{} + {} = {}", x, y_old, &x + y);
     }
 }
 
-fn demo_rational_add_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         println!("&{} + &{} = {}", x, y, &x + &y);
     }
 }
 
-fn demo_rational_add_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x += y.clone();
-        println!("x := {}; x += {}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x += {y}; x = {x}");
     }
 }
 
-fn demo_rational_add_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_add_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x += &y;
-        println!("x := {}; x += &{}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x += &{y}; x = {x}");
     }
 }
 
-fn demo_rational_sum(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+fn demo_rational_sum(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, config).take(limit) {
         println!("sum({:?}) = {}", xs.clone(), Rational::sum(xs.into_iter()));
     }
 }
 
-fn demo_rational_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+fn demo_rational_ref_sum(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, config).take(limit) {
         println!("sum({:?}) = {}", xs, Rational::sum(xs.iter()));
     }
 }
@@ -95,14 +95,14 @@ fn demo_rational_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_add_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational + Rational",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_nrm().get(gm, &config),
+        rational_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -118,14 +118,14 @@ fn benchmark_rational_add_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_add_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational + Rational",
         BenchmarkType::EvaluationStrategy,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -142,14 +142,14 @@ fn benchmark_rational_add_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_add_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational + Rational",
         BenchmarkType::Algorithms,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -163,14 +163,14 @@ fn benchmark_rational_add_algorithms(
 
 fn benchmark_rational_add_assign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational += Rational",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_rm().get(gm, &config),
+        rational_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -181,14 +181,14 @@ fn benchmark_rational_add_assign_library_comparison(
 
 fn benchmark_rational_add_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational += Rational",
         BenchmarkType::EvaluationStrategy,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -202,14 +202,14 @@ fn benchmark_rational_add_assign_evaluation_strategy(
 
 fn benchmark_rational_sum_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::sum(Iterator<Item=Rational>)",
         BenchmarkType::LibraryComparison,
-        rational_vec_gen_nrm().get(gm, &config),
+        rational_vec_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -230,14 +230,14 @@ fn benchmark_rational_sum_library_comparison(
 
 fn benchmark_rational_sum_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::sum(Iterator<Item=Rational>)",
         BenchmarkType::Algorithms,
-        rational_vec_gen().get(gm, &config),
+        rational_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -253,14 +253,14 @@ fn benchmark_rational_sum_algorithms(
 
 fn benchmark_rational_sum_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::sum(Iterator<Item=Rational>)",
         BenchmarkType::EvaluationStrategy,
-        rational_vec_gen().get(gm, &config),
+        rational_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

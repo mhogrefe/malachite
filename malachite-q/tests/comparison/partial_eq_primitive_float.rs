@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_nz::natural::Natural;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use malachite_q::Rational;
 use rug;
@@ -8,7 +8,7 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 #[test]
-fn test_partial_eq() {
+fn test_partial_eq_primitive_float() {
     let test = |u, v: f32, out| {
         assert_eq!(Rational::from_str(u).unwrap() == v, out);
         assert_eq!(rug::Rational::from_str(u).unwrap() == v, out);
@@ -24,10 +24,10 @@ fn test_partial_eq() {
         assert_eq!(v == rug::Rational::from_str(u).unwrap(), out);
     };
     test("2/3", f32::NAN, false);
-    test("2/3", f32::POSITIVE_INFINITY, false);
+    test("2/3", f32::INFINITY, false);
     test("2/3", f32::NEGATIVE_INFINITY, false);
     test("-2/3", f32::NAN, false);
-    test("-2/3", f32::POSITIVE_INFINITY, false);
+    test("-2/3", f32::INFINITY, false);
     test("-2/3", f32::NEGATIVE_INFINITY, false);
 
     test("0", 0.0, true);
@@ -44,11 +44,10 @@ fn test_partial_eq() {
 
 #[allow(clippy::cmp_owned, clippy::trait_duplication_in_bounds)]
 fn partial_eq_primitive_float_properties_helper<
-    T: PartialEq<Rational> + PartialEq<Natural> + PartialEq<rug::Rational> + PrimitiveFloat,
+    T: PartialEq<Rational> + PartialEq<rug::Rational> + PrimitiveFloat,
 >()
 where
     Rational: TryFrom<T> + PartialEq<T> + PartialOrd<T>,
-    Natural: PartialEq<T>,
     rug::Rational: PartialEq<T>,
 {
     rational_primitive_float_pair_gen::<T>().test_properties(|(n, f)| {

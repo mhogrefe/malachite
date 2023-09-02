@@ -49,8 +49,8 @@ pub fn test_to_string() {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_string(), u);
         assert_eq!(x.to_debug_string(), u);
-        assert_eq!(format!("{:00}", x), u);
-        assert_eq!(format!("{:00?}", x), u);
+        assert_eq!(format!("{x:00}"), u);
+        assert_eq!(format!("{x:00?}"), u);
     }
     test("0");
     test("2");
@@ -67,8 +67,8 @@ pub fn test_to_string() {
     fn test_width(u: &str, width: usize, out: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_string();
-        assert_eq!(format!("{:0width$}", x, width = width), out);
-        assert_eq!(format!("{:0width$?}", x, width = width), out);
+        assert_eq!(format!("{x:0width$}"), out);
+        assert_eq!(format!("{x:0width$?}"), out);
         test_padding(&s, out, width);
     }
     test_width("0", 0, "0");
@@ -126,9 +126,9 @@ fn to_string_properties() {
 
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         let s = x.to_string();
-        let s_padded = format!("{:0width$}", x, width = width);
+        let s_padded = format!("{x:0width$}");
         test_padding(&s, &s_padded, width);
-        assert_eq!(format!("{:0width$?}", x, width = width), s_padded);
+        assert_eq!(format!("{x:0width$?}"), s_padded);
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(&x, 10), width = width),
             s_padded
@@ -154,7 +154,7 @@ fn to_string_properties() {
     signed_unsigned_pair_gen_var_5::<SignedLimb, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$}", Integer::from(x), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
     });
 }
@@ -164,8 +164,8 @@ pub fn test_to_binary_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_binary_string(), out);
-        assert_eq!(format!("{:00b}", x), out);
-        assert_eq!(format!("{:#b}", x), out_prefixed);
+        assert_eq!(format!("{x:00b}"), out);
+        assert_eq!(format!("{x:#b}"), out_prefixed);
     }
     test("0", "0", "0b0");
     test("2", "10", "0b10");
@@ -194,8 +194,8 @@ pub fn test_to_binary_string() {
     fn test_width(u: &str, width: usize, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_binary_string();
-        assert_eq!(format!("{:0width$b}", x, width = width), out);
-        assert_eq!(format!("{:#0width$b}", x, width = width), out_prefixed);
+        assert_eq!(format!("{x:0width$b}"), out);
+        assert_eq!(format!("{x:#0width$b}"), out_prefixed);
         test_padding(&s, out, width);
     }
     test_width("0", 0, "0", "0b0");
@@ -271,16 +271,16 @@ fn to_binary_string_properties() {
         } else {
             "0b".to_owned() + &s
         };
-        assert_eq!(format!("{:#b}", x), prefixed_s);
-        assert_eq!(format!("{:00b}", x), s);
-        assert_eq!(format!("{:#00b}", x), prefixed_s);
+        assert_eq!(format!("{x:#b}"), prefixed_s);
+        assert_eq!(format!("{x:00b}"), s);
+        assert_eq!(format!("{x:#00b}"), prefixed_s);
         assert_eq!(x.to_string_base(2), s);
         let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_binary_string(), s);
-        assert_eq!(format!("{:#b}", num_x), prefixed_s);
+        assert_eq!(format!("{num_x:#b}"), prefixed_s);
         let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_binary_string(), s);
-        assert_eq!(format!("{:#b}", rug_x), prefixed_s);
+        assert_eq!(format!("{rug_x:#b}"), prefixed_s);
         assert!(string_is_subset(&s, "-01"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -289,7 +289,7 @@ fn to_binary_string_properties() {
 
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         let s = x.to_binary_string();
-        let s_padded = format!("{:0width$b}", x, width = width);
+        let s_padded = format!("{x:0width$b}");
         test_padding(&s, &s_padded, width);
         assert_eq!(
             format!("{:0width$b}", BigInt::from(&x), width = width),
@@ -300,7 +300,7 @@ fn to_binary_string_properties() {
             s_padded
         );
 
-        let s_padded = format!("{:#0width$b}", x, width = width);
+        let s_padded = format!("{x:#0width$b}");
         assert_eq!(
             format!("{:#0width$b}", BigInt::from(&x), width = width),
             s_padded
@@ -313,17 +313,17 @@ fn to_binary_string_properties() {
 
     signed_gen_var_2::<SignedLimb>().test_properties(|x| {
         assert_eq!(Integer::from(x).to_binary_string(), x.to_binary_string());
-        assert_eq!(format!("{:#b}", Integer::from(x)), format!("{:#b}", x));
+        assert_eq!(format!("{:#b}", Integer::from(x)), format!("{x:#b}"));
     });
 
     signed_unsigned_pair_gen_var_7::<SignedLimb, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$b}", Integer::from(x), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:#0width$b}", Integer::from(x), width = width),
-            format!("{:#0width$b}", x, width = width)
+            format!("{x:#0width$b}")
         );
     });
 }
@@ -333,8 +333,8 @@ pub fn test_to_octal_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_octal_string(), out);
-        assert_eq!(format!("{:00o}", x), out);
-        assert_eq!(format!("{:#o}", x), out_prefixed);
+        assert_eq!(format!("{x:00o}"), out);
+        assert_eq!(format!("{x:#o}"), out_prefixed);
     }
     test("0", "0", "0o0");
     test("2", "2", "0o2");
@@ -359,8 +359,8 @@ pub fn test_to_octal_string() {
     fn test_width(u: &str, width: usize, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_octal_string();
-        assert_eq!(format!("{:0width$o}", x, width = width), out);
-        assert_eq!(format!("{:#0width$o}", x, width = width), out_prefixed);
+        assert_eq!(format!("{x:0width$o}"), out);
+        assert_eq!(format!("{x:#0width$o}"), out_prefixed);
         test_padding(&s, out, width);
     }
     test_width("0", 0, "0", "0o0");
@@ -438,16 +438,16 @@ fn to_octal_string_properties() {
         } else {
             "0o".to_owned() + &s
         };
-        assert_eq!(format!("{:#o}", x), prefixed_s);
-        assert_eq!(format!("{:00o}", x), s);
-        assert_eq!(format!("{:#00o}", x), prefixed_s);
+        assert_eq!(format!("{x:#o}"), prefixed_s);
+        assert_eq!(format!("{x:00o}"), s);
+        assert_eq!(format!("{x:#00o}"), prefixed_s);
         assert_eq!(x.to_string_base(8), s);
         let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_octal_string(), s);
-        assert_eq!(format!("{:#o}", num_x), prefixed_s);
+        assert_eq!(format!("{num_x:#o}"), prefixed_s);
         let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_octal_string(), s);
-        assert_eq!(format!("{:#o}", rug_x), prefixed_s);
+        assert_eq!(format!("{rug_x:#o}"), prefixed_s);
         assert!(string_is_subset(&s, "-01234567"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -456,7 +456,7 @@ fn to_octal_string_properties() {
 
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         let s = x.to_octal_string();
-        let s_padded = format!("{:0width$o}", x, width = width);
+        let s_padded = format!("{x:0width$o}");
         test_padding(&s, &s_padded, width);
         assert_eq!(
             format!("{:0width$o}", BigInt::from(&x), width = width),
@@ -467,7 +467,7 @@ fn to_octal_string_properties() {
             s_padded
         );
 
-        let s_padded = format!("{:#0width$o}", x, width = width);
+        let s_padded = format!("{x:#0width$o}");
         assert_eq!(
             format!("{:#0width$o}", BigInt::from(&x), width = width),
             s_padded
@@ -480,17 +480,17 @@ fn to_octal_string_properties() {
 
     signed_gen_var_2::<SignedLimb>().test_properties(|x| {
         assert_eq!(Integer::from(x).to_octal_string(), x.to_octal_string());
-        assert_eq!(format!("{:#o}", Integer::from(x)), format!("{:#o}", x));
+        assert_eq!(format!("{:#o}", Integer::from(x)), format!("{x:#o}"));
     });
 
     signed_unsigned_pair_gen_var_7::<SignedLimb, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$o}", Integer::from(x), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:#0width$o}", Integer::from(x), width = width),
-            format!("{:#0width$o}", x, width = width)
+            format!("{x:#0width$o}")
         );
     });
 }
@@ -500,8 +500,8 @@ pub fn test_to_lower_hex_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_lower_hex_string(), out);
-        assert_eq!(format!("{:00x}", x), out);
-        assert_eq!(format!("{:#x}", x), out_prefixed);
+        assert_eq!(format!("{x:00x}"), out);
+        assert_eq!(format!("{x:#x}"), out_prefixed);
     }
     test("0", "0", "0x0");
     test("2", "2", "0x2");
@@ -518,8 +518,8 @@ pub fn test_to_lower_hex_string() {
     fn test_width(u: &str, width: usize, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_lower_hex_string();
-        assert_eq!(format!("{:0width$x}", x, width = width), out);
-        assert_eq!(format!("{:#0width$x}", x, width = width), out_prefixed);
+        assert_eq!(format!("{x:0width$x}"), out);
+        assert_eq!(format!("{x:#0width$x}"), out_prefixed);
         test_padding(&s, out, width);
     }
     test_width("0", 0, "0", "0x0");
@@ -568,8 +568,8 @@ pub fn test_to_upper_hex_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_upper_hex_string(), out);
-        assert_eq!(format!("{:00X}", x), out);
-        assert_eq!(format!("{:#X}", x), out_prefixed);
+        assert_eq!(format!("{x:00X}"), out);
+        assert_eq!(format!("{x:#X}"), out_prefixed);
     }
     test("0", "0", "0x0");
     test("2", "2", "0x2");
@@ -586,8 +586,8 @@ pub fn test_to_upper_hex_string() {
     fn test_width(u: &str, width: usize, out: &str, out_prefixed: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_upper_hex_string();
-        assert_eq!(format!("{:0width$X}", x, width = width), out);
-        assert_eq!(format!("{:#0width$X}", x, width = width), out_prefixed);
+        assert_eq!(format!("{x:0width$X}"), out);
+        assert_eq!(format!("{x:#0width$X}"), out_prefixed);
         test_padding(&s, out, width);
     }
     test_width("0", 0, "0", "0x0");
@@ -640,21 +640,21 @@ fn to_hex_string_properties() {
         } else {
             "0x".to_owned() + &s
         };
-        assert_eq!(format!("{:#x}", x), prefixed_s);
+        assert_eq!(format!("{x:#x}"), prefixed_s);
         assert_eq!(x.to_upper_hex_string(), s.to_ascii_uppercase());
         assert_eq!(
-            format!("{:#X}", x),
+            format!("{x:#X}"),
             if x < 0 {
                 "-0x".to_owned() + &s[1..].to_ascii_uppercase()
             } else {
                 "0x".to_owned() + &s.to_ascii_uppercase()
             }
         );
-        assert_eq!(format!("{:00x}", x), s);
-        assert_eq!(format!("{:#00x}", x), prefixed_s);
-        assert_eq!(format!("{:00X}", x), s.to_ascii_uppercase());
+        assert_eq!(format!("{x:00x}"), s);
+        assert_eq!(format!("{x:#00x}"), prefixed_s);
+        assert_eq!(format!("{x:00X}"), s.to_ascii_uppercase());
         assert_eq!(
-            format!("{:#00X}", x),
+            format!("{x:#00X}"),
             if x < 0 {
                 "-0x".to_owned() + &s[1..].to_ascii_uppercase()
             } else {
@@ -664,10 +664,10 @@ fn to_hex_string_properties() {
         assert_eq!(x.to_string_base(16), s);
         let num_x = BigInt::from(&x);
         assert_eq!(num_x.to_lower_hex_string(), s);
-        assert_eq!(format!("{:#x}", num_x), prefixed_s);
+        assert_eq!(format!("{num_x:#x}"), prefixed_s);
         let rug_x = rug::Integer::from(&x);
         assert_eq!(rug_x.to_lower_hex_string(), s);
-        assert_eq!(format!("{:#x}", rug_x), prefixed_s);
+        assert_eq!(format!("{rug_x:#x}"), prefixed_s);
         assert!(string_is_subset(&s, "-0123456789abcdef"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -676,7 +676,7 @@ fn to_hex_string_properties() {
 
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         let s = x.to_lower_hex_string();
-        let s_padded = format!("{:0width$x}", x, width = width);
+        let s_padded = format!("{x:0width$x}");
         test_padding(&s, &s_padded, width);
         assert_eq!(
             format!("{:0width$x}", BigInt::from(&x), width = width),
@@ -687,7 +687,7 @@ fn to_hex_string_properties() {
             s_padded
         );
 
-        let s_padded = format!("{:#0width$x}", x, width = width);
+        let s_padded = format!("{x:#0width$x}");
         assert_eq!(
             format!("{:#0width$x}", BigInt::from(&x), width = width),
             s_padded
@@ -698,11 +698,8 @@ fn to_hex_string_properties() {
         );
 
         let s = x.to_upper_hex_string();
-        let s_padded_upper = format!("{:0width$X}", x, width = width);
-        assert_eq!(
-            s_padded_upper,
-            format!("{:0width$x}", x, width = width).to_ascii_uppercase()
-        );
+        let s_padded_upper = format!("{x:0width$X}");
+        assert_eq!(s_padded_upper, format!("{x:0width$x}").to_ascii_uppercase());
         let s_padded = s_padded_upper;
         test_padding(&s, &s_padded, width);
         assert_eq!(
@@ -714,7 +711,7 @@ fn to_hex_string_properties() {
             s_padded
         );
 
-        let s_padded = format!("{:#0width$X}", x, width = width);
+        let s_padded = format!("{x:#0width$X}");
         assert_eq!(
             format!("{:#0width$X}", BigInt::from(&x), width = width),
             s_padded
@@ -734,26 +731,26 @@ fn to_hex_string_properties() {
             Integer::from(x).to_upper_hex_string(),
             x.to_upper_hex_string()
         );
-        assert_eq!(format!("{:#x}", Integer::from(x)), format!("{:#x}", x));
-        assert_eq!(format!("{:#X}", Integer::from(x)), format!("{:#X}", x));
+        assert_eq!(format!("{:#x}", Integer::from(x)), format!("{x:#x}"));
+        assert_eq!(format!("{:#X}", Integer::from(x)), format!("{x:#X}"));
     });
 
     signed_unsigned_pair_gen_var_7::<SignedLimb, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$x}", Integer::from(x), width = width),
-            format!("{:0width$x}", x, width = width)
+            format!("{x:0width$x}")
         );
         assert_eq!(
             format!("{:0width$X}", Integer::from(x), width = width),
-            format!("{:0width$X}", x, width = width)
+            format!("{x:0width$X}")
         );
         assert_eq!(
             format!("{:#0width$x}", Integer::from(x), width = width),
-            format!("{:#0width$x}", x, width = width)
+            format!("{x:#0width$x}")
         );
         assert_eq!(
             format!("{:#0width$X}", Integer::from(x), width = width),
-            format!("{:#0width$X}", x, width = width)
+            format!("{x:#0width$X}")
         );
     });
 }
@@ -915,8 +912,8 @@ fn to_string_base_properties() {
     integer_unsigned_unsigned_triple_gen_var_1().test_properties(|(x, base, width)| {
         let fx = BaseFmtWrapper::new(&x, base);
         let s = x.to_string_base(base);
-        let s_padded = format!("{:0width$}", fx, width = width);
-        assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
+        let s_padded = format!("{fx:0width$}");
+        assert_eq!(format!("{fx:0width$?}"), s_padded);
         assert_eq!(Integer::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
@@ -928,19 +925,19 @@ fn to_string_base_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(&x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(&x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(&x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(&x, 16), width = width),
-            format!("{:0width$x}", x, width = width)
+            format!("{x:0width$x}")
         );
     });
 
@@ -1130,8 +1127,8 @@ fn to_string_base_upper_properties() {
     integer_unsigned_unsigned_triple_gen_var_1().test_properties(|(x, base, width)| {
         let fx = BaseFmtWrapper::new(&x, base);
         let s = x.to_string_base_upper(base);
-        let s_padded = format!("{:#0width$}", fx, width = width);
-        assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
+        let s_padded = format!("{fx:#0width$}");
+        assert_eq!(format!("{fx:#0width$?}"), s_padded);
         assert_eq!(Integer::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
@@ -1143,19 +1140,19 @@ fn to_string_base_upper_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(&x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(&x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(&x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(&x, 16), width = width),
-            format!("{:0width$X}", x, width = width)
+            format!("{x:0width$X}")
         );
     });
 

@@ -24,37 +24,31 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_natural_sci_mantissa_and_exponent);
     register_primitive_float_demos!(runner, demo_natural_sci_mantissa);
     register_primitive_float_demos!(runner, demo_natural_sci_exponent);
-    register_primitive_float_demos!(runner, demo_natural_sci_mantissa_and_exponent_with_rounding);
+    register_primitive_float_demos!(runner, demo_natural_sci_mantissa_and_exponent_round);
     register_primitive_float_demos!(runner, demo_natural_from_sci_mantissa_and_exponent);
     register_primitive_float_demos!(runner, demo_natural_from_sci_mantissa_and_exponent_targeted);
+    register_primitive_float_demos!(runner, demo_natural_from_sci_mantissa_and_exponent_round);
     register_primitive_float_demos!(
         runner,
-        demo_natural_from_sci_mantissa_and_exponent_with_rounding
-    );
-    register_primitive_float_demos!(
-        runner,
-        demo_natural_from_sci_mantissa_and_exponent_with_rounding_targeted
+        demo_natural_from_sci_mantissa_and_exponent_round_targeted
     );
     register_primitive_float_benches!(runner, benchmark_natural_sci_mantissa_and_exponent);
-    register_primitive_float_benches!(
-        runner,
-        benchmark_natural_sci_mantissa_and_exponent_with_rounding
-    );
+    register_primitive_float_benches!(runner, benchmark_natural_sci_mantissa_and_exponent_round);
     register_primitive_float_benches!(runner, benchmark_natural_from_sci_mantissa_and_exponent);
     register_primitive_float_benches!(
         runner,
-        benchmark_natural_from_sci_mantissa_and_exponent_with_rounding
+        benchmark_natural_from_sci_mantissa_and_exponent_round
     );
 }
 
 fn demo_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         let (mantissa, exponent) = n.sci_mantissa_and_exponent();
         println!(
             "sci_mantissa_and_exponent({}) = {:?}",
@@ -64,52 +58,52 @@ fn demo_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     }
 }
 
-fn demo_natural_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("sci_mantissa({}) = {}", n, NiceFloat(n.sci_mantissa()));
     }
 }
 
-fn demo_natural_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("sci_exponent({}) = {}", n, n.sci_exponent());
     }
 }
 
-fn demo_natural_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn demo_natural_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, rm) in natural_rounding_mode_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "sci_mantissa_and_exponent_with_rounding({}, {}) = {:?}",
+            "sci_mantissa_and_exponent_round({}, {}) = {:?}",
             n,
             rm,
-            n.sci_mantissa_and_exponent_with_rounding::<T>(rm)
-                .map(|(m, e)| (NiceFloat(m), e))
+            n.sci_mantissa_and_exponent_round::<T>(rm)
+                .map(|(m, e, o)| (NiceFloat(m), e, o))
         );
     }
 }
 
 fn demo_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
     for (m, e) in primitive_float_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -123,13 +117,13 @@ fn demo_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
 
 fn demo_natural_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
     for (m, e) in primitive_float_unsigned_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -141,47 +135,47 @@ fn demo_natural_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
     }
 }
 
-fn demo_natural_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (m, e, rm) in primitive_float_unsigned_rounding_mode_triple_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "Natural::from_sci_mantissa_and_exponent_with_rounding({}, {}, {}) = {:?}",
+            "Natural::from_sci_mantissa_and_exponent_round({}, {}, {}) = {:?}",
             NiceFloat(m),
             e,
             rm,
-            Natural::from_sci_mantissa_and_exponent_with_rounding(m, e, rm)
+            Natural::from_sci_mantissa_and_exponent_round(m, e, rm)
         );
     }
 }
 
-fn demo_natural_from_sci_mantissa_and_exponent_with_rounding_targeted<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent_round_targeted<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (m, e, rm) in primitive_float_unsigned_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "Natural::from_sci_mantissa_and_exponent_with_rounding({}, {}, {}) = {:?}",
+            "Natural::from_sci_mantissa_and_exponent_round({}, {}, {}) = {:?}",
             NiceFloat(m),
             e,
             rm,
-            Natural::from_sci_mantissa_and_exponent_with_rounding(m, e, rm)
+            Natural::from_sci_mantissa_and_exponent_round(m, e, rm)
         );
     }
 }
 
 fn benchmark_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -190,7 +184,7 @@ fn benchmark_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     run_benchmark(
         "Natural.sci_mantissa_and_exponent()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -199,29 +193,29 @@ fn benchmark_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     );
 }
 
-fn benchmark_natural_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn benchmark_natural_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural.sci_mantissa_and_exponent_with_rounding(RoundingMode)",
+        "Natural.sci_mantissa_and_exponent_round(RoundingMode)",
         BenchmarkType::Single,
-        natural_rounding_mode_pair_gen_var_2().get(gm, &config),
+        natural_rounding_mode_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(n, rm)| {
-            no_out!(n.sci_mantissa_and_exponent_with_rounding::<T>(rm))
+            no_out!(n.sci_mantissa_and_exponent_round::<T>(rm))
         })],
     );
 }
 
 fn benchmark_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -230,7 +224,7 @@ fn benchmark_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Natural::from_sci_mantissa_and_exponent({}, u64)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -243,27 +237,25 @@ fn benchmark_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     );
 }
 
-fn benchmark_natural_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn benchmark_natural_from_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!(
-            "Natural::from_sci_mantissa_and_exponent_with_rounding({}, u64, RoundingMode)",
+            "Natural::from_sci_mantissa_and_exponent_round({}, u64, RoundingMode)",
             T::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_unsigned_rounding_mode_triple_gen_var_1::<T, u64>().get(gm, &config),
+        primitive_float_unsigned_rounding_mode_triple_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(m, e, rm)| {
-            no_out!(Natural::from_sci_mantissa_and_exponent_with_rounding(
-                m, e, rm
-            ))
+            no_out!(Natural::from_sci_mantissa_and_exponent_round(m, e, rm))
         })],
     );
 }

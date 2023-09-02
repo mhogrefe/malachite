@@ -8,6 +8,7 @@ use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use std::mem::swap;
 
@@ -296,9 +297,9 @@ pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Li
 impl Natural {
     fn add_mul_limb_ref_ref(&self, y: &Natural, z: Limb) -> Natural {
         match (self, y, z) {
-            (x, _, 0) | (x, natural_zero!(), _) => x.clone(),
+            (x, _, 0) | (x, &Natural::ZERO, _) => x.clone(),
             (x, y, 1) => x + y,
-            (x, natural_one!(), z) => x + Natural::from(z),
+            (x, &Natural::ONE, z) => x + Natural::from(z),
             (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
                 Natural(Large(limbs_add_mul_limb(xs, ys, z)))
             }
@@ -308,9 +309,9 @@ impl Natural {
 
     fn add_mul_assign_limb(&mut self, mut y: Natural, z: Limb) {
         match (&mut *self, &mut y, z) {
-            (_, _, 0) | (_, natural_zero!(), _) => {}
+            (_, _, 0) | (_, &mut Natural::ZERO, _) => {}
             (x, _, 1) => *x += y,
-            (x, natural_one!(), z) => *x += Natural::from(z),
+            (x, &mut Natural::ONE, z) => *x += Natural::from(z),
             (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
                 if limbs_vec_add_mul_limb_in_place_either(xs, ys, z) {
                     *self = y;
@@ -322,9 +323,9 @@ impl Natural {
 
     fn add_mul_assign_limb_ref(&mut self, y: &Natural, z: Limb) {
         match (&mut *self, y, z) {
-            (_, _, 0) | (_, natural_zero!(), _) => {}
+            (_, _, 0) | (_, &Natural::ZERO, _) => {}
             (x, y, 1) => *x += y,
-            (x, natural_one!(), z) => *x += Natural::from(z),
+            (x, &Natural::ONE, z) => *x += Natural::from(z),
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
                 limbs_vec_add_mul_limb_in_place_left(xs, ys, z);
             }

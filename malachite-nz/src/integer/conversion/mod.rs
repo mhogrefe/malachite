@@ -15,50 +15,94 @@ pub mod from_natural;
 /// ```
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!(Integer::rounding_from(0.0, RoundingMode::Exact), 0);
-/// assert_eq!(Integer::rounding_from(-0.0, RoundingMode::Exact), 0);
-/// assert_eq!(Integer::rounding_from(123.0, RoundingMode::Exact), 123);
-/// assert_eq!(Integer::rounding_from(1.0e9, RoundingMode::Exact), 1000000000);
-/// assert_eq!(Integer::rounding_from(1.0e9, RoundingMode::Exact), 1000000000);
-/// assert_eq!(Integer::rounding_from(4294967295.0, RoundingMode::Exact), 4294967295u32);
-/// assert_eq!(Integer::rounding_from(4294967296.0, RoundingMode::Exact), 4294967296u64);
+/// assert_eq!(Integer::rounding_from(0.0, RoundingMode::Exact).to_debug_string(), "(0, Equal)");
+/// assert_eq!(Integer::rounding_from(-0.0, RoundingMode::Exact).to_debug_string(), "(0, Equal)");
 /// assert_eq!(
-///     Integer::rounding_from(1.0e100, RoundingMode::Exact).to_string(),
-///     "10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469\
-///     985856815104"
+///     Integer::rounding_from(123.0, RoundingMode::Exact).to_debug_string(),
+///     "(123, Equal)"
 /// );
-/// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Floor), 123);
-/// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Ceiling), 124);
-/// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Nearest), 123);
-/// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Floor), 123);
-/// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Ceiling), 124);
-/// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Nearest), 124);
-/// assert_eq!(Integer::rounding_from(123.5, RoundingMode::Nearest), 124);
-/// assert_eq!(Integer::rounding_from(124.5, RoundingMode::Nearest), 124);
-/// assert_eq!(Integer::rounding_from(-0.99, RoundingMode::Ceiling), 0);
-/// assert_eq!(Integer::rounding_from(-0.499, RoundingMode::Nearest), 0);
-/// assert_eq!(Integer::rounding_from(-0.5, RoundingMode::Nearest), 0);
+/// assert_eq!(
+///     Integer::rounding_from(1.0e9, RoundingMode::Exact).to_debug_string(),
+///     "(1000000000, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(1.0e9, RoundingMode::Exact).to_debug_string(),
+///     "(1000000000, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(4294967295.0, RoundingMode::Exact).to_debug_string(),
+///     "(4294967295, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(4294967296.0, RoundingMode::Exact).to_debug_string(),
+///     "(4294967296, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(1.0e100, RoundingMode::Exact).to_debug_string(),
+///     "(1000000000000000015902891109759918046836080856394528138978132755774783877217038106081346\
+///     9985856815104, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.1, RoundingMode::Floor).to_debug_string(),
+///     "(123, Less)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.1, RoundingMode::Ceiling).to_debug_string(),
+///     "(124, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.1, RoundingMode::Nearest).to_debug_string(),
+///     "(123, Less)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.9, RoundingMode::Floor).to_debug_string(),
+///     "(123, Less)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.9, RoundingMode::Ceiling).to_debug_string(),
+///     "(124, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.9, RoundingMode::Nearest).to_debug_string(),
+///     "(124, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(123.5, RoundingMode::Nearest).to_debug_string(),
+///     "(124, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(124.5, RoundingMode::Nearest).to_debug_string(),
+///     "(124, Less)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(-0.99, RoundingMode::Ceiling).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(-0.499, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::rounding_from(-0.5, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
 /// ```
 ///
 /// # try_from
 /// ```
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!(
-///     Integer::try_from(f64::NAN).to_debug_string(),
-///     "Err(IntegerFromPrimitiveFloatError)"
-/// );
-/// assert_eq!(
-///     Integer::try_from(f64::POSITIVE_INFINITY).to_debug_string(),
-///     "Err(IntegerFromPrimitiveFloatError)"
-/// );
+/// assert_eq!(Integer::try_from(f64::NAN).to_debug_string(), "Err(FloatInfiniteOrNan)");
+/// assert_eq!(Integer::try_from(f64::INFINITY).to_debug_string(), "Err(FloatInfiniteOrNan)");
 /// assert_eq!(
 ///     Integer::try_from(f64::NEGATIVE_INFINITY).to_debug_string(),
-///     "Err(IntegerFromPrimitiveFloatError)"
+///     "Err(FloatInfiniteOrNan)"
 /// );
 /// assert_eq!(Integer::try_from(0.0).to_debug_string(), "Ok(0)");
 /// assert_eq!(Integer::try_from(-0.0).to_debug_string(), "Ok(0)");
@@ -72,22 +116,23 @@ pub mod from_natural;
 ///     "Ok(10000000000000000159028911097599180468360808563945281389781327557747838772170381060813\
 ///     469985856815104)"
 /// );
-/// assert_eq!(Integer::try_from(123.1).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
-/// assert_eq!(Integer::try_from(123.9).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
-/// assert_eq!(Integer::try_from(123.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
-/// assert_eq!(Integer::try_from(124.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
-/// assert_eq!(Integer::try_from(-0.499).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
-/// assert_eq!(Integer::try_from(-0.5).to_debug_string(), "Err(IntegerFromPrimitiveFloatError)");
+/// assert_eq!(Integer::try_from(123.1).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
+/// assert_eq!(Integer::try_from(123.9).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
+/// assert_eq!(Integer::try_from(123.5).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
+/// assert_eq!(Integer::try_from(124.5).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
+/// assert_eq!(Integer::try_from(-0.499).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
+/// assert_eq!(Integer::try_from(-0.5).to_debug_string(), "Err(FloatNonIntegerOrOutOfRange)");
 /// ```
 ///
 /// # convertible_from
 /// ```
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(Integer::convertible_from(f64::NAN), false);
-/// assert_eq!(Integer::convertible_from(f64::POSITIVE_INFINITY), false);
+/// assert_eq!(Integer::convertible_from(f64::INFINITY), false);
 /// assert_eq!(Integer::convertible_from(f64::NEGATIVE_INFINITY), false);
 /// assert_eq!(Integer::convertible_from(0.0), true);
 /// assert_eq!(Integer::convertible_from(-0.0), true);
@@ -147,34 +192,35 @@ pub mod natural_from_integer;
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::integer::Integer;
+/// use std::cmp::Ordering;
 /// use std::str::FromStr;
 ///
 /// assert_eq!(
 ///     f32::rounding_from(&Integer::from_str("123").unwrap(), RoundingMode::Exact),
-///     123.0
+///     (123.0, Ordering::Equal)
 /// );
 /// assert_eq!(
 ///     f32::rounding_from(&Integer::from_str("1000000001").unwrap(), RoundingMode::Floor),
-///     1.0e9
+///     (1.0e9, Ordering::Less)
 /// );
 /// assert_eq!(
 ///     f32::rounding_from(&Integer::from_str("1000000001").unwrap(), RoundingMode::Ceiling),
-///     1.00000006e9
+///     (1.00000006e9, Ordering::Greater)
 /// );
 /// assert_eq!(
 ///     f32::rounding_from(&Integer::from_str("-1000000001").unwrap(), RoundingMode::Floor),
-///     -1.00000006e9
+///     (-1.00000006e9, Ordering::Less)
 /// );
 /// assert_eq!(
 ///     f32::rounding_from(&Integer::from_str("-1000000001").unwrap(), RoundingMode::Ceiling),
-///     -1.0e9
+///     (-1.0e9, Ordering::Greater)
 /// );
 /// assert_eq!(
 ///     f32::rounding_from(
 ///         &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
 ///         RoundingMode::Nearest
 ///     ),
-///     3.4028235e38
+///     (3.4028235e38, Ordering::Less)
 /// );
 /// ```
 ///

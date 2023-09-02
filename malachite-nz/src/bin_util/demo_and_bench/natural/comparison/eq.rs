@@ -9,12 +9,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_eq_library_comparison);
 }
 
-fn demo_natural_eq(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_eq(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         if x == y {
-            println!("{} = {}", x, y);
+            println!("{x} = {y}");
         } else {
-            println!("{} ≠ {}", x, y);
+            println!("{x} ≠ {y}");
         }
     }
 }
@@ -22,14 +22,14 @@ fn demo_natural_eq(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_eq_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural == Natural",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_nrm().get(gm, &config),
+        natural_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

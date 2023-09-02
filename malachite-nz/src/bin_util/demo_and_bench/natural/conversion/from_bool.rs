@@ -7,8 +7,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_from_bool);
 }
 
-fn demo_natural_from_bool(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in bool_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_bool(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in bool_gen().get(gm, config).take(limit) {
         println!("Natural::from({}) = {}", b, Natural::from(b));
     }
 }

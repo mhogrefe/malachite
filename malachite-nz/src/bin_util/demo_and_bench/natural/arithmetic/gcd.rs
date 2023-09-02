@@ -65,9 +65,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_gcd_evaluation_strategy_2);
 }
 
-fn demo_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_gcd_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen_var_23()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -79,8 +79,8 @@ fn demo_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen_var_11().get(gm, &config).take(limit) {
+fn demo_half_gcd_matrix_init(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen_var_11().get(gm, config).take(limit) {
         let scratch_len = HalfGcdMatrix::min_init_scratch(n);
         println!(
             "HalfGcdMatrix::init({}, vec![0; {}]) = {:?}",
@@ -91,44 +91,40 @@ fn demo_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_half_gcd_matrix_update_q(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut m, qs, column) in large_type_gen_var_5().get(gm, &config).take(limit) {
+fn demo_half_gcd_matrix_update_q(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut m, qs, column) in large_type_gen_var_5().get(gm, config).take(limit) {
         let old_m = m.clone();
         let mut scratch = vec![0; OwnedHalfGcdMatrix::update_q_scratch_len(&m, qs.len())];
         m.update_q(&qs, column, &mut scratch);
-        println!(
-            "HalfGcdMatrix::update_q({:?}, {:?}, {}) = {:?}",
-            old_m, qs, column, m
-        );
+        println!("HalfGcdMatrix::update_q({old_m:?}, {qs:?}, {column}) = {m:?}");
     }
 }
 
-fn demo_half_gcd_matrix_mul_matrix_1(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut m, m_1) in large_type_gen_var_7().get(gm, &config).take(limit) {
+fn demo_half_gcd_matrix_mul_matrix_1(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut m, m_1) in large_type_gen_var_7().get(gm, config).take(limit) {
         let old_m = m.clone();
         let mut scratch = vec![0; m.n];
         m.mul_matrix_1(&m_1, &mut scratch);
-        println!("m := {:?}; m.mul_matrix_1({:?}); m = {:?}", old_m, m_1, m);
+        println!("m := {old_m:?}; m.mul_matrix_1({m_1:?}); m = {m:?}");
     }
 }
 
-fn demo_half_gcd_matrix_1_mul_vector(gm: GenMode, config: GenConfig, limit: usize) {
-    for (m, mut out, xs, mut ys) in large_type_gen_var_6().get(gm, &config).take(limit) {
+fn demo_half_gcd_matrix_1_mul_vector(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (m, mut out, xs, mut ys) in large_type_gen_var_6().get(gm, config).take(limit) {
         let old_out = out.clone();
         let old_ys = ys.clone();
         let out_len = limbs_half_gcd_matrix_1_mul_vector(&m, &mut out, &xs, &mut ys);
         println!(
-            "out := {:?}; ys := {:?}; \
-            limbs_half_gcd_matrix_1_mul_vector({:?}, &mut out, {:?}, &mut ys) = {}; \
-            out = {:?}; ys = {:?}",
-            old_out, old_ys, m, xs, out_len, out, ys
+            "out := {old_out:?}; ys := {old_ys:?}; \
+            limbs_half_gcd_matrix_1_mul_vector({m:?}, &mut out, {xs:?}, &mut ys) = {out_len}; \
+            out = {out:?}; ys = {ys:?}",
         );
     }
 }
 
-fn demo_limbs_matrix_2_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_matrix_2_2_mul(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs00, mut xs01, mut xs10, mut xs11, xs_len, ys00, ys01, ys10, ys11) in
-        large_type_gen_var_8().get(gm, &config).take(limit)
+        large_type_gen_var_8().get(gm, config).take(limit)
     {
         let xs00_old = xs00.clone();
         let xs01_old = xs01.clone();
@@ -162,8 +158,8 @@ fn demo_limbs_matrix_2_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_gcd_div(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n1, n0, d1, d0) in unsigned_quadruple_gen_var_11().get(gm, &config).take(limit) {
+fn demo_limbs_gcd_div(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n1, n0, d1, d0) in unsigned_quadruple_gen_var_11().get(gm, config).take(limit) {
         println!(
             "limbs_gcd_div({}, {}, {}, {}) = {:?}",
             n1,
@@ -175,77 +171,74 @@ fn demo_limbs_gcd_div(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_gcd_reduced(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_10().get(gm, &config).take(limit) {
+fn demo_limbs_gcd_reduced(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_10().get(gm, config).take(limit) {
         let xs_old = xs.clone();
         let ys_old = ys.clone();
         let mut out = vec![0; xs.len()];
         let out_len = limbs_gcd_reduced(&mut out, &mut xs, &mut ys);
         out.resize(out_len, 0);
-        println!(
-            "limbs_gcd_reduced(&mut out, {:?}, {:?}); out = {:?}",
-            xs_old, ys_old, out
-        );
+        println!("limbs_gcd_reduced(&mut out, {xs_old:?}, {ys_old:?}); out = {out:?}");
     }
 }
 
-fn demo_natural_gcd(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.gcd({}) = {}", x_old, y_old, x.gcd(y));
     }
 }
 
-fn demo_natural_gcd_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.gcd(&{}) = {}", x_old, y, x.gcd(&y));
     }
 }
 
-fn demo_natural_gcd_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).gcd({}) = {}", x, y_old, (&x).gcd(y));
     }
 }
 
-fn demo_natural_gcd_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         println!("(&{}).gcd(&{}) = {}", x, y, (&x).gcd(&y));
     }
 }
 
-fn demo_natural_gcd_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.gcd_assign(y.clone());
-        println!("x := {}; x.gcd_assign({}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.gcd_assign({y}); x = {x}");
     }
 }
 
-fn demo_natural_gcd_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_gcd_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.gcd_assign(&y);
-        println!("x := {}; x.gcd_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.gcd_assign(&{y}); x = {x}");
     }
 }
 
-fn demo_natural_gcd_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_natural_gcd_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen_var_4().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.gcd({}) = {}", x_old, y_old, x.gcd(y));
     }
 }
 
-fn benchmark_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_gcd_limb(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "HalfGcdMatrix::init(usize, Vec<Limb>)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_23().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_23().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -254,11 +247,11 @@ fn benchmark_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize, file_n
     );
 }
 
-fn benchmark_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_half_gcd_matrix_init(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_gcd_limb(&[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_gen_var_11().get(gm, &config),
+        unsigned_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -272,14 +265,14 @@ fn benchmark_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize, 
 
 fn benchmark_half_gcd_matrix_update_q(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "HalfGcdMatrix::update_q(&[Limb], u8, &mut [Limb])",
         BenchmarkType::Single,
-        large_type_gen_var_5().get(gm, &config),
+        large_type_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -293,14 +286,14 @@ fn benchmark_half_gcd_matrix_update_q(
 
 fn benchmark_half_gcd_matrix_mul_matrix_1(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "HalfGcdMatrix::mul_matrix_1(&HalfGcdMatrix1, &mut [Limb])",
         BenchmarkType::Single,
-        large_type_gen_var_7().get(gm, &config),
+        large_type_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -314,14 +307,14 @@ fn benchmark_half_gcd_matrix_mul_matrix_1(
 
 fn benchmark_half_gcd_matrix_1_mul_vector(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_half_gcd_matrix_1_mul_vector(&HalfGcdMatrix1, &mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Single,
-        large_type_gen_var_6().get(gm, &config),
+        large_type_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -336,14 +329,14 @@ fn benchmark_half_gcd_matrix_1_mul_vector(
 
 fn benchmark_limbs_matrix_2_2_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_matrix_2_2_mul",
         BenchmarkType::Algorithms,
-        large_type_gen_var_8().get(gm, &config),
+        large_type_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -433,14 +426,14 @@ fn benchmark_limbs_matrix_2_2_mul_algorithms(
 
 fn benchmark_limbs_gcd_div_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_gcd_div(Limb, Limb, Limb, Limb)",
         BenchmarkType::Algorithms,
-        unsigned_quadruple_gen_var_11().get(gm, &config),
+        unsigned_quadruple_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -459,11 +452,11 @@ fn benchmark_limbs_gcd_div_algorithms(
     );
 }
 
-fn benchmark_limbs_gcd_reduced(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_gcd_reduced(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_gcd_reduced(&mut [Limb], &mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_10().get(gm, &config),
+        unsigned_vec_pair_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -475,11 +468,16 @@ fn benchmark_limbs_gcd_reduced(gm: GenMode, config: GenConfig, limit: usize, fil
     );
 }
 
-fn benchmark_natural_gcd_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_gcd_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -495,14 +493,14 @@ fn benchmark_natural_gcd_algorithms(gm: GenMode, config: GenConfig, limit: usize
 #[allow(unused_must_use)]
 fn benchmark_natural_gcd_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_nrm().get(gm, &config),
+        natural_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -517,14 +515,14 @@ fn benchmark_natural_gcd_library_comparison(
 
 fn benchmark_natural_gcd_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -543,14 +541,14 @@ fn benchmark_natural_gcd_evaluation_strategy(
 
 fn benchmark_natural_gcd_algorithms_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_4().get(gm, &config),
+        natural_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -566,14 +564,14 @@ fn benchmark_natural_gcd_algorithms_2(
 #[allow(unused_must_use)]
 fn benchmark_natural_gcd_library_comparison_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_4_nrm().get(gm, &config),
+        natural_pair_gen_var_4_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -588,14 +586,14 @@ fn benchmark_natural_gcd_library_comparison_2(
 
 fn benchmark_natural_gcd_evaluation_strategy_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_4().get(gm, &config),
+        natural_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -614,14 +612,14 @@ fn benchmark_natural_gcd_evaluation_strategy_2(
 
 fn benchmark_natural_gcd_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.gcd_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

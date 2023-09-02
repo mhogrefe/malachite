@@ -9,17 +9,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_limb_count);
 }
 
-fn demo_natural_limb_count(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_limb_count(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("limb_count({}) = {}", n, n.limb_count());
     }
 }
 
-fn benchmark_natural_limb_count(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_limb_count(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.limb_count()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

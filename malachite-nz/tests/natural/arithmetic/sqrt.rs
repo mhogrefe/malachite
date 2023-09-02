@@ -147,7 +147,7 @@ fn limbs_sqrt_rem_helper_fail() {
 #[test]
 fn test_limbs_sqrt_helper() {
     fn test(xs: &[Limb], out_out: &[Limb], has_remainder: bool) {
-        let n = xs.len().shr_round(1, RoundingMode::Ceiling);
+        let n = xs.len().shr_round(1, RoundingMode::Ceiling).0;
         let odd = xs.len().odd();
         let shift = LeadingZeros::leading_zeros(*xs.last().unwrap()) >> 1;
         let mut out = vec![0; n];
@@ -283,7 +283,7 @@ fn limbs_sqrt_helper_fail() {
 fn test_limbs_sqrt_to_out() {
     fn test(xs: &[Limb], out_out: &[Limb]) {
         let xs_len = xs.len();
-        let mut out = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+        let mut out = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
         limbs_sqrt_to_out(&mut out, xs);
         assert_eq!(out, out_out);
         let x = Natural::from_limbs_asc(xs);
@@ -354,7 +354,7 @@ fn limbs_sqrt_to_out_fail() {
 fn test_limbs_sqrt_rem_to_out() {
     fn test(xs: &[Limb], out_out_sqrt: &[Limb], out_out_rem: &[Limb]) {
         let xs_len = xs.len();
-        let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+        let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling).0];
         let mut out_rem = vec![0; xs_len];
         let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
         assert_eq!(out_sqrt, out_out_sqrt);
@@ -719,7 +719,7 @@ fn limbs_sqrt_to_out_properties() {
     unsigned_vec_pair_gen_var_5().test_properties_with_config(&config, |(mut out, xs)| {
         limbs_sqrt_to_out(&mut out, &xs);
         let xs_len = xs.len();
-        let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+        let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
         let x = Natural::from_limbs_asc(&xs);
         let sqrt = Natural::from_limbs_asc(&out[..sqrt_len]);
         assert_eq!((&x).floor_sqrt(), sqrt);
@@ -738,7 +738,7 @@ fn limbs_sqrt_rem_to_out_properties() {
         |(mut out_sqrt, mut out_rem, xs)| {
             let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, &xs);
             let xs_len = xs.len();
-            let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling).0;
             let x = Natural::from_limbs_asc(&xs);
             let sqrt = Natural::from_limbs_asc(&out_sqrt[..sqrt_len]);
             let rem = Natural::from_limbs_asc(&out_rem[..rem_len]);

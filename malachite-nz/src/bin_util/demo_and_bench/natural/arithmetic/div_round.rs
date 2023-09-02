@@ -19,12 +19,12 @@ use rug::ops::DivRounding;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_limb_div_round_limbs);
-    register_demo!(runner, demo_natural_div_round_assign);
-    register_demo!(runner, demo_natural_div_round_assign_ref);
     register_demo!(runner, demo_natural_div_round);
     register_demo!(runner, demo_natural_div_round_val_ref);
     register_demo!(runner, demo_natural_div_round_ref_val);
     register_demo!(runner, demo_natural_div_round_ref_ref);
+    register_demo!(runner, demo_natural_div_round_assign);
+    register_demo!(runner, demo_natural_div_round_assign_ref);
 
     register_bench!(runner, benchmark_limbs_limb_div_round_limbs);
     register_bench!(runner, benchmark_natural_div_round_down_library_comparison);
@@ -41,9 +41,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_div_round_evaluation_strategy);
 }
 
-fn demo_limbs_limb_div_round_limbs(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_limb_div_round_limbs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (ys, x, rm) in unsigned_vec_unsigned_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -56,44 +56,15 @@ fn demo_limbs_limb_div_round_limbs(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_div_round_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
-        let x_old = x.clone();
-        let y_old = y.clone();
-        x.div_round_assign(y, rm);
-        println!(
-            "x := {}; x.div_round_assign({}, {}); x = {}",
-            x_old, y_old, rm, x
-        );
-    }
-}
-
-fn demo_natural_div_round_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
-        let x_old = x.clone();
-        x.div_round_assign(&y, rm);
-        println!(
-            "x := {}; x.div_round_assign(&{}, {}); x = {}",
-            x_old, y, rm, x
-        );
-    }
-}
-
-fn demo_natural_div_round(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_div_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
-            "{}.div_round({}, {}) = {}",
+            "{}.div_round({}, {}) = {:?}",
             x_old,
             y_old,
             rm,
@@ -102,14 +73,14 @@ fn demo_natural_div_round(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_div_round_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_div_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         println!(
-            "{}.div_round(&{}, {}) = {}",
+            "{}.div_round(&{}, {}) = {:?}",
             x_old,
             y,
             rm,
@@ -118,14 +89,14 @@ fn demo_natural_div_round_val_ref(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_natural_div_round_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_div_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
         println!(
-            "(&{}).div_round({}, {}) = {}",
+            "(&{}).div_round({}, {}) = {:?}",
             x,
             y_old,
             rm,
@@ -134,13 +105,13 @@ fn demo_natural_div_round_ref_val(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_natural_div_round_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_div_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).div_round(&{}, {}) = {}",
+            "(&{}).div_round(&{}, {}) = {:?}",
             x,
             y,
             rm,
@@ -149,16 +120,39 @@ fn demo_natural_div_round_ref_ref(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
+fn demo_natural_div_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.div_round_assign(y, rm);
+        println!("x := {x_old}; x.div_round_assign({y_old}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_natural_div_round_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in natural_natural_rounding_mode_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.div_round_assign(&y, rm);
+        println!("x := {x_old}; x.div_round_assign(&{y}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
 fn benchmark_limbs_limb_div_round_limbs(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_limb_div_round_limbs(Limb, &[Limb], RoundingMode)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_rounding_mode_triple_gen_var_1().get(gm, &config),
+        unsigned_vec_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -171,14 +165,14 @@ fn benchmark_limbs_limb_div_round_limbs(
 
 fn benchmark_natural_div_round_down_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_rm().get(gm, &config),
+        natural_pair_gen_var_5_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -194,14 +188,14 @@ fn benchmark_natural_div_round_down_library_comparison(
 
 fn benchmark_natural_div_round_floor_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Floor)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_nrm().get(gm, &config),
+        natural_pair_gen_var_5_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -218,14 +212,14 @@ fn benchmark_natural_div_round_floor_library_comparison(
 
 fn benchmark_natural_div_round_ceiling_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_var_5_rm().get(gm, &config),
+        natural_pair_gen_var_5_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -242,14 +236,14 @@ fn benchmark_natural_div_round_ceiling_library_comparison(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_natural_div_round_ceiling_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -267,14 +261,14 @@ fn benchmark_natural_div_round_ceiling_algorithms(
 
 fn benchmark_natural_div_round_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round_assign(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_rounding_mode_triple_gen_var_1().get(gm, &config),
+        natural_natural_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -282,11 +276,11 @@ fn benchmark_natural_div_round_assign_evaluation_strategy(
         &mut [
             (
                 "Natural.div_round_assign(Natural, RoundingMode)",
-                &mut |(mut x, y, rm)| x.div_round_assign(y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.div_round_assign(y, rm)),
             ),
             (
                 "Natural.div_round_assign(&Natural, RoundingMode)",
-                &mut |(mut x, y, rm)| x.div_round_assign(&y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.div_round_assign(&y, rm)),
             ),
         ],
     );
@@ -294,14 +288,14 @@ fn benchmark_natural_div_round_assign_evaluation_strategy(
 
 fn benchmark_natural_div_round_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.div_round(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_rounding_mode_triple_gen_var_1().get(gm, &config),
+        natural_natural_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

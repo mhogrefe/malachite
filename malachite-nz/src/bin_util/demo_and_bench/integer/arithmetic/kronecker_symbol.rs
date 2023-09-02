@@ -36,8 +36,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x_sign, xs, y_sign, ys) in large_type_gen_var_27().get(gm, &config).take(limit) {
+fn demo_limbs_kronecker_symbol(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x_sign, xs, y_sign, ys) in large_type_gen_var_27().get(gm, config).take(limit) {
         println!(
             "limbs_kronecker_symbol({}, {:?}, {}, {:?}) = {}",
             x_sign,
@@ -49,8 +49,8 @@ fn demo_limbs_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_jacobi_symbol(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_jacobi_symbol(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen_var_4().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         println!(
@@ -62,15 +62,15 @@ fn demo_integer_jacobi_symbol(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_jacobi_symbol_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_jacobi_symbol_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen_var_4().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!("({}).jacobi_symbol({}) = {}", n_old, m, n.jacobi_symbol(&m));
     }
 }
 
-fn demo_integer_jacobi_symbol_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_jacobi_symbol_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen_var_4().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!(
             "({}).jacobi_symbol({}) = {}",
@@ -81,14 +81,14 @@ fn demo_integer_jacobi_symbol_ref_val(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_integer_jacobi_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_jacobi_symbol_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen_var_4().get(gm, config).take(limit) {
         println!("({}).jacobi_symbol({}) = {}", n, m, (&n).jacobi_symbol(&m));
     }
 }
 
-fn demo_integer_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_kronecker_symbol(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         println!(
@@ -100,8 +100,8 @@ fn demo_integer_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_kronecker_symbol_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_kronecker_symbol_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!(
             "({}).kronecker_symbol({}) = {}",
@@ -112,8 +112,8 @@ fn demo_integer_kronecker_symbol_val_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_integer_kronecker_symbol_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_kronecker_symbol_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!(
             "({}).kronecker_symbol({}) = {}",
@@ -124,8 +124,8 @@ fn demo_integer_kronecker_symbol_ref_val(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_integer_kronecker_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_kronecker_symbol_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in integer_pair_gen().get(gm, config).take(limit) {
         println!(
             "({}).kronecker_symbol({}) = {}",
             n,
@@ -135,11 +135,16 @@ fn demo_integer_kronecker_symbol_ref_ref(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn benchmark_limbs_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_kronecker_symbol(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "limbs_kronecker_symbol(bool, &[Limb], bool, &[Limb])",
         BenchmarkType::Single,
-        large_type_gen_var_27().get(gm, &config),
+        large_type_gen_var_27().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -152,14 +157,14 @@ fn benchmark_limbs_kronecker_symbol(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_integer_jacobi_symbol_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.jacobi_symbol(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_4_rm().get(gm, &config),
+        integer_pair_gen_var_4_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -173,14 +178,14 @@ fn benchmark_integer_jacobi_symbol_library_comparison(
 
 fn benchmark_integer_jacobi_symbol_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.jacobi_symbol(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_4().get(gm, &config),
+        integer_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -204,14 +209,14 @@ fn benchmark_integer_jacobi_symbol_evaluation_strategy(
 
 fn benchmark_integer_kronecker_symbol_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.kronecker_symbol(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_rm().get(gm, &config),
+        integer_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -227,14 +232,14 @@ fn benchmark_integer_kronecker_symbol_library_comparison(
 
 fn benchmark_integer_kronecker_symbol_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.kronecker_symbol(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -18,8 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_extended_gcd_evaluation_strategy);
 }
 
-fn demo_integer_extended_gcd(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_extended_gcd(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -31,8 +31,8 @@ fn demo_integer_extended_gcd(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_extended_gcd_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_extended_gcd_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "({}).extended_gcd(&{}) = {:?}",
@@ -43,8 +43,8 @@ fn demo_integer_extended_gcd_val_ref(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_integer_extended_gcd_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_extended_gcd_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).extended_gcd({}) = {:?}",
@@ -55,8 +55,8 @@ fn demo_integer_extended_gcd_ref_val(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_integer_extended_gcd_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_extended_gcd_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         println!(
             "(&{}).extended_gcd(&{}) = {:?}",
             x,
@@ -68,14 +68,14 @@ fn demo_integer_extended_gcd_ref_ref(gm: GenMode, config: GenConfig, limit: usiz
 
 fn benchmark_integer_extended_gcd_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.extended_gcd(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_nrm().get(gm, &config),
+        integer_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -95,14 +95,14 @@ fn benchmark_integer_extended_gcd_library_comparison(
 
 fn benchmark_integer_extended_gcd_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.extended_gcd(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

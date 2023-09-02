@@ -11,25 +11,28 @@ pub(crate) fn register(runner: &mut Runner) {
     register_generic_benches!(runner, benchmark_upper_half, u16, u32, u64, u128);
 }
 
-fn demo_upper_half<T: PrimitiveUnsigned + SplitInHalf>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     T::Half: PrimitiveUnsigned,
 {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.upper_half() = {}", u, u.upper_half());
     }
 }
 
 fn benchmark_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.upper_half()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

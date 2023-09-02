@@ -81,7 +81,7 @@ pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
 // input slice.
 pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         if x.overflowing_sub_assign(y) {
             y = 1;
         } else {
@@ -498,10 +498,7 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_right(
 }}
 
 fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
-    panic!(
-        "Cannot subtract a number from a smaller number. self: {}, other: {}",
-        x, y
-    );
+    panic!("Cannot subtract a number from a smaller number. self: {x}, other: {y}");
 }
 
 impl Natural {
@@ -514,6 +511,20 @@ impl Natural {
         self.checked_sub_limb_ref(other).unwrap_or_else(|| {
             sub_panic(self, other);
         })
+    }
+
+    #[cfg(feature = "float_helpers")]
+    pub fn sub_assign_at_limb(&mut self, i: usize, y: Limb) {
+        if i == 0 {
+            *self -= Natural::from(y);
+            return;
+        }
+        let xs = self.promote_in_place();
+        if xs.len() <= i {
+            xs.resize(i + 1, 0);
+        }
+        assert!(!limbs_sub_limb_in_place(&mut xs[i..], y));
+        self.trim();
     }
 }
 

@@ -35,7 +35,7 @@ pub fn write_exponent<T: PrimitiveInt>(
     if exp > T::ZERO && (options.get_force_exponent_plus_sign() || options.get_base() >= 15) {
         f.write_char('+')?;
     }
-    write!(f, "{}", exp)
+    write!(f, "{exp}")
 }
 
 fn write_helper<T>(x: T, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result
@@ -49,7 +49,7 @@ where
     if options.lowercase {
         Display::fmt(&w, f)
     } else {
-        write!(f, "{:#}", w)
+        write!(f, "{w:#}")
     }
 }
 

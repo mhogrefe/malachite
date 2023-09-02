@@ -39,11 +39,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_floor_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_21::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -57,11 +57,11 @@ fn demo_floor_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_floor_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in primitive_float_unsigned_pair_gen_var_3::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -75,11 +75,11 @@ fn demo_floor_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn demo_ceiling_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_21::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -93,11 +93,11 @@ fn demo_ceiling_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_ceiling_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in primitive_float_unsigned_pair_gen_var_3::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -111,11 +111,11 @@ fn demo_ceiling_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn demo_checked_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_21::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -129,11 +129,11 @@ fn demo_checked_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_checked_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in primitive_float_unsigned_pair_gen_var_3::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -147,14 +147,14 @@ fn demo_checked_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_floor_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_21::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_21::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -167,14 +167,14 @@ fn benchmark_floor_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -187,14 +187,14 @@ fn benchmark_floor_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_ceiling_log_base_power_of_2_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_21::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_21::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -212,14 +212,14 @@ fn benchmark_ceiling_log_base_power_of_2_algorithms_unsigned<T: PrimitiveUnsigne
 
 fn benchmark_ceiling_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -232,14 +232,14 @@ fn benchmark_ceiling_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_checked_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_21::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_21::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -252,14 +252,14 @@ fn benchmark_checked_log_base_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_log_base_power_of_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_log_base_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_3::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

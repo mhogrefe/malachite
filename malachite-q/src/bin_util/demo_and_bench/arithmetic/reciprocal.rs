@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_reciprocal_assign);
 }
 
-fn demo_rational_reciprocal(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+fn demo_rational_reciprocal(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         println!("reciprocal({}) = {}", n.clone(), n.reciprocal());
     }
 }
 
-fn demo_rational_reciprocal_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+fn demo_rational_reciprocal_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         println!("reciprocal(&{}) = {}", n, (&n).reciprocal());
     }
 }
 
-fn demo_rational_reciprocal_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen_var_1().get(gm, &config).take(limit) {
+fn demo_rational_reciprocal_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen_var_1().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.reciprocal_assign();
-        println!("n := {}; n.reciprocal_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.reciprocal_assign(); n = {n}");
     }
 }
 
 #[allow(unused_must_use)]
 fn benchmark_rational_reciprocal_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.reciprocal()",
         BenchmarkType::LibraryComparison,
-        rational_gen_var_1_nrm().get(gm, &config),
+        rational_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -62,14 +62,14 @@ fn benchmark_rational_reciprocal_library_comparison(
 
 fn benchmark_rational_reciprocal_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.reciprocal()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen_var_1().get(gm, &config),
+        rational_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -85,14 +85,14 @@ fn benchmark_rational_reciprocal_evaluation_strategy(
 
 fn benchmark_rational_reciprocal_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.reciprocal_assign()",
         BenchmarkType::Single,
-        rational_gen_var_1().get(gm, &config),
+        rational_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

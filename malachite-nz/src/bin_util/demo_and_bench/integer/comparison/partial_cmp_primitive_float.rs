@@ -24,12 +24,12 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_partial_cmp_float<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_integer_partial_cmp_float<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Integer: PartialOrd<T>,
 {
     for (n, f) in integer_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n.partial_cmp(&f) {
@@ -43,11 +43,11 @@ where
 
 fn demo_float_partial_cmp_integer<T: PartialOrd<Integer> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, f) in integer_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match f.partial_cmp(&n) {
@@ -62,7 +62,7 @@ fn demo_float_partial_cmp_integer<T: PartialOrd<Integer> + PrimitiveFloat>(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_integer_partial_cmp_float_library_comparison<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -72,7 +72,7 @@ fn benchmark_integer_partial_cmp_float_library_comparison<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Integer.partial_cmp(&{})", T::NAME),
         BenchmarkType::LibraryComparison,
-        integer_primitive_float_pair_gen_rm::<T>().get(gm, &config),
+        integer_primitive_float_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -89,14 +89,14 @@ fn benchmark_float_partial_cmp_integer_library_comparison<
     T: PartialOrd<Integer> + PartialOrd<rug::Integer> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp(&Integer)", T::NAME),
         BenchmarkType::LibraryComparison,
-        integer_primitive_float_pair_gen_rm::<T>().get(gm, &config),
+        integer_primitive_float_pair_gen_rm::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

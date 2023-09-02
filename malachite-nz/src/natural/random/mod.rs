@@ -58,7 +58,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
     #[cfg(feature = "32_bit_limbs")]
     let mut xs = iterator_to_bit_chunks(
         xs.take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
+            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
         )),
         u64::WIDTH,
         u32::WIDTH,
@@ -68,7 +68,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
         .take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
+            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
         ))
         .collect_vec();
     limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
@@ -112,7 +112,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
     #[cfg(feature = "32_bit_limbs")]
     let mut xs = iterator_to_bit_chunks(
         xs.take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
+            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
         )),
         u64::WIDTH,
         u32::WIDTH,
@@ -122,7 +122,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
         .take(usize::exact_from(
-            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
+            bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling).0,
         ))
         .collect_vec();
     limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
@@ -237,12 +237,12 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $E(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if after being reduced
@@ -295,12 +295,12 @@ pub fn random_naturals(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
@@ -365,12 +365,12 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -425,12 +425,12 @@ pub fn striped_random_naturals(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if
@@ -705,13 +705,12 @@ impl Iterator for RandomNaturalRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio is less than
@@ -1175,7 +1174,9 @@ pub fn striped_random_natural_inclusive_range(
     assert!(a <= b);
     let diff_bits = (&a ^ &b).significant_bits();
     let mask = Natural::low_mask(diff_bits);
-    let lo_template = (&a).round_to_multiple_of_power_of_2(diff_bits, RoundingMode::Floor);
+    let lo_template = (&a)
+        .round_to_multiple_of_power_of_2(diff_bits, RoundingMode::Floor)
+        .0;
     let hi_template = &lo_template | mask;
     StripedRandomNaturalInclusiveRange {
         a,
@@ -1234,13 +1235,12 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 /// numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(m) = O(m)$
+/// $M(n, m) = O(n / m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if

@@ -18,56 +18,56 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_odd_signed);
 }
 
-fn demo_even_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_even_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         if u.even() {
-            println!("{} is even", u);
+            println!("{u} is even");
         } else {
-            println!("{} is not even", u);
+            println!("{u} is not even");
         }
     }
 }
 
-fn demo_even_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_even_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         if i.even() {
-            println!("{} is even", i);
+            println!("{i} is even");
         } else {
-            println!("{} is not even", i);
+            println!("{i} is not even");
         }
     }
 }
 
-fn demo_odd_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_odd_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         if u.odd() {
-            println!("{} is odd", u);
+            println!("{u} is odd");
         } else {
-            println!("{} is not od", u);
+            println!("{u} is not odd");
         }
     }
 }
 
-fn demo_odd_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_odd_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen::<T>().get(gm, config).take(limit) {
         if i.odd() {
-            println!("{} is odd", i);
+            println!("{i} is odd");
         } else {
-            println!("{} is not odd", i);
+            println!("{i} is not odd");
         }
     }
 }
 
 fn benchmark_even_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.even()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -78,14 +78,14 @@ fn benchmark_even_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_even_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.even()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -96,14 +96,14 @@ fn benchmark_even_signed<T: PrimitiveSigned>(
 
 fn benchmark_odd_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.odd()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -114,14 +114,14 @@ fn benchmark_odd_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_odd_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.odd()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

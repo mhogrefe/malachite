@@ -25,8 +25,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_checked_log_base_2);
 }
 
-fn demo_limbs_floor_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_floor_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_floor_log_base_2({:?}) = {}",
             xs,
@@ -35,8 +35,8 @@ fn demo_limbs_floor_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_ceiling_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_ceiling_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_ceiling_log_base_2({:?}) = {}",
             xs,
@@ -45,8 +45,8 @@ fn demo_limbs_ceiling_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_checked_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_checked_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_checked_log_base_2({:?}) = {:?}",
             xs,
@@ -55,29 +55,34 @@ fn demo_limbs_checked_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_floor_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_floor_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("floor_log_base_2({}) = {}", n, n.floor_log_base_2());
     }
 }
 
-fn demo_natural_ceiling_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("ceiling_log_base_2({}) = {}", n, n.ceiling_log_base_2());
     }
 }
 
-fn demo_natural_checked_log_base_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_checked_log_base_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("checked_log_base_2({}) = {:?}", n, n.checked_log_base_2());
     }
 }
 
-fn benchmark_limbs_floor_log_base_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_floor_log_base_2(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "limbs_floor_log_base_2(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -90,14 +95,14 @@ fn benchmark_limbs_floor_log_base_2(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_limbs_ceiling_log_base_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_ceiling_log_base_2(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,14 +115,14 @@ fn benchmark_limbs_ceiling_log_base_2(
 
 fn benchmark_limbs_checked_log_base_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_checked_log_base_2(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -130,14 +135,14 @@ fn benchmark_limbs_checked_log_base_2(
 
 fn benchmark_natural_floor_log_base_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_log_base_2()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -148,14 +153,14 @@ fn benchmark_natural_floor_log_base_2(
 
 fn benchmark_natural_ceiling_log_base_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_log_base_2()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -166,14 +171,14 @@ fn benchmark_natural_ceiling_log_base_2(
 
 fn benchmark_natural_checked_log_base_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_log_base_2()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

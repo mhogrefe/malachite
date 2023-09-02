@@ -20,64 +20,58 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_overflowing_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.overflowing_square() = {:?}", x, x.overflowing_square());
     }
 }
 
 fn demo_overflowing_square_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+    for x in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.overflowing_square() = {:?}", x, x.overflowing_square());
     }
 }
 
 fn demo_overflowing_square_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut x in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let overflow = x.overflowing_square_assign();
-        println!(
-            "x := {}; x.overflowing_square_assign() = {}; x = {}",
-            old_x, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_square_assign() = {overflow}; x = {x}");
     }
 }
 
 fn demo_overflowing_square_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut x in signed_gen::<T>().get(gm, &config).take(limit) {
+    for mut x in signed_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let overflow = x.overflowing_square_assign();
-        println!(
-            "x := {}; x.overflowing_square_assign() = {}; x = {}",
-            old_x, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_square_assign() = {overflow}; x = {x}");
     }
 }
 
 fn benchmark_overflowing_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_square()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -88,14 +82,14 @@ fn benchmark_overflowing_square_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_square_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_square()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -106,14 +100,14 @@ fn benchmark_overflowing_square_signed<T: PrimitiveSigned>(
 
 fn benchmark_overflowing_square_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_square_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -126,14 +120,14 @@ fn benchmark_overflowing_square_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_square_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_square_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_neg_assign);
 }
 
-fn demo_integer_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("-{} = {}", n.clone(), -n);
     }
 }
 
-fn demo_integer_neg_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_neg_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("-(&{}) = {}", n.clone(), -n);
     }
 }
 
-fn demo_integer_neg_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in integer_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.neg_assign();
-        println!("n := {}; n.neg_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.neg_assign(); n = {n}");
     }
 }
 
 #[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
 fn benchmark_integer_neg_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Integer",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -63,14 +63,14 @@ fn benchmark_integer_neg_library_comparison(
 #[allow(unused_must_use, clippy::no_effect)]
 fn benchmark_integer_neg_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "-Integer",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -79,11 +79,11 @@ fn benchmark_integer_neg_evaluation_strategy(
     );
 }
 
-fn benchmark_integer_neg_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_neg_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "-Integer",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

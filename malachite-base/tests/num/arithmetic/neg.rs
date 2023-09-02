@@ -24,8 +24,8 @@ fn neg_assign_helper_primitive_float<T: PrimitiveFloat>() {
     };
     test(T::ZERO, T::NEGATIVE_ZERO);
     test(T::NEGATIVE_ZERO, T::ZERO);
-    test(T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY);
-    test(T::NEGATIVE_INFINITY, T::POSITIVE_INFINITY);
+    test(T::INFINITY, T::NEGATIVE_INFINITY);
+    test(T::NEGATIVE_INFINITY, T::INFINITY);
     test(T::NAN, T::NAN);
 
     test(T::ONE, T::NEGATIVE_ONE);

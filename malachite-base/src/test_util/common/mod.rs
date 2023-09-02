@@ -79,10 +79,34 @@ pub const TRIPLE_SIGNIFICANT_BITS_LABEL: &str =
 
 pub fn rle_decode<T: Clone>(ps: &[(T, usize)]) -> Vec<T> {
     let mut out = Vec::new();
-    for (x, count) in ps.iter() {
+    for (x, count) in ps {
         for _ in 0..*count {
             out.push(x.clone());
         }
     }
     out
+}
+
+pub fn test_double_ended_iterator_size_hint<I: Clone + DoubleEndedIterator>(
+    mut xs: I,
+    original_expected_size: usize,
+) {
+    let original_xs = xs.clone();
+    let mut expected_size = original_expected_size;
+    for _ in 0..10 {
+        assert_eq!(xs.size_hint(), (expected_size, Some(expected_size)));
+        if xs.next().is_none() {
+            break;
+        };
+        expected_size -= 1;
+    }
+    let mut xs = original_xs;
+    let mut expected_size = original_expected_size;
+    for _ in 0..10 {
+        assert_eq!(xs.size_hint(), (expected_size, Some(expected_size)));
+        if xs.next_back().is_none() {
+            break;
+        };
+        expected_size -= 1;
+    }
 }

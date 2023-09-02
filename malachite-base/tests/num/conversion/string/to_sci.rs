@@ -827,7 +827,7 @@ fn to_sci_helper_unsigned<T: PrimitiveUnsigned>() {
                     let pow = *powers_of_10
                         .entry(log - default_p + 1)
                         .or_insert_with_key(|&p| ten.pow(p));
-                    assert_eq!(x.round_to_multiple(pow, RoundingMode::Nearest), x_from);
+                    assert_eq!(x.round_to_multiple(pow, RoundingMode::Nearest).0, x_from);
                 }
             }
         } else {
@@ -880,7 +880,7 @@ where
                     let pow = *powers_of_10
                         .entry(log - default_p + 1)
                         .or_insert_with_key(|&p| ten.pow(p));
-                    assert_eq!(x.round_to_multiple(pow, RoundingMode::Nearest), x_from);
+                    assert_eq!(x.round_to_multiple(pow, RoundingMode::Nearest).0, x_from);
                 }
             }
         } else {
@@ -951,7 +951,7 @@ fn to_sci_with_options_helper_unsigned<T: PrimitiveUnsigned>() {
                         .entry((base, scale))
                         .or_insert_with(|| base.pow(scale));
                     assert_eq!(
-                        x.round_to_multiple(pow, options.get_rounding_mode()),
+                        x.round_to_multiple(pow, options.get_rounding_mode()).0,
                         x_from
                     );
                 } else {
@@ -1032,7 +1032,7 @@ where
                         .entry((base, scale))
                         .or_insert_with(|| base.pow(scale));
                     assert_eq!(
-                        x.round_to_multiple(pow, options.get_rounding_mode()),
+                        x.round_to_multiple(pow, options.get_rounding_mode()).0,
                         x_from
                     );
                 } else {

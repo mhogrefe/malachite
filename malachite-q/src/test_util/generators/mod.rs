@@ -364,6 +364,8 @@ pub fn rational_signed_rounding_mode_triple_gen_var_1() -> Generator<(Rational, 
     )
 }
 
+// var 2 is in malachite-float.
+
 // -- (Rational, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn rational_signed_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Rational, T, T)> {
@@ -382,6 +384,19 @@ pub fn rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>() -> Generato
         &exhaustive_rational_signed_signed_triple_gen_var_1,
         &random_rational_signed_signed_triple_gen_var_1,
         &special_random_rational_signed_signed_triple_gen_var_1,
+    )
+}
+
+// -- (Rational, PrimitiveSigned, PrimitiveUnsigned) --
+
+// All `(Rational, T, U)` where `T` is small and signed, and positive and `U` is small, unsigned,
+// and positive.
+pub fn rational_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(Rational, T, U)> {
+    Generator::new(
+        &exhaustive_rational_signed_unsigned_triple_gen_var_1,
+        &random_rational_signed_unsigned_triple_gen_var_1,
+        &special_random_rational_signed_unsigned_triple_gen_var_1,
     )
 }
 
@@ -803,7 +818,7 @@ where
     )
 }
 
-// All `(Rational, RoundingMode)` pairs where the `Rational` is positive.
+// All `(Rational, RoundingMode)` pairs where the `Rational` is nonzero.
 pub fn rational_rounding_mode_pair_gen_var_4() -> Generator<(Rational, RoundingMode)> {
     Generator::new(
         &exhaustive_rational_rounding_mode_pair_gen_var_4,
@@ -826,6 +841,8 @@ where
         &special_random_rational_rounding_mode_pair_gen_var_5::<T>,
     )
 }
+
+// var 6 is in malachite-float.
 
 // -- (Rational, ToSciOptions) --
 

@@ -158,6 +158,7 @@ fn to_power_of_2_digits_desc_helper<
             usize::exact_from(
                 u.significant_bits()
                     .div_round(log_base, RoundingMode::Ceiling)
+                    .0
             )
         );
         assert!(digits

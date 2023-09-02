@@ -10,9 +10,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_xxx_sub_yyy_to_zzz);
 }
 
-fn demo_xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x_2, x_1, x_0, y_2, y_1, y_0) in unsigned_sextuple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -30,7 +30,7 @@ fn demo_xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
 
 fn benchmark_xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -46,7 +46,7 @@ fn benchmark_xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_sextuple_gen_var_1::<T>().get(gm, &config),
+        unsigned_sextuple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

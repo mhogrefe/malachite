@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::random::special_random_negative_primitive_floats;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::num::random::special_random_primitive_floats_helper_helper;

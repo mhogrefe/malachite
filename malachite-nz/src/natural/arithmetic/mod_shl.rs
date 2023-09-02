@@ -1,10 +1,9 @@
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShl, ModShlAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
@@ -17,7 +16,7 @@ where
         x.clone()
     } else {
         match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            Natural::ONE | Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits), &m), m),
         }
     }
@@ -31,7 +30,7 @@ where
         x.clone()
     } else {
         match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits), m), m),
         }
     }
@@ -43,7 +42,7 @@ where
 {
     if bits != T::ZERO {
         match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            Natural::ONE | Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits), &m), m),
         }
     }
@@ -55,7 +54,7 @@ where
 {
     if bits != T::ZERO {
         match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits), m), m),
         }
     }
@@ -228,7 +227,7 @@ where
         Ordering::Equal => x.clone(),
         Ordering::Less => x >> bits_abs,
         Ordering::Greater => match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            Natural::ONE | Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
     }
@@ -248,7 +247,7 @@ where
         Ordering::Equal => x.clone(),
         Ordering::Less => x >> bits_abs,
         Ordering::Greater => match m {
-            natural_one!() | natural_two!() => Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => Natural::ZERO,
             _ => x.mod_mul(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },
     }
@@ -266,7 +265,7 @@ fn mod_shl_assign_signed_nz<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
         Ordering::Equal => {}
         Ordering::Less => *x >>= bits_abs,
         Ordering::Greater => match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            Natural::ONE | Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), &m), m),
         },
     }
@@ -284,7 +283,7 @@ fn mod_shl_assign_ref_signed<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
         Ordering::Equal => {}
         Ordering::Less => *x >>= bits_abs,
         Ordering::Greater => match m {
-            natural_one!() | natural_two!() => *x = Natural::ZERO,
+            &Natural::ONE | &Natural::TWO => *x = Natural::ZERO,
             _ => x.mod_mul_assign(Natural::TWO.mod_pow(Natural::from(bits_abs), m), m),
         },
     }

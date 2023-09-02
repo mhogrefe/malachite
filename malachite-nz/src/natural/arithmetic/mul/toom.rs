@@ -744,7 +744,7 @@ pub_test! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
-    xs_len >= ys_len && xs_len.div_round(3, RoundingMode::Ceiling) << 1 < ys_len
+    xs_len >= ys_len && xs_len.div_round(3, RoundingMode::Ceiling).0 << 1 < ys_len
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -761,7 +761,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.div_round(3, RoundingMode::Ceiling);
+    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
     let m = n + 1;
     assert!(m < xs_len);
     let s = xs_len - (n << 1);
@@ -831,7 +831,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = xs_len.div_round(3, RoundingMode::Ceiling);
+    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
     let m = n + 1;
     split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
     let s = xs_2.len();
@@ -1002,13 +1002,12 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_42_input_sizes_valid(
-    xs_len: usize,
-    ys_len: usize
-) -> bool {
+pub_test! {
+    limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 9 && ys_len == 4)
         && xs_len + 3 < ys_len << 2
-        && xs_len.div_round(3, RoundingMode::Ceiling) > ys_len.shr_round(1, RoundingMode::Ceiling)
+        && xs_len.div_round(3, RoundingMode::Ceiling).0
+            > ys_len.shr_round(1, RoundingMode::Ceiling).0
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1023,9 +1022,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42_scratch_len(
     ys_len: usize
 ) -> usize {
     let n = if xs_len >= ys_len << 1 {
-        xs_len.shr_round(2, RoundingMode::Ceiling)
+        xs_len.shr_round(2, RoundingMode::Ceiling).0
     } else {
-        ys_len.shr_round(1, RoundingMode::Ceiling)
+        ys_len.shr_round(1, RoundingMode::Ceiling).0
     };
     let s = xs_len - 3 * n;
     let t = ys_len - n;
@@ -1092,9 +1091,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     let xs_len = xs.len();
     let ys_len = ys.len();
     let n = if xs_len >= ys_len << 1 {
-        xs_len.shr_round(2, RoundingMode::Ceiling)
+        xs_len.shr_round(2, RoundingMode::Ceiling).0
     } else {
-        ys_len.shr_round(1, RoundingMode::Ceiling)
+        ys_len.shr_round(1, RoundingMode::Ceiling).0
     };
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
     let s = xs_3.len();
@@ -1208,15 +1207,14 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_43_input_sizes_valid(
-    xs_len: usize,
-    ys_len: usize
-) -> bool {
+pub_test! {
+    limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 13)
-        && xs_len.div_round(3, RoundingMode::Ceiling) > ys_len.div_round(3, RoundingMode::Ceiling)
+        && xs_len.div_round(3, RoundingMode::Ceiling).0
+            > ys_len.div_round(3, RoundingMode::Ceiling).0
         && {
-            let xs_len_div_4: usize = xs_len.shr_round(2, RoundingMode::Ceiling);
-            xs_len_div_4 < ys_len.shr_round(1, RoundingMode::Ceiling)
+            let xs_len_div_4: usize = xs_len.shr_round(2, RoundingMode::Ceiling).0;
+            xs_len_div_4 < ys_len.shr_round(1, RoundingMode::Ceiling).0
                 && xs_len + ys_len >= 5 * (xs_len_div_4 + 1)
         }
 }}
@@ -1416,7 +1414,7 @@ pub_test! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
-    xs_len >= ys_len && 3usize * xs_len.shr_round(2, RoundingMode::Ceiling) < ys_len
+    xs_len >= ys_len && 3usize * xs_len.shr_round(2, RoundingMode::Ceiling).0 < ys_len
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1430,7 +1428,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.shr_round(2, RoundingMode::Ceiling);
+    let n = xs_len.shr_round(2, RoundingMode::Ceiling).0;
     let s = xs_len - 3 * n;
     let t = ys_len - 3 * n;
     assert!(n + 1 < xs_len);
@@ -1524,7 +1522,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = xs_len.shr_round(2, RoundingMode::Ceiling);
+    let n = xs_len.shr_round(2, RoundingMode::Ceiling).0;
     let m = 2 * n + 1;
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
     let s = xs_3.len();
@@ -1645,13 +1643,12 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_52_input_sizes_valid(
-    xs_len: usize,
-    ys_len: usize
-) -> bool {
+pub_test! {
+    limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     xs_len + 4 < 5 * ys_len
-        && xs_len.shr_round(2, RoundingMode::Ceiling) > ys_len.shr_round(1, RoundingMode::Ceiling)
-        && xs_len + ys_len >= 5 * (xs_len.div_round(5, RoundingMode::Ceiling) + 1)
+        && xs_len.shr_round(2, RoundingMode::Ceiling).0
+            > ys_len.shr_round(1, RoundingMode::Ceiling).0
+        && xs_len + ys_len >= 5 * (xs_len.div_round(5, RoundingMode::Ceiling).0 + 1)
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in
@@ -1867,13 +1864,13 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_53_input_sizes_valid(
-    xs_len: usize,
-    ys_len: usize
-) -> bool {
+pub_test! {
+    limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 9)
-        && xs_len.shr_round(2, RoundingMode::Ceiling) > ys_len.div_round(3, RoundingMode::Ceiling)
-        && xs_len.div_round(5, RoundingMode::Ceiling) < ys_len.shr_round(1, RoundingMode::Ceiling)
+        && xs_len.shr_round(2, RoundingMode::Ceiling).0
+            > ys_len.div_round(3, RoundingMode::Ceiling).0
+        && xs_len.div_round(5, RoundingMode::Ceiling).0
+            < ys_len.shr_round(1, RoundingMode::Ceiling).0
 }}
 
 // This function can be used to determine the length of the input `scratch` slice in

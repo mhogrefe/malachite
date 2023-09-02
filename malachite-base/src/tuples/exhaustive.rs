@@ -10,7 +10,7 @@ use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
-use std::mem::swap;
+use std::mem::take;
 
 /// Generates the only unit: `()`.
 ///
@@ -2686,9 +2686,7 @@ where
 
     fn next(&mut self) -> Option<(I::Item, I::Item)> {
         if self.next.is_some() {
-            let mut p = None;
-            swap(&mut p, &mut self.next);
-            p
+            take(&mut self.next)
         } else if let Some(p) = self.ps.next() {
             self.next = Some((p.1.clone(), p.0.clone()));
             Some(p)

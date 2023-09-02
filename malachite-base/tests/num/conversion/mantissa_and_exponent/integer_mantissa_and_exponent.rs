@@ -53,7 +53,7 @@ fn integer_mantissa_and_exponent_unsigned_fail_helper<T: PrimitiveUnsigned>() {
 
 fn integer_mantissa_and_exponent_primitive_float_fail_helper<T: PrimitiveFloat>() {
     assert_panic!(T::NAN.integer_mantissa_and_exponent());
-    assert_panic!(T::POSITIVE_INFINITY.integer_mantissa_and_exponent());
+    assert_panic!(T::INFINITY.integer_mantissa_and_exponent());
     assert_panic!(T::NEGATIVE_INFINITY.integer_mantissa_and_exponent());
     assert_panic!(T::ZERO.integer_mantissa_and_exponent());
     assert_panic!(T::NEGATIVE_ZERO.integer_mantissa_and_exponent());

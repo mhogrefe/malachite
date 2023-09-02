@@ -34,6 +34,7 @@
     clippy::single_match_else,
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
+    clippy::uninlined_format_args,
     clippy::unused_self
 )]
 

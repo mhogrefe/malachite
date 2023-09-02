@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen;
@@ -155,6 +156,7 @@ fn test_partial_cmp_abs_rational_natural() {
 fn partial_cmp_abs_natural_properties() {
     rational_natural_pair_gen().test_properties(|(x, y)| {
         let cmp = x.partial_cmp_abs(&y);
+        assert_eq!((&x).abs().partial_cmp(&y), cmp);
         assert_eq!(x.cmp_abs(&Rational::from(&y)), cmp.unwrap());
         assert_eq!(y.partial_cmp_abs(&x), cmp.map(Ordering::reverse));
     });

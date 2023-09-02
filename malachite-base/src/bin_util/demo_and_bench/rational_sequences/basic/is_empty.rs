@@ -9,29 +9,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_is_empty);
 }
 
-fn demo_rational_sequence_is_empty(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_is_empty(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if xs.is_empty() {
-            println!("{} is empty", xs);
+            println!("{xs} is empty");
         } else {
-            println!("{} is not empty", xs);
+            println!("{xs} is not empty");
         }
     }
 }
 
 fn benchmark_rational_sequence_is_empty(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.is_empty()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

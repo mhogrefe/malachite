@@ -26,68 +26,68 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_checked_sqrt_evaluation_strategy);
 }
 
-fn demo_integer_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_floor_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("{}.floor_sqrt() = {}", x, x.clone().floor_sqrt());
     }
 }
 
-fn demo_integer_floor_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_floor_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("(&{}).floor_sqrt() = {}", x, (&x).floor_sqrt());
     }
 }
 
-fn demo_integer_floor_sqrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_floor_sqrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in integer_gen_var_4().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.floor_sqrt_assign();
-        println!("x := {}; x.floor_sqrt_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.floor_sqrt_assign(); x = {x}");
     }
 }
 
-fn demo_integer_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("{}.ceiling_sqrt() = {}", x, x.clone().ceiling_sqrt());
     }
 }
 
-fn demo_integer_ceiling_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("(&{}).ceiling_sqrt() = {}", x, (&x).ceiling_sqrt());
     }
 }
 
-fn demo_integer_ceiling_sqrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_ceiling_sqrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in integer_gen_var_4().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.ceiling_sqrt_assign();
-        println!("x := {}; x.ceiling_sqrt_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.ceiling_sqrt_assign(); x = {x}");
     }
 }
 
-fn demo_integer_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("{}.checked_sqrt() = {:?}", x, x.clone().checked_sqrt());
     }
 }
 
-fn demo_integer_checked_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in integer_gen_var_4().get(gm, &config).take(limit) {
+fn demo_integer_checked_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in integer_gen_var_4().get(gm, config).take(limit) {
         println!("(&{}).checked_sqrt() = {:?}", x, (&x).checked_sqrt());
     }
 }
 
 fn benchmark_integer_floor_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.floor_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -104,14 +104,14 @@ fn benchmark_integer_floor_sqrt_evaluation_strategy(
 #[allow(unused_must_use)]
 fn benchmark_integer_floor_sqrt_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.floor_sqrt()",
         BenchmarkType::LibraryComparison,
-        integer_gen_var_4_nrm().get(gm, &config),
+        integer_gen_var_4_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -126,14 +126,14 @@ fn benchmark_integer_floor_sqrt_library_comparison(
 
 fn benchmark_integer_floor_sqrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.floor_sqrt_assign()",
         BenchmarkType::Single,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -144,14 +144,14 @@ fn benchmark_integer_floor_sqrt_assign(
 
 fn benchmark_integer_ceiling_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -167,14 +167,14 @@ fn benchmark_integer_ceiling_sqrt_evaluation_strategy(
 
 fn benchmark_integer_ceiling_sqrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_sqrt_assign()",
         BenchmarkType::Single,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -185,14 +185,14 @@ fn benchmark_integer_ceiling_sqrt_assign(
 
 fn benchmark_integer_checked_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.checked_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen_var_4().get(gm, &config),
+        integer_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

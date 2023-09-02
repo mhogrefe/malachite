@@ -43,13 +43,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_from_power_of_2_digits_asc<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: PowerOf2Digits<T>,
 {
     for (digits, log_base) in unsigned_vec_unsigned_pair_gen_var_11::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -63,13 +63,13 @@ fn demo_from_power_of_2_digits_asc<T: PrimitiveUnsigned>(
 
 fn demo_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: PowerOf2Digits<T>,
 {
     for (digits, log_base) in unsigned_vec_unsigned_pair_gen_var_11::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -83,13 +83,13 @@ fn demo_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
 
 fn demo_from_power_of_2_digits_asc_targeted<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: PowerOf2Digits<T>,
 {
     for (digits, log_base) in unsigned_vec_unsigned_pair_gen_var_10::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -103,13 +103,13 @@ fn demo_from_power_of_2_digits_asc_targeted<T: PrimitiveUnsigned>(
 
 fn demo_from_power_of_2_digits_desc_targeted<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: PowerOf2Digits<T>,
 {
     for (digits, log_base) in unsigned_vec_unsigned_pair_gen_var_10::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -121,9 +121,9 @@ fn demo_from_power_of_2_digits_desc_targeted<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_natural_from_power_of_2_digits_asc_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_from_power_of_2_digits_asc_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (digits, log_base) in natural_vec_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -135,9 +135,9 @@ fn demo_natural_from_power_of_2_digits_asc_natural(gm: GenMode, config: GenConfi
     }
 }
 
-fn demo_natural_from_power_of_2_digits_desc_natural(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_from_power_of_2_digits_desc_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (digits, log_base) in natural_vec_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -151,11 +151,11 @@ fn demo_natural_from_power_of_2_digits_desc_natural(gm: GenMode, config: GenConf
 
 fn demo_natural_from_power_of_2_digits_asc_natural_targeted(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (digits, log_base) in natural_vec_unsigned_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -169,11 +169,11 @@ fn demo_natural_from_power_of_2_digits_asc_natural_targeted(
 
 fn demo_natural_from_power_of_2_digits_desc_natural_targeted(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (digits, log_base) in natural_vec_unsigned_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -187,7 +187,7 @@ fn demo_natural_from_power_of_2_digits_desc_natural_targeted(
 
 fn benchmark_from_power_of_2_digits_asc_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -200,7 +200,7 @@ fn benchmark_from_power_of_2_digits_asc_algorithms<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_10::<T>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_10::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -224,7 +224,7 @@ fn benchmark_from_power_of_2_digits_asc_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -237,7 +237,7 @@ fn benchmark_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_10::<T>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_10::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -253,14 +253,14 @@ fn benchmark_from_power_of_2_digits_desc<T: PrimitiveUnsigned>(
 
 fn benchmark_natural_from_power_of_2_digits_asc_natural_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_power_of_2_digits_asc<I: Iterator<Item=Natural>>(u64, I)",
         BenchmarkType::Algorithms,
-        natural_vec_unsigned_pair_gen_var_1().get(gm, &config),
+        natural_vec_unsigned_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -284,14 +284,14 @@ fn benchmark_natural_from_power_of_2_digits_asc_natural_algorithms(
 
 fn benchmark_natural_from_power_of_2_digits_desc_natural(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_power_of_2_digits_desc<I: Iterator<Item=Natural>>(u64, I)",
         BenchmarkType::Single,
-        natural_vec_unsigned_pair_gen_var_1().get(gm, &config),
+        natural_vec_unsigned_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

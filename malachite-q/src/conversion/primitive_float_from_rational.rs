@@ -9,13 +9,14 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 fn abs_is_neg_power_of_2(x: &Rational) -> bool {
     x.numerator == 1u32 && x.denominator.is_power_of_2()
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct PrimitiveFloatFromRationalError;
+pub struct FloatFromRationalError;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -63,29 +64,29 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_rational#rounding_from).
-            fn rounding_from(mut value: Rational, mut rm: RoundingMode) -> $f {
+            fn rounding_from(mut value: Rational, mut rm: RoundingMode) -> ($f, Ordering) {
                 if value == 0u32 {
-                    0.0
+                    (0.0, Ordering::Equal)
                 } else {
                     let sign = value.sign;
                     if !sign {
                         rm.neg_assign();
                     }
-                    let mut exponent = value.floor_log_base_2_of_abs();
-                    let f = if exponent > $f::MAX_EXPONENT {
+                    let mut exponent = value.floor_log_base_2_abs();
+                    let (f, o) = if exponent > $f::MAX_EXPONENT {
                         match rm {
                             RoundingMode::Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
                             RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                $f::MAX_FINITE
+                                ($f::MAX_FINITE, Ordering::Less)
                             }
-                            _ => $f::POSITIVE_INFINITY,
+                            _ => ($f::INFINITY, Ordering::Greater),
                         }
                     } else if exponent >= $f::MIN_NORMAL_EXPONENT {
                         value >>= exponent - i64::wrapping_from($f::MANTISSA_WIDTH);
                         let (n, d) = value.into_numerator_and_denominator();
-                        let mut mantissa = n.div_round(d, rm);
+                        let (mut mantissa, o) = n.div_round(d, rm);
                         let mut bits = mantissa.significant_bits();
                         let mut done = false;
                         if bits > $f::MANTISSA_WIDTH + 1 {
@@ -104,58 +105,64 @@ macro_rules! float_impls {
                                 }
                                 RoundingMode::Floor
                                 | RoundingMode::Down
-                                | RoundingMode::Nearest => $f::MAX_FINITE,
-                                _ => $f::POSITIVE_INFINITY,
+                                | RoundingMode::Nearest => ($f::MAX_FINITE, Ordering::Less),
+                                _ => ($f::INFINITY, Ordering::Greater),
                             }
                         } else {
                             assert_eq!(bits, $f::MANTISSA_WIDTH + 1);
                             mantissa.clear_bit($f::MANTISSA_WIDTH);
-                            $f::from_raw_mantissa_and_exponent(
-                                u64::exact_from(&mantissa),
-                                u64::exact_from(exponent + $f::MAX_EXPONENT),
+                            (
+                                $f::from_raw_mantissa_and_exponent(
+                                    u64::exact_from(&mantissa),
+                                    u64::exact_from(exponent + $f::MAX_EXPONENT),
+                                ),
+                                o,
                             )
                         }
                     } else if exponent >= $f::MIN_EXPONENT {
                         let target_width = u64::wrapping_from(exponent - $f::MIN_EXPONENT + 1);
                         value >>= $f::MIN_EXPONENT;
                         let (n, d) = value.into_numerator_and_denominator();
-                        let mantissa = n.div_round(d, rm);
-                        if mantissa.significant_bits() > target_width
-                            && exponent == $f::MIN_NORMAL_EXPONENT - 1
-                        {
-                            $f::MIN_POSITIVE_NORMAL
-                        } else {
-                            $f::from_raw_mantissa_and_exponent(u64::exact_from(&mantissa), 0)
-                        }
+                        let (mantissa, o) = n.div_round(d, rm);
+                        (
+                            if mantissa.significant_bits() > target_width
+                                && exponent == $f::MIN_NORMAL_EXPONENT - 1
+                            {
+                                $f::MIN_POSITIVE_NORMAL
+                            } else {
+                                $f::from_raw_mantissa_and_exponent(u64::exact_from(&mantissa), 0)
+                            },
+                            o,
+                        )
                     } else {
                         match rm {
                             RoundingMode::Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
-                            RoundingMode::Floor | RoundingMode::Down => 0.0,
+                            RoundingMode::Floor | RoundingMode::Down => (0.0, Ordering::Less),
                             RoundingMode::Nearest => {
                                 if exponent == $f::MIN_EXPONENT - 1
                                     && !abs_is_neg_power_of_2(&value)
                                 {
-                                    $f::MIN_POSITIVE_SUBNORMAL
+                                    ($f::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
                                 } else {
-                                    0.0
+                                    (0.0, Ordering::Less)
                                 }
                             }
-                            _ => $f::MIN_POSITIVE_SUBNORMAL,
+                            _ => ($f::MIN_POSITIVE_SUBNORMAL, Ordering::Greater),
                         }
                     };
                     if sign {
-                        f
+                        (f, o)
                     } else {
-                        -f
+                        (-f, o.reverse())
                     }
                 }
             }
         }
 
         impl TryFrom<Rational> for $f {
-            type Error = PrimitiveFloatFromRationalError;
+            type Error = FloatFromRationalError;
 
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by value. If
             /// the input isn't exactly equal to any float, an error is returned.
@@ -174,11 +181,11 @@ macro_rules! float_impls {
                     Ok(0.0)
                 } else {
                     let sign = value.sign;
-                    let (mantissa, exponent) = value
-                        .sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)
-                        .ok_or(PrimitiveFloatFromRationalError)?;
+                    let (mantissa, exponent, _) = value
+                        .sci_mantissa_and_exponent_round(RoundingMode::Exact)
+                        .ok_or(FloatFromRationalError)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
-                        .ok_or(PrimitiveFloatFromRationalError);
+                        .ok_or(FloatFromRationalError);
                     if sign {
                         f
                     } else {
@@ -205,8 +212,8 @@ macro_rules! float_impls {
                 if value == 0 {
                     true
                 } else {
-                    if let Some((mantissa, exponent)) =
-                        value.sci_mantissa_and_exponent_with_rounding::<$f>(RoundingMode::Exact)
+                    if let Some((mantissa, exponent, _)) =
+                        value.sci_mantissa_and_exponent_round::<$f>(RoundingMode::Exact)
                     {
                         let exponent = i64::exact_from(exponent);
                         if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {
@@ -269,28 +276,28 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_rational#rounding_from).
-            fn rounding_from(value: &'a Rational, mut rm: RoundingMode) -> $f {
+            fn rounding_from(value: &'a Rational, mut rm: RoundingMode) -> ($f, Ordering) {
                 if *value == 0u32 {
-                    0.0
+                    (0.0, Ordering::Equal)
                 } else {
                     if !value.sign {
                         rm.neg_assign();
                     }
-                    let mut exponent = value.floor_log_base_2_of_abs();
-                    let f = if exponent > $f::MAX_EXPONENT {
+                    let mut exponent = value.floor_log_base_2_abs();
+                    let (f, o) = if exponent > $f::MAX_EXPONENT {
                         match rm {
                             RoundingMode::Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
                             RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                $f::MAX_FINITE
+                                ($f::MAX_FINITE, Ordering::Less)
                             }
-                            _ => $f::POSITIVE_INFINITY,
+                            _ => ($f::INFINITY, Ordering::Greater),
                         }
                     } else if exponent >= $f::MIN_NORMAL_EXPONENT {
                         let x = value >> exponent - i64::wrapping_from($f::MANTISSA_WIDTH);
                         let (n, d) = x.into_numerator_and_denominator();
-                        let mut mantissa = n.div_round(d, rm);
+                        let (mut mantissa, o) = n.div_round(d, rm);
                         let mut bits = mantissa.significant_bits();
                         let mut done = false;
                         if bits > $f::MANTISSA_WIDTH + 1 {
@@ -309,58 +316,64 @@ macro_rules! float_impls {
                                 }
                                 RoundingMode::Floor
                                 | RoundingMode::Down
-                                | RoundingMode::Nearest => $f::MAX_FINITE,
-                                _ => $f::POSITIVE_INFINITY,
+                                | RoundingMode::Nearest => ($f::MAX_FINITE, Ordering::Less),
+                                _ => ($f::INFINITY, Ordering::Greater),
                             }
                         } else {
                             assert_eq!(bits, $f::MANTISSA_WIDTH + 1);
                             mantissa.clear_bit($f::MANTISSA_WIDTH);
-                            $f::from_raw_mantissa_and_exponent(
-                                u64::exact_from(&mantissa),
-                                u64::exact_from(exponent + $f::MAX_EXPONENT),
+                            (
+                                $f::from_raw_mantissa_and_exponent(
+                                    u64::exact_from(&mantissa),
+                                    u64::exact_from(exponent + $f::MAX_EXPONENT),
+                                ),
+                                o,
                             )
                         }
                     } else if exponent >= $f::MIN_EXPONENT {
                         let target_width = u64::wrapping_from(exponent - $f::MIN_EXPONENT + 1);
                         let x = value >> $f::MIN_EXPONENT;
                         let (n, d) = x.into_numerator_and_denominator();
-                        let mantissa = n.div_round(d, rm);
-                        if mantissa.significant_bits() > target_width
-                            && exponent == $f::MIN_NORMAL_EXPONENT - 1
-                        {
-                            $f::MIN_POSITIVE_NORMAL
-                        } else {
-                            $f::from_raw_mantissa_and_exponent(u64::exact_from(&mantissa), 0)
-                        }
+                        let (mantissa, o) = n.div_round(d, rm);
+                        (
+                            if mantissa.significant_bits() > target_width
+                                && exponent == $f::MIN_NORMAL_EXPONENT - 1
+                            {
+                                $f::MIN_POSITIVE_NORMAL
+                            } else {
+                                $f::from_raw_mantissa_and_exponent(u64::exact_from(&mantissa), 0)
+                            },
+                            o,
+                        )
                     } else {
                         match rm {
                             RoundingMode::Exact => {
                                 panic!("Value cannot be represented exactly as a float")
                             }
-                            RoundingMode::Floor | RoundingMode::Down => 0.0,
+                            RoundingMode::Floor | RoundingMode::Down => (0.0, Ordering::Less),
                             RoundingMode::Nearest => {
                                 if exponent == $f::MIN_EXPONENT - 1
                                     && !abs_is_neg_power_of_2(&value)
                                 {
-                                    $f::MIN_POSITIVE_SUBNORMAL
+                                    ($f::MIN_POSITIVE_SUBNORMAL, Ordering::Greater)
                                 } else {
-                                    0.0
+                                    (0.0, Ordering::Less)
                                 }
                             }
-                            _ => $f::MIN_POSITIVE_SUBNORMAL,
+                            _ => ($f::MIN_POSITIVE_SUBNORMAL, Ordering::Greater),
                         }
                     };
                     if value.sign {
-                        f
+                        (f, o)
                     } else {
-                        -f
+                        (-f, o.reverse())
                     }
                 }
             }
         }
 
         impl<'a> TryFrom<&'a Rational> for $f {
-            type Error = PrimitiveFloatFromRationalError;
+            type Error = FloatFromRationalError;
 
             /// Converts a [`Rational`] to a primitive float, taking the [`Rational`] by reference.
             /// If the input isn't exactly equal to any float, an error is returned.
@@ -378,11 +391,11 @@ macro_rules! float_impls {
                 if *value == 0 {
                     Ok(0.0)
                 } else {
-                    let (mantissa, exponent) = value
-                        .sci_mantissa_and_exponent_with_rounding_ref(RoundingMode::Exact)
-                        .ok_or(PrimitiveFloatFromRationalError)?;
+                    let (mantissa, exponent, _) = value
+                        .sci_mantissa_and_exponent_round_ref(RoundingMode::Exact)
+                        .ok_or(FloatFromRationalError)?;
                     let f = $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
-                        .ok_or(PrimitiveFloatFromRationalError);
+                        .ok_or(FloatFromRationalError);
                     if value.sign {
                         f
                     } else {
@@ -409,8 +422,8 @@ macro_rules! float_impls {
                 if *value == 0 {
                     true
                 } else {
-                    if let Some((mantissa, exponent)) =
-                        value.sci_mantissa_and_exponent_with_rounding_ref::<$f>(RoundingMode::Exact)
+                    if let Some((mantissa, exponent, _)) =
+                        value.sci_mantissa_and_exponent_round_ref::<$f>(RoundingMode::Exact)
                     {
                         let exponent = i64::exact_from(exponent);
                         if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {

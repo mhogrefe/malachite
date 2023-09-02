@@ -40,7 +40,8 @@ impl Floor for Rational {
             Integer::from_sign_and_abs(
                 false,
                 self.numerator
-                    .div_round(self.denominator, RoundingMode::Ceiling),
+                    .div_round(self.denominator, RoundingMode::Ceiling)
+                    .0,
             )
         }
     }
@@ -80,7 +81,9 @@ impl<'a> Floor for &'a Rational {
         } else {
             Integer::from_sign_and_abs(
                 false,
-                (&self.numerator).div_round(&self.denominator, RoundingMode::Ceiling),
+                (&self.numerator)
+                    .div_round(&self.denominator, RoundingMode::Ceiling)
+                    .0,
             )
         }
     }

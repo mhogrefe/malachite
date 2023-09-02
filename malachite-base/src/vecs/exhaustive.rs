@@ -18,7 +18,7 @@ use itertools::{repeat_n, Itertools};
 use std::cmp::{max, min, Ordering};
 use std::iter::{empty, once, FromIterator, Once, Zip};
 use std::marker::PhantomData;
-use std::mem::swap;
+use std::mem::take;
 use std::ops::RangeFrom;
 
 #[doc(hidden)]
@@ -2621,7 +2621,7 @@ pub fn next_bit_pattern(
                     .count();
                 let tf_count = leading_false_count + true_after_false_count;
                 if tf_count == pattern.len() {
-                    for b in pattern.iter_mut() {
+                    for b in &mut *pattern {
                         *b = false;
                     }
                     pattern.push(true);
@@ -3959,9 +3959,7 @@ where
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
         if self.next.is_some() {
-            let mut p = None;
-            swap(&mut p, &mut self.next);
-            let (a, b) = p.unwrap();
+            let (a, b) = take(&mut self.next).unwrap();
             Some(vec![a, b])
         } else if let Some(p) = self.ps.next() {
             self.next = Some((p[1].clone(), p[0].clone()));

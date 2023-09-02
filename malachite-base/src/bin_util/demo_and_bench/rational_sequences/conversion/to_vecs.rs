@@ -15,27 +15,27 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_sequence_to_vecs(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_to_vecs(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("to_vecs(&{}) = {:?}", xs, xs.to_vecs());
     }
 }
 
-fn demo_rational_sequence_into_vecs(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_into_vecs(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("into_vecs({}) = {:?}", xs.clone(), xs.into_vecs());
     }
 }
 
-fn demo_rational_sequence_slices_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_slices_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("slices_ref(&{}) = {:?}", xs, xs.slices_ref());
@@ -44,14 +44,14 @@ fn demo_rational_sequence_slices_ref(gm: GenMode, config: GenConfig, limit: usiz
 
 fn benchmark_rational_sequence_to_vecs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.to_vecs()",
         BenchmarkType::EvaluationStrategy,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

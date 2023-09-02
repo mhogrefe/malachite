@@ -23,11 +23,11 @@ fn demo_from_digits_asc<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_9::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -45,11 +45,11 @@ fn demo_from_digits_desc<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_9::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -67,11 +67,11 @@ fn demo_from_digits_asc_targeted<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_8::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -89,11 +89,11 @@ fn demo_from_digits_desc_targeted<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_7::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -111,7 +111,7 @@ fn benchmark_from_digits_asc<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -123,7 +123,7 @@ fn benchmark_from_digits_asc<
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_8::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_8::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -139,7 +139,7 @@ fn benchmark_from_digits_desc<
     U: Digits<T> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -151,7 +151,7 @@ fn benchmark_from_digits_desc<
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_7::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_7::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

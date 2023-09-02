@@ -13,26 +13,26 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     T::Half: PrimitiveUnsigned,
 {
-    for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.split_in_half() = {:?}", u, u.split_in_half());
     }
 }
 
 fn benchmark_split_in_half<T: PrimitiveUnsigned + SplitInHalf>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.split_in_half()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

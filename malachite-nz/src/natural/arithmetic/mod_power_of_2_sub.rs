@@ -17,6 +17,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use std::mem::swap;
@@ -29,7 +30,7 @@ use std::mem::swap;
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     xs.resize(
-        usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)),
+        usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0),
         Limb::MAX,
     );
 }
@@ -180,7 +181,7 @@ impl Natural {
     fn mod_power_of_2_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
         match (self, y, pow) {
             (x, 0, _) => x.clone(),
-            (&natural_zero!(), _, _) => Natural(Small(y)).mod_power_of_2_neg(pow),
+            (&Natural::ZERO, _, _) => Natural(Small(y)).mod_power_of_2_neg(pow),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(small.mod_power_of_2_sub(other, pow)))
             }
@@ -204,7 +205,7 @@ impl Natural {
     fn mod_power_of_2_right_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
         match (self, y, pow) {
             (_, 0, _) => self.mod_power_of_2_neg(pow),
-            (&natural_zero!(), _, _) => Natural(Small(y)),
+            (&Natural::ZERO, _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(other.mod_power_of_2_sub(small, pow)))
             }
@@ -227,7 +228,7 @@ impl Natural {
     fn mod_power_of_2_sub_assign_limb(&mut self, y: Limb, pow: u64) {
         match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut natural_zero!(), _, _) => *self = Natural(Small(y)).mod_power_of_2_neg(pow),
+            (&mut Natural::ZERO, _, _) => *self = Natural(Small(y)).mod_power_of_2_neg(pow),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_sub_assign(other, pow)
             }
@@ -252,7 +253,7 @@ impl Natural {
     fn mod_power_of_2_right_sub_assign_limb(&mut self, other: Limb, pow: u64) {
         match (&mut *self, other, pow) {
             (_, 0, _) => self.mod_power_of_2_neg_assign(pow),
-            (&mut natural_zero!(), _, _) => *self = Natural(Small(other)),
+            (&mut Natural::ZERO, _, _) => *self = Natural(Small(other)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 *small = other.mod_power_of_2_sub(*small, pow);
             }
@@ -402,7 +403,7 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     /// ```
     fn mod_power_of_2_sub(self, other: &'a Natural, pow: u64) -> Natural {
         match (self, other) {
-            (x, y) if std::ptr::eq(x, y) => natural_zero!(),
+            (x, y) if std::ptr::eq(x, y) => Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_2_right_sub_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
@@ -485,7 +486,7 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     /// ```
     fn mod_power_of_2_sub_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {
-            (x, y) if std::ptr::eq(x, y) => *self = natural_zero!(),
+            (x, y) if std::ptr::eq(x, y) => *self = Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_right_sub_limb_ref(x, pow),
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {

@@ -7,7 +7,35 @@ use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::Ordering;
 
 impl Rational {
-    pub(crate) fn floor_log_base_2_of_abs(&self) -> i64 {
+    /// Returns the floor of the base-2 logarithm of the absolute value of a nonzero [`Rational`].
+    ///
+    /// $f(x) = \lfloor\log_2 |x|\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from(3u32).floor_log_base_2_abs(), 1);
+    /// assert_eq!(Rational::from_signeds(1, 3).floor_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(1, 4).floor_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(1, 5).floor_log_base_2_abs(), -3);
+    ///
+    /// assert_eq!(Rational::from(-3).floor_log_base_2_abs(), 1);
+    /// assert_eq!(Rational::from_signeds(-1, 3).floor_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(-1, 4).floor_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(-1, 5).floor_log_base_2_abs(), -3);
+    /// ```
+    pub fn floor_log_base_2_abs(&self) -> i64 {
         let exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         if self.numerator.cmp_normalized(&self.denominator) == Ordering::Less {
@@ -17,7 +45,36 @@ impl Rational {
         }
     }
 
-    pub(crate) fn ceiling_log_base_2_of_abs(&self) -> i64 {
+    /// Returns the ceiling of the base-2 logarithm of the absolute value of a nonzero
+    /// [`Rational`].
+    ///
+    /// $f(x) = \lfloor\log_2 |x|\rfloor$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` less than or equal to zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from(3u32).ceiling_log_base_2_abs(), 2);
+    /// assert_eq!(Rational::from_signeds(1, 3).ceiling_log_base_2_abs(), -1);
+    /// assert_eq!(Rational::from_signeds(1, 4).ceiling_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(1, 5).ceiling_log_base_2_abs(), -2);
+    ///
+    /// assert_eq!(Rational::from(-3).ceiling_log_base_2_abs(), 2);
+    /// assert_eq!(Rational::from_signeds(-1, 3).ceiling_log_base_2_abs(), -1);
+    /// assert_eq!(Rational::from_signeds(-1, 4).ceiling_log_base_2_abs(), -2);
+    /// assert_eq!(Rational::from_signeds(-1, 5).ceiling_log_base_2_abs(), -2);
+    /// ```
+    pub fn ceiling_log_base_2_abs(&self) -> i64 {
         let exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         if self.numerator.cmp_normalized(&self.denominator) == Ordering::Greater {
@@ -58,7 +115,7 @@ impl<'a> FloorLogBase2 for &'a Rational {
     #[inline]
     fn floor_log_base_2(self) -> i64 {
         assert!(*self > 0u32);
-        self.floor_log_base_2_of_abs()
+        self.floor_log_base_2_abs()
     }
 }
 
@@ -92,7 +149,7 @@ impl<'a> CeilingLogBase2 for &'a Rational {
     #[inline]
     fn ceiling_log_base_2(self) -> i64 {
         assert!(*self > 0u32);
-        self.ceiling_log_base_2_of_abs()
+        self.ceiling_log_base_2_abs()
     }
 }
 

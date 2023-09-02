@@ -120,7 +120,10 @@ impl Rational {
                 }
                 count
             };
-            length = max(length, count.div_round(u64::from(m), RoundingMode::Ceiling));
+            length = max(
+                length,
+                count.div_round(u64::from(m), RoundingMode::Ceiling).0,
+            );
         }
         if let Some(temp) = temp {
             if temp == 1 {
@@ -139,11 +142,11 @@ pub_test! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
         match log_base.sign() {
             Ordering::Equal => panic!("Cannot take base-1 logarithm"),
             Ordering::Greater => x
-                .floor_log_base_2_of_abs()
-                .div_round(log_base, RoundingMode::Floor),
+                .floor_log_base_2_abs()
+                .div_round(log_base, RoundingMode::Floor).0,
             Ordering::Less => {
-                -(x.ceiling_log_base_2_of_abs()
-                    .div_round(-log_base, RoundingMode::Ceiling))
+                -(x.ceiling_log_base_2_abs()
+                    .div_round(-log_base, RoundingMode::Ceiling).0)
             }
         }
     } else {
@@ -352,7 +355,7 @@ impl ToSci for Rational {
                 let scale = self
                     .length_after_point_in_small_base(base)
                     .unwrap_or_else(|| {
-                        panic!("{} has a non-terminating expansion in base {}", self, base)
+                        panic!("{self} has a non-terminating expansion in base {base}")
                     });
                 let precision = i64::exact_from(scale) + log + 1;
                 assert!(precision > 0);
@@ -366,7 +369,9 @@ impl ToSci for Rational {
                 i64::exact_from(precision),
             ),
         };
-        let n = Integer::rounding_from(self * q_base.pow(scale), options.get_rounding_mode()).abs();
+        let n = Integer::rounding_from(self * q_base.pow(scale), options.get_rounding_mode())
+            .0
+            .abs();
         if precision <= 0 {
             // e.g. we're in base 10, self is 0.01 or 0.000001, but scale is 1
             if n == 0u32 {

@@ -1,6 +1,7 @@
 use crate::integer::Integer;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromIntegerError;
@@ -9,7 +10,9 @@ macro_rules! float_impls {
     ($f: ident) => {
         impl<'a> RoundingFrom<&'a Integer> for $f {
             /// Converts an [`Integer`] to a primitive float according to a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
+            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode). An [`Ordering`] is
+            /// also returned, indicating whether the returned value is less than, equal to, or
+            /// greater than the original value.
             ///
             /// - If the rounding mode is `Floor` the largest float less than or equal to the
             ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite
@@ -40,11 +43,12 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_integer#rounding_from).
-            fn rounding_from(value: &'a Integer, rm: RoundingMode) -> $f {
+            fn rounding_from(value: &'a Integer, rm: RoundingMode) -> ($f, Ordering) {
                 if value.sign {
                     $f::rounding_from(&value.abs, rm)
                 } else {
-                    -$f::rounding_from(&value.abs, -rm)
+                    let (f, o) = $f::rounding_from(&value.abs, -rm);
+                    (-f, o.reverse())
                 }
             }
         }

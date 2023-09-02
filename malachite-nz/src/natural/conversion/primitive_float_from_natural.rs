@@ -7,6 +7,7 @@ use malachite_base::num::conversion::traits::{
     WrappingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromNaturalError;
@@ -15,7 +16,9 @@ macro_rules! float_impls {
     ($f: ident) => {
         impl<'a> RoundingFrom<&'a Natural> for $f {
             /// Converts a [`Natural`] to a primitive float according to a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
+            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode). An [`Ordering`] is
+            /// also returned, indicating whether the returned value is less than, equal to, or
+            /// greater than the original value.
             ///
             /// - If the rounding mode is `Floor` or `Down`, the largest float less than or equal
             ///   to the [`Natural`] is returned. If the [`Natural`] is greater than the maximum
@@ -40,26 +43,26 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_natural#rounding_from).
-            fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
+            fn rounding_from(value: &'a Natural, rm: RoundingMode) -> ($f, Ordering) {
                 if *value == 0 {
-                    0.0
+                    (0.0, Ordering::Equal)
                 } else {
-                    let (mantissa, exponent) = value
-                        .sci_mantissa_and_exponent_with_rounding(rm)
+                    let (mantissa, exponent, o) = value
+                        .sci_mantissa_and_exponent_round(rm)
                         .expect("Value cannot be represented exactly as a float");
                     if let Some(f) =
                         $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                     {
-                        f
+                        (f, o)
                     } else {
                         match rm {
                             RoundingMode::Exact => {
                                 panic!("Value cannot be represented exactly as an {}", $f::NAME)
                             }
                             RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                                $f::MAX_FINITE
+                                ($f::MAX_FINITE, Ordering::Less)
                             }
-                            _ => $f::POSITIVE_INFINITY,
+                            _ => ($f::INFINITY, Ordering::Greater),
                         }
                     }
                 }
@@ -86,8 +89,8 @@ macro_rules! float_impls {
                 if *value == 0 {
                     Ok(0.0)
                 } else {
-                    let (mantissa, exponent) = value
-                        .sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)
+                    let (mantissa, exponent, _) = value
+                        .sci_mantissa_and_exponent_round(RoundingMode::Exact)
                         .ok_or(PrimitiveFloatFromNaturalError)?;
                     $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                         .ok_or(PrimitiveFloatFromNaturalError)
@@ -111,8 +114,8 @@ macro_rules! float_impls {
                 if *value == 0 {
                     true
                 } else {
-                    if let Some((mantissa, exponent)) =
-                        value.sci_mantissa_and_exponent_with_rounding::<$f>(RoundingMode::Exact)
+                    if let Some((mantissa, exponent, _)) =
+                        value.sci_mantissa_and_exponent_round::<$f>(RoundingMode::Exact)
                     {
                         let exponent = i64::exact_from(exponent);
                         if !($f::MIN_EXPONENT..=$f::MAX_EXPONENT).contains(&exponent) {

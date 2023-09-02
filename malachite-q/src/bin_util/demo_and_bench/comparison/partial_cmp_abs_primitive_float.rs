@@ -19,13 +19,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: PartialOrdAbs<T>,
 {
     for (n, f) in rational_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match n.partial_cmp_abs(&f) {
@@ -39,11 +39,11 @@ fn demo_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
 
 fn demo_float_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, f) in rational_primitive_float_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match f.partial_cmp_abs(&n) {
@@ -57,7 +57,7 @@ fn demo_float_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveFlo
 
 fn benchmark_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -66,7 +66,7 @@ fn benchmark_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Rational.partial_cmp_abs(&{})", T::NAME),
         BenchmarkType::Single,
-        rational_primitive_float_pair_gen::<T>().get(gm, &config),
+        rational_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -77,14 +77,14 @@ fn benchmark_rational_partial_cmp_abs_float<T: PrimitiveFloat>(
 
 fn benchmark_float_partial_cmp_abs_rational<T: PartialOrdAbs<Rational> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&Rational)", T::NAME),
         BenchmarkType::Single,
-        rational_primitive_float_pair_gen::<T>().get(gm, &config),
+        rational_primitive_float_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

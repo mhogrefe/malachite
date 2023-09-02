@@ -26,8 +26,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_natural_try_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         let x_clone = x.clone();
         println!(
             "Natural::try_from({}) = {:?}",
@@ -37,14 +37,14 @@ fn demo_natural_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_natural_try_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_natural_try_from_rational_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!("Natural::try_from(&{}) = {:?}", x, Natural::try_from(&x));
     }
 }
 
-fn demo_natural_convertible_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_natural_convertible_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a Natural",
             x,
@@ -57,14 +57,14 @@ fn demo_natural_convertible_from_rational(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_natural_rounding_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_rounding_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in rational_rounding_mode_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_clone = x.clone();
         println!(
-            "Natural::rounding_from({}, {}) = {}",
+            "Natural::rounding_from({}, {}) = {:?}",
             x_clone,
             rm,
             Natural::rounding_from(x, rm)
@@ -72,13 +72,13 @@ fn demo_natural_rounding_from_rational(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_natural_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_rounding_from_rational_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in rational_rounding_mode_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "Natural::rounding_from(&{}, {}) = {}",
+            "Natural::rounding_from(&{}, {}) = {:?}",
             x,
             rm,
             Natural::rounding_from(&x, rm)
@@ -88,14 +88,14 @@ fn demo_natural_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit
 
 fn benchmark_natural_try_from_rational_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::try_from(Rational)",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -113,14 +113,14 @@ fn benchmark_natural_try_from_rational_evaluation_strategy(
 
 fn benchmark_natural_convertible_from_rational(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::convertible_from(Rational)",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -131,14 +131,14 @@ fn benchmark_natural_convertible_from_rational(
 
 fn benchmark_natural_rounding_from_rational_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::rounding_from(Rational)",
         BenchmarkType::EvaluationStrategy,
-        rational_rounding_mode_pair_gen_var_1().get(gm, &config),
+        rational_rounding_mode_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -65,46 +65,46 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_primitive_int_try_from_integer<T: for<'a> TryFrom<&'a Integer> + PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> <T as TryFrom<&'a Integer>>::Error: Debug,
 {
-    for n in integer_gen().get(gm, &config).take(limit) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("{}::try_from(&{}) = {:?}", T::NAME, n, T::try_from(&n));
     }
 }
 
 fn demo_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: From<T>,
 {
-    for n in integer_gen_var_5::<T>().get(gm, &config).take(limit) {
+    for n in integer_gen_var_5::<T>().get(gm, config).take(limit) {
         println!("{}::exact_from(&{}) = {}", T::NAME, n, T::exact_from(&n));
     }
 }
 
 fn demo_signed_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Integer: From<T>,
 {
-    for n in integer_gen_var_6::<T>().get(gm, &config).take(limit) {
+    for n in integer_gen_var_6::<T>().get(gm, config).take(limit) {
         println!("{}::exact_from(&{}) = {}", T::NAME, n, T::exact_from(&n));
     }
 }
 
 fn demo_primitive_int_wrapping_from_integer<T: PrimitiveInt + for<'a> WrappingFrom<&'a Integer>>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "{}::wrapping_from(&{}) = {}",
             T::NAME,
@@ -118,10 +118,10 @@ fn demo_primitive_int_saturating_from_integer<
     T: PrimitiveInt + for<'a> SaturatingFrom<&'a Integer>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "{}::saturating_from(&{}) = {}",
             T::NAME,
@@ -135,10 +135,10 @@ fn demo_primitive_int_overflowing_from_integer<
     T: for<'a> OverflowingFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "{}::overflowing_from(&{}) = {:?}",
             T::NAME,
@@ -152,10 +152,10 @@ fn demo_primitive_int_convertible_from_integer<
     T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a {}",
             n,
@@ -169,14 +169,14 @@ fn benchmark_primitive_int_try_from_integer_algorithms<
     T: for<'a> TryFrom<&'a Integer> + for<'a> OverflowingFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::try_from(&Integer)", T::NAME),
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -197,7 +197,7 @@ fn benchmark_primitive_int_try_from_integer_algorithms<
 
 fn benchmark_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -206,7 +206,7 @@ fn benchmark_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + Pri
     run_benchmark(
         &format!("{}::exact_from(&Integer)", T::NAME),
         BenchmarkType::Single,
-        integer_gen_var_5::<T>().get(gm, &config),
+        integer_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -217,7 +217,7 @@ fn benchmark_unsigned_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + Pri
 
 fn benchmark_signed_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -226,7 +226,7 @@ fn benchmark_signed_exact_from_integer<T: for<'a> ExactFrom<&'a Integer> + Primi
     run_benchmark(
         &format!("{}::exact_from(&Integer)", T::NAME),
         BenchmarkType::Single,
-        integer_gen_var_6::<T>().get(gm, &config),
+        integer_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -240,14 +240,14 @@ fn benchmark_primitive_int_wrapping_from_integer_algorithms<
     T: for<'a> OverflowingFrom<&'a Integer> + PrimitiveInt + for<'a> WrappingFrom<&'a Integer>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::wrapping_from(&Integer)", T::NAME),
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -265,14 +265,14 @@ fn benchmark_primitive_int_saturating_from_integer<
     T: PrimitiveInt + for<'a> SaturatingFrom<&'a Integer>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::saturating_from(&Integer)", T::NAME),
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -289,14 +289,14 @@ fn benchmark_primitive_int_overflowing_from_integer_algorithms<
         + for<'a> WrappingFrom<&'a Integer>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::overflowing_from(&Integer)", T::NAME),
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -315,14 +315,14 @@ fn benchmark_primitive_int_convertible_from_integer_algorithms<
     T: for<'a> TryFrom<&'a Integer> + for<'a> ConvertibleFrom<&'a Integer> + PrimitiveInt,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::convertible_from(&Integer)", T::NAME),
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -336,14 +336,14 @@ fn benchmark_primitive_int_convertible_from_integer_algorithms<
 
 fn benchmark_u32_try_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -357,14 +357,14 @@ fn benchmark_u32_try_from_integer_library_comparison(
 
 fn benchmark_u32_wrapping_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u32::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -378,14 +378,14 @@ fn benchmark_u32_wrapping_from_integer_library_comparison(
 
 fn benchmark_u64_try_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -399,14 +399,14 @@ fn benchmark_u64_try_from_integer_library_comparison(
 
 fn benchmark_u64_wrapping_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "u64::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -420,14 +420,14 @@ fn benchmark_u64_wrapping_from_integer_library_comparison(
 
 fn benchmark_i32_try_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i32::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -441,14 +441,14 @@ fn benchmark_i32_try_from_integer_library_comparison(
 
 fn benchmark_i32_wrapping_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i32::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -462,14 +462,14 @@ fn benchmark_i32_wrapping_from_integer_library_comparison(
 
 fn benchmark_i64_try_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i64::try_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -483,14 +483,14 @@ fn benchmark_i64_try_from_integer_library_comparison(
 
 fn benchmark_i64_wrapping_from_integer_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "i64::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_rm().get(gm, &config),
+        integer_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

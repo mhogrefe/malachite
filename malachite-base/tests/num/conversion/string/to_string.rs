@@ -79,17 +79,14 @@ fn test_digit_to_display_byte_lower() {
 #[test]
 fn digit_to_display_byte_lower_properties() {
     unsigned_gen().test_properties(|b| {
-        assert_eq!(
-            digit_to_display_byte_lower(b).is_some(),
-            (0..36).contains(&b)
-        );
+        assert_eq!(digit_to_display_byte_lower(b).is_some(), b < 36);
     });
 
     unsigned_gen_var_7().test_properties(|b| {
         let display_byte = digit_to_display_byte_lower(b).unwrap();
-        assert!((b'0'..=b'9').contains(&display_byte) || (b'a'..=b'z').contains(&display_byte));
+        assert!(display_byte.is_ascii_digit() || display_byte.is_ascii_lowercase());
         let display_byte_upper = digit_to_display_byte_upper(b).unwrap();
-        assert_eq!(display_byte == display_byte_upper, (0..=9).contains(&b));
+        assert_eq!(display_byte == display_byte_upper, b < 10);
         assert_eq!(
             char::from(display_byte).to_ascii_uppercase(),
             char::from(display_byte_upper)
@@ -137,9 +134,9 @@ fn digit_to_display_byte_upper_properties() {
 
     unsigned_gen_var_7().test_properties(|b| {
         let display_byte = digit_to_display_byte_upper(b).unwrap();
-        assert!((b'0'..=b'9').contains(&display_byte) || (b'A'..=b'Z').contains(&display_byte));
+        assert!(display_byte.is_ascii_digit() || display_byte.is_ascii_uppercase());
         let display_byte_lower = digit_to_display_byte_lower(b).unwrap();
-        assert_eq!(display_byte == display_byte_lower, (0..=9).contains(&b));
+        assert_eq!(display_byte == display_byte_lower, b < 10);
         assert_eq!(
             char::from(display_byte).to_ascii_lowercase(),
             char::from(display_byte_lower)
@@ -341,8 +338,8 @@ where
     unsigned_triple_gen_var_6::<T, u8, usize>().test_properties(|(x, base, width)| {
         let fx = BaseFmtWrapper::new(x, base);
         let s = x.to_string_base(base);
-        let s_padded = format!("{:0width$}", fx, width = width);
-        assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
+        let s_padded = format!("{fx:0width$}");
+        assert_eq!(format!("{fx:0width$?}"), s_padded);
         assert_eq!(T::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
@@ -354,19 +351,19 @@ where
     unsigned_pair_gen_var_2::<T, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 16), width = width),
-            format!("{:0width$x}", x, width = width)
+            format!("{x:0width$x}")
         );
     });
 
@@ -427,10 +424,10 @@ where
         |(x, base, width)| {
             let fx = BaseFmtWrapper::new(x, base);
             let s = x.to_string_base(base);
-            let s_padded = format!("{:0width$}", fx, width = width);
+            let s_padded = format!("{fx:0width$}");
             assert!(s_padded.len() >= width);
             assert_eq!(s.len() >= width, s == s_padded);
-            assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
+            assert_eq!(format!("{fx:0width$?}"), s_padded);
             assert_eq!(T::from_string_base(base, &s).unwrap(), x);
             assert!(string_is_subset(
                 &s_padded,
@@ -443,19 +440,19 @@ where
     signed_unsigned_pair_gen_var_6::<T, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:0width$}", BaseFmtWrapper::new(x, 16), width = width),
-            format!("{:0width$x}", x, width = width)
+            format!("{x:0width$x}")
         );
     });
 
@@ -657,8 +654,8 @@ where
     unsigned_triple_gen_var_6::<T, u8, usize>().test_properties(|(x, base, width)| {
         let fx = BaseFmtWrapper::new(x, base);
         let s = x.to_string_base_upper(base);
-        let s_padded = format!("{:#0width$}", fx, width = width);
-        assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
+        let s_padded = format!("{fx:#0width$}");
+        assert_eq!(format!("{fx:#0width$?}"), s_padded);
         assert_eq!(T::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
@@ -670,19 +667,19 @@ where
     unsigned_pair_gen_var_2::<T, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 16), width = width),
-            format!("{:0width$X}", x, width = width)
+            format!("{x:0width$X}")
         );
     });
 
@@ -738,10 +735,10 @@ where
         |(x, base, width)| {
             let fx = BaseFmtWrapper::new(x, base);
             let s = x.to_string_base_upper(base);
-            let s_padded = format!("{:#0width$}", fx, width = width);
+            let s_padded = format!("{fx:#0width$}");
             assert!(s_padded.len() >= width);
             assert_eq!(s.len() >= width, s == s_padded);
-            assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
+            assert_eq!(format!("{fx:#0width$?}"), s_padded);
             assert_eq!(T::from_string_base(base, &s).unwrap(), x);
             assert!(string_is_subset(
                 &s_padded,
@@ -754,19 +751,19 @@ where
     signed_unsigned_pair_gen_var_6::<T, usize>().test_properties(|(x, width)| {
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 10), width = width),
-            format!("{:0width$}", x, width = width)
+            format!("{x:0width$}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 2), width = width),
-            format!("{:0width$b}", x, width = width)
+            format!("{x:0width$b}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 8), width = width),
-            format!("{:0width$o}", x, width = width)
+            format!("{x:0width$o}")
         );
         assert_eq!(
             format!("{:#0width$}", BaseFmtWrapper::new(x, 16), width = width),
-            format!("{:0width$X}", x, width = width)
+            format!("{x:0width$X}")
         );
     });
 

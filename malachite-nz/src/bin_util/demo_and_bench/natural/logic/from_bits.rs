@@ -20,8 +20,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_from_bits_desc_algorithms);
 }
 
-fn demo_natural_from_bits_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for bits in bool_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_bits_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bits in bool_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_bits_asc({:?}) = {:?}",
             bits,
@@ -30,8 +30,8 @@ fn demo_natural_from_bits_asc(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_from_bits_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for bits in bool_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_bits_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for bits in bool_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_bits_desc({:?}) = {:?}",
             bits,
@@ -42,14 +42,14 @@ fn demo_natural_from_bits_desc(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_natural_from_bits_asc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_bits_asc<I: Iterator<Item=bool>>(I)",
         BenchmarkType::Algorithms,
-        bool_vec_gen().get(gm, &config),
+        bool_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -70,14 +70,14 @@ fn benchmark_natural_from_bits_asc_algorithms(
 
 fn benchmark_natural_from_bits_desc_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_bits_desc<I: Iterator<Item=bool>>(I)",
         BenchmarkType::Algorithms,
-        bool_vec_gen().get(gm, &config),
+        bool_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -59,9 +59,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_shr_round_up(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr_round_up(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, bits) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -73,9 +73,9 @@ fn demo_limbs_shr_round_up(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_shr_round_nearest(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr_round_nearest(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, bits) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -87,9 +87,9 @@ fn demo_limbs_shr_round_nearest(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_shr_exact(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr_exact(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, bits) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -101,9 +101,9 @@ fn demo_limbs_shr_exact(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_shr_round(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_shr_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, bits, rm) in unsigned_vec_unsigned_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -116,96 +116,93 @@ fn demo_limbs_shr_round(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_vec_shr_round_up_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_shr_round_up_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        limbs_vec_shr_round_up_in_place(&mut xs, bits);
+        let o = limbs_vec_shr_round_up_in_place(&mut xs, bits);
         println!(
-            "xs := {:?}; limbs_vec_shr_round_up_in_place(&mut xs, {}); xs = {:?}",
-            xs_old, bits, xs
+            "xs := {xs_old:?}; \
+            limbs_vec_shr_round_up_in_place(&mut xs, {bits}) = {o:?}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_shr_round_nearest_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_shr_round_nearest_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        limbs_vec_shr_round_nearest_in_place(&mut xs, bits);
+        let o = limbs_vec_shr_round_nearest_in_place(&mut xs, bits);
         println!(
-            "limbs := {:?}; limbs_vec_shr_round_nearest_in_place(&mut limbs, {}); limbs = {:?}",
-            xs_old, bits, xs
+            "limbs := {xs_old:?}; \
+            limbs_vec_shr_round_nearest_in_place(&mut limbs, {bits}) = {o:?}; limbs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_shr_exact_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_shr_exact_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let result = limbs_vec_shr_exact_in_place(&mut xs, bits);
         println!(
-            "xs := {:?}; limbs_vec_shr_exact_in_place(&mut xs, {}) = {}; xs = {:?}",
-            xs_old, bits, result, xs
+            "xs := {xs_old:?}; \
+            limbs_vec_shr_exact_in_place(&mut xs, {bits}) = {result}; xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_vec_shr_round_in_place(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_shr_round_in_place(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, bits, rm) in unsigned_vec_unsigned_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         let result = limbs_vec_shr_round_in_place(&mut xs, bits, rm);
         println!(
-            "xs := {:?}; limbs_vec_shr_round_in_place(&mut xs, {}, {}) = {}; xs = {:?}",
-            xs_old, bits, rm, result, xs
+            "xs := {xs_old:?}; \
+            limbs_vec_shr_round_in_place(&mut xs, {bits}, {rm}) = {result:?}; xs = {xs:?}",
         );
     }
 }
 
 fn demo_natural_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: Shl<T, Output = Natural> + ShrRoundAssign<T>,
 {
     for (mut n, u, rm) in natural_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.shr_round_assign(u, rm);
-        println!(
-            "x := {}; x.shr_round_assign({}, {}); x = {}",
-            n_old, u, rm, n
-        );
+        let o = n.shr_round_assign(u, rm);
+        println!("x := {n_old}; x.shr_round_assign({u}, {rm}) = {o:?}; x = {n}");
     }
 }
 
 fn demo_natural_shr_round_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: Shl<T, Output = Natural> + ShrRound<T, Output = Natural>,
 {
     for (n, u, rm) in natural_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {}) = {}",
+            "{}.shr_round({}, {}) = {:?}",
             n_old,
             u,
             rm,
@@ -216,18 +213,18 @@ fn demo_natural_shr_round_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_natural_shr_round_unsigned_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: Shl<T, Output = Natural>,
     for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
     for (n, u, rm) in natural_unsigned_rounding_mode_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).shr_round({}, {}) = {}",
+            "(&{}).shr_round({}, {}) = {:?}",
             n,
             u,
             rm,
@@ -238,35 +235,32 @@ fn demo_natural_shr_round_unsigned_ref<T: PrimitiveUnsigned>(
 
 fn demo_natural_shr_round_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: Shl<T, Output = Natural> + ShrRoundAssign<T>,
 {
     for (mut n, i, rm) in natural_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.shr_round_assign(i, rm);
-        println!(
-            "x := {}; x.shr_round_assign({}, {}); x = {}",
-            n_old, i, rm, n
-        );
+        let o = n.shr_round_assign(i, rm);
+        println!("x := {n_old}; x.shr_round_assign({i}, {rm}) = {o:?}; x = {n}");
     }
 }
 
-fn demo_natural_shr_round_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shr_round_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: Shl<T, Output = Natural> + ShrRound<T, Output = Natural>,
 {
     for (n, i, rm) in natural_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "{}.shr_round({}, {}) = {}",
+            "{}.shr_round({}, {}) = {:?}",
             n_old,
             i,
             rm,
@@ -277,18 +271,18 @@ where
 
 fn demo_natural_shr_round_signed_ref<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: Shl<T, Output = Natural>,
     for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
     for (n, i, rm) in natural_signed_rounding_mode_triple_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).shr_round({}, {}) = {}",
+            "(&{}).shr_round({}, {}) = {:?}",
             n,
             i,
             rm,
@@ -297,11 +291,11 @@ fn demo_natural_shr_round_signed_ref<T: PrimitiveSigned>(
     }
 }
 
-fn benchmark_limbs_shr_round_up(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr_round_up(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_shr_round_up(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -314,14 +308,14 @@ fn benchmark_limbs_shr_round_up(gm: GenMode, config: GenConfig, limit: usize, fi
 
 fn benchmark_limbs_shr_round_nearest(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_shr_round_nearest(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -332,11 +326,11 @@ fn benchmark_limbs_shr_round_nearest(
     );
 }
 
-fn benchmark_limbs_shr_exact(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr_exact(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_shr_exact(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -347,11 +341,11 @@ fn benchmark_limbs_shr_exact(gm: GenMode, config: GenConfig, limit: usize, file_
     );
 }
 
-fn benchmark_limbs_shr_round(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr_round(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_shr_round(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, &config),
+        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -364,54 +358,54 @@ fn benchmark_limbs_shr_round(gm: GenMode, config: GenConfig, limit: usize, file_
 
 fn benchmark_limbs_vec_shr_round_up_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_shr_round_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            limbs_vec_shr_round_up_in_place(&mut xs, bits)
+            no_out!(limbs_vec_shr_round_up_in_place(&mut xs, bits))
         })],
     );
 }
 
 fn benchmark_limbs_vec_shr_round_nearest_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_shr_round_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, bits)| {
-            limbs_vec_shr_round_nearest_in_place(&mut xs, bits)
+            no_out!(limbs_vec_shr_round_nearest_in_place(&mut xs, bits))
         })],
     );
 }
 
 fn benchmark_limbs_vec_shr_exact_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_shr_exact_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -424,14 +418,14 @@ fn benchmark_limbs_vec_shr_exact_in_place(
 
 fn benchmark_limbs_vec_shr_round_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_vec_shr_round_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, &config),
+        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -444,7 +438,7 @@ fn benchmark_limbs_vec_shr_round_in_place(
 
 fn benchmark_natural_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -453,18 +447,20 @@ fn benchmark_natural_shr_round_assign_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural.shr_round_assign({}, RoundingMode)", T::NAME),
         BenchmarkType::Single,
-        natural_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        natural_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_natural_bit_bucketer("n"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.shr_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.shr_round_assign(y, rm))
+        })],
     );
 }
 
 fn benchmark_natural_shr_round_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -474,7 +470,7 @@ fn benchmark_natural_shr_round_unsigned_evaluation_strategy<T: PrimitiveUnsigned
     run_benchmark(
         &format!("Natural.shr_round({}, RoundingMode)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
+        natural_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -494,7 +490,7 @@ fn benchmark_natural_shr_round_unsigned_evaluation_strategy<T: PrimitiveUnsigned
 
 fn benchmark_natural_shr_round_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -503,18 +499,20 @@ fn benchmark_natural_shr_round_assign_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.shr_round_assign({}, RoundingMode)", T::NAME),
         BenchmarkType::Single,
-        natural_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        natural_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_natural_bit_bucketer("n"),
-        &mut [("Malachite", &mut |(mut x, y, rm)| x.shr_round_assign(y, rm))],
+        &mut [("Malachite", &mut |(mut x, y, rm)| {
+            no_out!(x.shr_round_assign(y, rm))
+        })],
     );
 }
 
 fn benchmark_natural_shr_round_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -524,7 +522,7 @@ fn benchmark_natural_shr_round_signed_evaluation_strategy<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.shr_round({}, RoundingMode)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, &config),
+        natural_signed_rounding_mode_triple_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

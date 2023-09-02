@@ -25,10 +25,9 @@ pub struct FitsInLimbIterator<'a, T>(FILIterator<'a, T>);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct FILIterator<'a, T> {
-    significant_digits: usize,
     limbs: &'a [Limb],
     log_base: u64,
-    some_remaining: bool,
+    remaining: usize,
     limb_i: usize,
     limb_j: usize,
     // This index initially points to the least-significant digit, and is incremented by next().
@@ -44,34 +43,29 @@ impl<'a, T: PrimitiveUnsigned> Iterator for FILIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = T::wrapping_from((self.limbs[self.limb_i] >> self.i) & self.mask);
-            if self.limb_i == self.limb_j && self.i == self.j {
-                self.some_remaining = false;
-            }
             self.i += self.log_base;
             if self.i == Limb::WIDTH {
                 self.i = 0;
                 self.limb_i += 1;
             }
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.significant_digits;
-        (significant_digits, Some(significant_digits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for FILIterator<'a, T> {
     fn next_back(&mut self) -> Option<T> {
-        if self.some_remaining {
-            if self.limb_i == self.limb_j && self.i == self.j {
-                self.some_remaining = false;
-            }
+        if self.remaining != 0 {
             let digit = T::wrapping_from((self.limbs[self.limb_j] >> self.j) & self.mask);
             if self.j == 0 {
                 self.j = Limb::WIDTH - self.log_base;
@@ -79,6 +73,7 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for FILIterator<'a, T> {
             } else {
                 self.j -= self.log_base;
             }
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -109,7 +104,7 @@ pub struct SizeOfLimbIterator<'a, T>(SOLIterator<'a, T>);
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct SOLIterator<'a, T> {
     limbs: &'a [Limb],
-    some_remaining: bool,
+    remaining: usize,
     // This index initially points to the least-significant digit, and is incremented by next().
     i: usize,
     // This index initially points to the most-significant nonzero digit, and is decremented by
@@ -122,32 +117,28 @@ impl<'a, T: PrimitiveUnsigned> Iterator for SOLIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = T::wrapping_from(self.limbs[self.i]);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.i += 1;
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.limbs.len();
-        (significant_digits, Some(significant_digits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for SOLIterator<'a, T> {
     fn next_back(&mut self) -> Option<T> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = T::wrapping_from(self.limbs[self.j]);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.j.saturating_sub_assign(1);
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -174,7 +165,6 @@ pub struct MultipleOfLimbIterator<'a, T>(MOLIterator<'a, T>);
 
 #[derive(Clone, Debug)]
 struct MOLIterator<'a, T> {
-    significant_digits: usize,
     log_ratio: u64,
     limbs: &'a [Limb],
     chunks: Chunks<'a, Limb>,
@@ -188,9 +178,9 @@ impl<'a, T: PrimitiveUnsigned> Iterator for MOLIterator<'a, T> {
         self.chunks.next().map(T::from_other_type_slice)
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.significant_digits;
-        (significant_digits, Some(significant_digits))
+        self.chunks.size_hint()
     }
 }
 
@@ -223,10 +213,9 @@ pub struct IrregularIterator<'a, T>(IIterator<'a, T>);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct IIterator<'a, T> {
-    significant_digits: usize,
     limbs: &'a [Limb],
     log_base: u64,
-    some_remaining: bool,
+    remaining: usize,
     // This index initially points to the least-significant digit, and is incremented by next().
     i: u64,
     // This index initially points to the most-significant nonzero digit, and is decremented by
@@ -239,32 +228,28 @@ impl<'a, T: PrimitiveUnsigned> Iterator for IIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = self.get(self.i);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.i += 1;
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.significant_digits;
-        (significant_digits, Some(significant_digits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator for IIterator<'a, T> {
     fn next_back(&mut self) -> Option<T> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = self.get(self.j);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.j.saturating_sub_assign(1);
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -422,12 +407,13 @@ fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
 ) -> FitsInLimbIterator<'_, T> {
     let significant_bits = limbs_significant_bits(xs);
     let log_log_base = log_base.floor_log_base_2();
-    let significant_digits = significant_bits.shr_round(log_log_base, RoundingMode::Ceiling);
+    let significant_digits = significant_bits
+        .shr_round(log_log_base, RoundingMode::Ceiling)
+        .0;
     FitsInLimbIterator(FILIterator {
-        significant_digits: usize::exact_from(significant_digits),
         limbs: xs,
         log_base,
-        some_remaining: true,
+        remaining: usize::exact_from(significant_digits),
         limb_i: 0,
         limb_j: xs.len() - 1,
         i: 0,
@@ -440,7 +426,7 @@ fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
 const fn size_of_limb_iterator<T: PrimitiveUnsigned>(xs: &[Limb]) -> SizeOfLimbIterator<'_, T> {
     SizeOfLimbIterator(SOLIterator {
         limbs: xs,
-        some_remaining: true,
+        remaining: xs.len(),
         i: 0,
         j: xs.len() - 1,
         phantom: PhantomData,
@@ -453,9 +439,7 @@ fn multiple_of_limb_iterator<T: PrimitiveUnsigned>(
 ) -> MultipleOfLimbIterator<'_, T> {
     let log_log_base = log_base.floor_log_base_2();
     let log_ratio = log_log_base - Limb::LOG_WIDTH;
-    let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
     MultipleOfLimbIterator(MOLIterator {
-        significant_digits,
         log_ratio,
         limbs: xs,
         chunks: xs.chunks(usize::power_of_2(log_ratio)),
@@ -467,12 +451,13 @@ fn irregular_iterator<T: PrimitiveUnsigned>(
     xs: &[Limb],
     log_base: u64,
 ) -> IrregularIterator<'_, T> {
-    let significant_digits = limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
+    let significant_digits = limbs_significant_bits(xs)
+        .div_round(log_base, RoundingMode::Ceiling)
+        .0;
     IrregularIterator(IIterator {
-        significant_digits: usize::exact_from(significant_digits),
         limbs: xs,
         log_base,
-        some_remaining: true,
+        remaining: usize::exact_from(significant_digits),
         i: 0,
         j: significant_digits - 1,
         phantom: PhantomData,
@@ -563,7 +548,6 @@ pub struct NaturalMultipleOfLimbIterator<'a>(NMOLIterator<'a>);
 
 #[derive(Clone, Debug)]
 struct NMOLIterator<'a> {
-    significant_digits: usize,
     log_ratio: u64,
     limbs: &'a [Limb],
     chunks: Chunks<'a, Limb>,
@@ -576,9 +560,9 @@ impl<'a> Iterator for NMOLIterator<'a> {
         self.chunks.next().map(Natural::from_limbs_asc)
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.significant_digits;
-        (significant_digits, Some(significant_digits))
+        self.chunks.size_hint()
     }
 }
 
@@ -611,10 +595,9 @@ pub struct NaturalIrregularIterator<'a>(NIIterator<'a>);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct NIIterator<'a> {
-    significant_digits: usize,
     limbs: &'a [Limb],
     log_base: u64,
-    some_remaining: bool,
+    remaining: usize,
     // This index initially points to the least-significant digit, and is incremented by next().
     i: u64,
     // This index initially points to the most-significant nonzero digit, and is decremented by
@@ -626,32 +609,28 @@ impl<'a> Iterator for NIIterator<'a> {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = self.get(self.i);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.i += 1;
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_digits = self.significant_digits;
-        (significant_digits, Some(significant_digits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<'a> DoubleEndedIterator for NIIterator<'a> {
     fn next_back(&mut self) -> Option<Natural> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let digit = self.get(self.j);
-            if self.i == self.j {
-                self.some_remaining = false;
-            }
             self.j.saturating_sub_assign(1);
+            self.remaining -= 1;
             Some(digit)
         } else {
             None
@@ -812,11 +791,8 @@ impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
 }
 
 fn multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbIterator<'_> {
-    let log_log_base = log_base.floor_log_base_2();
-    let log_ratio = log_log_base - Limb::LOG_WIDTH;
-    let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
+    let log_ratio = log_base.floor_log_base_2() - Limb::LOG_WIDTH;
     NaturalMultipleOfLimbIterator(NMOLIterator {
-        significant_digits,
         log_ratio,
         limbs: xs,
         chunks: xs.chunks(usize::power_of_2(log_ratio)),
@@ -824,12 +800,13 @@ fn multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbItera
 }
 
 fn irregular_fn(xs: &[Limb], log_base: u64) -> NaturalIrregularIterator<'_> {
-    let significant_digits = limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
+    let significant_digits = limbs_significant_bits(xs)
+        .div_round(log_base, RoundingMode::Ceiling)
+        .0;
     NaturalIrregularIterator(NIIterator {
-        significant_digits: usize::exact_from(significant_digits),
         limbs: xs,
         log_base,
-        some_remaining: true,
+        remaining: usize::exact_from(significant_digits),
         i: 0,
         j: significant_digits - 1,
     })

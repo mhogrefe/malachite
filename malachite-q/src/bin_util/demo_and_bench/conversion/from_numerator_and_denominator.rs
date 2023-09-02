@@ -42,8 +42,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_from_sign_and_unsigneds);
 }
 
-fn demo_from_naturals(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, d) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_from_naturals(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, d) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         let n_old = n.clone();
         let d_old = d.clone();
         println!(
@@ -55,8 +55,8 @@ fn demo_from_naturals(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_naturals_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, d) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_from_naturals_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, d) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         println!(
             "Rational::from_naturals_ref({}, {}) = {}",
             n,
@@ -66,12 +66,12 @@ fn demo_from_naturals_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_from_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: From<T>,
 {
     for (n, d) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -83,8 +83,8 @@ where
     }
 }
 
-fn demo_from_integers(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, d) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_from_integers(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, d) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let n_old = n.clone();
         let d_old = d.clone();
         println!(
@@ -96,8 +96,8 @@ fn demo_from_integers(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_integers_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, d) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
+fn demo_from_integers_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, d) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "Rational::from_naturals_ref({}, {}) = {}",
             n,
@@ -107,11 +107,11 @@ fn demo_from_integers_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_signeds<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_from_signeds<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Integer: From<T>,
 {
-    for (n, d) in signed_pair_gen_var_6::<T>().get(gm, &config).take(limit) {
+    for (n, d) in signed_pair_gen_var_6::<T>().get(gm, config).take(limit) {
         println!(
             "Rational::from_signeds({}, {}) = {}",
             n,
@@ -121,9 +121,9 @@ where
     }
 }
 
-fn demo_from_sign_and_naturals(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_sign_and_naturals(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, d, sign) in natural_natural_bool_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -138,9 +138,9 @@ fn demo_from_sign_and_naturals(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_sign_and_naturals_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_sign_and_naturals_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, d, sign) in natural_natural_bool_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -153,12 +153,12 @@ fn demo_from_sign_and_naturals_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_from_sign_and_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_from_sign_and_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: From<T>,
 {
     for (n, d, sign) in unsigned_unsigned_bool_triple_gen_var_2::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -173,14 +173,14 @@ where
 
 fn benchmark_from_naturals_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_naturals(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -198,7 +198,7 @@ fn benchmark_from_naturals_evaluation_strategy(
 
 fn benchmark_from_unsigneds<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -207,7 +207,7 @@ fn benchmark_from_unsigneds<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Rational::from_unsigneds({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -220,14 +220,14 @@ fn benchmark_from_unsigneds<T: PrimitiveUnsigned>(
 
 fn benchmark_from_integers_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_integers(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -246,14 +246,14 @@ fn benchmark_from_integers_evaluation_strategy(
 #[allow(unused_must_use)]
 fn benchmark_from_integers_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_integers(Integer, Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_nrm().get(gm, &config),
+        integer_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -272,7 +272,7 @@ fn benchmark_from_integers_library_comparison(
 
 fn benchmark_from_signeds<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -281,7 +281,7 @@ fn benchmark_from_signeds<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Rational::from_signeds({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_6::<T>().get(gm, &config),
+        signed_pair_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -294,14 +294,14 @@ fn benchmark_from_signeds<T: PrimitiveSigned>(
 
 fn benchmark_from_sign_and_naturals_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_sign_and_naturals(bool, Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_natural_bool_triple_gen_var_1().get(gm, &config),
+        natural_natural_bool_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -319,7 +319,7 @@ fn benchmark_from_sign_and_naturals_evaluation_strategy(
 
 fn benchmark_from_sign_and_unsigneds<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -332,7 +332,7 @@ fn benchmark_from_sign_and_unsigneds<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_bool_triple_gen_var_2::<T, T>().get(gm, &config),
+        unsigned_unsigned_bool_triple_gen_var_2::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

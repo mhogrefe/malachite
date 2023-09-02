@@ -28,42 +28,28 @@ pub trait OneHalf {
     const ONE_HALF: Self;
 }
 
-/// The [Iverson bracket](https://en.wikipedia.org/wiki/Iverson_bracket): converts a [`bool`] to 0
-/// or 1.
-pub trait Iverson {
-    fn iverson(b: bool) -> Self;
+/// Provides the constant -0.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait NegativeZero {
+    const NEGATIVE_ZERO: Self;
 }
 
-/// Converts a [`bool`] to 0 or 1.
-///
-/// This function is known as the [Iverson bracket](https://en.wikipedia.org/wiki/Iverson_bracket).
-///
-/// $$
-/// f(P) = \[P\] = \\begin{cases}
-///     1 & \text{if} \\quad P, \\\\
-///     0 & \\text{otherwise}.
-/// \\end{cases}
-/// $$
-///
-/// # Worst-case complexity
-/// Constant time and additional memory.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::basic::traits::Iverson;
-///
-/// assert_eq!(u32::iverson(false), 0);
-/// assert_eq!(i8::iverson(true), 1);
-/// ```
-impl<T: One + Sized + Zero> Iverson for T {
-    #[inline]
-    fn iverson(b: bool) -> T {
-        if b {
-            T::ONE
-        } else {
-            T::ZERO
-        }
-    }
+/// Provides the constant (positive) Infinity.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait Infinity {
+    const INFINITY: Self;
+}
+
+/// Provides the constant -Infinity.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait NegativeInfinity {
+    const NEGATIVE_INFINITY: Self;
+}
+
+/// Provides the constant NaN.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait NaN {
+    const NAN: Self;
 }
 
 // Implementation for `NonZero*` types:

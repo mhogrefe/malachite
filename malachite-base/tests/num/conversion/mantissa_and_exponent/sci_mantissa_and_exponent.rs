@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::mantissa_and_exponent::{
-    from_sci_mantissa_and_exponent_with_rounding, sci_mantissa_and_exponent_with_rounding,
+    from_sci_mantissa_and_exponent_round, sci_mantissa_and_exponent_round,
 };
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
@@ -81,7 +81,7 @@ fn sci_mantissa_and_exponent_fail_helper_unsigned<
 
 fn sci_mantissa_and_exponent_fail_helper_primitive_float<T: PrimitiveFloat>() {
     assert_panic!(T::NAN.sci_mantissa_and_exponent());
-    assert_panic!(T::POSITIVE_INFINITY.sci_mantissa_and_exponent());
+    assert_panic!(T::INFINITY.sci_mantissa_and_exponent());
     assert_panic!(T::NEGATIVE_INFINITY.sci_mantissa_and_exponent());
     assert_panic!(T::ZERO.sci_mantissa_and_exponent());
     assert_panic!(T::NEGATIVE_ZERO.sci_mantissa_and_exponent());
@@ -94,112 +94,214 @@ pub fn sci_mantissa_and_exponent_fail() {
 }
 
 #[test]
-pub fn test_sci_mantissa_and_exponent_with_rounding() {
+pub fn test_sci_mantissa_and_exponent_round() {
     fn test<T: PrimitiveUnsigned + SciMantissaAndExponent<U, u64>, U: PrimitiveFloat>(
         x: T,
         rm: RoundingMode,
-        out: Option<(U, u64)>,
+        out: Option<(U, u64, Ordering)>,
     ) {
         assert_eq!(
-            sci_mantissa_and_exponent_with_rounding::<T, U>(x, rm).map(|(m, e)| (NiceFloat(m), e)),
-            out.map(|(m, e)| (NiceFloat(m), e))
+            sci_mantissa_and_exponent_round::<T, U>(x, rm).map(|(m, e, o)| (NiceFloat(m), e, o)),
+            out.map(|(m, e, o)| (NiceFloat(m), e, o))
         );
     }
-    test::<u8, f32>(1, RoundingMode::Floor, Some((1.0, 0)));
-    test::<u8, f32>(1, RoundingMode::Down, Some((1.0, 0)));
-    test::<u8, f32>(1, RoundingMode::Ceiling, Some((1.0, 0)));
-    test::<u8, f32>(1, RoundingMode::Up, Some((1.0, 0)));
-    test::<u8, f32>(1, RoundingMode::Nearest, Some((1.0, 0)));
-    test::<u8, f32>(1, RoundingMode::Exact, Some((1.0, 0)));
+    test::<u8, f32>(1, RoundingMode::Floor, Some((1.0, 0, Ordering::Equal)));
+    test::<u8, f32>(1, RoundingMode::Down, Some((1.0, 0, Ordering::Equal)));
+    test::<u8, f32>(1, RoundingMode::Ceiling, Some((1.0, 0, Ordering::Equal)));
+    test::<u8, f32>(1, RoundingMode::Up, Some((1.0, 0, Ordering::Equal)));
+    test::<u8, f32>(1, RoundingMode::Nearest, Some((1.0, 0, Ordering::Equal)));
+    test::<u8, f32>(1, RoundingMode::Exact, Some((1.0, 0, Ordering::Equal)));
 
-    test::<u8, f32>(2, RoundingMode::Floor, Some((1.0, 1)));
-    test::<u8, f32>(3, RoundingMode::Floor, Some((1.5, 1)));
-    test::<u8, f32>(100, RoundingMode::Floor, Some((1.5625, 6)));
-    test::<u32, f32>(65536, RoundingMode::Floor, Some((1.0, 16)));
+    test::<u8, f32>(2, RoundingMode::Floor, Some((1.0, 1, Ordering::Equal)));
+    test::<u8, f32>(3, RoundingMode::Floor, Some((1.5, 1, Ordering::Equal)));
+    test::<u8, f32>(100, RoundingMode::Floor, Some((1.5625, 6, Ordering::Equal)));
+    test::<u32, f32>(65536, RoundingMode::Floor, Some((1.0, 16, Ordering::Equal)));
 
-    test::<u16, f32>(u16::MAX, RoundingMode::Floor, Some((1.9999695, 15)));
-    test::<u16, f32>(u16::MAX, RoundingMode::Down, Some((1.9999695, 15)));
-    test::<u16, f32>(u16::MAX, RoundingMode::Ceiling, Some((1.9999695, 15)));
-    test::<u16, f32>(u16::MAX, RoundingMode::Up, Some((1.9999695, 15)));
-    test::<u16, f32>(u16::MAX, RoundingMode::Nearest, Some((1.9999695, 15)));
-    test::<u16, f32>(u16::MAX, RoundingMode::Exact, Some((1.9999695, 15)));
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Floor,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Down,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Ceiling,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Up,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Nearest,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
+    test::<u16, f32>(
+        u16::MAX,
+        RoundingMode::Exact,
+        Some((1.9999695, 15, Ordering::Equal)),
+    );
 
-    test::<u32, f32>(u32::MAX, RoundingMode::Floor, Some((1.9999999, 31)));
-    test::<u32, f32>(u32::MAX, RoundingMode::Down, Some((1.9999999, 31)));
-    test::<u32, f32>(u32::MAX, RoundingMode::Ceiling, Some((1.0, 32)));
-    test::<u32, f32>(u32::MAX, RoundingMode::Up, Some((1.0, 32)));
-    test::<u32, f32>(u32::MAX, RoundingMode::Nearest, Some((1.0, 32)));
+    test::<u32, f32>(
+        u32::MAX,
+        RoundingMode::Floor,
+        Some((1.9999999, 31, Ordering::Less)),
+    );
+    test::<u32, f32>(
+        u32::MAX,
+        RoundingMode::Down,
+        Some((1.9999999, 31, Ordering::Less)),
+    );
+    test::<u32, f32>(
+        u32::MAX,
+        RoundingMode::Ceiling,
+        Some((1.0, 32, Ordering::Greater)),
+    );
+    test::<u32, f32>(
+        u32::MAX,
+        RoundingMode::Up,
+        Some((1.0, 32, Ordering::Greater)),
+    );
+    test::<u32, f32>(
+        u32::MAX,
+        RoundingMode::Nearest,
+        Some((1.0, 32, Ordering::Greater)),
+    );
     test::<u32, f32>(u32::MAX, RoundingMode::Exact, None);
 
-    test::<u64, f32>(u64::MAX, RoundingMode::Floor, Some((1.9999999, 63)));
-    test::<u64, f32>(u64::MAX, RoundingMode::Down, Some((1.9999999, 63)));
-    test::<u64, f32>(u64::MAX, RoundingMode::Ceiling, Some((1.0, 64)));
-    test::<u64, f32>(u64::MAX, RoundingMode::Up, Some((1.0, 64)));
-    test::<u64, f32>(u64::MAX, RoundingMode::Nearest, Some((1.0, 64)));
+    test::<u64, f32>(
+        u64::MAX,
+        RoundingMode::Floor,
+        Some((1.9999999, 63, Ordering::Less)),
+    );
+    test::<u64, f32>(
+        u64::MAX,
+        RoundingMode::Down,
+        Some((1.9999999, 63, Ordering::Less)),
+    );
+    test::<u64, f32>(
+        u64::MAX,
+        RoundingMode::Ceiling,
+        Some((1.0, 64, Ordering::Greater)),
+    );
+    test::<u64, f32>(
+        u64::MAX,
+        RoundingMode::Up,
+        Some((1.0, 64, Ordering::Greater)),
+    );
+    test::<u64, f32>(
+        u64::MAX,
+        RoundingMode::Nearest,
+        Some((1.0, 64, Ordering::Greater)),
+    );
     test::<u64, f32>(u64::MAX, RoundingMode::Exact, None);
 
-    test::<u16, f64>(u16::MAX, RoundingMode::Floor, Some((1.999969482421875, 15)));
-    test::<u16, f64>(u16::MAX, RoundingMode::Down, Some((1.999969482421875, 15)));
+    test::<u16, f64>(
+        u16::MAX,
+        RoundingMode::Floor,
+        Some((1.999969482421875, 15, Ordering::Equal)),
+    );
+    test::<u16, f64>(
+        u16::MAX,
+        RoundingMode::Down,
+        Some((1.999969482421875, 15, Ordering::Equal)),
+    );
     test::<u16, f64>(
         u16::MAX,
         RoundingMode::Ceiling,
-        Some((1.999969482421875, 15)),
+        Some((1.999969482421875, 15, Ordering::Equal)),
     );
-    test::<u16, f64>(u16::MAX, RoundingMode::Up, Some((1.999969482421875, 15)));
+    test::<u16, f64>(
+        u16::MAX,
+        RoundingMode::Up,
+        Some((1.999969482421875, 15, Ordering::Equal)),
+    );
     test::<u16, f64>(
         u16::MAX,
         RoundingMode::Nearest,
-        Some((1.999969482421875, 15)),
+        Some((1.999969482421875, 15, Ordering::Equal)),
     );
-    test::<u16, f64>(u16::MAX, RoundingMode::Exact, Some((1.999969482421875, 15)));
+    test::<u16, f64>(
+        u16::MAX,
+        RoundingMode::Exact,
+        Some((1.999969482421875, 15, Ordering::Equal)),
+    );
 
     test::<u32, f64>(
         u32::MAX,
         RoundingMode::Floor,
-        Some((1.9999999995343387, 31)),
+        Some((1.9999999995343387, 31, Ordering::Equal)),
     );
-    test::<u32, f64>(u32::MAX, RoundingMode::Down, Some((1.9999999995343387, 31)));
+    test::<u32, f64>(
+        u32::MAX,
+        RoundingMode::Down,
+        Some((1.9999999995343387, 31, Ordering::Equal)),
+    );
     test::<u32, f64>(
         u32::MAX,
         RoundingMode::Ceiling,
-        Some((1.9999999995343387, 31)),
+        Some((1.9999999995343387, 31, Ordering::Equal)),
     );
-    test::<u32, f64>(u32::MAX, RoundingMode::Up, Some((1.9999999995343387, 31)));
+    test::<u32, f64>(
+        u32::MAX,
+        RoundingMode::Up,
+        Some((1.9999999995343387, 31, Ordering::Equal)),
+    );
     test::<u32, f64>(
         u32::MAX,
         RoundingMode::Nearest,
-        Some((1.9999999995343387, 31)),
+        Some((1.9999999995343387, 31, Ordering::Equal)),
     );
     test::<u32, f64>(
         u32::MAX,
         RoundingMode::Exact,
-        Some((1.9999999995343387, 31)),
+        Some((1.9999999995343387, 31, Ordering::Equal)),
     );
 
     test::<u64, f64>(
         u64::MAX,
         RoundingMode::Floor,
-        Some((1.9999999999999998, 63)),
+        Some((1.9999999999999998, 63, Ordering::Less)),
     );
-    test::<u64, f64>(u64::MAX, RoundingMode::Down, Some((1.9999999999999998, 63)));
-    test::<u64, f64>(u64::MAX, RoundingMode::Ceiling, Some((1.0, 64)));
-    test::<u64, f64>(u64::MAX, RoundingMode::Up, Some((1.0, 64)));
-    test::<u64, f64>(u64::MAX, RoundingMode::Nearest, Some((1.0, 64)));
+    test::<u64, f64>(
+        u64::MAX,
+        RoundingMode::Down,
+        Some((1.9999999999999998, 63, Ordering::Less)),
+    );
+    test::<u64, f64>(
+        u64::MAX,
+        RoundingMode::Ceiling,
+        Some((1.0, 64, Ordering::Greater)),
+    );
+    test::<u64, f64>(
+        u64::MAX,
+        RoundingMode::Up,
+        Some((1.0, 64, Ordering::Greater)),
+    );
+    test::<u64, f64>(
+        u64::MAX,
+        RoundingMode::Nearest,
+        Some((1.0, 64, Ordering::Greater)),
+    );
     test::<u64, f64>(u64::MAX, RoundingMode::Exact, None);
 }
 
-fn sci_mantissa_and_exponent_with_rounding_fail_helper<T: PrimitiveUnsigned, U: PrimitiveFloat>() {
-    assert_panic!(sci_mantissa_and_exponent_with_rounding::<T, U>(
+fn sci_mantissa_and_exponent_round_fail_helper<T: PrimitiveUnsigned, U: PrimitiveFloat>() {
+    assert_panic!(sci_mantissa_and_exponent_round::<T, U>(
         T::ZERO,
         RoundingMode::Floor
     ));
 }
 
 #[test]
-pub fn sci_mantissa_and_exponent_with_rounding_fail() {
-    apply_fn_to_unsigneds_and_primitive_floats!(
-        sci_mantissa_and_exponent_with_rounding_fail_helper
-    );
+pub fn sci_mantissa_and_exponent_round_fail() {
+    apply_fn_to_unsigneds_and_primitive_floats!(sci_mantissa_and_exponent_round_fail_helper);
 }
 
 #[test]
@@ -256,52 +358,52 @@ pub fn test_from_sci_mantissa_and_exponent() {
 }
 
 #[test]
-pub fn test_from_sci_mantissa_and_exponent_with_rounding() {
+pub fn test_from_sci_mantissa_and_exponent_round() {
     fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
         mantissa: U,
         exponent: u64,
         rm: RoundingMode,
-        x: Option<T>,
+        xo: Option<(T, Ordering)>,
     ) {
         assert_eq!(
-            from_sci_mantissa_and_exponent_with_rounding::<T, U>(mantissa, exponent, rm),
-            x
+            from_sci_mantissa_and_exponent_round::<T, U>(mantissa, exponent, rm),
+            xo
         );
     }
-    test::<u8, f32>(1.0, 0, RoundingMode::Floor, Some(1));
-    test::<u8, f32>(1.0, 0, RoundingMode::Down, Some(1));
-    test::<u8, f32>(1.0, 0, RoundingMode::Ceiling, Some(1));
-    test::<u8, f32>(1.0, 0, RoundingMode::Up, Some(1));
-    test::<u8, f32>(1.0, 0, RoundingMode::Nearest, Some(1));
-    test::<u8, f32>(1.0, 0, RoundingMode::Exact, Some(1));
+    test::<u8, f32>(1.0, 0, RoundingMode::Floor, Some((1, Ordering::Equal)));
+    test::<u8, f32>(1.0, 0, RoundingMode::Down, Some((1, Ordering::Equal)));
+    test::<u8, f32>(1.0, 0, RoundingMode::Ceiling, Some((1, Ordering::Equal)));
+    test::<u8, f32>(1.0, 0, RoundingMode::Up, Some((1, Ordering::Equal)));
+    test::<u8, f32>(1.0, 0, RoundingMode::Nearest, Some((1, Ordering::Equal)));
+    test::<u8, f32>(1.0, 0, RoundingMode::Exact, Some((1, Ordering::Equal)));
 
-    test::<u8, f32>(1.25, 0, RoundingMode::Floor, Some(1));
-    test::<u8, f32>(1.25, 0, RoundingMode::Down, Some(1));
-    test::<u8, f32>(1.25, 0, RoundingMode::Ceiling, Some(2));
-    test::<u8, f32>(1.25, 0, RoundingMode::Up, Some(2));
-    test::<u8, f32>(1.25, 0, RoundingMode::Nearest, Some(1));
+    test::<u8, f32>(1.25, 0, RoundingMode::Floor, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.25, 0, RoundingMode::Down, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.25, 0, RoundingMode::Ceiling, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.25, 0, RoundingMode::Up, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.25, 0, RoundingMode::Nearest, Some((1, Ordering::Less)));
     test::<u8, f32>(1.25, 0, RoundingMode::Exact, None);
 
-    test::<u8, f32>(1.5, 0, RoundingMode::Floor, Some(1));
-    test::<u8, f32>(1.5, 0, RoundingMode::Down, Some(1));
-    test::<u8, f32>(1.5, 0, RoundingMode::Ceiling, Some(2));
-    test::<u8, f32>(1.5, 0, RoundingMode::Up, Some(2));
-    test::<u8, f32>(1.5, 0, RoundingMode::Nearest, Some(2));
+    test::<u8, f32>(1.5, 0, RoundingMode::Floor, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.5, 0, RoundingMode::Down, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.5, 0, RoundingMode::Ceiling, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.5, 0, RoundingMode::Up, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.5, 0, RoundingMode::Nearest, Some((2, Ordering::Greater)));
     test::<u8, f32>(1.5, 0, RoundingMode::Exact, None);
 
-    test::<u8, f32>(1.75, 0, RoundingMode::Floor, Some(1));
-    test::<u8, f32>(1.75, 0, RoundingMode::Down, Some(1));
-    test::<u8, f32>(1.75, 0, RoundingMode::Ceiling, Some(2));
-    test::<u8, f32>(1.75, 0, RoundingMode::Up, Some(2));
-    test::<u8, f32>(1.75, 0, RoundingMode::Nearest, Some(2));
+    test::<u8, f32>(1.75, 0, RoundingMode::Floor, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.75, 0, RoundingMode::Down, Some((1, Ordering::Less)));
+    test::<u8, f32>(1.75, 0, RoundingMode::Ceiling, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.75, 0, RoundingMode::Up, Some((2, Ordering::Greater)));
+    test::<u8, f32>(1.75, 0, RoundingMode::Nearest, Some((2, Ordering::Greater)));
     test::<u8, f32>(1.75, 0, RoundingMode::Exact, None);
 
-    test::<u8, f32>(1.5, 1, RoundingMode::Floor, Some(3));
-    test::<u8, f32>(1.5, 1, RoundingMode::Down, Some(3));
-    test::<u8, f32>(1.5, 1, RoundingMode::Ceiling, Some(3));
-    test::<u8, f32>(1.5, 1, RoundingMode::Up, Some(3));
-    test::<u8, f32>(1.5, 1, RoundingMode::Nearest, Some(3));
-    test::<u8, f32>(1.5, 1, RoundingMode::Exact, Some(3));
+    test::<u8, f32>(1.5, 1, RoundingMode::Floor, Some((3, Ordering::Equal)));
+    test::<u8, f32>(1.5, 1, RoundingMode::Down, Some((3, Ordering::Equal)));
+    test::<u8, f32>(1.5, 1, RoundingMode::Ceiling, Some((3, Ordering::Equal)));
+    test::<u8, f32>(1.5, 1, RoundingMode::Up, Some((3, Ordering::Equal)));
+    test::<u8, f32>(1.5, 1, RoundingMode::Nearest, Some((3, Ordering::Equal)));
+    test::<u8, f32>(1.5, 1, RoundingMode::Exact, Some((3, Ordering::Equal)));
 
     test::<u8, f32>(1.0, 100, RoundingMode::Floor, None);
     test::<u8, f32>(1.0, 100, RoundingMode::Down, None);
@@ -311,11 +413,8 @@ pub fn test_from_sci_mantissa_and_exponent_with_rounding() {
     test::<u8, f32>(1.0, 100, RoundingMode::Exact, None);
 }
 
-fn from_sci_mantissa_and_exponent_with_rounding_fail_helper<
-    T: PrimitiveUnsigned,
-    U: PrimitiveFloat,
->() {
-    assert_panic!(from_sci_mantissa_and_exponent_with_rounding::<T, U>(
+fn from_sci_mantissa_and_exponent_round_fail_helper<T: PrimitiveUnsigned, U: PrimitiveFloat>() {
+    assert_panic!(from_sci_mantissa_and_exponent_round::<T, U>(
         U::ZERO,
         0,
         RoundingMode::Floor
@@ -323,10 +422,8 @@ fn from_sci_mantissa_and_exponent_with_rounding_fail_helper<
 }
 
 #[test]
-pub fn from_sci_mantissa_and_exponent_with_rounding_fail() {
-    apply_fn_to_unsigneds_and_primitive_floats!(
-        from_sci_mantissa_and_exponent_with_rounding_fail_helper
-    );
+pub fn from_sci_mantissa_and_exponent_round_fail() {
+    apply_fn_to_unsigneds_and_primitive_floats!(from_sci_mantissa_and_exponent_round_fail_helper);
 }
 
 fn sci_mantissa_and_exponent_properties_helper_unsigned<
@@ -338,8 +435,8 @@ fn sci_mantissa_and_exponent_properties_helper_unsigned<
         assert_eq!(NiceFloat(x.sci_mantissa()), NiceFloat(mantissa));
         assert_eq!(SciMantissaAndExponent::<U, u64>::sci_exponent(x), exponent);
         assert_eq!(
-            sci_mantissa_and_exponent_with_rounding(x, RoundingMode::Nearest)
-                .map(|(m, e)| (NiceFloat(m), e)),
+            sci_mantissa_and_exponent_round(x, RoundingMode::Nearest)
+                .map(|(m, e, _)| (NiceFloat(m), e)),
             Some((NiceFloat(mantissa), exponent))
         );
 
@@ -378,41 +475,47 @@ fn sci_mantissa_and_exponent_properties() {
     apply_fn_to_primitive_floats!(sci_mantissa_and_exponent_properties_helper_primitive_float);
 }
 
-fn sci_mantissa_and_exponent_properties_with_rounding_helper<
-    T: PrimitiveUnsigned,
-    U: PrimitiveFloat,
->() {
+fn sci_mantissa_and_exponent_properties_round_helper<T: PrimitiveUnsigned, U: PrimitiveFloat>() {
     unsigned_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
-        if let Some((mantissa, exponent)) = sci_mantissa_and_exponent_with_rounding::<T, U>(x, rm) {
+        if let Some((mantissa, exponent, o)) = sci_mantissa_and_exponent_round::<T, U>(x, rm) {
             assert!(mantissa >= U::ONE);
             assert!(mantissa < U::TWO);
             if rm == RoundingMode::Exact {
                 assert_eq!(
-                    from_sci_mantissa_and_exponent_with_rounding(mantissa, exponent, rm),
-                    Some(x)
+                    from_sci_mantissa_and_exponent_round(mantissa, exponent, rm),
+                    Some((x, Ordering::Equal))
                 );
+            }
+            match rm {
+                RoundingMode::Floor | RoundingMode::Down => assert_ne!(o, Ordering::Greater),
+                RoundingMode::Ceiling | RoundingMode::Up => assert_ne!(o, Ordering::Less),
+                RoundingMode::Exact => assert_eq!(o, Ordering::Equal),
+                _ => {}
             }
         }
     });
 
     unsigned_gen_var_1::<T>().test_properties(|n| {
-        let (floor_mantissa, floor_exponent) =
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Floor).unwrap();
+        let (floor_mantissa, floor_exponent, o_floor) =
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Floor).unwrap();
+        assert_ne!(o_floor, Ordering::Greater);
         assert_eq!(
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Down).unwrap(),
-            (floor_mantissa, floor_exponent)
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Down).unwrap(),
+            (floor_mantissa, floor_exponent, o_floor)
         );
-        let (ceiling_mantissa, ceiling_exponent) =
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Ceiling).unwrap();
+        let (ceiling_mantissa, ceiling_exponent, o_ceiling) =
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Ceiling).unwrap();
+        assert_ne!(o_ceiling, Ordering::Less);
         assert_eq!(
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Up).unwrap(),
-            (ceiling_mantissa, ceiling_exponent)
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Up).unwrap(),
+            (ceiling_mantissa, ceiling_exponent, o_ceiling)
         );
-        let (nearest_mantissa, nearest_exponent) =
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Nearest).unwrap();
-        if let Some((mantissa, exponent)) =
-            sci_mantissa_and_exponent_with_rounding::<T, U>(n, RoundingMode::Exact)
+        let (nearest_mantissa, nearest_exponent, o_nearest) =
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Nearest).unwrap();
+        if let Some((mantissa, exponent, o)) =
+            sci_mantissa_and_exponent_round::<T, U>(n, RoundingMode::Exact)
         {
+            assert_eq!(o, Ordering::Equal);
             assert_eq!(floor_mantissa, mantissa);
             assert_eq!(ceiling_mantissa, mantissa);
             assert_eq!(nearest_mantissa, mantissa);
@@ -425,8 +528,10 @@ fn sci_mantissa_and_exponent_properties_with_rounding_helper<
                 (ceiling_mantissa, ceiling_exponent)
             );
             assert!(
-                (nearest_mantissa, nearest_exponent) == (floor_mantissa, floor_exponent)
-                    || (nearest_mantissa, nearest_exponent) == (ceiling_mantissa, ceiling_exponent)
+                (nearest_mantissa, nearest_exponent, o_nearest)
+                    == (floor_mantissa, floor_exponent, Ordering::Less)
+                    || (nearest_mantissa, nearest_exponent, o_nearest)
+                        == (ceiling_mantissa, ceiling_exponent, Ordering::Greater)
             );
             if ceiling_mantissa == U::ONE {
                 assert_eq!(floor_mantissa, U::TWO.next_lower());
@@ -440,10 +545,8 @@ fn sci_mantissa_and_exponent_properties_with_rounding_helper<
 }
 
 #[test]
-fn sci_mantissa_and_exponent_with_rounding_properties() {
-    apply_fn_to_unsigneds_and_primitive_floats!(
-        sci_mantissa_and_exponent_properties_with_rounding_helper
-    );
+fn sci_mantissa_and_exponent_round_properties() {
+    apply_fn_to_unsigneds_and_primitive_floats!(sci_mantissa_and_exponent_properties_round_helper);
 }
 
 fn from_sci_mantissa_and_exponent_properties_helper_unsigned<
@@ -458,7 +561,7 @@ fn from_sci_mantissa_and_exponent_properties_helper_unsigned<
         assert!(m >= U::ONE && m < U::TWO);
         let on = T::from_sci_mantissa_and_exponent(m, e);
         assert_eq!(
-            from_sci_mantissa_and_exponent_with_rounding(m, e, RoundingMode::Nearest),
+            from_sci_mantissa_and_exponent_round(m, e, RoundingMode::Nearest).map(|p| p.0),
             on
         );
     });
@@ -485,13 +588,13 @@ fn from_sci_mantissa_and_exponent_properties() {
     apply_fn_to_primitive_floats!(from_sci_mantissa_and_exponent_properties_helper_primitive_float);
 }
 
-fn from_sci_mantissa_and_exponent_properties_with_rounding_helper<
+fn from_sci_mantissa_and_exponent_properties_round_helper<
     T: PrimitiveUnsigned,
     U: PrimitiveFloat,
 >() {
     primitive_float_unsigned_rounding_mode_triple_gen_var_1::<U, u64>().test_properties(
         |(m, e, rm)| {
-            let on = from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, rm);
+            let on = from_sci_mantissa_and_exponent_round::<T, U>(m, e, rm);
             if on.is_some() {
                 assert!(m >= U::ONE && m < U::TWO);
             }
@@ -500,39 +603,34 @@ fn from_sci_mantissa_and_exponent_properties_with_rounding_helper<
 
     primitive_float_unsigned_rounding_mode_triple_gen_var_2::<U>().test_properties(|(m, e, rm)| {
         assert!(m >= U::ONE && m < U::TWO);
-        from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, rm);
+        from_sci_mantissa_and_exponent_round::<T, U>(m, e, rm);
     });
 
     primitive_float_unsigned_pair_gen_var_2::<U>().test_properties(|(m, e)| {
         if let Some(ceiling_n) =
-            from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Ceiling)
+            from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Ceiling)
         {
             assert_eq!(
-                from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Up)
-                    .unwrap(),
+                from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Up).unwrap(),
                 ceiling_n
             );
             let floor_n =
-                from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Floor)
-                    .unwrap();
+                from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Floor).unwrap();
             assert_eq!(
-                from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Down)
-                    .unwrap(),
+                from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Down).unwrap(),
                 floor_n
             );
             let nearest_n =
-                from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Nearest)
-                    .unwrap();
-            if let Some(n) =
-                from_sci_mantissa_and_exponent_with_rounding::<T, U>(m, e, RoundingMode::Exact)
+                from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Nearest).unwrap();
+            if let Some(n) = from_sci_mantissa_and_exponent_round::<T, U>(m, e, RoundingMode::Exact)
             {
                 assert_eq!(floor_n, n);
                 assert_eq!(ceiling_n, n);
                 assert_eq!(nearest_n, n);
             } else {
                 assert!(nearest_n == floor_n || nearest_n == ceiling_n);
-                if floor_n != T::MAX {
-                    assert_eq!(ceiling_n, floor_n + T::ONE);
+                if floor_n.0 != T::MAX {
+                    assert_eq!(ceiling_n.0, floor_n.0 + T::ONE);
                 }
             }
         }
@@ -540,8 +638,8 @@ fn from_sci_mantissa_and_exponent_properties_with_rounding_helper<
 }
 
 #[test]
-fn from_sci_mantissa_and_exponent_with_rounding_properties() {
+fn from_sci_mantissa_and_exponent_round_properties() {
     apply_fn_to_unsigneds_and_primitive_floats!(
-        from_sci_mantissa_and_exponent_properties_with_rounding_helper
+        from_sci_mantissa_and_exponent_properties_round_helper
     );
 }

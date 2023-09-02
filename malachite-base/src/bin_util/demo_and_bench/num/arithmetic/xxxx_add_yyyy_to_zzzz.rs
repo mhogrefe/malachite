@@ -10,9 +10,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_xxxx_add_yyyy_to_zzzz);
 }
 
-fn demo_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0) in unsigned_octuple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -32,7 +32,7 @@ fn demo_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConf
 
 fn benchmark_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -50,7 +50,7 @@ fn benchmark_xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_octuple_gen_var_1::<T>().get(gm, &config),
+        unsigned_octuple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

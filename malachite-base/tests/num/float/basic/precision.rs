@@ -21,7 +21,7 @@ fn test_precision() {
 
 fn precision_fail_helper<T: PrimitiveFloat>() {
     assert_panic!(T::NAN.precision());
-    assert_panic!(T::POSITIVE_INFINITY.precision());
+    assert_panic!(T::INFINITY.precision());
     assert_panic!(T::NEGATIVE_INFINITY.precision());
     assert_panic!(T::ZERO.precision());
     assert_panic!(T::NEGATIVE_ZERO.precision());

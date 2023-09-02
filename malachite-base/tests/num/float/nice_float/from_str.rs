@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{string_gen, string_gen_var_10};
@@ -15,7 +16,7 @@ fn test_from_str() {
         assert_eq!(NiceFloat::<T>::from_str(s).unwrap(), out);
     }
     test_ok::<f32>("NaN", NiceFloat(f32::NAN));
-    test_ok::<f32>("Infinity", NiceFloat(f32::POSITIVE_INFINITY));
+    test_ok::<f32>("Infinity", NiceFloat(f32::INFINITY));
     test_ok::<f32>("-Infinity", NiceFloat(f32::NEGATIVE_INFINITY));
     test_ok::<f32>("0", NiceFloat(0.0));
     test_ok::<f32>("00", NiceFloat(0.0));
@@ -27,7 +28,7 @@ fn test_from_str() {
     test_ok::<f32>("3.14", NiceFloat(3.14));
     test_ok::<f32>("1e2", NiceFloat(100.0));
     test_ok::<f32>("1e20", NiceFloat(1.0e20));
-    test_ok::<f32>("1.0e1000", NiceFloat(f32::POSITIVE_INFINITY));
+    test_ok::<f32>("1.0e1000", NiceFloat(f32::INFINITY));
     test_ok::<f32>("1.0e-1000", NiceFloat(0.0));
     test_ok::<f32>("-0", NiceFloat(-0.0));
     test_ok::<f32>("-00", NiceFloat(-0.0));
@@ -43,7 +44,7 @@ fn test_from_str() {
     test_ok::<f32>("-1.0e-1000", NiceFloat(-0.0));
 
     test_ok::<f64>("NaN", NiceFloat(f64::NAN));
-    test_ok::<f64>("Infinity", NiceFloat(f64::POSITIVE_INFINITY));
+    test_ok::<f64>("Infinity", NiceFloat(f64::INFINITY));
     test_ok::<f64>("-Infinity", NiceFloat(f64::NEGATIVE_INFINITY));
     test_ok::<f64>("0", NiceFloat(0.0));
     test_ok::<f64>("00", NiceFloat(0.0));
@@ -55,7 +56,7 @@ fn test_from_str() {
     test_ok::<f64>("3.14", NiceFloat(3.14));
     test_ok::<f64>("1e2", NiceFloat(100.0));
     test_ok::<f64>("1e20", NiceFloat(1.0e20));
-    test_ok::<f64>("1.0e1000", NiceFloat(f64::POSITIVE_INFINITY));
+    test_ok::<f64>("1.0e1000", NiceFloat(f64::INFINITY));
     test_ok::<f64>("1.0e-1000", NiceFloat(0.0));
     test_ok::<f64>("-0", NiceFloat(-0.0));
     test_ok::<f64>("-00", NiceFloat(-0.0));

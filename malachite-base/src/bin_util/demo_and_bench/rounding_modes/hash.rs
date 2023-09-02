@@ -7,8 +7,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rounding_mode_hash);
 }
 
-fn demo_rounding_mode_hash(gm: GenMode, config: GenConfig, limit: usize) {
-    for rm in rounding_mode_gen().get(gm, &config).take(limit) {
+fn demo_rounding_mode_hash(gm: GenMode, config: &GenConfig, limit: usize) {
+    for rm in rounding_mode_gen().get(gm, config).take(limit) {
         println!("hash({}) = {}", rm, hash(&rm));
     }
 }

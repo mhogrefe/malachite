@@ -40,6 +40,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingSubAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use std::cmp::{max, Ordering};
@@ -327,7 +328,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // This is equivalent to `mpn_toom3_sqr` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
-    let n = xs_len.div_round(3, RoundingMode::Ceiling);
+    let n = xs_len.div_round(3, RoundingMode::Ceiling).0;
     let m = n + 1;
     let k = m + n;
     let s = xs_len - (n << 1);
@@ -847,7 +848,7 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
-    let n: usize = xs_len.shr_round(3, RoundingMode::Ceiling);
+    let n: usize = xs_len.shr_round(3, RoundingMode::Ceiling).0;
     let m = n + 1;
     let k = m + n;
     let p = k + n;
@@ -1057,7 +1058,7 @@ impl<'a> Square for &'a Natural {
     #[inline]
     fn square(self) -> Natural {
         match self {
-            natural_zero!() | natural_one!() => self.clone(),
+            &Natural::ZERO | &Natural::ONE => self.clone(),
             Natural(Small(x)) => Natural({
                 let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {
@@ -1101,7 +1102,7 @@ impl SquareAssign for Natural {
     /// ```
     fn square_assign(&mut self) {
         match self {
-            natural_zero!() | natural_one!() => {}
+            &mut Natural::ZERO | &mut Natural::ONE => {}
             Natural(Small(x)) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*x, *x);
                 if upper == 0 {

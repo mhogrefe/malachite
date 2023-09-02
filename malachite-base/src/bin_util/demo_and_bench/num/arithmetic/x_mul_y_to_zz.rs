@@ -11,22 +11,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_x_mul_y_to_zz_algorithms);
 }
 
-fn demo_x_mul_y_to_zz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_x_mul_y_to_zz<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{} * {} = {:?}", x, y, T::x_mul_y_to_zz(x, y));
     }
 }
 
 fn benchmark_x_mul_y_to_zz_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::x_mul_y_to_zz({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

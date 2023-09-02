@@ -17,8 +17,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_from_raw_mantissa_and_exponent);
 }
 
-fn demo_raw_mantissa_and_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_raw_mantissa_and_exponent<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!(
             "raw_mantissa_and_exponent({}) = {:?}",
             NiceFloat(x),
@@ -27,24 +31,24 @@ fn demo_raw_mantissa_and_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenCon
     }
 }
 
-fn demo_raw_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_raw_mantissa<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!("raw_mantissa({}) = {}", NiceFloat(x), x.raw_mantissa());
     }
 }
 
-fn demo_raw_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_raw_exponent<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
         println!("raw_exponent({}) = {}", NiceFloat(x), x.raw_exponent());
     }
 }
 
 fn demo_from_raw_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mantissa, exponent) in unsigned_pair_gen_var_26::<T>().get(gm, &config).take(limit) {
+    for (mantissa, exponent) in unsigned_pair_gen_var_26::<T>().get(gm, config).take(limit) {
         println!(
             "{}::from_raw_mantissa_and_exponent({}, {}) = {}",
             T::NAME,
@@ -58,14 +62,14 @@ fn demo_from_raw_mantissa_and_exponent<T: PrimitiveFloat>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_raw_mantissa_and_exponent_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.raw_mantissa_and_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -82,14 +86,14 @@ fn benchmark_raw_mantissa_and_exponent_algorithms<T: PrimitiveFloat>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_raw_mantissa_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.raw_mantissa()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -104,14 +108,14 @@ fn benchmark_raw_mantissa_algorithms<T: PrimitiveFloat>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_raw_exponent_algorithms<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.raw_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -125,14 +129,14 @@ fn benchmark_raw_exponent_algorithms<T: PrimitiveFloat>(
 
 fn benchmark_from_raw_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_raw_mantissa_and_exponent(u64, u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_26::<T>().get(gm, &config),
+        unsigned_pair_gen_var_26::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

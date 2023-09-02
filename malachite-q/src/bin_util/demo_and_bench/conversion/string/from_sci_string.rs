@@ -34,8 +34,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_from_sci_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_14().get(gm, &config).take(limit) {
+fn demo_rational_from_sci_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_14().get(gm, config).take(limit) {
         println!(
             "Rational::from_sci_string({}) = {:?}",
             s,
@@ -44,8 +44,8 @@ fn demo_rational_from_sci_string(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_from_sci_string_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_15().get(gm, &config).take(limit) {
+fn demo_rational_from_sci_string_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_15().get(gm, config).take(limit) {
         println!(
             "Rational::from_sci_string({}) = {:?}",
             s,
@@ -54,11 +54,8 @@ fn demo_rational_from_sci_string_targeted(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_rational_from_sci_string_with_options(gm: GenMode, config: GenConfig, limit: usize) {
-    for (s, base) in string_unsigned_pair_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_rational_from_sci_string_with_options(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (s, base) in string_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         let mut options = FromSciStringOptions::default();
         options.set_base(base);
         println!(
@@ -72,13 +69,10 @@ fn demo_rational_from_sci_string_with_options(gm: GenMode, config: GenConfig, li
 
 fn demo_rational_from_sci_string_with_options_targeted(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (s, base) in string_unsigned_pair_gen_var_2()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (s, base) in string_unsigned_pair_gen_var_2().get(gm, config).take(limit) {
         let mut options = FromSciStringOptions::default();
         options.set_base(base);
         println!(
@@ -90,8 +84,8 @@ fn demo_rational_from_sci_string_with_options_targeted(
     }
 }
 
-fn demo_rational_from_sci_string_simplest(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_14().get(gm, &config).take(limit) {
+fn demo_rational_from_sci_string_simplest(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_14().get(gm, config).take(limit) {
         println!(
             "Rational::from_sci_string_simplest({}) = {:?}",
             s,
@@ -100,8 +94,8 @@ fn demo_rational_from_sci_string_simplest(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_rational_from_sci_string_simplest_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_15().get(gm, &config).take(limit) {
+fn demo_rational_from_sci_string_simplest_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_15().get(gm, config).take(limit) {
         println!(
             "Rational::from_sci_string_simplest({}) = {:?}",
             s,
@@ -112,13 +106,10 @@ fn demo_rational_from_sci_string_simplest_targeted(gm: GenMode, config: GenConfi
 
 fn demo_rational_from_sci_string_simplest_with_options(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (s, base) in string_unsigned_pair_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (s, base) in string_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         let mut options = FromSciStringOptions::default();
         options.set_base(base);
         println!(
@@ -132,13 +123,10 @@ fn demo_rational_from_sci_string_simplest_with_options(
 
 fn demo_rational_from_sci_string_simplest_with_options_targeted(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (s, base) in string_unsigned_pair_gen_var_2()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for (s, base) in string_unsigned_pair_gen_var_2().get(gm, config).take(limit) {
         let mut options = FromSciStringOptions::default();
         options.set_base(base);
         println!(
@@ -152,14 +140,14 @@ fn demo_rational_from_sci_string_simplest_with_options_targeted(
 
 fn benchmark_rational_from_sci_string(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_sci_string(&str)",
         BenchmarkType::Single,
-        string_gen_var_15().get(gm, &config),
+        string_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -170,14 +158,14 @@ fn benchmark_rational_from_sci_string(
 
 fn benchmark_rational_from_sci_string_with_options(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_sci_string_with_options(&str, FromSciStrOptions)",
         BenchmarkType::Single,
-        string_unsigned_pair_gen_var_2().get(gm, &config),
+        string_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -194,14 +182,14 @@ fn benchmark_rational_from_sci_string_with_options(
 
 fn benchmark_rational_from_sci_string_simplest(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_sci_string_simplest(&str)",
         BenchmarkType::Single,
-        string_gen_var_15().get(gm, &config),
+        string_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -214,14 +202,14 @@ fn benchmark_rational_from_sci_string_simplest(
 
 fn benchmark_rational_from_sci_string_simplest_with_options(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_sci_string_simplest_with_options(&str, FromSciStrOptions)",
         BenchmarkType::Single,
-        string_unsigned_pair_gen_var_2().get(gm, &config),
+        string_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

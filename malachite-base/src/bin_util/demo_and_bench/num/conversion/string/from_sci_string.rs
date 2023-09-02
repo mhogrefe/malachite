@@ -25,10 +25,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_primitive_int_from_sci_string<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for s in string_gen().get(gm, &config).take(limit) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!(
             "{}::from_sci_string({}) = {:?}",
             T::NAME,
@@ -40,10 +40,10 @@ fn demo_primitive_int_from_sci_string<T: PrimitiveInt>(
 
 fn demo_primitive_int_from_sci_string_targeted<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for s in string_gen_var_13().get(gm, &config).take(limit) {
+    for s in string_gen_var_13().get(gm, config).take(limit) {
         println!(
             "{}::from_sci_string({}) = {:?}",
             T::NAME,
@@ -55,11 +55,11 @@ fn demo_primitive_int_from_sci_string_targeted<T: PrimitiveInt>(
 
 fn demo_primitive_int_from_sci_string_with_options<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (s, options) in string_from_sci_string_options_pair_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -74,11 +74,11 @@ fn demo_primitive_int_from_sci_string_with_options<T: PrimitiveInt>(
 
 fn demo_primitive_int_from_sci_string_with_options_targeted<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (s, options) in string_from_sci_string_options_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -93,14 +93,14 @@ fn demo_primitive_int_from_sci_string_with_options_targeted<T: PrimitiveInt>(
 
 fn benchmark_primitive_int_from_sci_string<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::from_sci_string(&str)", T::NAME),
         BenchmarkType::Single,
-        string_gen_var_13().get(gm, &config),
+        string_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -111,7 +111,7 @@ fn benchmark_primitive_int_from_sci_string<T: PrimitiveInt>(
 
 fn benchmark_primitive_int_from_sci_string_with_options<T: PrimitiveInt>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -121,7 +121,7 @@ fn benchmark_primitive_int_from_sci_string_with_options<T: PrimitiveInt>(
             T::NAME
         ),
         BenchmarkType::Single,
-        string_from_sci_string_options_pair_gen_var_1().get(gm, &config),
+        string_from_sci_string_options_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

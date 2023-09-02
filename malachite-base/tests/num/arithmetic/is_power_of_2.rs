@@ -7,7 +7,7 @@ fn is_power_of_2_helper<T: PrimitiveFloat>() {
     };
     test(T::ZERO, false);
     test(T::NEGATIVE_ZERO, false);
-    test(T::POSITIVE_INFINITY, false);
+    test(T::INFINITY, false);
     test(T::NEGATIVE_INFINITY, false);
     test(T::NAN, false);
     test(T::NEGATIVE_ONE, false);

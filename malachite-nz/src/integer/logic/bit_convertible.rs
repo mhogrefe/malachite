@@ -34,7 +34,7 @@ pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits.len()`.
 pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
-    for bit in bits.iter_mut() {
+    for bit in &mut *bits {
         if true_seen {
             bit.not_assign();
         } else if *bit {

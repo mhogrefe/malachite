@@ -10,24 +10,24 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_wrapping_abs_assign);
 }
 
-fn demo_wrapping_abs_assign<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_wrapping_abs_assign<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut i in signed_gen::<T>().get(gm, config).take(limit) {
         let old_i = i;
         i.wrapping_abs_assign();
-        println!("i := {}; i.wrapping_abs_assign(); i = {}", old_i, i);
+        println!("i := {old_i}; i.wrapping_abs_assign(); i = {i}");
     }
 }
 
 fn benchmark_wrapping_abs_assign<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_abs_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

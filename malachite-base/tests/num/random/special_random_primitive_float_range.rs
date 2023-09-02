@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::special_random_primitive_float_range;
 use malachite_base::random::EXAMPLE_SEED;
@@ -632,7 +633,7 @@ fn test_special_random_primitive_float_range() {
     };
     special_random_primitive_float_range_helper::<f32>(
         1.0e38,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         129,
         1,
         2,
@@ -880,7 +881,7 @@ fn test_special_random_primitive_float_range() {
     };
     special_random_primitive_float_range_helper::<f32>(
         f32::NEGATIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         1,
         1,
         2,
@@ -1689,7 +1690,7 @@ fn test_special_random_primitive_float_range() {
     };
     special_random_primitive_float_range_helper::<f64>(
         1.0e38,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         129,
         1,
         2,
@@ -1939,7 +1940,7 @@ fn test_special_random_primitive_float_range() {
     };
     special_random_primitive_float_range_helper::<f64>(
         f64::NEGATIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         1,
         1,
         2,

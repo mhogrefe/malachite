@@ -73,7 +73,7 @@ fn simplest_denominators_in_closed_interval_properties() {
         assert!(is_strictly_ascending(ds.iter()));
         for d in &ds {
             assert!(
-                exhaustive_rationals_with_denominator_inclusive_range(d, a.clone(), b.clone(),)
+                exhaustive_rationals_with_denominator_inclusive_range(d, a.clone(), b.clone())
                     .next()
                     .is_some()
             );

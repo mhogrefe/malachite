@@ -40,11 +40,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_from_string_base_algorithms);
 }
 
-fn demo_natural_from_string_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, s) in unsigned_string_pair_gen_var_2()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_natural_from_string_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, s) in unsigned_string_pair_gen_var_2().get(gm, config).take(limit) {
         println!(
             "Natural::from_string_base({}, {}) = {:?}",
             base,
@@ -54,11 +51,8 @@ fn demo_natural_from_string_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_from_string_base_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for (base, s) in unsigned_string_pair_gen_var_1()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_natural_from_string_base_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, s) in unsigned_string_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
             "Natural::from_string_base({}, {}) = {}",
             base,
@@ -68,14 +62,14 @@ fn demo_natural_from_string_base_targeted(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_natural_from_str(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_str(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!("Natural::from_str({}) = {:?}", s, Natural::from_str(&s));
     }
 }
 
-fn demo_natural_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_from_str_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_3().get(gm, config).take(limit) {
         println!(
             "Natural::from_str({}) = {}",
             s,
@@ -86,14 +80,14 @@ fn demo_natural_from_str_targeted(gm: GenMode, config: GenConfig, limit: usize) 
 
 fn benchmark_natural_from_str_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_str(&str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_3().get(gm, &config),
+        string_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -111,14 +105,14 @@ fn benchmark_natural_from_str_library_comparison(
 
 fn benchmark_natural_from_str_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_str(&str)",
         BenchmarkType::Algorithms,
-        string_gen_var_3().get(gm, &config),
+        string_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -134,14 +128,14 @@ fn benchmark_natural_from_str_algorithms(
 
 fn benchmark_natural_from_string_base_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_string_base(u64, &str)",
         BenchmarkType::LibraryComparison,
-        unsigned_string_pair_gen_var_1().get(gm, &config),
+        unsigned_string_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -162,14 +156,14 @@ fn benchmark_natural_from_string_base_library_comparison(
 
 fn benchmark_natural_from_string_base_binary_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_string_base(2, &str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_5().get(gm, &config),
+        string_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -190,14 +184,14 @@ fn benchmark_natural_from_string_base_binary_library_comparison(
 
 fn benchmark_natural_from_string_base_octal_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_string_base(8, &str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_6().get(gm, &config),
+        string_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -218,14 +212,14 @@ fn benchmark_natural_from_string_base_octal_library_comparison(
 
 fn benchmark_natural_from_string_base_hex_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_string_base(16, &str)",
         BenchmarkType::LibraryComparison,
-        string_gen_var_7().get(gm, &config),
+        string_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -246,14 +240,14 @@ fn benchmark_natural_from_string_base_hex_library_comparison(
 
 fn benchmark_natural_from_string_base_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural::from_string_base(u8, &str)",
         BenchmarkType::Algorithms,
-        unsigned_string_pair_gen_var_1().get(gm, &config),
+        unsigned_string_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

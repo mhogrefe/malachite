@@ -258,6 +258,22 @@ pub fn exhaustive_rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>(
     )
 }
 
+// -- (Rational, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_rational_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Rational, T, U)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_rationals(),
+        exhaustive_signeds::<T>(),
+        exhaustive_positive_primitive_ints::<U>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
 // -- (Rational, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1(
@@ -277,6 +293,8 @@ pub fn exhaustive_rational_signed_rounding_mode_triple_gen_var_1(
         }),
     )
 }
+
+// var 2 is in malachite-float.
 
 // -- (Rational, PrimitiveUnsigned) --
 
@@ -587,7 +605,7 @@ where
 
 pub fn exhaustive_rational_rounding_mode_pair_gen_var_4() -> It<(Rational, RoundingMode)> {
     Box::new(lex_pairs(
-        exhaustive_positive_rationals(),
+        exhaustive_nonzero_rationals(),
         exhaustive_rounding_modes(),
     ))
 }

@@ -12,7 +12,7 @@ fn ceiling_assign_primitive_float_helper<T: PrimitiveFloat>() {
     };
     test(T::ZERO, T::ZERO);
     test(T::NEGATIVE_ZERO, T::NEGATIVE_ZERO);
-    test(T::POSITIVE_INFINITY, T::POSITIVE_INFINITY);
+    test(T::INFINITY, T::INFINITY);
     test(T::NEGATIVE_INFINITY, T::NEGATIVE_INFINITY);
     test(T::NAN, T::NAN);
     test(T::ONE, T::ONE);

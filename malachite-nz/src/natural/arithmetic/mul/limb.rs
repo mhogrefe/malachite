@@ -2,7 +2,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
 use malachite_base::num::arithmetic::traits::XMulYToZZ;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::SplitInHalf;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -100,7 +100,7 @@ pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
     mut carry: Limb
 ) -> Limb {
     let y = DoubleLimb::from(y);
-    for x in xs.iter_mut() {
+    for x in &mut *xs {
         let product = DoubleLimb::from(*x) * y + DoubleLimb::from(carry);
         *x = product.lower_half();
         carry = product.upper_half();
@@ -146,8 +146,8 @@ impl Natural {
     pub(crate) fn mul_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => *self = Natural::ZERO,
-            (_, 1) | (&mut natural_zero!(), _) => {}
-            (&mut natural_one!(), _) => *self = Natural::from(other),
+            (_, 1) | (&mut Natural::ZERO, _) => {}
+            (&mut Natural::ONE, _) => *self = Natural::from(other),
             (&mut Natural(Small(ref mut small)), other) => {
                 let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {
@@ -165,8 +165,8 @@ impl Natural {
     pub(crate) fn mul_limb_ref(&self, other: Limb) -> Natural {
         match (self, other) {
             (_, 0) => Natural::ZERO,
-            (_, 1) | (natural_zero!(), _) => self.clone(),
-            (natural_one!(), _) => Natural::from(other),
+            (_, 1) | (&Natural::ZERO, _) => self.clone(),
+            (&Natural::ONE, _) => Natural::from(other),
             (Natural(Small(small)), other) => Natural({
                 let (upper, lower) = Limb::x_mul_y_to_zz(*small, other);
                 if upper == 0 {

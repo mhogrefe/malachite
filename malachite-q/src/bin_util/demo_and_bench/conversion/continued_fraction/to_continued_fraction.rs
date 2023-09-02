@@ -22,8 +22,8 @@ fn helper(p: (Integer, RationalContinuedFraction)) -> (Integer, Vec<Natural>) {
     (p.0, p.1.collect_vec())
 }
 
-fn demo_rational_continued_fraction(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_continued_fraction(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "continued_fraction({}) = {:?}",
             x.clone(),
@@ -32,8 +32,8 @@ fn demo_rational_continued_fraction(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_rational_continued_fraction_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_continued_fraction_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "continued_fraction(&{}) = {:?}",
             x,
@@ -44,14 +44,14 @@ fn demo_rational_continued_fraction_ref(gm: GenMode, config: GenConfig, limit: u
 
 fn benchmark_rational_continued_fraction_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.continued_fraction()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

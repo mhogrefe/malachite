@@ -3,7 +3,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::slice_leading_zeros;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 use std::cmp::Ordering;
 use std::mem::swap;
 
@@ -120,7 +120,9 @@ pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
                 Ordering::Less
             };
         } else if ys_i == 0 {
-            return if swapped {
+            return if xs_lo << xs_shift == 0 && slice_test_zero(&xs[..xs_i - 1]) {
+                Ordering::Equal
+            } else if swapped {
                 Ordering::Less
             } else {
                 Ordering::Greater
@@ -236,6 +238,69 @@ impl Natural {
             (&Natural(Small(x)), &Natural(Large(ref ys))) => limbs_cmp_normalized(&[x], ys),
             (&Natural(Large(ref xs)), &Natural(Small(y))) => limbs_cmp_normalized(xs, &[y]),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_cmp_normalized(xs, ys),
+        }
+    }
+
+    #[cfg(feature = "float_helpers")]
+    pub fn cmp_normalized_no_shift(&self, other: &Natural) -> Ordering {
+        assert_ne!(*self, 0);
+        assert_ne!(*other, 0);
+        if std::ptr::eq(self, other) {
+            return Ordering::Equal;
+        }
+        match (self, other) {
+            (&Natural(Small(x)), &Natural(Small(y))) => x.cmp(&y),
+            (Natural(Small(x)), &Natural(Large(ref ys))) => {
+                let (ys_last, ys_init) = ys.split_last().unwrap();
+                let c = x.cmp(ys_last);
+                if c != Ordering::Equal {
+                    c
+                } else if slice_test_zero(ys_init) {
+                    Ordering::Equal
+                } else {
+                    Ordering::Less
+                }
+            }
+            (&Natural(Large(ref xs)), Natural(Small(y))) => {
+                let (xs_last, xs_init) = xs.split_last().unwrap();
+                let c = xs_last.cmp(y);
+                if c != Ordering::Equal {
+                    c
+                } else if slice_test_zero(xs_init) {
+                    Ordering::Equal
+                } else {
+                    Ordering::Greater
+                }
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let xs_len = xs.len();
+                let ys_len = ys.len();
+                match xs_len.cmp(&ys_len) {
+                    Ordering::Equal => xs.iter().rev().cmp(ys.iter().rev()),
+                    Ordering::Less => {
+                        let (ys_lo, ys_hi) = ys.split_at(ys_len - xs_len);
+                        let c = xs.iter().rev().cmp(ys_hi.iter().rev());
+                        if c != Ordering::Equal {
+                            c
+                        } else if slice_test_zero(ys_lo) {
+                            Ordering::Equal
+                        } else {
+                            Ordering::Less
+                        }
+                    }
+                    Ordering::Greater => {
+                        let (xs_lo, xs_hi) = xs.split_at(xs_len - ys_len);
+                        let c = xs_hi.iter().rev().cmp(ys.iter().rev());
+                        if c != Ordering::Equal {
+                            c
+                        } else if slice_test_zero(xs_lo) {
+                            Ordering::Equal
+                        } else {
+                            Ordering::Greater
+                        }
+                    }
+                }
+            }
         }
     }
 }

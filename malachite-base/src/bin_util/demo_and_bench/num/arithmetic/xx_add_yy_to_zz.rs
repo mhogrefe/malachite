@@ -11,9 +11,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_xx_add_yy_to_zz_algorithms);
 }
 
-fn demo_xx_add_yy_to_zz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_xx_add_yy_to_zz<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x_1, x_0, y_1, y_0) in unsigned_quadruple_gen_var_10::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -29,7 +29,7 @@ fn demo_xx_add_yy_to_zz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, li
 
 fn benchmark_xx_add_yy_to_zz_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -43,7 +43,7 @@ fn benchmark_xx_add_yy_to_zz_algorithms<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_quadruple_gen_var_10::<T>().get(gm, &config),
+        unsigned_quadruple_gen_var_10::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

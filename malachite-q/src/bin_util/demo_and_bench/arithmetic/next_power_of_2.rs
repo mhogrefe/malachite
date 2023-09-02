@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_next_power_of_2_assign);
 }
 
-fn demo_rational_next_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen_var_2().get(gm, &config).take(limit) {
+fn demo_rational_next_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen_var_2().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("next_power_of_2({}) = {}", x_old, x.next_power_of_2());
     }
 }
 
-fn demo_rational_next_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen_var_2().get(gm, &config).take(limit) {
+fn demo_rational_next_power_of_2_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen_var_2().get(gm, config).take(limit) {
         println!("next_power_of_2({}) = {}", x, (&x).next_power_of_2());
     }
 }
 
-fn demo_rational_next_power_of_2_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in rational_gen_var_2().get(gm, &config).take(limit) {
+fn demo_rational_next_power_of_2_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in rational_gen_var_2().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.next_power_of_2_assign();
-        println!("x := {}; x.next_power_of_2_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.next_power_of_2_assign(); x = {x}");
     }
 }
 
 fn benchmark_rational_next_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.next_power_of_2()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen_var_2().get(gm, &config),
+        rational_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -65,14 +65,14 @@ fn benchmark_rational_next_power_of_2_evaluation_strategy(
 
 fn benchmark_rational_next_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.next_power_of_2_assign()",
         BenchmarkType::Single,
-        rational_gen_var_2().get(gm, &config),
+        rational_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

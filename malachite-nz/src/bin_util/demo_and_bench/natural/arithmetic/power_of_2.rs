@@ -11,17 +11,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_power_of_2);
 }
 
-fn demo_natural_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for pow in unsigned_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for pow in unsigned_gen_var_5().get(gm, config).take(limit) {
         println!("2^{} = {}", pow, Natural::power_of_2(pow));
     }
 }
 
-fn benchmark_natural_power_of_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_power_of_2(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.power_of_2(u64)",
         BenchmarkType::Single,
-        unsigned_gen_var_5().get(gm, &config),
+        unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

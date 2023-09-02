@@ -11,9 +11,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_xx_div_mod_y_to_qr_algorithms);
 }
 
-fn demo_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x_1, x_0, y) in unsigned_triple_gen_var_15::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -28,7 +28,7 @@ fn demo_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
 
 fn benchmark_xx_div_mod_y_to_qr_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -41,7 +41,7 @@ fn benchmark_xx_div_mod_y_to_qr_algorithms<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_15::<T, T>().get(gm, &config),
+        unsigned_triple_gen_var_15::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

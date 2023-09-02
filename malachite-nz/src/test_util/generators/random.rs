@@ -46,9 +46,9 @@ use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
 use crate::natural::random::{
-    get_random_natural_with_up_to_bits, random_natural_range_to_infinity, random_naturals,
-    random_naturals_less_than, random_positive_naturals, RandomNaturalRangeToInfinity,
-    RandomNaturals, RandomNaturalsLessThan,
+    get_random_natural_with_bits, get_random_natural_with_up_to_bits,
+    random_natural_range_to_infinity, random_naturals, random_naturals_less_than,
+    random_positive_naturals, RandomNaturalRangeToInfinity, RandomNaturals, RandomNaturalsLessThan,
 };
 use crate::natural::Natural;
 use crate::platform::{
@@ -566,7 +566,7 @@ pub fn random_integer_integer_natural_triple_gen_var_2(
                 )
             },
         )
-        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+        .filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -940,6 +940,37 @@ pub fn random_integer_signed_pair_gen_var_1<T: PrimitiveSigned>(
     ))
 }
 
+// -- (Integer, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn random_integer_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Integer, PrimitiveSigned, RoundingMode) --
 
 pub fn random_integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -1163,6 +1194,28 @@ pub fn random_integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn random_integer_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Integer, PrimitiveUnsigned, bool) --
 
 pub fn random_integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -1363,6 +1416,8 @@ where
         .map(|(n, u, rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
     )
 }
+
+// var 3 is in malachite-float.
 
 // -- (Integer, RoundingMode) --
 
@@ -2021,7 +2076,7 @@ pub fn random_natural_triple_gen_var_2(config: &GenConfig) -> It<(Natural, Natur
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+        .filter(|(x, y, m)| !x.eq_mod(y, m)),
     )
 }
 
@@ -2722,6 +2777,45 @@ pub fn random_natural_signed_pair_gen_var_2<T: PrimitiveSigned>(
     ))
 }
 
+struct NaturalBitsMultipleOfLimbBitsGenerator {
+    limbs: RandomPrimitiveInts<u64>,
+    limb_counts: GeometricRandomNaturalValues<u64>,
+}
+
+impl Iterator for NaturalBitsMultipleOfLimbBitsGenerator {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        Some(get_random_natural_with_bits(
+            &mut self.limbs,
+            self.limb_counts.next().unwrap() << Limb::LOG_WIDTH,
+        ))
+    }
+}
+
+pub fn random_natural_signed_pair_gen_var_3<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| NaturalBitsMultipleOfLimbBitsGenerator {
+            limbs: random_primitive_ints(seed.fork("limbs")),
+            limb_counts: geometric_random_positive_unsigneds(
+                seed.fork("limb_counts"),
+                config.get_or("mean_small_n", 2),
+                config.get_or("mean_small_d", 1),
+            ),
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn random_natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>(
@@ -2757,6 +2851,35 @@ pub fn random_natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>(
             (x, y, m)
         }),
     )
+}
+
+pub fn random_natural_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Natural, PrimitiveSigned, RoundingMode) --
@@ -3382,6 +3505,8 @@ where
     )
 }
 
+// var 2 is in malachite-float
+
 // --(Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecTripleGenerator {
@@ -3399,7 +3524,8 @@ impl Iterator for NaturalUnsignedBoolVecTripleGenerator {
         let bs = (&mut self.bs)
             .take(usize::exact_from(
                 x.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling),
+                    .div_round(log_base, RoundingMode::Ceiling)
+                    .0,
             ))
             .collect();
         Some((x, log_base, bs))

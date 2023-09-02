@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::exhaustive::primitive_floats_increasing;
 use malachite_base::test_util::num::exhaustive::*;
 
@@ -55,7 +56,7 @@ fn test_primitive_floats_increasing() {
             3.402823e38,
             3.4028233e38,
             3.4028235e38,
-            f32::POSITIVE_INFINITY,
+            f32::INFINITY,
         ],
     );
     primitive_floats_increasing_helper::<f64>(
@@ -101,7 +102,7 @@ fn test_primitive_floats_increasing() {
             1.7976931348623153e308,
             1.7976931348623155e308,
             1.7976931348623157e308,
-            f64::POSITIVE_INFINITY,
+            f64::INFINITY,
         ],
     );
 }

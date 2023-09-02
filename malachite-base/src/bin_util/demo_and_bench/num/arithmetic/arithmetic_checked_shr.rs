@@ -21,11 +21,11 @@ fn demo_arithmetic_checked_shr_unsigned_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, i) in unsigned_signed_pair_gen_var_1::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -42,10 +42,10 @@ fn demo_arithmetic_checked_shr_signed_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (n, i) in signed_pair_gen_var_2::<T, U>().get(gm, &config).take(limit) {
+    for (n, i) in signed_pair_gen_var_2::<T, U>().get(gm, config).take(limit) {
         println!(
             "({}).arithmetic_checked_shr({}) = {:?}",
             n,
@@ -60,7 +60,7 @@ fn benchmark_arithmetic_checked_shr_unsigned_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -69,7 +69,7 @@ fn benchmark_arithmetic_checked_shr_unsigned_signed<
     run_benchmark(
         &format!("{}.arithmetic_checked_shr({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_signed_pair_gen_var_1::<T, U>().get(gm, &config),
+        unsigned_signed_pair_gen_var_1::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -85,7 +85,7 @@ fn benchmark_arithmetic_checked_shr_signed_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -94,7 +94,7 @@ fn benchmark_arithmetic_checked_shr_signed_signed<
     run_benchmark(
         &format!("{}.arithmetic_checked_shr({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_2::<T, U>().get(gm, &config),
+        signed_pair_gen_var_2::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -52,103 +52,107 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_sqrt_assign);
 }
 
-fn demo_floor_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_floor_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("floor_sqrt({}) = {}", n, n.floor_sqrt());
     }
 }
 
-fn demo_floor_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen_var_2::<T>().get(gm, &config).take(limit) {
+fn demo_floor_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen_var_2::<T>().get(gm, config).take(limit) {
         println!("floor_sqrt({}) = {}", n, n.floor_sqrt());
     }
 }
 
 fn demo_floor_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.floor_sqrt_assign();
-        println!("n := {}; n.floor_sqrt_assign(); n = {}", old_n, n);
+        println!("n := {old_n}; n.floor_sqrt_assign(); n = {n}");
     }
 }
 
-fn demo_floor_sqrt_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in signed_gen_var_2::<T>().get(gm, &config).take(limit) {
+fn demo_floor_sqrt_assign_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut n in signed_gen_var_2::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.floor_sqrt_assign();
-        println!("n := {}; n.floor_sqrt_assign(); n = {}", old_n, n);
+        println!("n := {old_n}; n.floor_sqrt_assign(); n = {n}");
     }
 }
 
-fn demo_ceiling_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("ceiling_sqrt({}) = {}", n, n.ceiling_sqrt());
     }
 }
 
-fn demo_ceiling_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen_var_2::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen_var_2::<T>().get(gm, config).take(limit) {
         println!("ceiling_sqrt({}) = {}", n, n.ceiling_sqrt());
     }
 }
 
 fn demo_ceiling_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.ceiling_sqrt_assign();
-        println!("n := {}; n.ceiling_sqrt_assign(); n = {}", old_n, n);
+        println!("n := {old_n}; n.ceiling_sqrt_assign(); n = {n}");
     }
 }
 
 fn demo_ceiling_sqrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut n in signed_gen_var_2::<T>().get(gm, &config).take(limit) {
+    for mut n in signed_gen_var_2::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.ceiling_sqrt_assign();
-        println!("n := {}; n.ceiling_sqrt_assign(); n = {}", old_n, n);
+        println!("n := {old_n}; n.ceiling_sqrt_assign(); n = {n}");
     }
 }
 
-fn demo_checked_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_checked_sqrt_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("checked_sqrt({}) = {:?}", n, n.checked_sqrt());
     }
 }
 
-fn demo_checked_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in signed_gen_var_2::<T>().get(gm, &config).take(limit) {
+fn demo_checked_sqrt_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen_var_2::<T>().get(gm, config).take(limit) {
         println!("checked_sqrt({}) = {:?}", n, n.checked_sqrt());
     }
 }
 
-fn demo_sqrt_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sqrt_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let (sqrt, rem) = n.sqrt_rem();
-        println!("{} = {} ^ 2 + {}", n, sqrt, rem);
+        println!("{n} = {sqrt} ^ 2 + {rem}");
     }
 }
 
-fn demo_sqrt_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sqrt_assign_rem<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_n = n;
         let rem = n.sqrt_assign_rem();
-        println!("n := {}; n.sqrt_assign() = {}; n = {}", old_n, rem, n);
+        println!("n := {old_n}; n.sqrt_assign() = {rem}; n = {n}");
     }
 }
 
-fn demo_sqrt_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_sqrt_assign<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         let old_f = f;
         f.sqrt_assign();
         println!(
@@ -161,14 +165,14 @@ fn demo_sqrt_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: us
 
 fn benchmark_floor_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_sqrt()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -182,14 +186,14 @@ fn benchmark_floor_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_sqrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_sqrt()", T::NAME),
         BenchmarkType::Algorithms,
-        signed_gen_var_2::<T>().get(gm, &config),
+        signed_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -200,14 +204,14 @@ fn benchmark_floor_sqrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_floor_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_sqrt_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -218,14 +222,14 @@ fn benchmark_floor_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_sqrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_sqrt_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_2::<T>().get(gm, &config),
+        signed_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -236,14 +240,14 @@ fn benchmark_floor_sqrt_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_sqrt()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -257,14 +261,14 @@ fn benchmark_ceiling_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_sqrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_sqrt()", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_2::<T>().get(gm, &config),
+        signed_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -275,14 +279,14 @@ fn benchmark_ceiling_sqrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_sqrt_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -293,14 +297,14 @@ fn benchmark_ceiling_sqrt_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_sqrt_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_sqrt_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_2::<T>().get(gm, &config),
+        signed_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -311,14 +315,14 @@ fn benchmark_ceiling_sqrt_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_checked_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_sqrt()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -332,14 +336,14 @@ fn benchmark_checked_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_sqrt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_sqrt()", T::NAME),
         BenchmarkType::Single,
-        signed_gen_var_2::<T>().get(gm, &config),
+        signed_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -350,14 +354,14 @@ fn benchmark_checked_sqrt_signed<T: PrimitiveSigned>(
 
 fn benchmark_sqrt_rem_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sqrt_rem()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -375,14 +379,14 @@ fn benchmark_sqrt_rem_algorithms_2<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sqrt_assign_rem()", U::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_17::<U>().get(gm, &config),
+        unsigned_gen_var_17::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -404,14 +408,14 @@ fn benchmark_sqrt_rem_algorithms_2<
 
 fn benchmark_sqrt_assign_rem<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sqrt_assign_rem()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -422,14 +426,14 @@ fn benchmark_sqrt_assign_rem<T: PrimitiveUnsigned>(
 
 fn benchmark_sqrt_assign<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sqrt_assign()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

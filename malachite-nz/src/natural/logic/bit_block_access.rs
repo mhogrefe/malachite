@@ -114,7 +114,11 @@ pub(crate) fn limbs_assign_bits_helper(
 ) {
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
     let small_end = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
-    let width = usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let width = usize::exact_from(
+        (end - start)
+            .shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)
+            .0,
+    );
     if width < bits.len() {
         bits = &bits[..width];
     }

@@ -115,7 +115,9 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
     let two_limit_b = Integer::from(b.div_exact(&gcd));
     let limit_b = &two_limit_b >> 1u32;
     if x > limit_b {
-        let k = (&x - limit_b).div_round(&two_limit_b, RoundingMode::Ceiling);
+        let k = (&x - limit_b)
+            .div_round(&two_limit_b, RoundingMode::Ceiling)
+            .0;
         x -= two_limit_b * &k;
         y += two_limit_a * k;
     }

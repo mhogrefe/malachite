@@ -18,48 +18,48 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_divisible_by_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (u, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if u.divisible_by_power_of_2(pow) {
-            println!("{} is divisible by 2^{}", u, pow);
+            println!("{u} is divisible by 2^{pow}");
         } else {
-            println!("{} is not divisible by 2^{}", u, pow);
+            println!("{u} is not divisible by 2^{pow}");
         }
     }
 }
 
 fn demo_divisible_by_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (i, pow) in signed_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if i.divisible_by_power_of_2(pow) {
-            println!("{} is divisible by 2^{}", i, pow);
+            println!("{i} is divisible by 2^{pow}");
         } else {
-            println!("{} is not divisible by 2^{}", i, pow);
+            println!("{i} is not divisible by 2^{pow}");
         }
     }
 }
 
 fn benchmark_divisible_by_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.divisible_by_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -72,14 +72,14 @@ fn benchmark_divisible_by_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_divisible_by_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.divisible_by_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

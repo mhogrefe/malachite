@@ -3,12 +3,14 @@ use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 impl RoundToMultipleOfPowerOf2<u64> for Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of $2^k$ according to a specified rounding mode. The
-    /// [`Integer`] is taken by value.
+    /// [`Integer`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{2^k}$:
     ///
@@ -58,28 +60,48 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Floor), 8);
     /// assert_eq!(
-    ///     Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling),
-    ///     -8
-    /// );
-    /// assert_eq!(Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Down), 8);
-    /// assert_eq!(Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Up), -12);
-    /// assert_eq!(
-    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest),
-    ///     8
+    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(-12).round_to_multiple_of_power_of_2(2, RoundingMode::Exact),
-    ///     -12
+    ///     Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(10).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-12).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-12, Equal)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple_of_power_of_2(mut self, pow: u64, rm: RoundingMode) -> Integer {
-        self.round_to_multiple_of_power_of_2_assign(pow, rm);
-        self
+    fn round_to_multiple_of_power_of_2(
+        mut self,
+        pow: u64,
+        rm: RoundingMode,
+    ) -> (Integer, Ordering) {
+        let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
+        (self, o)
     }
 }
 
@@ -87,7 +109,8 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
     type Output = Integer;
 
     /// Rounds an [`Integer`] to a multiple of $2^k$ according to a specified rounding mode. The
-    /// [`Integer`] is taken by reference.
+    /// [`Integer`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{2^k}$:
     ///
@@ -137,48 +160,61 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Floor),
-    ///     8
+    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling),
-    ///     -8
+    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(-8, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Down),
-    ///     8
+    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Up),
-    ///     -12
+    ///     (&Integer::from(-10)).round_to_multiple_of_power_of_2(2, RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-12, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest),
-    ///     8
+    ///     (&Integer::from(10)).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(-12)).round_to_multiple_of_power_of_2(2, RoundingMode::Exact),
-    ///     -12
+    ///     (&Integer::from(-12)).round_to_multiple_of_power_of_2(2, RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(-12, Equal)"
     /// );
     /// ```
-    fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> Integer {
+    fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> (Integer, Ordering) {
         if self.sign {
-            Integer {
-                sign: self.sign,
-                abs: (&self.abs).round_to_multiple_of_power_of_2(pow, rm),
-            }
+            let (abs, o) = (&self.abs).round_to_multiple_of_power_of_2(pow, rm);
+            (
+                Integer {
+                    sign: self.sign,
+                    abs,
+                },
+                o,
+            )
         } else {
-            -(&self.abs).round_to_multiple_of_power_of_2(pow, -rm)
+            let (abs, o) = (&self.abs).round_to_multiple_of_power_of_2(pow, -rm);
+            (-abs, o.reverse())
         }
     }
 }
 
 impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// Rounds an [`Integer`] to a multiple of $2^k$ in place, according to a specified rounding
-    /// mode.
+    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
+    /// equal to, or greater than the original value.
     ///
     /// See the [`RoundToMultipleOfPowerOf2`](RoundToMultipleOfPowerOf2) documentation for details.
     ///
@@ -204,39 +240,56 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
+    /// use std::cmp::Ordering;
     ///
     /// let mut n = Integer::from(10);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor);
+    /// assert_eq!(
+    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-10);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling);
+    /// assert_eq!(
+    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(n, -8);
     ///
     /// let mut n = Integer::from(10);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down);
+    /// assert_eq!(
+    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-10);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up);
+    /// assert_eq!(n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up), Ordering::Less);
     /// assert_eq!(n, -12);
     ///
     /// let mut n = Integer::from(10);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(n, 8);
     ///
     /// let mut n = Integer::from(-12);
-    /// n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact);
+    /// assert_eq!(
+    ///     n.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(n, -12);
     /// ```
-    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) {
+    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) -> Ordering {
         if self.sign {
-            self.abs.round_to_multiple_of_power_of_2_assign(pow, rm);
+            self.abs.round_to_multiple_of_power_of_2_assign(pow, rm)
         } else {
-            self.abs.round_to_multiple_of_power_of_2_assign(pow, -rm);
+            let o = self.abs.round_to_multiple_of_power_of_2_assign(pow, -rm);
             if self.abs == 0 {
                 self.sign = true;
             }
+            o.reverse()
         }
     }
 }

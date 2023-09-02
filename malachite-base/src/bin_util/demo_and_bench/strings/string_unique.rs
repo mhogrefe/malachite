@@ -11,23 +11,23 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_string_unique);
 }
 
-fn demo_string_unique(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_string_unique(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         println!("string_unique({:?}) = {:?}", s, string_unique(&s));
     }
 }
 
-fn demo_string_unique_ascii(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_1().get(gm, &config).take(limit) {
+fn demo_string_unique_ascii(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_1().get(gm, config).take(limit) {
         println!("string_unique({:?}) = {:?}", s, string_unique(&s));
     }
 }
 
-fn benchmark_string_unique(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_string_unique(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "string_unique(&str)",
         BenchmarkType::Single,
-        string_gen().get(gm, &config),
+        string_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

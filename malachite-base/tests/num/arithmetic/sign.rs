@@ -32,7 +32,7 @@ fn sign_helper_primitive_float<T: PrimitiveFloat>() {
     test(T::NEGATIVE_ZERO, Ordering::Less);
     test(T::ONE, Ordering::Greater);
     test(T::NEGATIVE_ONE, Ordering::Less);
-    test(T::POSITIVE_INFINITY, Ordering::Greater);
+    test(T::INFINITY, Ordering::Greater);
     test(T::NEGATIVE_INFINITY, Ordering::Less);
     test(T::NAN, Ordering::Equal);
 }

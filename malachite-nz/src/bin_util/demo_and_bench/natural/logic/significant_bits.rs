@@ -20,11 +20,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_significant_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1::<Limb>()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_significant_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1::<Limb>().get(gm, config).take(limit) {
         println!(
             "limbs_significant_bits({:?}) = {}",
             xs,
@@ -33,17 +30,22 @@ fn demo_limbs_significant_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_significant_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_significant_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("significant_bits({}) = {}", n, n.significant_bits());
     }
 }
 
-fn benchmark_limbs_significant_bits(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_significant_bits(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "limbs_significant_bits(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1::<Limb>().get(gm, &config),
+        unsigned_vec_gen_var_1::<Limb>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -54,14 +56,14 @@ fn benchmark_limbs_significant_bits(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_natural_significant_bits_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.significant_bits()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

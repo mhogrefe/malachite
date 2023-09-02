@@ -717,7 +717,7 @@ fn limbs_fft_split_bits(poly: &mut [&mut [Limb]], xs: &[Limb], bits: usize) -> u
     let mut total_bits = 0;
     let mut q = 0;
     let (poly_last, poly_init) = poly[..length].split_last_mut().unwrap();
-    for ps in poly_init.iter_mut() {
+    for ps in &mut *poly_init {
         slice_set_zero(ps);
         let xs = &xs[q + usize::exact_from(total_bits >> Limb::LOG_WIDTH)..];
         let mut shift_bits = total_bits & Limb::WIDTH_MASK;
@@ -1576,7 +1576,7 @@ fn limbs_fft_mulmod_2expp1<'a>(
         *x0 = ps[0];
     }
     limbs_fft_negacyclic(xss, w, ts, us, ss);
-    for ps in xss.iter_mut() {
+    for ps in &mut *xss {
         limbs_fft_normmod_2expp1(ps);
     }
     let j = limbs_fft_split_bits(yss, &ys[..limbs], bits);
@@ -1731,11 +1731,11 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
         *x0 = ps[0];
     }
     limbs_fft_negacyclic(xss, w, ts, us, ss);
-    for ps in xss.iter_mut() {
+    for ps in &mut *xss {
         limbs_fft_normmod_2expp1(ps);
     }
     let nw = n * w;
-    for ps in xss.iter_mut() {
+    for ps in &mut *xss {
         assert_eq!(*ps.last_mut().unwrap(), 0);
         *ps.last_mut().unwrap() =
             Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(ps, nw, scratch));
@@ -2729,7 +2729,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 let start = sqrt * n_revbin(s, depth);
                 let xss_hi = &mut xss_hi[start..][..sqrt];
                 limbs_fft_radix2(xss_hi, wy, &mut ts, &mut us);
-                for xs in xss_hi.iter_mut() {
+                for xs in &mut *xss_hi {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
                         Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
@@ -2739,7 +2739,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
             // convolutions on rows
             for xss_chunk in xss.chunks_mut(sqrt).take(len) {
                 limbs_fft_radix2(xss_chunk, wy, &mut ts, &mut us);
-                for xs in xss_chunk.iter_mut() {
+                for xs in &mut *xss_chunk {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
                         Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
@@ -2773,7 +2773,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 let start = sqrt * n_revbin(s, depth);
                 let xss_hi = &mut xss_hi[start..][..sqrt];
                 limbs_fft_radix2(xss_hi, wy, &mut ts, &mut us);
-                for xs in xss_hi.iter_mut() {
+                for xs in &mut *xss_hi {
                     limbs_fft_normmod_2expp1(xs);
                     limbs_fft_mulmod_2expp1_same(
                         xs,
@@ -2792,7 +2792,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
             // convolutions on rows
             for xss_chunk in xss.chunks_mut(sqrt).take(len) {
                 limbs_fft_radix2(xss_chunk, wy, &mut ts, &mut us);
-                for xs in xss_chunk.iter_mut() {
+                for xs in &mut *xss_chunk {
                     limbs_fft_normmod_2expp1(xs);
                     limbs_fft_mulmod_2expp1_same(
                         xs,

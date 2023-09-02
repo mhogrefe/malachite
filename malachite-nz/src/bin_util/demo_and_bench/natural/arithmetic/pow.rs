@@ -31,29 +31,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_pow_evaluation_strategy);
 }
 
-fn demo_limbs_pow(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_pow(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, exp) in unsigned_vec_unsigned_pair_gen_var_31()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("limbs_pow({:?}, {}) = {:?}", xs, exp, limbs_pow(&xs, exp));
     }
 }
 
-fn demo_natural_pow_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_pow_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, pow) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.pow_assign(pow);
-        println!("x := {}; x.pow_assign({}); x = {}", n_old, pow, n);
+        println!("x := {n_old}; x.pow_assign({pow}); x = {n}");
     }
 }
 
-fn demo_natural_pow(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_pow(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -61,20 +61,20 @@ fn demo_natural_pow(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_pow_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_pow_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).pow({}) = {}", n, pow, (&n).pow(pow));
     }
 }
 
-fn benchmark_limbs_pow(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_pow(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_pow(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_31().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -85,11 +85,11 @@ fn benchmark_limbs_pow(gm: GenMode, config: GenConfig, limit: usize, file_name: 
     );
 }
 
-fn benchmark_natural_pow_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_pow_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.pow_assign(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -98,11 +98,16 @@ fn benchmark_natural_pow_assign(gm: GenMode, config: GenConfig, limit: usize, fi
     );
 }
 
-fn benchmark_natural_pow_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_pow_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Natural.pow(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -120,14 +125,14 @@ fn benchmark_natural_pow_algorithms(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_natural_pow_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.pow(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_4_nrm().get(gm, &config),
+        natural_unsigned_pair_gen_var_4_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -144,14 +149,14 @@ fn benchmark_natural_pow_library_comparison(
 
 fn benchmark_natural_pow_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.pow(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

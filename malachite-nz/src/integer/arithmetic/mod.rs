@@ -197,42 +197,100 @@ pub mod shl;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRound;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!(Integer::from(0x101).shl_round(-8i8, RoundingMode::Down), 1);
-/// assert_eq!(Integer::from(0x101).shl_round(-8i16, RoundingMode::Up), 2);
-///
-/// assert_eq!(Integer::from(-0x101).shl_round(-9i32, RoundingMode::Down), 0);
-/// assert_eq!(Integer::from(-0x101).shl_round(-9i64, RoundingMode::Up), -1);
-/// assert_eq!(Integer::from(-0x101).shl_round(-9i8, RoundingMode::Nearest), -1);
-/// assert_eq!(Integer::from(-0xff).shl_round(-9i16, RoundingMode::Nearest), 0);
-/// assert_eq!(Integer::from(-0x100).shl_round(-9i32, RoundingMode::Nearest), 0);
-///
-/// assert_eq!(Integer::from(0x100).shl_round(-8i64, RoundingMode::Exact), 1);
-///
-/// assert_eq!(Integer::ZERO.shl_round(10i8, RoundingMode::Exact), 0);
-/// assert_eq!(Integer::from(123u32).shl_round(2i16, RoundingMode::Exact), 492);
 /// assert_eq!(
-///     Integer::from(123u32).shl_round(100i32, RoundingMode::Exact).to_string(),
-///     "155921023828072216384094494261248"
+///     Integer::from(0x101).shl_round(-8i8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(0x101).shl_round(-8i16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
 /// );
 ///
-/// assert_eq!((&Integer::from(0x101)).shl_round(-8i8, RoundingMode::Down), 1);
-/// assert_eq!((&Integer::from(0x101)).shl_round(-8i16, RoundingMode::Up), 2);
-///
-/// assert_eq!((&Integer::from(-0x101)).shl_round(-9i32, RoundingMode::Down), 0);
-/// assert_eq!((&Integer::from(-0x101)).shl_round(-9i64, RoundingMode::Up), -1);
-/// assert_eq!((&Integer::from(-0x101)).shl_round(-9i8, RoundingMode::Nearest), -1);
-/// assert_eq!((&Integer::from(-0xff)).shl_round(-9i16, RoundingMode::Nearest), 0);
-/// assert_eq!((&Integer::from(-0x100)).shl_round(-9i32, RoundingMode::Nearest), 0);
-///
-/// assert_eq!((&Integer::from(0x100)).shl_round(-8i64, RoundingMode::Exact), 1);
-///
-/// assert_eq!((&Integer::ZERO).shl_round(10i8, RoundingMode::Exact), 0);
-/// assert_eq!((&Integer::from(123u32)).shl_round(2i16, RoundingMode::Exact), 492);
 /// assert_eq!(
-///     (&Integer::from(123u32)).shl_round(100i32, RoundingMode::Exact).to_string(),
-///     "155921023828072216384094494261248"
+///     Integer::from(-0x101).shl_round(-9i32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shl_round(-9i64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shl_round(-9i8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0xff).shl_round(-9i16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x100).shl_round(-9i32, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     Integer::from(0x100).shl_round(-8i64, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(Integer::ZERO.shl_round(10i8, RoundingMode::Exact).to_debug_string(), "(0, Equal)");
+/// assert_eq!(
+///     Integer::from(123u32).shl_round(2i16, RoundingMode::Exact).to_debug_string(),
+///     "(492, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::from(123u32).shl_round(100i32, RoundingMode::Exact).to_debug_string(),
+///     "(155921023828072216384094494261248, Equal)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x101)).shl_round(-8i8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(0x101)).shl_round(-8i16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shl_round(-9i32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shl_round(-9i64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shl_round(-9i8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0xff)).shl_round(-9i16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x100)).shl_round(-9i32, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x100)).shl_round(-8i64, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::ZERO).shl_round(10i8, RoundingMode::Exact).to_debug_string(),
+///     "(0, Equal)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(123u32)).shl_round(2i16, RoundingMode::Exact).to_debug_string(),
+///     "(492, Equal)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(123u32)).shl_round(100i32, RoundingMode::Exact).to_debug_string(),
+///     "(155921023828072216384094494261248, Equal)"
 /// );
 /// ```
 ///
@@ -242,44 +300,45 @@ pub mod shl;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
+/// use std::cmp::Ordering;
 ///
 /// let mut n = Integer::from(0x101);
-/// n.shl_round_assign(-8i8, RoundingMode::Down);
+/// assert_eq!(n.shl_round_assign(-8i8, RoundingMode::Down), Ordering::Less);
 /// assert_eq!(n, 1);
 ///
 /// let mut n = Integer::from(0x101);
-/// n.shl_round_assign(-8i16, RoundingMode::Up);
+/// assert_eq!(n.shl_round_assign(-8i16, RoundingMode::Up), Ordering::Greater);
 /// assert_eq!(n, 2);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shl_round_assign(-9i32, RoundingMode::Down);
+/// assert_eq!(n.shl_round_assign(-9i32, RoundingMode::Down), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shl_round_assign(-9i64, RoundingMode::Up);
+/// assert_eq!(n.shl_round_assign(-9i64, RoundingMode::Up), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shl_round_assign(-9i8, RoundingMode::Nearest);
+/// assert_eq!(n.shl_round_assign(-9i8, RoundingMode::Nearest), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0xff);
-/// n.shl_round_assign(-9i16, RoundingMode::Nearest);
+/// assert_eq!(n.shl_round_assign(-9i16, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x100);
-/// n.shl_round_assign(-9i32, RoundingMode::Nearest);
+/// assert_eq!(n.shl_round_assign(-9i32, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(0x100);
-/// n.shl_round_assign(-8i64, RoundingMode::Exact);
+/// assert_eq!(n.shl_round_assign(-8i64, RoundingMode::Exact), Ordering::Equal);
 /// assert_eq!(n, 1);
 ///
 /// let mut x = Integer::ONE;
-/// x.shl_round_assign(1i8, RoundingMode::Exact);
-/// x.shl_round_assign(2i16, RoundingMode::Exact);
-/// x.shl_round_assign(3i32, RoundingMode::Exact);
-/// x.shl_round_assign(4i64, RoundingMode::Exact);
+/// assert_eq!(x.shl_round_assign(1i8, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shl_round_assign(2i16, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shl_round_assign(3i32, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shl_round_assign(4i64, RoundingMode::Exact), Ordering::Equal);
 /// assert_eq!(x, 1024);
 /// ```
 pub mod shl_round;
@@ -361,63 +420,170 @@ pub mod shr;
 /// use malachite_base::num::arithmetic::traits::ShrRound;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::integer::Integer;
+/// use malachite_base::strings::ToDebugString;
 ///
-/// assert_eq!(Integer::from(0x101).shr_round(8u8, RoundingMode::Down), 1);
-/// assert_eq!(Integer::from(0x101).shr_round(8u16, RoundingMode::Up), 2);
-///
-/// assert_eq!(Integer::from(-0x101).shr_round(9u32, RoundingMode::Down), 0);
-/// assert_eq!(Integer::from(-0x101).shr_round(9u64, RoundingMode::Up), -1);
-/// assert_eq!(Integer::from(-0x101).shr_round(9u8, RoundingMode::Nearest), -1);
-/// assert_eq!(Integer::from(-0xff).shr_round(9u16, RoundingMode::Nearest), 0);
-/// assert_eq!(Integer::from(-0x100).shr_round(9u64, RoundingMode::Nearest), 0);
-///
-/// assert_eq!(Integer::from(0x100u32).shr_round(8u32, RoundingMode::Exact), 1);
-///
-/// assert_eq!((&Integer::from(0x101)).shr_round(8u8, RoundingMode::Down), 1);
-/// assert_eq!((&Integer::from(0x101)).shr_round(8u16, RoundingMode::Up), 2);
-///
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9u32, RoundingMode::Down), 0);
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9u64, RoundingMode::Up), -1);
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9u8, RoundingMode::Nearest), -1);
-/// assert_eq!((&Integer::from(-0xff)).shr_round(9u16, RoundingMode::Nearest), 0);
-/// assert_eq!((&Integer::from(-0x100)).shr_round(9u64, RoundingMode::Nearest), 0);
-///
-/// assert_eq!((&Integer::from(0x100u32)).shr_round(8u32, RoundingMode::Exact), 1);
-///
-/// assert_eq!(Integer::from(0x101u32).shr_round(8i8, RoundingMode::Down), 1);
-/// assert_eq!(Integer::from(0x101u32).shr_round(8i16, RoundingMode::Up), 2);
-///
-/// assert_eq!(Integer::from(-0x101).shr_round(9i32, RoundingMode::Down), 0);
-/// assert_eq!(Integer::from(-0x101).shr_round(9i64, RoundingMode::Up), -1);
-/// assert_eq!(Integer::from(-0x101).shr_round(9i8, RoundingMode::Nearest), -1);
-/// assert_eq!(Integer::from(-0xff).shr_round(9i16, RoundingMode::Nearest), 0);
-/// assert_eq!(Integer::from(-0x100).shr_round(9i32, RoundingMode::Nearest), 0);
-///
-/// assert_eq!(Integer::from(0x100u32).shr_round(8i64, RoundingMode::Exact), 1);
-///
-/// assert_eq!(Integer::ZERO.shr_round(-10i8, RoundingMode::Exact), 0);
-/// assert_eq!(Integer::from(123u32).shr_round(-2i16, RoundingMode::Exact), 492);
 /// assert_eq!(
-///     Integer::from(123u32).shr_round(-100i32, RoundingMode::Exact).to_string(),
-///     "155921023828072216384094494261248"
+///     Integer::from(0x101).shr_round(8u8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(0x101).shr_round(8u16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
 /// );
 ///
-/// assert_eq!((&Integer::from(0x101u32)).shr_round(8i8, RoundingMode::Down), 1);
-/// assert_eq!((&Integer::from(0x101u32)).shr_round(8i16, RoundingMode::Up), 2);
-///
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9i32, RoundingMode::Down), 0);
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9i64, RoundingMode::Up), -1);
-/// assert_eq!((&Integer::from(-0x101)).shr_round(9i8, RoundingMode::Nearest), -1);
-/// assert_eq!((&Integer::from(-0xff)).shr_round(9i16, RoundingMode::Nearest), 0);
-/// assert_eq!((&Integer::from(-0x100)).shr_round(9i32, RoundingMode::Nearest), 0);
-///
-/// assert_eq!((&Integer::from(0x100u32)).shr_round(8i64, RoundingMode::Exact), 1);
-///
-/// assert_eq!((&Integer::ZERO).shr_round(-10i8, RoundingMode::Exact), 0);
-/// assert_eq!((&Integer::from(123u32)).shr_round(-2i16, RoundingMode::Exact), 492);
 /// assert_eq!(
-///     (&Integer::from(123u32)).shr_round(-100i32, RoundingMode::Exact).to_string(),
-///     "155921023828072216384094494261248"
+///     Integer::from(-0x101).shr_round(9u32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shr_round(9u64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shr_round(9u8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0xff).shr_round(9u16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x100).shr_round(9u64, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     Integer::from(0x100u32).shr_round(8u32, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x101)).shr_round(8u8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(0x101)).shr_round(8u16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9u32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9u64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9u8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0xff)).shr_round(9u16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x100)).shr_round(9u64, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x100u32)).shr_round(8u32, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(
+///     Integer::from(0x101u32).shr_round(8i8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(0x101u32).shr_round(8i16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
+/// );
+///
+/// assert_eq!(
+///     Integer::from(-0x101).shr_round(9i32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shr_round(9i64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x101).shr_round(9i8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0xff).shr_round(9i16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     Integer::from(-0x100).shr_round(9i32, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     Integer::from(0x100u32).shr_round(8i64, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(
+///     Integer::ZERO.shr_round(-10i8, RoundingMode::Exact).to_debug_string(),
+///     "(0, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::from(123u32).shr_round(-2i16, RoundingMode::Exact).to_debug_string(),
+///     "(492, Equal)"
+/// );
+/// assert_eq!(
+///     Integer::from(123u32).shr_round(-100i32, RoundingMode::Exact).to_debug_string(),
+///     "(155921023828072216384094494261248, Equal)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x101u32)).shr_round(8i8, RoundingMode::Down).to_debug_string(),
+///     "(1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(0x101u32)).shr_round(8i16, RoundingMode::Up).to_debug_string(),
+///     "(2, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9i32, RoundingMode::Down).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9i64, RoundingMode::Up).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x101)).shr_round(9i8, RoundingMode::Nearest).to_debug_string(),
+///     "(-1, Less)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0xff)).shr_round(9i16, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+/// assert_eq!(
+///     (&Integer::from(-0x100)).shr_round(9i32, RoundingMode::Nearest).to_debug_string(),
+///     "(0, Greater)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::from(0x100u32)).shr_round(8i64, RoundingMode::Exact).to_debug_string(),
+///     "(1, Equal)"
+/// );
+///
+/// assert_eq!(
+///     (&Integer::ZERO).shr_round(-10i8, RoundingMode::Exact).to_debug_string(),
+///     "(0, Equal)");
+/// assert_eq!(
+///     (&Integer::from(123u32)).shr_round(-2i16, RoundingMode::Exact).to_debug_string(),
+///     "(492, Equal)");
+/// assert_eq!(
+///     (&Integer::from(123u32)).shr_round(-100i32, RoundingMode::Exact).to_debug_string(),
+///     "(155921023828072216384094494261248, Equal)"
 /// );
 /// ```
 ///
@@ -427,76 +593,77 @@ pub mod shr;
 /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::integer::Integer;
+/// use std::cmp::Ordering;
 ///
 /// let mut n = Integer::from(0x101);
-/// n.shr_round_assign(8u8, RoundingMode::Down);
+/// assert_eq!(n.shr_round_assign(8u8, RoundingMode::Down), Ordering::Less);
 /// assert_eq!(n, 1);
 ///
 /// let mut n = Integer::from(0x101);
-/// n.shr_round_assign(8u16, RoundingMode::Up);
+/// assert_eq!(n.shr_round_assign(8u16, RoundingMode::Up), Ordering::Greater);
 /// assert_eq!(n, 2);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9u32, RoundingMode::Down);
+/// assert_eq!(n.shr_round_assign(9u32, RoundingMode::Down), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9u64, RoundingMode::Up);
+/// assert_eq!(n.shr_round_assign(9u64, RoundingMode::Up), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9u8, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9u8, RoundingMode::Nearest), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0xff);
-/// n.shr_round_assign(9u16, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9u16, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x100);
-/// n.shr_round_assign(9u32, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9u32, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(0x100);
-/// n.shr_round_assign(8u64, RoundingMode::Exact);
+/// assert_eq!(n.shr_round_assign(8u64, RoundingMode::Exact), Ordering::Equal);
 /// assert_eq!(n, 1);
 ///
 /// let mut n = Integer::from(0x101u32);
-/// n.shr_round_assign(8i8, RoundingMode::Down);
+/// assert_eq!(n.shr_round_assign(8i8, RoundingMode::Down), Ordering::Less);
 /// assert_eq!(n, 1);
 ///
 /// let mut n = Integer::from(0x101u32);
-/// n.shr_round_assign(8i16, RoundingMode::Up);
+/// assert_eq!(n.shr_round_assign(8i16, RoundingMode::Up), Ordering::Greater);
 /// assert_eq!(n, 2);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9i32, RoundingMode::Down);
+/// assert_eq!(n.shr_round_assign(9i32, RoundingMode::Down), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9i64, RoundingMode::Up);
+/// assert_eq!(n.shr_round_assign(9i64, RoundingMode::Up), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0x101);
-/// n.shr_round_assign(9i8, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9i8, RoundingMode::Nearest), Ordering::Less);
 /// assert_eq!(n, -1);
 ///
 /// let mut n = Integer::from(-0xff);
-/// n.shr_round_assign(9i16, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9i16, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(-0x100);
-/// n.shr_round_assign(9i32, RoundingMode::Nearest);
+/// assert_eq!(n.shr_round_assign(9i32, RoundingMode::Nearest), Ordering::Greater);
 /// assert_eq!(n, 0);
 ///
 /// let mut n = Integer::from(0x100u32);
-/// n.shr_round_assign(8i64, RoundingMode::Exact);
+/// assert_eq!(n.shr_round_assign(8i64, RoundingMode::Exact), Ordering::Equal);
 /// assert_eq!(n, 1);
 ///
 /// let mut x = Integer::ONE;
-/// x.shr_round_assign(-1i8, RoundingMode::Exact);
-/// x.shr_round_assign(-2i16, RoundingMode::Exact);
-/// x.shr_round_assign(-3i32, RoundingMode::Exact);
-/// x.shr_round_assign(-4i64, RoundingMode::Exact);
+/// assert_eq!(x.shr_round_assign(-1i8, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shr_round_assign(-2i16, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shr_round_assign(-3i32, RoundingMode::Exact), Ordering::Equal);
+/// assert_eq!(x.shr_round_assign(-4i64, RoundingMode::Exact), Ordering::Equal);
 /// assert_eq!(x, 1024);
 /// ```
 pub mod shr_round;

@@ -17,43 +17,43 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_power_of_2_inverse_algorithms);
 }
 
-fn demo_natural_mod_power_of_2_inverse(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_inverse(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         if let Some(inverse) = n.mod_power_of_2_inverse(pow) {
-            println!("{}⁻¹ ≡ {} mod 2^{}", n_old, inverse, pow);
+            println!("{n_old}⁻¹ ≡ {inverse} mod 2^{pow}");
         } else {
-            println!("{} is not invertible mod 2^{}", n_old, pow);
+            println!("{n_old} is not invertible mod 2^{pow}");
         }
     }
 }
 
-fn demo_natural_mod_power_of_2_inverse_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_inverse_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if let Some(inverse) = (&n).mod_power_of_2_inverse(pow) {
-            println!("{}⁻¹ ≡ {} mod 2^{}", n, inverse, pow);
+            println!("{n}⁻¹ ≡ {inverse} mod 2^{pow}");
         } else {
-            println!("{} is not invertible mod 2^{}", n, pow);
+            println!("{n} is not invertible mod 2^{pow}");
         }
     }
 }
 
 fn benchmark_natural_mod_power_of_2_inverse_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_inverse(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_14().get(gm, &config),
+        natural_unsigned_pair_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -71,14 +71,14 @@ fn benchmark_natural_mod_power_of_2_inverse_evaluation_strategy(
 
 fn benchmark_natural_mod_power_of_2_inverse_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_power_of_2_inverse(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_14().get(gm, &config),
+        natural_unsigned_pair_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,

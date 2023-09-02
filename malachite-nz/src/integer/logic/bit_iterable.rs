@@ -1,7 +1,6 @@
 use crate::integer::Integer;
 use crate::natural::logic::bit_iterable::NaturalBitIterator;
 use crate::natural::Natural;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable};
 use std::ops::Index;
 
@@ -39,9 +38,9 @@ impl<'a> Iterator for NegativeBitIterator<'a> {
         })
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_bits = usize::exact_from(self.bits.significant_bits);
-        (significant_bits, Some(significant_bits))
+        self.bits.size_hint()
     }
 }
 
@@ -68,6 +67,8 @@ impl<'a> DoubleEndedIterator for NegativeBitIterator<'a> {
         })
     }
 }
+
+impl<'a> ExactSizeIterator for NegativeBitIterator<'a> {}
 
 trait SignExtendedBitIterator: DoubleEndedIterator<Item = bool> {
     const EXTENSION: bool;

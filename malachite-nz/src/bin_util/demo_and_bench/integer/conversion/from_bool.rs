@@ -7,8 +7,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_from_bool);
 }
 
-fn demo_integer_from_bool(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in bool_gen().get(gm, &config).take(limit) {
+fn demo_integer_from_bool(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in bool_gen().get(gm, config).take(limit) {
         println!("Integer::from({}) = {}", b, Integer::from(b));
     }
 }

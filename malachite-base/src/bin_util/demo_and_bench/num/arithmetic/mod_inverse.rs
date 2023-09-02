@@ -14,12 +14,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_signed_match_benches!(runner, benchmark_mod_inverse_algorithms);
 }
 
-fn demo_mod_inverse<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in unsigned_pair_gen_var_38::<T>().get(gm, &config).take(limit) {
+fn demo_mod_inverse<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in unsigned_pair_gen_var_38::<T>().get(gm, config).take(limit) {
         if let Some(inverse) = n.mod_inverse(m) {
-            println!("{}⁻¹ ≡ {} mod {}", n, inverse, m);
+            println!("{n}⁻¹ ≡ {inverse} mod {m}");
         } else {
-            println!("{} is not invertible mod {}", n, m);
+            println!("{n} is not invertible mod {m}");
         }
     }
 }
@@ -29,14 +29,14 @@ fn benchmark_mod_inverse_algorithms<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_inverse({})", U::NAME, U::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_38::<U>().get(gm, &config),
+        unsigned_pair_gen_var_38::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

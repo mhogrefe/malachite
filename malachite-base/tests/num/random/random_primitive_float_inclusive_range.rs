@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_primitive_float_inclusive_range;
 use malachite_base::random::EXAMPLE_SEED;
@@ -222,7 +223,7 @@ fn test_random_primitive_float_inclusive_range() {
     };
     random_primitive_float_inclusive_range_helper::<f32>(
         1.0e38,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         values,
         common_values,
         sample_median,
@@ -377,7 +378,7 @@ fn test_random_primitive_float_inclusive_range() {
     };
     random_primitive_float_inclusive_range_helper::<f32>(
         f32::NEGATIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         values,
         common_values,
         sample_median,
@@ -645,13 +646,13 @@ fn test_random_primitive_float_inclusive_range() {
     let sample_median = (1.2523958970084127e173, Some(1.2542732495420994e173));
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(2.939399538027295e305),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
     random_primitive_float_inclusive_range_helper::<f64>(
         1.0e38,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         values,
         common_values,
         sample_median,
@@ -800,13 +801,13 @@ fn test_random_primitive_float_inclusive_range() {
     let sample_median = (2.772306592172272e-308, Some(2.7820731194979217e-308));
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(7.922018643581038e303),
-        standard_deviation: NiceFloat(f64::POSITIVE_INFINITY),
+        standard_deviation: NiceFloat(f64::INFINITY),
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
     random_primitive_float_inclusive_range_helper::<f64>(
         f64::NEGATIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         values,
         common_values,
         sample_median,

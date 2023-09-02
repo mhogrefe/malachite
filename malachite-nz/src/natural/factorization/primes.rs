@@ -80,14 +80,7 @@ impl Primes for Natural {
         NaturalPrimesLessThanIterator(u64::primes_less_than_or_equal_to(&u64::saturating_from(n)))
     }
 
-    /// Returns all primes that fit into the specified type.
-    ///
-    /// The iterator produced by `primes(n)` generates the same primes as the iterator
-    /// produced by `primes_less_than_or_equal_to(T::MAX)`. If you really need to generate
-    /// _every_ prime, and `T` is `u32` or smaller, then you should use the latter, as it
-    /// will allocate all the needed memory at once. If `T` is `u64` or larger, or if you
-    /// probably don't need every prime, then `primes()` will be faster as it won't
-    /// allocate too much memory right away.
+    /// Returns all [`Natural`] primes.
     ///
     /// # Worst-case complexity (amortized)
     /// $T(i) = O(\log \log i)$

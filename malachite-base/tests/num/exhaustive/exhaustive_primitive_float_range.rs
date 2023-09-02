@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::exhaustive::exhaustive_primitive_float_range;
 use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 use std::panic::catch_unwind;
@@ -106,7 +107,7 @@ fn test_exhaustive_primitive_float_range() {
     );
     exhaustive_primitive_float_range_helper::<f32>(
         1.0e38,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         &[
             1.2760589e38,
             1.7014118e38,
@@ -175,7 +176,7 @@ fn test_exhaustive_primitive_float_range() {
     );
     exhaustive_primitive_float_range_helper::<f32>(
         f32::NEGATIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         &[
             f32::NEGATIVE_INFINITY,
             0.0,
@@ -234,11 +235,7 @@ fn test_exhaustive_primitive_float_range() {
         f32::NEGATIVE_INFINITY,
         &[],
     );
-    exhaustive_primitive_float_range_helper::<f32>(
-        f32::POSITIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
-        &[],
-    );
+    exhaustive_primitive_float_range_helper::<f32>(f32::INFINITY, f32::INFINITY, &[]);
     exhaustive_primitive_float_range_helper::<f32>(0.0, 0.0, &[]);
     exhaustive_primitive_float_range_helper::<f32>(-0.0, -0.0, &[]);
     exhaustive_primitive_float_range_helper::<f32>(-0.0, 0.0, &[-0.0]);
@@ -339,7 +336,7 @@ fn test_exhaustive_primitive_float_range() {
     );
     exhaustive_primitive_float_range_helper::<f64>(
         1.0e308,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         &[
             1.348269851146737e308,
             1.1235582092889474e308,
@@ -412,7 +409,7 @@ fn test_exhaustive_primitive_float_range() {
     );
     exhaustive_primitive_float_range_helper::<f64>(
         f64::NEGATIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         &[
             f64::NEGATIVE_INFINITY,
             0.0,
@@ -471,11 +468,7 @@ fn test_exhaustive_primitive_float_range() {
         f64::NEGATIVE_INFINITY,
         &[],
     );
-    exhaustive_primitive_float_range_helper::<f64>(
-        f64::POSITIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
-        &[],
-    );
+    exhaustive_primitive_float_range_helper::<f64>(f64::INFINITY, f64::INFINITY, &[]);
     exhaustive_primitive_float_range_helper::<f64>(0.0, 0.0, &[]);
     exhaustive_primitive_float_range_helper::<f64>(-0.0, -0.0, &[]);
     exhaustive_primitive_float_range_helper::<f64>(-0.0, 0.0, &[-0.0]);

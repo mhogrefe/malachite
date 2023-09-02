@@ -11,8 +11,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_is_power_of_2);
 }
 
-fn demo_is_power_of_2<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
-    for f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
+fn demo_is_power_of_2<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for f in primitive_float_gen::<T>().get(gm, config).take(limit) {
         if f.is_power_of_2() {
             println!("{} is a power of 2", NiceFloat(f));
         } else {
@@ -23,14 +23,14 @@ fn demo_is_power_of_2<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: 
 
 fn benchmark_is_power_of_2<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.is_power_of_2()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen::<T>().get(gm, &config),
+        primitive_float_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

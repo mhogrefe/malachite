@@ -4448,7 +4448,7 @@ fn test_div_exact() {
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = u.div_round(v, RoundingMode::Exact);
+        let q = u.div_round(v, RoundingMode::Exact).0;
         assert_eq!(q.to_string(), quotient);
 
         let q = rug::Integer::from_str(s)
@@ -4871,7 +4871,7 @@ fn div_exact_properties() {
         assert!(q_alt.is_valid());
         assert_eq!(q_alt, q);
 
-        let q_alt = (&x).div_round(&y, RoundingMode::Exact);
+        let q_alt = (&x).div_round(&y, RoundingMode::Exact).0;
         assert_eq!(q_alt, q);
 
         assert_eq!(

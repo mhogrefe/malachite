@@ -16,8 +16,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_trailing_zeros_algorithms);
 }
 
-fn demo_limbs_trailing_zeros(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_2().get(gm, &config).take(limit) {
+fn demo_limbs_trailing_zeros(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_2().get(gm, config).take(limit) {
         println!(
             "limbs_trailing_zeros({:?}) = {}",
             xs,
@@ -26,17 +26,17 @@ fn demo_limbs_trailing_zeros(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_trailing_zeros(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_trailing_zeros(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("trailing_zeros({}) = {:?}", n, n.trailing_zeros());
     }
 }
 
-fn benchmark_limbs_trailing_zeros(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_trailing_zeros(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_trailing_zeros(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_2().get(gm, &config),
+        unsigned_vec_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -47,14 +47,14 @@ fn benchmark_limbs_trailing_zeros(gm: GenMode, config: GenConfig, limit: usize, 
 
 fn benchmark_natural_trailing_zeros_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.trailing_zeros()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

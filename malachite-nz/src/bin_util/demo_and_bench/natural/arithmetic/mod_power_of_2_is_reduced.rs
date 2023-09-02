@@ -15,29 +15,29 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_mod_power_of_2_is_reduced(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_mod_power_of_2_is_reduced(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if n.mod_power_of_2_is_reduced(log_base) {
-            println!("{} is reduced mod 2^{}", n, log_base);
+            println!("{n} is reduced mod 2^{log_base}");
         } else {
-            println!("{} is not reduced mod 2^{}", n, log_base);
+            println!("{n} is not reduced mod 2^{log_base}");
         }
     }
 }
 
 fn benchmark_natural_mod_power_of_2_is_reduced_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mod_power_of_2_add_limb(&[Limb], Limb, u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

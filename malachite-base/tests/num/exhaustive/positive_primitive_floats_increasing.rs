@@ -38,7 +38,7 @@ fn test_positive_primitive_floats_increasing() {
             3.402823e38,
             3.4028233e38,
             3.4028235e38,
-            f32::POSITIVE_INFINITY,
+            f32::INFINITY,
         ],
     );
     positive_primitive_floats_increasing_helper::<f64>(
@@ -67,7 +67,7 @@ fn test_positive_primitive_floats_increasing() {
             1.7976931348623153e308,
             1.7976931348623155e308,
             1.7976931348623157e308,
-            f64::POSITIVE_INFINITY,
+            f64::INFINITY,
         ],
     );
 }

@@ -4,6 +4,7 @@ use malachite_base::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator, PowerOf2Digits,
 };
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_4, unsigned_pair_gen_var_5, unsigned_triple_gen_var_3,
     unsigned_unsigned_bool_vec_triple_gen_var_1,
@@ -102,15 +103,18 @@ fn power_of_2_digits_fail() {
 fn power_of_2_digit_iterable_helper<
     T: PowerOf2DigitIterable<U> + PowerOf2Digits<U> + PrimitiveUnsigned,
     U: PrimitiveUnsigned,
->() {
+>()
+where
+    <T as PowerOf2DigitIterable<U>>::PowerOf2DigitIterator: Clone,
+{
     unsigned_pair_gen_var_4::<T, U>().test_properties(|(u, log_base)| {
-        let significant_digits = usize::exact_from(
-            u.significant_bits()
-                .div_round(log_base, RoundingMode::Ceiling),
-        );
-        assert_eq!(
-            PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base).size_hint(),
-            (significant_digits, Some(significant_digits))
+        test_double_ended_iterator_size_hint(
+            PowerOf2DigitIterable::<U>::power_of_2_digits(u, log_base),
+            usize::exact_from(
+                u.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+                    .0,
+            ),
         );
     });
 
@@ -141,6 +145,7 @@ fn power_of_2_digit_iterable_helper<
         if i < u
             .significant_bits()
             .div_round(log_base, RoundingMode::Ceiling)
+            .0
         {
             assert_eq!(
                 digits.get(i),

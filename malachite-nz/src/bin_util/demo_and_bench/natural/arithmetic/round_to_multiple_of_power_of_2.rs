@@ -75,9 +75,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_round_to_multiple_of_power_of_2_down(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_round_to_multiple_of_power_of_2_down(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -89,9 +89,9 @@ fn demo_limbs_round_to_multiple_of_power_of_2_down(gm: GenMode, config: GenConfi
     }
 }
 
-fn demo_limbs_round_to_multiple_of_power_of_2_up(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_round_to_multiple_of_power_of_2_up(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -105,11 +105,11 @@ fn demo_limbs_round_to_multiple_of_power_of_2_up(gm: GenMode, config: GenConfig,
 
 fn demo_limbs_round_to_multiple_of_power_of_2_nearest(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -121,9 +121,9 @@ fn demo_limbs_round_to_multiple_of_power_of_2_nearest(
     }
 }
 
-fn demo_limbs_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_round_to_multiple_of_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow, rm) in unsigned_vec_unsigned_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -138,106 +138,105 @@ fn demo_limbs_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, li
 
 fn demo_limbs_round_to_multiple_of_power_of_2_down_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut xs, pow) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, pow);
+        let o = limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, pow);
         println!(
-            "xs := {:?}; limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, {}); \
-            xs = {:?}",
-            xs_old, pow, xs
+            "xs := {xs_old:?}; \
+            limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, {pow}) = {o:?}; \
+            xs = {xs:?}",
         );
     }
 }
 
 fn demo_limbs_round_to_multiple_of_power_of_2_up_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut xs, pow) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, pow);
+        let o = limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, pow);
         println!(
-            "xs := {:?}; limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, {}); \
-            xs = {:?}",
-            xs_old, pow, xs
+            "xs := {xs_old:?}; \
+            limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, {pow}) = {o:?}; \
+            xs = {xs:?}",
         );
     }
 }
 
 fn demo_limbs_round_to_multiple_of_power_of_2_nearest_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut xs, pow) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, pow);
+        let o = limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, pow);
         println!(
-            "xs := {:?}; \
-            limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, {}); xs = {:?}",
-            xs_old, pow, xs
+            "xs := {xs_old:?}; \
+            limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, {pow}) = {o:?}; \
+            xs = {xs:?}",
         );
     }
 }
 
 fn demo_limbs_round_to_multiple_of_power_of_2_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut xs, pow, rm) in unsigned_vec_unsigned_rounding_mode_triple_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
-        let success = limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, pow, rm);
+        let oo = limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, pow, rm);
         println!(
-            "xs := {:?}; \
-            limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, {}, {}) = {}; xs = {:?}",
-            xs_old, pow, rm, success, xs
+            "xs := {xs_old:?}; \
+            limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, {pow}, {rm}) = {oo:?}; \
+            xs = {xs:?}",
         );
     }
 }
 
 fn demo_natural_round_to_multiple_of_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow, rm) in natural_unsigned_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
-        n.round_to_multiple_of_power_of_2_assign(pow, rm);
+        let o = n.round_to_multiple_of_power_of_2_assign(pow, rm);
         println!(
-            "x := {}; x.round_to_multiple_of_power_of_2_assign({}, {}); x = {}",
-            n_old, pow, rm, n
+            "x := {n_old}; x.round_to_multiple_of_power_of_2_assign({pow}, {rm}) = {o:?}; x = {n}"
         );
     }
 }
 
-fn demo_natural_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_round_to_multiple_of_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow, rm) in natural_unsigned_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "{}.round_to_multiple_of_power_of_2({}, {}) = {}",
+            "{}.round_to_multiple_of_power_of_2({}, {}) = {:?}",
             n_old,
             pow,
             rm,
@@ -246,13 +245,13 @@ fn demo_natural_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, 
     }
 }
 
-fn demo_natural_round_to_multiple_of_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_round_to_multiple_of_power_of_2_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow, rm) in natural_unsigned_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).round_to_multiple_of_power_of_2({}, {}) = {}",
+            "(&{}).round_to_multiple_of_power_of_2({}, {}) = {:?}",
             n,
             pow,
             rm,
@@ -263,14 +262,14 @@ fn demo_natural_round_to_multiple_of_power_of_2_ref(gm: GenMode, config: GenConf
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_down(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_down(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -283,14 +282,14 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_down(
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_up(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_up(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -303,14 +302,14 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_up(
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_nearest(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_nearest(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -323,14 +322,14 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_nearest(
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, &config),
+        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -343,74 +342,80 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2(
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_down_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_down_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, pow)
+            no_out!(limbs_round_to_multiple_of_power_of_2_down_in_place(
+                &mut xs, pow
+            ))
         })],
     );
 }
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_up_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_up_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, pow)
+            no_out!(limbs_round_to_multiple_of_power_of_2_up_in_place(
+                &mut xs, pow
+            ))
         })],
     );
 }
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_nearest_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(mut xs, pow)| {
-            limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, pow)
+            no_out!(limbs_round_to_multiple_of_power_of_2_nearest_in_place(
+                &mut xs, pow
+            ))
         })],
     );
 }
 
 fn benchmark_limbs_round_to_multiple_of_power_of_2_in_place(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_round_to_multiple_of_power_of_2_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, &config),
+        unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -425,20 +430,20 @@ fn benchmark_limbs_round_to_multiple_of_power_of_2_in_place(
 
 fn benchmark_natural_round_to_multiple_of_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.round_to_multiple_of_power_of_2_assign(u64, RoundingMode)",
         BenchmarkType::Single,
-        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, &config),
+        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_natural_bit_bucketer("n"),
         &mut [("Malachite", &mut |(mut x, y, rm)| {
-            x.round_to_multiple_of_power_of_2_assign(y, rm)
+            no_out!(x.round_to_multiple_of_power_of_2_assign(y, rm))
         })],
     );
 }
@@ -446,14 +451,14 @@ fn benchmark_natural_round_to_multiple_of_power_of_2_assign(
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_round_to_multiple_of_power_of_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.round_to_multiple_of_power_of_2(u64, RoundingMode)",
         BenchmarkType::Algorithms,
-        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, &config),
+        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -463,7 +468,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_2_algorithms(
                 no_out!(x.round_to_multiple_of_power_of_2(y, rm))
             }),
             ("using shr_round", &mut |(x, y, rm)| {
-                no_out!(x.shr_round(y, rm) << y)
+                no_out!(x.shr_round(y, rm).0 << y)
             }),
             ("using round_to_multiple", &mut |(x, y, rm)| {
                 no_out!(x.round_to_multiple(Natural::power_of_2(y), rm))
@@ -474,14 +479,14 @@ fn benchmark_natural_round_to_multiple_of_power_of_2_algorithms(
 
 fn benchmark_natural_round_to_multiple_of_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.round_to_multiple_of_power_of_2(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, &config),
+        natural_unsigned_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

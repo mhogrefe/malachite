@@ -35,9 +35,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_hamming_distance_algorithms);
 }
 
-fn demo_limbs_hamming_distance_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_hamming_distance_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen_var_15()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -49,8 +49,8 @@ fn demo_limbs_hamming_distance_limb(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_limbs_hamming_distance_same_length(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, &config).take(limit) {
+fn demo_limbs_hamming_distance_same_length(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_6().get(gm, config).take(limit) {
         println!(
             "limbs_hamming_distance_same_length({:?}, {:?}) = {}",
             xs,
@@ -60,8 +60,8 @@ fn demo_limbs_hamming_distance_same_length(gm: GenMode, config: GenConfig, limit
     }
 }
 
-fn demo_limbs_hamming_distance(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_7().get(gm, &config).take(limit) {
+fn demo_limbs_hamming_distance(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_7().get(gm, config).take(limit) {
         println!(
             "limbs_hamming_distance({:?}, {:?}) = {}",
             xs,
@@ -71,8 +71,8 @@ fn demo_limbs_hamming_distance(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_hamming_distance(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_hamming_distance(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         println!(
             "hamming_distance({}, {}) = {}",
             x,
@@ -84,14 +84,14 @@ fn demo_natural_hamming_distance(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_hamming_distance_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_hamming_distance_limb(&[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_15().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -104,14 +104,14 @@ fn benchmark_limbs_hamming_distance_limb(
 
 fn benchmark_limbs_hamming_distance_same_length(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_hamming_distance_same_length(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_6().get(gm, &config),
+        unsigned_vec_pair_gen_var_6().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -122,11 +122,16 @@ fn benchmark_limbs_hamming_distance_same_length(
     );
 }
 
-fn benchmark_limbs_hamming_distance(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_hamming_distance(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "limbs_hamming_distance(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_7().get(gm, &config),
+        unsigned_vec_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -139,14 +144,14 @@ fn benchmark_limbs_hamming_distance(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_natural_hamming_distance_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_rm().get(gm, &config),
+        natural_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -164,14 +169,14 @@ fn benchmark_natural_hamming_distance_library_comparison(
 
 fn benchmark_natural_hamming_distance_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

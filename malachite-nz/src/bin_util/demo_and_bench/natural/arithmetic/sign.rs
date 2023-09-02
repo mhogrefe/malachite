@@ -11,26 +11,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_sign_library_comparison);
 }
 
-fn demo_natural_sign(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_sign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         match n.sign() {
-            Ordering::Less => println!("{} is negative", n),
-            Ordering::Equal => println!("{} is zero", n),
-            Ordering::Greater => println!("{} is positive", n),
+            Ordering::Less => println!("{n} is negative"),
+            Ordering::Equal => println!("{n} is zero"),
+            Ordering::Greater => println!("{n} is positive"),
         }
     }
 }
 
 fn benchmark_natural_sign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.sign()",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

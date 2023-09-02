@@ -1,6 +1,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use std::ops::Index;
 
@@ -15,9 +16,7 @@ use std::ops::Index;
 pub struct LimbIterator<'a> {
     pub(crate) n: &'a Natural,
     pub(crate) limb_count: usize,
-    // This is true iff `n` is nonzero and `i` and `j` are not yet equal. The iterator returns
-    // `Some` iff this is true.
-    pub(crate) some_remaining: bool,
+    pub(crate) remaining: usize,
     // If `n` is nonzero, this index initially points to the least-significant limb, and is
     // incremented by next().
     pub(crate) i: u64,
@@ -55,24 +54,24 @@ impl<'a> Iterator for LimbIterator<'a> {
     /// }
     /// ```
     fn next(&mut self) -> Option<Limb> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let limb = match *self.n {
                 Natural(Small(small)) => small,
                 Natural(Large(ref limbs)) => limbs[usize::exact_from(self.i)],
             };
-            if self.i == self.j {
-                self.some_remaining = false;
-            } else {
+            if self.i != self.j {
                 self.i += 1;
             }
+            self.remaining -= 1;
             Some(limb)
         } else {
             None
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        (self.limb_count, Some(self.limb_count))
+        (self.remaining, Some(self.remaining))
     }
 }
 
@@ -103,16 +102,15 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     /// }
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let limb = match *self.n {
                 Natural(Small(small)) => small,
                 Natural(Large(ref limbs)) => limbs[usize::exact_from(self.j)],
             };
-            if self.j == self.i {
-                self.some_remaining = false;
-            } else {
+            if self.j != self.i {
                 self.j -= 1;
             }
+            self.remaining -= 1;
             Some(limb)
         } else {
             None
@@ -200,7 +198,7 @@ impl Natural {
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
         match *self {
-            natural_zero!() => Vec::new(),
+            Natural::ZERO => Vec::new(),
             Natural(Small(small)) => vec![small],
             Natural(Large(ref limbs)) => limbs.clone(),
         }
@@ -240,7 +238,7 @@ impl Natural {
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
         match *self {
-            natural_zero!() => Vec::new(),
+            Natural::ZERO => Vec::new(),
             Natural(Small(small)) => vec![small],
             Natural(Large(ref limbs)) => limbs.iter().cloned().rev().collect(),
         }
@@ -276,7 +274,7 @@ impl Natural {
     /// ```
     pub fn into_limbs_asc(self) -> Vec<Limb> {
         match self {
-            natural_zero!() => Vec::new(),
+            Natural::ZERO => Vec::new(),
             Natural(Small(small)) => vec![small],
             Natural(Large(limbs)) => limbs,
         }
@@ -316,7 +314,7 @@ impl Natural {
     /// ```
     pub fn into_limbs_desc(self) -> Vec<Limb> {
         match self {
-            natural_zero!() => Vec::new(),
+            Natural::ZERO => Vec::new(),
             Natural(Small(small)) => vec![small],
             Natural(Large(mut limbs)) => {
                 limbs.reverse();
@@ -364,10 +362,11 @@ impl Natural {
     /// ```
     pub fn limbs(&self) -> LimbIterator {
         let limb_count = self.limb_count();
+        let limb_count_usize = usize::exact_from(limb_count);
         LimbIterator {
             n: self,
-            limb_count: usize::exact_from(limb_count),
-            some_remaining: limb_count != 0,
+            limb_count: limb_count_usize,
+            remaining: limb_count_usize,
             i: 0,
             j: limb_count.saturating_sub(1),
         }

@@ -18,10 +18,10 @@ fn demo_vec_from_other_type_slice<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for xs in unsigned_vec_gen::<U>().get(gm, &config).take(limit) {
+    for xs in unsigned_vec_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{}::vec_from_other_type_slice({:?}) = {:?}",
             T::NAME,
@@ -36,14 +36,14 @@ fn benchmark_vec_from_other_type_slice<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.vec_from_other_type_slice(&[{}])", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_vec_gen::<U>().get(gm, &config),
+        unsigned_vec_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

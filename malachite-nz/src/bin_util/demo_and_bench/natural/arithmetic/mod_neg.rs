@@ -21,61 +21,61 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_neg_algorithms);
 }
 
-fn demo_natural_mod_neg_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         n.mod_neg_assign(m);
-        println!("x := {}; x.mod_neg_assign({}); x = {}", n_old, m_old, n);
+        println!("x := {n_old}; x.mod_neg_assign({m_old}); x = {n}");
     }
 }
 
-fn demo_natural_mod_neg_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.mod_neg_assign(&m);
-        println!("x := {}; x.mod_neg_assign(&{}); x = {}", n_old, m, n);
+        println!("x := {n_old}; x.mod_neg_assign(&{m}); x = {n}");
     }
 }
 
-fn demo_natural_mod_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         println!("-{} ≡ {} mod {}", n_old, n.mod_neg(m), m_old);
     }
 }
 
-fn demo_natural_mod_neg_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!("-{} ≡ {} mod &{}", n_old, n.mod_neg(&m), m);
     }
 }
 
-fn demo_natural_mod_neg_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         let m_old = m.clone();
         println!("&(-{}) ≡ {} mod {}", n, (&n).mod_neg(m), m_old);
     }
 }
 
-fn demo_natural_mod_neg_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_natural_mod_neg_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_8().get(gm, config).take(limit) {
         println!("&(-{}) ≡ {} mod &{}", n, (&n).mod_neg(&m), m);
     }
 }
 
 fn benchmark_natural_mod_neg_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_neg_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_8().get(gm, &config),
+        natural_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_natural_mod_neg_assign_evaluation_strategy(
 
 fn benchmark_natural_mod_neg_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_neg(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_8().get(gm, &config),
+        natural_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -124,14 +124,14 @@ fn benchmark_natural_mod_neg_evaluation_strategy(
 
 fn benchmark_natural_mod_neg_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_neg(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_8().get(gm, &config),
+        natural_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,

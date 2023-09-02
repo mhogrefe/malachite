@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_11, primitive_float_pair_gen_var_1,
@@ -35,7 +36,7 @@ pub fn test_to_ordered_representation() {
     test::<f32>(3.141593, 3217625053);
     test::<f32>(10.0, 3231711233);
     test::<f32>(f32::MAX_FINITE, 4278190080);
-    test::<f32>(f32::POSITIVE_INFINITY, 4278190081);
+    test::<f32>(f32::INFINITY, 4278190081);
 
     test::<f64>(f64::NEGATIVE_INFINITY, 0);
     test::<f64>(-f64::MAX_FINITE, 1);
@@ -61,7 +62,7 @@ pub fn test_to_ordered_representation() {
     test::<f64>(3.1415926535897936, 13833125093779451162);
     test::<f64>(10.0, 13840687554816376833);
     test::<f64>(f64::MAX_FINITE, 18437736874454810624);
-    test::<f64>(f64::POSITIVE_INFINITY, 18437736874454810625);
+    test::<f64>(f64::INFINITY, 18437736874454810625);
 }
 
 fn to_ordered_representation_fail_helper<T: PrimitiveFloat>() {

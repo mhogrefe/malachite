@@ -25,61 +25,61 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_div_exact(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{}.div_exact({}) = {}", x_old, y_old, x.div_exact(y));
     }
 }
 
-fn demo_integer_div_exact_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{}.div_exact(&{}) = {}", x_old, y, x.div_exact(&y));
     }
 }
 
-fn demo_integer_div_exact_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("(&{}).div_exact({}) = {}", x, y_old, (&x).div_exact(y));
     }
 }
 
-fn demo_integer_div_exact_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         println!("(&{}).div_exact(&{}) = {}", x, y, (&x).div_exact(&y));
     }
 }
 
-fn demo_integer_div_exact_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.div_exact_assign(y.clone());
-        println!("x := {}; x.div_exact_assign({}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.div_exact_assign({y}); x = {x}");
     }
 }
 
-fn demo_integer_div_exact_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen_var_2().get(gm, &config).take(limit) {
+fn demo_integer_div_exact_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen_var_2().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.div_exact_assign(&y);
-        println!("x := {}; x.div_exact_assign(&{}); x = {}", x_old, y, x);
+        println!("x := {x_old}; x.div_exact_assign(&{y}); x = {x}");
     }
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_div_exact_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_2_nrm().get(gm, &config),
+        integer_pair_gen_var_2_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -95,14 +95,14 @@ fn benchmark_integer_div_exact_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_div_exact_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_2().get(gm, &config),
+        integer_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -116,14 +116,14 @@ fn benchmark_integer_div_exact_algorithms(
 
 fn benchmark_integer_div_exact_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_2().get(gm, &config),
+        integer_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -147,14 +147,14 @@ fn benchmark_integer_div_exact_evaluation_strategy(
 
 fn benchmark_integer_div_exact_assign_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_exact_assign(Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_2().get(gm, &config),
+        integer_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -168,14 +168,14 @@ fn benchmark_integer_div_exact_assign_algorithms(
 
 fn benchmark_integer_div_exact_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_exact_assign(Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen_var_2().get(gm, &config),
+        integer_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -151,19 +151,19 @@ For example, here's how to generate all pairs of the characters `'a'` to `'z'` (
 
 ```rust
 for p in exhaustive_pairs_from_single('a'..='z').take(10) {
-    println!("{}", p);
+    println!("{:?}", p);
 }
 ```
 ```
-(a, a),
-(a, b),
-(b, a),
-(b, b),
-(a, c),
-(a, d),
-(b, c),
-(b, d),
-(c, a),
+(a, a)
+(a, b)
+(b, a)
+(b, b)
+(a, c)
+(a, d)
+(b, c)
+(b, d)
+(c, a)
 (c, b)
 ```
 

@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_gen_var_10;
 use std::panic::catch_unwind;
@@ -32,7 +33,7 @@ pub fn test_next_lower() {
     test::<f32>(3.141593, core::f32::consts::PI);
     test::<f32>(10.0, 9.999999);
     test::<f32>(f32::MAX_FINITE, 3.4028233e38);
-    test::<f32>(f32::POSITIVE_INFINITY, f32::MAX_FINITE);
+    test::<f32>(f32::INFINITY, f32::MAX_FINITE);
 
     test::<f64>(-f64::MAX_FINITE, f64::NEGATIVE_INFINITY);
     test::<f64>(-10.0, -10.000000000000002);
@@ -57,7 +58,7 @@ pub fn test_next_lower() {
     test::<f64>(3.1415926535897936, core::f64::consts::PI);
     test::<f64>(10.0, 9.999999999999998);
     test::<f64>(f64::MAX_FINITE, 1.7976931348623155e308);
-    test::<f64>(f64::POSITIVE_INFINITY, f64::MAX_FINITE);
+    test::<f64>(f64::INFINITY, f64::MAX_FINITE);
 }
 
 fn next_lower_fail_helper<T: PrimitiveFloat>() {

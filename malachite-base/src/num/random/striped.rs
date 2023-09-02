@@ -1761,13 +1761,13 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
                 xs.next().map(S::wrapping_from)
             }
             StripedRandomSignedInclusiveRange::Negative(_, xs) => {
-                xs.next().map(|x| -S::wrapping_from(x))
+                xs.next().map(|x| S::wrapping_from(x).wrapping_neg())
             }
             StripedRandomSignedInclusiveRange::Both(_, bs, xs_nn, xs_n) => {
                 if bs.next().unwrap() {
                     xs_nn.next().map(S::wrapping_from)
                 } else {
-                    xs_n.next().map(|x| -S::wrapping_from(x))
+                    xs_n.next().map(|x| S::wrapping_from(x).wrapping_neg())
                 }
             }
         }

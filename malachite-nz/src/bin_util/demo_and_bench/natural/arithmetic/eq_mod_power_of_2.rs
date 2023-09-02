@@ -34,9 +34,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_eq_mod_power_of_2_algorithms);
 }
 
-fn demo_limbs_eq_limb_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_eq_limb_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_13()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -49,9 +49,9 @@ fn demo_limbs_eq_limb_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_limbs_eq_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_eq_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -64,29 +64,29 @@ fn demo_limbs_eq_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_eq_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_eq_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in natural_natural_unsigned_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.eq_mod_power_of_2(&y, pow) {
-            println!("{} is equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is equal to {y} mod 2^{pow}");
         } else {
-            println!("{} is not equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is not equal to {y} mod 2^{pow}");
         }
     }
 }
 
 fn benchmark_limbs_eq_limb_mod_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_limb_mod_power_of_2(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_13().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -99,14 +99,14 @@ fn benchmark_limbs_eq_limb_mod_power_of_2(
 
 fn benchmark_limbs_eq_mod_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_mod_power_of_2(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -119,14 +119,14 @@ fn benchmark_limbs_eq_mod_power_of_2(
 
 fn benchmark_natural_eq_mod_power_of_2_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.eq_mod_power_of_2(&Natural, u64)",
         BenchmarkType::LibraryComparison,
-        natural_natural_unsigned_triple_gen_var_1_rm().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -145,14 +145,14 @@ fn benchmark_natural_eq_mod_power_of_2_library_comparison(
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_natural_eq_mod_power_of_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.eq_mod_power_of_2(&Natural, u64)",
         BenchmarkType::Algorithms,
-        natural_natural_unsigned_triple_gen_var_1().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

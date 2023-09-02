@@ -23,9 +23,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_checked_root_u64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_checked_root_u64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in rational_unsigned_pair_gen_var_4::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -37,9 +37,9 @@ fn demo_rational_checked_root_u64(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_rational_checked_root_u64_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_checked_root_u64_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in rational_unsigned_pair_gen_var_4::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -51,9 +51,9 @@ fn demo_rational_checked_root_u64_ref(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_rational_checked_root_i64(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_checked_root_i64(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in rational_signed_pair_gen_var_4::<i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -65,9 +65,9 @@ fn demo_rational_checked_root_i64(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_rational_checked_root_i64_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_checked_root_i64_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in rational_signed_pair_gen_var_4::<i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -81,14 +81,14 @@ fn demo_rational_checked_root_i64_ref(gm: GenMode, config: GenConfig, limit: usi
 
 fn benchmark_rational_checked_root_u64_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.checked_root(u64)",
         BenchmarkType::EvaluationStrategy,
-        rational_unsigned_pair_gen_var_4::<u64>().get(gm, &config),
+        rational_unsigned_pair_gen_var_4::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -106,14 +106,14 @@ fn benchmark_rational_checked_root_u64_evaluation_strategy(
 
 fn benchmark_rational_checked_root_i64_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.checked_root(i64)",
         BenchmarkType::EvaluationStrategy,
-        rational_signed_pair_gen_var_4::<i64>().get(gm, &config),
+        rational_signed_pair_gen_var_4::<i64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

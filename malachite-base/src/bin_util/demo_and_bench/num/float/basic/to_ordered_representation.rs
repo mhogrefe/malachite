@@ -11,9 +11,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_to_ordered_representation);
 }
 
-fn demo_to_ordered_representation<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_ordered_representation<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in primitive_float_gen_var_11::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -26,14 +30,14 @@ fn demo_to_ordered_representation<T: PrimitiveFloat>(gm: GenMode, config: GenCon
 
 fn benchmark_to_ordered_representation<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_ordered_representation()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_11::<T>().get(gm, &config),
+        primitive_float_gen_var_11::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

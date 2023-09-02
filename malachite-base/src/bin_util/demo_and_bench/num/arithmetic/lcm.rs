@@ -15,36 +15,36 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_checked_lcm);
 }
 
-fn demo_lcm<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_34::<T>().get(gm, &config).take(limit) {
+fn demo_lcm<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_34::<T>().get(gm, config).take(limit) {
         println!("{}.lcm({}) = {}", x, y, x.lcm(y));
     }
 }
 
-fn demo_lcm_assign<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in unsigned_pair_gen_var_34::<T>().get(gm, &config).take(limit) {
+fn demo_lcm_assign<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in unsigned_pair_gen_var_34::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.lcm_assign(y);
-        println!("x := {}; x.lcm_assign({}); x = {}", old_x, y, x);
+        println!("x := {old_x}; x.lcm_assign({y}); x = {x}");
     }
 }
 
-fn demo_checked_lcm<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_33::<T>().get(gm, &config).take(limit) {
+fn demo_checked_lcm<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_33::<T>().get(gm, config).take(limit) {
         println!("{}.checked_lcm({}) = {:?}", x, y, x.checked_lcm(y));
     }
 }
 
 fn benchmark_lcm<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.lcm({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_34::<T>().get(gm, &config),
+        unsigned_pair_gen_var_34::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -55,14 +55,14 @@ fn benchmark_lcm<T: PrimitiveUnsigned>(
 
 fn benchmark_lcm_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.lcm_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_34::<T>().get(gm, &config),
+        unsigned_pair_gen_var_34::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -73,14 +73,14 @@ fn benchmark_lcm_assign<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_lcm<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_lcm({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_33::<T>().get(gm, &config),
+        unsigned_pair_gen_var_33::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

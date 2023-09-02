@@ -43,7 +43,9 @@ fn test_is_power_of_2() {
 #[test]
 fn is_power_of_2_properties() {
     rational_gen().test_properties(|x| {
-        x.is_power_of_2();
+        if x.is_power_of_2() {
+            assert!(x >= 0u32);
+        }
     });
 
     rational_gen_var_2().test_properties(|x| {

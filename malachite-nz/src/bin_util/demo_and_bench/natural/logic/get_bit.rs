@@ -19,9 +19,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_get_bit_library_comparison);
 }
 
-fn demo_limbs_get_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_get_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, index) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -33,20 +33,20 @@ fn demo_limbs_get_bit(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_get_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_get_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, index) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.get_bit({}) = {}", n, index, n.get_bit(index));
     }
 }
 
-fn benchmark_limbs_get_bit(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_get_bit(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_get_bit(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -59,14 +59,14 @@ fn benchmark_limbs_get_bit(gm: GenMode, config: GenConfig, limit: usize, file_na
 
 fn benchmark_natural_get_bit_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.get_bit(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_4_nrm().get(gm, &config),
+        natural_unsigned_pair_gen_var_4_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

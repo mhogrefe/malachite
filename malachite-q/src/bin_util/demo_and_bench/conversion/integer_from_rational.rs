@@ -26,8 +26,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_integer_try_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         let x_clone = x.clone();
         println!(
             "Integer::try_from({}) = {:?}",
@@ -37,14 +37,14 @@ fn demo_integer_try_from_rational(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_integer_try_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_integer_try_from_rational_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!("Integer::try_from(&{}) = {:?}", x, Integer::try_from(&x));
     }
 }
 
-fn demo_integer_convertible_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_integer_convertible_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         println!(
             "{} is {}convertible to a Integer",
             x,
@@ -57,14 +57,14 @@ fn demo_integer_convertible_from_rational(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_integer_rounding_from_rational(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_rounding_from_rational(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in rational_rounding_mode_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_clone = x.clone();
         println!(
-            "Integer::rounding_from({}, {}) = {}",
+            "Integer::rounding_from({}, {}) = {:?}",
             x_clone,
             rm,
             Integer::rounding_from(x, rm)
@@ -72,13 +72,13 @@ fn demo_integer_rounding_from_rational(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_integer_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_rounding_from_rational_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in rational_rounding_mode_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "Integer::rounding_from(&{}, {}) = {}",
+            "Integer::rounding_from(&{}, {}) = {:?}",
             x,
             rm,
             Integer::rounding_from(&x, rm)
@@ -88,14 +88,14 @@ fn demo_integer_rounding_from_rational_ref(gm: GenMode, config: GenConfig, limit
 
 fn benchmark_integer_try_from_rational_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::try_from(Rational)",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -113,14 +113,14 @@ fn benchmark_integer_try_from_rational_evaluation_strategy(
 
 fn benchmark_integer_convertible_from_rational(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::convertible_from(Rational)",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -131,14 +131,14 @@ fn benchmark_integer_convertible_from_rational(
 
 fn benchmark_integer_rounding_from_rational_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::rounding_from(Rational)",
         BenchmarkType::EvaluationStrategy,
-        rational_rounding_mode_pair_gen_var_2().get(gm, &config),
+        rational_rounding_mode_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

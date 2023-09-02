@@ -31,8 +31,8 @@ fn abs_primitive_float_helper<T: PrimitiveFloat>() {
     };
     test(T::ZERO, T::ZERO);
     test(T::NEGATIVE_ZERO, T::ZERO);
-    test(T::POSITIVE_INFINITY, T::POSITIVE_INFINITY);
-    test(T::NEGATIVE_INFINITY, T::POSITIVE_INFINITY);
+    test(T::INFINITY, T::INFINITY);
+    test(T::NEGATIVE_INFINITY, T::INFINITY);
     test(T::NAN, T::NAN);
     test(T::ONE, T::ONE);
     test(T::NEGATIVE_ONE, T::ONE);

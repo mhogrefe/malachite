@@ -13,10 +13,10 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_from_ordered_representation<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_13::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_13::<T>().get(gm, config).take(limit) {
         println!(
             "from_ordered_representation({}) = {}",
             x,
@@ -27,14 +27,14 @@ fn demo_from_ordered_representation<T: PrimitiveFloat>(
 
 fn benchmark_from_ordered_representation<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::from_ordered_representation(u64)", T::NAME,),
+        &format!("{}::from_ordered_representation(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_13::<T>().get(gm, &config),
+        unsigned_gen_var_13::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

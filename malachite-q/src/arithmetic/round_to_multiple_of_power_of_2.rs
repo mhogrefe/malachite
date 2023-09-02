@@ -5,12 +5,14 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
+use std::cmp::Ordering;
 
 impl RoundToMultipleOfPowerOf2<i64> for Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of $2^k$ according to a specified rounding
-    /// mode. The [`Rational`] is taken by value.
+    /// mode. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{2^k}$:
     ///
@@ -55,34 +57,39 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_string(),
-    ///     "25/8"
+    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_string(),
-    ///     "25/8"
+    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_string(),
-    ///     "13/4"
+    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_debug_string(),
+    ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_string(),
-    ///     "13/4"
+    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_debug_string(),
+    ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_string(),
-    ///     "25/8"
+    ///     q.clone().round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple_of_power_of_2(mut self, pow: i64, rm: RoundingMode) -> Rational {
-        self.round_to_multiple_of_power_of_2_assign(pow, rm);
-        self
+    fn round_to_multiple_of_power_of_2(
+        mut self,
+        pow: i64,
+        rm: RoundingMode,
+    ) -> (Rational, Ordering) {
+        let o = self.round_to_multiple_of_power_of_2_assign(pow, rm);
+        (self, o)
     }
 }
 
@@ -90,7 +97,8 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
     type Output = Rational;
 
     /// Rounds a [`Rational`] to an integer multiple of $2^k$ according to a specified rounding
-    /// mode. The [`Rational`] is taken by reference.
+    /// mode. The [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{2^k}$:
     ///
@@ -135,38 +143,41 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_q::Rational;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_string(),
-    ///     "25/8"
+    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Floor).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_string(),
-    ///     "25/8"
+    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Down).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_string(),
-    ///     "13/4"
+    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Ceiling).to_debug_string(),
+    ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_string(),
-    ///     "13/4"
+    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Up).to_debug_string(),
+    ///     "(13/4, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_string(),
-    ///     "25/8"
+    ///     (&q).round_to_multiple_of_power_of_2(-3, RoundingMode::Nearest).to_debug_string(),
+    ///     "(25/8, Less)"
     /// );
     /// ```
-    fn round_to_multiple_of_power_of_2(self, pow: i64, rm: RoundingMode) -> Rational {
-        Rational::from(Integer::rounding_from(self >> pow, rm)) << pow
+    fn round_to_multiple_of_power_of_2(self, pow: i64, rm: RoundingMode) -> (Rational, Ordering) {
+        let (s, o) = Integer::rounding_from(self >> pow, rm);
+        (Rational::from(s) << pow, o)
     }
 }
 
 impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     /// Rounds a [`Rational`] to a multiple of $2^k$ in place, according to a specified rounding
-    /// mode.
+    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
+    /// equal to, or greater than the original value.
     ///
     /// See the [`RoundToMultipleOfPowerOf2`](RoundToMultipleOfPowerOf2) documentation for details.
     ///
@@ -189,31 +200,49 @@ impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_q::Rational;
+    /// use std::cmp::Ordering;
     ///
     /// let q = Rational::exact_from(std::f64::consts::PI);
     ///
     /// let mut x = q.clone();
-    /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Floor);
+    /// assert_eq!(
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Floor),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x.to_string(), "25/8");
     ///
     /// let mut x = q.clone();
-    /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Down),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x.to_string(), "25/8");
     ///
     /// let mut x = q.clone();
-    /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Ceiling);
+    /// assert_eq!(
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Ceiling),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x.to_string(), "13/4");
     ///
     /// let mut x = q.clone();
-    /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Up),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x.to_string(), "13/4");
     ///
     /// let mut x = q.clone();
-    /// x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_of_power_of_2_assign(-3, RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x.to_string(), "25/8");
     /// ```
-    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: i64, rm: RoundingMode) {
+    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: i64, rm: RoundingMode) -> Ordering {
         *self >>= pow;
-        *self = Rational::from(Integer::rounding_from(&*self, rm)) << pow
+        let (s, o) = Integer::rounding_from(&*self, rm);
+        *self = Rational::from(s) << pow;
+        o
     }
 }

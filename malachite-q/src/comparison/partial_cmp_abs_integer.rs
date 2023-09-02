@@ -64,7 +64,7 @@ impl PartialOrdAbs<Integer> for Rational {
         }
         // Then compare floor ∘ log_2 ∘ abs
         let log_cmp = self
-            .floor_log_base_2_of_abs()
+            .floor_log_base_2_abs()
             .cmp(&i64::exact_from(other.significant_bits() - 1));
         if log_cmp != Ordering::Equal {
             return Some(log_cmp);

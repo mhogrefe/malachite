@@ -35,9 +35,9 @@ fn to_string_helper(p: (Vec<Natural>, RationalSequence<Natural>)) -> String {
     s
 }
 
-fn demo_rational_into_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_into_power_of_2_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in rational_unsigned_pair_gen_var_2::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -49,9 +49,9 @@ fn demo_rational_into_power_of_2_digits(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_rational_to_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_to_power_of_2_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in rational_unsigned_pair_gen_var_2::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -63,8 +63,8 @@ fn demo_rational_to_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_rational_into_power_of_2_digits_binary(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen_var_7().get(gm, &config).take(limit) {
+fn demo_rational_into_power_of_2_digits_binary(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen_var_7().get(gm, config).take(limit) {
         println!(
             "({}).into_power_of_2_digits(1) = {}",
             n.clone(),
@@ -73,9 +73,9 @@ fn demo_rational_into_power_of_2_digits_binary(gm: GenMode, config: GenConfig, l
     }
 }
 
-fn demo_rational_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_power_of_2_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, log_base) in rational_unsigned_pair_gen_var_3::<u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let (before_point, after_point) = n.power_of_2_digits(log_base);
@@ -89,8 +89,8 @@ fn demo_rational_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_rational_power_of_2_digits_binary(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_power_of_2_digits_binary(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         let (before_point, after_point) = n.power_of_2_digits(1);
         println!(
             "({}).power_of_2_digits(1) = ({:?}, {})",
@@ -103,14 +103,14 @@ fn demo_rational_power_of_2_digits_binary(gm: GenMode, config: GenConfig, limit:
 
 fn benchmark_rational_to_power_of_2_digits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.to_power_of_2_digits(u64)",
         BenchmarkType::EvaluationStrategy,
-        rational_unsigned_pair_gen_var_2::<u64>().get(gm, &config),
+        rational_unsigned_pair_gen_var_2::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -130,14 +130,14 @@ fn benchmark_rational_to_power_of_2_digits_evaluation_strategy(
 
 fn benchmark_rational_power_of_2_digits(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.power_of_2_digits(u64)",
         BenchmarkType::Single,
-        rational_unsigned_pair_gen_var_3::<u64>().get(gm, &config),
+        rational_unsigned_pair_gen_var_3::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

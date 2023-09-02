@@ -3,6 +3,7 @@ use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
+use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct IntegerFromRationalError;
@@ -99,7 +100,8 @@ impl<'a> ConvertibleFrom<&'a Rational> for Integer {
 impl RoundingFrom<Rational> for Integer {
     /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), using a
     /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
-    /// [`Rational`] by value.
+    /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -115,44 +117,79 @@ impl RoundingFrom<Rational> for Integer {
     /// ```
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Integer::rounding_from(Rational::from(123), RoundingMode::Exact), 123);
-    /// assert_eq!(Integer::rounding_from(Rational::from(-123), RoundingMode::Exact), -123);
-    ///
-    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
-    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Down), 3);
     /// assert_eq!(
-    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Ceiling),
-    ///     4
+    ///     Integer::rounding_from(Rational::from(123), RoundingMode::Exact).to_debug_string(),
+    ///     "(123, Equal)"
     /// );
-    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Up), 4);
     /// assert_eq!(
-    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Nearest),
-    ///     3
+    ///     Integer::rounding_from(Rational::from(-123), RoundingMode::Exact).to_debug_string(),
+    ///     "(-123, Equal)"
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Floor),
-    ///     -4
+    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
     /// );
-    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Down), -3);
     /// assert_eq!(
-    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Ceiling),
-    ///     -3
+    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
     /// );
-    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Up), -4);
     /// assert_eq!(
-    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Nearest),
-    ///     -3
+    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(4, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(4, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(22, 7), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(-4, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-4, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: Rational, rm: RoundingMode) -> Integer {
-        Integer::from_sign_and_abs(
-            x.sign,
-            x.numerator
-                .div_round(x.denominator, if x.sign { rm } else { -rm }),
+    fn rounding_from(x: Rational, rm: RoundingMode) -> (Integer, Ordering) {
+        let s = x.sign;
+        let (n, o) = x
+            .numerator
+            .div_round(x.denominator, if s { rm } else { -rm });
+        (
+            Integer::from_sign_and_abs(x.sign, n),
+            if s { o } else { o.reverse() },
         )
     }
 }
@@ -160,7 +197,8 @@ impl RoundingFrom<Rational> for Integer {
 impl<'a> RoundingFrom<&'a Rational> for Integer {
     /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), using a
     /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
-    /// [`Rational`] by reference.
+    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// returned value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -176,46 +214,75 @@ impl<'a> RoundingFrom<&'a Rational> for Integer {
     /// ```
     /// use malachite_base::num::conversion::traits::RoundingFrom;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Integer::rounding_from(&Rational::from(123), RoundingMode::Exact), 123);
-    /// assert_eq!(Integer::rounding_from(&Rational::from(-123), RoundingMode::Exact), -123);
-    ///
-    /// assert_eq!(Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor), 3);
-    /// assert_eq!(Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down), 3);
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling),
-    ///     4
+    ///     Integer::rounding_from(&Rational::from(123), RoundingMode::Exact).to_debug_string(),
+    ///     "(123, Equal)"
     /// );
-    /// assert_eq!(Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up), 4);
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest),
-    ///     3
+    ///     Integer::rounding_from(&Rational::from(-123), RoundingMode::Exact).to_debug_string(),
+    ///     "(-123, Equal)"
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Floor),
-    ///     -4
+    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Down),
-    ///     -3
+    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Ceiling),
-    ///     -3
+    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(4, Greater)"
     /// );
-    /// assert_eq!(Integer::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Up), -4);
     /// assert_eq!(
-    ///     Integer::rounding_from(&Rational::from_signeds(-22, 7), RoundingMode::Nearest),
-    ///     -3
+    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(4, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(&Rational::from_signeds(22, 7), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(3, Less)"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Floor)
+    ///         .to_debug_string(),
+    ///     "(-4, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Ceiling)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
+    /// );
+    /// assert_eq!(Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(-4, Less)"
+    /// );
+    /// assert_eq!(
+    ///     Integer::rounding_from(Rational::from_signeds(-22, 7), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(-3, Greater)"
     /// );
     /// ```
-    fn rounding_from(x: &Rational, rm: RoundingMode) -> Integer {
-        Integer::from_sign_and_abs(
-            x.sign,
-            (&x.numerator).div_round(&x.denominator, if x.sign { rm } else { -rm }),
+    fn rounding_from(x: &Rational, rm: RoundingMode) -> (Integer, Ordering) {
+        let (n, o) = (&x.numerator).div_round(&x.denominator, if x.sign { rm } else { -rm });
+        (
+            Integer::from_sign_and_abs(x.sign, n),
+            if x.sign { o } else { o.reverse() },
         )
     }
 }

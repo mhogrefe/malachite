@@ -75,7 +75,7 @@ impl<'a> FloorRoot<u64> for &'a Integer {
         } else if exp.odd() {
             -self.unsigned_abs_ref().ceiling_root(exp)
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }
@@ -127,7 +127,7 @@ impl FloorRootAssign<u64> for Integer {
         } else if exp.odd() {
             self.mutate_unsigned_abs(|n| n.ceiling_root_assign(exp));
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }
@@ -203,7 +203,7 @@ impl<'a> CeilingRoot<u64> for &'a Integer {
         } else if exp.odd() {
             -self.unsigned_abs_ref().floor_root(exp)
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }
@@ -255,7 +255,7 @@ impl CeilingRootAssign<u64> for Integer {
         } else if exp.odd() {
             self.mutate_unsigned_abs(|n| n.floor_root_assign(exp));
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }
@@ -304,7 +304,7 @@ impl CheckedRoot<u64> for Integer {
         } else if exp.odd() {
             self.unsigned_abs().checked_root(exp).map(Natural::neg)
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }
@@ -356,7 +356,7 @@ impl<'a> CheckedRoot<u64> for &'a Integer {
         } else if exp.odd() {
             self.unsigned_abs_ref().checked_root(exp).map(Natural::neg)
         } else {
-            panic!("Cannot take even root of {}", self)
+            panic!("Cannot take even root of {self}")
         }
     }
 }

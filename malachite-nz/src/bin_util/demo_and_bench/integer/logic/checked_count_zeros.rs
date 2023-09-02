@@ -18,8 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_checked_count_zeros_algorithms);
 }
 
-fn demo_limbs_count_zeros_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_4().get(gm, &config).take(limit) {
+fn demo_limbs_count_zeros_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_4().get(gm, config).take(limit) {
         println!(
             "limbs_count_zeros_neg({:?}) = {}",
             xs,
@@ -28,17 +28,17 @@ fn demo_limbs_count_zeros_neg(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_checked_count_zeros(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_checked_count_zeros(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("checked_count_zeros({}) = {:?}", n, n.checked_count_zeros());
     }
 }
 
-fn benchmark_limbs_count_zeros_neg(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_count_zeros_neg(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_count_zeros_neg(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_4().get(gm, &config),
+        unsigned_vec_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -49,14 +49,14 @@ fn benchmark_limbs_count_zeros_neg(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_integer_checked_count_zeros_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.count_zeros()",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

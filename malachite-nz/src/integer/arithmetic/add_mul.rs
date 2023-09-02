@@ -8,12 +8,13 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::basic::traits::Zero;
 
 impl Natural {
     // self - b * c, returns sign (true means non-negative)
     fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
         match (self, b, c) {
-            (x, natural_zero!(), _) | (x, _, 0) => (x.clone(), true),
+            (x, &Natural::ZERO, _) | (x, _, 0) => (x.clone(), true),
             (x, y, 1) if x >= y => (x - y, true),
             (x, y, 1) => (y - x, false),
             (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
@@ -34,7 +35,7 @@ impl Natural {
     // self -= b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
         match (&mut *self, &mut b, c) {
-            (_, &mut natural_zero!(), _) | (_, _, 0) => true,
+            (_, &mut Natural::ZERO, _) | (_, _, 0) => true,
             (x, y, 1) if *x >= *y => {
                 self.sub_assign_no_panic(b);
                 true
@@ -69,7 +70,7 @@ impl Natural {
     // self -= &b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
         match (&mut *self, b, c) {
-            (_, &natural_zero!(), _) | (_, _, 0) => true,
+            (_, &Natural::ZERO, _) | (_, _, 0) => true,
             (x, y, 1) if *x >= *y => {
                 self.sub_assign_ref_no_panic(y);
                 true
@@ -121,7 +122,7 @@ impl Natural {
         match (&mut *self, b, c) {
             (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
             (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
-            (&mut natural_zero!(), y, z) => {
+            (&mut Natural::ZERO, y, z) => {
                 *self = y * z;
                 false
             }
@@ -136,7 +137,7 @@ impl Natural {
         match (&mut *self, b, c) {
             (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
             (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
-            (&mut natural_zero!(), y, z) => {
+            (&mut Natural::ZERO, y, z) => {
                 *self = y * z;
                 false
             }
@@ -151,7 +152,7 @@ impl Natural {
         match (&mut *self, b, c) {
             (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
             (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
-            (&mut natural_zero!(), y, z) => {
+            (&mut Natural::ZERO, y, z) => {
                 *self = y * z;
                 false
             }
@@ -166,7 +167,7 @@ impl Natural {
         match (&mut *self, b, c) {
             (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
             (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
-            (&mut natural_zero!(), y, z) => {
+            (&mut Natural::ZERO, y, z) => {
                 *self = y * z;
                 false
             }

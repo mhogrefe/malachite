@@ -468,7 +468,7 @@ where
         assert_eq!(shifted_alt, shifted);
 
         assert!(shifted <= n);
-        assert_eq!((&n).shr_round(u, RoundingMode::Floor), shifted);
+        assert_eq!((&n).shr_round(u, RoundingMode::Floor).0, shifted);
 
         if u <= U::low_mask(U::WIDTH - 1) {
             let u = S::wrapping_from(u);
@@ -520,7 +520,7 @@ where
         assert!(shifted_alt.is_valid());
         assert_eq!(shifted_alt, shifted);
 
-        assert_eq!(n.shr_round(i, RoundingMode::Floor), shifted);
+        assert_eq!(n.shr_round(i, RoundingMode::Floor).0, shifted);
     });
 
     natural_gen().test_properties(|n| {

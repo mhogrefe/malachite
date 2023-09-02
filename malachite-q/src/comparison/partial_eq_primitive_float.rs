@@ -13,8 +13,8 @@ macro_rules! impl_float {
             /// $M(m) = O(m)$
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is
-            /// `max(self.significant_bits(), other.sci_exponent())`, and $m$ is
-            /// `other.sci_exponent()`.
+            /// `max(self.significant_bits(), other.sci_exponent().abs())`, and $m$ is
+            /// `other.sci_exponent().abs()`.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_float#partial_eq).
@@ -28,7 +28,7 @@ macro_rules! impl_float {
                     *self != 0u32
                         && self.sign == (*other > 0.0)
                         && self.denominator.is_power_of_2()
-                        && self.floor_log_base_2_of_abs() == other.abs().floor_log_base_2()
+                        && self.floor_log_base_2_abs() == other.abs().floor_log_base_2()
                         && *self == Rational::exact_from(*other)
                 }
             }
@@ -43,8 +43,8 @@ macro_rules! impl_float {
             /// $M(m) = O(m)$
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is
-            /// `max(self.sci_exponent(), other.significant_bits())`, and $m$ is
-            /// `self.sci_exponent()`.
+            /// `max(self.sci_exponent().abs(), other.significant_bits())`, and $m$ is
+            /// `self.sci_exponent().abs()`.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_float#partial_eq).

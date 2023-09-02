@@ -57,7 +57,7 @@ impl Natural {
     // self -= other, return borrow
     pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
         match (&mut *self, other) {
-            (_, natural_zero!()) => false,
+            (_, Natural::ZERO) => false,
             (x, Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
             (Natural(Small(_)), _) => true,
             (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
@@ -73,7 +73,7 @@ impl Natural {
     // self -= &other, return borrow
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
         match (&mut *self, other) {
-            (_, natural_zero!()) => false,
+            (_, &Natural::ZERO) => false,
             (x, y) if std::ptr::eq(x, y) => {
                 *self = Natural::ZERO;
                 false
@@ -93,7 +93,7 @@ impl Natural {
     // self = &other - self, return borrow
     pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
         match (&mut *self, other) {
-            (natural_zero!(), y) => {
+            (&mut Natural::ZERO, y) => {
                 *self = y.clone();
                 false
             }
@@ -305,7 +305,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
         match (self, other) {
             (x, y) if std::ptr::eq(x, y) => Some(Natural::ZERO),
-            (x, &natural_zero!()) => Some(x.clone()),
+            (x, &Natural::ZERO) => Some(x.clone()),
             (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
             (&Natural(Small(_)), _) => None,
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {

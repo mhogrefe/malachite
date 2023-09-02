@@ -17,8 +17,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_from_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_limbs_asc({:?}) = {:?}",
             xs,
@@ -27,8 +27,8 @@ fn demo_natural_from_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_from_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_limbs_desc({:?}) = {:?}",
             xs,
@@ -37,8 +37,8 @@ fn demo_natural_from_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_from_owned_limbs_asc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_owned_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_owned_limbs_asc({:?}) = {:?}",
             xs,
@@ -47,8 +47,8 @@ fn demo_natural_from_owned_limbs_asc(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_natural_from_owned_limbs_desc(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_natural_from_owned_limbs_desc(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!(
             "from_owned_limbs_desc({:?}) = {:?}",
             xs,
@@ -59,14 +59,14 @@ fn demo_natural_from_owned_limbs_desc(gm: GenMode, config: GenConfig, limit: usi
 
 fn benchmark_natural_from_limbs_asc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.from_limbs_asc(&[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -84,14 +84,14 @@ fn benchmark_natural_from_limbs_asc_evaluation_strategy(
 
 fn benchmark_natural_from_limbs_desc_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.from_limbs_desc(&[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

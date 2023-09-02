@@ -15,36 +15,33 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_set_bit);
 }
 
-fn demo_limbs_set_bit_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_set_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, index) in unsigned_vec_unsigned_pair_gen_var_20()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_xs = xs.clone();
         limbs_set_bit_neg(&mut xs, index);
-        println!(
-            "xs := {:?}; limbs_set_bit_neg(&mut xs, {}); xs = {:?}",
-            old_xs, index, xs
-        );
+        println!("xs := {old_xs:?}; limbs_set_bit_neg(&mut xs, {index}); xs = {xs:?}");
     }
 }
 
-fn demo_integer_set_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_set_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.set_bit(index);
-        println!("x := {}; x.set_bit({}); x = {}", n_old, index, n);
+        println!("x := {n_old}; x.set_bit({index}); x = {n}");
     }
 }
 
-fn benchmark_limbs_set_bit_neg(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_set_bit_neg(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_set_bit_neg(&mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_20().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -55,11 +52,11 @@ fn benchmark_limbs_set_bit_neg(gm: GenMode, config: GenConfig, limit: usize, fil
     );
 }
 
-fn benchmark_integer_set_bit(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_set_bit(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.set_bit(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

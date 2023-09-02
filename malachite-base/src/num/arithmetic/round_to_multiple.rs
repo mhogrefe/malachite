@@ -5,48 +5,53 @@ use crate::num::conversion::traits::ExactFrom;
 use crate::rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
-fn round_to_multiple_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> T {
+fn round_to_multiple_unsigned<T: PrimitiveUnsigned>(
+    x: T,
+    other: T,
+    rm: RoundingMode,
+) -> (T, Ordering) {
     match (x, other) {
-        (x, y) if x == y => x,
+        (x, y) if x == y => (x, Ordering::Equal),
         (x, y) if y == T::ZERO => match rm {
-            RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => T::ZERO,
-            _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+            RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                (T::ZERO, Ordering::Less)
+            }
+            _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
         },
         (x, y) => {
             let r = x % y;
             if r == T::ZERO {
-                x
+                (x, Ordering::Equal)
             } else {
                 let floor = x - r;
                 match rm {
-                    RoundingMode::Down | RoundingMode::Floor => floor,
-                    RoundingMode::Up | RoundingMode::Ceiling => floor.checked_add(y).unwrap(),
+                    RoundingMode::Down | RoundingMode::Floor => (floor, Ordering::Less),
+                    RoundingMode::Up | RoundingMode::Ceiling => {
+                        (floor.checked_add(y).unwrap(), Ordering::Greater)
+                    }
                     RoundingMode::Nearest => {
                         match r.cmp(&(y >> 1)) {
-                            Ordering::Less => floor,
-                            Ordering::Greater => floor.checked_add(y).unwrap(),
+                            Ordering::Less => (floor, Ordering::Less),
+                            Ordering::Greater => (floor.checked_add(y).unwrap(), Ordering::Greater),
                             Ordering::Equal => {
                                 if y.odd() {
-                                    floor
+                                    (floor, Ordering::Less)
                                 } else {
                                     // The even multiple of y will have more trailing zeros.
                                     let (ceiling, overflow) = floor.overflowing_add(y);
                                     if floor.trailing_zeros() > ceiling.trailing_zeros() {
-                                        floor
+                                        (floor, Ordering::Less)
                                     } else if overflow {
-                                        panic!(
-                                            "Cannot round {} to {} using RoundingMode {}",
-                                            x, y, rm
-                                        );
+                                        panic!("Cannot round {x} to {y} using RoundingMode {rm}");
                                     } else {
-                                        ceiling
+                                        (ceiling, Ordering::Greater)
                                     }
                                 }
                             }
                         }
                     }
                     RoundingMode::Exact => {
-                        panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                        panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                     }
                 }
             }
@@ -60,7 +65,8 @@ macro_rules! impl_round_to_multiple_unsigned {
             type Output = $t;
 
             /// Rounds a number to a multiple of another number, according to a specified rounding
-            /// mode.
+            /// mode. An [`Ordering`] is also returned, indicating whether the returned value is
+            /// less than, equal to, or greater than the original value.
             ///
             /// The only rounding modes that are guaranteed to return without a panic are `Down`
             /// and `Floor`.
@@ -105,14 +111,15 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// # Examples
             /// See [here](super::round_to_multiple#round_to_multiple).
             #[inline]
-            fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
+            fn round_to_multiple(self, other: $t, rm: RoundingMode) -> ($t, Ordering) {
                 round_to_multiple_unsigned(self, other, rm)
             }
         }
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds a number to a multiple of another number in place, according to a specified
-            /// rounding mode.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value
+            /// is less than, equal to, or greater than the original value.
             ///
             /// The only rounding modes that are guaranteed to return without a panic are `Down`
             /// and `Floor`.
@@ -137,8 +144,10 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// # Examples
             /// See [here](super::round_to_multiple#round_to_multiple_assign).
             #[inline]
-            fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) {
-                *self = self.round_to_multiple(other, rm);
+            fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) -> Ordering {
+                let o;
+                (*self, o) = self.round_to_multiple(other, rm);
+                o
             }
         }
     };
@@ -152,18 +161,22 @@ fn round_to_multiple_signed<
     x: S,
     other: S,
     rm: RoundingMode,
-) -> S {
+) -> (S, Ordering) {
     if x >= S::ZERO {
-        S::exact_from(x.unsigned_abs().round_to_multiple(other.unsigned_abs(), rm))
+        let (m, o) = x.unsigned_abs().round_to_multiple(other.unsigned_abs(), rm);
+        (S::exact_from(m), o)
     } else {
-        let abs_result = x
+        let (abs_result, o) = x
             .unsigned_abs()
             .round_to_multiple(other.unsigned_abs(), -rm);
-        if abs_result == S::MIN.unsigned_abs() {
-            S::MIN
-        } else {
-            S::exact_from(abs_result).checked_neg().unwrap()
-        }
+        (
+            if abs_result == S::MIN.unsigned_abs() {
+                S::MIN
+            } else {
+                S::exact_from(abs_result).checked_neg().unwrap()
+            },
+            o.reverse(),
+        )
     }
 }
 
@@ -173,7 +186,8 @@ macro_rules! impl_round_to_multiple_signed {
             type Output = $t;
 
             /// Rounds a number to a multiple of another number, according to a specified rounding
-            /// mode.
+            /// mode. An [`Ordering`] is also returned, indicating whether the returned value is
+            /// less than, equal to, or greater than the original value.
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
@@ -221,14 +235,15 @@ macro_rules! impl_round_to_multiple_signed {
             /// # Examples
             /// See [here](super::round_to_multiple#round_to_multiple).
             #[inline]
-            fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
+            fn round_to_multiple(self, other: $t, rm: RoundingMode) -> ($t, Ordering) {
                 round_to_multiple_signed(self, other, rm)
             }
         }
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds a number to a multiple of another number in place, according to a specified
-            /// rounding mode.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value
+            /// is less than, equal to, or greater than the original value.
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
@@ -252,8 +267,10 @@ macro_rules! impl_round_to_multiple_signed {
             /// # Examples
             /// See [here](super::round_to_multiple#round_to_multiple_assign).
             #[inline]
-            fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) {
-                *self = self.round_to_multiple(other, rm);
+            fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) -> Ordering {
+                let o;
+                (*self, o) = self.round_to_multiple(other, rm);
+                o
             }
         }
     };

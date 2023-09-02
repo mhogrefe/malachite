@@ -20,11 +20,11 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_wrapping_sub_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, y, z) in unsigned_triple_gen_var_19::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -37,8 +37,8 @@ fn demo_wrapping_sub_mul_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_wrapping_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in signed_triple_gen::<T>().get(gm, &config).take(limit) {
+fn demo_wrapping_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in signed_triple_gen::<T>().get(gm, config).take(limit) {
         println!(
             "{}.wrapping_sub_mul({}, {}) = {}",
             x,
@@ -51,47 +51,41 @@ fn demo_wrapping_sub_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConf
 
 fn demo_wrapping_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y, z) in unsigned_triple_gen_var_19::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.wrapping_sub_mul_assign(y, z);
-        println!(
-            "x := {}; x.wrapping_sub_mul_assign({}, {}); x = {}",
-            old_x, y, z, x
-        );
+        println!("x := {old_x}; x.wrapping_sub_mul_assign({y}, {z}); x = {x}");
     }
 }
 
 fn demo_wrapping_sub_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y, z) in signed_triple_gen::<T>().get(gm, &config).take(limit) {
+    for (mut x, y, z) in signed_triple_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.wrapping_sub_mul_assign(y, z);
-        println!(
-            "x := {}; x.wrapping_sub_mul_assign({}, {}); x = {}",
-            old_x, y, z, x
-        );
+        println!("x := {old_x}; x.wrapping_sub_mul_assign({y}, {z}); x = {x}");
     }
 }
 
 fn benchmark_wrapping_sub_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_sub_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_19::<T>().get(gm, &config),
+        unsigned_triple_gen_var_19::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -104,14 +98,14 @@ fn benchmark_wrapping_sub_mul_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_wrapping_sub_mul_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_sub_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_triple_gen::<T>().get(gm, &config),
+        signed_triple_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -124,7 +118,7 @@ fn benchmark_wrapping_sub_mul_signed<T: PrimitiveSigned>(
 
 fn benchmark_wrapping_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -136,7 +130,7 @@ fn benchmark_wrapping_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_19::<T>().get(gm, &config),
+        unsigned_triple_gen_var_19::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -149,7 +143,7 @@ fn benchmark_wrapping_sub_mul_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_wrapping_sub_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -161,7 +155,7 @@ fn benchmark_wrapping_sub_mul_assign_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_triple_gen::<T>().get(gm, &config),
+        signed_triple_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

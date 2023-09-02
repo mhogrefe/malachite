@@ -30,11 +30,11 @@ fn demo_mod_shl_unsigned_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, u, m) in unsigned_triple_gen_var_18::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} << {} ≡ {} mod {}", x, u, x.mod_shl(u, m), m);
@@ -47,11 +47,11 @@ fn demo_mod_shl_unsigned_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} << {} ≡ {} mod {}", x, u, x.mod_shl(u, m), m);
@@ -63,16 +63,16 @@ fn demo_mod_shl_assign_unsigned_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, u, m) in unsigned_triple_gen_var_18::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.mod_shl_assign(u, m);
-        println!("x := {}; x.mod_shl_assign({}, {}); x = {}", old_x, u, m, x);
+        println!("x := {old_x}; x.mod_shl_assign({u}, {m}); x = {x}");
     }
 }
 
@@ -82,16 +82,16 @@ fn demo_mod_shl_assign_unsigned_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.mod_shl_assign(u, m);
-        println!("x := {}; x.mod_shl_assign({}, {}); x = {}", old_x, u, m, x);
+        println!("x := {old_x}; x.mod_shl_assign({u}, {m}); x = {x}");
     }
 }
 
@@ -100,14 +100,14 @@ fn benchmark_mod_shl_unsigned_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_shl({}, {})", T::NAME, U::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_18::<T, U>().get(gm, &config),
+        unsigned_triple_gen_var_18::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -122,14 +122,14 @@ fn benchmark_mod_shl_unsigned_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_shl({}, {})", T::NAME, S::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -143,14 +143,14 @@ fn benchmark_mod_shl_assign_unsigned_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_shl_assign({}, u64)", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_18::<T, U>().get(gm, &config),
+        unsigned_triple_gen_var_18::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -165,14 +165,14 @@ fn benchmark_mod_shl_assign_unsigned_signed<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_shl_assign({}, u64)", T::NAME, S::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,

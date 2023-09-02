@@ -21,9 +21,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_get_bits_algorithms);
 }
 
-fn demo_limbs_slice_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_slice_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, start, end) in unsigned_vec_unsigned_unsigned_triple_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -36,9 +36,9 @@ fn demo_limbs_slice_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_vec_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_vec_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, start, end) in unsigned_vec_unsigned_unsigned_triple_gen_var_3()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_xs = xs.clone();
@@ -52,9 +52,9 @@ fn demo_limbs_vec_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_get_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, start, end) in natural_unsigned_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -67,9 +67,9 @@ fn demo_natural_get_bits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_get_bits_owned(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_get_bits_owned(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, start, end) in natural_unsigned_unsigned_triple_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n.clone();
@@ -85,14 +85,14 @@ fn demo_natural_get_bits_owned(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_get_bits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_get_bits(&[Limb], u64, u64)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_3().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,14 +110,14 @@ fn benchmark_limbs_get_bits_evaluation_strategy(
 
 fn benchmark_natural_get_bits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.get_bits(u64, u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -135,14 +135,14 @@ fn benchmark_natural_get_bits_evaluation_strategy(
 
 fn benchmark_natural_get_bits_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.get_bits(u64, u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_unsigned_triple_gen_var_4().get(gm, &config),
+        natural_unsigned_unsigned_triple_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

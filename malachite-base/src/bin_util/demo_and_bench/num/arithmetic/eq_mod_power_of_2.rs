@@ -18,44 +18,48 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_eq_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, y, pow) in unsigned_triple_gen_var_4::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.eq_mod_power_of_2(y, pow) {
-            println!("{} is equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is equal to {y} mod 2^{pow}");
         } else {
-            println!("{} is not equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is not equal to {y} mod 2^{pow}");
         }
     }
 }
 
-fn demo_eq_mod_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_eq_mod_power_of_2_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, y, pow) in signed_signed_unsigned_triple_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.eq_mod_power_of_2(y, pow) {
-            println!("{} is equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is equal to {y} mod 2^{pow}");
         } else {
-            println!("{} is not equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is not equal to {y} mod 2^{pow}");
         }
     }
 }
 
 fn benchmark_eq_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.eq_mod_power_of_2({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_4::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_4::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -68,14 +72,14 @@ fn benchmark_eq_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_eq_mod_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.eq_mod_power_of_2({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_signed_unsigned_triple_gen_var_2::<T, u64>().get(gm, &config),
+        signed_signed_unsigned_triple_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

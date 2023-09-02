@@ -2,6 +2,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
@@ -51,7 +52,7 @@ impl Natural {
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
-            natural_zero!() => None,
+            Natural::ZERO => None,
             Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(small)),
             Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
         }

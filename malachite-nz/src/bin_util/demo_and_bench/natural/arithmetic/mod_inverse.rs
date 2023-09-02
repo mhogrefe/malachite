@@ -16,60 +16,60 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_inverse_algorithms);
 }
 
-fn demo_natural_mod_inverse(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_natural_mod_inverse(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_11().get(gm, config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
         if let Some(inverse) = n.mod_inverse(m) {
-            println!("{}⁻¹ ≡ {} mod {}", n_old, inverse, m_old);
+            println!("{n_old}⁻¹ ≡ {inverse} mod {m_old}");
         } else {
-            println!("{} is not invertible mod {}", n_old, m_old);
+            println!("{n_old} is not invertible mod {m_old}");
         }
     }
 }
 
-fn demo_natural_mod_inverse_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_natural_mod_inverse_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_11().get(gm, config).take(limit) {
         let n_old = n.clone();
         if let Some(inverse) = n.mod_inverse(&m) {
-            println!("{}⁻¹ ≡ {} mod {}", n_old, inverse, m);
+            println!("{n_old}⁻¹ ≡ {inverse} mod {m}");
         } else {
-            println!("{} is not invertible mod {}", n_old, m);
+            println!("{n_old} is not invertible mod {m}");
         }
     }
 }
 
-fn demo_natural_mod_inverse_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_natural_mod_inverse_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_11().get(gm, config).take(limit) {
         let m_old = m.clone();
         if let Some(inverse) = (&n).mod_inverse(m) {
-            println!("{}⁻¹ ≡ {} mod {}", n, inverse, m_old);
+            println!("{n}⁻¹ ≡ {inverse} mod {m_old}");
         } else {
-            println!("{} is not invertible mod {}", n, m_old);
+            println!("{n} is not invertible mod {m_old}");
         }
     }
 }
 
-fn demo_natural_mod_inverse_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_11().get(gm, &config).take(limit) {
+fn demo_natural_mod_inverse_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_11().get(gm, config).take(limit) {
         if let Some(inverse) = (&n).mod_inverse(&m) {
-            println!("{}⁻¹ ≡ {} mod {}", n, inverse, m);
+            println!("{n}⁻¹ ≡ {inverse} mod {m}");
         } else {
-            println!("{} is not invertible mod {}", n, m);
+            println!("{n} is not invertible mod {m}");
         }
     }
 }
 
 fn benchmark_natural_mod_inverse_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_inverse(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen_var_11().get(gm, &config),
+        natural_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_natural_mod_inverse_evaluation_strategy(
 
 fn benchmark_natural_mod_inverse_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.mod_inverse(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_11().get(gm, &config),
+        natural_pair_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,

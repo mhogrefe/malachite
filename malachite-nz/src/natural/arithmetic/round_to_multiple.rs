@@ -1,4 +1,3 @@
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
@@ -9,7 +8,9 @@ impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. Both [`Natural`]s are taken by value.
+    /// rounding mode. Both [`Natural`]s are taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the returned value is less than, equal to, or greater than the original
+    /// value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -54,43 +55,55 @@ impl RoundToMultiple<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(5u32).round_to_multiple(Natural::ZERO, RoundingMode::Down), 0);
+    /// assert_eq!(
+    ///     Natural::from(5u32).round_to_multiple(Natural::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Less)"
+    /// );
     ///
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Down),
-    ///     8
+    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Up),
-    ///     12
+    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(Natural::from(5u32), RoundingMode::Exact),
-    ///     10
+    ///     Natural::from(10u32).round_to_multiple(Natural::from(5u32), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(10, Equal)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest),
-    ///     9
+    ///     Natural::from(10u32).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(9, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(20u32).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest),
-    ///     21
+    ///     Natural::from(20u32).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(21, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest),
-    ///     8
+    ///     Natural::from(10u32).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(14u32).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest),
-    ///     16
+    ///     Natural::from(14u32).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(16, Greater)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: Natural, rm: RoundingMode) -> Natural {
-        self.round_to_multiple_assign(other, rm);
-        self
+    fn round_to_multiple(mut self, other: Natural, rm: RoundingMode) -> (Natural, Ordering) {
+        let o = self.round_to_multiple_assign(other, rm);
+        (self, o)
     }
 }
 
@@ -98,7 +111,9 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. The first [`Natural`] is taken by value and the second by reference.
+    /// rounding mode. The first [`Natural`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -143,43 +158,55 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(5u32).round_to_multiple(&Natural::ZERO, RoundingMode::Down), 0);
+    /// assert_eq!(
+    ///     Natural::from(5u32).round_to_multiple(&Natural::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Less)"
+    /// );
     ///
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Down),
-    ///     8
+    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Up),
-    ///     12
+    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(&Natural::from(5u32), RoundingMode::Exact),
-    ///     10
+    ///     Natural::from(10u32).round_to_multiple(&Natural::from(5u32), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(10, Equal)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest),
-    ///     9
+    ///     Natural::from(10u32).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(9, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(20u32).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest),
-    ///     21
+    ///     Natural::from(20u32).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(21, Greater)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest),
-    ///     8
+    ///     Natural::from(10u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     Natural::from(14u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest),
-    ///     16
+    ///     Natural::from(14u32).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(16, Greater)"
     /// );
     /// ```
     #[inline]
-    fn round_to_multiple(mut self, other: &'a Natural, rm: RoundingMode) -> Natural {
-        self.round_to_multiple_assign(other, rm);
-        self
+    fn round_to_multiple(mut self, other: &'a Natural, rm: RoundingMode) -> (Natural, Ordering) {
+        let o = self.round_to_multiple_assign(other, rm);
+        (self, o)
     }
 }
 
@@ -187,7 +214,9 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. The first [`Natural`] is taken by reference and the second by value.
+    /// rounding mode. The first [`Natural`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -232,76 +261,90 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(5u32)).round_to_multiple(Natural::ZERO, RoundingMode::Down), 0);
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).round_to_multiple(Natural::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Less)"
+    /// );
     ///
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Down),
-    ///     8
+    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Up),
-    ///     12
+    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(5u32), RoundingMode::Exact),
-    ///     10
+    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(5u32), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(10, Equal)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest),
-    ///     9
+    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(9, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(20u32)).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest),
-    ///     21
+    ///     (&Natural::from(20u32)).round_to_multiple(Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(21, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest),
-    ///     8
+    ///     (&Natural::from(10u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(14u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest),
-    ///     16
+    ///     (&Natural::from(14u32)).round_to_multiple(Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(16, Greater)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: Natural, rm: RoundingMode) -> Natural {
+    fn round_to_multiple(self, other: Natural, rm: RoundingMode) -> (Natural, Ordering) {
         match (self, other) {
-            (x, y) if *x == y => y,
-            (x, natural_zero!()) => match rm {
-                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => Natural::ZERO,
-                _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+            (x, y) if *x == y => (y, Ordering::Equal),
+            (x, Natural::ZERO) => match rm {
+                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                    (Natural::ZERO, Ordering::Less)
+                }
+                _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
             },
             (x, y) => {
                 let r = x % &y;
                 if r == 0 {
-                    x.clone()
+                    (x.clone(), Ordering::Equal)
                 } else {
                     let floor = x - &r;
                     match rm {
-                        RoundingMode::Down | RoundingMode::Floor => floor,
-                        RoundingMode::Up | RoundingMode::Ceiling => floor + y,
+                        RoundingMode::Down | RoundingMode::Floor => (floor, Ordering::Less),
+                        RoundingMode::Up | RoundingMode::Ceiling => (floor + y, Ordering::Greater),
                         RoundingMode::Nearest => {
                             match (r << 1u64).cmp(&y) {
-                                Ordering::Less => floor,
-                                Ordering::Greater => floor + y,
+                                Ordering::Less => (floor, Ordering::Less),
+                                Ordering::Greater => (floor + y, Ordering::Greater),
                                 Ordering::Equal => {
                                     // The even multiple of y will have more trailing zeros.
                                     if floor == 0 {
-                                        floor
+                                        (floor, Ordering::Less)
                                     } else {
                                         let ceiling = &floor + y;
                                         if floor.trailing_zeros() > ceiling.trailing_zeros() {
-                                            floor
+                                            (floor, Ordering::Less)
                                         } else {
-                                            ceiling
+                                            (ceiling, Ordering::Greater)
                                         }
                                     }
                                 }
                             }
                         }
                         RoundingMode::Exact => {
-                            panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                            panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                         }
                     }
                 }
@@ -314,7 +357,9 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     type Output = Natural;
 
     /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. Both [`Natural`]s are taken by reference.
+    /// rounding mode. Both [`Natural`]s are taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the returned value is less than, equal to, or greater than the original
+    /// value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -359,76 +404,90 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(5u32)).round_to_multiple(&Natural::ZERO, RoundingMode::Down), 0);
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).round_to_multiple(&Natural::ZERO, RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(0, Less)"
+    /// );
     ///
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Down),
-    ///     8
+    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Down)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Up),
-    ///     12
+    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Up)
+    ///         .to_debug_string(),
+    ///     "(12, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(5u32), RoundingMode::Exact),
-    ///     10
+    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(5u32), RoundingMode::Exact)
+    ///         .to_debug_string(),
+    ///     "(10, Equal)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest),
-    ///     9
+    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(9, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(20u32)).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest),
-    ///     21
+    ///     (&Natural::from(20u32)).round_to_multiple(&Natural::from(3u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(21, Greater)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest),
-    ///     8
+    ///     (&Natural::from(10u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(8, Less)"
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(14u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest),
-    ///     16
+    ///     (&Natural::from(14u32)).round_to_multiple(&Natural::from(4u32), RoundingMode::Nearest)
+    ///         .to_debug_string(),
+    ///     "(16, Greater)"
     /// );
     /// ```
-    fn round_to_multiple(self, other: &'b Natural, rm: RoundingMode) -> Natural {
+    fn round_to_multiple(self, other: &'b Natural, rm: RoundingMode) -> (Natural, Ordering) {
         match (self, other) {
-            (x, y) if x == y => x.clone(),
-            (x, &natural_zero!()) => match rm {
-                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => Natural::ZERO,
-                _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+            (x, y) if x == y => (x.clone(), Ordering::Equal),
+            (x, &Natural::ZERO) => match rm {
+                RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
+                    (Natural::ZERO, Ordering::Less)
+                }
+                _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
             },
             (x, y) => {
                 let r = x % y;
                 if r == 0 {
-                    x.clone()
+                    (x.clone(), Ordering::Equal)
                 } else {
                     let floor = x - &r;
                     match rm {
-                        RoundingMode::Down | RoundingMode::Floor => floor,
-                        RoundingMode::Up | RoundingMode::Ceiling => floor + y,
+                        RoundingMode::Down | RoundingMode::Floor => (floor, Ordering::Less),
+                        RoundingMode::Up | RoundingMode::Ceiling => (floor + y, Ordering::Greater),
                         RoundingMode::Nearest => {
                             match (r << 1u64).cmp(y) {
-                                Ordering::Less => floor,
-                                Ordering::Greater => floor + y,
+                                Ordering::Less => (floor, Ordering::Less),
+                                Ordering::Greater => (floor + y, Ordering::Greater),
                                 Ordering::Equal => {
                                     // The even multiple of y will have more trailing zeros.
                                     if floor == 0 {
-                                        floor
+                                        (floor, Ordering::Less)
                                     } else {
                                         let ceiling = &floor + y;
                                         if floor.trailing_zeros() > ceiling.trailing_zeros() {
-                                            floor
+                                            (floor, Ordering::Less)
                                         } else {
-                                            ceiling
+                                            (ceiling, Ordering::Greater)
                                         }
                                     }
                                 }
                             }
                         }
                         RoundingMode::Exact => {
-                            panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                            panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                         }
                     }
                 }
@@ -439,7 +498,9 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
 
 impl RoundToMultipleAssign<Natural> for Natural {
     /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
-    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by value.
+    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by value. An
+    /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+    /// greater than the original value.
     ///
     /// See the
     /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
@@ -468,72 +529,108 @@ impl RoundToMultipleAssign<Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
+    /// use std::cmp::Ordering;
     ///
     /// let mut x = Natural::from(5u32);
-    /// x.round_to_multiple_assign(Natural::ZERO, RoundingMode::Down);
+    /// assert_eq!(x.round_to_multiple_assign(Natural::ZERO, RoundingMode::Down), Ordering::Less);
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Down),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Up),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 12);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(Natural::from(5u32), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(5u32), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(Natural::from(3u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(3u32), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 9);
     ///
     /// let mut x = Natural::from(20u32);
-    /// x.round_to_multiple_assign(Natural::from(3u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(3u32), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 21);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::from(14u32);
-    /// x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(Natural::from(4u32), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: Natural, rm: RoundingMode) {
+    fn round_to_multiple_assign(&mut self, other: Natural, rm: RoundingMode) -> Ordering {
         match (&mut *self, other) {
-            (x, y) if *x == y => {}
-            (x, natural_zero!()) => match rm {
+            (x, y) if *x == y => Ordering::Equal,
+            (x, Natural::ZERO) => match rm {
                 RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
-                    *self = Natural::ZERO
+                    *self = Natural::ZERO;
+                    Ordering::Less
                 }
-                _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+                _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
             },
             (x, y) => {
                 let r = &*x % &y;
-                if r != 0 {
+                if r == 0 {
+                    Ordering::Equal
+                } else {
                     *x -= &r;
                     match rm {
-                        RoundingMode::Down | RoundingMode::Floor => {}
-                        RoundingMode::Up | RoundingMode::Ceiling => *x += y,
+                        RoundingMode::Down | RoundingMode::Floor => Ordering::Less,
+                        RoundingMode::Up | RoundingMode::Ceiling => {
+                            *x += y;
+                            Ordering::Greater
+                        }
                         RoundingMode::Nearest => {
                             match (r << 1u64).cmp(&y) {
-                                Ordering::Less => {}
-                                Ordering::Greater => *x += y,
+                                Ordering::Less => Ordering::Less,
+                                Ordering::Greater => {
+                                    *x += y;
+                                    Ordering::Greater
+                                }
                                 Ordering::Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if *x != 0 {
+                                    if *x == 0 {
+                                        Ordering::Less
+                                    } else {
                                         let ceiling = &*x + y;
                                         if x.trailing_zeros() < ceiling.trailing_zeros() {
                                             *x = ceiling;
+                                            Ordering::Greater
+                                        } else {
+                                            Ordering::Less
                                         }
                                     }
                                 }
                             }
                         }
                         RoundingMode::Exact => {
-                            panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                            panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                         }
                     }
                 }
@@ -544,7 +641,9 @@ impl RoundToMultipleAssign<Natural> for Natural {
 
 impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
-    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by reference.
+    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// See the
     /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
@@ -573,72 +672,108 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
+    /// use std::cmp::Ordering;
     ///
     /// let mut x = Natural::from(5u32);
-    /// x.round_to_multiple_assign(&Natural::ZERO, RoundingMode::Down);
+    /// assert_eq!(x.round_to_multiple_assign(&Natural::ZERO, RoundingMode::Down), Ordering::Less);
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Down);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Down),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Up);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Up),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 12);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(&Natural::from(5u32), RoundingMode::Exact);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(5u32), RoundingMode::Exact),
+    ///     Ordering::Equal
+    /// );
     /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(&Natural::from(3u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(3u32), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 9);
     ///
     /// let mut x = Natural::from(20u32);
-    /// x.round_to_multiple_assign(&Natural::from(3u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(3u32), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 21);
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Nearest),
+    ///     Ordering::Less
+    /// );
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::from(14u32);
-    /// x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Nearest);
+    /// assert_eq!(
+    ///     x.round_to_multiple_assign(&Natural::from(4u32), RoundingMode::Nearest),
+    ///     Ordering::Greater
+    /// );
     /// assert_eq!(x, 16);
     /// ```
-    fn round_to_multiple_assign(&mut self, other: &'a Natural, rm: RoundingMode) {
+    fn round_to_multiple_assign(&mut self, other: &'a Natural, rm: RoundingMode) -> Ordering {
         match (&mut *self, other) {
-            (x, y) if *x == *y => {}
-            (x, natural_zero!()) => match rm {
+            (x, y) if *x == *y => Ordering::Equal,
+            (x, &Natural::ZERO) => match rm {
                 RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => {
-                    *self = Natural::ZERO
+                    *self = Natural::ZERO;
+                    Ordering::Less
                 }
-                _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+                _ => panic!("Cannot round {x} to zero using RoundingMode {rm}"),
             },
             (x, y) => {
                 let r = &*x % y;
-                if r != 0 {
+                if r == 0 {
+                    Ordering::Equal
+                } else {
                     *x -= &r;
                     match rm {
-                        RoundingMode::Down | RoundingMode::Floor => {}
-                        RoundingMode::Up | RoundingMode::Ceiling => *x += y,
+                        RoundingMode::Down | RoundingMode::Floor => Ordering::Less,
+                        RoundingMode::Up | RoundingMode::Ceiling => {
+                            *x += y;
+                            Ordering::Greater
+                        }
                         RoundingMode::Nearest => {
                             match (r << 1u64).cmp(y) {
-                                Ordering::Less => {}
-                                Ordering::Greater => *x += y,
+                                Ordering::Less => Ordering::Less,
+                                Ordering::Greater => {
+                                    *x += y;
+                                    Ordering::Greater
+                                }
                                 Ordering::Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if *x != 0 {
+                                    if *x == 0 {
+                                        Ordering::Less
+                                    } else {
                                         let ceiling = &*x + y;
                                         if x.trailing_zeros() < ceiling.trailing_zeros() {
                                             *x = ceiling;
+                                            Ordering::Greater
+                                        } else {
+                                            Ordering::Less
                                         }
                                     }
                                 }
                             }
                         }
                         RoundingMode::Exact => {
-                            panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                            panic!("Cannot round {x} to {y} using RoundingMode {rm}")
                         }
                     }
                 }

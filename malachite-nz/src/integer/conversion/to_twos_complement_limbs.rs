@@ -146,8 +146,9 @@ impl<'a> Iterator for NLIterator<'a> {
     //
     // # Worst-case complexity
     // Constant time and additional memory.
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        (self.limbs.limb_count, Some(self.limbs.limb_count))
+        self.limbs.size_hint()
     }
 }
 

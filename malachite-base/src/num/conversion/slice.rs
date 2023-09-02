@@ -234,7 +234,7 @@ fn vec_from_other_type_slice_small_to_large<
     xs: &[A],
 ) -> Vec<B> {
     let log_size_ratio = B::LOG_WIDTH - A::LOG_WIDTH;
-    let mut out = vec![B::ZERO; xs.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
+    let mut out = vec![B::ZERO; xs.len().shr_round(log_size_ratio, RoundingMode::Ceiling).0];
     for (x, chunk) in out.iter_mut().zip(xs.chunks(1 << log_size_ratio)) {
         *x = from_other_type_slice_small_to_large(chunk);
     }
@@ -405,7 +405,7 @@ impl VecFromOtherTypeSlice<u32> for usize {
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling).0];
             for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
                 *x = usize::from_other_type_slice(chunk);
             }
@@ -607,7 +607,7 @@ impl VecFromOtherTypeSlice<usize> for u64 {
     fn vec_from_other_type_slice(xs: &[usize]) -> Vec<Self> {
         let mut out;
         if usize::WIDTH == u32::WIDTH {
-            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling).0];
             for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
                 *x = u64::from_other_type_slice(chunk);
             }

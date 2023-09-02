@@ -13,7 +13,7 @@ use std::ops::Index;
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {
     pub(crate) value: T,
-    pub(crate) some_remaining: bool,
+    pub(crate) remaining: usize,
     // If `n` is nonzero, this mask initially points to the least-significant bit, and is left-
     // shifted by next().
     pub(crate) i_mask: T,
@@ -26,12 +26,10 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
-        if self.some_remaining {
+        if self.remaining != 0 {
             let bit = self.value & self.i_mask != T::ZERO;
-            if self.i_mask == self.j_mask {
-                self.some_remaining = false;
-            }
             self.i_mask <<= 1;
+            self.remaining -= 1;
             Some(bit)
         } else {
             None
@@ -39,19 +37,16 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_bits = usize::exact_from(self.value.significant_bits());
-        (significant_bits, Some(significant_bits))
+        (self.remaining, Some(self.remaining))
     }
 }
 
 impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<T> {
     fn next_back(&mut self) -> Option<bool> {
-        if self.some_remaining {
-            if self.i_mask == self.j_mask {
-                self.some_remaining = false;
-            }
+        if self.remaining != 0 {
             let bit = self.value & self.j_mask != T::ZERO;
             self.j_mask >>= 1;
+            self.remaining -= 1;
             Some(bit)
         } else {
             None
@@ -105,7 +100,7 @@ fn bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> 
     let significant_bits = x.significant_bits();
     PrimitiveUnsignedBitIterator {
         value: x,
-        some_remaining: significant_bits != 0,
+        remaining: usize::exact_from(significant_bits),
         i_mask: T::ONE,
         j_mask: T::power_of_2(significant_bits.saturating_sub(1)),
     }
@@ -151,17 +146,29 @@ pub struct PrimitiveSignedBitIterator<U: PrimitiveUnsigned, S: PrimitiveSigned> 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<U, S> {
     type Item = bool;
 
+    #[inline]
     fn next(&mut self) -> Option<bool> {
         self.xs.next()
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.xs.size_hint()
     }
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
     for PrimitiveSignedBitIterator<U, S>
 {
+    #[inline]
     fn next_back(&mut self) -> Option<bool> {
         self.xs.next_back()
     }
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned> ExactSizeIterator
+    for PrimitiveSignedBitIterator<U, S>
+{
 }
 
 impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<U, S> {
@@ -218,7 +225,7 @@ fn bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
         phantom: PhantomData,
         xs: PrimitiveUnsignedBitIterator {
             value: unsigned,
-            some_remaining: significant_bits != 0,
+            remaining: usize::exact_from(significant_bits),
             i_mask: U::ONE,
             j_mask: U::power_of_2(significant_bits.saturating_sub(1)),
         },

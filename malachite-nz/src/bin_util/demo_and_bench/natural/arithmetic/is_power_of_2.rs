@@ -16,8 +16,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_is_power_of_2_library_comparison);
 }
 
-fn demo_limbs_is_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_is_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_is_power_of_2({:?}) = {:?}",
             xs,
@@ -26,21 +26,21 @@ fn demo_limbs_is_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_is_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_is_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         if n.is_power_of_2() {
-            println!("{} is a power of 2", n);
+            println!("{n} is a power of 2");
         } else {
-            println!("{} is not a power of 2", n);
+            println!("{n} is not a power of 2");
         }
     }
 }
 
-fn benchmark_limbs_is_power_of_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_is_power_of_2(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_is_power_of_2(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -51,14 +51,14 @@ fn benchmark_limbs_is_power_of_2(gm: GenMode, config: GenConfig, limit: usize, f
 
 fn benchmark_natural_is_power_of_2_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.is_power_of_2()",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -35,85 +35,85 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_ceiling_div_assign_mod);
 }
 
-fn demo_div_mod_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_div_mod_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.div_mod({}) = {:?}", x, y, x.div_mod(y));
     }
 }
 
-fn demo_div_mod_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_div_mod_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         println!("({}).div_mod({}) = {:?}", x, y, x.div_mod(y));
     }
 }
 
 fn demo_div_assign_mod_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         let r = x.div_assign_mod(y);
-        println!("x := {}; x.div_assign_mod({}) = {}; x = {}", old_x, y, r, x);
+        println!("x := {old_x}; x.div_assign_mod({y}) = {r}; x = {x}");
     }
 }
 
-fn demo_div_assign_mod_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_div_assign_mod_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let r = x.div_assign_mod(y);
-        println!("x := {}; x.div_assign_mod({}) = {}; x = {}", old_x, y, r, x);
+        println!("x := {old_x}; x.div_assign_mod({y}) = {r}; x = {x}");
     }
 }
 
-fn demo_div_rem_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_div_rem_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.div_rem({}) = {:?}", x, y, x.div_rem(y));
     }
 }
 
-fn demo_div_rem_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_div_rem_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         println!("({}).div_rem({}) = {:?}", x, y, x.div_rem(y));
     }
 }
 
 fn demo_div_assign_rem_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         let r = x.div_assign_rem(y);
-        println!("x := {}; x.div_assign_rem({}) = {}; x = {}", old_x, y, r, x);
+        println!("x := {old_x}; x.div_assign_rem({y}) = {r}; x = {x}");
     }
 }
 
-fn demo_div_assign_rem_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_div_assign_rem_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let r = x.div_assign_rem(y);
-        println!("x := {}; x.div_assign_rem({}) = {}; x = {}", old_x, y, r, x);
+        println!("x := {old_x}; x.div_assign_rem({y}) = {r}; x = {x}");
     }
 }
 
-fn demo_ceiling_div_neg_mod<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_ceiling_div_neg_mod<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -127,24 +127,21 @@ fn demo_ceiling_div_neg_mod<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig
 
 fn demo_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         let r = x.ceiling_div_assign_neg_mod(y);
-        println!(
-            "x := {}; x.ceiling_div_assign_neg_mod({}) = {}; x = {}",
-            old_x, y, r, x
-        );
+        println!("x := {old_x}; x.ceiling_div_assign_neg_mod({y}) = {r}; x = {x}");
     }
 }
 
-fn demo_ceiling_div_mod<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_div_mod<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         println!(
             "({}).ceiling_div_mod({}) = {:?}",
             x,
@@ -154,28 +151,25 @@ fn demo_ceiling_div_mod<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_ceiling_div_assign_mod<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, &config).take(limit) {
+fn demo_ceiling_div_assign_mod<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let r = x.ceiling_div_assign_mod(y);
-        println!(
-            "x := {}; x.ceiling_div_assign_mod({}) = {}; x = {}",
-            old_x, y, r, x
-        );
+        println!("x := {old_x}; x.ceiling_div_assign_mod({y}) = {r}; x = {x}");
     }
 }
 
 #[allow(clippy::no_effect)]
 fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -190,14 +184,14 @@ fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_div_mod_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -213,14 +207,14 @@ fn benchmark_div_mod_signed_algorithms<T: PrimitiveSigned>(
 
 fn benchmark_div_assign_mod_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -231,14 +225,14 @@ fn benchmark_div_assign_mod_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_div_assign_mod_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -250,14 +244,14 @@ fn benchmark_div_assign_mod_signed<T: PrimitiveSigned>(
 #[allow(clippy::no_effect)]
 fn benchmark_div_rem_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_rem({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -272,14 +266,14 @@ fn benchmark_div_rem_unsigned_algorithms<T: PrimitiveUnsigned>(
 #[allow(clippy::no_effect)]
 fn benchmark_div_rem_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_rem({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -293,14 +287,14 @@ fn benchmark_div_rem_signed_algorithms<T: PrimitiveSigned>(
 
 fn benchmark_div_assign_rem_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_assign_rem({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -311,14 +305,14 @@ fn benchmark_div_assign_rem_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_div_assign_rem_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.div_assign_rem({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -330,14 +324,14 @@ fn benchmark_div_assign_rem_signed<T: PrimitiveSigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_div_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -356,14 +350,14 @@ fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -381,14 +375,14 @@ fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned>(
 
 fn benchmark_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_div_assign_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -401,14 +395,14 @@ fn benchmark_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_div_assign_mod<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen_var_4::<T>().get(gm, &config),
+        signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

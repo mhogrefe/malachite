@@ -9,7 +9,7 @@ fn exhaustive_positive_primitive_floats_helper<T: PrimitiveFloat>(out: &[T]) {
 #[test]
 fn test_exhaustive_positive_primitive_floats() {
     exhaustive_positive_primitive_floats_helper::<f32>(&[
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         1.0,
         2.0,
         1.5,
@@ -61,7 +61,7 @@ fn test_exhaustive_positive_primitive_floats() {
         1.53125,
     ]);
     exhaustive_positive_primitive_floats_helper::<f64>(&[
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         1.0,
         2.0,
         1.5,

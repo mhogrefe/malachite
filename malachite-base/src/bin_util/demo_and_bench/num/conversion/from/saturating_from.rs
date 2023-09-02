@@ -24,10 +24,10 @@ fn demo_primitive_int_saturating_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for u in unsigned_gen::<U>().get(gm, &config).take(limit) {
+    for u in unsigned_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{}::saturating_from({}) = {}",
             T::NAME,
@@ -42,10 +42,10 @@ fn demo_primitive_int_saturating_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for i in signed_gen::<U>().get(gm, &config).take(limit) {
+    for i in signed_gen::<U>().get(gm, config).take(limit) {
         println!(
             "{}::saturating_from({}) = {}",
             T::NAME,
@@ -60,14 +60,14 @@ fn benchmark_primitive_int_saturating_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<U>().get(gm, &config),
+        unsigned_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -81,14 +81,14 @@ fn benchmark_primitive_int_saturating_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.saturating_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_gen::<U>().get(gm, &config),
+        signed_gen::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

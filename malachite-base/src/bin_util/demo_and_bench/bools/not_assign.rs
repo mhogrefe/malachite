@@ -7,10 +7,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_bool_not_assign);
 }
 
-fn demo_bool_not_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut b in bool_gen().get(gm, &config).take(limit) {
+fn demo_bool_not_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut b in bool_gen().get(gm, config).take(limit) {
         let b_old = b;
         b.not_assign();
-        println!("b := {}; b.not_assign(); b = {}", b_old, b);
+        println!("b := {b_old}; b.not_assign(); b = {b}");
     }
 }

@@ -18,39 +18,36 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_mod_pow_precomputed_algorithms);
 }
 
-fn demo_mod_pow<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_pow<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp, m) in unsigned_triple_gen_var_15::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.pow({}) ≡ {} mod {}", x, exp, x.mod_pow(exp, m), m);
     }
 }
 
-fn demo_mod_pow_assign<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_mod_pow_assign<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, exp, m) in unsigned_triple_gen_var_15::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x;
         x.mod_pow_assign(exp, m);
-        println!(
-            "x := {}; x.mod_pow_assign({}, {}); x = {}",
-            old_x, exp, m, x
-        );
+        println!("x := {old_x}; x.mod_pow_assign({exp}, {m}); x = {x}");
     }
 }
 
 fn benchmark_mod_pow_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_15::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_15::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -66,14 +63,14 @@ fn benchmark_mod_pow_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_pow_naive_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_14::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_14::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -92,14 +89,14 @@ fn benchmark_mod_pow_naive_algorithms<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_pow_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_pow_assign(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_15::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_15::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,14 +107,14 @@ fn benchmark_mod_pow_assign<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_pow_precomputed_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_triple_gen_var_15::<T, u64>().get(gm, &config),
+        unsigned_triple_gen_var_15::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -1,7 +1,6 @@
 use crate::integer::Integer;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use crate::natural::conversion::from_primitive_float::NaturalFromPrimitiveFloatError;
 use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
@@ -19,6 +18,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::rational_sequences::RationalSequence;
@@ -57,7 +57,7 @@ pub fn integer_gen_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
 // All `Integer`s that are exactly equal to a floating point value of type `T`.
 pub fn integer_gen_var_1<T: PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_1::<T>,
@@ -79,7 +79,7 @@ pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloa
 // All `Integer`s that are exactly between two adjacent floats of type `T`.
 pub fn integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_3::<T>,
@@ -637,6 +637,18 @@ pub fn integer_signed_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Inte
     )
 }
 
+// -- (Integer, PrimitiveSigned, PrimitiveUnsigned) --
+
+// All `(Integer, T, U)` where `T` is signed and small and `U` is unsigned, small, and positive.
+pub fn integer_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, U)> {
+    Generator::new(
+        &exhaustive_integer_signed_unsigned_triple_gen_var_1,
+        &random_integer_signed_unsigned_triple_gen_var_1,
+        &special_random_integer_signed_unsigned_triple_gen_var_1,
+    )
+}
+
 // -- (Integer, PrimitiveSigned, RoundingMode) --
 
 // All `(Integer, T, RoundingMode)` where `T` is signed and the triple is a valid input to
@@ -783,6 +795,15 @@ pub fn integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Int
     )
 }
 
+// All `(Integer, T)` where `T` is unsigned, positive, and small.
+pub fn integer_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_6,
+        &random_integer_unsigned_pair_gen_var_6,
+        &special_random_integer_unsigned_pair_gen_var_6,
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, bool) --
 
 // All `(Integer, T, bool)` where `T` is unsigned and small.
@@ -902,6 +923,8 @@ where
     )
 }
 
+// var 3 is in malachite-float
+
 // -- (Integer, RoundingMode) --
 
 pub fn integer_rounding_mode_pair_gen() -> Generator<(Integer, RoundingMode)> {
@@ -1020,7 +1043,7 @@ pub fn natural_gen_var_2() -> Generator<Natural> {
 // All `Natural`s that are exactly equal to a floating point value of type `T`.
 pub fn natural_gen_var_3<T: PrimitiveFloat>() -> Generator<Natural>
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_3::<T>,
@@ -1044,7 +1067,7 @@ type GN = Generator<Natural>;
 // All `Natural`s that are exactly between two adjacent floats of type `T`.
 pub fn natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> GN
 where
-    Natural: TryFrom<T, Error = NaturalFromPrimitiveFloatError>,
+    Natural: TryFrom<T, Error = UnsignedFromFloatError>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_5::<T>,
@@ -1816,6 +1839,16 @@ pub fn natural_signed_pair_gen_var_3<T: PrimitiveSigned>() -> Generator<(Natural
     )
 }
 
+// All `(Natural, T)` where `T` is signed and small, the `Natural` is positive, and the `Natural`s
+// bit length is a multiple of the limb bit length.
+pub fn natural_signed_pair_gen_var_4<T: PrimitiveSigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_signed_pair_gen_var_4,
+        &random_natural_signed_pair_gen_var_3,
+        &special_random_natural_signed_pair_gen_var_4,
+    )
+}
+
 // -- (Natural, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn natural_signed_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Natural, T, T)> {
@@ -1836,6 +1869,16 @@ pub fn natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>() -> T2<T> {
         &exhaustive_natural_signed_unsigned_triple_gen_var_1,
         &random_natural_signed_unsigned_triple_gen_var_1,
         &special_random_natural_signed_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Natural, T, U)` where `T` is signed and small and `U` is unsigned, small, and positive.
+pub fn natural_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(Natural, T, U)> {
+    Generator::new(
+        &exhaustive_natural_signed_unsigned_triple_gen_var_2,
+        &random_natural_signed_unsigned_triple_gen_var_2,
+        &special_random_natural_signed_unsigned_triple_gen_var_2,
     )
 }
 
@@ -2215,6 +2258,8 @@ where
         &special_random_natural_unsigned_rounding_mode_triple_gen_var_1,
     )
 }
+
+// var 2 is in malachite-float
 
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 

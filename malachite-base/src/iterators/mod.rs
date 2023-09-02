@@ -88,6 +88,7 @@ where
 ///
 /// assert_eq!(is_constant([1; 4].iter()), true);
 /// assert_eq!(is_constant([1, 2, 3, 4].iter()), false);
+/// assert_eq!(is_constant(0..), false);
 /// ```
 pub fn is_constant<I: Iterator>(xs: I) -> bool
 where
@@ -118,6 +119,7 @@ where
 /// assert_eq!(count_is_at_least([1, 2, 3, 4].iter(), 3), true);
 /// assert_eq!(count_is_at_least([1, 2, 3, 4].iter(), 4), true);
 /// assert_eq!(count_is_at_least([1, 2, 3, 4].iter(), 5), false);
+/// assert_eq!(count_is_at_least(0.., 5), true);
 /// ```
 #[inline]
 pub fn count_is_at_least<I: Iterator>(xs: I, n: usize) -> bool {
@@ -136,6 +138,7 @@ pub fn count_is_at_least<I: Iterator>(xs: I, n: usize) -> bool {
 /// assert_eq!(count_is_at_most([1, 2, 3, 4].iter(), 3), false);
 /// assert_eq!(count_is_at_most([1, 2, 3, 4].iter(), 4), true);
 /// assert_eq!(count_is_at_most([1, 2, 3, 4].iter(), 5), true);
+/// assert_eq!(count_is_at_most(0.., 5), false);
 /// ```
 #[inline]
 pub fn count_is_at_most<I: Iterator>(xs: I, n: usize) -> bool {
@@ -157,6 +160,7 @@ pub fn count_is_at_most<I: Iterator>(xs: I, n: usize) -> bool {
 /// assert_eq!(is_unique(empty.iter()), true);
 /// assert_eq!(is_unique([1, 2, 3, 4].iter()), true);
 /// assert_eq!(is_unique([1, 2, 3, 1].iter()), false);
+/// assert_eq!(is_unique((0..).map(|i| i / 2)), false);
 /// ```
 #[inline]
 pub fn is_unique<I: Iterator>(xs: I) -> bool

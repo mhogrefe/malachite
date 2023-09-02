@@ -1,6 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::num::float::NiceFloat;
@@ -45,7 +46,7 @@ pub fn test_convertible_from() {
     test_double::<_, u8>(500.0f32, false);
     test_double::<_, u8>(123.1f32, false);
     test_double::<_, u8>(f32::NAN, false);
-    test_double::<_, u8>(f32::POSITIVE_INFINITY, false);
+    test_double::<_, u8>(f32::INFINITY, false);
     test_double::<_, u8>(f32::NEGATIVE_INFINITY, false);
     test_double::<_, u8>(255.0f32, true);
     test_double::<_, u8>(256.0f32, false);

@@ -17,18 +17,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_partial_cmp_abs_signed);
 }
 
-fn demo_cmp_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+fn demo_cmp_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.cmp_abs(&{}) = {:?}", x, y, x.cmp_abs(&y));
     }
 }
 
 fn demo_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!(
             "{}.partial_cmp_abs(&{}) = {:?}",
             x,
@@ -38,14 +38,14 @@ fn demo_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!("({}).cmp_abs(&{}) = {:?}", x, y, x.cmp_abs(&y));
     }
 }
 
-fn demo_partial_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_partial_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!(
             "({}).partial_cmp_abs(&{}) = {:?}",
             x,
@@ -57,14 +57,14 @@ fn demo_partial_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfi
 
 fn benchmark_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.cmp_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -75,14 +75,14 @@ fn benchmark_cmp_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -93,14 +93,14 @@ fn benchmark_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_cmp_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.cmp_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -111,14 +111,14 @@ fn benchmark_cmp_abs_signed<T: PrimitiveSigned>(
 
 fn benchmark_partial_cmp_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.partial_cmp_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

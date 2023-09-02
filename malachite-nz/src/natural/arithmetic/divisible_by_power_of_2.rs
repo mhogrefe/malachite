@@ -21,6 +21,7 @@ use malachite_base::slices::slice_test_zero;
 // This is equivalent to `mpz_divisible_2exp_p` from `mpz/divis_2exp.c`, GMP 6.2.1, where `a` is
 // non-negative.
 pub_crate_test! {limbs_divisible_by_power_of_2(xs: &[Limb], pow: u64) -> bool {
+    assert!(!xs.is_empty());
     let zeros = usize::exact_from(pow >> Limb::LOG_WIDTH);
     zeros < xs.len()
         && slice_test_zero(&xs[..zeros])

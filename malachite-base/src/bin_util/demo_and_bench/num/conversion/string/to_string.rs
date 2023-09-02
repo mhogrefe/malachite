@@ -52,8 +52,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_digit_to_display_byte_lower(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in unsigned_gen().get(gm, &config).take(limit) {
+fn demo_digit_to_display_byte_lower(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in unsigned_gen().get(gm, config).take(limit) {
         println!(
             "digit_to_display_byte_lower({}) = {:?}",
             b,
@@ -62,8 +62,8 @@ fn demo_digit_to_display_byte_lower(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_digit_to_display_byte_upper(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in unsigned_gen().get(gm, &config).take(limit) {
+fn demo_digit_to_display_byte_upper(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in unsigned_gen().get(gm, config).take(limit) {
         println!(
             "digit_to_display_byte_upper({}) = {:?}",
             b,
@@ -72,8 +72,8 @@ fn demo_digit_to_display_byte_upper(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_digit_to_display_byte_lower_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in unsigned_gen_var_7().get(gm, &config).take(limit) {
+fn demo_digit_to_display_byte_lower_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in unsigned_gen_var_7().get(gm, config).take(limit) {
         println!(
             "digit_to_display_byte_lower({}) = {}",
             b,
@@ -82,8 +82,8 @@ fn demo_digit_to_display_byte_lower_targeted(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn demo_digit_to_display_byte_upper_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in unsigned_gen_var_7().get(gm, &config).take(limit) {
+fn demo_digit_to_display_byte_upper_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for b in unsigned_gen_var_7().get(gm, config).take(limit) {
         println!(
             "digit_to_display_byte_upper({}) = {}",
             b,
@@ -94,11 +94,11 @@ fn demo_digit_to_display_byte_upper_targeted(gm: GenMode, config: GenConfig, lim
 
 fn demo_to_string_base_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, base) in unsigned_pair_gen_var_8::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -110,9 +110,9 @@ fn demo_to_string_base_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_to_string_base_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_string_base_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, base) in signed_unsigned_pair_gen_var_5::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -126,11 +126,11 @@ fn demo_to_string_base_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
 
 fn demo_to_string_base_upper_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, base) in unsigned_pair_gen_var_8::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -144,11 +144,11 @@ fn demo_to_string_base_upper_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_to_string_base_upper_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, base) in signed_unsigned_pair_gen_var_5::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -163,13 +163,13 @@ fn demo_to_string_base_upper_signed<T: PrimitiveSigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base) in unsigned_pair_gen_var_8::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -184,13 +184,13 @@ fn demo_base_fmt_wrapper_fmt_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base, width) in unsigned_triple_gen_var_6::<T, u8, usize>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -206,13 +206,13 @@ fn demo_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base) in signed_unsigned_pair_gen_var_5::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -227,13 +227,13 @@ fn demo_base_fmt_wrapper_fmt_signed<T: PrimitiveSigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base, width) in signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -249,13 +249,13 @@ fn demo_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base) in unsigned_pair_gen_var_8::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -270,13 +270,13 @@ fn demo_base_fmt_wrapper_fmt_upper_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base, width) in unsigned_triple_gen_var_6::<T, u8, usize>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -292,13 +292,13 @@ fn demo_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base) in signed_unsigned_pair_gen_var_5::<T, u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -313,13 +313,13 @@ fn demo_base_fmt_wrapper_fmt_upper_signed<T: PrimitiveSigned>(
 #[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     BaseFmtWrapper<T>: Display,
 {
     for (x, base, width) in signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -334,7 +334,7 @@ fn demo_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
 
 fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -344,7 +344,7 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.to_string_base(u8)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_8::<T, u8>().get(gm, &config),
+        unsigned_pair_gen_var_8::<T, u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -366,7 +366,7 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -377,7 +377,7 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.to_string_base(u8)", T::NAME),
         BenchmarkType::Algorithms,
-        signed_unsigned_pair_gen_var_5::<T, u8>().get(gm, &config),
+        signed_unsigned_pair_gen_var_5::<T, u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -399,7 +399,7 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
 
 fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -408,7 +408,7 @@ fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.to_string_base_upper(u8)", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_8::<T, u8>().get(gm, &config),
+        unsigned_pair_gen_var_8::<T, u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -426,7 +426,7 @@ fn benchmark_to_string_base_upper_algorithms_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -435,7 +435,7 @@ fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.to_string_base_upper(u8)", T::NAME),
         BenchmarkType::Algorithms,
-        signed_unsigned_pair_gen_var_5::<T, u8>().get(gm, &config),
+        signed_unsigned_pair_gen_var_5::<T, u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -454,7 +454,7 @@ fn benchmark_to_string_base_upper_algorithms_signed<T: PrimitiveSigned>(
 
 fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -466,7 +466,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_6::<T, u8, usize>().get(gm, &config),
+        unsigned_triple_gen_var_6::<T, u8, usize>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -483,7 +483,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -495,7 +495,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>().get(gm, &config),
+        signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -512,7 +512,7 @@ fn benchmark_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
 
 fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -524,7 +524,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_triple_gen_var_6::<T, u8, usize>().get(gm, &config),
+        unsigned_triple_gen_var_6::<T, u8, usize>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -541,7 +541,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned
 
 fn benchmark_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -553,7 +553,7 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>().get(gm, &config),
+        signed_unsigned_unsigned_triple_gen_var_3::<T, u8, usize>().get(gm, config),
         gm.name(),
         limit,
         file_name,

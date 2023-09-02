@@ -1,15 +1,16 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use malachite_base::num::conversion::from::{SignedFromFloatError, UnsignedFromFloatError};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct IntegerFromPrimitiveFloatError;
+use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident) => {
         impl RoundingFrom<$f> for Integer {
-            /// Converts a primitive float to an [`Integer`], using the specified rounding mode.
+            /// Converts a primitive float to an [`Integer`], using the specified rounding mode. An
+            /// [`Ordering`] is also returned, indicating whether the returned value is less than,
+            /// equal to, or greater than the original value.
             ///
             /// The floating-point value cannot be NaN or infinite.
             ///
@@ -26,20 +27,19 @@ macro_rules! float_impls {
             ///
             /// # Examples
             /// See [here](super::from_primitive_float#rounding_from).
-            fn rounding_from(value: $f, rm: RoundingMode) -> Self {
+            fn rounding_from(value: $f, rm: RoundingMode) -> (Self, Ordering) {
                 if value >= 0.0 {
-                    Integer {
-                        sign: true,
-                        abs: Natural::rounding_from(value, rm),
-                    }
+                    let (abs, o) = Natural::rounding_from(value, rm);
+                    (Integer { sign: true, abs }, o)
                 } else {
-                    -Natural::rounding_from(-value, -rm)
+                    let (n, o) = Natural::rounding_from(-value, -rm);
+                    (-n, o.reverse())
                 }
             }
         }
 
         impl TryFrom<$f> for Integer {
-            type Error = IntegerFromPrimitiveFloatError;
+            type Error = SignedFromFloatError;
 
             /// Converts a primitive float to an [`Integer`].
             ///
@@ -60,7 +60,15 @@ macro_rules! float_impls {
                         sign: value >= 0.0,
                         abs: n,
                     })
-                    .map_err(|_| IntegerFromPrimitiveFloatError)
+                    .map_err(|e| match e {
+                        UnsignedFromFloatError::FloatInfiniteOrNan => {
+                            SignedFromFloatError::FloatInfiniteOrNan
+                        }
+                        UnsignedFromFloatError::FloatNonIntegerOrOutOfRange => {
+                            SignedFromFloatError::FloatNonIntegerOrOutOfRange
+                        }
+                        _ => unreachable!(),
+                    })
             }
         }
 

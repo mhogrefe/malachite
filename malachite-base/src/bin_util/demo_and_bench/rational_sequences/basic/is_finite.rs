@@ -9,29 +9,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_is_finite);
 }
 
-fn demo_rational_sequence_is_finite(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_is_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if xs.is_finite() {
-            println!("{} is finite", xs);
+            println!("{xs} is finite");
         } else {
-            println!("{} is not finite", xs);
+            println!("{xs} is not finite");
         }
     }
 }
 
 fn benchmark_rational_sequence_is_finite(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.is_finite()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

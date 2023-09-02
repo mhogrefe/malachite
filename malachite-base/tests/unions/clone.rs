@@ -1,5 +1,6 @@
 use malachite_base::unions::Union2;
 
+#[allow(clippy::redundant_clone)]
 #[test]
 fn test_clone() {
     let test = |u: Union2<Vec<char>, u32>| {

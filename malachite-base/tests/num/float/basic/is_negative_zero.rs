@@ -9,7 +9,7 @@ fn is_negative_zero_helper<T: PrimitiveFloat>() {
     test(T::ZERO, false);
     test(T::NEGATIVE_ZERO, true);
     test(T::NAN, false);
-    test(T::POSITIVE_INFINITY, false);
+    test(T::INFINITY, false);
     test(T::NEGATIVE_INFINITY, false);
     test(T::ONE, false);
     test(T::NEGATIVE_ONE, false);

@@ -1,12 +1,121 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase2, FloorLogBase2, IsPowerOf2, PowerOf2,
+    Abs, CeilingLogBase2, CheckedLogBase2, FloorLogBase2, IsPowerOf2, PowerOf2,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::test_util::generators::natural_gen_var_2;
-use malachite_q::test_util::generators::rational_gen_var_2;
+use malachite_q::test_util::generators::{rational_gen_var_1, rational_gen_var_2};
 use malachite_q::Rational;
 use std::str::FromStr;
+
+#[test]
+fn test_floor_log_base_2_abs() {
+    let test = |n, out| {
+        assert_eq!(Rational::from_str(n).unwrap().floor_log_base_2_abs(), out);
+    };
+    test("1", 0);
+    test("100", 6);
+    test("1000000000000", 39);
+    test("4294967295", 31);
+    test("4294967296", 32);
+    test("4294967297", 32);
+    test("22/7", 1);
+    test("936851431250/1397", 29);
+    test("1/1000000000000", -40);
+    test("1/4294967295", -32);
+    test("1/4294967296", -32);
+    test("1/4294967297", -33);
+    test("1/2", -1);
+    test("1/3", -2);
+    test("1/4", -2);
+    test("1/5", -3);
+    test("1/6", -3);
+    test("1/7", -3);
+    test("1/8", -3);
+    test("1/9", -4);
+
+    test("-1", 0);
+    test("-100", 6);
+    test("-1000000000000", 39);
+    test("-4294967295", 31);
+    test("-4294967296", 32);
+    test("-4294967297", 32);
+    test("-22/7", 1);
+    test("-936851431250/1397", 29);
+    test("-1/1000000000000", -40);
+    test("-1/4294967295", -32);
+    test("-1/4294967296", -32);
+    test("-1/4294967297", -33);
+    test("-1/2", -1);
+    test("-1/3", -2);
+    test("-1/4", -2);
+    test("-1/5", -3);
+    test("-1/6", -3);
+    test("-1/7", -3);
+    test("-1/8", -3);
+    test("-1/9", -4);
+}
+
+#[test]
+#[should_panic]
+fn floor_log_base_2_abs_fail() {
+    Rational::ZERO.floor_log_base_2_abs();
+}
+
+#[test]
+fn test_ceiling_log_base_2_abs() {
+    let test = |n, out| {
+        assert_eq!(Rational::from_str(n).unwrap().ceiling_log_base_2_abs(), out);
+    };
+    test("1", 0);
+    test("100", 7);
+    test("1000000000000", 40);
+    test("4294967295", 32);
+    test("4294967296", 32);
+    test("4294967297", 33);
+    test("22/7", 2);
+    test("936851431250/1397", 30);
+    test("1/1000000000000", -39);
+    test("1/4294967295", -31);
+    test("1/4294967296", -32);
+    test("1/4294967297", -32);
+    test("1/2", -1);
+    test("1/3", -1);
+    test("1/4", -2);
+    test("1/5", -2);
+    test("1/6", -2);
+    test("1/7", -2);
+    test("1/8", -3);
+    test("1/9", -3);
+
+    test("-1", 0);
+    test("-100", 7);
+    test("-1000000000000", 40);
+    test("-4294967295", 32);
+    test("-4294967296", 32);
+    test("-4294967297", 33);
+    test("-22/7", 2);
+    test("-936851431250/1397", 30);
+    test("-1/1000000000000", -39);
+    test("-1/4294967295", -31);
+    test("-1/4294967296", -32);
+    test("-1/4294967297", -32);
+    test("-1/2", -1);
+    test("-1/3", -1);
+    test("-1/4", -2);
+    test("-1/5", -2);
+    test("-1/6", -2);
+    test("-1/7", -2);
+    test("-1/8", -3);
+    test("-1/9", -3);
+}
+
+#[test]
+#[should_panic]
+fn ceiling_log_base_2_abs_fail() {
+    Rational::ZERO.ceiling_log_base_2_abs();
+}
 
 #[test]
 fn test_floor_log_base_2() {
@@ -37,8 +146,14 @@ fn test_floor_log_base_2() {
 
 #[test]
 #[should_panic]
-fn floor_log_base_2_fail() {
+fn floor_log_base_2_fail_1() {
     Rational::ZERO.floor_log_base_2();
+}
+
+#[test]
+#[should_panic]
+fn floor_log_base_2_fail_2() {
+    Rational::NEGATIVE_ONE.floor_log_base_2();
 }
 
 #[test]
@@ -75,6 +190,12 @@ fn ceiling_log_base_2_fail() {
 }
 
 #[test]
+#[should_panic]
+fn ceiling_log_base_2_fail_2() {
+    Rational::NEGATIVE_ONE.ceiling_log_base_2();
+}
+
+#[test]
 fn test_checked_log_base_2() {
     let test = |n, out| {
         assert_eq!(Rational::from_str(n).unwrap().checked_log_base_2(), out);
@@ -105,6 +226,26 @@ fn test_checked_log_base_2() {
 #[should_panic]
 fn checked_log_base_2_fail() {
     Rational::ZERO.checked_log_base_2();
+}
+
+#[test]
+fn floor_log_base_2_abs_properties() {
+    rational_gen_var_1().test_properties(|x| {
+        let floor_log_base_2 = x.floor_log_base_2_abs();
+        assert_eq!((&x).abs().floor_log_base_2(), floor_log_base_2);
+        assert!(Rational::power_of_2(floor_log_base_2).le_abs(&x));
+        assert!(x.lt_abs(&Rational::power_of_2(floor_log_base_2 + 1)));
+    });
+}
+
+#[test]
+fn ceiling_log_base_2_abs_properties() {
+    rational_gen_var_1().test_properties(|x| {
+        let ceiling_log_base_2 = x.ceiling_log_base_2_abs();
+        assert_eq!((&x).abs().ceiling_log_base_2(), ceiling_log_base_2);
+        assert!(Rational::power_of_2(ceiling_log_base_2 - 1).lt_abs(&x));
+        assert!(x.le_abs(&Rational::power_of_2(ceiling_log_base_2)));
+    });
 }
 
 #[test]

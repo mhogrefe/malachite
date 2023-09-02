@@ -89,6 +89,7 @@
     clippy::single_match_else,
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
+    clippy::uninlined_format_args,
     clippy::unused_self
 )]
 #![allow(
@@ -119,7 +120,7 @@ extern crate walkdir;
 #[doc(hidden)]
 #[inline]
 pub fn fail_on_untested_path(message: &str) {
-    panic!("Untested path. {}", message);
+    panic!("Untested path. {message}");
 }
 
 #[cfg(not(feature = "test_build"))]

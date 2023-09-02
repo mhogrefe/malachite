@@ -36,15 +36,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_div_round(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
-            "{}.div_round({}, {}) = {}",
+            "{}.div_round({}, {}) = {:?}",
             x_old,
             y_old,
             rm,
@@ -53,14 +53,14 @@ fn demo_integer_div_round(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_div_round_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         println!(
-            "{}.div_round(&{}, {}) = {}",
+            "{}.div_round(&{}, {}) = {:?}",
             x_old,
             y,
             rm,
@@ -69,14 +69,14 @@ fn demo_integer_div_round_val_ref(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_integer_div_round_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let y_old = y.clone();
         println!(
-            "(&{}).div_round({}, {}) = {}",
+            "(&{}).div_round({}, {}) = {:?}",
             x,
             y_old,
             rm,
@@ -85,13 +85,13 @@ fn demo_integer_div_round_ref_val(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_integer_div_round_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "(&{}).div_round(&{}, {}) = {}",
+            "(&{}).div_round(&{}, {}) = {:?}",
             x,
             y,
             rm,
@@ -100,45 +100,39 @@ fn demo_integer_div_round_ref_ref(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_integer_div_round_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
-        x.div_round_assign(y, rm);
-        println!(
-            "x := {}; x.div_round_assign({}, {}); x = {}",
-            x_old, y_old, rm, x
-        );
+        let o = x.div_round_assign(y, rm);
+        println!("x := {x_old}; x.div_round_assign({y_old}, {rm}) = {o:?}; x = {x}");
     }
 }
 
-fn demo_integer_div_round_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_div_round_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y, rm) in integer_integer_rounding_mode_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let x_old = x.clone();
-        x.div_round_assign(&y, rm);
-        println!(
-            "x := {}; x.div_round_assign(&{}, {}); x = {}",
-            x_old, y, rm, x
-        );
+        let o = x.div_round_assign(&y, rm);
+        println!("x := {x_old}; x.div_round_assign(&{y}, {rm}) = {o:?}; x = {x}");
     }
 }
 
 fn benchmark_integer_div_round_down_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round(Integer, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_rm().get(gm, &config),
+        integer_pair_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -154,14 +148,14 @@ fn benchmark_integer_div_round_down_library_comparison(
 
 fn benchmark_integer_div_round_floor_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round(Integer, RoundingMode::Floor)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_nrm().get(gm, &config),
+        integer_pair_gen_var_1_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -178,14 +172,14 @@ fn benchmark_integer_div_round_floor_library_comparison(
 
 fn benchmark_integer_div_round_ceiling_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_var_1_rm().get(gm, &config),
+        integer_pair_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -202,14 +196,14 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_integer_div_round_ceiling_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
-        integer_pair_gen_var_1().get(gm, &config),
+        integer_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -227,14 +221,14 @@ fn benchmark_integer_div_round_ceiling_algorithms(
 
 fn benchmark_integer_div_round_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        integer_integer_rounding_mode_triple_gen_var_1().get(gm, &config),
+        integer_integer_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -262,14 +256,14 @@ fn benchmark_integer_div_round_evaluation_strategy(
 
 fn benchmark_integer_div_round_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.div_round_assign(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        integer_integer_rounding_mode_triple_gen_var_1().get(gm, &config),
+        integer_integer_rounding_mode_triple_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -277,11 +271,11 @@ fn benchmark_integer_div_round_assign_evaluation_strategy(
         &mut [
             (
                 "Integer.div_round_assign(Integer, RoundingMode)",
-                &mut |(mut x, y, rm)| x.div_round_assign(y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.div_round_assign(y, rm)),
             ),
             (
                 "Integer.div_round_assign(&Integer, RoundingMode)",
-                &mut |(mut x, y, rm)| x.div_round_assign(&y, rm),
+                &mut |(mut x, y, rm)| no_out!(x.div_round_assign(&y, rm)),
             ),
         ],
     );

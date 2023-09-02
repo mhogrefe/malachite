@@ -1,6 +1,4 @@
-use malachite_base::num::arithmetic::log_base::{
-    ceiling_log_base_naive, checked_log_base_naive, floor_log_base_naive,
-};
+use malachite_base::num::arithmetic::log_base::{ceiling_log_base_naive, checked_log_base_naive};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_24,
@@ -116,7 +114,6 @@ fn floor_log_base_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_24::<T, T>().test_properties(|(n, base)| {
         let floor_log = n.floor_log_base(base);
         assert!(floor_log < T::WIDTH);
-        assert_eq!(floor_log, floor_log_base_naive(n, base));
         assert_eq!(floor_log == 0, n < base);
 
         if let Some(pow) = base.checked_pow(floor_log) {

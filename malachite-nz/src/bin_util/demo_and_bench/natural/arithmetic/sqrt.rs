@@ -71,8 +71,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_sqrt_assign_rem);
 }
 
-fn demo_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize) {
-    for (h_hi, h_lo) in unsigned_pair_gen_var_31().get(gm, &config).take(limit) {
+fn demo_sqrt_rem_2_newton(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (h_hi, h_lo) in unsigned_pair_gen_var_31().get(gm, config).take(limit) {
         println!(
             "sqrt_rem_2_newton({}, {}) = {:?}",
             h_hi,
@@ -82,68 +82,62 @@ fn demo_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, mut xs) in unsigned_vec_pair_gen_var_4().get(gm, &config).take(limit) {
+fn demo_limbs_sqrt_rem_helper(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, mut xs) in unsigned_vec_pair_gen_var_4().get(gm, config).take(limit) {
         let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
         let old_out = out.clone();
         let old_xs = xs.clone();
         let r_hi = limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
         println!(
-            "out := {:?}, xs := {:?}; \
-            limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch) = {}; \
-            out = {:?}, xs = {:?}",
-            old_out, old_xs, r_hi, out, xs
+            "out := {old_out:?}, xs := {old_xs:?}; \
+            limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch) = {r_hi}; \
+            out = {out:?}, xs = {xs:?}",
         );
     }
 }
 
-fn demo_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs, shift, odd) in large_type_gen_var_2().get(gm, &config).take(limit) {
+fn demo_limbs_sqrt_helper(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs, shift, odd) in large_type_gen_var_2().get(gm, config).take(limit) {
         let old_out = out.clone();
         let r = limbs_sqrt_helper(&mut out, &xs, shift, odd);
         println!(
-            "out := {:?}, limbs_sqrt_helper(&mut out, {:?}, {}, {}) = {}; out = {:?}",
-            old_out, xs, shift, odd, r, out
+            "out := {old_out:?}, \
+            limbs_sqrt_helper(&mut out, {xs:?}, {shift}, {odd}) = {r}; out = {out:?}",
         );
     }
 }
 
-fn demo_limbs_sqrt_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_limbs_sqrt_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_5().get(gm, config).take(limit) {
         let old_out = out.clone();
         limbs_sqrt_to_out(&mut out, &xs);
-        println!(
-            "out := {:?}, limbs_sqrt_to_out(&mut out, {:?}); out = {:?}",
-            old_out, xs, out
-        );
+        println!("out := {old_out:?}, limbs_sqrt_to_out(&mut out, {xs:?}); out = {out:?}");
     }
 }
 
-fn demo_limbs_sqrt_rem_to_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut sqrt_out, mut rem_out, xs) in unsigned_vec_triple_gen_var_28()
-        .get(gm, &config)
-        .take(limit)
+fn demo_limbs_sqrt_rem_to_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut sqrt_out, mut rem_out, xs) in
+        unsigned_vec_triple_gen_var_28().get(gm, config).take(limit)
     {
         let old_sqrt_out = sqrt_out.clone();
         let old_rem_out = rem_out.clone();
         let r = limbs_sqrt_rem_to_out(&mut sqrt_out, &mut rem_out, &xs);
         println!(
-            "out := {:?}, rem_out := {:?}; \
-            limbs_sqrt_rem_to_out(&mut sqrt_out, &mut rem_out, {:?}) = {}; \
-            sqrt_out = {:?}, rem_out = {:?}",
-            old_sqrt_out, old_rem_out, xs, r, sqrt_out, rem_out
+            "out := {old_sqrt_out:?}, rem_out := {old_rem_out:?}; \
+            limbs_sqrt_rem_to_out(&mut sqrt_out, &mut rem_out, {xs:?}) = {r}; \
+            sqrt_out = {sqrt_out:?}, rem_out = {rem_out:?}",
         );
     }
 }
 
-fn demo_limbs_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_floor_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!("limbs_floor_sqrt({:?}) = {:?}", xs, limbs_floor_sqrt(&xs));
     }
 }
 
-fn demo_limbs_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_ceiling_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_ceiling_sqrt({:?}) = {:?}",
             xs,
@@ -152,8 +146,8 @@ fn demo_limbs_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
             "limbs_checked_sqrt({:?}) = {:?}",
             xs,
@@ -162,89 +156,89 @@ fn demo_limbs_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_sqrt_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen_var_1().get(gm, &config).take(limit) {
+fn demo_limbs_sqrt_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen_var_1().get(gm, config).take(limit) {
         println!("limbs_sqrt_rem({:?}) = {:?}", xs, limbs_sqrt_rem(&xs));
     }
 }
 
-fn demo_natural_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.floor_sqrt() = {}", x, x.clone().floor_sqrt());
     }
 }
 
-fn demo_natural_floor_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).floor_sqrt() = {}", x, (&x).floor_sqrt());
     }
 }
 
-fn demo_natural_floor_sqrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_sqrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.floor_sqrt_assign();
-        println!("x := {}; x.floor_sqrt_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.floor_sqrt_assign(); x = {x}");
     }
 }
 
-fn demo_natural_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.ceiling_sqrt() = {}", x, x.clone().ceiling_sqrt());
     }
 }
 
-fn demo_natural_ceiling_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).ceiling_sqrt() = {}", x, (&x).ceiling_sqrt());
     }
 }
 
-fn demo_natural_ceiling_sqrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_sqrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.ceiling_sqrt_assign();
-        println!("x := {}; x.ceiling_sqrt_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.ceiling_sqrt_assign(); x = {x}");
     }
 }
 
-fn demo_natural_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.checked_sqrt() = {:?}", x, x.clone().checked_sqrt());
     }
 }
 
-fn demo_natural_checked_sqrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sqrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).checked_sqrt() = {:?}", x, (&x).checked_sqrt());
     }
 }
 
-fn demo_natural_sqrt_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_sqrt_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.sqrt_rem() = {:?}", x, x.clone().sqrt_rem());
     }
 }
 
-fn demo_natural_sqrt_rem_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_sqrt_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).sqrt_rem() = {:?}", x, (&x).sqrt_rem());
     }
 }
 
-fn demo_natural_sqrt_assign_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_sqrt_assign_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         let rem = x.sqrt_assign_rem();
-        println!("x := {}; x.sqrt_assign_rem() = {}; x = {}", old_x, rem, x);
+        println!("x := {old_x}; x.sqrt_assign_rem() = {rem}; x = {x}");
     }
 }
 
-fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "sqrt_rem_2_newton(Limb, Limb)",
         BenchmarkType::Single,
-        unsigned_pair_gen_var_31().get(gm, &config),
+        unsigned_pair_gen_var_31().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -255,11 +249,11 @@ fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize, fil
     );
 }
 
-fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sqrt_rem_helper(&mut [Limb], &mut [Limb], Limb, &mut [Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_4().get(gm, &config),
+        unsigned_vec_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -274,11 +268,11 @@ fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize,
     );
 }
 
-fn benchmark_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sqrt_helper(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sqrt_helper(&mut [Limb], &[Limb], u64, bool)",
         BenchmarkType::Single,
-        large_type_gen_var_2().get(gm, &config),
+        large_type_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -290,11 +284,11 @@ fn benchmark_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize, fil
     );
 }
 
-fn benchmark_limbs_sqrt_to_out(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sqrt_to_out(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sqrt_to_out(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_5().get(gm, &config),
+        unsigned_vec_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -308,11 +302,11 @@ fn benchmark_limbs_sqrt_to_out(gm: GenMode, config: GenConfig, limit: usize, fil
     );
 }
 
-fn benchmark_limbs_sqrt_rem_to_out(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sqrt_rem_to_out(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sqrt_rem_to_out(&mut [Limb], &mut [Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_28().get(gm, &config),
+        unsigned_vec_triple_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -326,11 +320,11 @@ fn benchmark_limbs_sqrt_rem_to_out(gm: GenMode, config: GenConfig, limit: usize,
     );
 }
 
-fn benchmark_limbs_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_floor_sqrt(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_floor_sqrt(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -341,11 +335,11 @@ fn benchmark_limbs_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize, file
     );
 }
 
-fn benchmark_limbs_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_ceiling_sqrt(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_floor_sqrt(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -356,11 +350,11 @@ fn benchmark_limbs_ceiling_sqrt(gm: GenMode, config: GenConfig, limit: usize, fi
     );
 }
 
-fn benchmark_limbs_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_checked_sqrt(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_checked_sqrt(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -371,11 +365,11 @@ fn benchmark_limbs_checked_sqrt(gm: GenMode, config: GenConfig, limit: usize, fi
     );
 }
 
-fn benchmark_limbs_sqrt_rem(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_sqrt_rem(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_sqrt_rem(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen_var_1().get(gm, &config),
+        unsigned_vec_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -388,14 +382,14 @@ fn benchmark_limbs_sqrt_rem(gm: GenMode, config: GenConfig, limit: usize, file_n
 
 fn benchmark_natural_floor_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -411,14 +405,14 @@ fn benchmark_natural_floor_sqrt_evaluation_strategy(
 
 fn benchmark_natural_floor_sqrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_sqrt()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -433,14 +427,14 @@ fn benchmark_natural_floor_sqrt_algorithms(
 #[allow(unused_must_use)]
 fn benchmark_natural_floor_sqrt_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_sqrt()",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -455,14 +449,14 @@ fn benchmark_natural_floor_sqrt_library_comparison(
 
 fn benchmark_natural_floor_sqrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_sqrt_assign()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -473,14 +467,14 @@ fn benchmark_natural_floor_sqrt_assign(
 
 fn benchmark_natural_ceiling_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -496,14 +490,14 @@ fn benchmark_natural_ceiling_sqrt_evaluation_strategy(
 
 fn benchmark_natural_ceiling_sqrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_sqrt()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -517,14 +511,14 @@ fn benchmark_natural_ceiling_sqrt_algorithms(
 
 fn benchmark_natural_ceiling_sqrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_sqrt_assign()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -535,14 +529,14 @@ fn benchmark_natural_ceiling_sqrt_assign(
 
 fn benchmark_natural_checked_sqrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sqrt()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -558,14 +552,14 @@ fn benchmark_natural_checked_sqrt_evaluation_strategy(
 
 fn benchmark_natural_checked_sqrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sqrt()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -579,14 +573,14 @@ fn benchmark_natural_checked_sqrt_algorithms(
 
 fn benchmark_natural_sqrt_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.sqrt_rem()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -601,14 +595,14 @@ fn benchmark_natural_sqrt_rem_evaluation_strategy(
 #[allow(clippy::no_effect)]
 fn benchmark_natural_sqrt_rem_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.sqrt_rem()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -627,14 +621,14 @@ fn benchmark_natural_sqrt_rem_algorithms(
 
 fn benchmark_natural_sqrt_rem_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.sqrt_rem()",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -651,14 +645,14 @@ fn benchmark_natural_sqrt_rem_library_comparison(
 
 fn benchmark_natural_sqrt_assign_rem(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.sqrt_assign_rem()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

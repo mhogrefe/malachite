@@ -34,41 +34,44 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_shl_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: ShlAssign<T>,
 {
     for (mut n, u) in rational_unsigned_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n <<= u;
-        println!("x := {}; x <<= {}; x = {}", n_old, u, n);
+        println!("x := {n_old}; x <<= {u}; x = {n}");
     }
 }
 
-fn demo_rational_shl_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_rational_shl_assign_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     Rational: ShlAssign<T>,
 {
     for (mut n, i) in rational_signed_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n <<= i;
-        println!("x := {}; x <<= {}; x = {}", n_old, i, n);
+        println!("x := {n_old}; x <<= {i}; x = {n}");
     }
 }
 
-fn demo_rational_shl_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_shl_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Rational: Shl<T, Output = Rational>,
 {
     for (n, u) in rational_unsigned_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -76,12 +79,12 @@ where
     }
 }
 
-fn demo_rational_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Rational: Shl<T, Output = Rational>,
 {
     for (n, i) in rational_signed_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -91,25 +94,25 @@ where
 
 fn demo_rational_shl_unsigned_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Rational: Shl<T, Output = Rational>,
 {
     for (n, u) in rational_unsigned_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("&{} << {} = {}", n, u, &n << u);
     }
 }
 
-fn demo_rational_shl_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_shl_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Rational: Shl<T, Output = Rational>,
 {
     for (n, i) in rational_signed_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("&{} << {} = {}", n, i, &n << i);
@@ -118,7 +121,7 @@ where
 
 fn benchmark_rational_shl_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -127,7 +130,7 @@ fn benchmark_rational_shl_assign_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Rational <<= {}", T::NAME),
         BenchmarkType::Single,
-        rational_unsigned_pair_gen_var_1::<T>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -138,7 +141,7 @@ fn benchmark_rational_shl_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_rational_shl_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -147,7 +150,7 @@ fn benchmark_rational_shl_assign_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Rational <<= {}", T::NAME),
         BenchmarkType::Single,
-        rational_signed_pair_gen_var_1::<T>().get(gm, &config),
+        rational_signed_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -159,7 +162,7 @@ fn benchmark_rational_shl_assign_signed<T: PrimitiveSigned>(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -169,7 +172,7 @@ fn benchmark_rational_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Rational << {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_unsigned_pair_gen_var_1::<T>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -188,7 +191,7 @@ fn benchmark_rational_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -198,7 +201,7 @@ fn benchmark_rational_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Rational << {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_signed_pair_gen_var_1::<T>().get(gm, &config),
+        rational_signed_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -216,14 +219,14 @@ fn benchmark_rational_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
 
 fn benchmark_rational_shl_assign_u32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational <<= u32",
         BenchmarkType::LibraryComparison,
-        rational_unsigned_pair_gen_var_1_rm::<u32>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1_rm::<u32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -238,14 +241,14 @@ fn benchmark_rational_shl_assign_u32_library_comparison(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_shl_u32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational << u32",
         BenchmarkType::LibraryComparison,
-        rational_unsigned_pair_gen_var_1_rm::<u32>().get(gm, &config),
+        rational_unsigned_pair_gen_var_1_rm::<u32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -259,14 +262,14 @@ fn benchmark_rational_shl_u32_library_comparison(
 
 fn benchmark_rational_shl_assign_i32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational <<= i32",
         BenchmarkType::LibraryComparison,
-        rational_signed_pair_gen_var_1_rm::<i32>().get(gm, &config),
+        rational_signed_pair_gen_var_1_rm::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -281,14 +284,14 @@ fn benchmark_rational_shl_assign_i32_library_comparison(
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_shl_i32_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational << i32",
         BenchmarkType::LibraryComparison,
-        rational_signed_pair_gen_var_1_rm::<i32>().get(gm, &config),
+        rational_signed_pair_gen_var_1_rm::<i32>().get(gm, config),
         gm.name(),
         limit,
         file_name,

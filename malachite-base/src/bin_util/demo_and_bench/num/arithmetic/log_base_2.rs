@@ -26,41 +26,41 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_floor_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for n in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("{}.floor_log_base_2() = {}", n, n.floor_log_base_2());
     }
 }
 
 fn demo_ceiling_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for n in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("{}.ceiling_log_base_2() = {}", n, n.ceiling_log_base_2());
     }
 }
 
 fn demo_checked_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for n in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!("{}.checked_log_base_2() = {:?}", n, n.checked_log_base_2());
     }
 }
 
 fn demo_floor_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for n in primitive_float_gen_var_18::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -73,11 +73,11 @@ fn demo_floor_log_base_2_primitive_float<T: PrimitiveFloat>(
 
 fn demo_ceiling_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for n in primitive_float_gen_var_18::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -90,11 +90,11 @@ fn demo_ceiling_log_base_2_primitive_float<T: PrimitiveFloat>(
 
 fn demo_checked_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for n in primitive_float_gen_var_18::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -107,14 +107,14 @@ fn demo_checked_log_base_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_floor_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -125,14 +125,14 @@ fn benchmark_floor_log_base_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_ceiling_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -143,14 +143,14 @@ fn benchmark_ceiling_log_base_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_checked_log_base_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -161,14 +161,14 @@ fn benchmark_checked_log_base_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_floor_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.floor_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_18::<T>().get(gm, &config),
+        primitive_float_gen_var_18::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -179,14 +179,14 @@ fn benchmark_floor_log_base_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_ceiling_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_18::<T>().get(gm, &config),
+        primitive_float_gen_var_18::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -197,14 +197,14 @@ fn benchmark_ceiling_log_base_2_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_checked_log_base_2_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.checked_log_base_2()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_18::<T>().get(gm, &config),
+        primitive_float_gen_var_18::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

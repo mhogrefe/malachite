@@ -31,9 +31,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_eq_mod_power_of_2_neg_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_eq_mod_power_of_2_neg_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_8()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -46,9 +46,9 @@ fn demo_limbs_eq_mod_power_of_2_neg_limb(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_limbs_eq_mod_power_of_2_neg_pos(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_eq_mod_power_of_2_neg_pos(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -61,29 +61,29 @@ fn demo_limbs_eq_mod_power_of_2_neg_pos(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_integer_eq_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_eq_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, pow) in integer_integer_unsigned_triple_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.eq_mod_power_of_2(&y, pow) {
-            println!("{} is equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is equal to {y} mod 2^{pow}");
         } else {
-            println!("{} is not equal to {} mod 2^{}", x, y, pow);
+            println!("{x} is not equal to {y} mod 2^{pow}");
         }
     }
 }
 
 fn benchmark_limbs_eq_mod_power_of_2_neg_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_mod_power_of_2_neg_limb(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_8().get(gm, &config),
+        unsigned_vec_unsigned_unsigned_triple_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -96,14 +96,14 @@ fn benchmark_limbs_eq_mod_power_of_2_neg_limb(
 
 fn benchmark_limbs_eq_mod_power_of_2_neg_pos(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_eq_mod_power_of_2_neg_pos(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -116,14 +116,14 @@ fn benchmark_limbs_eq_mod_power_of_2_neg_pos(
 
 fn benchmark_integer_eq_mod_power_of_2_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.eq_mod_power_of_2(&Integer, u64)",
         BenchmarkType::LibraryComparison,
-        integer_integer_unsigned_triple_gen_var_1_rm().get(gm, &config),
+        integer_integer_unsigned_triple_gen_var_1_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,

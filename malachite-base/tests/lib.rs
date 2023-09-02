@@ -19,6 +19,7 @@
     clippy::single_match_else,
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
+    clippy::uninlined_format_args,
     clippy::unused_self
 )]
 #![allow(
@@ -279,7 +280,6 @@ pub mod num {
     }
     pub mod basic {
         pub mod constants;
-        pub mod iverson;
     }
     pub mod comparison {
         pub mod cmp_abs_partial_cmp_abs_and_comparators;

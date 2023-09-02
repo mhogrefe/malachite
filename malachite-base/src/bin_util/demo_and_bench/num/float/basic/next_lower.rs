@@ -11,9 +11,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_benches!(runner, benchmark_next_lower);
 }
 
-fn demo_next_lower<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_next_lower<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in primitive_float_gen_var_10::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -26,14 +26,14 @@ fn demo_next_lower<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usi
 
 fn benchmark_next_lower<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.next_lower()", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_10::<T>().get(gm, &config),
+        primitive_float_gen_var_10::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

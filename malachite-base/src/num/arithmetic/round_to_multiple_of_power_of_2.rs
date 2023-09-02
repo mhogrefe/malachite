@@ -1,9 +1,15 @@
 use crate::num::arithmetic::traits::{RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
-fn round_to_multiple_of_power_of_2<T: PrimitiveInt>(x: T, pow: u64, rm: RoundingMode) -> T {
-    x.shr_round(pow, rm).arithmetic_checked_shl(pow).unwrap()
+fn round_to_multiple_of_power_of_2<T: PrimitiveInt>(
+    x: T,
+    pow: u64,
+    rm: RoundingMode,
+) -> (T, Ordering) {
+    let (s, o) = x.shr_round(pow, rm);
+    (s.arithmetic_checked_shl(pow).unwrap(), o)
 }
 
 macro_rules! impl_round_to_multiple_of_power_of_2 {
@@ -11,7 +17,9 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
         impl RoundToMultipleOfPowerOf2<u64> for $t {
             type Output = $t;
 
-            /// Rounds a number to a multiple of $2^k$ according to a specified rounding mode.
+            /// Rounds a number to a multiple of $2^k$ according to a specified rounding mode. An
+            /// [`Ordering`] is also returned, indicating whether the returned value is less than,
+            /// equal to, or greater than the original value.
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
@@ -64,14 +72,15 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// # Examples
             /// See [here](super::round_to_multiple_of_power_of_2#round_to_multiple_of_power_of_2).
             #[inline]
-            fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> $t {
+            fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> ($t, Ordering) {
                 round_to_multiple_of_power_of_2(self, pow, rm)
             }
         }
 
         impl RoundToMultipleOfPowerOf2Assign<u64> for $t {
             /// Rounds a number to a multiple of $2^k$ in place, according to a specified rounding
-            /// mode.
+            /// mode. An [`Ordering`] is returned, indicating whether the returned value is less
+            /// than, equal to, or greater than the original value.
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
@@ -101,8 +110,14 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// See
             /// [here](super::round_to_multiple_of_power_of_2#round_to_multiple_of_power_of_2_assign).
             #[inline]
-            fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) {
-                *self = self.round_to_multiple_of_power_of_2(pow, rm);
+            fn round_to_multiple_of_power_of_2_assign(
+                &mut self,
+                pow: u64,
+                rm: RoundingMode,
+            ) -> Ordering {
+                let o;
+                (*self, o) = self.round_to_multiple_of_power_of_2(pow, rm);
+                o
             }
         }
     };

@@ -366,7 +366,7 @@ fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_fail_hel
     assert_panic!(
         exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::ONE,
-            T::POSITIVE_INFINITY,
+            T::INFINITY,
             0,
             1
         )

@@ -1,8 +1,9 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::basic::traits::NegativeInfinity;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::strings::ToDebugString;
-use malachite_base::test_util::generators::primitive_float_gen_var_8;
+use malachite_base::test_util::generators::{primitive_float_gen, primitive_float_gen_var_8};
 use malachite_q::Rational;
 
 #[test]
@@ -15,10 +16,7 @@ fn test_try_from_f32() {
         }
     };
     test(f32::NAN, "Err(RationalFromPrimitiveFloatError)");
-    test(
-        f32::POSITIVE_INFINITY,
-        "Err(RationalFromPrimitiveFloatError)",
-    );
+    test(f32::INFINITY, "Err(RationalFromPrimitiveFloatError)");
     test(
         f32::NEGATIVE_INFINITY,
         "Err(RationalFromPrimitiveFloatError)",
@@ -100,10 +98,7 @@ fn test_try_from_f64() {
         }
     };
     test(f64::NAN, "Err(RationalFromPrimitiveFloatError)");
-    test(
-        f64::POSITIVE_INFINITY,
-        "Err(RationalFromPrimitiveFloatError)",
-    );
+    test(f64::INFINITY, "Err(RationalFromPrimitiveFloatError)");
     test(
         f64::NEGATIVE_INFINITY,
         "Err(RationalFromPrimitiveFloatError)",
@@ -221,13 +216,43 @@ fn test_try_from_f64() {
     test(std::f64::consts::E, "Ok(6121026514868073/2251799813685248)");
 }
 
+#[test]
+fn test_rational_convertible_from_f32() {
+    let test = |f: f32, out| {
+        assert_eq!(Rational::convertible_from(f), out);
+    };
+    test(0.0, true);
+    test(1.0, true);
+    test(1.5, true);
+    test(0.1, true);
+
+    test(f32::NAN, false);
+    test(f32::INFINITY, false);
+    test(f32::NEGATIVE_INFINITY, false);
+}
+
+#[test]
+fn test_rational_convertible_from_f64() {
+    let test = |f: f64, out| {
+        assert_eq!(Rational::convertible_from(f), out);
+    };
+    test(0.0, true);
+    test(1.0, true);
+    test(1.5, true);
+    test(0.1, true);
+
+    test(f64::NAN, false);
+    test(f64::INFINITY, false);
+    test(f64::NEGATIVE_INFINITY, false);
+}
+
 fn try_from_float_properties_helper<T: ExactFrom<Rational> + PrimitiveFloat>()
 where
-    Rational: TryFrom<T>,
+    Rational: ConvertibleFrom<T> + TryFrom<T>,
 {
-    primitive_float_gen_var_8::<T>().test_properties(|f| {
+    primitive_float_gen::<T>().test_properties(|f| {
         let n = Rational::try_from(f);
-        assert_eq!(n.is_ok(), f.is_finite());
+        assert_eq!(n.is_ok(), Rational::convertible_from(f));
         if let Ok(n) = n {
             assert!(n.is_valid());
             assert_eq!(Rational::exact_from(-f), -&n);
@@ -256,4 +281,21 @@ fn try_from_float_properties() {
             Rational::from(&rug::Rational::from_f64(f).unwrap())
         );
     });
+}
+
+fn rational_convertible_from_primitive_float_properties_helper<T: PrimitiveFloat>()
+where
+    Rational: ConvertibleFrom<T>,
+{
+    primitive_float_gen().test_properties(|f| {
+        assert_eq!(
+            Rational::convertible_from(f),
+            Rational::convertible_from(-f)
+        );
+    });
+}
+
+#[test]
+fn rational_convertible_from_primitive_float_properties() {
+    apply_fn_to_primitive_floats!(rational_convertible_from_primitive_float_properties_helper);
 }

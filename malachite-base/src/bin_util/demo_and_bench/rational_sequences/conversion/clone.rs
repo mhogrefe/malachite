@@ -15,37 +15,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_clone_from);
 }
 
-fn demo_rational_sequence_clone(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_clone(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in unsigned_rational_sequence_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("clone({}) = {}", xs, xs.clone());
     }
 }
 
-fn demo_rational_sequence_clone_from(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_clone_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, ys) in unsigned_rational_sequence_pair_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let xs_old = xs.clone();
         xs.clone_from(&ys);
-        println!("xs := {}; xs.clone_from({}); xs = {}", xs_old, ys, xs);
+        println!("xs := {xs_old}; xs.clone_from({ys}); xs = {xs}");
     }
 }
 
 #[allow(clippy::redundant_clone, unused_must_use)]
 fn benchmark_rational_sequence_clone(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.clone()",
         BenchmarkType::Single,
-        unsigned_rational_sequence_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -56,14 +56,14 @@ fn benchmark_rational_sequence_clone(
 
 fn benchmark_rational_sequence_clone_from(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "RationalSequence.clone_from(&RationalSequence)",
         BenchmarkType::Single,
-        unsigned_rational_sequence_pair_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_pair_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

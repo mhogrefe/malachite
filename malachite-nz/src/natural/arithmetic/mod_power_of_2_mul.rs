@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 
@@ -37,7 +37,7 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -86,7 +86,7 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -135,7 +135,7 @@ pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) 
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
-    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if max_len > xs_len + ys_len + 1 {
         return limbs_mul(xs, ys);
     }
@@ -171,9 +171,9 @@ pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) 
 impl Natural {
     fn mod_power_of_2_mul_limb_ref(&self, y: Limb, pow: u64) -> Natural {
         match (self, y, pow) {
-            (_, 0, _) | (&natural_zero!(), _, _) => Natural::ZERO,
+            (_, 0, _) | (&Natural::ZERO, _, _) => Natural::ZERO,
             (_, 1, _) => self.clone(),
-            (&natural_one!(), _, _) => Natural(Small(y)),
+            (&Natural::ONE, _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(small.mod_power_of_2_mul(other, pow)))
             }
@@ -186,9 +186,9 @@ impl Natural {
 
     fn mod_power_of_2_mul_limb_assign(&mut self, y: Limb, pow: u64) {
         match (&mut *self, y, pow) {
-            (_, 1, _) | (&mut natural_zero!(), _, _) => {}
+            (_, 1, _) | (&mut Natural::ZERO, _, _) => {}
             (_, 0, _) => *self = Natural::ZERO,
-            (&mut natural_one!(), _, _) => *self = Natural(Small(y)),
+            (&mut Natural::ONE, _, _) => *self = Natural(Small(y)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_2_mul_assign(other, pow);
             }

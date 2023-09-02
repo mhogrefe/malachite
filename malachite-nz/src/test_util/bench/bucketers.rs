@@ -20,7 +20,7 @@ pub fn natural_bucketer(var_name: &str) -> Bucketer<Natural> {
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -32,10 +32,7 @@ pub fn pair_natural_max_bit_bucketer<'a>(
         bucketing_function: &|(x, y)| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -47,10 +44,7 @@ pub fn pair_natural_min_bit_bucketer<'a>(
         bucketing_function: &|(x, y)| {
             usize::exact_from(min(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "min({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("min({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -62,10 +56,7 @@ pub fn pair_2_pair_natural_max_bit_bucketer<'a, T>(
         bucketing_function: &|(_, (x, y))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -77,10 +68,71 @@ pub fn pair_2_pair_natural_min_bit_bucketer<'a, T>(
         bucketing_function: &|(_, (x, y))| {
             usize::exact_from(min(x.significant_bits(), y.significant_bits()))
         },
+        bucketing_label: format!("min({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_natural_bit_u64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
+    }
+}
+
+pub fn pair_natural_bit_i64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, i64)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(max(x.significant_bits(), y.unsigned_abs()))
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.unsigned_abs())"),
+    }
+}
+
+pub fn triple_natural_bit_i64_u64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Natural, i64, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(x.significant_bits(), y.unsigned_abs(), *z))
+        },
         bucketing_label: format!(
-            "min({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
+            "max({x_name}.significant_bits(), {y_name}.unsigned_abs(), {z_name})"
         ),
+    }
+}
+
+pub fn quadruple_1_2_3_natural_bit_i64_u64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Natural, i64, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(x.significant_bits(), y.unsigned_abs(), *z))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.unsigned_abs(), {z_name})"
+        ),
+    }
+}
+
+pub fn pair_integer_bit_i64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, i64)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(max(x.significant_bits(), y.unsigned_abs()))
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.unsigned_abs())"),
     }
 }
 
@@ -90,7 +142,7 @@ pub fn pair_integer_bit_u64_max_bucketer<'a>(
 ) -> Bucketer<'a, (Integer, u64)> {
     Bucketer {
         bucketing_function: &|(x, y)| usize::exact_from(max(x.significant_bits(), *y)),
-        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
     }
 }
 
@@ -100,7 +152,37 @@ pub fn pair_2_pair_integer_bit_u64_max_bucketer<'a, T>(
 ) -> Bucketer<'a, (T, (Integer, u64))> {
     Bucketer {
         bucketing_function: &|(_, (x, y))| usize::exact_from(max(x.significant_bits(), *y)),
-        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
+    }
+}
+
+pub fn triple_integer_bit_i64_u64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Integer, i64, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(x.significant_bits(), y.unsigned_abs(), *z))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.unsigned_abs(), {z_name})"
+        ),
+    }
+}
+
+pub fn quadruple_1_2_3_integer_bit_i64_u64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Integer, i64, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(x.significant_bits(), y.unsigned_abs(), *z))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.unsigned_abs(), {z_name})"
+        ),
     }
 }
 
@@ -112,10 +194,7 @@ pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
         bucketing_function: &|(_, _, (x, y))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -127,38 +206,35 @@ pub fn triple_3_pair_natural_min_bit_bucketer<'a, T, U>(
         bucketing_function: &|(_, _, (x, y))| {
             usize::exact_from(min(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "min({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("min({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
 pub fn pair_1_natural_bit_bucketer<T>(var_name: &str) -> Bucketer<(Natural, T)> {
     Bucketer {
         bucketing_function: &|(x, _)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn pair_2_natural_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Natural)> {
     Bucketer {
         bucketing_function: &|(_, x)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn triple_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Natural, T, U)> {
     Bucketer {
         bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn triple_3_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, U, Natural)> {
     Bucketer {
         bucketing_function: &|(_, _, x)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -167,14 +243,14 @@ pub fn triple_3_pair_1_natural_bit_bucketer<T, U, V>(
 ) -> Bucketer<(T, U, (Natural, V))> {
     Bucketer {
         bucketing_function: &|(_, _, (x, _))| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn pair_2_pair_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Natural, U))> {
     Bucketer {
         bucketing_function: &|(_, (x, _))| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -192,8 +268,8 @@ pub fn triple_natural_max_bit_bucketer<'a>(
             ))
         },
         bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
-            x_name, y_name, z_name
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
         ),
     }
 }
@@ -201,21 +277,21 @@ pub fn triple_natural_max_bit_bucketer<'a>(
 pub fn integer_bit_bucketer(var_name: &str) -> Bucketer<Integer> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn pair_1_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(Integer, T)> {
     Bucketer {
         bucketing_function: &|(x, _)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn pair_2_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Integer)> {
     Bucketer {
         bucketing_function: &|(_, x)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -227,10 +303,7 @@ pub fn pair_integer_max_bit_bucketer<'a>(
         bucketing_function: &|(x, y)| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -248,8 +321,8 @@ pub fn triple_integer_max_bit_bucketer<'a>(
             ))
         },
         bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
-            x_name, y_name, z_name
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
         ),
     }
 }
@@ -262,10 +335,7 @@ pub fn triple_1_2_natural_max_bit_bucketer<'a, T>(
         bucketing_function: &|(x, y, _)| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -277,10 +347,7 @@ pub fn pair_2_triple_1_2_natural_max_bit_bucketer<'a, T, U>(
         bucketing_function: &|(_, (x, y, _))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -292,10 +359,7 @@ pub fn triple_1_2_integer_max_bit_bucketer<'a, T>(
         bucketing_function: &|(x, y, _)| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -307,10 +371,7 @@ pub fn pair_2_triple_1_2_integer_max_bit_bucketer<'a, T, U>(
         bucketing_function: &|(_, (x, y, _))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -322,10 +383,7 @@ pub fn pair_2_pair_integer_max_bit_bucketer<'a, T>(
         bucketing_function: &|(_, (x, y))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -337,17 +395,14 @@ pub fn integer_natural_max_bit_bucketer<'a>(
         bucketing_function: &|(x, y)| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
 pub fn pair_2_pair_1_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Integer, U))> {
     Bucketer {
         bucketing_function: &|(_, (x, _))| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -359,24 +414,21 @@ pub fn pair_2_integer_natural_max_bit_bucketer<'a, T>(
         bucketing_function: &|(_, (x, y))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
 pub fn triple_1_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Integer, T, U)> {
     Bucketer {
         bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
 pub fn triple_3_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, U, Integer)> {
     Bucketer {
         bucketing_function: &|(_, _, x)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -385,7 +437,7 @@ pub fn triple_3_pair_1_integer_bit_bucketer<T, U, V>(
 ) -> Bucketer<(T, U, (Integer, V))> {
     Bucketer {
         bucketing_function: &|(_, _, (x, _))| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 
@@ -397,10 +449,7 @@ pub fn triple_3_pair_integer_max_bit_bucketer<'a, T, U>(
         bucketing_function: &|(_, _, (x, y))| {
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
-        bucketing_label: format!(
-            "max({}.significant_bits(), {}.significant_bits())",
-            x_name, y_name
-        ),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
     }
 }
 
@@ -412,10 +461,7 @@ pub fn natural_bit_ratio_bucketer<'a>(
         bucketing_function: &|(x, y)| {
             usize::exact_from(x.significant_bits() / y.significant_bits())
         },
-        bucketing_label: format!(
-            "{}.significant_bits() / {}.significant_bits()",
-            x_name, y_name
-        ),
+        bucketing_label: format!("{x_name}.significant_bits() / {y_name}.significant_bits()"),
     }
 }
 
@@ -424,12 +470,12 @@ pub fn pair_1_vec_len_times_pair_2_natural_bits_bucketer<'a, T>(
     y_name: &'a str,
 ) -> Bucketer<'a, (Vec<T>, Natural)> {
     Bucketer {
-        bucketing_function: &|&(ref xs, ref y)| {
+        bucketing_function: &|(xs, y)| {
             xs.len()
                 .checked_mul(usize::exact_from(y.significant_bits()))
                 .unwrap()
         },
-        bucketing_label: format!("{}.len() * {}.significant_bits()", xs_name, y_name),
+        bucketing_label: format!("{xs_name}.len() * {y_name}.significant_bits()"),
     }
 }
 
@@ -442,13 +488,13 @@ where
 {
     Bucketer {
         bucketing_function: &|&(ref xs, y)| xs.len().checked_mul(usize::exact_from(y)).unwrap(),
-        bucketing_label: format!("{}.len() * {}", xs_name, y_name),
+        bucketing_label: format!("{xs_name}.len() * {y_name}"),
     }
 }
 
 pub fn natural_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, String)> {
     Bucketer {
-        bucketing_function: &|&(_, _, ref s)| {
+        bucketing_function: &|(_, _, s)| {
             let n: Natural = serde_json::from_str(s).unwrap();
             usize::exact_from(n.significant_bits())
         },
@@ -458,7 +504,7 @@ pub fn natural_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, Strin
 
 pub fn integer_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, String)> {
     Bucketer {
-        bucketing_function: &|&(_, _, ref s)| {
+        bucketing_function: &|(_, _, s)| {
             let n: Integer = serde_json::from_str(s).unwrap();
             usize::exact_from(n.significant_bits())
         },
@@ -476,10 +522,7 @@ pub fn triple_1_3_prod_natural_bits_bucketer<'a, T>(
                 .checked_mul(usize::exact_from(z.significant_bits()))
                 .unwrap()
         },
-        bucketing_label: format!(
-            "{}.significant_bits() * {}.significant_bits()",
-            xs_name, zs_name
-        ),
+        bucketing_label: format!("{xs_name}.significant_bits() * {zs_name}.significant_bits()"),
     }
 }
 
@@ -493,10 +536,7 @@ pub fn triple_3_triple_1_3_prod_natural_bits_bucketer<'a, T, U, V>(
                 .checked_mul(usize::exact_from(z.significant_bits()))
                 .unwrap()
         },
-        bucketing_label: format!(
-            "{}.significant_bits() * {}.significant_bits()",
-            xs_name, zs_name
-        ),
+        bucketing_label: format!("{xs_name}.significant_bits() * {zs_name}.significant_bits()"),
     }
 }
 
@@ -543,7 +583,17 @@ pub fn triple_3_pair_1_integer_bits_times_pair_2_bucketer<'a, T, U>(
 ) -> Bucketer<'a, (T, U, (Integer, u64))> {
     Bucketer {
         bucketing_function: &|&(_, _, (ref x, y))| usize::exact_from(x.significant_bits() * y),
-        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+        bucketing_label: format!("{x_name}.significant_bits() * {y_name}"),
+    }
+}
+
+pub fn triple_1_2_natural_bit_u64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
     }
 }
 
@@ -553,7 +603,7 @@ pub fn triple_1_2_integer_bit_u64_max_bucketer<'a, T>(
 ) -> Bucketer<'a, (Integer, u64, T)> {
     Bucketer {
         bucketing_function: &|(x, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
-        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
     }
 }
 
@@ -595,7 +645,7 @@ pub fn limbs_div_mod_barrett_helper_bucketer<'a>(
 pub fn limb_pair_significant_bits_bucketer(var_name: &str) -> Bucketer<(Limb, Limb)> {
     Bucketer {
         bucketing_function: &|&(hi, lo)| usize::exact_from(limbs_significant_bits(&[lo, hi])),
-        bucketing_label: format!("{}.significant_bits()", var_name),
+        bucketing_label: format!("{var_name}.significant_bits()"),
     }
 }
 

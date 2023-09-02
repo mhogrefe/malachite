@@ -258,16 +258,20 @@ pub trait CeilingDivAssignMod<RHS = Self> {
     fn ceiling_div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
 }
 
-/// Divides a number by another number and rounds according to a specified rounding mode.
+/// Divides a number by another number and rounds according to a specified rounding mode. An
+/// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to, or
+/// greater than the exact value.
 pub trait DivRound<RHS = Self> {
     type Output;
 
-    fn div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+    fn div_round(self, other: RHS, rm: RoundingMode) -> (Self::Output, Ordering);
 }
 
 /// Divides a number by another number in place and rounds according to a specified rounding mode.
+/// An [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
+/// greater than the exact value.
 pub trait DivRoundAssign<RHS = Self> {
-    fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
+    fn div_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
 /// Determines whether a number is divisible by $2^k$.
@@ -1250,29 +1254,40 @@ pub trait RotateRightAssign {
     fn rotate_right_assign(&mut self, n: u64);
 }
 
-/// Rounds a number to a multiple of another number, according to a specified rounding mode.
+/// Rounds a number to a multiple of another number, according to a specified rounding mode. An
+/// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to, or
+/// greater than the original value.
 pub trait RoundToMultiple<RHS = Self> {
     type Output;
 
-    fn round_to_multiple(self, other: RHS, rm: RoundingMode) -> Self::Output;
+    fn round_to_multiple(self, other: RHS, rm: RoundingMode) -> (Self::Output, Ordering);
 }
 
 /// Rounds a number to a multiple of another number in place, according to a specified rounding
-/// mode.
+/// mode. [`Ordering`] is returned, indicating whether the returned value is less than, equal to,
+/// or greater than the original value.
 pub trait RoundToMultipleAssign<RHS = Self> {
-    fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode);
+    fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
-/// Rounds a number to a multiple of $2^k$, according to a specified rounding mode.
+/// Rounds a number to a multiple of $2^k$, according to a specified rounding mode. An [`Ordering`]
+/// is also returned, indicating whether the returned value is less than, equal to, or greater than
+/// the original value.
 pub trait RoundToMultipleOfPowerOf2<RHS> {
     type Output;
 
-    fn round_to_multiple_of_power_of_2(self, pow: RHS, rm: RoundingMode) -> Self::Output;
+    fn round_to_multiple_of_power_of_2(
+        self,
+        pow: RHS,
+        rm: RoundingMode,
+    ) -> (Self::Output, Ordering);
 }
 
-/// Rounds a number to a multiple of $2^k$ in place, according to a specified rounding mode.
+/// Rounds a number to a multiple of $2^k$ in place, according to a specified rounding mode. An
+/// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+/// greater than the original value.
 pub trait RoundToMultipleOfPowerOf2Assign<RHS> {
-    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: RHS, rm: RoundingMode);
+    fn round_to_multiple_of_power_of_2_assign(&mut self, pow: RHS, rm: RoundingMode) -> Ordering;
 }
 
 /// Takes the absolute value of a number, saturating at the numeric bounds instead of overflowing.
@@ -1392,39 +1407,43 @@ pub trait SaturatingSubMulAssign<Y = Self, Z = Self> {
 }
 
 /// Left-shifts a number (multiplies it by a power of 2), rounding the result according to a
-/// specified rounding mode.
+/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
+/// value is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is negative.
 pub trait ShlRound<RHS> {
     type Output;
 
-    fn shl_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+    fn shl_round(self, other: RHS, rm: RoundingMode) -> (Self::Output, Ordering);
 }
 
 /// Left-shifts a number (multiplies it by a power of 2) in place, rounding the result according to
-/// a specified rounding mode.
+/// a specified rounding mode. An [`Ordering`] is also returned, indicating whether the assigned
+/// value is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is negative.
 pub trait ShlRoundAssign<RHS> {
-    fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode);
+    fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
 /// Right-shifts a number (divides it by a power of 2), rounding the result according to a
-/// specified rounding mode.
+/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
+/// value is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is positive.
 pub trait ShrRound<RHS> {
     type Output;
 
-    fn shr_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+    fn shr_round(self, other: RHS, rm: RoundingMode) -> (Self::Output, Ordering);
 }
 
 /// Right-shifts a number (divides it by a power of 2) in place, rounding the result according to a
-/// specified rounding mode.
+/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the assigned
+/// value is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is positive.
 pub trait ShrRoundAssign<RHS> {
-    fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode);
+    fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
 /// Returns `Greater`, `Equal`, or `Less`, depending on whether a number is positive, zero, or

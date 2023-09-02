@@ -158,6 +158,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
                 assert!(self > 0.0);
                 self.sci_exponent()
                     .div_round(i64::exact_from(pow), RoundingMode::Floor)
+                    .0
             }
         }
 

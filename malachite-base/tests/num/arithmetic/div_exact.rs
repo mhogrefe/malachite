@@ -86,7 +86,7 @@ fn div_exact_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let q = mut_x;
 
         assert_eq!(x.div_exact(y), q);
-        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact).0, q);
         assert_eq!(q * y, x);
     });
 
@@ -107,7 +107,7 @@ fn div_exact_properties_helper_signed<T: PrimitiveSigned>() {
         let q = mut_x;
 
         assert_eq!(x.div_exact(y), q);
-        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact).0, q);
         assert_eq!(q * y, x);
 
         if x != T::MIN {

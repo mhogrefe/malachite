@@ -10,25 +10,25 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_sequence_cmp);
 }
 
-fn demo_rational_sequence_cmp(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_sequence_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, ys) in unsigned_rational_sequence_pair_gen::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         match xs.cmp(&ys) {
-            Ordering::Less => println!("{} < {}", xs, ys),
-            Ordering::Equal => println!("{} = {}", xs, ys),
-            Ordering::Greater => println!("{} > {}", xs, ys),
+            Ordering::Less => println!("{xs} < {ys}"),
+            Ordering::Equal => println!("{xs} = {ys}"),
+            Ordering::Greater => println!("{xs} > {ys}"),
         }
     }
 }
 
 #[allow(unused_must_use)]
-fn benchmark_rational_sequence_cmp(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_sequence_cmp(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "RationalSequence.cmp(&RationalSequence)",
         BenchmarkType::Single,
-        unsigned_rational_sequence_pair_gen::<u8>().get(gm, &config),
+        unsigned_rational_sequence_pair_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

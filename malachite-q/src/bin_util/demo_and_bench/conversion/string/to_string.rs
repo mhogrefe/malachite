@@ -16,28 +16,28 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_to_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for q in rational_gen().get(gm, &config).take(limit) {
-        println!("{}", q);
+fn demo_rational_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q}");
     }
 }
 
-fn demo_rational_to_debug_string(gm: GenMode, config: GenConfig, limit: usize) {
-    for q in rational_gen().get(gm, &config).take(limit) {
-        println!("{:?}", q);
+fn demo_rational_to_debug_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:?}");
     }
 }
 
 fn benchmark_rational_to_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.to_string()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -52,14 +52,14 @@ fn benchmark_rational_to_string_library_comparison(
 
 fn benchmark_rational_to_debug_string_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.to_debug_string()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

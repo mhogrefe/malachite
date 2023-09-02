@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::exhaustive::primitive_float_increasing_inclusive_range;
 use malachite_base::test_util::num::exhaustive::*;
 use std::panic::catch_unwind;
@@ -146,7 +147,7 @@ fn test_primitive_float_increasing_inclusive_range() {
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(
         1.0e38,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         &[
             1.0e38,
             1.0000001e38,
@@ -189,7 +190,7 @@ fn test_primitive_float_increasing_inclusive_range() {
             3.402823e38,
             3.4028233e38,
             3.4028235e38,
-            f32::POSITIVE_INFINITY,
+            f32::INFINITY,
         ],
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(
@@ -224,7 +225,7 @@ fn test_primitive_float_increasing_inclusive_range() {
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(
         f32::NEGATIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
+        f32::INFINITY,
         &[
             f32::NEGATIVE_INFINITY,
             -3.4028235e38,
@@ -267,7 +268,7 @@ fn test_primitive_float_increasing_inclusive_range() {
             3.402823e38,
             3.4028233e38,
             3.4028235e38,
-            f32::POSITIVE_INFINITY,
+            f32::INFINITY,
         ],
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(
@@ -277,10 +278,10 @@ fn test_primitive_float_increasing_inclusive_range() {
         &[f32::NEGATIVE_INFINITY],
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(
-        f32::POSITIVE_INFINITY,
-        f32::POSITIVE_INFINITY,
-        &[f32::POSITIVE_INFINITY],
-        &[f32::POSITIVE_INFINITY],
+        f32::INFINITY,
+        f32::INFINITY,
+        &[f32::INFINITY],
+        &[f32::INFINITY],
     );
     primitive_float_increasing_inclusive_range_helper::<f32>(0.0, 0.0, &[0.0], &[0.0]);
     primitive_float_increasing_inclusive_range_helper::<f32>(-0.0, -0.0, &[-0.0], &[-0.0]);
@@ -481,7 +482,7 @@ fn test_primitive_float_increasing_inclusive_range() {
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(
         1.0e308,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         &[
             1.0e308,
             1.0000000000000002e308,
@@ -524,7 +525,7 @@ fn test_primitive_float_increasing_inclusive_range() {
             1.7976931348623153e308,
             1.7976931348623155e308,
             1.7976931348623157e308,
-            f64::POSITIVE_INFINITY,
+            f64::INFINITY,
         ],
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(
@@ -559,7 +560,7 @@ fn test_primitive_float_increasing_inclusive_range() {
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(
         f64::NEGATIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
+        f64::INFINITY,
         &[
             f64::NEGATIVE_INFINITY,
             -1.7976931348623157e308,
@@ -602,7 +603,7 @@ fn test_primitive_float_increasing_inclusive_range() {
             1.7976931348623153e308,
             1.7976931348623155e308,
             1.7976931348623157e308,
-            f64::POSITIVE_INFINITY,
+            f64::INFINITY,
         ],
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(
@@ -612,10 +613,10 @@ fn test_primitive_float_increasing_inclusive_range() {
         &[f64::NEGATIVE_INFINITY],
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(
-        f64::POSITIVE_INFINITY,
-        f64::POSITIVE_INFINITY,
-        &[f64::POSITIVE_INFINITY],
-        &[f64::POSITIVE_INFINITY],
+        f64::INFINITY,
+        f64::INFINITY,
+        &[f64::INFINITY],
+        &[f64::INFINITY],
     );
     primitive_float_increasing_inclusive_range_helper::<f64>(0.0, 0.0, &[0.0], &[0.0]);
     primitive_float_increasing_inclusive_range_helper::<f64>(-0.0, -0.0, &[-0.0], &[-0.0]);

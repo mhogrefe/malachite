@@ -41,47 +41,46 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_square_evaluation_strategy);
 }
 
-fn demo_limbs_square_to_out_basecase(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut out, xs) in unsigned_vec_pair_gen_var_22().get(gm, &config).take(limit) {
+fn demo_limbs_square_to_out_basecase(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut out, xs) in unsigned_vec_pair_gen_var_22().get(gm, config).take(limit) {
         let out_old = out.clone();
         limbs_square_to_out_basecase(&mut out, &xs);
         println!(
-            "out := {:?}; limbs_square_to_out_basecase(&mut out, {:?}); out = {:?}",
-            out_old, out, xs
+            "out := {out_old:?}; limbs_square_to_out_basecase(&mut out, {xs:?}); out = {out:?}",
         );
     }
 }
 
-fn demo_natural_square_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_square_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in natural_gen().get(gm, config).take(limit) {
         let old_n = n.clone();
         n.square_assign();
-        println!("n := {}; n.square_assign(); n = {}", n, old_n);
+        println!("n := {n}; n.square_assign(); n = {old_n}");
     }
 }
 
-fn demo_natural_square(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("{} ^ 2 = {}", n.clone(), n.square());
     }
 }
 
-fn demo_natural_square_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_square_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("&{} ^ 2 = {}", n, (&n).square());
     }
 }
 
 fn benchmark_limbs_square_to_out_basecase_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_basecase(&mut [Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_22().get(gm, &config),
+        unsigned_vec_pair_gen_var_22().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -100,14 +99,14 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
 
 fn benchmark_limbs_square_to_out_toom_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_toom_2(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_23().get(gm, &config),
+        unsigned_vec_pair_gen_var_23().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -126,14 +125,14 @@ fn benchmark_limbs_square_to_out_toom_2_algorithms(
 
 fn benchmark_limbs_square_to_out_toom_3_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_toom_3(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_24().get(gm, &config),
+        unsigned_vec_pair_gen_var_24().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -153,14 +152,14 @@ fn benchmark_limbs_square_to_out_toom_3_algorithms(
 
 fn benchmark_limbs_square_to_out_toom_4_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_toom_4(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_26().get(gm, &config),
+        unsigned_vec_pair_gen_var_26().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -180,14 +179,14 @@ fn benchmark_limbs_square_to_out_toom_4_algorithms(
 
 fn benchmark_limbs_square_to_out_toom_6_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_toom_6(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_27().get(gm, &config),
+        unsigned_vec_pair_gen_var_27().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -207,14 +206,14 @@ fn benchmark_limbs_square_to_out_toom_6_algorithms(
 
 fn benchmark_limbs_square_to_out_toom_8_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_square_to_out_toom_8(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_28().get(gm, &config),
+        unsigned_vec_pair_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -234,14 +233,14 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
 
 fn benchmark_limbs_square_to_out_fft_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_28().get(gm, &config),
+        unsigned_vec_pair_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -259,11 +258,11 @@ fn benchmark_limbs_square_to_out_fft_algorithms(
     );
 }
 
-fn benchmark_natural_square_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_square_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.square_assign()",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -275,14 +274,14 @@ fn benchmark_natural_square_assign(gm: GenMode, config: GenConfig, limit: usize,
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_square_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.square()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -293,14 +292,14 @@ fn benchmark_natural_square_algorithms(
 
 fn benchmark_natural_square_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.square()",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

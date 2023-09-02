@@ -11,21 +11,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_mod_is_reduced);
 }
 
-fn demo_natural_mod_is_reduced(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, m) in natural_pair_gen_var_5().get(gm, &config).take(limit) {
+fn demo_natural_mod_is_reduced(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, m) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         if n.mod_is_reduced(&m) {
-            println!("{} is reduced mod {}", n, m);
+            println!("{n} is reduced mod {m}");
         } else {
-            println!("{} is not reduced mod {}", n, m);
+            println!("{n} is not reduced mod {m}");
         }
     }
 }
 
-fn benchmark_natural_mod_is_reduced(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_natural_mod_is_reduced(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Natural.mod_is_reduced(&Natural)",
         BenchmarkType::Single,
-        natural_pair_gen_var_5().get(gm, &config),
+        natural_pair_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,

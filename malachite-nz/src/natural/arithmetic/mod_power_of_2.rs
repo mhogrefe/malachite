@@ -57,7 +57,7 @@ pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) 
         slice_set_zero(xs);
         return;
     }
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if new_size > xs.len() {
         return;
     }
@@ -82,7 +82,7 @@ pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
         xs.clear();
         return;
     }
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     if new_size > xs.len() {
         return;
     }
@@ -126,7 +126,7 @@ pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // negative and `res == in`. `xs` is the limbs of `-in`.
 pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
-    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0);
     xs.resize(new_size, 0);
     limbs_twos_complement_in_place(xs);
     let leftover_bits = pow & Limb::WIDTH_MASK;
@@ -422,7 +422,7 @@ impl<'a> NegModPowerOf2 for &'a Natural {
     /// ```
     fn neg_mod_power_of_2(self, pow: u64) -> Natural {
         match (self, pow) {
-            (natural_zero!(), _) => Natural::ZERO,
+            (&Natural::ZERO, _) => Natural::ZERO,
             (_, pow) if pow <= Limb::WIDTH => {
                 Natural::from(Limb::wrapping_from(self).neg_mod_power_of_2(pow))
             }

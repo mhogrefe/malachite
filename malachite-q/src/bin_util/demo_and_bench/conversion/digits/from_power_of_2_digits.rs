@@ -15,9 +15,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_rational_from_power_of_2_digits(gm: GenMode, config: GenConfig, limit: usize) {
-    for (log_base, before_point, after_point) in
-        large_type_gen_var_23().get(gm, &config).take(limit)
+fn demo_rational_from_power_of_2_digits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (log_base, before_point, after_point) in large_type_gen_var_23().get(gm, config).take(limit)
     {
         println!(
             "from_power_of_2_digits({}, {:?}, {}) = {}",
@@ -29,9 +28,8 @@ fn demo_rational_from_power_of_2_digits(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_rational_from_power_of_2_digits_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (log_base, before_point, after_point) in
-        large_type_gen_var_23().get(gm, &config).take(limit)
+fn demo_rational_from_power_of_2_digits_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (log_base, before_point, after_point) in large_type_gen_var_23().get(gm, config).take(limit)
     {
         println!(
             "from_power_of_2_digits_ref({}, {:?}, {:?}) = {}",
@@ -43,8 +41,8 @@ fn demo_rational_from_power_of_2_digits_ref(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_rational_from_power_of_2_digits_binary(gm: GenMode, config: GenConfig, limit: usize) {
-    for (before_point, after_point) in large_type_gen_var_24().get(gm, &config).take(limit) {
+fn demo_rational_from_power_of_2_digits_binary(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (before_point, after_point) in large_type_gen_var_24().get(gm, config).take(limit) {
         println!(
             "from_power_of_2_digits(1, {:?}, {}) = {}",
             before_point.clone(),
@@ -56,14 +54,14 @@ fn demo_rational_from_power_of_2_digits_binary(gm: GenMode, config: GenConfig, l
 
 fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::from_power_of_2_digits(u64, &[Natural], &RationalSequence<Natural>)",
         BenchmarkType::EvaluationStrategy,
-        large_type_gen_var_23().get(gm, &config),
+        large_type_gen_var_23().get(gm, config),
         gm.name(),
         limit,
         file_name,

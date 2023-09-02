@@ -293,7 +293,7 @@ impl BitDistributor {
     /// );
     /// ```
     pub fn increment_counter(&mut self) {
-        for b in self.counter.iter_mut() {
+        for b in &mut self.counter {
             b.not_assign();
             if *b {
                 break;

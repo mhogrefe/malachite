@@ -10,27 +10,24 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_overflowing_abs_assign);
 }
 
-fn demo_overflowing_abs_assign<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut i in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_overflowing_abs_assign<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut i in signed_gen::<T>().get(gm, config).take(limit) {
         let old_i = i;
         let overflow = i.overflowing_abs_assign();
-        println!(
-            "i := {}; i.overflowing_abs_assign() = {}; i = {}",
-            old_i, overflow, i
-        );
+        println!("i := {old_i}; i.overflowing_abs_assign() = {overflow}; i = {i}");
     }
 }
 
 fn benchmark_overflowing_abs_assign<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_abs_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

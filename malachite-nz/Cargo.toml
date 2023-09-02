@@ -22,13 +22,13 @@ path = "src/bin.rs"
 
 [dependencies]
 embed-doc-image = "0.1.4"
-itertools = "0.9.0"
-malachite-base = { workspace = true }
-serde = { version = "^1.0.0", optional = true, features = ["derive"] }
+itertools = "0.11.0"
+malachite-base = { path = "../malachite-base" }
+serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
-serde_json = { version = "^1.0.32", optional = true }
-num = { version = "0.4.0", optional = true, features = ["serde"] }
-rug = { version = "1.16.0", default-features = false, optional = true, features = ["integer", "serde"] }
+serde_json = { version = "1.0.105", optional = true }
+num = { version = "0.4.1", optional = true, features = ["serde"] }
+rug = { version = "1.21.0", default-features = false, optional = true, features = ["integer", "serde"] }
 
 [dev-dependencies]
 malachite-nz = { path = ".", features = ["test_build"] }
@@ -38,6 +38,7 @@ malachite-nz = { path = ".", features = ["test_build"] }
 enable_serde = ["serde"]
 test_build = ["malachite-base/test_build", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
+float_helpers = []
 doc-images = []
 
 [package.metadata.docs.rs]

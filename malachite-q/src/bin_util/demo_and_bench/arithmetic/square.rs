@@ -15,36 +15,36 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_square_assign);
 }
 
-fn demo_rational_square(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("{} ^ 2 = {}", n.clone(), n.square());
     }
 }
 
-fn demo_rational_square_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_square_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("&{} ^ 2 = {}", n, (&n).square());
     }
 }
 
-fn demo_rational_square_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_square_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.square_assign();
-        println!("n := {}; n.square_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.square_assign(); n = {n}");
     }
 }
 
 fn benchmark_rational_square_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.square()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -59,14 +59,14 @@ fn benchmark_rational_square_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_square_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.square()",
         BenchmarkType::Algorithms,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -78,11 +78,16 @@ fn benchmark_rational_square_algorithms(
     );
 }
 
-fn benchmark_rational_square_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_square_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Rational.square_assign()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

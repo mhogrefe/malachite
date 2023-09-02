@@ -34,6 +34,7 @@
     clippy::single_match_else,
     clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
+    clippy::uninlined_format_args,
     clippy::unused_self
 )]
 
@@ -104,7 +105,6 @@ pub mod integer {
     }
     pub mod conversion {
         pub mod clone;
-        pub mod floating_point_from_integer;
         pub mod from_bool;
         pub mod from_natural;
         pub mod from_primitive_float;
@@ -112,6 +112,7 @@ pub mod integer {
         pub mod from_twos_complement_limbs;
         pub mod is_integer;
         pub mod natural_from_integer;
+        pub mod primitive_float_from_integer;
         pub mod primitive_int_from_integer;
         #[cfg(feature = "serde")]
         pub mod serde;
@@ -280,16 +281,16 @@ pub mod natural {
             pub mod to_digits;
             pub mod to_power_of_2_digits;
         }
-        pub mod floating_point_from_natural;
         pub mod from_bool;
-        pub mod from_floating_point;
         pub mod from_limbs;
+        pub mod from_primitive_float;
         pub mod from_primitive_int;
         pub mod is_integer;
         pub mod mantissa_and_exponent {
             pub mod integer_mantissa_and_exponent;
             pub mod sci_mantissa_and_exponent;
         }
+        pub mod primitive_float_from_natural;
         pub mod primitive_int_from_natural;
         #[cfg(feature = "serde")]
         pub mod serde;

@@ -56,7 +56,7 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     } else if x < base {
         return (0, false);
     }
-    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), RoundingMode::Floor);
+    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), RoundingMode::Floor).0;
     let mut power = base.pow(log);
     match power.cmp(x) {
         Ordering::Equal => (log, true),

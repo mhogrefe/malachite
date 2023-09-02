@@ -40,9 +40,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_divisible_by_library_comparison);
 }
 
-fn demo_limbs_divisible_by_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_divisible_by_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen_var_22()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -54,8 +54,8 @@ fn demo_limbs_divisible_by_limb(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_divisible_by(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut ns, mut ds) in unsigned_vec_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_limbs_divisible_by(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut ns, mut ds) in unsigned_vec_pair_gen_var_15().get(gm, config).take(limit) {
         let ns_old = ns.clone();
         let ds_old = ds.clone();
         println!(
@@ -67,8 +67,8 @@ fn demo_limbs_divisible_by(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_divisible_by_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut ns, ds) in unsigned_vec_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_limbs_divisible_by_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut ns, ds) in unsigned_vec_pair_gen_var_15().get(gm, config).take(limit) {
         let ns_old = ns.clone();
         println!(
             "limbs_divisible_by_val_ref({:?}, {:?}) = {}",
@@ -79,8 +79,8 @@ fn demo_limbs_divisible_by_val_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_limbs_divisible_by_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (ns, mut ds) in unsigned_vec_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_limbs_divisible_by_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (ns, mut ds) in unsigned_vec_pair_gen_var_15().get(gm, config).take(limit) {
         let ds_old = ds.clone();
         println!(
             "limbs_divisible_by_ref_val({:?}, {:?}) = {}",
@@ -91,8 +91,8 @@ fn demo_limbs_divisible_by_ref_val(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_limbs_divisible_by_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (ns, ds) in unsigned_vec_pair_gen_var_15().get(gm, &config).take(limit) {
+fn demo_limbs_divisible_by_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (ns, ds) in unsigned_vec_pair_gen_var_15().get(gm, config).take(limit) {
         println!(
             "limbs_divisible_by_ref_ref({:?}, {:?}) = {}",
             ns,
@@ -102,47 +102,47 @@ fn demo_limbs_divisible_by_ref_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_natural_divisible_by(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_divisible_by(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         if x.divisible_by(y) {
-            println!("{} is divisible by {}", x_old, y_old);
+            println!("{x_old} is divisible by {y_old}");
         } else {
-            println!("{} is not divisible by {}", x_old, y_old);
+            println!("{x_old} is not divisible by {y_old}");
         }
     }
 }
 
-fn demo_natural_divisible_by_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_divisible_by_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         if x.divisible_by(&y) {
-            println!("{} is divisible by {}", x_old, y);
+            println!("{x_old} is divisible by {y}");
         } else {
-            println!("{} is not divisible by {}", x_old, y);
+            println!("{x_old} is not divisible by {y}");
         }
     }
 }
 
-fn demo_natural_divisible_by_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_divisible_by_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         if (&x).divisible_by(y) {
-            println!("{} is divisible by {}", x, y_old);
+            println!("{x} is divisible by {y_old}");
         } else {
-            println!("{} is not divisible by {}", x, y_old);
+            println!("{x} is not divisible by {y_old}");
         }
     }
 }
 
-fn demo_natural_divisible_by_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+fn demo_natural_divisible_by_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         if (&x).divisible_by(y) {
-            println!("{} is divisible by {}", x, y_old);
+            println!("{x} is divisible by {y_old}");
         } else {
-            println!("{} is not divisible by {}", x, y_old);
+            println!("{x} is not divisible by {y_old}");
         }
     }
 }
@@ -151,14 +151,14 @@ fn demo_natural_divisible_by_ref_ref(gm: GenMode, config: GenConfig, limit: usiz
 #[allow(clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_limbs_divisible_by_limb_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_divisible_by_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_22().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_22().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -180,14 +180,14 @@ fn benchmark_limbs_divisible_by_limb_algorithms(
 // use large params
 fn benchmark_limbs_divisible_by_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_divisible_by(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        unsigned_vec_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -206,14 +206,14 @@ fn benchmark_limbs_divisible_by_algorithms(
 // use large params
 fn benchmark_limbs_divisible_by_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_divisible_by(&[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_pair_gen_var_15().get(gm, &config),
+        unsigned_vec_pair_gen_var_15().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -242,14 +242,14 @@ fn benchmark_limbs_divisible_by_evaluation_strategy(
 #[allow(clippy::no_effect, clippy::short_circuit_statement, unused_must_use)]
 fn benchmark_natural_divisible_by_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.divisible_by(Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -265,14 +265,14 @@ fn benchmark_natural_divisible_by_algorithms(
 
 fn benchmark_natural_divisible_by_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.divisible_by(Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_pair_gen().get(gm, &config),
+        natural_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -296,14 +296,14 @@ fn benchmark_natural_divisible_by_evaluation_strategy(
 
 fn benchmark_natural_divisible_by_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.divisible_by(Natural)",
         BenchmarkType::LibraryComparison,
-        natural_pair_gen_nrm().get(gm, &config),
+        natural_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

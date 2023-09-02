@@ -13,6 +13,7 @@ use crate::platform::{
 };
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
@@ -438,7 +439,7 @@ limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
 impl Natural {
     fn divisible_by_limb(&self, other: Limb) -> bool {
         match (self, other) {
-            (&natural_zero!(), _) => true,
+            (&Natural::ZERO, _) => true,
             (_, 0) => false,
             (&Natural(Small(small)), y) => small.divisible_by(y),
             (&Natural(Large(ref limbs)), y) => limbs_divisible_by_limb(limbs, y),
@@ -449,7 +450,7 @@ impl Natural {
     fn limb_divisible_by_natural(&self, other: Limb) -> bool {
         match (other, self) {
             (0, _) => true,
-            (_, natural_zero!()) | (_, &Natural(Large(_))) => false,
+            (_, &Natural::ZERO) | (_, &Natural(Large(_))) => false,
             (x, &Natural(Small(small))) => x.divisible_by(small),
         }
     }

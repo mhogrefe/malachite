@@ -17,9 +17,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_index_of_next_false_bit_algorithms);
 }
 
-fn demo_limbs_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_index_of_next_false_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, u) in unsigned_vec_unsigned_pair_gen_var_16()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -31,9 +31,9 @@ fn demo_limbs_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: usi
     }
 }
 
-fn demo_natural_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_index_of_next_false_bit(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in natural_unsigned_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -47,14 +47,14 @@ fn demo_natural_index_of_next_false_bit(gm: GenMode, config: GenConfig, limit: u
 
 fn benchmark_limbs_index_of_next_false_bit(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_index_of_next_false_bit(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_16().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_16().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -67,14 +67,14 @@ fn benchmark_limbs_index_of_next_false_bit(
 
 fn benchmark_natural_index_of_next_false_bit_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.index_of_next_false_bit(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_4().get(gm, &config),
+        natural_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,

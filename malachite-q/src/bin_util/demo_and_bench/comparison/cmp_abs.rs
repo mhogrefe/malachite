@@ -23,52 +23,52 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_ge_abs);
 }
 
-fn demo_rational_cmp_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         match x.cmp_abs(&y) {
-            Ordering::Less => println!("|{}| < |{}|", x, y),
-            Ordering::Equal => println!("|{}| = |{}|", x, y),
-            Ordering::Greater => println!("|{}| > |{}|", x, y),
+            Ordering::Less => println!("|{x}| < |{y}|"),
+            Ordering::Equal => println!("|{x}| = |{y}|"),
+            Ordering::Greater => println!("|{x}| > |{y}|"),
         }
     }
 }
 
-fn demo_rational_lt_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_lt_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         if x.lt_abs(&y) {
-            println!("|{}| < |{}|", x, y);
+            println!("|{x}| < |{y}|");
         } else {
-            println!("|{}| ≮ |{}|", x, y);
+            println!("|{x}| ≮ |{y}|");
         }
     }
 }
 
-fn demo_rational_gt_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_gt_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         if x.gt_abs(&y) {
-            println!("|{}| > |{}|", x, y);
+            println!("|{x}| > |{y}|");
         } else {
-            println!("|{}| ≯ |{}|", x, y);
+            println!("|{x}| ≯ |{y}|");
         }
     }
 }
 
-fn demo_rational_le_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_le_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         if x.le_abs(&y) {
-            println!("|{}| ≤ |{}|", x, y);
+            println!("|{x}| ≤ |{y}|");
         } else {
-            println!("|{}| ≰ |{}|", x, y);
+            println!("|{x}| ≰ |{y}|");
         }
     }
 }
 
-fn demo_rational_ge_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_ge_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         if x.ge_abs(&y) {
-            println!("|{}| ≥ |{}|", x, y);
+            println!("|{x}| ≥ |{y}|");
         } else {
-            println!("|{}| ≱ |{}|", x, y);
+            println!("|{x}| ≱ |{y}|");
         }
     }
 }
@@ -76,14 +76,14 @@ fn demo_rational_ge_abs(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(unused_must_use)]
 fn benchmark_rational_cmp_abs_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.cmp_abs(&Rational)",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_rm().get(gm, &config),
+        rational_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -95,11 +95,11 @@ fn benchmark_rational_cmp_abs_library_comparison(
     );
 }
 
-fn benchmark_rational_lt_abs(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_lt_abs(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.lt_abs(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -108,11 +108,11 @@ fn benchmark_rational_lt_abs(gm: GenMode, config: GenConfig, limit: usize, file_
     );
 }
 
-fn benchmark_rational_gt_abs(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_gt_abs(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.gt_abs(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -121,11 +121,11 @@ fn benchmark_rational_gt_abs(gm: GenMode, config: GenConfig, limit: usize, file_
     );
 }
 
-fn benchmark_rational_le_abs(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_le_abs(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.le_abs(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -134,11 +134,11 @@ fn benchmark_rational_le_abs(gm: GenMode, config: GenConfig, limit: usize, file_
     );
 }
 
-fn benchmark_rational_ge_abs(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_ge_abs(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.ge_abs(&Rational)",
         BenchmarkType::Single,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

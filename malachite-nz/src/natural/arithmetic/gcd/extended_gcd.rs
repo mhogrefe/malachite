@@ -307,8 +307,8 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
 // non-normalized too). Temporary space needed is M->n + n.
 //
 // This is equivalent to `hgcd_mul_matrix_vector` from `mpn/generic/gcdext.c`, GMP 6.2.1.
-fn limbs_half_gcd_matrix_mul_vector<'a>(
-    m: &mut HalfGcdMatrix<'a>,
+fn limbs_half_gcd_matrix_mul_vector(
+    m: &mut HalfGcdMatrix<'_>,
     rp: &mut [Limb],
     xs: &[Limb],
     ys: &mut [Limb],
@@ -775,10 +775,10 @@ impl ExtendedGcd for Natural {
     /// ```
     fn extended_gcd(self, other: Natural) -> (Natural, Integer, Integer) {
         match (self, other) {
-            (natural_zero!(), natural_zero!()) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (Natural::ZERO, Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == b => (b, Integer::ZERO, Integer::ONE),
-            (natural_zero!(), b) => (b, Integer::ZERO, Integer::ONE),
-            (a, natural_zero!()) => (a, Integer::ONE, Integer::ZERO),
+            (Natural::ZERO, b) => (b, Integer::ZERO, Integer::ONE),
+            (a, Natural::ZERO) => (a, Integer::ONE, Integer::ZERO),
             (Natural(Small(x)), Natural(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(y);
                 (Natural::from(gcd), Integer::from(s), Integer::from(t))
@@ -831,10 +831,10 @@ impl<'a> ExtendedGcd<&'a Natural> for Natural {
     /// ```
     fn extended_gcd(self, other: &'a Natural) -> (Natural, Integer, Integer) {
         match (self, other) {
-            (natural_zero!(), natural_zero!()) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (Natural::ZERO, &Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == *b => (b.clone(), Integer::ZERO, Integer::ONE),
-            (natural_zero!(), b) => (b.clone(), Integer::ZERO, Integer::ONE),
-            (a, natural_zero!()) => (a, Integer::ONE, Integer::ZERO),
+            (Natural::ZERO, b) => (b.clone(), Integer::ZERO, Integer::ONE),
+            (a, &Natural::ZERO) => (a, Integer::ONE, Integer::ZERO),
             (Natural(Small(x)), Natural(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(*y);
                 (Natural::from(gcd), Integer::from(s), Integer::from(t))
@@ -887,10 +887,10 @@ impl<'a> ExtendedGcd<Natural> for &'a Natural {
     /// ```
     fn extended_gcd(self, other: Natural) -> (Natural, Integer, Integer) {
         match (self, other) {
-            (natural_zero!(), natural_zero!()) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (&Natural::ZERO, Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if *a == b => (b, Integer::ZERO, Integer::ONE),
-            (natural_zero!(), b) => (b, Integer::ZERO, Integer::ONE),
-            (a, natural_zero!()) => (a.clone(), Integer::ONE, Integer::ZERO),
+            (&Natural::ZERO, b) => (b, Integer::ZERO, Integer::ONE),
+            (a, Natural::ZERO) => (a.clone(), Integer::ONE, Integer::ZERO),
             (Natural(Small(x)), Natural(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(y);
                 (Natural::from(gcd), Integer::from(s), Integer::from(t))
@@ -943,10 +943,10 @@ impl<'a, 'b> ExtendedGcd<&'a Natural> for &'b Natural {
     /// ```
     fn extended_gcd(self, other: &'a Natural) -> (Natural, Integer, Integer) {
         match (self, other) {
-            (natural_zero!(), natural_zero!()) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
+            (&Natural::ZERO, &Natural::ZERO) => (Natural::ZERO, Integer::ZERO, Integer::ZERO),
             (a, b) if a == b => (b.clone(), Integer::ZERO, Integer::ONE),
-            (natural_zero!(), b) => (b.clone(), Integer::ZERO, Integer::ONE),
-            (a, natural_zero!()) => (a.clone(), Integer::ONE, Integer::ZERO),
+            (&Natural::ZERO, b) => (b.clone(), Integer::ZERO, Integer::ONE),
+            (a, &Natural::ZERO) => (a.clone(), Integer::ONE, Integer::ZERO),
             (Natural(Small(x)), Natural(Small(y))) => {
                 let (gcd, s, t) = x.extended_gcd(*y);
                 (Natural::from(gcd), Integer::from(s), Integer::from(t))

@@ -1,0 +1,41 @@
+[package]
+name = "malachite-float"
+version = "0.3.2"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+rust-version = "1.61.0"
+edition = "2021"
+description = "The arbitrary-precision floating-point type Float, with efficient algorithms partially derived from MPFR"
+readme = "README.md"
+homepage = "https://malachite.rs/"
+repository = "https://github.com/mhogrefe/malachite"
+license = "LGPL-3.0-only"
+keywords = ["mathematics", "math", "numerics", "bignum"]
+categories = ["mathematics"]
+
+[lib]
+name = "malachite_float"
+path = "src/lib.rs"
+
+[[bin]]
+name = "malachite_float_main"
+path = "src/bin.rs"
+
+[dependencies]
+itertools = "0.11.0"
+malachite-base = { path = "../malachite-base" }
+malachite-nz = { path = "../malachite-nz", features = ["float_helpers"] }
+malachite-q = { path = "../malachite-q" }
+serde = { version = "1.0.188", optional = true, features = ["derive"] }
+
+serde_json = { version = "1.0.105", optional = true }
+num = { version = "0.4.1", optional = true, features = ["serde"] }
+rug = { version = "1.21.0", default-features = false, optional = true, features = ["float", "serde"] }
+
+[features]
+enable_serde = ["serde", "malachite-nz/enable_serde"]
+32_bit_limbs = ["malachite-nz/32_bit_limbs"]
+test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "serde", "serde_json", "num", "rug"]
+bin_build = ["test_build"]
+
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]

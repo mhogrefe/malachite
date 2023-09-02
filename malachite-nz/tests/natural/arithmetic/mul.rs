@@ -11624,7 +11624,7 @@ fn verify_limbs_mul_greater_to_out_fft(
 }
 
 #[test]
-fn test_limbs_mul_greater_to_out_fftzzz() {
+fn test_limbs_mul_greater_to_out_fft() {
     let test = |xs: &[Limb], ys: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_mul_greater_to_out_fft_scratch_len(xs.len(), ys.len())];
@@ -11952,7 +11952,7 @@ fn verify_limbs_square_to_out_fft(out_before: &[Limb], xs: &[Limb], out_after: &
 }
 
 #[test]
-fn test_limbs_square_to_out_fftzzz() {
+fn test_limbs_square_to_out_fft() {
     #[cfg(not(feature = "32_bit_limbs"))]
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();

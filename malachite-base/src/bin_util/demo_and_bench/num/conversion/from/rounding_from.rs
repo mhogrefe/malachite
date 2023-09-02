@@ -42,15 +42,15 @@ fn demo_primitive_int_rounding_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (f, rm) in primitive_float_rounding_mode_pair_gen_var_3::<U, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "{}::rounding_from({}, {}) = {}",
+            "{}::rounding_from({}, {}) = {:?}",
             T::NAME,
             NiceFloat(f),
             rm,
@@ -64,19 +64,20 @@ fn demo_primitive_float_rounding_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (u, rm) in unsigned_rounding_mode_pair_gen_var_2::<U, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
+        let (x, o) = T::rounding_from(u, rm);
         println!(
-            "{}::rounding_from({}, {}) = {}",
+            "{}::rounding_from({}, {}) = {:?}",
             T::NAME,
             u,
             rm,
-            NiceFloat(T::rounding_from(u, rm))
+            (NiceFloat(x), o)
         );
     }
 }
@@ -86,19 +87,20 @@ fn demo_primitive_float_rounding_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (i, rm) in signed_rounding_mode_pair_gen_var_4::<U, T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
+        let (x, o) = T::rounding_from(i, rm);
         println!(
-            "{}::rounding_from({}, {}) = {}",
+            "{}::rounding_from({}, {}) = {:?}",
             T::NAME,
             i,
             rm,
-            NiceFloat(T::rounding_from(i, rm))
+            (NiceFloat(x), o)
         );
     }
 }
@@ -108,14 +110,14 @@ fn benchmark_primitive_int_rounding_from_primitive_float<
     U: PrimitiveFloat + RoundingFrom<T>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rounding_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        primitive_float_rounding_mode_pair_gen_var_3::<U, T>().get(gm, &config),
+        primitive_float_rounding_mode_pair_gen_var_3::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -129,14 +131,14 @@ fn benchmark_primitive_float_rounding_from_unsigned<
     U: PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rounding_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        unsigned_rounding_mode_pair_gen_var_2::<U, T>().get(gm, &config),
+        unsigned_rounding_mode_pair_gen_var_2::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -150,14 +152,14 @@ fn benchmark_primitive_float_rounding_from_signed<
     U: PrimitiveSigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rounding_from({})", T::NAME, U::NAME),
         BenchmarkType::Single,
-        signed_rounding_mode_pair_gen_var_4::<U, T>().get(gm, &config),
+        signed_rounding_mode_pair_gen_var_4::<U, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

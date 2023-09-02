@@ -23,8 +23,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_serialize_json(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_serialize_json(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!(
             "serde_json::to_string({}) = {}",
             n,
@@ -33,30 +33,30 @@ fn demo_integer_serialize_json(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_deserialize_json(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen().get(gm, &config).take(limit) {
+fn demo_integer_deserialize_json(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen().get(gm, config).take(limit) {
         let n: Result<Integer, _> = serde_json::from_str(&s);
-        println!("serde_json::from_str({}) = {:?}", s, n);
+        println!("serde_json::from_str({s}) = {n:?}");
     }
 }
 
-fn demo_integer_deserialize_json_targeted(gm: GenMode, config: GenConfig, limit: usize) {
-    for s in string_gen_var_9().get(gm, &config).take(limit) {
+fn demo_integer_deserialize_json_targeted(gm: GenMode, config: &GenConfig, limit: usize) {
+    for s in string_gen_var_9().get(gm, config).take(limit) {
         let n: Integer = serde_json::from_str(&s).unwrap();
-        println!("serde_json::from_str({}) = {}", s, n);
+        println!("serde_json::from_str({s}) = {n}");
     }
 }
 
 fn benchmark_integer_serialize_json_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "serde_json::to_string(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -77,14 +77,14 @@ fn benchmark_integer_serialize_json_library_comparison(
 
 fn benchmark_integer_deserialize_json(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "serde_json::from_str(&str)",
         BenchmarkType::Single,
-        string_gen().get(gm, &config),
+        string_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -97,14 +97,14 @@ fn benchmark_integer_deserialize_json(
 
 fn benchmark_integer_deserialize_json_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "serde_json::from_str(&str)",
         BenchmarkType::LibraryComparison,
-        string_triple_gen_var_2().get(gm, &config),
+        string_triple_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -10,7 +10,9 @@ use malachite_nz::natural::Natural;
 pub fn approximate_naive(x: &Rational, max_denominator: &Natural) -> Rational {
     let mut nearest = Rational::ZERO;
     for d in exhaustive_natural_inclusive_range(Natural::ONE, max_denominator.clone()) {
-        let q = x.round_to_multiple(Rational::from(d).reciprocal(), RoundingMode::Nearest);
+        let q = x
+            .round_to_multiple(Rational::from(d).reciprocal(), RoundingMode::Nearest)
+            .0;
         if (x - &q).lt_abs(&(x - &nearest)) {
             nearest = q;
         }

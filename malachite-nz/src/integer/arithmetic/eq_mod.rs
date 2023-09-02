@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleBy, EqMod, EqModPowerOf2, NegMod, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::TrailingZeros;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
@@ -316,9 +317,9 @@ impl Natural {
 
     fn pos_eq_neg_mod(&self, other: &Natural, m: Natural) -> bool {
         match (self, other, m) {
-            (_, _, natural_zero!()) => false,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (_, _, Natural::ZERO) => false,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
             (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), Natural(Large(ref m))) => {
@@ -341,9 +342,9 @@ impl Natural {
 
     fn pos_eq_neg_mod_ref(&self, other: &Natural, m: &Natural) -> bool {
         match (self, other, m) {
-            (_, _, &natural_zero!()) => false,
-            (x, &natural_zero!(), m) => x.divisible_by(m),
-            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (_, _, &Natural::ZERO) => false,
+            (x, &Natural::ZERO, m) => x.divisible_by(m),
+            (&Natural::ZERO, y, m) => y.divisible_by(m),
             (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_neg_limb_mod_limb(y, m),
             (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_neg_limb_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref m))) => {

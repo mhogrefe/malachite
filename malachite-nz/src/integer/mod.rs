@@ -1,4 +1,3 @@
-use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
@@ -38,7 +37,7 @@ macro_rules! integer_zero {
     () => {
         Integer {
             sign: true,
-            abs: natural_zero!(),
+            abs: Natural::ZERO,
         }
     };
 }
@@ -47,7 +46,7 @@ macro_rules! integer_one {
     () => {
         Integer {
             sign: true,
-            abs: natural_one!(),
+            abs: Natural::ONE,
         }
     };
 }
@@ -56,7 +55,7 @@ macro_rules! integer_two {
     () => {
         Integer {
             sign: true,
-            abs: natural_two!(),
+            abs: Natural::TWO,
         }
     };
 }
@@ -65,7 +64,7 @@ macro_rules! integer_negative_one {
     () => {
         Integer {
             sign: false,
-            abs: natural_one!(),
+            abs: Natural::ONE,
         }
     };
 }

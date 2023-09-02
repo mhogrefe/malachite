@@ -15,15 +15,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_try_from_float_simplest<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: TryFrom<T, Error = RationalFromPrimitiveFloatError>,
 {
-    for f in primitive_float_gen_var_8::<T>()
-        .get(gm, &config)
-        .take(limit)
-    {
+    for f in primitive_float_gen_var_8::<T>().get(gm, config).take(limit) {
         println!(
             "Rational::try_from_float_simplest({}) = {:?}",
             NiceFloat(f),
@@ -34,7 +31,7 @@ fn demo_rational_try_from_float_simplest<T: PrimitiveFloat>(
 
 fn benchmark_rational_try_from_float_simplest<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -43,7 +40,7 @@ fn benchmark_rational_try_from_float_simplest<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Rational::try_from_float_simplest({})", T::NAME),
         BenchmarkType::Single,
-        primitive_float_gen_var_8::<T>().get(gm, &config),
+        primitive_float_gen_var_8::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

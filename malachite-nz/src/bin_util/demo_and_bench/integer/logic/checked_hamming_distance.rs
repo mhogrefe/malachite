@@ -37,9 +37,9 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_limbs_hamming_distance_limb_neg(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_hamming_distance_limb_neg(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, y) in unsigned_vec_unsigned_pair_gen_var_19()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -51,8 +51,8 @@ fn demo_limbs_hamming_distance_limb_neg(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_limbs_hamming_distance_neg(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys) in unsigned_vec_pair_gen_var_8().get(gm, &config).take(limit) {
+fn demo_limbs_hamming_distance_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in unsigned_vec_pair_gen_var_8().get(gm, config).take(limit) {
         println!(
             "limbs_hamming_distance_neg({:?}, {:?}) = {}",
             xs,
@@ -62,8 +62,8 @@ fn demo_limbs_hamming_distance_neg(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_integer_checked_hamming_distance(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_checked_hamming_distance(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         println!(
             "checked_hamming_distance({}, {}) = {:?}",
             x,
@@ -75,14 +75,14 @@ fn demo_integer_checked_hamming_distance(gm: GenMode, config: GenConfig, limit: 
 
 fn benchmark_limbs_hamming_distance_limb_neg(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_hamming_distance_limb_neg(&[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_19().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_19().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -95,14 +95,14 @@ fn benchmark_limbs_hamming_distance_limb_neg(
 
 fn benchmark_limbs_hamming_distance_neg(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_hamming_distance_neg(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_pair_gen_var_8().get(gm, &config),
+        unsigned_vec_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -115,14 +115,14 @@ fn benchmark_limbs_hamming_distance_neg(
 
 fn benchmark_integer_checked_hamming_distance_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.checked_hamming_distance(&Integer)",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_rm().get(gm, &config),
+        integer_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -140,14 +140,14 @@ fn benchmark_integer_checked_hamming_distance_library_comparison(
 
 fn benchmark_integer_checked_hamming_distance_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.checked_hamming_distance(&Integer)",
         BenchmarkType::Algorithms,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

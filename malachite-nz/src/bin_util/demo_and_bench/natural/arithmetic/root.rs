@@ -82,9 +82,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_root_assign_rem);
 }
 
-fn demo_limbs_floor_root(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_floor_root(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, exp) in unsigned_vec_unsigned_pair_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -96,9 +96,9 @@ fn demo_limbs_floor_root(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_limbs_root_rem(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_root_rem(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, exp) in unsigned_vec_unsigned_pair_gen_var_14()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -110,110 +110,110 @@ fn demo_limbs_root_rem(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_floor_cbrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_cbrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.floor_root(3) = {}", x, x.clone().floor_root(3));
     }
 }
 
-fn demo_natural_floor_cbrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_cbrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).floor_root(3) = {}", x, (&x).floor_root(3));
     }
 }
 
-fn demo_natural_floor_cbrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_floor_cbrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.floor_root_assign(3);
-        println!("x := {}; x.floor_root_assign(3); x = {}", old_x, x);
+        println!("x := {old_x}; x.floor_root_assign(3); x = {x}");
     }
 }
 
-fn demo_natural_ceiling_cbrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_cbrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.ceiling_root(3) = {}", x, x.clone().ceiling_root(3));
     }
 }
 
-fn demo_natural_ceiling_cbrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_cbrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).ceiling_root(3) = {}", x, (&x).ceiling_root(3));
     }
 }
 
-fn demo_natural_ceiling_cbrt_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_cbrt_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         x.ceiling_root_assign(3);
-        println!("x := {}; x.ceiling_root_assign(3); x = {}", old_x, x);
+        println!("x := {old_x}; x.ceiling_root_assign(3); x = {x}");
     }
 }
 
-fn demo_natural_checked_cbrt(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_cbrt(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.checked_root(3) = {:?}", x, x.clone().checked_root(3));
     }
 }
 
-fn demo_natural_checked_cbrt_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_cbrt_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).checked_root(3) = {:?}", x, (&x).checked_root(3));
     }
 }
 
-fn demo_natural_cbrt_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_cbrt_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("{}.root_rem(3) = {:?}", x, x.clone().root_rem(3));
     }
 }
 
-fn demo_natural_cbrt_rem_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_cbrt_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in natural_gen().get(gm, config).take(limit) {
         println!("(&{}).root_rem(3) = {:?}", x, (&x).root_rem(3));
     }
 }
 
-fn demo_natural_cbrt_assign_rem(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut x in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_cbrt_assign_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in natural_gen().get(gm, config).take(limit) {
         let old_x = x.clone();
         let rem = x.root_assign_rem(3);
-        println!("x := {}; x.root_assign_rem(3) = {}; x = {}", old_x, rem, x);
+        println!("x := {old_x}; x.root_assign_rem(3) = {rem}; x = {x}");
     }
 }
 
-fn demo_natural_floor_root(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_floor_root(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.floor_root({}) = {}", x, exp, x.clone().floor_root(exp));
     }
 }
 
-fn demo_natural_floor_root_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_floor_root_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).floor_root({}) = {}", x, exp, (&x).floor_root(exp));
     }
 }
 
-fn demo_natural_floor_root_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_floor_root_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x.clone();
         x.floor_root_assign(exp);
-        println!("x := {}; x.floor_root_assign({}); x = {}", old_x, exp, x);
+        println!("x := {old_x}; x.floor_root_assign({exp}); x = {x}");
     }
 }
 
-fn demo_natural_ceiling_root(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_ceiling_root(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -225,9 +225,9 @@ fn demo_natural_ceiling_root(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_ceiling_root_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_ceiling_root_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -239,20 +239,20 @@ fn demo_natural_ceiling_root_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_ceiling_root_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_ceiling_root_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x.clone();
         x.ceiling_root_assign(exp);
-        println!("x := {}; x.ceiling_root_assign({}); x = {}", old_x, exp, x);
+        println!("x := {old_x}; x.ceiling_root_assign({exp}); x = {x}");
     }
 }
 
-fn demo_natural_checked_root(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_checked_root(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -264,9 +264,9 @@ fn demo_natural_checked_root(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_checked_root_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_checked_root_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -278,43 +278,40 @@ fn demo_natural_checked_root_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_root_rem(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_root_rem(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.root_rem({}) = {:?}", x, exp, x.clone().root_rem(exp));
     }
 }
 
-fn demo_natural_root_rem_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_root_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).root_rem({}) = {:?}", x, exp, (&x).root_rem(exp));
     }
 }
 
-fn demo_natural_root_assign_rem(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_root_assign_rem(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, exp) in natural_unsigned_pair_gen_var_7()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_x = x.clone();
         let rem = x.root_assign_rem(exp);
-        println!(
-            "x := {}; x.root_assign_rem({}) = {}; x = {}",
-            old_x, exp, rem, x
-        );
+        println!("x := {old_x}; x.root_assign_rem({exp}) = {rem}; x = {x}");
     }
 }
 
-fn benchmark_limbs_floor_root(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_floor_root(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_floor_root(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -325,11 +322,11 @@ fn benchmark_limbs_floor_root(gm: GenMode, config: GenConfig, limit: usize, file
     );
 }
 
-fn benchmark_limbs_root_rem(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_root_rem(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_root_rem(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_14().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_14().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -342,14 +339,14 @@ fn benchmark_limbs_root_rem(gm: GenMode, config: GenConfig, limit: usize, file_n
 
 fn benchmark_natural_floor_cbrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(3)",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -365,14 +362,14 @@ fn benchmark_natural_floor_cbrt_evaluation_strategy(
 
 fn benchmark_natural_floor_cbrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(3)",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -387,14 +384,14 @@ fn benchmark_natural_floor_cbrt_algorithms(
 #[allow(unused_must_use)]
 fn benchmark_natural_floor_cbrt_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(3)",
         BenchmarkType::LibraryComparison,
-        natural_gen_nrm().get(gm, &config),
+        natural_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -409,14 +406,14 @@ fn benchmark_natural_floor_cbrt_library_comparison(
 
 fn benchmark_natural_floor_cbrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root_assign(3)",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -427,14 +424,14 @@ fn benchmark_natural_floor_cbrt_assign(
 
 fn benchmark_natural_ceiling_cbrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root(3)",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -452,14 +449,14 @@ fn benchmark_natural_ceiling_cbrt_evaluation_strategy(
 
 fn benchmark_natural_ceiling_cbrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root(3)",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -473,14 +470,14 @@ fn benchmark_natural_ceiling_cbrt_algorithms(
 
 fn benchmark_natural_ceiling_cbrt_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root_assign(3)",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -491,14 +488,14 @@ fn benchmark_natural_ceiling_cbrt_assign(
 
 fn benchmark_natural_checked_cbrt_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_root(3)",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -516,14 +513,14 @@ fn benchmark_natural_checked_cbrt_evaluation_strategy(
 
 fn benchmark_natural_checked_cbrt_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_root(3)",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -537,14 +534,14 @@ fn benchmark_natural_checked_cbrt_algorithms(
 
 fn benchmark_natural_cbrt_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(3)",
         BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -559,14 +556,14 @@ fn benchmark_natural_cbrt_rem_evaluation_strategy(
 #[allow(clippy::no_effect)]
 fn benchmark_natural_cbrt_rem_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(3)",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -585,14 +582,14 @@ fn benchmark_natural_cbrt_rem_algorithms(
 
 fn benchmark_natural_cbrt_rem_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(3)",
         BenchmarkType::LibraryComparison,
-        natural_gen_rm().get(gm, &config),
+        natural_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -608,14 +605,14 @@ fn benchmark_natural_cbrt_rem_library_comparison(
 
 fn benchmark_natural_cbrt_assign_rem(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_assign_rem(3)",
         BenchmarkType::Single,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -626,14 +623,14 @@ fn benchmark_natural_cbrt_assign_rem(
 
 fn benchmark_natural_floor_root_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -651,14 +648,14 @@ fn benchmark_natural_floor_root_evaluation_strategy(
 
 fn benchmark_natural_floor_root_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -675,14 +672,14 @@ fn benchmark_natural_floor_root_algorithms(
 #[allow(unused_must_use)]
 fn benchmark_natural_floor_root_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_7_nrm::<u64>().get(gm, &config),
+        natural_unsigned_pair_gen_var_7_nrm::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -703,14 +700,14 @@ fn benchmark_natural_floor_root_library_comparison(
 
 fn benchmark_natural_floor_root_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_root_assign(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -721,14 +718,14 @@ fn benchmark_natural_floor_root_assign(
 
 fn benchmark_natural_ceiling_root_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -746,14 +743,14 @@ fn benchmark_natural_ceiling_root_evaluation_strategy(
 
 fn benchmark_natural_ceiling_root_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -769,14 +766,14 @@ fn benchmark_natural_ceiling_root_algorithms(
 
 fn benchmark_natural_ceiling_root_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_root_assign(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -787,14 +784,14 @@ fn benchmark_natural_ceiling_root_assign(
 
 fn benchmark_natural_checked_root_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_root(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -812,14 +809,14 @@ fn benchmark_natural_checked_root_evaluation_strategy(
 
 fn benchmark_natural_checked_root_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_root(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -835,14 +832,14 @@ fn benchmark_natural_checked_root_algorithms(
 
 fn benchmark_natural_root_rem_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(u64)",
         BenchmarkType::EvaluationStrategy,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -861,14 +858,14 @@ fn benchmark_natural_root_rem_evaluation_strategy(
 #[allow(clippy::no_effect)]
 fn benchmark_natural_root_rem_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -887,14 +884,14 @@ fn benchmark_natural_root_rem_algorithms(
 
 fn benchmark_natural_root_rem_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_rem(u64)",
         BenchmarkType::LibraryComparison,
-        natural_unsigned_pair_gen_var_7_rm::<u64>().get(gm, &config),
+        natural_unsigned_pair_gen_var_7_rm::<u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -910,14 +907,14 @@ fn benchmark_natural_root_rem_library_comparison(
 
 fn benchmark_natural_root_assign_rem(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.root_assign_rem(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_7().get(gm, &config),
+        natural_unsigned_pair_gen_var_7().get(gm, config),
         gm.name(),
         limit,
         file_name,

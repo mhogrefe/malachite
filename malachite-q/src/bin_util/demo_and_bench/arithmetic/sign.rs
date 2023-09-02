@@ -12,26 +12,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_sign_library_comparison);
 }
 
-fn demo_integer_sign(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in rational_gen().get(gm, &config).take(limit) {
+fn demo_integer_sign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
         match x.sign() {
-            Ordering::Less => println!("{} is negative", x),
-            Ordering::Equal => println!("{} is zero", x),
-            Ordering::Greater => println!("{} is positive", x),
+            Ordering::Less => println!("{x} is negative"),
+            Ordering::Equal => println!("{x} is zero"),
+            Ordering::Greater => println!("{x} is positive"),
         }
     }
 }
 
 fn benchmark_integer_sign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.sign()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

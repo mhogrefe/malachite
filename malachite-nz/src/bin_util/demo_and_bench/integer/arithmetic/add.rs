@@ -34,58 +34,58 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_sum_evaluation_strategy);
 }
 
-fn demo_integer_add(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} + {} = {}", x_old, y_old, x + y);
     }
 }
 
-fn demo_integer_add_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} + &{} = {}", x_old, y, x + &y);
     }
 }
 
-fn demo_integer_add_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("&{} + {} = {}", x, y_old, &x + y);
     }
 }
 
-fn demo_integer_add_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         println!("&{} + &{} = {}", x, y, &x + &y);
     }
 }
 
-fn demo_integer_add_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x += y.clone();
-        println!("x := {}; x += {}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x += {y}; x = {x}");
     }
 }
 
-fn demo_integer_add_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in integer_pair_gen().get(gm, &config).take(limit) {
+fn demo_integer_add_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in integer_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x += &y;
-        println!("x := {}; x += &{}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x += &{y}; x = {x}");
     }
 }
 
-fn demo_integer_sum(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+fn demo_integer_sum(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, config).take(limit) {
         println!("sum({:?}) = {}", xs.clone(), Integer::sum(xs.into_iter()));
     }
 }
 
-fn demo_integer_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in integer_vec_gen().get(gm, &config).take(limit) {
+fn demo_integer_ref_sum(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in integer_vec_gen().get(gm, config).take(limit) {
         println!("sum({:?}) = {}", xs, Integer::sum(xs.iter()));
     }
 }
@@ -93,14 +93,14 @@ fn demo_integer_ref_sum(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_integer_add_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer + Integer",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_nrm().get(gm, &config),
+        integer_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -116,14 +116,14 @@ fn benchmark_integer_add_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_add_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer + Integer",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -139,14 +139,14 @@ fn benchmark_integer_add_evaluation_strategy(
 
 fn benchmark_integer_add_assign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer += Integer",
         BenchmarkType::LibraryComparison,
-        integer_pair_gen_rm().get(gm, &config),
+        integer_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -157,14 +157,14 @@ fn benchmark_integer_add_assign_library_comparison(
 
 fn benchmark_integer_add_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer += Integer",
         BenchmarkType::EvaluationStrategy,
-        integer_pair_gen().get(gm, &config),
+        integer_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -178,14 +178,14 @@ fn benchmark_integer_add_assign_evaluation_strategy(
 
 fn benchmark_integer_sum_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::sum(Iterator<Item=Integer>)",
         BenchmarkType::LibraryComparison,
-        integer_vec_gen_nrm().get(gm, &config),
+        integer_vec_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -204,11 +204,16 @@ fn benchmark_integer_sum_library_comparison(
     );
 }
 
-fn benchmark_integer_sum_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_sum_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Integer::sum(Iterator<Item=Integer>)",
         BenchmarkType::Algorithms,
-        integer_vec_gen().get(gm, &config),
+        integer_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -222,14 +227,14 @@ fn benchmark_integer_sum_algorithms(gm: GenMode, config: GenConfig, limit: usize
 
 fn benchmark_integer_sum_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer::sum(Iterator<Item=Integer>)",
         BenchmarkType::EvaluationStrategy,
-        integer_vec_gen().get(gm, &config),
+        integer_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

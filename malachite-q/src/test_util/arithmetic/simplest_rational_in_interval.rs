@@ -26,7 +26,7 @@ pub fn simplest_rational_in_open_interval_naive(x: &Rational, y: &Rational) -> R
     };
     for d in exhaustive_positive_naturals() {
         let dr = Rational::from(d).reciprocal();
-        let mut q = x.round_to_multiple(&dr, RoundingMode::Ceiling);
+        let mut q = x.round_to_multiple(&dr, RoundingMode::Ceiling).0;
         if q == *x {
             q += dr;
         }
@@ -142,7 +142,7 @@ pub fn simplest_rational_in_closed_interval_naive(x: &Rational, y: &Rational) ->
     };
     for d in exhaustive_positive_naturals() {
         let dr = Rational::from(d).reciprocal();
-        let q = x.round_to_multiple(&dr, RoundingMode::Ceiling);
+        let q = x.round_to_multiple(&dr, RoundingMode::Ceiling).0;
         if q <= *y {
             return if neg { -q } else { q };
         }

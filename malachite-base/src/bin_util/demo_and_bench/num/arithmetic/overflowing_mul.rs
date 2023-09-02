@@ -20,16 +20,16 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_overflowing_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         println!("{}.overflowing_mul({}) = {:?}", x, y, x.overflowing_mul(y));
     }
 }
 
-fn demo_overflowing_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+fn demo_overflowing_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         println!(
             "({}).overflowing_mul({}) = {:?}",
             x,
@@ -41,44 +41,38 @@ fn demo_overflowing_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfi
 
 fn demo_overflowing_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen_var_27::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let overflow = x.overflowing_mul_assign(y);
-        println!(
-            "x := {}; x.overflowing_mul_assign({}) = {}; x = {}",
-            old_x, y, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_mul_assign({y}) = {overflow}; x = {x}");
     }
 }
 
 fn demo_overflowing_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in signed_pair_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         let overflow = x.overflowing_mul_assign(y);
-        println!(
-            "x := {}; x.overflowing_mul_assign({}) = {}; x = {}",
-            old_x, y, overflow, x
-        );
+        println!("x := {old_x}; x.overflowing_mul_assign({y}) = {overflow}; x = {x}");
     }
 }
 
 fn benchmark_overflowing_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_mul({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -89,14 +83,14 @@ fn benchmark_overflowing_mul_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_mul_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_mul({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -107,14 +101,14 @@ fn benchmark_overflowing_mul_signed<T: PrimitiveSigned>(
 
 fn benchmark_overflowing_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_mul_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -127,14 +121,14 @@ fn benchmark_overflowing_mul_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_mul_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        signed_pair_gen::<T>().get(gm, &config),
+        signed_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

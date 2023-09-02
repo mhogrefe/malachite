@@ -33,10 +33,9 @@ pub fn random_naturals_helper_helper<I: Clone + Iterator<Item = Natural>>(
         median_hi.map(|x| Natural::to_string(&x)),
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
-    // Note that the population moments do not exist.
     let actual_sample_moment_stats = moment_stats(
         xs.take(1000000)
-            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest)),
+            .map(|x| f64::rounding_from(&x, RoundingMode::Nearest).0),
     );
     assert_eq!(
         (

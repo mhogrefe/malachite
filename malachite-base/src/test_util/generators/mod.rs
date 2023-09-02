@@ -434,6 +434,42 @@ pub fn primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>() -> Generator<(
     )
 }
 
+// All `(T, i64)` where `T` is a primitive float type, the `T` is greater than or equal to 1.0 and
+// less than 2.0, and the `i64` is small.
+pub fn primitive_float_signed_pair_gen_var_3<T: PrimitiveFloat>() -> Generator<(T, i64)> {
+    Generator::new(
+        &exhaustive_primitive_float_signed_pair_gen_var_3,
+        &random_primitive_float_signed_pair_gen_var_3,
+        &special_random_primitive_float_signed_pair_gen_var_3,
+    )
+}
+
+// All `(T, U)` where `T` is a primitive float type, `U` is signed, and the `U` is small.
+pub fn primitive_float_signed_pair_gen_var_4<T: PrimitiveFloat, U: PrimitiveSigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_primitive_float_signed_pair_gen_var_4,
+        &random_primitive_float_signed_pair_gen_var_4,
+        &special_random_primitive_float_signed_pair_gen_var_4,
+    )
+}
+
+// -- (PrimitiveFloat, PrimitiveSigned, PrimitiveUnsigned) --
+
+// All `(T, U, V)` where `T` is a primitive float type, `U` is signed, `V` is unsigned, the `U` is
+// small, and the `V` is small and positive.
+pub fn primitive_float_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> Generator<(T, U, V)> {
+    Generator::new(
+        &exhaustive_primitive_float_signed_unsigned_triple_gen_var_1,
+        &random_primitive_float_signed_unsigned_triple_gen_var_1,
+        &special_random_primitive_float_signed_unsigned_triple_gen_var_1,
+    )
+}
+
 // -- (PrimitiveFloat, PrimitiveUnsigned) --
 
 // All `(T, U)` where `T` is a primitive float type, `U` is unsigned, the `T` is finite and
@@ -468,6 +504,17 @@ pub fn primitive_float_unsigned_pair_gen_var_3<T: PrimitiveFloat, U: PrimitiveUn
     )
 }
 
+// All `(T, U)` where `T` is a primitive float type, `U` is unsigned, and the `U` is small and
+// positive.
+pub fn primitive_float_unsigned_pair_gen_var_4<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_primitive_float_unsigned_pair_gen_var_3,
+        &random_primitive_float_unsigned_pair_gen_var_4,
+        &special_random_primitive_float_unsigned_pair_gen_var_4,
+    )
+}
+
 // -- (PrimitiveFloat, PrimitiveUnsigned, RoundingMode) --
 
 // All `(T, U, RoundingMode)` where `T` is a primitive float type, `U` is unsigned, the `T` is
@@ -493,6 +540,8 @@ pub fn primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveFloat
         &special_random_primitive_float_unsigned_rounding_mode_triple_gen_var_2,
     )
 }
+
+// var 3 is in malachite-float.
 
 // -- (PrimitiveFloat, RoundingMode) --
 
@@ -935,9 +984,23 @@ pub fn signed_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveU
 // All triples `(T, T, u64)` (x, y, k) where `T` is unsigned and x is not equal to y mod $2^k$.
 pub fn signed_signed_unsigned_triple_gen_var_3<T: PrimitiveSigned>() -> Generator<(T, T, u64)> {
     Generator::new(
-        &exhaustive_signed_signed_unsigned_triple_gen_var_5,
+        &exhaustive_signed_signed_unsigned_triple_gen_var_2,
         &random_primitive_int_primitive_int_unsigned_triple_gen_var_3,
         &special_random_signed_signed_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(T, U, V)` where `T` is signed, `U` is signed and small, and `V` is unsigned, small, and
+// positive.
+pub fn signed_signed_unsigned_triple_gen_var_4<
+    T: PrimitiveSigned,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> Generator<(T, U, V)> {
+    Generator::new(
+        &exhaustive_signed_signed_unsigned_triple_gen_var_3,
+        &random_signed_signed_unsigned_triple_gen_var_2,
+        &special_random_signed_signed_unsigned_triple_gen_var_4,
     )
 }
 
@@ -1182,7 +1245,7 @@ pub fn signed_unsigned_pair_gen_var_17<
     )
 }
 
-// All `(T, U)`s where `T` is signed, the `U` is unsigned, positive, and small, and the either the
+// All `(T, U)`s where `T` is signed, the `U` is unsigned, positive, and small, and either the
 // `T` is non-negative or the `U` is odd.
 pub fn signed_unsigned_pair_gen_var_18<T: PrimitiveSigned, U: PrimitiveUnsigned>(
 ) -> Generator<(T, U)> {
@@ -1190,6 +1253,26 @@ pub fn signed_unsigned_pair_gen_var_18<T: PrimitiveSigned, U: PrimitiveUnsigned>
         &exhaustive_signed_unsigned_pair_gen_var_17,
         &random_signed_unsigned_pair_gen_var_12,
         &special_random_signed_unsigned_pair_gen_var_14,
+    )
+}
+
+// All `(T, U)`s where `T` is signed, `U` is unsigned, and both `T` and `U` are small, and the `U`
+// is positive.
+pub fn signed_unsigned_pair_gen_var_19<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_signed_unsigned_pair_gen_var_18,
+        &random_signed_unsigned_pair_gen_var_13,
+    )
+}
+
+// All `(T, U)`s where `T` is signed, `U` is unsigned, and the `U` is small and positive.
+pub fn signed_unsigned_pair_gen_var_20<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_19,
+        &random_primitive_int_unsigned_pair_gen_var_10,
+        &special_random_signed_unsigned_pair_gen_var_16,
     )
 }
 
@@ -1287,6 +1370,8 @@ pub fn signed_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveSigned, U: Pri
         &special_random_signed_unsigned_rounding_mode_triple_gen_var_2,
     )
 }
+
+// var 3 is in malachite-float.
 
 // -- (PrimitiveSigned, RoundingMode) --
 
@@ -1717,6 +1802,20 @@ pub fn unsigned_signed_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: Primit
         &exhaustive_unsigned_signed_unsigned_triple_gen_var_3,
         &random_primitive_int_triple_gen_var_3,
         &special_random_unsigned_signed_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(T, U, V)` where `T` is unsigned, `U` is signed and small, and `V` is unsigned, small, and
+// positive.
+pub fn unsigned_signed_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveSigned,
+    V: PrimitiveUnsigned,
+>() -> Generator<(T, U, V)> {
+    Generator::new(
+        &exhaustive_unsigned_signed_unsigned_triple_gen_var_4,
+        &random_unsigned_signed_unsigned_triple_gen_var_2,
+        &special_random_unsigned_signed_unsigned_triple_gen_var_4,
     )
 }
 
@@ -2656,6 +2755,8 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_4<
         &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_4,
     )
 }
+
+// var 5 is in malachite-float.
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 

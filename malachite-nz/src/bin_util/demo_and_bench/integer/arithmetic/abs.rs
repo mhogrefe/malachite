@@ -26,47 +26,47 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_mutate_unsigned_abs);
 }
 
-fn demo_integer_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("|{}| = {}", n.clone(), n.abs());
     }
 }
 
-fn demo_integer_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_abs_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("|&{}| = {}", n, (&n).abs());
     }
 }
 
-fn demo_integer_abs_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_abs_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in integer_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.abs_assign();
-        println!("n := {}; n.abs_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.abs_assign(); n = {n}");
     }
 }
 
-fn demo_integer_unsigned_abs(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_unsigned_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("unsigned_abs({}) = {}", n.clone(), n.unsigned_abs());
     }
 }
 
-fn demo_integer_unsigned_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_unsigned_abs_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("unsigned_abs(&{}) = {}", n, (&n).unsigned_abs());
     }
 }
 
-fn demo_integer_unsigned_abs_ref_out(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_unsigned_abs_ref_out(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("{}.unsigned_abs_ref() = {}", n, n.unsigned_abs_ref());
     }
 }
 
-fn demo_integer_mutate_unsigned_abs(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_mutate_unsigned_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, out, new_abs) in integer_integer_natural_triple_gen()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n.clone();
@@ -77,22 +77,23 @@ fn demo_integer_mutate_unsigned_abs(gm: GenMode, config: GenConfig, limit: usize
             out
         });
         println!(
-            "n := {}; n.mutate_unsigned_abs(|x| {{ *x = {}; {} }}) = {}; n = {}",
-            old_n, old_new_abs, old_out, actual_out, n
+            "n := {old_n}; \
+            n.mutate_unsigned_abs(|x| {{ *x = {old_new_abs}; {old_out} }}) = {actual_out}; \
+            n = {n}",
         );
     }
 }
 
 fn benchmark_integer_abs_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.abs()",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -107,14 +108,14 @@ fn benchmark_integer_abs_library_comparison(
 
 fn benchmark_integer_abs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.abs()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -126,11 +127,11 @@ fn benchmark_integer_abs_evaluation_strategy(
     );
 }
 
-fn benchmark_integer_abs_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_abs_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Integer.abs_assign()",
         BenchmarkType::Single,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -141,14 +142,14 @@ fn benchmark_integer_abs_assign(gm: GenMode, config: GenConfig, limit: usize, fi
 
 fn benchmark_integer_unsigned_abs_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.unsigned_abs()",
         BenchmarkType::EvaluationStrategy,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -167,14 +168,14 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
 
 fn benchmark_integer_mutate_unsigned_abs(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.mutate_unsigned_abs(FnOnce(&mut Natural) -> T)",
         BenchmarkType::Single,
-        integer_integer_natural_triple_gen().get(gm, &config),
+        integer_integer_natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

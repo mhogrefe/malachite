@@ -36,52 +36,52 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_product_evaluation_strategy);
 }
 
-fn demo_rational_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("{} * {} = {}", x_old, y_old, x * y);
     }
 }
 
-fn demo_rational_mul_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("{} * &{} = {}", x_old, y, x * &y);
     }
 }
 
-fn demo_rational_mul_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let y_old = y.clone();
         println!("&{} * {} = {}", x, y_old, &x * y);
     }
 }
 
-fn demo_rational_mul_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
         println!("&{} * &{} = {}", x, y, &x * &y);
     }
 }
 
-fn demo_rational_mul_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x *= y.clone();
-        println!("x := {}; x *= {}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x *= {y}; x = {x}");
     }
 }
 
-fn demo_rational_mul_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y) in rational_pair_gen().get(gm, &config).take(limit) {
+fn demo_rational_mul_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y) in rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x *= &y;
-        println!("x := {}; x *= &{}; x = {}", x_old, y, x);
+        println!("x := {x_old}; x *= &{y}; x = {x}");
     }
 }
 
-fn demo_rational_product(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+fn demo_rational_product(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, config).take(limit) {
         println!(
             "product({:?}) = {}",
             xs.clone(),
@@ -90,8 +90,8 @@ fn demo_rational_product(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_ref_product(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in rational_vec_gen().get(gm, &config).take(limit) {
+fn demo_rational_ref_product(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in rational_vec_gen().get(gm, config).take(limit) {
         println!("product({:?}) = {}", xs, Rational::product(xs.iter()));
     }
 }
@@ -99,14 +99,14 @@ fn demo_rational_ref_product(gm: GenMode, config: GenConfig, limit: usize) {
 #[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
 fn benchmark_rational_mul_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational * Rational",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_nrm().get(gm, &config),
+        rational_pair_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -122,14 +122,14 @@ fn benchmark_rational_mul_library_comparison(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_mul_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational * Rational",
         BenchmarkType::EvaluationStrategy,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -146,14 +146,14 @@ fn benchmark_rational_mul_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_rational_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational * Rational",
         BenchmarkType::Algorithms,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -167,14 +167,14 @@ fn benchmark_rational_mul_algorithms(
 
 fn benchmark_rational_mul_assign_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational *= Rational",
         BenchmarkType::LibraryComparison,
-        rational_pair_gen_rm().get(gm, &config),
+        rational_pair_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -185,14 +185,14 @@ fn benchmark_rational_mul_assign_library_comparison(
 
 fn benchmark_rational_mul_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational *= Rational",
         BenchmarkType::EvaluationStrategy,
-        rational_pair_gen().get(gm, &config),
+        rational_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -206,14 +206,14 @@ fn benchmark_rational_mul_assign_evaluation_strategy(
 
 fn benchmark_rational_product_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::product(Iterator<Item=Rational>)",
         BenchmarkType::LibraryComparison,
-        rational_vec_gen_nrm().get(gm, &config),
+        rational_vec_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -234,14 +234,14 @@ fn benchmark_rational_product_library_comparison(
 
 fn benchmark_rational_product_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::product(Iterator<Item=Rational>)",
         BenchmarkType::Algorithms,
-        rational_vec_gen().get(gm, &config),
+        rational_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -259,14 +259,14 @@ fn benchmark_rational_product_algorithms(
 
 fn benchmark_rational_product_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational::product(Iterator<Item=Rational>)",
         BenchmarkType::EvaluationStrategy,
-        rational_vec_gen().get(gm, &config),
+        rational_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

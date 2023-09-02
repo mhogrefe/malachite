@@ -10,11 +10,13 @@ use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
+use std::cmp::Ordering;
 use std::ops::{Shl, ShlAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -29,10 +31,10 @@ use std::ops::{Shl, ShlAssign};
 //
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and the result is returned.
-pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
+pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
-        vec![1]
+        (vec![1], Ordering::Greater)
     } else {
         let (xs_lo, xs_hi) = xs.split_at(delete_count);
         let mut exact = slice_test_zero(xs_lo);
@@ -44,7 +46,14 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
         if !exact {
             limbs_vec_add_limb_in_place(&mut out, 1);
         }
-        out
+        (
+            out,
+            if exact {
+                Ordering::Equal
+            } else {
+                Ordering::Greater
+            },
+        )
     }
 }}
 
@@ -54,20 +63,38 @@ pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
-fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
+fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
-        Vec::new()
+        (
+            Vec::new(),
+            if slice_test_zero(xs) {
+                Ordering::Equal
+            } else {
+                Ordering::Less
+            },
+        )
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut out = xs[delete_count..].to_vec();
+        let (xs_lo, xs_hi) = xs.split_at(delete_count);
+        let mut exact = slice_test_zero(xs_lo);
+        let mut out = xs_hi.to_vec();
         if small_bits != 0 {
-            limbs_slice_shr_in_place(&mut out, small_bits);
+            exact &= limbs_slice_shr_in_place(&mut out, small_bits) == 0;
         }
         if !out.is_empty() && out[0].odd() {
             limbs_vec_add_limb_in_place(&mut out, 1);
+            (out, Ordering::Greater)
+        } else {
+            (
+                out,
+                if exact {
+                    Ordering::Equal
+                } else {
+                    Ordering::Less
+                },
+            )
         }
-        out
     }
 }
 
@@ -83,15 +110,21 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
 // `max(1, xs.len() - bits / Limb::WIDTH)`.
-pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
+pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     if bits == 0 {
-        xs.to_vec()
-    } else if !limbs_get_bit(xs, bits - 1) {
-        limbs_shr(xs, bits)
-    } else if !limbs_divisible_by_power_of_2(xs, bits - 1) {
-        limbs_shr_round_up(xs, bits)
+        (xs.to_vec(), Ordering::Equal)
     } else {
-        limbs_shr_round_half_integer_to_even(xs, bits)
+        let d = slice_test_zero(xs) || limbs_divisible_by_power_of_2(xs, bits - 1);
+        if !limbs_get_bit(xs, bits - 1) {
+            (
+                limbs_shr(xs, bits),
+                if d { Ordering::Equal } else { Ordering::Less },
+            )
+        } else if d {
+            limbs_shr_round_half_integer_to_even(xs, bits)
+        } else {
+            limbs_shr_round_up(xs, bits)
+        }
     }
 }}
 
@@ -125,12 +158,20 @@ pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
 // `max(1, xs.len() - bits / Limb::WIDTH)`.
-pub_test! {limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
+pub_test! {
+    limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<(Vec<Limb>, Ordering)> {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
+        RoundingMode::Down | RoundingMode::Floor => Some((
+            limbs_shr(xs, bits),
+            if limbs_divisible_by_power_of_2(xs, bits) {
+                Ordering::Equal
+            } else {
+                Ordering::Less
+            },
+        )),
         RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(xs, bits)),
         RoundingMode::Nearest => Some(limbs_shr_round_nearest(xs, bits)),
-        RoundingMode::Exact => limbs_shr_exact(xs, bits),
+        RoundingMode::Exact => limbs_shr_exact(xs, bits).map(|ss| (ss, Ordering::Equal)),
     }
 }}
 
@@ -147,11 +188,12 @@ pub_test! {limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<V
 //
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and `w == u`.
-pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
+pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
         xs.truncate(1);
         xs[0] = 1;
+        Ordering::Greater
     } else {
         let mut exact = slice_test_zero(&xs[..delete_count]);
         let small_bits = bits & Limb::WIDTH_MASK;
@@ -162,6 +204,11 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
         if !exact {
             limbs_vec_add_limb_in_place(xs, 1);
         }
+        if exact {
+            Ordering::Equal
+        } else {
+            Ordering::Greater
+        }
     }
 }}
 
@@ -171,18 +218,30 @@ pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
-fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) {
+fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
+        let o = if slice_test_zero(xs) {
+            Ordering::Equal
+        } else {
+            Ordering::Less
+        };
         xs.clear();
+        o
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
+        let mut exact = slice_test_zero(&xs[..delete_count]);
         vec_delete_left(xs, delete_count);
         if small_bits != 0 {
-            limbs_slice_shr_in_place(xs, small_bits);
+            exact &= limbs_slice_shr_in_place(xs, small_bits) == 0;
         }
         if !xs.is_empty() && xs[0].odd() {
             limbs_vec_add_limb_in_place(xs, 1);
+            Ordering::Greater
+        } else if exact {
+            Ordering::Equal
+        } else {
+            Ordering::Less
         }
     }
 }
@@ -198,14 +257,23 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
-pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
+pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     if bits == 0 {
-    } else if !limbs_get_bit(xs, bits - 1) {
-        limbs_vec_shr_in_place(xs, bits)
-    } else if !limbs_divisible_by_power_of_2(xs, bits - 1) {
-        limbs_vec_shr_round_up_in_place(xs, bits)
+        Ordering::Equal
     } else {
-        limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
+        let d = slice_test_zero(xs) || limbs_divisible_by_power_of_2(xs, bits - 1);
+        if !limbs_get_bit(xs, bits - 1) {
+            limbs_vec_shr_in_place(xs, bits);
+            if d {
+                Ordering::Equal
+            } else {
+                Ordering::Less
+            }
+        } else if d {
+            limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
+        } else {
+            limbs_vec_shr_round_up_in_place(xs, bits)
+        }
     }
 }}
 
@@ -241,59 +309,78 @@ pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
-pub_test! {limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
+pub_test! {limbs_vec_shr_round_in_place(
+    xs: &mut Vec<Limb>,
+    bits: u64,
+    rm: RoundingMode,
+) -> (bool, Ordering) {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {
+            let exact = limbs_divisible_by_power_of_2(xs, bits);
             limbs_vec_shr_in_place(xs, bits);
-            true
+            (
+                true,
+                if exact {
+                    Ordering::Equal
+                } else {
+                    Ordering::Less
+                },
+            )
         }
         RoundingMode::Up | RoundingMode::Ceiling => {
-            limbs_vec_shr_round_up_in_place(xs, bits);
-            true
+            (true, limbs_vec_shr_round_up_in_place(xs, bits))
         }
-        RoundingMode::Nearest => {
-            limbs_vec_shr_round_nearest_in_place(xs, bits);
-            true
-        }
-        RoundingMode::Exact => limbs_vec_shr_exact_in_place(xs, bits),
+        RoundingMode::Nearest => (true, limbs_vec_shr_round_nearest_in_place(xs, bits)),
+        RoundingMode::Exact => (limbs_vec_shr_exact_in_place(xs, bits), Ordering::Equal),
     }
 }}
 
-fn shr_round_unsigned_ref_n<T: PrimitiveUnsigned>(x: &Natural, bits: T, rm: RoundingMode) -> Natural
+fn shr_round_unsigned_ref_n<T: PrimitiveUnsigned>(
+    x: &Natural,
+    bits: T,
+    rm: RoundingMode,
+) -> (Natural, Ordering)
 where
     u64: ExactFrom<T>,
     Limb: ShrRound<T, Output = Limb>,
 {
     match (x, bits) {
-        (natural_zero!(), _) => x.clone(),
-        (_, bits) if bits == T::ZERO => x.clone(),
-        (Natural(Small(ref small)), bits) => Natural(Small(small.shr_round(bits, rm))),
+        (&Natural::ZERO, _) => (x.clone(), Ordering::Equal),
+        (_, bits) if bits == T::ZERO => (x.clone(), Ordering::Equal),
+        (Natural(Small(ref small)), bits) => {
+            let (s, o) = small.shr_round(bits, rm);
+            (Natural(Small(s)), o)
+        }
         (Natural(Large(ref limbs)), bits) => {
-            if let Some(out) = limbs_shr_round(limbs, u64::exact_from(bits), rm) {
-                Natural::from_owned_limbs_asc(out)
+            if let Some((out, o)) = limbs_shr_round(limbs, u64::exact_from(bits), rm) {
+                (Natural::from_owned_limbs_asc(out), o)
             } else {
-                panic!("Right shift is not exact: {} >> {}", x, bits);
+                panic!("Right shift is not exact: {x} >> {bits}");
             }
         }
     }
 }
 
-fn shr_round_assign_unsigned_n<T: PrimitiveUnsigned>(x: &mut Natural, bits: T, rm: RoundingMode)
+fn shr_round_assign_unsigned_n<T: PrimitiveUnsigned>(
+    x: &mut Natural,
+    bits: T,
+    rm: RoundingMode,
+) -> Ordering
 where
     u64: ExactFrom<T>,
     Limb: ShrRoundAssign<T>,
 {
     match (&mut *x, bits) {
-        (natural_zero!(), _) => {}
-        (_, bits) if bits == T::ZERO => {}
-        (Natural(Small(ref mut small)), bits) => {
-            small.shr_round_assign(bits, rm);
-        }
+        (&mut Natural::ZERO, _) => Ordering::Equal,
+        (_, bits) if bits == T::ZERO => Ordering::Equal,
+        (Natural(Small(ref mut small)), bits) => small.shr_round_assign(bits, rm),
         (Natural(Large(ref mut limbs)), bits) => {
-            if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm) {
+            let (b, o) = limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm);
+            if !b {
                 panic!("Right shift is not exact.");
             }
             x.trim();
+            o
         }
     }
 }
@@ -304,13 +391,16 @@ macro_rules! impl_natural_shr_round_unsigned {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by value, and
-            /// rounds according to the specified rounding mode.
+            /// rounds according to the specified rounding mode. An [`Ordering`] is also returned,
+            /// indicating whether the returned value is less than, equal to, or greater than the
+            /// exact value.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Let $q = \frac{x}{2^k}$:
+            /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
@@ -332,6 +422,10 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// $$
             ///
             /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -347,9 +441,9 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// # Examples
             /// See [here](super::shr_round#shr_round).
             #[inline]
-            fn shr_round(mut self, bits: $t, rm: RoundingMode) -> Natural {
-                self.shr_round_assign(bits, rm);
-                self
+            fn shr_round(mut self, bits: $t, rm: RoundingMode) -> (Natural, Ordering) {
+                let o = self.shr_round_assign(bits, rm);
+                (self, o)
             }
         }
 
@@ -357,13 +451,16 @@ macro_rules! impl_natural_shr_round_unsigned {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by reference,
-            /// and rounds according to the specified rounding mode.
+            /// and rounds according to the specified rounding mode. An [`Ordering`] is also
+            /// returned, indicating whether the returned value is less than, equal to, or greater
+            /// than the exact value.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Let $q = \frac{x}{2^k}$:
+            /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
@@ -385,6 +482,10 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// $$
             ///
             /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -401,14 +502,17 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// # Examples
             /// See [here](super::shr_round#shr_round).
             #[inline]
-            fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
+            fn shr_round(self, bits: $t, rm: RoundingMode) -> (Natural, Ordering) {
                 shr_round_unsigned_ref_n(self, bits, rm)
             }
         }
 
         impl ShrRoundAssign<$t> for Natural {
             /// Shifts a [`Natural`] right (divides it by a power of 2) and rounds according to the
-            /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
+            /// specified rounding mode, in place. An [`Ordering`] is returned, indicating whether
+            /// the assigned value is less than, equal to, or greater than the exact value.
+            ///
+            /// Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
@@ -429,8 +533,8 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).
             #[inline]
-            fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                shr_round_assign_unsigned_n(self, bits, rm);
+            fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) -> Ordering {
+                shr_round_assign_unsigned_n(self, bits, rm)
             }
         }
     };
@@ -441,14 +545,14 @@ fn shr_round_signed_ref_n<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
     bits: S,
     rm: RoundingMode,
-) -> Natural
+) -> (Natural, Ordering)
 where
     &'a Natural: Shl<U, Output = Natural> + ShrRound<U, Output = Natural>,
 {
     if bits >= S::ZERO {
         x.shr_round(bits.unsigned_abs(), rm)
     } else {
-        x << bits.unsigned_abs()
+        (x << bits.unsigned_abs(), Ordering::Equal)
     }
 }
 
@@ -456,13 +560,15 @@ fn shr_round_assign_signed_n<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &mut Natural,
     bits: S,
     rm: RoundingMode,
-) where
+) -> Ordering
+where
     Natural: ShlAssign<U> + ShrRoundAssign<U>,
 {
     if bits >= S::ZERO {
-        x.shr_round_assign(bits.unsigned_abs(), rm);
+        x.shr_round_assign(bits.unsigned_abs(), rm)
     } else {
-        *x <<= bits.unsigned_abs()
+        *x <<= bits.unsigned_abs();
+        Ordering::Equal
     }
 }
 
@@ -472,13 +578,17 @@ macro_rules! impl_natural_shr_round_signed {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2), taking it by
-            /// value, and rounds according to the specified rounding mode.
+            /// value, and rounds according to the specified rounding mode. An [`Ordering`] is also
+            /// returned, indicating whether the returned value is less than, equal to, or greater
+            /// than the exact value. If `bits` is negative, then the returned [`Ordering`] is
+            /// always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Let $q = \frac{x}{2^k}$:
+            /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
@@ -501,6 +611,10 @@ macro_rules! impl_natural_shr_round_signed {
             ///
             /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
             ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
+            ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$
             ///
@@ -516,9 +630,9 @@ macro_rules! impl_natural_shr_round_signed {
             /// # Examples
             /// See [here](super::shr_round#shr_round).
             #[inline]
-            fn shr_round(mut self, bits: $t, rm: RoundingMode) -> Natural {
-                self.shr_round_assign(bits, rm);
-                self
+            fn shr_round(mut self, bits: $t, rm: RoundingMode) -> (Natural, Ordering) {
+                let o = self.shr_round_assign(bits, rm);
+                (self, o)
             }
         }
 
@@ -526,13 +640,17 @@ macro_rules! impl_natural_shr_round_signed {
             type Output = Natural;
 
             /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2), taking it by
-            /// reference, and rounds according to the specified rounding mode.
+            /// reference, and rounds according to the specified rounding mode. An [`Ordering`] is
+            /// also returned, indicating whether the returned value is less than, equal to, or
+            /// greater than the exact value. If `bits` is negative, then the returned [`Ordering`]
+            /// is always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// Let $q = \frac{x}{2^k}$:
+            /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the first
+            /// element of the pair, without the [`Ordering`]:
             ///
             /// $f(x, k, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
             ///
@@ -554,6 +672,10 @@ macro_rules! impl_natural_shr_round_signed {
             /// $$
             ///
             /// $f(x, k, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// Then
+            ///
+            /// $f(x, k, r) = (g(x, k, r), \operatorname{cmp}(g(x, k, r), q))$.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$
@@ -578,14 +700,17 @@ macro_rules! impl_natural_shr_round_signed {
             /// # Examples
             /// See [here](super::shr_round#shr_round).
             #[inline]
-            fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
+            fn shr_round(self, bits: $t, rm: RoundingMode) -> (Natural, Ordering) {
                 shr_round_signed_ref_n(self, bits, rm)
             }
         }
 
         impl ShrRoundAssign<$t> for Natural {
             /// Shifts a [`Natural`] right (divides or multiplies it by a power of 2) and rounds
-            /// according to the specified rounding mode, in place.
+            /// according to the specified rounding mode, in place. An [`Ordering`] is returned,
+            /// indicating whether the assigned value is less than, equal to, or greater than the
+            /// exact value. If `bits` is negative, then the returned [`Ordering`] is always
+            /// `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
@@ -609,8 +734,8 @@ macro_rules! impl_natural_shr_round_signed {
             /// # Examples
             /// See [here](super::shr_round#shr_round_assign).
             #[inline]
-            fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                shr_round_assign_signed_n(self, bits, rm);
+            fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) -> Ordering {
+                shr_round_assign_signed_n(self, bits, rm)
             }
         }
     };

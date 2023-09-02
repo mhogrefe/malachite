@@ -35,8 +35,8 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_natural_checked_sub_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         let c_old = c.clone();
@@ -50,8 +50,8 @@ fn demo_natural_checked_sub_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_checked_sub_mul_val_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_mul_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let b_old = b.clone();
         println!(
@@ -64,8 +64,8 @@ fn demo_natural_checked_sub_mul_val_val_ref(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_natural_checked_sub_mul_val_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_mul_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         let c_old = c.clone();
         println!(
@@ -78,8 +78,8 @@ fn demo_natural_checked_sub_mul_val_ref_val(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_natural_checked_sub_mul_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_mul_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         println!(
             "{}.checked_sub_mul(&{}, &{}) = {:?}",
@@ -91,8 +91,8 @@ fn demo_natural_checked_sub_mul_val_ref_ref(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_natural_checked_sub_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in natural_triple_gen().get(gm, &config).take(limit) {
+fn demo_natural_checked_sub_mul_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in natural_triple_gen().get(gm, config).take(limit) {
         let a_old = a.clone();
         println!(
             "(&{}).checked_sub_mul(&{}, &{}) = {:?}",
@@ -106,14 +106,14 @@ fn demo_natural_checked_sub_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limi
 
 fn benchmark_natural_checked_sub_mul_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -145,14 +145,14 @@ fn benchmark_natural_checked_sub_mul_evaluation_strategy(
 
 fn benchmark_natural_checked_sub_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -171,14 +171,14 @@ fn benchmark_natural_checked_sub_mul_algorithms(
 
 fn benchmark_natural_checked_sub_mul_val_val_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub_mul(Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -197,14 +197,14 @@ fn benchmark_natural_checked_sub_mul_val_val_ref_algorithms(
 
 fn benchmark_natural_checked_sub_mul_val_ref_val_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub_mul(&Natural, Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -223,14 +223,14 @@ fn benchmark_natural_checked_sub_mul_val_ref_val_algorithms(
 
 fn benchmark_natural_checked_sub_mul_val_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.checked_sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -249,14 +249,14 @@ fn benchmark_natural_checked_sub_mul_val_ref_ref_algorithms(
 
 fn benchmark_natural_checked_sub_mul_ref_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Natural).checked_sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
-        natural_triple_gen().get(gm, &config),
+        natural_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -15,35 +15,35 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_flip_bit_signed);
 }
 
-fn demo_flip_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut n, index) in unsigned_pair_gen_var_3::<T>().get(gm, &config).take(limit) {
+fn demo_flip_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut n, index) in unsigned_pair_gen_var_3::<T>().get(gm, config).take(limit) {
         let n_old = n;
         n.flip_bit(index);
-        println!("x := {}; x.flip_bit({}); x = {}", n_old, index, n);
+        println!("x := {n_old}; x.flip_bit({index}); x = {n}");
     }
 }
 
-fn demo_flip_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_flip_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, index) in signed_unsigned_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n;
         n.flip_bit(index);
-        println!("x := {}; x.flip_bit({}); x = {}", n_old, index, n);
+        println!("x := {n_old}; x.flip_bit({index}); x = {n}");
     }
 }
 
 fn benchmark_flip_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_3::<T>().get(gm, &config),
+        unsigned_pair_gen_var_3::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -54,14 +54,14 @@ fn benchmark_flip_bit_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_flip_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_2::<T>().get(gm, &config),
+        signed_unsigned_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

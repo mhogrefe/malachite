@@ -6,12 +6,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rounding_mode_eq);
 }
 
-fn demo_rounding_mode_eq(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in rounding_mode_pair_gen().get(gm, &config).take(limit) {
+fn demo_rounding_mode_eq(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rounding_mode_pair_gen().get(gm, config).take(limit) {
         if x == y {
-            println!("{} = {}", x, y);
+            println!("{x} = {y}");
         } else {
-            println!("{} ≠ {}", x, y);
+            println!("{x} ≠ {y}");
         }
     }
 }

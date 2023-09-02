@@ -30,20 +30,20 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_mod_power_of_2_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_mod_power_of_2_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_power_of_2_assign(u);
-        println!("x := {}; x.mod_power_of_2_assign({}); x = {}", n_old, u, n);
+        println!("x := {n_old}; x.mod_power_of_2_assign({u}); x = {n}");
     }
 }
 
-fn demo_integer_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -51,9 +51,9 @@ fn demo_integer_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_mod_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_mod_power_of_2_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -65,20 +65,20 @@ fn demo_integer_mod_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_integer_rem_power_of_2_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_rem_power_of_2_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.rem_power_of_2_assign(u);
-        println!("x := {}; x.rem_power_of_2_assign({}); x = {}", n_old, u, n);
+        println!("x := {n_old}; x.rem_power_of_2_assign({u}); x = {n}");
     }
 }
 
-fn demo_integer_rem_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_rem_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -86,9 +86,9 @@ fn demo_integer_rem_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_rem_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_rem_power_of_2_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -100,23 +100,20 @@ fn demo_integer_rem_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
-fn demo_integer_ceiling_mod_power_of_2_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_2_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.ceiling_mod_power_of_2_assign(u);
-        println!(
-            "x := {}; x.ceiling_mod_power_of_2_assign({}); x = {}",
-            n_old, u, n
-        );
+        println!("x := {n_old}; x.ceiling_mod_power_of_2_assign({u}); x = {n}");
     }
 }
 
-fn demo_integer_ceiling_mod_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -129,9 +126,9 @@ fn demo_integer_ceiling_mod_power_of_2(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_integer_ceiling_mod_power_of_2_ref(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_ceiling_mod_power_of_2_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, u) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -145,14 +142,14 @@ fn demo_integer_ceiling_mod_power_of_2_ref(gm: GenMode, config: GenConfig, limit
 
 fn benchmark_integer_mod_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.mod_power_of_2_assign(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -163,14 +160,14 @@ fn benchmark_integer_mod_power_of_2_assign(
 
 fn benchmark_integer_mod_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.mod_power_of_2(u64)",
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -188,14 +185,14 @@ fn benchmark_integer_mod_power_of_2_evaluation_strategy(
 
 fn benchmark_integer_rem_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.rem_power_of_2_assign(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -206,14 +203,14 @@ fn benchmark_integer_rem_power_of_2_assign(
 
 fn benchmark_integer_rem_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.rem_power_of_2(u64)",
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -231,14 +228,14 @@ fn benchmark_integer_rem_power_of_2_evaluation_strategy(
 
 fn benchmark_integer_ceiling_mod_power_of_2_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_mod_power_of_2_assign(u64)",
         BenchmarkType::Single,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -251,14 +248,14 @@ fn benchmark_integer_ceiling_mod_power_of_2_assign(
 
 fn benchmark_integer_ceiling_mod_power_of_2_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.ceiling_mod_power_of_2(u64)",
         BenchmarkType::EvaluationStrategy,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

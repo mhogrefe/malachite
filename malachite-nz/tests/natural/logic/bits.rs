@@ -1,6 +1,7 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
+use malachite_base::test_util::common::test_double_ended_iterator_size_hint;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_gen_var_5};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -47,11 +48,7 @@ fn test_bits() {
 #[test]
 fn bits_properties() {
     natural_gen().test_properties(|n| {
-        let significant_bits = usize::exact_from(n.significant_bits());
-        assert_eq!(
-            n.bits().size_hint(),
-            (significant_bits, Some(significant_bits))
-        );
+        test_double_ended_iterator_size_hint(n.bits(), usize::exact_from(n.significant_bits()));
     });
 
     natural_bool_vec_pair_gen_var_2().test_properties(|(n, bs)| {

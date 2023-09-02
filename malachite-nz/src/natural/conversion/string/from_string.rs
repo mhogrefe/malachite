@@ -47,7 +47,7 @@ fn from_binary_str(s: &str) -> Option<Natural> {
     if len <= usize::wrapping_from(Limb::WIDTH) {
         Limb::from_str_radix(s, 2).ok().map(Natural::from)
     } else {
-        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)];
+        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0];
         let mut remaining = u64::wrapping_from(len & usize::wrapping_from(Limb::WIDTH_MASK));
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -78,7 +78,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
         Limb::from_str_radix(s, 8).ok().map(Natural::from)
     } else {
         let bit_len = len.checked_mul(3).unwrap();
-        let mut xs = vec![0; bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)];
+        let mut xs = vec![0; bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0];
         let mut remaining = u64::exact_from(bit_len) & Limb::WIDTH_MASK;
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -86,7 +86,11 @@ fn from_oct_str(s: &str) -> Option<Natural> {
             i -= 1;
         }
         for b in s.bytes() {
-            let digit = Limb::wrapping_from(digit_from_display_byte(b)?);
+            let digit = digit_from_display_byte(b)?;
+            if digit >= 8 {
+                return None;
+            }
+            let digit = Limb::wrapping_from(digit);
             match remaining {
                 0 => {
                     i -= 1;
@@ -126,7 +130,7 @@ fn from_hex_str(s: &str) -> Option<Natural> {
     if len <= usize::wrapping_from(Limb::WIDTH >> 2) {
         Limb::from_str_radix(s, 16).ok().map(Natural::from)
     } else {
-        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH - 2, RoundingMode::Ceiling)];
+        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH - 2, RoundingMode::Ceiling).0];
         let mut remaining = u64::wrapping_from(len.mod_power_of_2(Limb::LOG_WIDTH - 2)) << 2;
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
@@ -140,7 +144,11 @@ fn from_hex_str(s: &str) -> Option<Natural> {
                 remaining = Limb::WIDTH;
             }
             *x <<= 4;
-            *x |= Limb::wrapping_from(digit_from_display_byte(b)?);
+            let digit = digit_from_display_byte(b)?;
+            if digit >= 16 {
+                return None;
+            }
+            *x |= Limb::wrapping_from(digit);
             remaining -= 4;
         }
         Some(Natural::from_owned_limbs_asc(xs))
@@ -193,7 +201,10 @@ impl FromStringBase for Natural {
                 16 => from_hex_str(s),
                 _ => {
                     for b in s.bytes() {
-                        digit_from_display_byte(b)?;
+                        let digit = digit_from_display_byte(b)?;
+                        if digit >= base {
+                            return None;
+                        }
                     }
                     Natural::from_digits_desc(
                         &u8::wrapping_from(base),

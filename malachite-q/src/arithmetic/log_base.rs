@@ -70,7 +70,8 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
     let mut log = i64::rounding_from(
         approx_log_helper(x) / approx_log_helper(base),
         RoundingMode::Floor,
-    );
+    )
+    .0;
     let mut power = base.pow(log);
     if *base > 1u32 {
         match power.cmp_abs(x) {

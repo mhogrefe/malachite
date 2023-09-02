@@ -33,7 +33,7 @@ pub_test! {limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
         out[1..].copy_from_slice(&xs[1..]);
     } else {
         out[0] = y.wrapping_neg();
-        for x in out[1..i].iter_mut() {
+        for x in &mut out[1..i] {
             *x = Limb::MAX;
         }
         out[i] = xs[i] - 1;
@@ -69,7 +69,7 @@ pub_test! {limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
         out[1..len].copy_from_slice(&xs[1..]);
     } else {
         out[0] = y.wrapping_neg();
-        for x in out[1..i].iter_mut() {
+        for x in &mut out[1..i] {
             *x = Limb::MAX;
         }
         out[i] = xs[i] - 1;
@@ -99,7 +99,7 @@ pub_test! {limbs_neg_or_limb_in_place(xs: &mut [Limb], y: Limb) {
         xs[0] = (xs[0].wrapping_neg() | y).wrapping_neg();
     } else {
         xs[0] = y.wrapping_neg();
-        for x in xs[1..i].iter_mut() {
+        for x in &mut xs[1..i] {
             *x = Limb::MAX;
         }
         xs[i] -= 1;
@@ -228,7 +228,7 @@ pub_test! {limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         slice_set_zero(&mut out[..x_i]);
         out[x_i] = xs[x_i].wrapping_neg();
         limbs_not_to_out(&mut out[x_i + 1..xs_len], &xs[x_i + 1..]);
-        for x in out[xs_len..y_i].iter_mut() {
+        for x in &mut out[xs_len..y_i] {
             *x = Limb::MAX;
         }
         out[y_i] = ys[y_i] - 1;
@@ -417,7 +417,7 @@ pub_test! {limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     if y_i >= xs_len {
         ys[x_i] = xs[x_i].wrapping_neg();
         limbs_not_to_out(&mut ys[x_i + 1..xs_len], &xs[x_i + 1..]);
-        for y in ys[xs_len..y_i].iter_mut() {
+        for y in &mut ys[xs_len..y_i] {
             *y = Limb::MAX;
         }
         ys[y_i] -= 1;

@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::mantissa_and_exponent::{
-    from_sci_mantissa_and_exponent_with_rounding, sci_mantissa_and_exponent_with_rounding,
+    from_sci_mantissa_and_exponent_round, sci_mantissa_and_exponent_round,
 };
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
@@ -25,19 +25,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_unsigned);
     register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_unsigned);
     register_unsigned_primitive_float_demos!(runner, demo_sci_exponent_unsigned);
-    register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_with_rounding);
+    register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_round);
     register_unsigned_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_unsigned);
     register_unsigned_primitive_float_demos!(
         runner,
         demo_from_sci_mantissa_and_exponent_targeted_unsigned
     );
+    register_unsigned_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_round);
     register_unsigned_primitive_float_demos!(
         runner,
-        demo_from_sci_mantissa_and_exponent_with_rounding
-    );
-    register_unsigned_primitive_float_demos!(
-        runner,
-        demo_from_sci_mantissa_and_exponent_with_rounding_targeted
+        demo_from_sci_mantissa_and_exponent_round_targeted
     );
 
     register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_primitive_float);
@@ -65,11 +62,11 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_unsigned_primitive_float_benches!(
         runner,
-        benchmark_from_sci_mantissa_and_exponent_with_rounding
+        benchmark_from_sci_mantissa_and_exponent_round
     );
     register_unsigned_primitive_float_benches!(
         runner,
-        benchmark_from_sci_mantissa_and_exponent_with_rounding_targeted
+        benchmark_from_sci_mantissa_and_exponent_round_targeted
     );
 
     register_primitive_float_benches!(
@@ -93,10 +90,10 @@ fn demo_sci_mantissa_and_exponent_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         let (m, e): (U, u64) = x.sci_mantissa_and_exponent();
         println!("sci_mantissa_and_exponent({}) = {:?}", x, (NiceFloat(m), e));
     }
@@ -107,10 +104,10 @@ fn demo_sci_mantissa_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         let m: U = x.sci_mantissa();
         println!("sci_mantissa({}) = {}", x, NiceFloat(m));
     }
@@ -121,10 +118,10 @@ fn demo_sci_exponent_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen_var_1::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen_var_1::<T>().get(gm, config).take(limit) {
         println!(
             "sci_exponent({}) = {}",
             x,
@@ -133,24 +130,21 @@ fn demo_sci_exponent_unsigned<
     }
 }
 
-fn demo_sci_mantissa_and_exponent_with_rounding<
+fn demo_sci_mantissa_and_exponent_round<
     T: PrimitiveUnsigned + SciMantissaAndExponent<U, u64>,
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, rm) in unsigned_rounding_mode_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let o =
-            sci_mantissa_and_exponent_with_rounding::<T, U>(x, rm).map(|(m, e)| (NiceFloat(m), e));
-        println!(
-            "sci_mantissa_and_exponent_with_rounding({}, {}) = {:?}",
-            x, rm, o
-        );
+            sci_mantissa_and_exponent_round::<T, U>(x, rm).map(|(m, e, o)| (NiceFloat(m), e, o));
+        println!("sci_mantissa_and_exponent_round({x}, {rm}) = {o:?}");
     }
 }
 
@@ -159,11 +153,11 @@ fn demo_from_sci_mantissa_and_exponent_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in primitive_float_unsigned_pair_gen_var_1::<U, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -181,11 +175,11 @@ fn demo_from_sci_mantissa_and_exponent_targeted_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in primitive_float_unsigned_pair_gen_var_2::<U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -198,55 +192,52 @@ fn demo_from_sci_mantissa_and_exponent_targeted_unsigned<
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+fn demo_from_sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent, rm) in
         primitive_float_unsigned_rounding_mode_triple_gen_var_1::<U, u64>()
-            .get(gm, &config)
+            .get(gm, config)
             .take(limit)
     {
         println!(
-            "from_sci_mantissa_and_exponent_with_rounding({}, {}, {}) = {:?}",
+            "from_sci_mantissa_and_exponent_round({}, {}, {}) = {:?}",
             NiceFloat(mantissa),
             exponent,
             rm,
-            from_sci_mantissa_and_exponent_with_rounding::<T, U>(mantissa, exponent, rm)
+            from_sci_mantissa_and_exponent_round::<T, U>(mantissa, exponent, rm)
         );
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent_with_rounding_targeted<
-    T: PrimitiveUnsigned,
-    U: PrimitiveFloat,
->(
+fn demo_from_sci_mantissa_and_exponent_round_targeted<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent, rm) in primitive_float_unsigned_rounding_mode_triple_gen_var_2::<U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "from_sci_mantissa_and_exponent_with_rounding({}, {}, {}) = {:?}",
+            "from_sci_mantissa_and_exponent_round({}, {}, {}) = {:?}",
             NiceFloat(mantissa),
             exponent,
             rm,
-            from_sci_mantissa_and_exponent_with_rounding::<T, U>(mantissa, exponent, rm)
+            from_sci_mantissa_and_exponent_round::<T, U>(mantissa, exponent, rm)
         );
     }
 }
 
 fn demo_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let (m, e) = x.sci_mantissa_and_exponent();
@@ -260,11 +251,11 @@ fn demo_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_sci_mantissa_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -277,11 +268,11 @@ fn demo_sci_mantissa_primitive_float<T: PrimitiveFloat>(
 
 fn demo_sci_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for x in primitive_float_gen_var_12::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("sci_exponent({}) = {}", NiceFloat(x), x.sci_exponent());
@@ -290,11 +281,11 @@ fn demo_sci_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in primitive_float_signed_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -309,11 +300,11 @@ fn demo_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn demo_from_sci_mantissa_and_exponent_targeted_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mantissa, exponent) in primitive_float_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -332,14 +323,14 @@ fn benchmark_sci_mantissa_and_exponent_algorithms_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_mantissa_and_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -366,14 +357,14 @@ fn benchmark_sci_mantissa_algorithms_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_mantissa()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -395,14 +386,14 @@ fn benchmark_sci_exponent_algorithms_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_gen_var_1::<T>().get(gm, &config),
+        unsigned_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -423,7 +414,7 @@ fn benchmark_from_sci_mantissa_and_exponent_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -434,7 +425,7 @@ fn benchmark_from_sci_mantissa_and_exponent_unsigned<
             T::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_1::<U, u64>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_1::<U, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -450,7 +441,7 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_unsigned<
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -461,7 +452,7 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_unsigned<
             T::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_unsigned_pair_gen_var_2::<U>().get(gm, &config),
+        primitive_float_unsigned_pair_gen_var_2::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -472,56 +463,53 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_unsigned<
     );
 }
 
-fn benchmark_from_sci_mantissa_and_exponent_with_rounding<
-    T: PrimitiveUnsigned,
-    U: PrimitiveFloat,
->(
+fn benchmark_from_sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!(
-            "from_sci_mantissa_and_exponent_with_rounding({}, u64, RoundingMode)",
+            "from_sci_mantissa_and_exponent_round({}, u64, RoundingMode)",
             U::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_unsigned_rounding_mode_triple_gen_var_1::<U, u64>().get(gm, &config),
+        primitive_float_unsigned_rounding_mode_triple_gen_var_1::<U, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent, rm)| {
-            no_out!(from_sci_mantissa_and_exponent_with_rounding::<T, U>(
+            no_out!(from_sci_mantissa_and_exponent_round::<T, U>(
                 mantissa, exponent, rm
             ))
         })],
     );
 }
 
-fn benchmark_from_sci_mantissa_and_exponent_with_rounding_targeted<
+fn benchmark_from_sci_mantissa_and_exponent_round_targeted<
     T: PrimitiveUnsigned,
     U: PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!(
-            "from_sci_mantissa_and_exponent_with_rounding({}, u64, RoundingMode)",
+            "from_sci_mantissa_and_exponent_round({}, u64, RoundingMode)",
             U::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_unsigned_rounding_mode_triple_gen_var_2::<U>().get(gm, &config),
+        primitive_float_unsigned_rounding_mode_triple_gen_var_2::<U>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &triple_1_primitive_float_bucketer("mantissa"),
         &mut [("Malachite", &mut |(mantissa, exponent, rm)| {
-            no_out!(from_sci_mantissa_and_exponent_with_rounding::<T, U>(
+            no_out!(from_sci_mantissa_and_exponent_round::<T, U>(
                 mantissa, exponent, rm
             ))
         })],
@@ -531,14 +519,14 @@ fn benchmark_from_sci_mantissa_and_exponent_with_rounding_targeted<
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_sci_mantissa_and_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_mantissa_and_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -555,14 +543,14 @@ fn benchmark_sci_mantissa_and_exponent_algorithms_primitive_float<T: PrimitiveFl
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_sci_mantissa_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_mantissa()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -577,14 +565,14 @@ fn benchmark_sci_mantissa_algorithms_primitive_float<T: PrimitiveFloat>(
 #[allow(clippy::unnecessary_operation)]
 fn benchmark_sci_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.sci_exponent()", T::NAME),
         BenchmarkType::Algorithms,
-        primitive_float_gen_var_12::<T>().get(gm, &config),
+        primitive_float_gen_var_12::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -598,7 +586,7 @@ fn benchmark_sci_exponent_algorithms_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -609,7 +597,7 @@ fn benchmark_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
             T::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_signed_pair_gen_var_1().get(gm, &config),
+        primitive_float_signed_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -622,7 +610,7 @@ fn benchmark_from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 
 fn benchmark_from_sci_mantissa_and_exponent_targeted_primitive_float<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
@@ -633,7 +621,7 @@ fn benchmark_from_sci_mantissa_and_exponent_targeted_primitive_float<T: Primitiv
             T::NAME
         ),
         BenchmarkType::Single,
-        primitive_float_signed_pair_gen_var_2::<T>().get(gm, &config),
+        primitive_float_signed_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

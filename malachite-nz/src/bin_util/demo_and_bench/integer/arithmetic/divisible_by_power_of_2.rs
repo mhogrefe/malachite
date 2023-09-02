@@ -20,29 +20,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_divisible_by_power_of_2_algorithms);
 }
 
-fn demo_integer_divisible_by_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_integer_divisible_by_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in integer_unsigned_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if n.divisible_by_power_of_2(pow) {
-            println!("{} is divisible by 2^{}", n, pow);
+            println!("{n} is divisible by 2^{pow}");
         } else {
-            println!("{} is not divisible by 2^{}", n, pow);
+            println!("{n} is not divisible by 2^{pow}");
         }
     }
 }
 
 fn benchmark_integer_divisible_by_power_of_2_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.divisible_by_power_of_2(u64)",
         BenchmarkType::LibraryComparison,
-        integer_unsigned_pair_gen_var_2_rm().get(gm, &config),
+        integer_unsigned_pair_gen_var_2_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -60,14 +60,14 @@ fn benchmark_integer_divisible_by_power_of_2_library_comparison(
 
 fn benchmark_integer_divisible_by_power_of_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.divisible_by_power_of_2(u64)",
         BenchmarkType::Algorithms,
-        integer_unsigned_pair_gen_var_2().get(gm, &config),
+        integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

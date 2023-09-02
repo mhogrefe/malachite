@@ -2,6 +2,7 @@ use crate::integer::Integer;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ExtendedGcd, ModInverse};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 fn mod_inverse_simple_helper(x: Natural, m: Natural) -> Option<Natural> {
@@ -21,7 +22,7 @@ pub fn mod_inverse_simple(n: Natural, m: Natural) -> Option<Natural> {
     assert_ne!(n, 0u32);
     assert!(n < m);
     match (n, m) {
-        (x @ natural_one!(), _) => Some(x),
+        (x @ Natural::ONE, _) => Some(x),
         (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
         (a, b) => mod_inverse_simple_helper(a, b),
     }

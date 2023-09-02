@@ -23,59 +23,53 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_min_3);
 }
 
-fn demo_max_1(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_max_1(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen::<u8>().get(gm, config).take(limit) {
         println!("max!({}) = {}", x, max!(x));
     }
 }
 
-fn demo_max_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<u8>()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_max_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<u8>().get(gm, config).take(limit) {
         println!("max!({}, {}) = {}", x, y, max!(x, y));
     }
 }
 
-fn demo_max_3(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_max_3(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z) in unsigned_triple_gen_var_19::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("max!({}, {}, {}) = {}", x, y, z, max!(x, y, z));
     }
 }
 
-fn demo_min_1(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen::<u8>().get(gm, &config).take(limit) {
+fn demo_min_1(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen::<u8>().get(gm, config).take(limit) {
         println!("min!({}) = {}", x, min!(x));
     }
 }
 
-fn demo_min_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_27::<u8>()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_min_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in unsigned_pair_gen_var_27::<u8>().get(gm, config).take(limit) {
         println!("min!({}, {}) = {}", x, y, min!(x, y));
     }
 }
 
-fn demo_min_3(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_min_3(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z) in unsigned_triple_gen_var_19::<u8>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("min!({}, {}, {}) = {}", x, y, z, min!(x, y, z));
     }
 }
 
-fn benchmark_max_1(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_max_1(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "max!(T)",
         BenchmarkType::Single,
-        unsigned_gen::<u8>().get(gm, &config),
+        unsigned_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -84,11 +78,11 @@ fn benchmark_max_1(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     );
 }
 
-fn benchmark_max_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_max_2(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "max!(T, T)",
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<u8>().get(gm, &config),
+        unsigned_pair_gen_var_27::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -97,11 +91,11 @@ fn benchmark_max_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     );
 }
 
-fn benchmark_max_3(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_max_3(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "max!(T, T, T)",
         BenchmarkType::Single,
-        unsigned_triple_gen_var_19::<u8>().get(gm, &config),
+        unsigned_triple_gen_var_19::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -110,11 +104,11 @@ fn benchmark_max_3(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     );
 }
 
-fn benchmark_min_1(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_min_1(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "min!(T)",
         BenchmarkType::Single,
-        unsigned_gen::<u8>().get(gm, &config),
+        unsigned_gen::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -123,11 +117,11 @@ fn benchmark_min_1(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     );
 }
 
-fn benchmark_min_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_min_2(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "min!(T, T)",
         BenchmarkType::Single,
-        unsigned_pair_gen_var_27::<u8>().get(gm, &config),
+        unsigned_pair_gen_var_27::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -136,11 +130,11 @@ fn benchmark_min_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     );
 }
 
-fn benchmark_min_3(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_min_3(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "min!(T, T, T)",
         BenchmarkType::Single,
-        unsigned_triple_gen_var_19::<u8>().get(gm, &config),
+        unsigned_triple_gen_var_19::<u8>().get(gm, config),
         gm.name(),
         limit,
         file_name,

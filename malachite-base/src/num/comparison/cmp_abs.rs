@@ -1,4 +1,5 @@
 use crate::num::arithmetic::traits::UnsignedAbs;
+use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use std::cmp::Ordering;
 
@@ -67,3 +68,28 @@ macro_rules! impl_ord_abs_signed {
     };
 }
 apply_to_signeds!(impl_ord_abs_signed);
+
+fn partial_cmp_abs_primitive_float<T: PrimitiveFloat>(x: &T, y: &T) -> Option<Ordering> {
+    x.abs().partial_cmp(&y.abs())
+}
+
+macro_rules! impl_ord_abs_primitive_float {
+    ($t:ident) => {
+        impl PartialOrdAbs for $t {
+            /// Compares the absolute values of two numbers, taking both by reference.
+            ///
+            /// For unsigned values, this is the same as ordinary comparison.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::cmp_abs#cmp_abs).
+            #[inline]
+            fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
+                partial_cmp_abs_primitive_float(self, other)
+            }
+        }
+    };
+}
+apply_to_primitive_floats!(impl_ord_abs_primitive_float);

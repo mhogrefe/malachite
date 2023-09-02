@@ -32,9 +32,9 @@ fn to_string_helper(p: (Vec<Natural>, RationalSequence<Natural>)) -> String {
     s
 }
 
-fn demo_rational_into_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_into_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, base) in rational_natural_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -46,9 +46,9 @@ fn demo_rational_into_digits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_to_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_to_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, base) in rational_natural_pair_gen_var_2()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -60,8 +60,8 @@ fn demo_rational_to_digits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_into_digits_decimal(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen_var_7().get(gm, &config).take(limit) {
+fn demo_rational_into_digits_decimal(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen_var_7().get(gm, config).take(limit) {
         println!(
             "({}).into_digits(10) = {}",
             n.clone(),
@@ -70,9 +70,9 @@ fn demo_rational_into_digits_decimal(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
-fn demo_rational_digits(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rational_digits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, base) in rational_natural_pair_gen_var_1()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let (before_point, after_point) = n.digits(&base);
@@ -86,8 +86,8 @@ fn demo_rational_digits(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_rational_digits_decimal(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_digits_decimal(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         let (before_point, after_point) = n.digits(&Natural::from(10u32));
         println!(
             "({}).digits(10) = ({:?}, {})",
@@ -100,14 +100,14 @@ fn demo_rational_digits_decimal(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_rational_to_digits_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.to_digits(u64)",
         BenchmarkType::EvaluationStrategy,
-        rational_natural_pair_gen_var_2().get(gm, &config),
+        rational_natural_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -123,11 +123,11 @@ fn benchmark_rational_to_digits_evaluation_strategy(
     );
 }
 
-fn benchmark_rational_digits(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_digits(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.digits(u64)",
         BenchmarkType::Single,
-        rational_natural_pair_gen_var_1().get(gm, &config),
+        rational_natural_pair_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,

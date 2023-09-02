@@ -18,20 +18,17 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_unsigned_match_benches!(runner, benchmark_assign_bits_algorithms_signed);
 }
 
-fn demo_assign_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_assign_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     T::Bits: PrimitiveUnsigned,
 {
     for (mut n, start, end, bits) in unsigned_quadruple_gen_var_1::<T, _>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.assign_bits(start, end, &bits);
-        println!(
-            "n := {}; n.assign_bits({}, {}, &{}); n = {}",
-            old_n, start, end, bits, n,
-        );
+        println!("n := {old_n}; n.assign_bits({start}, {end}, &{bits}); n = {n}");
     }
 }
 
@@ -40,25 +37,22 @@ fn demo_assign_bits_signed<
     U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, start, end, bits) in signed_unsigned_unsigned_unsigned_quadruple_gen_var_1::<T, U>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.assign_bits(start, end, &bits);
-        println!(
-            "n := {}; n.assign_bits({}, {}, &{}); n = {}",
-            old_n, start, end, bits, n,
-        );
+        println!("n := {old_n}; n.assign_bits({start}, {end}, &{bits}); n = {n}");
     }
 }
 
 fn benchmark_assign_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -67,7 +61,7 @@ fn benchmark_assign_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.assign_bits(u64, u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_quadruple_gen_var_1::<T, _>().get(gm, &config),
+        unsigned_quadruple_gen_var_1::<T, _>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -88,14 +82,14 @@ fn benchmark_assign_bits_algorithms_signed<
     U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.assign_bits(u64, u64, {})", T::NAME, U::NAME),
         BenchmarkType::Algorithms,
-        signed_unsigned_unsigned_unsigned_quadruple_gen_var_1::<T, U>().get(gm, &config),
+        signed_unsigned_unsigned_unsigned_quadruple_gen_var_1::<T, U>().get(gm, config),
         gm.name(),
         limit,
         file_name,

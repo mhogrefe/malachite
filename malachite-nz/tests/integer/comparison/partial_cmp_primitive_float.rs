@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_primitive_float_triple_gen, integer_primitive_float_pair_gen,
@@ -26,10 +27,10 @@ fn test_partial_cmp_primitive_float() {
         assert_eq!(v.partial_cmp(&rug::Integer::from_str(u).unwrap()), out_rev);
     };
     test("5", f32::NAN, None);
-    test("5", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("5", f32::INFINITY, Some(Ordering::Less));
     test("5", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
     test("-5", f32::NAN, None);
-    test("-5", f32::POSITIVE_INFINITY, Some(Ordering::Less));
+    test("-5", f32::INFINITY, Some(Ordering::Less));
     test("-5", f32::NEGATIVE_INFINITY, Some(Ordering::Greater));
 
     test("0", 0.0, Some(Ordering::Equal));
@@ -105,6 +106,12 @@ fn test_partial_cmp_primitive_float() {
         -1.2089258e24,
         Some(Ordering::Less),
     );
+
+    test(
+        "-117886223846050103296",
+        -1.1788622e20,
+        Some(Ordering::Equal),
+    );
 }
 
 #[allow(clippy::trait_duplication_in_bounds)]
@@ -142,7 +149,7 @@ where
 
     integer_gen().test_properties(|x| {
         assert!(x > T::NEGATIVE_INFINITY);
-        assert!(x < T::POSITIVE_INFINITY);
+        assert!(x < T::INFINITY);
     });
 }
 

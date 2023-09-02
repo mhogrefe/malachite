@@ -18,7 +18,7 @@ use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 pub_crate_test! {limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_seen = false;
-    for &x in xs.iter() {
+    for &x in xs {
         sum += if nonzero_seen {
             CountOnes::count_ones(x)
         } else if x == 0 {

@@ -42,23 +42,23 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} ≡ {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
     }
 }
 
-fn demo_mod_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_mod_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     <T as ModPowerOf2>::Output: PrimitiveUnsigned,
 {
     for (n, pow) in signed_unsigned_pair_gen_var_10::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{} ≡ {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
@@ -67,58 +67,52 @@ where
 
 fn demo_mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.mod_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.mod_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.mod_power_of_2_assign({pow}); n = {n}");
     }
 }
 
 fn demo_mod_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     <T as ModPowerOf2>::Output: PrimitiveUnsigned,
 {
     for (mut n, pow) in signed_unsigned_pair_gen_var_4::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.mod_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.mod_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.mod_power_of_2_assign({pow}); n = {n}");
     }
 }
 
 fn demo_rem_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.rem_power_of_2({}) = {}", n, pow, n.rem_power_of_2(pow));
     }
 }
 
-fn demo_rem_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_rem_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in signed_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("{}.rem_power_of_2({}) = {}", n, pow, n.rem_power_of_2(pow));
@@ -127,42 +121,36 @@ fn demo_rem_power_of_2_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
 
 fn demo_rem_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.rem_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.rem_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.rem_power_of_2_assign({pow}); n = {n}");
     }
 }
 
 fn demo_rem_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow) in signed_unsigned_pair_gen_var_1::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.rem_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.rem_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.rem_power_of_2_assign({pow}); n = {n}");
     }
 }
 
-fn demo_neg_mod_power_of_2<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in unsigned_pair_gen_var_20::<T>().get(gm, &config).take(limit) {
+fn demo_neg_mod_power_of_2<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, pow) in unsigned_pair_gen_var_20::<T>().get(gm, config).take(limit) {
         println!(
             "{}.neg_mod_power_of_2({}) = {}",
             n,
@@ -174,16 +162,13 @@ fn demo_neg_mod_power_of_2<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
 
 fn demo_neg_mod_power_of_2_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for (mut n, pow) in unsigned_pair_gen_var_20::<T>().get(gm, &config).take(limit) {
+    for (mut n, pow) in unsigned_pair_gen_var_20::<T>().get(gm, config).take(limit) {
         let old_n = n;
         n.neg_mod_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.neg_mod_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.neg_mod_power_of_2_assign({pow}); n = {n}");
     }
 }
 
@@ -192,11 +177,11 @@ fn demo_ceiling_mod_power_of_2<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in signed_unsigned_pair_gen_var_11::<U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -213,32 +198,29 @@ fn demo_ceiling_mod_power_of_2_assign<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut n, pow) in signed_unsigned_pair_gen_var_11::<U, S>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let old_n = n;
         n.ceiling_mod_power_of_2_assign(pow);
-        println!(
-            "n := {}; n.ceiling_mod_power_of_2_assign({}); n = {}",
-            old_n, pow, n
-        );
+        println!("n := {old_n}; n.ceiling_mod_power_of_2_assign({pow}); n = {n}");
     }
 }
 
 fn benchmark_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -249,7 +231,7 @@ fn benchmark_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -258,7 +240,7 @@ fn benchmark_mod_power_of_2_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.mod_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_10::<T>().get(gm, &config),
+        signed_unsigned_pair_gen_var_10::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -269,14 +251,14 @@ fn benchmark_mod_power_of_2_signed<T: PrimitiveSigned>(
 
 fn benchmark_mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -289,14 +271,14 @@ fn benchmark_mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_mod_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_4::<T>().get(gm, &config),
+        signed_unsigned_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -309,14 +291,14 @@ fn benchmark_mod_power_of_2_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_rem_power_of_2_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rem_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -327,7 +309,7 @@ fn benchmark_rem_power_of_2_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_rem_power_of_2_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -336,7 +318,7 @@ fn benchmark_rem_power_of_2_signed<T: PrimitiveSigned>(
     run_benchmark(
         &format!("{}.rem_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -347,14 +329,14 @@ fn benchmark_rem_power_of_2_signed<T: PrimitiveSigned>(
 
 fn benchmark_rem_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rem_power_of_2_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -367,14 +349,14 @@ fn benchmark_rem_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_rem_power_of_2_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.rem_power_of_2_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, &config),
+        signed_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -387,14 +369,14 @@ fn benchmark_rem_power_of_2_assign_signed<T: PrimitiveSigned>(
 
 fn benchmark_neg_mod_power_of_2<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.neg_mod_power_of_2(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_20::<T>().get(gm, &config),
+        unsigned_pair_gen_var_20::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -407,14 +389,14 @@ fn benchmark_neg_mod_power_of_2<T: PrimitiveUnsigned>(
 
 fn benchmark_neg_mod_power_of_2_assign<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.neg_mod_power_of_2_assign(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_20::<T>().get(gm, &config),
+        unsigned_pair_gen_var_20::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -430,14 +412,14 @@ fn benchmark_ceiling_mod_power_of_2<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_mod_power_of_2(u64)", S::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, &config),
+        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -453,14 +435,14 @@ fn benchmark_ceiling_mod_power_of_2_assign<
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.ceiling_mod_power_of_2_assign(u64)", S::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, &config),
+        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, config),
         gm.name(),
         limit,
         file_name,

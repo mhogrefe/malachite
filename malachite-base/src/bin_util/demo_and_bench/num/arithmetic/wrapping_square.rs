@@ -20,54 +20,54 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_wrapping_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.wrapping_square() = {}", x, x.wrapping_square());
     }
 }
 
-fn demo_wrapping_square_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_wrapping_square_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.wrapping_square() = {}", x, x.wrapping_square());
     }
 }
 
 fn demo_wrapping_square_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut x in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.wrapping_square_assign();
-        println!("x := {}; x.wrapping_square_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.wrapping_square_assign(); x = {x}");
     }
 }
 
 fn demo_wrapping_square_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut x in signed_gen::<T>().get(gm, &config).take(limit) {
+    for mut x in signed_gen::<T>().get(gm, config).take(limit) {
         let old_x = x;
         x.wrapping_square_assign();
-        println!("x := {}; x.wrapping_square_assign(); x = {}", old_x, x);
+        println!("x := {old_x}; x.wrapping_square_assign(); x = {x}");
     }
 }
 
 fn benchmark_wrapping_square_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_square()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -78,14 +78,14 @@ fn benchmark_wrapping_square_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_wrapping_square_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_square()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -96,14 +96,14 @@ fn benchmark_wrapping_square_signed<T: PrimitiveSigned>(
 
 fn benchmark_wrapping_square_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_square_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -114,14 +114,14 @@ fn benchmark_wrapping_square_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_wrapping_square_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.wrapping_square_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

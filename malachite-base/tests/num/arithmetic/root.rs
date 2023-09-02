@@ -477,7 +477,7 @@ fn floor_root_properties_helper_signed<T: PrimitiveSigned>() {
             assert!(cube <= n);
         }
         if n != T::MIN {
-            assert_ne!((-n).ceiling_root(3), T::MIN, "{}", n);
+            assert_ne!((-n).ceiling_root(3), T::MIN);
             assert_eq!(-(-n).ceiling_root(3), cbrt);
         }
     });

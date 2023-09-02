@@ -12,22 +12,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_checked_count_ones_algorithms);
 }
 
-fn demo_integer_checked_count_ones(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_checked_count_ones(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("checked_count_ones({}) = {:?}", n, n.checked_count_ones());
     }
 }
 
 fn benchmark_integer_checked_count_ones_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.count_ones()",
         BenchmarkType::Algorithms,
-        integer_gen().get(gm, &config),
+        integer_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

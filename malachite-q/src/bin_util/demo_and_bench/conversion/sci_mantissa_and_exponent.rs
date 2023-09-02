@@ -23,14 +23,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_rational_sci_mantissa_ref);
     register_primitive_float_demos!(runner, demo_rational_sci_exponent);
     register_primitive_float_demos!(runner, demo_rational_sci_exponent_ref);
-    register_primitive_float_demos!(
-        runner,
-        demo_rational_sci_mantissa_and_exponent_with_rounding
-    );
-    register_primitive_float_demos!(
-        runner,
-        demo_rational_sci_mantissa_and_exponent_with_rounding_ref
-    );
+    register_primitive_float_demos!(runner, demo_rational_sci_mantissa_and_exponent_round);
+    register_primitive_float_demos!(runner, demo_rational_sci_mantissa_and_exponent_round_ref);
     register_primitive_float_demos!(runner, demo_rational_from_sci_mantissa_and_exponent);
     register_primitive_float_demos!(
         runner,
@@ -42,19 +36,19 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_primitive_float_benches!(
         runner,
-        benchmark_rational_sci_mantissa_and_exponent_with_rounding_evaluation_strategy
+        benchmark_rational_sci_mantissa_and_exponent_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_rational_from_sci_mantissa_and_exponent);
 }
 
 fn demo_rational_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: SciMantissaAndExponent<T, i64>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         let n_old = n.clone();
         let (mantissa, exponent) = n.sci_mantissa_and_exponent();
         println!(
@@ -67,12 +61,12 @@ fn demo_rational_sci_mantissa_and_exponent<T: PrimitiveFloat>(
 
 fn demo_rational_sci_mantissa_and_exponent_ref<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Rational: SciMantissaAndExponent<T, i64, Rational>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         let (mantissa, exponent) = (&n).sci_mantissa_and_exponent();
         println!(
             "sci_mantissa_and_exponent(&{}) = {:?}",
@@ -82,92 +76,92 @@ fn demo_rational_sci_mantissa_and_exponent_ref<T: PrimitiveFloat>(
     }
 }
 
-fn demo_rational_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Rational: SciMantissaAndExponent<T, i64>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!("sci_mantissa({}) = {}", n_old, NiceFloat(n.sci_mantissa()));
     }
 }
 
-fn demo_rational_sci_mantissa_ref<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_sci_mantissa_ref<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Rational: SciMantissaAndExponent<T, i64, Rational>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         println!("sci_mantissa({}) = {}", n, NiceFloat((&n).sci_mantissa()));
     }
 }
 
-fn demo_rational_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Rational: SciMantissaAndExponent<T, i64>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         let n_old = n.clone();
         println!("sci_exponent({}) = {}", n_old, n.sci_exponent());
     }
 }
 
-fn demo_rational_sci_exponent_ref<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_rational_sci_exponent_ref<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     for<'a> &'a Rational: SciMantissaAndExponent<T, i64, Rational>,
 {
-    for n in rational_gen_var_1().get(gm, &config).take(limit) {
+    for n in rational_gen_var_1().get(gm, config).take(limit) {
         println!("sci_exponent({}) = {}", n, (&n).sci_exponent());
     }
 }
 
-fn demo_rational_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn demo_rational_sci_mantissa_and_exponent_round<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, rm) in rational_rounding_mode_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         println!(
-            "sci_mantissa_and_exponent_with_rounding({}, {}) = {:?}",
+            "sci_mantissa_and_exponent_round({}, {}) = {:?}",
             n_old,
             rm,
-            n.sci_mantissa_and_exponent_with_rounding::<T>(rm)
-                .map(|(m, e)| (NiceFloat(m), e))
+            n.sci_mantissa_and_exponent_round::<T>(rm)
+                .map(|(m, e, o)| (NiceFloat(m), e, o))
         );
     }
 }
 
-fn demo_rational_sci_mantissa_and_exponent_with_rounding_ref<T: PrimitiveFloat>(
+fn demo_rational_sci_mantissa_and_exponent_round_ref<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, rm) in rational_rounding_mode_pair_gen_var_4()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
-            "sci_mantissa_and_exponent_with_rounding({}, {}) = {:?}",
+            "sci_mantissa_and_exponent_round({}, {}) = {:?}",
             n,
             rm,
-            n.sci_mantissa_and_exponent_with_rounding_ref::<T>(rm)
-                .map(|(m, e)| (NiceFloat(m), e))
+            n.sci_mantissa_and_exponent_round_ref::<T>(rm)
+                .map(|(m, e, o)| (NiceFloat(m), e, o))
         );
     }
 }
 
 fn demo_rational_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Rational: SciMantissaAndExponent<T, i64, Rational>,
 {
     for (m, e) in primitive_float_signed_pair_gen_var_1::<T, i64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -181,13 +175,13 @@ fn demo_rational_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
 
 fn demo_rational_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Rational: SciMantissaAndExponent<T, i64, Rational>,
 {
     for (m, e) in primitive_float_signed_pair_gen_var_2::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -201,7 +195,7 @@ fn demo_rational_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
 
 fn benchmark_rational_sci_mantissa_and_exponent_evaluation_strategy<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -211,7 +205,7 @@ fn benchmark_rational_sci_mantissa_and_exponent_evaluation_strategy<T: Primitive
     run_benchmark(
         "Rational.sci_mantissa_and_exponent()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen_var_1().get(gm, &config),
+        rational_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -227,30 +221,28 @@ fn benchmark_rational_sci_mantissa_and_exponent_evaluation_strategy<T: Primitive
     );
 }
 
-fn benchmark_rational_sci_mantissa_and_exponent_with_rounding_evaluation_strategy<
-    T: PrimitiveFloat,
->(
+fn benchmark_rational_sci_mantissa_and_exponent_round_evaluation_strategy<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Rational.sci_mantissa_and_exponent_with_rounding(RoundingMode)",
+        "Rational.sci_mantissa_and_exponent_round(RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        rational_rounding_mode_pair_gen_var_4().get(gm, &config),
+        rational_rounding_mode_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [
             (
-                "Rational.sci_mantissa_and_exponent_with_rounding(RoundingMode)",
-                &mut |(n, rm)| no_out!(n.sci_mantissa_and_exponent_with_rounding::<T>(rm)),
+                "Rational.sci_mantissa_and_exponent_round(RoundingMode)",
+                &mut |(n, rm)| no_out!(n.sci_mantissa_and_exponent_round::<T>(rm)),
             ),
             (
-                "Rational.sci_mantissa_and_exponent_with_rounding_ref(RoundingMode)",
-                &mut |(n, rm)| no_out!(n.sci_mantissa_and_exponent_with_rounding_ref::<T>(rm)),
+                "Rational.sci_mantissa_and_exponent_round_ref(RoundingMode)",
+                &mut |(n, rm)| no_out!(n.sci_mantissa_and_exponent_round_ref::<T>(rm)),
             ),
         ],
     );
@@ -258,7 +250,7 @@ fn benchmark_rational_sci_mantissa_and_exponent_with_rounding_evaluation_strateg
 
 fn benchmark_rational_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -267,7 +259,7 @@ fn benchmark_rational_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     run_benchmark(
         &format!("Rational::from_sci_mantissa_and_exponent({}, u64)", T::NAME),
         BenchmarkType::Single,
-        primitive_float_signed_pair_gen_var_1::<T, i64>().get(gm, &config),
+        primitive_float_signed_pair_gen_var_1::<T, i64>().get(gm, config),
         gm.name(),
         limit,
         file_name,

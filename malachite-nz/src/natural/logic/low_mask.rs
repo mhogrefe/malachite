@@ -16,7 +16,7 @@ use malachite_base::rounding_modes::RoundingMode;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
-    let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
+    let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling).0;
     let remaining_bits = bits & Limb::WIDTH_MASK;
     let mut xs = vec![Limb::MAX; usize::exact_from(len)];
     if remaining_bits != 0 {

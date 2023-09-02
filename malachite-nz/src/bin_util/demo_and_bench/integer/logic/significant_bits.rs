@@ -13,22 +13,22 @@ pub(crate) fn register(runner: &mut Runner) {
     );
 }
 
-fn demo_integer_significant_bits(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_significant_bits(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("significant_bits({}) = {}", n, n.significant_bits());
     }
 }
 
 fn benchmark_integer_significant_bits_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.significant_bits()",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

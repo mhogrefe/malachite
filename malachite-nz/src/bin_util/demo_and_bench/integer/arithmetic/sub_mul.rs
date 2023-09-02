@@ -63,9 +63,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_sub_mul_assign_ref_ref_algorithms);
 }
 
-fn demo_limbs_overflowing_sub_mul_limb(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_overflowing_sub_mul_limb(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -78,65 +78,66 @@ fn demo_limbs_overflowing_sub_mul_limb(gm: GenMode, config: GenConfig, limit: us
     }
 }
 
-fn demo_limbs_overflowing_sub_mul_limb_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_overflowing_sub_mul_limb_in_place_left(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (mut a, b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let a_old = a.clone();
         let borrow = limbs_overflowing_sub_mul_limb_in_place_left(&mut a, &b, c);
         println!(
-            "a := {:?}; limbs_overflowing_sub_mul_limb_in_place_left(&mut a, {:?}, {}) = {}; \
-             a = {:?}",
-            a_old, b, c, borrow, a,
+            "a := {a_old:?}; \
+            limbs_overflowing_sub_mul_limb_in_place_left(&mut a, {b:?}, {c}) = {borrow}; \
+            a = {a:?}",
         );
     }
 }
 
 fn demo_limbs_overflowing_sub_mul_limb_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (a, mut b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let b_old = b.clone();
         let borrow = limbs_overflowing_sub_mul_limb_in_place_right(&a, &mut b, c);
         println!(
-            "b := {:?}; limbs_overflowing_sub_mul_limb_in_place_right({:?}, &mut b, {}) = {}; \
-             b = {:?}",
-            b_old, a, c, borrow, b,
+            "b := {b_old:?}; \
+            limbs_overflowing_sub_mul_limb_in_place_right({a:?}, &mut b, {c}) = {borrow}; \
+            b = {b:?}",
         );
     }
 }
 
 fn demo_limbs_overflowing_sub_mul_limb_in_place_either(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (mut a, mut b, c) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let a_old = a.clone();
         let b_old = b.clone();
         limbs_overflowing_sub_mul_limb_in_place_either(&mut a, &mut b, c);
         println!(
-            "a := {:?}; b := {:?}; \
-            limbs_overflowing_sub_mul_limb_in_place_either(&mut a, &mut b, {}); a = {:?}; b = {:?}",
-            a_old, b_old, c, a, b,
+            "a := {a_old:?}; b := {b_old:?}; \
+            limbs_overflowing_sub_mul_limb_in_place_either(&mut a, &mut b, {c}); \
+            a = {a:?}; b = {b:?}",
         );
     }
 }
 
-fn demo_limbs_overflowing_sub_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (a, b, c) in unsigned_vec_triple_gen_var_39()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_overflowing_sub_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c) in unsigned_vec_triple_gen_var_39().get(gm, config).take(limit) {
         println!(
             "limbs_overflowing_sub_mul({:?}, {:?}, {:?}) = {:?}",
             a,
@@ -147,22 +148,20 @@ fn demo_limbs_overflowing_sub_mul(gm: GenMode, config: GenConfig, limit: usize) 
     }
 }
 
-fn demo_limbs_overflowing_sub_mul_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut a, b, c) in unsigned_vec_triple_gen_var_39()
-        .get(gm, &config)
-        .take(limit)
-    {
+fn demo_limbs_overflowing_sub_mul_in_place_left(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b, c) in unsigned_vec_triple_gen_var_39().get(gm, config).take(limit) {
         let a_old = a.clone();
         let sign = limbs_overflowing_sub_mul_in_place_left(&mut a, &b, &c);
         println!(
-            "a := {:?}; limbs_overflowing_sub_mul_in_place_left(&mut a, {:?}, {:?}) = {}; a = {:?}",
-            a_old, b, c, sign, a,
+            "a := {a_old:?}; \
+            limbs_overflowing_sub_mul_in_place_left(&mut a, {b:?}, {c:?}) = {sign}; \
+            a = {a:?}",
         );
     }
 }
 
-fn demo_integer_sub_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let z_old = z.clone();
@@ -176,8 +175,8 @@ fn demo_integer_sub_mul(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_integer_sub_mul_val_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -190,8 +189,8 @@ fn demo_integer_sub_mul_val_val_ref(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_integer_sub_mul_val_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let z_old = z.clone();
         println!(
@@ -204,8 +203,8 @@ fn demo_integer_sub_mul_val_ref_val(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_integer_sub_mul_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!(
             "{}.sub_mul(&({}), &({})) = {}",
@@ -217,8 +216,8 @@ fn demo_integer_sub_mul_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_integer_sub_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         println!(
             "(&{}).sub_mul(&({}), &({})) = {}",
             x,
@@ -229,64 +228,52 @@ fn demo_integer_sub_mul_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize
     }
 }
 
-fn demo_integer_sub_mul_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         let z_old = z.clone();
         x.sub_mul_assign(y, z);
-        println!(
-            "x := {}; x.sub_mul_assign({}, {}); x = {}",
-            x_old, y_old, z_old, x
-        );
+        println!("x := {x_old}; x.sub_mul_assign({y_old}, {z_old}); x = {x}");
     }
 }
 
-fn demo_integer_sub_mul_assign_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.sub_mul_assign(y, &z);
-        println!(
-            "x := {}; x.sub_mul_assign({}, &({})); x = {}",
-            x_old, y_old, z, x
-        );
+        println!("x := {x_old}; x.sub_mul_assign({y_old}, &({z})); x = {x}");
     }
 }
 
-fn demo_integer_sub_mul_assign_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         let z_old = z.clone();
         x.sub_mul_assign(&y, z);
-        println!(
-            "x := {}; x.sub_mul_assign(&({}), {}); x = {}",
-            x_old, y, z_old, x
-        );
+        println!("x := {x_old}; x.sub_mul_assign(&({y}), {z_old}); x = {x}");
     }
 }
 
-fn demo_integer_sub_mul_assign_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut x, y, z) in integer_triple_gen().get(gm, &config).take(limit) {
+fn demo_integer_sub_mul_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, z) in integer_triple_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         x.sub_mul_assign(&y, &z);
-        println!(
-            "x := {}; x.sub_mul_assign(&({}), &({})); x = {}",
-            x_old, y, z, x
-        );
+        println!("x := {x_old}; x.sub_mul_assign(&({y}), &({z})); x = {x}");
     }
 }
 
 fn benchmark_limbs_overflowing_sub_mul_limb(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -299,14 +286,14 @@ fn benchmark_limbs_overflowing_sub_mul_limb(
 
 fn benchmark_limbs_overflowing_sub_mul_limb_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul_limb_in_place_left(&mut Vec<Limb>, &[Limb], Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -319,14 +306,14 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_left(
 
 fn benchmark_limbs_overflowing_sub_mul_limb_in_place_right(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul_limb_in_place_right(&[Limb], &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -339,14 +326,14 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_right(
 
 fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul_limb_in_place_either(&mut Vec<Limb>, &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -361,14 +348,14 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
 
 fn benchmark_limbs_overflowing_sub_mul(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_39().get(gm, &config),
+        unsigned_vec_triple_gen_var_39().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -381,14 +368,14 @@ fn benchmark_limbs_overflowing_sub_mul(
 
 fn benchmark_limbs_overflowing_sub_mul_in_place_left(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_overflowing_sub_mul_in_place_left(&mut Vec<Limb>, &[Limb], &[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_triple_gen_var_39().get(gm, &config),
+        unsigned_vec_triple_gen_var_39().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -401,14 +388,14 @@ fn benchmark_limbs_overflowing_sub_mul_in_place_left(
 
 fn benchmark_integer_sub_mul_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -437,14 +424,14 @@ fn benchmark_integer_sub_mul_evaluation_strategy(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_sub_mul_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(Integer, Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -463,14 +450,14 @@ fn benchmark_integer_sub_mul_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_sub_mul_val_val_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(Integer, &Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -489,14 +476,14 @@ fn benchmark_integer_sub_mul_val_val_ref_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_sub_mul_val_ref_val_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(&Integer, Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -515,14 +502,14 @@ fn benchmark_integer_sub_mul_val_ref_val_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(&Integer, &Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -541,14 +528,14 @@ fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul(&Integer, &Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -567,14 +554,14 @@ fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
 
 fn benchmark_integer_sub_mul_assign_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul_assign(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -602,14 +589,14 @@ fn benchmark_integer_sub_mul_assign_evaluation_strategy(
 
 fn benchmark_integer_sub_mul_assign_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul_assign(Integer, Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -628,14 +615,14 @@ fn benchmark_integer_sub_mul_assign_algorithms(
 
 fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul_assign(Integer, &Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -654,14 +641,14 @@ fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
 
 fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul_assign(&Integer, Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -680,14 +667,14 @@ fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
 
 fn benchmark_integer_sub_mul_assign_ref_ref_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer.sub_mul_assign(&Integer, &Integer)",
         BenchmarkType::Algorithms,
-        integer_triple_gen().get(gm, &config),
+        integer_triple_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -5,7 +5,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_q::conversion::primitive_float_from_rational::PrimitiveFloatFromRationalError;
+use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
 use malachite_q::test_util::bench::bucketers::{
     pair_1_rational_bit_bucketer, pair_2_rational_bit_bucketer, rational_bit_bucketer,
 };
@@ -54,21 +54,22 @@ fn demo_float_rounding_from_rational<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat + RoundingFrom<Rational>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: TryFrom<T>,
 {
     for (n, rm) in rational_rounding_mode_pair_gen_var_5::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
+        let (f, o) = T::rounding_from(n.clone(), rm);
         println!(
-            "{}::rounding_from({}, {}) = {}",
+            "{}::rounding_from({}, {}) = {:?}",
             T::NAME,
-            n.clone(),
+            n,
             rm,
-            NiceFloat(T::rounding_from(n, rm))
+            (NiceFloat(f), o)
         );
     }
 }
@@ -77,33 +78,34 @@ fn demo_float_rounding_from_rational_ref<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat + for<'a> RoundingFrom<&'a Rational>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: TryFrom<T>,
 {
     for (n, rm) in rational_rounding_mode_pair_gen_var_5::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
+        let (f, o) = T::rounding_from(&n, rm);
         println!(
-            "{}::rounding_from(&{}, {}) = {}",
+            "{}::rounding_from(&{}, {}) = {:?}",
             T::NAME,
             n,
             rm,
-            NiceFloat(T::rounding_from(&n, rm))
+            (NiceFloat(f), o)
         );
     }
 }
 
 fn demo_float_try_from_rational<
-    T: TryFrom<Rational, Error = PrimitiveFloatFromRationalError> + PrimitiveFloat,
+    T: TryFrom<Rational, Error = FloatFromRationalError> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!(
             "{}::try_from({}) = {:?}",
             T::NAME,
@@ -114,13 +116,13 @@ fn demo_float_try_from_rational<
 }
 
 fn demo_float_try_from_rational_ref<
-    T: for<'a> TryFrom<&'a Rational, Error = PrimitiveFloatFromRationalError> + PrimitiveFloat,
+    T: for<'a> TryFrom<&'a Rational, Error = FloatFromRationalError> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!(
             "{}::try_from(&{}) = {:?}",
             T::NAME,
@@ -132,12 +134,12 @@ fn demo_float_try_from_rational_ref<
 
 fn demo_float_exact_from_rational<T: ExactFrom<Rational> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: TryFrom<T>,
 {
-    for n in rational_gen_var_4::<T>().get(gm, &config).take(limit) {
+    for n in rational_gen_var_4::<T>().get(gm, config).take(limit) {
         println!(
             "{}::exact_from({}) = {}",
             T::NAME,
@@ -149,12 +151,12 @@ fn demo_float_exact_from_rational<T: ExactFrom<Rational> + PrimitiveFloat>(
 
 fn demo_float_exact_from_rational_ref<T: for<'a> ExactFrom<&'a Rational> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Rational: TryFrom<T>,
 {
-    for n in rational_gen_var_4::<T>().get(gm, &config).take(limit) {
+    for n in rational_gen_var_4::<T>().get(gm, config).take(limit) {
         println!(
             "{}::exact_from(&{}) = {}",
             T::NAME,
@@ -166,10 +168,10 @@ fn demo_float_exact_from_rational_ref<T: for<'a> ExactFrom<&'a Rational> + Primi
 
 fn demo_float_convertible_from_rational<T: ConvertibleFrom<Rational> + PrimitiveFloat>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+    for n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         if T::convertible_from(n) {
             println!("{} is convertible to an {}", n_old, T::NAME);
@@ -183,10 +185,10 @@ fn demo_float_convertible_from_rational_ref<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+    for n in rational_gen().get(gm, config).take(limit) {
         if T::convertible_from(&n) {
             println!("{} is convertible to an {}", n, T::NAME);
         } else {
@@ -202,7 +204,7 @@ fn benchmark_float_rounding_from_rational_evaluation_strategy<
         + for<'a> RoundingFrom<&'a Rational>,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -211,7 +213,7 @@ fn benchmark_float_rounding_from_rational_evaluation_strategy<
     run_benchmark(
         &format!("{}::rounding_from(Rational, RoundingMode)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_rounding_mode_pair_gen_var_5::<T>().get(gm, &config),
+        rational_rounding_mode_pair_gen_var_5::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -231,14 +233,14 @@ fn benchmark_float_rounding_from_rational_evaluation_strategy<
 
 fn benchmark_f32_rounding_from_down_rational_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "f32::rounding_from(Rational, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        rational_gen_rm().get(gm, &config),
+        rational_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -254,14 +256,14 @@ fn benchmark_f32_rounding_from_down_rational_library_comparison(
 
 fn benchmark_f64_rounding_from_down_rational_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "f64::rounding_from(Rational, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        rational_gen_rm().get(gm, &config),
+        rational_gen_rm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -279,14 +281,14 @@ fn benchmark_float_try_from_rational_evaluation_strategy<
     T: TryFrom<Rational> + for<'a> TryFrom<&'a Rational> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::try_from(Rational)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -306,7 +308,7 @@ fn benchmark_float_exact_from_rational_evaluation_strategy<
     T: ExactFrom<Rational> + for<'a> ExactFrom<&'a Rational> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -315,7 +317,7 @@ fn benchmark_float_exact_from_rational_evaluation_strategy<
     run_benchmark(
         &format!("{}::exact_from(Rational)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_gen_var_4::<T>().get(gm, &config),
+        rational_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -335,14 +337,14 @@ fn benchmark_float_convertible_from_rational_evaluation_strategy<
     T: ConvertibleFrom<Rational> + for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat,
 >(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}::convertible_from(Rational)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

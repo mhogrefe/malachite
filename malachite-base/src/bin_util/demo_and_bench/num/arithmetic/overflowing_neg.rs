@@ -15,44 +15,38 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_overflowing_neg_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut u in unsigned_gen::<T>().get(gm, &config).take(limit) {
+    for mut u in unsigned_gen::<T>().get(gm, config).take(limit) {
         let old_u = u;
         let overflow = u.overflowing_neg_assign();
-        println!(
-            "u := {}; u.overflowing_neg_assign() = {}; u = {}",
-            old_u, overflow, u
-        );
+        println!("u := {old_u}; u.overflowing_neg_assign() = {overflow}; u = {u}");
     }
 }
 
 fn demo_overflowing_neg_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
-    for mut i in signed_gen::<T>().get(gm, &config).take(limit) {
+    for mut i in signed_gen::<T>().get(gm, config).take(limit) {
         let old_i = i;
         let overflow = i.overflowing_neg_assign();
-        println!(
-            "i := {}; i.overflowing_neg_assign() = {}; i = {}",
-            old_i, overflow, i
-        );
+        println!("i := {old_i}; i.overflowing_neg_assign() = {overflow}; i = {i}");
     }
 }
 
 fn benchmark_overflowing_neg_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_neg_assign()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -66,14 +60,14 @@ fn benchmark_overflowing_neg_assign_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_overflowing_neg_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.overflowing_neg_assign()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

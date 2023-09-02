@@ -12,27 +12,27 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_decrement_char);
 }
 
-fn demo_increment_char(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut c in char_gen_var_1().get(gm, &config).take(limit) {
+fn demo_increment_char(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut c in char_gen_var_1().get(gm, config).take(limit) {
         let c_old = c;
         increment_char(&mut c);
-        println!("c := {:?}; increment_char(&mut c); c = {:?}", c_old, c);
+        println!("c := {c_old:?}; increment_char(&mut c); c = {c:?}");
     }
 }
 
-fn demo_decrement_char(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut c in char_gen_var_2().get(gm, &config).take(limit) {
+fn demo_decrement_char(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut c in char_gen_var_2().get(gm, config).take(limit) {
         let c_old = c;
         increment_char(&mut c);
-        println!("c := {:?}; decrement_char(&mut c); c = {:?}", c_old, c);
+        println!("c := {c_old:?}; decrement_char(&mut c); c = {c:?}");
     }
 }
 
-fn benchmark_increment_char(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_increment_char(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "increment_char(&mut char)",
         BenchmarkType::Single,
-        char_gen_var_1().get(gm, &config),
+        char_gen_var_1().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -41,11 +41,11 @@ fn benchmark_increment_char(gm: GenMode, config: GenConfig, limit: usize, file_n
     );
 }
 
-fn benchmark_decrement_char(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_decrement_char(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "decrement_char(&mut char)",
         BenchmarkType::Single,
-        char_gen_var_2().get(gm, &config),
+        char_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

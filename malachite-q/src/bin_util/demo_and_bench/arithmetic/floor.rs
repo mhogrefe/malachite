@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_floor_assign);
 }
 
-fn demo_rational_floor(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_floor(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("floor({}) = {}", n.clone(), n.floor());
     }
 }
 
-fn demo_rational_floor_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_floor_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("floor(&{}) = {}", n, (&n).floor());
     }
 }
 
-fn demo_rational_floor_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_floor_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.floor_assign();
-        println!("n := {}; n.floor_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.floor_assign(); n = {n}");
     }
 }
 
 #[allow(unused_must_use)]
 fn benchmark_rational_floor_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.floor()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -62,14 +62,14 @@ fn benchmark_rational_floor_library_comparison(
 
 fn benchmark_rational_floor_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.floor()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -81,11 +81,11 @@ fn benchmark_rational_floor_evaluation_strategy(
     );
 }
 
-fn benchmark_rational_floor_assign(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_rational_floor_assign(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Rational.floor_assign()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

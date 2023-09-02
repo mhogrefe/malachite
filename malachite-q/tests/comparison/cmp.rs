@@ -41,8 +41,8 @@ fn test_cmp() {
 fn cmp_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let ord = x.cmp(&y);
-        assert_eq!(BigRational::from(&x).cmp(&BigRational::from(&y)), ord,);
-        assert_eq!(rug::Rational::from(&x).cmp(&rug::Rational::from(&y)), ord,);
+        assert_eq!(BigRational::from(&x).cmp(&BigRational::from(&y)), ord);
+        assert_eq!(rug::Rational::from(&x).cmp(&rug::Rational::from(&y)), ord);
         assert_eq!(y.cmp(&x).reverse(), ord);
         assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
         assert_eq!((-y).cmp(&-x), ord);

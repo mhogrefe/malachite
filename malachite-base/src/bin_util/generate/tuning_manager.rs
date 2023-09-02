@@ -65,7 +65,7 @@ fn get_all_top_level_functions() -> BTreeMap<String, FunctionRecord> {
                     if !allowed_double_names.contains(&fn_name.as_str())
                         && fns.contains_key(&fn_name)
                     {
-                        panic!("Duplicate top-level function name: {}", fn_name);
+                        panic!("Duplicate top-level function name: {fn_name}");
                     }
                     fns.insert(
                         fn_name.clone(),
@@ -105,14 +105,14 @@ fn get_all_tuneable_constants() -> BTreeMap<String, FunctionRecord> {
                         }
                     }
                     if p.is_none() {
-                        panic!("Bad const. line {} in {}", i, path);
+                        panic!("Bad const. line {i} in {path}");
                     }
                     let p = p.unwrap();
                     let name = &line[p.len()..];
                     let colon_index = name.chars().position(|c| c == ':').unwrap();
                     let name = &name[..colon_index];
                     if constants.contains_key(name) {
-                        panic!("Duplicate constant name: {}", name);
+                        panic!("Duplicate constant name: {name}");
                     }
                     constants.insert(
                         name.to_string(),
@@ -322,13 +322,11 @@ fn generate_defining_function_map(data: &ReferenceData) -> BTreeMap<String, Stri
     for (c, fs) in invert_map(&data.functions_referencing_constants) {
         if defining_functions.contains_key(&c) {
             continue;
-        } else if fs.len() == 1 {
+        }
+        if fs.len() == 1 {
             defining_functions.insert(c.clone(), fs.iter().next().unwrap().clone());
         } else {
-            panic!(
-                "Must specify defining function for {}. Possibilities are {:?}",
-                c, fs
-            );
+            panic!("Must specify defining function for {c}. Possibilities are {fs:?}");
         }
     }
     defining_functions

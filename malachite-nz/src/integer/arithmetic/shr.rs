@@ -21,7 +21,7 @@ where
             sign: false,
             ref abs,
         } => {
-            let abs_shifted = abs.shr_round(bits, RoundingMode::Ceiling);
+            let abs_shifted = abs.shr_round(bits, RoundingMode::Ceiling).0;
             if abs_shifted == 0 {
                 Integer::ZERO
             } else {

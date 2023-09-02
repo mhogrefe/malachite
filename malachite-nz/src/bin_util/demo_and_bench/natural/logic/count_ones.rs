@@ -19,23 +19,23 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_count_ones_algorithms);
 }
 
-fn demo_limbs_count_ones(gm: GenMode, config: GenConfig, limit: usize) {
-    for xs in unsigned_vec_gen().get(gm, &config).take(limit) {
+fn demo_limbs_count_ones(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen().get(gm, config).take(limit) {
         println!("limbs_count_ones({:?}) = {}", xs, limbs_count_ones(&xs));
     }
 }
 
-fn demo_natural_count_ones(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen().get(gm, &config).take(limit) {
+fn demo_natural_count_ones(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
         println!("count_ones({}) = {}", n, n.count_ones());
     }
 }
 
-fn benchmark_limbs_count_ones(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_limbs_count_ones(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "limbs_count_ones(&[Limb])",
         BenchmarkType::Single,
-        unsigned_vec_gen().get(gm, &config),
+        unsigned_vec_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -46,14 +46,14 @@ fn benchmark_limbs_count_ones(gm: GenMode, config: GenConfig, limit: usize, file
 
 fn benchmark_natural_count_ones_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.count_ones()",
         BenchmarkType::Algorithms,
-        natural_gen().get(gm, &config),
+        natural_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

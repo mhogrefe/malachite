@@ -10,22 +10,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_hash_library_comparison);
 }
 
-fn demo_integer_hash(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in integer_gen().get(gm, &config).take(limit) {
+fn demo_integer_hash(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
         println!("hash({}) = {}", n, hash(&n));
     }
 }
 
 fn benchmark_integer_hash_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Integer hash",
         BenchmarkType::LibraryComparison,
-        integer_gen_nrm().get(gm, &config),
+        integer_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,

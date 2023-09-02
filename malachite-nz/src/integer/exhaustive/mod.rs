@@ -327,7 +327,7 @@ pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
 #[inline]
 pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     IntegerIncreasingRange { a, b }
 }
@@ -373,7 +373,7 @@ pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRang
 #[inline]
 pub fn integer_increasing_inclusive_range(a: Integer, b: Integer) -> IntegerIncreasingRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     IntegerIncreasingRange {
         a,
@@ -492,7 +492,7 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 /// ```
 pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a >= 0 {
         ExhaustiveIntegerRange::NonNegative(integer_increasing_range(a, b))
@@ -550,7 +550,7 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 /// ```
 pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     if a >= 0 {
         ExhaustiveIntegerRange::NonNegative(integer_increasing_inclusive_range(a, b))

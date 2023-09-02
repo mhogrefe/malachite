@@ -21,14 +21,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_checked_log_base_algorithms);
 }
 
-fn demo_natural_approx_log(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+fn demo_natural_approx_log(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen_var_2().get(gm, config).take(limit) {
         println!("log({}) ≈ {}", n, NiceFloat(n.approx_log()));
     }
 }
 
-fn demo_natural_floor_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in natural_pair_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_floor_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in natural_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "floor_log_base({}, {}) = {}",
             n,
@@ -38,8 +38,8 @@ fn demo_natural_floor_log_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_ceiling_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in natural_pair_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_ceiling_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in natural_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "ceiling_log_base({}, {}) = {}",
             n,
@@ -49,8 +49,8 @@ fn demo_natural_ceiling_log_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_checked_log_base(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, base) in natural_pair_gen_var_3().get(gm, &config).take(limit) {
+fn demo_natural_checked_log_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, base) in natural_pair_gen_var_3().get(gm, config).take(limit) {
         println!(
             "checked_log_base({}, {}) = {:?}",
             n,
@@ -60,11 +60,11 @@ fn demo_natural_checked_log_base(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_approx_log(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+fn benchmark_approx_log(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "(&Natural).approx_log()",
         BenchmarkType::Single,
-        natural_gen_var_2().get(gm, &config),
+        natural_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -75,14 +75,14 @@ fn benchmark_approx_log(gm: GenMode, config: GenConfig, limit: usize, file_name:
 
 fn benchmark_natural_floor_log_base_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Natural).floor_log_base(&Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_3().get(gm, &config),
+        natural_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -101,14 +101,14 @@ fn benchmark_natural_floor_log_base_algorithms(
 
 fn benchmark_natural_ceiling_log_base_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Natural).ceiling_log_base(&Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_3().get(gm, &config),
+        natural_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -129,14 +129,14 @@ fn benchmark_natural_ceiling_log_base_algorithms(
 
 fn benchmark_natural_checked_log_base_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "(&Natural).checked_log_base(&Natural)",
         BenchmarkType::Algorithms,
-        natural_pair_gen_var_3().get(gm, &config),
+        natural_pair_gen_var_3().get(gm, config),
         gm.name(),
         limit,
         file_name,

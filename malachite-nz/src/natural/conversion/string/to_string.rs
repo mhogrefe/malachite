@@ -360,18 +360,18 @@ impl Binary for NaturalAlt2 {
                     0
                 };
                 let mut result = if f.alternate() {
-                    write!(f, "{:#0width$b}", xs_last, width = width)
+                    write!(f, "{xs_last:#0width$b}")
                 } else {
-                    write!(f, "{:0width$b}", xs_last, width = width)
+                    write!(f, "{xs_last:0width$b}")
                 };
                 for x in xs_init.iter().rev() {
                     #[cfg(feature = "32_bit_limbs")]
                     {
-                        result = write!(f, "{:032b}", x);
+                        result = write!(f, "{x:032b}");
                     }
                     #[cfg(not(feature = "32_bit_limbs"))]
                     {
-                        result = write!(f, "{:064b}", x);
+                        result = write!(f, "{x:064b}");
                     }
                 }
                 result
@@ -451,7 +451,8 @@ impl Octal for NaturalAlt {
                 let mut len = usize::exact_from(
                     self.0
                         .significant_bits()
-                        .div_round(3, RoundingMode::Ceiling),
+                        .div_round(3, RoundingMode::Ceiling)
+                        .0,
                 );
                 if f.alternate() {
                     len += 2;
@@ -471,12 +472,12 @@ impl Octal for NaturalAlt {
 #[cfg(feature = "test_build")]
 #[cfg(feature = "32_bit_limbs")]
 fn oz_fmt(f: &mut Formatter, x: Limb) -> Result {
-    write!(f, "{:08o}", x)
+    write!(f, "{x:08o}")
 }
 #[cfg(feature = "test_build")]
 #[cfg(not(feature = "32_bit_limbs"))]
 fn oz_fmt(f: &mut Formatter, x: Limb) -> Result {
-    write!(f, "{:016o}", x)
+    write!(f, "{x:016o}")
 }
 
 #[cfg(feature = "test_build")]
@@ -490,7 +491,9 @@ impl Octal for NaturalAlt2 {
                 }
                 if let Some(width) = f.width() {
                     let mut len = usize::exact_from(
-                        limbs_significant_bits(xs).div_round(3, RoundingMode::Ceiling),
+                        limbs_significant_bits(xs)
+                            .div_round(3, RoundingMode::Ceiling)
+                            .0,
                     );
                     if f.alternate() {
                         len += 2;
@@ -516,7 +519,7 @@ impl Octal for NaturalAlt2 {
                         if y == 0 {
                             result = write!(f, "{:o}", x_2 & MASK);
                         } else {
-                            write!(f, "{:o}", y).unwrap();
+                            write!(f, "{y:o}").unwrap();
                             result = oz_fmt(f, x_2 & MASK);
                         }
                     }
@@ -527,7 +530,7 @@ impl Octal for NaturalAlt2 {
                         if y == 0 {
                             write!(f, "{:o}", ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
                         } else {
-                            write!(f, "{:o}", y).unwrap();
+                            write!(f, "{y:o}").unwrap();
                             oz_fmt(f, ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
                         }
                         result = oz_fmt(f, x_2 & MASK);
@@ -540,7 +543,7 @@ impl Octal for NaturalAlt2 {
                         if y == 0 {
                             write!(f, "{:o}", ((x_0 << W_1_2) & MASK) | (x_1 >> W_1_2)).unwrap();
                         } else {
-                            write!(f, "{:o}", y).unwrap();
+                            write!(f, "{y:o}").unwrap();
                             oz_fmt(f, ((x_0 << W_1_2) & MASK) | (x_1 >> W_1_2)).unwrap();
                         }
                         oz_fmt(f, ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
@@ -604,7 +607,9 @@ impl Octal for Natural {
                 let mut digits = vec![
                     0;
                     usize::exact_from(
-                        limbs_significant_bits(xs).div_round(3, RoundingMode::Ceiling)
+                        limbs_significant_bits(xs)
+                            .div_round(3, RoundingMode::Ceiling)
+                            .0
                     )
                 ];
                 let mut limbs = xs.iter();
@@ -666,7 +671,8 @@ impl LowerHex for NaturalAlt {
                 let mut len = usize::exact_from(
                     self.0
                         .significant_bits()
-                        .shr_round(2, RoundingMode::Ceiling),
+                        .shr_round(2, RoundingMode::Ceiling)
+                        .0,
                 );
                 if f.alternate() {
                     len += 2;
@@ -696,18 +702,18 @@ impl LowerHex for NaturalAlt2 {
                     0
                 };
                 let mut result = if f.alternate() {
-                    write!(f, "{:#0width$x}", xs_last, width = width)
+                    write!(f, "{xs_last:#0width$x}")
                 } else {
-                    write!(f, "{:0width$x}", xs_last, width = width)
+                    write!(f, "{xs_last:0width$x}")
                 };
                 for x in xs_init.iter().rev() {
                     #[cfg(feature = "32_bit_limbs")]
                     {
-                        result = write!(f, "{:08x}", x);
+                        result = write!(f, "{x:08x}");
                     }
                     #[cfg(not(feature = "32_bit_limbs"))]
                     {
-                        result = write!(f, "{:016x}", x);
+                        result = write!(f, "{x:016x}");
                     }
                 }
                 result
@@ -759,7 +765,9 @@ impl LowerHex for Natural {
                 let mut digits = vec![
                     0;
                     usize::exact_from(
-                        limbs_significant_bits(xs).shr_round(2, RoundingMode::Ceiling)
+                        limbs_significant_bits(xs)
+                            .shr_round(2, RoundingMode::Ceiling)
+                            .0
                     )
                 ];
                 let mut limbs = xs.iter();
@@ -823,7 +831,9 @@ impl UpperHex for Natural {
                 let mut digits = vec![
                     0;
                     usize::exact_from(
-                        limbs_significant_bits(xs).shr_round(2, RoundingMode::Ceiling)
+                        limbs_significant_bits(xs)
+                            .shr_round(2, RoundingMode::Ceiling)
+                            .0
                     )
                 ];
                 let mut limbs = xs.iter();

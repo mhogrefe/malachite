@@ -1,4 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::traits::NegativeInfinity;
 use malachite_base::num::exhaustive::exhaustive_negative_primitive_floats;
 use malachite_base::test_util::num::exhaustive::exhaustive_primitive_floats_helper_helper;
 

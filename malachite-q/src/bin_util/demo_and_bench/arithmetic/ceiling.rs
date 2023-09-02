@@ -17,37 +17,37 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_ceiling_assign);
 }
 
-fn demo_rational_ceiling(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_ceiling(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("ceiling({}) = {}", n.clone(), n.ceiling());
     }
 }
 
-fn demo_rational_ceiling_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_ceiling_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in rational_gen().get(gm, config).take(limit) {
         println!("ceiling(&{}) = {}", n, (&n).ceiling());
     }
 }
 
-fn demo_rational_ceiling_assign(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut n in rational_gen().get(gm, &config).take(limit) {
+fn demo_rational_ceiling_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in rational_gen().get(gm, config).take(limit) {
         let n_old = n.clone();
         n.ceiling_assign();
-        println!("n := {}; n.ceiling_assign(); n = {}", n_old, n);
+        println!("n := {n_old}; n.ceiling_assign(); n = {n}");
     }
 }
 
 #[allow(unused_must_use)]
 fn benchmark_rational_ceiling_library_comparison(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.ceiling()",
         BenchmarkType::LibraryComparison,
-        rational_gen_nrm().get(gm, &config),
+        rational_gen_nrm().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -62,14 +62,14 @@ fn benchmark_rational_ceiling_library_comparison(
 
 fn benchmark_rational_ceiling_evaluation_strategy(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.ceiling()",
         BenchmarkType::EvaluationStrategy,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -83,14 +83,14 @@ fn benchmark_rational_ceiling_evaluation_strategy(
 
 fn benchmark_rational_ceiling_assign(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Rational.ceiling_assign()",
         BenchmarkType::Single,
-        rational_gen().get(gm, &config),
+        rational_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -55,7 +55,7 @@ fn floor_properties() {
         assert!(floor_alt.is_valid());
         assert_eq!(floor_alt, floor);
 
-        assert_eq!(Integer::rounding_from(&x, RoundingMode::Floor), floor);
+        assert_eq!(Integer::rounding_from(&x, RoundingMode::Floor).0, floor);
         assert!(floor <= x);
         assert!(&floor + Integer::ONE > x);
         assert_eq!(floor, Rational::from(&floor).floor());

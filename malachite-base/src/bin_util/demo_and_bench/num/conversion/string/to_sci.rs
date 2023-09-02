@@ -27,51 +27,55 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_to_sci_with_options_signed);
 }
 
-fn demo_to_sci_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_sci_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 
-fn demo_to_sci_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+fn demo_to_sci_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen::<T>().get(gm, config).take(limit) {
         println!("{}.to_sci() = {}", x, x.to_sci());
     }
 }
 
-fn demo_fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, options) in unsigned_to_sci_options_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.fmt_sci_valid(options) {
-            println!("{} can be converted to sci using {:?}", x, options);
+            println!("{x} can be converted to sci using {options:?}");
         } else {
-            println!("{} cannot be converted to sci using {:?}", x, options);
+            println!("{x} cannot be converted to sci using {options:?}");
         }
     }
 }
 
-fn demo_fmt_sci_valid_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_fmt_sci_valid_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, options) in signed_to_sci_options_pair_gen::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if x.fmt_sci_valid(options) {
-            println!("{} can be converted to sci using {:?}", x, options);
+            println!("{x} can be converted to sci using {options:?}");
         } else {
-            println!("{} cannot be converted to sci using {:?}", x, options);
+            println!("{x} cannot be converted to sci using {options:?}");
         }
     }
 }
 
 fn demo_to_sci_with_options_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, options) in unsigned_to_sci_options_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -85,11 +89,11 @@ fn demo_to_sci_with_options_unsigned<T: PrimitiveUnsigned>(
 
 fn demo_to_sci_with_options_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (x, options) in signed_to_sci_options_pair_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -103,14 +107,14 @@ fn demo_to_sci_with_options_signed<T: PrimitiveSigned>(
 
 fn benchmark_to_sci_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_sci()", T::NAME),
         BenchmarkType::Single,
-        unsigned_gen::<T>().get(gm, &config),
+        unsigned_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -121,14 +125,14 @@ fn benchmark_to_sci_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_sci_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_sci()", T::NAME),
         BenchmarkType::Single,
-        signed_gen::<T>().get(gm, &config),
+        signed_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -139,14 +143,14 @@ fn benchmark_to_sci_signed<T: PrimitiveSigned>(
 
 fn benchmark_fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.fmt_sci_valid(ToSciOptions)", T::NAME),
         BenchmarkType::Single,
-        unsigned_to_sci_options_pair_gen::<T>().get(gm, &config),
+        unsigned_to_sci_options_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -159,14 +163,14 @@ fn benchmark_fmt_sci_valid_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_fmt_sci_valid_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.fmt_sci_valid(ToSciOptions)", T::NAME),
         BenchmarkType::Single,
-        signed_to_sci_options_pair_gen::<T>().get(gm, &config),
+        signed_to_sci_options_pair_gen::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -179,14 +183,14 @@ fn benchmark_fmt_sci_valid_signed<T: PrimitiveSigned>(
 
 fn benchmark_to_sci_with_options_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_sci_with_options(ToSciOptions)", T::NAME),
         BenchmarkType::Single,
-        unsigned_to_sci_options_pair_gen_var_1::<T>().get(gm, &config),
+        unsigned_to_sci_options_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -199,14 +203,14 @@ fn benchmark_to_sci_with_options_unsigned<T: PrimitiveUnsigned>(
 
 fn benchmark_to_sci_with_options_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.to_sci_with_options(ToSciOptions)", T::NAME),
         BenchmarkType::Single,
-        signed_to_sci_options_pair_gen_var_1::<T>().get(gm, &config),
+        signed_to_sci_options_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

@@ -44,44 +44,47 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_mod_shl_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ModShlAssign<T>,
 {
     for (mut n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_shl_assign(u, m.clone());
-        println!("x := {}; x.mod_shl_assign({}, {}); x = {}", n_old, u, m, n);
+        println!("x := {n_old}; x.mod_shl_assign({u}, {m}); x = {n}");
     }
 }
 
 fn demo_natural_mod_shl_assign_unsigned_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> Natural: ModShlAssign<T, &'a Natural>,
 {
     for (mut n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_shl_assign(u, &m);
-        println!("x := {}; x.mod_shl_assign({}, &{}); x = {}", n_old, u, m, n);
+        println!("x := {n_old}; x.mod_shl_assign({u}, &{m}); x = {n}");
     }
 }
 
-fn demo_natural_mod_shl_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_natural_mod_shl_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
     Natural: ModShl<T, Output = Natural>,
 {
     for (n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -97,13 +100,13 @@ where
 
 fn demo_natural_mod_shl_unsigned_val_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> Natural: ModShl<T, &'a Natural, Output = Natural>,
 {
     for (n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -113,13 +116,13 @@ fn demo_natural_mod_shl_unsigned_val_ref<T: PrimitiveUnsigned>(
 
 fn demo_natural_mod_shl_unsigned_ref_val<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: ModShl<T, Natural, Output = Natural>,
 {
     for (n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -134,13 +137,13 @@ fn demo_natural_mod_shl_unsigned_ref_val<T: PrimitiveUnsigned>(
 
 fn demo_natural_mod_shl_unsigned_ref_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a, 'b> &'a Natural: ModShl<T, &'b Natural, Output = Natural>,
 {
     for (n, m, u) in natural_natural_unsigned_triple_gen_var_6::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).mod_shl({}, &{}) = {}", n, u, m, (&n).mod_shl(u, &m));
@@ -149,44 +152,44 @@ fn demo_natural_mod_shl_unsigned_ref_ref<T: PrimitiveUnsigned>(
 
 fn demo_natural_mod_shl_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     Natural: ModShlAssign<T>,
 {
     for (mut n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_shl_assign(i, m.clone());
-        println!("x := {}; x.mod_shl_assign({}, {}); x = {}", n_old, i, m, n);
+        println!("x := {n_old}; x.mod_shl_assign({i}, {m}); x = {n}");
     }
 }
 
 fn demo_natural_mod_shl_assign_signed_ref<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> Natural: ModShlAssign<T, &'a Natural>,
 {
     for (mut n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
         n.mod_shl_assign(i, &m);
-        println!("x := {}; x.mod_shl_assign({}, &{}); x = {}", n_old, i, m, n);
+        println!("x := {n_old}; x.mod_shl_assign({i}, &{m}); x = {n}");
     }
 }
 
-fn demo_natural_mod_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_mod_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Natural: ModShl<T, Output = Natural>,
 {
     for (n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -202,13 +205,13 @@ where
 
 fn demo_natural_mod_shl_signed_val_ref<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> Natural: ModShl<T, &'a Natural, Output = Natural>,
 {
     for (n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         let n_old = n.clone();
@@ -218,13 +221,13 @@ fn demo_natural_mod_shl_signed_val_ref<T: PrimitiveSigned>(
 
 fn demo_natural_mod_shl_signed_ref_val<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a> &'a Natural: ModShl<T, Natural, Output = Natural>,
 {
     for (n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -239,32 +242,32 @@ fn demo_natural_mod_shl_signed_ref_val<T: PrimitiveSigned>(
 
 fn demo_natural_mod_shl_signed_ref_ref<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) where
     for<'a, 'b> &'a Natural: ModShl<T, &'b Natural, Output = Natural>,
 {
     for (n, m, i) in natural_natural_signed_triple_gen_var_1::<T>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!("(&{}).mod_shl({}, &{}) = {}", n, i, m, (&n).mod_shl(i, &m));
     }
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn benchmark_natural_mod_shl_assign_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Natural: ModShlAssign<T>,
-    for<'a> Natural: ModShlAssign<T, &'a Natural>,
+    for<'a> Natural: ModShlAssign<T> + ModShlAssign<T, &'a Natural>,
 {
     run_benchmark(
         &format!("Natural.mod_shl_assign({}, Natural)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -285,7 +288,7 @@ fn benchmark_natural_mod_shl_assign_unsigned_evaluation_strategy<T: PrimitiveUns
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_mod_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -294,7 +297,7 @@ fn benchmark_natural_mod_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural.mod_shl({}, Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -306,9 +309,10 @@ fn benchmark_natural_mod_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn benchmark_natural_mod_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -319,7 +323,7 @@ fn benchmark_natural_mod_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("Natural.mod_shl({}, Natural)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, &config),
+        natural_natural_unsigned_triple_gen_var_6::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -345,19 +349,19 @@ fn benchmark_natural_mod_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn benchmark_natural_mod_shl_assign_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    Natural: ModShlAssign<T>,
-    for<'a> Natural: ModShlAssign<T, &'a Natural>,
+    for<'a> Natural: ModShlAssign<T> + ModShlAssign<T, &'a Natural>,
 {
     run_benchmark(
         &format!("Natural.mod_shl_assign({}, Natural)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_natural_signed_triple_gen_var_1::<T>().get(gm, &config),
+        natural_natural_signed_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -378,7 +382,7 @@ fn benchmark_natural_mod_shl_assign_signed_evaluation_strategy<T: PrimitiveSigne
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_natural_mod_shl_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -387,7 +391,7 @@ fn benchmark_natural_mod_shl_signed_algorithms<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.mod_shl({}, Natural)", T::NAME),
         BenchmarkType::Algorithms,
-        natural_natural_signed_triple_gen_var_1::<T>().get(gm, &config),
+        natural_natural_signed_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -399,9 +403,10 @@ fn benchmark_natural_mod_shl_signed_algorithms<T: PrimitiveSigned>(
     );
 }
 
+#[allow(clippy::trait_duplication_in_bounds)]
 fn benchmark_natural_mod_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
@@ -412,7 +417,7 @@ fn benchmark_natural_mod_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
     run_benchmark(
         &format!("Natural.mod_shl({}, Natural)", T::NAME),
         BenchmarkType::EvaluationStrategy,
-        natural_natural_signed_triple_gen_var_1::<T>().get(gm, &config),
+        natural_natural_signed_triple_gen_var_1::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,

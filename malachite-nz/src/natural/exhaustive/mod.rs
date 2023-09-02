@@ -156,7 +156,7 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 #[inline]
 pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     ExhaustiveNaturalRange { a, b }
 }
@@ -201,7 +201,7 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 #[inline]
 pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveNaturalRange {
     if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+        panic!("a must be less than or equal to b. a: {a}, b: {b}");
     }
     ExhaustiveNaturalRange {
         a,

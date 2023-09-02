@@ -32,9 +32,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_checked_log_base_power_of_2);
 }
 
-fn demo_limbs_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_floor_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_13()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -46,9 +46,9 @@ fn demo_limbs_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
-fn demo_limbs_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_ceiling_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_13()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -60,9 +60,9 @@ fn demo_limbs_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_limbs_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_limbs_checked_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, pow) in unsigned_vec_unsigned_pair_gen_var_13()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -74,9 +74,9 @@ fn demo_limbs_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_natural_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_floor_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_8()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -88,9 +88,9 @@ fn demo_natural_floor_log_base_power_of_2(gm: GenMode, config: GenConfig, limit:
     }
 }
 
-fn demo_natural_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_ceiling_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_8()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -102,9 +102,9 @@ fn demo_natural_ceiling_log_base_power_of_2(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn demo_natural_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_checked_log_base_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, pow) in natural_unsigned_pair_gen_var_8()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         println!(
@@ -118,14 +118,14 @@ fn demo_natural_checked_log_base_power_of_2(gm: GenMode, config: GenConfig, limi
 
 fn benchmark_limbs_floor_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_floor_log_base_power_of_2(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_13().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -138,14 +138,14 @@ fn benchmark_limbs_floor_log_base_power_of_2(
 
 fn benchmark_limbs_ceiling_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_ceiling_log_base_power_of_2(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_13().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -158,14 +158,14 @@ fn benchmark_limbs_ceiling_log_base_power_of_2(
 
 fn benchmark_limbs_checked_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "limbs_checked_log_base_power_of_2(&[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_13().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_13().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -178,14 +178,14 @@ fn benchmark_limbs_checked_log_base_power_of_2(
 
 fn benchmark_natural_floor_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_log_base_power_of_2(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_8().get(gm, &config),
+        natural_unsigned_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -198,14 +198,14 @@ fn benchmark_natural_floor_log_base_power_of_2(
 
 fn benchmark_natural_ceiling_log_base_power_of_2_algorithms(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.ceiling_log_base_power_of_2(u64)",
         BenchmarkType::Algorithms,
-        natural_unsigned_pair_gen_var_8().get(gm, &config),
+        natural_unsigned_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -223,14 +223,14 @@ fn benchmark_natural_ceiling_log_base_power_of_2_algorithms(
 
 fn benchmark_natural_checked_log_base_power_of_2(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         "Natural.floor_log_base_power_of_2(u64)",
         BenchmarkType::Single,
-        natural_unsigned_pair_gen_var_8().get(gm, &config),
+        natural_unsigned_pair_gen_var_8().get(gm, config),
         gm.name(),
         limit,
         file_name,

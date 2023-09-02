@@ -12,31 +12,31 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_mod_power_of_2_is_reduced<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
 ) {
     for (n, pow) in unsigned_pair_gen_var_2::<T, u64>()
-        .get(gm, &config)
+        .get(gm, config)
         .take(limit)
     {
         if n.mod_power_of_2_is_reduced(pow) {
-            println!("{} is reduced mod 2^{}", n, pow);
+            println!("{n} is reduced mod 2^{pow}");
         } else {
-            println!("{} is not reduced mod 2^{}", n, pow);
+            println!("{n} is not reduced mod 2^{pow}");
         }
     }
 }
 
 fn benchmark_mod_power_of_2_is_reduced<T: PrimitiveUnsigned>(
     gm: GenMode,
-    config: GenConfig,
+    config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
         &format!("{}.mod_power_of_2_is_reduced(u64)", T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_2::<T, u64>().get(gm, &config),
+        unsigned_pair_gen_var_2::<T, u64>().get(gm, config),
         gm.name(),
         limit,
         file_name,
