@@ -1,10 +1,11 @@
 [workspace]
 members = ['malachite', 'malachite-base', 'malachite-float', 'malachite-nz', 'malachite-q', 'malachite-criterion-bench']
+resolver = "2"
 
 [workspace.dependencies]
-malachite-base = { version = "0.3.2", path = 'malachite-base' }
-malachite-nz = { version = "0.3.2", path = 'malachite-nz', default_features = false }
-malachite-q = { version = "0.3.2", path = 'malachite-q' }
+malachite-base = { version = "0.4.0", path = 'malachite-base' }
+malachite-nz = { version = "0.4.0", path = 'malachite-nz', default_features = false }
+malachite-q = { version = "0.4.0", path = 'malachite-q' }
 
 [profile.release]
 lto = true

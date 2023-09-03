@@ -221,13 +221,15 @@ impl CheckedDiv<Rational> for Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::TWO.checked_div(Rational::TWO), Some(1));
+    /// assert_eq!(Rational::TWO.checked_div(Rational::TWO).unwrap(), 1);
     /// assert_eq!(Rational::TWO.checked_div(Rational::ZERO), None);
     /// assert_eq!(
-    ///     (Rational::from_signeds(22, 7).checked_div(Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     (Rational::from_signeds(22, 7).checked_div(Rational::from_signeds(99, 100))).unwrap()
+    ///         .to_string(),
     ///     "200/63"
     /// );
     /// ```
@@ -272,13 +274,15 @@ impl<'a> CheckedDiv<&'a Rational> for Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::TWO.checked_div(&Rational::TWO), Some(1));
+    /// assert_eq!(Rational::TWO.checked_div(&Rational::TWO).unwrap(), 1);
     /// assert_eq!(Rational::TWO.checked_div(&Rational::ZERO), None);
     /// assert_eq!(
-    ///     (Rational::from_signeds(22, 7).checked_div(&Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     (Rational::from_signeds(22, 7).checked_div(&Rational::from_signeds(99, 100))).unwrap()
+    ///         .to_string(),
     ///     "200/63"
     /// );
     /// ```
@@ -315,13 +319,15 @@ impl<'a> CheckedDiv<Rational> for &'a Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::TWO).checked_div(Rational::TWO), Some(1));
+    /// assert_eq!((&Rational::TWO).checked_div(Rational::TWO).unwrap(), 1);
     /// assert_eq!((&Rational::TWO).checked_div(Rational::ZERO), None);
     /// assert_eq!(
-    ///     (&Rational::from_signeds(22, 7).checked_div(Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     (&Rational::from_signeds(22, 7)).checked_div(Rational::from_signeds(99, 100)).unwrap()
+    ///         .to_string(),
     ///     "200/63"
     /// );
     /// ```
@@ -365,13 +371,15 @@ impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
     /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::TWO).checked_div(&Rational::TWO), Some(1));
+    /// assert_eq!((&Rational::TWO).checked_div(&Rational::TWO).unwrap(), 1);
     /// assert_eq!((&Rational::TWO).checked_div(&Rational::ZERO), None);
     /// assert_eq!(
-    ///     (&Rational::from_signeds(22, 7).checked_div(&Rational::from_signeds(99, 100))).unwrap().to_string(),
+    ///     (&Rational::from_signeds(22, 7)).checked_div(&Rational::from_signeds(99, 100)).unwrap()
+    ///         .to_string(),
     ///     "200/63"
     /// );
     /// ```

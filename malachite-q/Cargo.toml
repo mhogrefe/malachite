@@ -1,6 +1,6 @@
 [package]
 name = "malachite-q"
-version = "0.3.2"
+version = "0.4.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -22,8 +22,8 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = "0.11.0"
-malachite-base = { path = "../malachite-base" }
-malachite-nz = { path = "../malachite-nz" }
+malachite-base = "0.4.0"
+malachite-nz = "0.4.0"
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 serde_json = { version = "1.0.105", optional = true }

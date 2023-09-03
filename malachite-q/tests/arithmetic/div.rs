@@ -77,25 +77,25 @@ fn test_checked_div() {
         let v = Rational::from_str(t).unwrap();
 
         let n = u.clone().checked_div(v.clone());
-        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        assert_eq!(n.as_ref().map(ToString::to_string).as_deref(), out);
         if out.is_some() {
             assert!(n.unwrap().is_valid());
         }
 
         let n = (&u).checked_div(v.clone());
-        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        assert_eq!(n.as_ref().map(ToString::to_string).as_deref(), out);
         if out.is_some() {
             assert!(n.unwrap().is_valid());
         }
 
         let n = u.clone().checked_div(&v);
-        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        assert_eq!(n.as_ref().map(ToString::to_string).as_deref(), out);
         if out.is_some() {
             assert!(n.unwrap().is_valid());
         }
 
         let n = (&u).checked_div(&v);
-        assert_eq!(n.as_ref().map(|v| v.to_string()).as_deref(), out);
+        assert_eq!(n.as_ref().map(ToString::to_string).as_deref(), out);
         if out.is_some() {
             assert!(n.unwrap().is_valid());
         }

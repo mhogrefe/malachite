@@ -1,3 +1,5 @@
+use std::num::*;
+
 /// Provides the constant 0.
 #[allow(clippy::declare_interior_mutable_const)]
 pub trait Zero {

@@ -129,6 +129,7 @@ fn test_twos_complement_limbs_asc() {
     assert_eq!(None, limbs.next());
     assert_eq!(None, limbs.next_back());
 
+    let limbs = n.twos_complement_limbs();
     assert_eq!(limbs.get(0), u32::MAX);
     assert_eq!(limbs.get(1), u32::MAX - 2);
     assert_eq!(limbs.get(2), u32::MAX - 3);

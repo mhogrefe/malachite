@@ -216,8 +216,8 @@ pub mod integer_from_float;
 /// An implementation of [`IsInteger`](malachite_base::num::conversion::traits::IsInteger), a trait
 /// for determining whether a number is an integer.
 pub mod is_integer;
-/// Implementations of traits for converting [`Float`]s to and from mantissa-and-exponent
-/// representations.
+/// Implementations of traits for converting [`Float`](crate::Float)s to and from
+/// mantissa-and-exponent representations.
 ///
 /// The traits are
 /// [`RawMantissaAndExponent`](malachite_base::num::conversion::traits::RawMantissaAndExponent),
