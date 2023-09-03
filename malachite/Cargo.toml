@@ -16,6 +16,7 @@ categories = ["mathematics"]
 malachite-base = "0.4.0"
 malachite-nz = { version = "0.4.0", optional = true }
 malachite-q = { version = "0.4.0", optional = true }
+malachite-float = { version = "0.4.0", optional = true }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 [features]
@@ -23,6 +24,7 @@ default = [ "naturals_and_integers", "rationals" ]
 enable_serde = [ "malachite-q/enable_serde", "malachite-nz/enable_serde" ]
 naturals_and_integers = [ "malachite-nz" ]
 rationals = [ "malachite-q" ]
+floats = [ "malachite-float" ]
 
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
