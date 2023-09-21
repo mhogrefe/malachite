@@ -23,7 +23,7 @@ path = "src/bin.rs"
 [dependencies]
 embed-doc-image = "0.1.4"
 itertools = "0.11.0"
-malachite-base = { version = "0.4.1", path = "../malachite-base" }
+malachite-base = { version = "0.4.1" }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 serde_json = { version = "1.0.105", optional = true }

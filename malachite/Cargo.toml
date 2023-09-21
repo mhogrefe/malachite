@@ -13,7 +13,7 @@ keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
 [dependencies]
-malachite-base = { version = "0.4.1" }
+malachite-base = "0.4.1"
 malachite-nz = { version = "0.4.1", optional = true }
 malachite-q = { version = "0.4.1", optional = true }
 malachite-float = { version = "0.4.1", optional = true }
