@@ -3,7 +3,7 @@ members = ['malachite', 'malachite-base', 'malachite-float', 'malachite-nz', 'ma
 resolver = "2"
 
 [workspace.dependencies]
-malachite-base = version = "0.4.1"
+malachite-base = "0.4.1"
 malachite-nz = { version = "0.4.1",  default_features = false }
 malachite-q = "0.4.1"
 malachite-float = "0.4.1"
