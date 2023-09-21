@@ -51,14 +51,14 @@ performance comparison against other libraries.
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.3.0"
+version = "0.4.1"
 ```
 
 By default, all of Malachite's features are included, but you can opt out of some of them. For
 example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
 ```yaml
 [dependencies.malachite]
-version = "0.3.0"
+version = "0.4.1"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```
