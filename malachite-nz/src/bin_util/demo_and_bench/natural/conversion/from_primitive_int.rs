@@ -15,12 +15,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_demos!(runner, demo_natural_exact_from_signed);
     register_signed_demos!(runner, demo_natural_saturating_from_signed);
     register_signed_demos!(runner, demo_natural_convertible_from_signed);
+    register_demo!(runner, demo_natural_const_from);
 
     register_unsigned_benches!(runner, benchmark_natural_from_unsigned);
     register_signed_benches!(runner, benchmark_natural_try_from_signed);
     register_signed_benches!(runner, benchmark_natural_exact_from_signed);
     register_signed_benches!(runner, benchmark_natural_saturating_from_signed);
     register_signed_benches!(runner, benchmark_natural_convertible_from_signed);
+    register_bench!(runner, benchmark_natural_const_from);
 }
 
 fn demo_natural_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
@@ -71,6 +73,12 @@ fn demo_natural_convertible_from_signed<T: PrimitiveSigned>(
                 "not "
             },
         );
+    }
+}
+
+fn demo_natural_const_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen().get(gm, config).take(limit) {
+        println!("Natural::const_from({}) = {}", u, Natural::const_from(u));
     }
 }
 
@@ -133,3 +141,16 @@ natural_signed_single_arg_bench_with_trait!(
     signed_gen,
     ConvertibleFrom
 );
+
+fn benchmark_natural_const_from(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Natural::const_from(Limb)",
+        BenchmarkType::Single,
+        unsigned_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut |u| no_out!(Natural::const_from(u)))],
+    );
+}

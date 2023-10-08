@@ -99,6 +99,7 @@ fn benchmark_natural_divisible_by_power_of_2_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_divisible_by_power_of_2_algorithms(
     gm: GenMode,
     config: &GenConfig,

@@ -15,6 +15,12 @@ fn test_from_u32() {
         assert_eq!(x.to_string(), out);
         assert_eq!(BigUint::from(u).to_string(), out);
         assert_eq!(rug::Integer::from(u).to_string(), out);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let x_alt = Natural::const_from(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -29,6 +35,12 @@ fn test_from_u64() {
         assert_eq!(x.to_string(), out);
         assert_eq!(BigUint::from(u).to_string(), out);
         assert_eq!(rug::Integer::from(u).to_string(), out);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let x_alt = Natural::const_from(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -189,12 +201,24 @@ fn from_primitive_int_properties() {
         let n = Natural::from(u);
         assert_eq!(Natural::from(&BigUint::from(u)), n);
         assert_eq!(Natural::exact_from(&rug::Integer::from(u)), n);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let n_alt = Natural::const_from(u);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     unsigned_gen::<u64>().test_properties(|u| {
         let n = Natural::from(u);
         assert_eq!(Natural::from(&BigUint::from(u)), n);
         assert_eq!(Natural::exact_from(&rug::Integer::from(u)), n);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let n_alt = Natural::const_from(u);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     apply_fn_to_unsigneds!(unsigned_properties);

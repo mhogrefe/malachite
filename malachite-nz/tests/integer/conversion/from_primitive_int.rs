@@ -15,6 +15,12 @@ fn test_from_u32() {
         assert!(x.is_valid());
         assert_eq!(BigInt::from(u).to_string(), out);
         assert_eq!(rug::Integer::from(u).to_string(), out);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let x_alt = Integer::const_from_unsigned(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -29,6 +35,12 @@ fn test_from_u64() {
         assert!(x.is_valid());
         assert_eq!(BigInt::from(u).to_string(), out);
         assert_eq!(rug::Integer::from(u).to_string(), out);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let x_alt = Integer::const_from_unsigned(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -43,6 +55,12 @@ fn test_from_i32() {
         assert!(x.is_valid());
         assert_eq!(BigInt::from(i).to_string(), out);
         assert_eq!(rug::Integer::from(i).to_string(), out);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let x_alt = Integer::const_from_signed(i);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -59,6 +77,12 @@ fn test_from_i64() {
         assert!(x.is_valid());
         assert_eq!(BigInt::from(i).to_string(), out);
         assert_eq!(rug::Integer::from(i).to_string(), out);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let x_alt = Integer::const_from_signed(i);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -113,23 +137,47 @@ fn from_primitive_int_properties() {
         let n = Integer::from(u);
         assert_eq!(Integer::from(&BigInt::from(u)), n);
         assert_eq!(Integer::from(&rug::Integer::from(u)), n);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let n_alt = Integer::const_from_unsigned(u);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     unsigned_gen::<u64>().test_properties(|u| {
         let n = Integer::from(u);
         assert_eq!(Integer::from(&BigInt::from(u)), n);
         assert_eq!(Integer::from(&rug::Integer::from(u)), n);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let n_alt = Integer::const_from_unsigned(u);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     signed_gen::<i32>().test_properties(|i| {
         let n = Integer::from(i);
         assert_eq!(Integer::from(&BigInt::from(i)), n);
         assert_eq!(Integer::from(&rug::Integer::from(i)), n);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let n_alt = Integer::const_from_signed(i);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     signed_gen::<i64>().test_properties(|i| {
         let n = Integer::from(i);
         assert_eq!(Integer::from(&BigInt::from(i)), n);
         assert_eq!(Integer::from(&rug::Integer::from(i)), n);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let n_alt = Integer::const_from_signed(i);
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 }

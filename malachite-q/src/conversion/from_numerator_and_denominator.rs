@@ -4,8 +4,217 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+
+macro_rules! const_gcd_step {
+    ($x: ident, $y: ident) => {
+        let new_y = $x % $y;
+        $x = $y;
+        $y = new_y;
+        if $y == 0 {
+            return Some($x);
+        }
+    };
+}
+
+// Worst case when Limb = u64 is
+// const_gcd(Fib_92, Fib_93)
+// = const_gcd(7540113804746346429, 12200160415121876738)
+const fn const_gcd(mut x: Limb, mut y: Limb) -> Option<Limb> {
+    if y == 0 {
+        Some(x)
+    } else {
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        const_gcd_step!(x, y);
+        unreachable!()
+    }
+}
 
 impl Rational {
+    /// Converts two[`Limb`](crate#limbs)s, representing a numerator and a denominator, to a
+    /// [`Rational`].
+    ///
+    /// If `denominator` is zero, `None` is returned.
+    ///
+    /// This function is const, so it may be used to define constants. When called at runtime,
+    /// it is slower than [`Rational::from_unsigneds`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// const TWO_THIRDS: Option<Rational> = Rational::const_from_unsigneds(2, 3);
+    /// assert_eq!(TWO_THIRDS, Some(Rational::from_unsigneds(2u32, 3)));
+    ///
+    /// const TWO_THIRDS_ALT: Option<Rational> = Rational::const_from_unsigneds(22, 33);
+    /// assert_eq!(TWO_THIRDS, Some(Rational::from_unsigneds(2u32, 3)));
+    ///
+    /// const ZERO_DENOMINATOR: Option<Rational> = Rational::const_from_unsigneds(22, 0);
+    /// assert_eq!(ZERO_DENOMINATOR, None);
+    /// ```
+    pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Option<Rational> {
+        if denominator == 0 {
+            None
+        } else if let Some(gcd) = const_gcd(numerator, denominator) {
+            Some(Rational {
+                sign: true,
+                numerator: Natural::const_from(numerator / gcd),
+                denominator: Natural::const_from(denominator / gcd),
+            })
+        } else {
+            unreachable!()
+        }
+    }
+
+    /// Converts two[`SignedLimb`](crate#limbs)s, representing a numerator and a denominator, to a
+    /// [`Rational`].
+    ///
+    /// If `denominator` is zero, `None` is returned.
+    ///
+    /// This function is const, so it may be used to define constants. When called at runtime,
+    /// it is slower than [`Rational::from_signeds`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// const NEGATIVE_TWO_THIRDS: Option<Rational> = Rational::const_from_signeds(-2, 3);
+    /// assert_eq!(NEGATIVE_TWO_THIRDS, Some(Rational::from_signeds(-2, 3)));
+    ///
+    /// const NEGATIVE_TWO_THIRDS_ALT: Option<Rational> = Rational::const_from_signeds(-22, 33);
+    /// assert_eq!(NEGATIVE_TWO_THIRDS, Some(Rational::from_signeds(-2, 3)));
+    ///
+    /// const ZERO_DENOMINATOR: Option<Rational> = Rational::const_from_signeds(-22, 0);
+    /// assert_eq!(ZERO_DENOMINATOR, None);
+    /// ```
+    pub const fn const_from_signeds(
+        numerator: SignedLimb,
+        denominator: SignedLimb,
+    ) -> Option<Rational> {
+        if denominator == 0 {
+            None
+        } else {
+            let sign = numerator == 0 || (numerator > 0) == (denominator > 0);
+            let numerator = numerator.unsigned_abs();
+            let denominator = denominator.unsigned_abs();
+            if let Some(gcd) = const_gcd(numerator, denominator) {
+                Some(Rational {
+                    sign,
+                    numerator: Natural::const_from(numerator / gcd),
+                    denominator: Natural::const_from(denominator / gcd),
+                })
+            } else {
+                unreachable!()
+            }
+        }
+    }
+
     /// Converts two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`], taking the
     /// [`Natural`](malachite_nz::natural::Natural)s by value.
     ///
@@ -109,7 +318,7 @@ impl Rational {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -243,7 +452,7 @@ impl Rational {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -402,7 +611,7 @@ impl Rational {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.

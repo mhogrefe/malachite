@@ -1,6 +1,56 @@
 use crate::Rational;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+
+impl Rational {
+    /// Converts a [`Limb`](crate#limbs) to a [`Rational`].
+    ///
+    /// This function is const, so it may be used to define constants.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// const TEN: Rational = Rational::const_from_unsigned(10);
+    /// assert_eq!(TEN, 10);
+    /// ```
+    pub const fn const_from_unsigned(x: Limb) -> Rational {
+        Rational {
+            sign: true,
+            numerator: Natural::const_from(x),
+            denominator: Natural::ONE,
+        }
+    }
+
+    /// Converts a [`SignedLimb`](crate#limbs) to a [`Rational`].
+    ///
+    /// This function is const, so it may be used to define constants.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::Rational;
+    ///
+    /// const TEN: Rational = Rational::const_from_signed(10);
+    /// assert_eq!(TEN, 10);
+    ///
+    /// const NEGATIVE_TEN: Rational = Rational::const_from_signed(-10);
+    /// assert_eq!(NEGATIVE_TEN, -10);
+    /// ```
+    pub const fn const_from_signed(x: SignedLimb) -> Rational {
+        Rational {
+            sign: x >= 0,
+            numerator: Natural::const_from(x.unsigned_abs()),
+            denominator: Natural::ONE,
+        }
+    }
+}
 
 macro_rules! impl_from_unsigned {
     ($t: ident) => {

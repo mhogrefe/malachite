@@ -1762,7 +1762,6 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
     split_into_chunks_mut!(out, m, [bs1, bsm2, bs2, as2, as1], _unused);
     let (v_neg_1, scratch_hi) = scratch.split_at_mut(m << 1);
     split_into_chunks_mut!(scratch_hi, m, [bsm1, asm1, asm2], _unused);
-    let asm2 = asm2;
     let bsm1 = &mut bsm1[..n];
     let mut v_neg_2_neg = limbs_mul_toom_evaluate_poly_in_2_and_neg_2(as2, asm2, 4, xs, n, asm1);
     // Compute bs1 and bsm1.
@@ -1978,7 +1977,6 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
         [as1, asm1, as2, asm2, ash, bs1, bsm1, bs2, bsm2, bsh],
         _unused
     );
-    let bsh = bsh;
     let out_lo = &mut out[..n + 1];
     // Compute as1 and asm1.
     let mut v_neg_1_neg = limbs_mul_toom_evaluate_poly_in_1_and_neg_1(as1, asm1, 4, xs, n, out_lo);
@@ -2484,7 +2482,6 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
         *ash_last += 1;
     }
     // Compute bs1 and bsm1.
-    let bs1 = bs1;
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
     let v_neg_1_neg_b = if t == n {
         *bs1_last = Limb::from(limbs_add_same_length_to_out(bs1_init, ys_0, ys_1));

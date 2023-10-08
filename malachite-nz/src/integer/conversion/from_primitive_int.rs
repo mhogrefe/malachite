@@ -1,5 +1,53 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use crate::platform::{Limb, SignedLimb};
+
+impl Integer {
+    /// Converts a [`Limb`](crate#limbs) to an [`Integer`].
+    ///
+    /// This function is const, so it may be used to define constants.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// const TEN: Integer = Integer::const_from_unsigned(10);
+    /// assert_eq!(TEN, 10);
+    /// ```
+    pub const fn const_from_unsigned(x: Limb) -> Integer {
+        Integer {
+            sign: true,
+            abs: Natural::const_from(x),
+        }
+    }
+
+    /// Converts a [`SignedLimb`](crate#limbs) to an [`Integer`].
+    ///
+    /// This function is const, so it may be used to define constants.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// const TEN: Integer = Integer::const_from_signed(10);
+    /// assert_eq!(TEN, 10);
+    ///
+    /// const NEGATIVE_TEN: Integer = Integer::const_from_signed(-10);
+    /// assert_eq!(NEGATIVE_TEN, -10);
+    /// ```
+    pub const fn const_from_signed(x: SignedLimb) -> Integer {
+        Integer {
+            sign: x >= 0,
+            abs: Natural::const_from(x.unsigned_abs()),
+        }
+    }
+}
 
 macro_rules! impl_from_unsigned {
     ($t: ident) => {

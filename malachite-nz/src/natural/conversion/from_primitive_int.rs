@@ -4,6 +4,26 @@ use crate::platform::Limb;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom, VecFromOtherType};
 
+impl Natural {
+    /// Converts a [`Limb`](crate#limbs) to a [`Natural`].
+    ///
+    /// This function is const, so it may be used to define constants.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// const TEN: Natural = Natural::const_from(10);
+    /// assert_eq!(TEN, 10);
+    /// ```
+    pub const fn const_from(x: Limb) -> Natural {
+        Natural(Small(x))
+    }
+}
+
 macro_rules! impl_from_limb {
     ($t: ident) => {
         impl From<$t> for Natural {

@@ -10,6 +10,8 @@ use malachite_q::Rational;
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_rational_from_unsigned);
     register_signed_demos!(runner, demo_rational_from_signed);
+    register_demo!(runner, demo_rational_const_from_unsigned);
+    register_demo!(runner, demo_rational_const_from_signed);
 
     register_unsigned_benches!(runner, benchmark_rational_from_unsigned);
     register_signed_benches!(runner, benchmark_rational_from_signed);
@@ -17,6 +19,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_from_u64_library_comparison);
     register_bench!(runner, benchmark_rational_from_i32_library_comparison);
     register_bench!(runner, benchmark_rational_from_i64_library_comparison);
+    register_bench!(runner, benchmark_rational_const_from_unsigned);
+    register_bench!(runner, benchmark_rational_const_from_signed);
 }
 
 fn demo_rational_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
@@ -34,6 +38,26 @@ where
 {
     for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("Rational::from({}) = {}", i, Rational::from(i));
+    }
+}
+
+fn demo_rational_const_from_unsigned(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen().get(gm, config).take(limit) {
+        println!(
+            "Rational::const_from_unsigned({}) = {}",
+            u,
+            Rational::const_from_unsigned(u)
+        );
+    }
+}
+
+fn demo_rational_const_from_signed(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen().get(gm, config).take(limit) {
+        println!(
+            "Rational::const_from_signed({}) = {}",
+            i,
+            Rational::const_from_signed(i)
+        );
     }
 }
 
@@ -164,5 +188,45 @@ fn benchmark_rational_from_i64_library_comparison(
             ("Malachite", &mut |i| no_out!(Rational::from(i))),
             ("rug", &mut |i| no_out!(rug::Rational::from(i))),
         ],
+    );
+}
+
+fn benchmark_rational_const_from_unsigned(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::const_from_unsigned(Limb)",
+        BenchmarkType::Single,
+        unsigned_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut |u| {
+            no_out!(Rational::const_from_unsigned(u))
+        })],
+    );
+}
+
+fn benchmark_rational_const_from_signed(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::const_from_signed(Limb)",
+        BenchmarkType::Single,
+        signed_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &signed_bit_bucketer(),
+        &mut [("Malachite", &mut |i| {
+            no_out!(Rational::const_from_signed(i))
+        })],
     );
 }

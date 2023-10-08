@@ -1,8 +1,10 @@
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
 use rug;
 
@@ -13,6 +15,12 @@ fn test_from_u32() {
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
         assert_eq!(rug::Rational::from(u).to_string(), out);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let x_alt = Rational::const_from_unsigned(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -26,6 +34,12 @@ fn test_from_u64() {
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
         assert_eq!(rug::Rational::from(u).to_string(), out);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let x_alt = Rational::const_from_unsigned(u);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -39,6 +53,12 @@ fn test_from_i32() {
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
         assert_eq!(rug::Rational::from(i).to_string(), out);
+        #[cfg(feature = "32_bit_limbs")]
+        {
+            let x_alt = Rational::const_from_signed(i);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -54,6 +74,12 @@ fn test_from_i64() {
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
         assert_eq!(rug::Rational::from(i).to_string(), out);
+        #[cfg(not(feature = "32_bit_limbs"))]
+        {
+            let x_alt = Rational::const_from_signed(i);
+            assert!(x_alt.is_valid());
+            assert_eq!(x_alt.to_string(), out);
+        }
     };
     test(0, "0");
     test(123, "123");
@@ -68,6 +94,7 @@ where
     Natural: From<T>,
     u128: TryFrom<T>,
     rug::Integer: From<T>,
+    Limb: ExactFrom<T>,
 {
     unsigned_gen::<T>().test_properties(|u| {
         let n = Rational::from(u);
@@ -79,6 +106,11 @@ where
         assert_eq!(alt_n, n);
         let alt_n: Rational = From::from(&rug::Rational::from(u));
         assert_eq!(alt_n, n);
+        if T::WIDTH == Limb::WIDTH {
+            let n_alt = Rational::const_from_unsigned(Limb::exact_from(u));
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 }
 
@@ -88,6 +120,7 @@ where
     Natural: TryFrom<T>,
     i128: TryFrom<T>,
     rug::Integer: From<T>,
+    SignedLimb: ExactFrom<T>,
 {
     signed_gen::<T>().test_properties(|i| {
         let n = Rational::from(i);
@@ -97,6 +130,11 @@ where
         assert_eq!(alt_n, n);
         let alt_n: Rational = From::from(&rug::Rational::from(i));
         assert_eq!(alt_n, n);
+        if T::WIDTH == Limb::WIDTH {
+            let n_alt = Rational::const_from_signed(SignedLimb::exact_from(i));
+            assert!(n_alt.is_valid());
+            assert_eq!(n_alt, n);
+        }
     });
 
     signed_gen_var_2::<T>().test_properties(|i| {

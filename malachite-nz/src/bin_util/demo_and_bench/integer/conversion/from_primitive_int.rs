@@ -11,6 +11,8 @@ use num::BigInt;
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_integer_from_unsigned);
     register_signed_demos!(runner, demo_integer_from_signed);
+    register_demo!(runner, demo_integer_const_from_unsigned);
+    register_demo!(runner, demo_integer_const_from_signed);
 
     register_unsigned_benches!(runner, benchmark_integer_from_unsigned);
     register_signed_benches!(runner, benchmark_integer_from_signed);
@@ -18,6 +20,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_from_u64_library_comparison);
     register_bench!(runner, benchmark_integer_from_i32_library_comparison);
     register_bench!(runner, benchmark_integer_from_i64_library_comparison);
+    register_bench!(runner, benchmark_integer_const_from_unsigned);
+    register_bench!(runner, benchmark_integer_const_from_signed);
 }
 
 fn demo_integer_from_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize)
@@ -35,6 +39,26 @@ where
 {
     for i in signed_gen::<T>().get(gm, config).take(limit) {
         println!("Integer::from({}) = {}", i, Integer::from(i));
+    }
+}
+
+fn demo_integer_const_from_unsigned(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen().get(gm, config).take(limit) {
+        println!(
+            "Integer::const_from_unsigned({}) = {}",
+            u,
+            Integer::const_from_unsigned(u)
+        );
+    }
+}
+
+fn demo_integer_const_from_signed(gm: GenMode, config: &GenConfig, limit: usize) {
+    for i in signed_gen().get(gm, config).take(limit) {
+        println!(
+            "Integer::const_from_signed({}) = {}",
+            i,
+            Integer::const_from_signed(i)
+        );
     }
 }
 
@@ -169,5 +193,43 @@ fn benchmark_integer_from_i64_library_comparison(
             ("num", &mut |i| no_out!(BigInt::from(i))),
             ("rug", &mut |i| no_out!(rug::Integer::from(i))),
         ],
+    );
+}
+
+fn benchmark_integer_const_from_unsigned(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::const_from_unsigned(Limb)",
+        BenchmarkType::Single,
+        unsigned_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut |u| {
+            no_out!(Integer::const_from_unsigned(u))
+        })],
+    );
+}
+
+fn benchmark_integer_const_from_signed(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::const_from_signed(Limb)",
+        BenchmarkType::Single,
+        signed_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &signed_bit_bucketer(),
+        &mut [("Malachite", &mut |i| no_out!(Integer::const_from_signed(i)))],
     );
 }

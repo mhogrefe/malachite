@@ -2358,6 +2358,7 @@ pub fn natural_bool_vec_pair_gen_var_2() -> Generator<(Natural, Vec<bool>)> {
 
 // -- (PrimitiveUnsigned, bool) --
 
+#[allow(clippy::redundant_comparisons)]
 pub(crate) const fn limbs_odd_factorial_valid(n: usize, b: bool) -> bool {
     !b || n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD
 }

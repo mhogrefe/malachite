@@ -228,7 +228,9 @@ pub(crate) fn log_n_max(n: Limb) -> u64 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1.
-pub_crate_test! { limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
+pub_crate_test! {
+#[allow(clippy::redundant_comparisons)]
+limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
         assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);

@@ -1,13 +1,17 @@
 use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
-    signed_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
-    unsigned_unsigned_bool_triple_gen_var_2,
+    signed_gen, signed_pair_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
+    unsigned_pair_gen_var_27, unsigned_unsigned_bool_triple_gen_var_2,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen_var_1, natural_gen, natural_natural_bool_triple_gen_var_1,
     natural_pair_gen_var_5,
@@ -57,6 +61,7 @@ fn from_naturals_properties() {
 fn test_from_unsigneds_helper<T: PrimitiveUnsigned>()
 where
     Natural: From<T>,
+    Limb: ExactFrom<T>,
 {
     let test = |n: u8, d: u8, out| {
         let n = T::from(n);
@@ -64,6 +69,12 @@ where
         let x = Rational::from_unsigneds(n, d);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
+        if T::WIDTH == Limb::WIDTH {
+            let x_alt =
+                Rational::const_from_unsigneds(Limb::exact_from(n), Limb::exact_from(d)).unwrap();
+            assert!(x_alt.is_valid());
+            assert!(PartialEq::<Rational>::eq(&x_alt, &x));
+        }
     };
     test(0, 1, "0");
     test(0, 5, "0");
@@ -76,18 +87,58 @@ fn test_from_unsigneds() {
     apply_fn_to_unsigneds!(test_from_unsigneds_helper);
 }
 
+#[test]
+fn test_const_from_unsigneds() {
+    let test = |n: Limb, d: Limb, out| {
+        if d != 0 {
+            let x = Rational::from_unsigneds(n, d);
+            assert!(x.is_valid());
+            assert_eq!(Some(x).to_debug_string(), out);
+        }
+        let x_alt = Rational::const_from_unsigneds(Limb::exact_from(n), Limb::exact_from(d));
+        assert!(x_alt.as_ref().map_or(true, Rational::is_valid));
+        assert_eq!(x_alt.to_debug_string(), out);
+    };
+    test(0, 1, "Some(0)");
+    test(0, 5, "Some(0)");
+    test(3, 6, "Some(1/2)");
+    test(100, 101, "Some(100/101)");
+    // The following test case has the highest number of steps in the Euclidean GCD algorithm.
+    #[cfg(not(feature = "32_bit_limbs"))]
+    test(
+        7540113804746346429,
+        12200160415121876738,
+        "Some(7540113804746346429/12200160415121876738)",
+    );
+    #[cfg(not(feature = "32_bit_limbs"))]
+    test(
+        7540113804746346430,
+        12200160415121876738,
+        "Some(3770056902373173215/6100080207560938369)",
+    );
+    test(5, 0, "None");
+    test(0, 0, "None");
+}
+
 fn from_unsigneds_properties_helper<T: PrimitiveUnsigned>()
 where
     Natural: From<T> + PartialEq<T>,
     Rational: PartialEq<T>,
+    Limb: ExactFrom<T>,
 {
     unsigned_pair_gen_var_12::<T, T>().test_properties(|(n, d)| {
         let x = Rational::from_unsigneds(n, d);
         assert!(x.is_valid());
         if n.coprime_with(d) {
-            let (n_alt, d_alt) = x.into_numerator_and_denominator();
+            let (n_alt, d_alt) = x.clone().into_numerator_and_denominator();
             assert_eq!(n_alt, n);
             assert_eq!(d_alt, d);
+        }
+        if T::WIDTH == Limb::WIDTH {
+            let x_alt =
+                Rational::const_from_unsigneds(Limb::exact_from(n), Limb::exact_from(d)).unwrap();
+            assert!(x_alt.is_valid());
+            assert!(PartialEq::<Rational>::eq(&x_alt, &x));
         }
     });
 
@@ -97,6 +148,22 @@ where
 #[test]
 fn from_unsigneds_properties() {
     apply_fn_to_unsigneds!(from_unsigneds_properties_helper);
+}
+
+#[test]
+fn const_from_unsigneds_properties() {
+    unsigned_pair_gen_var_27::<Limb>().test_properties(|(n, d)| {
+        Rational::const_from_unsigneds(n, d).map_or_else(
+            || {
+                assert_eq!(d, 0);
+            },
+            |x_alt| {
+                let x = Rational::from_unsigneds(n, d);
+                assert!(x_alt.is_valid());
+                assert_eq!(x_alt, x);
+            },
+        )
+    });
 }
 
 #[test]
@@ -178,6 +245,7 @@ fn from_integers_properties() {
 fn test_from_signeds_helper<T: PrimitiveSigned>()
 where
     Integer: From<T>,
+    SignedLimb: ExactFrom<T>,
 {
     let test = |n: i8, d: i8, out| {
         let n = T::from(n);
@@ -185,6 +253,13 @@ where
         let x = Rational::from_signeds(n, d);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
+        if T::WIDTH == Limb::WIDTH {
+            let x_alt =
+                Rational::const_from_signeds(SignedLimb::exact_from(n), SignedLimb::exact_from(d))
+                    .unwrap();
+            assert!(x_alt.is_valid());
+            assert!(PartialEq::<Rational>::eq(&x_alt, &x));
+        }
     };
     test(0, 1, "0");
     test(0, -1, "0");
@@ -212,6 +287,7 @@ where
     <T as UnsignedAbs>::Output: CoprimeWith,
     Natural: PartialEq<T>,
     Rational: PartialEq<T>,
+    SignedLimb: ExactFrom<T>,
 {
     signed_pair_gen_var_6::<T>().test_properties(|(n, d)| {
         let x = Rational::from_signeds(n, d);
@@ -226,9 +302,16 @@ where
             );
         }
         if n >= T::ZERO && d > T::ZERO && (n.unsigned_abs()).coprime_with(d.unsigned_abs()) {
-            let (n_2, d_2) = x.into_numerator_and_denominator();
+            let (n_2, d_2) = x.clone().into_numerator_and_denominator();
             assert_eq!(n_2, n);
             assert_eq!(d_2, d);
+        }
+        if T::WIDTH == Limb::WIDTH {
+            let x_alt =
+                Rational::const_from_signeds(SignedLimb::exact_from(n), SignedLimb::exact_from(d))
+                    .unwrap();
+            assert!(x_alt.is_valid());
+            assert!(PartialEq::<Rational>::eq(&x_alt, &x));
         }
     });
 
@@ -238,6 +321,22 @@ where
 #[test]
 fn from_signeds_properties() {
     apply_fn_to_signeds!(from_signeds_properties_helper);
+}
+
+#[test]
+fn const_from_signeds_properties() {
+    signed_pair_gen::<SignedLimb>().test_properties(|(n, d)| {
+        Rational::const_from_signeds(n, d).map_or_else(
+            || {
+                assert_eq!(d, 0);
+            },
+            |x_alt| {
+                let x = Rational::from_signeds(n, d);
+                assert!(x_alt.is_valid());
+                assert_eq!(x_alt, x);
+            },
+        )
+    });
 }
 
 #[test]

@@ -98,7 +98,7 @@ fn try_from_signed<
             if significant_bits < S::WIDTH
                 || significant_bits == S::WIDTH && numerator.divisible_by_power_of_2(S::WIDTH - 1)
             {
-                Ok(-S::wrapping_from(U::wrapping_from(numerator)))
+                Ok(S::wrapping_from(U::wrapping_from(numerator)).wrapping_neg())
             } else {
                 Err(SignedFromRationalError)
             }

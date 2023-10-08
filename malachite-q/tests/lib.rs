@@ -78,12 +78,9 @@ pub mod arithmetic {
 pub mod basic {
     pub mod constants;
     pub mod default;
-    pub mod from_numerator_and_denominator;
-    pub mod mutate_numerator_or_denominator;
     pub mod named;
     pub mod significant_bits;
     pub mod size;
-    pub mod to_numerator_or_denominator;
 }
 pub mod comparison {
     pub mod cmp;
@@ -123,10 +120,12 @@ pub mod conversion {
     pub mod from_float_simplest;
     pub mod from_integer;
     pub mod from_natural;
+    pub mod from_numerator_and_denominator;
     pub mod from_primitive_float;
     pub mod from_primitive_int;
     pub mod integer_from_rational;
     pub mod is_integer;
+    pub mod mutate_numerator_or_denominator;
     pub mod natural_from_rational;
     pub mod primitive_float_from_rational;
     pub mod primitive_int_from_rational;
@@ -138,6 +137,7 @@ pub mod conversion {
         pub mod to_sci;
         pub mod to_string;
     }
+    pub mod to_numerator_or_denominator;
 }
 pub mod exhaustive {
     pub mod exhaustive_negative_rationals;
