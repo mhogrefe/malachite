@@ -25,6 +25,28 @@ impl Integer {
         }
     }
 
+    /// Converts a sign and a [`Natural`] to an [`Integer`], taking the [`Natural`] by value. The
+    /// [`Natural`] becomes the [`Integer`]'s absolute value, and the sign indicates whether the
+    /// [`Integer`] should be non-negative. Unlike [`Integer::from_sign_and_abs`], the [`Natural`]
+    /// is not checked for equality with zero, so the provided sign is used regardless of the
+    /// [`Natural`]'s value.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::platform::Limb;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Integer::from_sign_and_abs_unchecked(true, Natural::from_limb(123u32 as Limb)), 123);
+    /// assert_eq!(Integer::from_sign_and_abs_unchecked(false, Natural::from_limb(123u32 as Limb)), -123);
+    /// ```
+    pub const fn from_sign_and_abs_unchecked(sign: bool, abs: Natural) -> Integer {
+        Integer { sign, abs }
+    }
+
     /// Converts a sign and an [`Natural`] to an [`Integer`], taking the [`Natural`] by reference.
     /// The [`Natural`] becomes the [`Integer`]'s absolute value, and the sign indicates whether
     /// the [`Integer`] should be non-negative. If the [`Natural`] is zero, then the [`Integer`]

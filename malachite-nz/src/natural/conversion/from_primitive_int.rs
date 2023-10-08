@@ -138,3 +138,13 @@ impl_from_larger_than_limb_or_usize!(u128);
 impl_from_larger_than_limb_or_usize!(usize);
 
 apply_to_signeds!(impl_signed);
+
+impl Natural {
+    /// Converts a constant [`Limb`](crate#limbs) to a [`Natural`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time.
+    pub const fn from_limb(u: Limb) -> Natural {
+        Natural(Small(u))
+    }
+}

@@ -4,6 +4,7 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, Satura
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
@@ -199,4 +200,22 @@ fn from_primitive_int_properties() {
 
     apply_fn_to_unsigneds!(unsigned_properties);
     apply_fn_to_signeds!(signed_properties);
+}
+
+#[test]
+fn from_limb_const() {
+    const U8: Natural = Natural::from_limb(129u8 as Limb);
+    assert_eq!(U8, Natural::from(129u8));
+
+    const U16: Natural = Natural::from_limb(32769u16 as Limb);
+    assert_eq!(U16, Natural::from(32769u16));
+
+    const U32: Natural = Natural::from_limb(2147483649u32 as Limb);
+    assert_eq!(U32, Natural::from(2147483649u32));
+
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        const U64: Natural = Natural::from_limb(9223372036854775809u64 as Limb);
+        assert_eq!(U64, Natural::from(9223372036854775809u64));
+    }
 }
