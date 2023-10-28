@@ -1,5 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
+use std::panic::catch_unwind;
 
 fn mod_power_of_2_neg_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, pow, out| {
@@ -19,6 +20,32 @@ fn mod_power_of_2_neg_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_power_of_2_neg() {
     apply_fn_to_unsigneds!(mod_power_of_2_neg_helper);
+}
+
+fn mod_power_of_2_neg_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.mod_power_of_2_neg(0));
+    assert_panic!(T::from(200u8).mod_power_of_2_neg(7));
+}
+
+#[test]
+fn mod_power_of_2_neg_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_neg_fail_helper);
+}
+
+fn mod_power_of_2_neg_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ONE;
+        x.mod_power_of_2_neg_assign(0)
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_power_of_2_neg_assign(7)
+    });
+}
+
+#[test]
+fn mod_power_of_2_neg_assign_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_neg_assign_fail_helper);
 }
 
 fn mod_power_of_2_neg_properties_helper<T: PrimitiveUnsigned>() {

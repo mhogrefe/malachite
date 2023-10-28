@@ -9,7 +9,7 @@ In `malachite-float`'s doctests you will frequently see import paths beginning w
 `malachite_float::`. When using the `malachite` crate, replace this part of the paths with
 `malachite::`.
 
-The import path of the `Float` type is shortened further, to `malachite::Float`.
+The import path of the `Float` type is shortened to `malachite::Float`.
 
 # malachite-float
 This crate defines

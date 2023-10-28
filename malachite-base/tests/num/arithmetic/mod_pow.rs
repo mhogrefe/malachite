@@ -7,6 +7,7 @@ use malachite_base::test_util::generators::{
     unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
 };
 use malachite_base::test_util::num::arithmetic::mod_pow::naive_mod_pow;
+use std::panic::catch_unwind;
 
 fn mod_pow_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, exp: u64, m, out| {
@@ -55,6 +56,32 @@ fn mod_pow_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_pow() {
     apply_fn_to_unsigneds!(mod_pow_helper);
+}
+
+fn mod_pow_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_pow(10, T::ZERO));
+    assert_panic!(T::from(123u8).mod_pow(10, T::from(123u8)));
+}
+
+#[test]
+fn mod_pow_fail() {
+    apply_fn_to_unsigneds!(mod_pow_fail_helper);
+}
+
+fn mod_pow_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_pow_assign(10, T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_pow_assign(10, T::from(123u8))
+    });
+}
+
+#[test]
+fn mod_pow_assign_fail() {
+    apply_fn_to_unsigneds!(mod_pow_assign_fail_helper);
 }
 
 fn mod_pow_properties_helper_helper<T: PrimitiveUnsigned, F: Fn(T, u64, T) -> T>(

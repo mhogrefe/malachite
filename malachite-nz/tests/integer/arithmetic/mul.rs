@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{DivMod, Square};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase2, DivMod, PowerOf2, Square, UnsignedAbs,
+};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_base::vecs::vec_from_str;
@@ -105,6 +107,12 @@ fn test_mul() {
     test("18446744073709551615", "-2", "-36893488147419103230");
     test("-18446744073709551615", "2", "-36893488147419103230");
     test("-18446744073709551615", "-2", "36893488147419103230");
+    let large_power_of_2 = Integer::power_of_2(100_000) * Integer::power_of_2(100_000);
+    assert!(large_power_of_2.is_valid());
+    assert_eq!(
+        large_power_of_2.unsigned_abs().checked_log_base_2(),
+        Some(200_000)
+    );
 }
 
 #[test]

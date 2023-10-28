@@ -8,8 +8,7 @@ use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrdAbs<Natural> for Rational {
-    /// Compares the absolute values of a [`Rational`] and a
-    /// [`Natural`](malachite_nz::natural::Natural).
+    /// Compares the absolute values of a [`Rational`] and a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -74,8 +73,7 @@ impl PartialOrdAbs<Natural> for Rational {
 }
 
 impl PartialOrdAbs<Rational> for Natural {
-    /// Compares the absolute values of a [`Natural`](malachite_nz::natural::Natural) and a
-    /// [`Rational`].
+    /// Compares the absolute values of a [`Natural`] and a [`Rational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

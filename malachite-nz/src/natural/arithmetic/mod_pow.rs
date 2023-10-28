@@ -529,8 +529,8 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
 impl ModPow<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. All three [`Natural`]s are taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -541,6 +541,9 @@ impl ModPow<Natural, Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -560,9 +563,9 @@ impl ModPow<Natural, Natural> for Natural {
 impl<'a> ModPow<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. The first two [`Natural`]s are taken by value and the
-    /// third by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. The first two [`Natural`]s are taken by value and the third
+    /// by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -573,6 +576,9 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -592,9 +598,9 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
 impl<'a> ModPow<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. The first and third [`Natural`]s are taken by value and
-    /// the second by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. The first and third [`Natural`]s are taken by value and the
+    /// second by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -605,6 +611,9 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -624,9 +633,9 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. The first [`Natural`] is taken by value and the second
-    /// and third by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. The first [`Natural`] is taken by value and the second and
+    /// third by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -637,6 +646,9 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -659,9 +671,9 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
 impl<'a> ModPow<Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`]$m$. Assumes the
-    /// input is already reduced mod $m$. The first [`Natural`] is taken by reference and the
-    /// second and third by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`]$m$. The base must be
+    /// already reduced modulo $m$. The first [`Natural`] is taken by reference and the second and
+    /// third by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -672,6 +684,9 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -689,6 +704,7 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, mut exp: Natural, mut m: Natural) -> Natural {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, &exp, &m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
             (_, &Natural::ZERO, _) => Natural::ONE,
@@ -713,9 +729,9 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. The first and third [`Natural`]s are taken by reference
-    /// and the second by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. The first and third [`Natural`]s are taken by reference and
+    /// the second by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -726,6 +742,9 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -743,6 +762,7 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, mut exp: Natural, m: &'b Natural) -> Natural {
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, &exp, m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
             (_, &Natural::ZERO, _) => Natural::ONE,
@@ -767,8 +787,8 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. The first two [`Natural`]s are taken by reference and the
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. The first two [`Natural`]s are taken by reference and the
     /// third by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
@@ -780,6 +800,9 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -797,6 +820,7 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, exp: &'b Natural, mut m: Natural) -> Natural {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, exp, &m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
             (_, &Natural::ZERO, _) => Natural::ONE,
@@ -821,8 +845,8 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. Assumes the
-    /// input is already reduced mod $m$. All three [`Natural`]s are taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
+    /// be already reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -833,6 +857,9 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -850,6 +877,7 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, exp: &'b Natural, m: &'c Natural) -> Natural {
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, exp, m) {
             (_, _, &Natural::ONE) => Natural::ZERO,
             (_, &Natural::ZERO, _) => Natural::ONE,
@@ -872,9 +900,9 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModPowAssign<Natural, Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
-    /// Assumes the input is already reduced mod $m$. Both [`Natural`]s on the right-hand side are
-    /// taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken
+    /// by value.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -885,6 +913,9 @@ impl ModPowAssign<Natural, Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -901,6 +932,7 @@ impl ModPowAssign<Natural, Natural> for Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, mut exp: Natural, mut m: Natural) {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, &exp, &m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
@@ -926,9 +958,9 @@ impl ModPowAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
-    /// Assumes the input is already reduced mod $m$. The first [`Natural`] on the right-hand side
-    /// is taken by value and the second by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. The first [`Natural`] on the right-hand side is
+    /// taken by value and the second by reference.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -939,6 +971,9 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -955,6 +990,7 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, mut exp: Natural, m: &'a Natural) {
+        assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, &exp, m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
@@ -980,9 +1016,9 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
-    /// Assumes the input is already reduced mod $m$. The first [`Natural`] on the right-hand side
-    /// is taken by reference and the second by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. The first [`Natural`] on the right-hand side is
+    /// taken by reference and the second by value.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -993,6 +1029,9 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1009,6 +1048,7 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, exp: &'a Natural, mut m: Natural) {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, exp, &m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,
@@ -1029,9 +1069,9 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place.
-    /// Assumes the input is already reduced mod $m$. Both [`Natural`]s on the right-hand side are
-    /// taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken
+    /// by reference.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -1042,6 +1082,9 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1058,6 +1101,7 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     /// ```
     #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, exp: &'a Natural, m: &'b Natural) {
+        assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (&mut *self, exp, m) {
             (_, _, &Natural::ONE) => *self = Natural::ZERO,
             (_, &Natural::ZERO, _) => *self = Natural::ONE,

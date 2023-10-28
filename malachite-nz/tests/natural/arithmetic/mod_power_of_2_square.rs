@@ -21,6 +21,7 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_30,
 };
 use malachite_nz::test_util::natural::arithmetic::mod_power_of_2_square::*;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -228,6 +229,17 @@ fn test_mod_power_of_2_square() {
     test("5", 3, "1");
     test("100", 8, "16");
     test("12345678987654321", 64, "16556040056090124897");
+}
+
+#[test]
+fn mod_power_of_2_square_fail() {
+    assert_panic!(Natural::ONE.mod_power_of_2_square(0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_square(0));
+
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_square_assign(0)
+    });
 }
 
 fn verify_limbs_square_low(out_before: &[Limb], xs: &[Limb], out_after: &[Limb]) {

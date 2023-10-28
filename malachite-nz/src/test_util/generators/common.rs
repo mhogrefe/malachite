@@ -34,6 +34,10 @@ pub fn natural_pair_rm(
     Box::new(ps.map(|(x, y)| ((rug::Integer::from(&x), rug::Integer::from(&y)), (x, y))))
 }
 
+pub fn natural_pair_nm(ps: It<(Natural, Natural)>) -> It<((BigUint, BigUint), (Natural, Natural))> {
+    Box::new(ps.map(|(x, y)| ((BigUint::from(&x), BigUint::from(&y)), (x, y))))
+}
+
 pub fn natural_pair_1_rm<T: 'static + Clone>(
     ps: It<(Natural, T)>,
 ) -> It<((rug::Integer, T), (Natural, T))> {

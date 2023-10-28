@@ -12,7 +12,7 @@ macro_rules! const_gcd_step {
         $x = $y;
         $y = new_y;
         if $y == 0 {
-            return Some($x);
+            return $x;
         }
     };
 }
@@ -20,9 +20,9 @@ macro_rules! const_gcd_step {
 // Worst case when Limb = u64 is
 // const_gcd(Fib_92, Fib_93)
 // = const_gcd(7540113804746346429, 12200160415121876738)
-const fn const_gcd(mut x: Limb, mut y: Limb) -> Option<Limb> {
+const fn const_gcd(mut x: Limb, mut y: Limb) -> Limb {
     if y == 0 {
-        Some(x)
+        x
     } else {
         const_gcd_step!(x, y);
         const_gcd_step!(x, y);
@@ -153,14 +153,13 @@ impl Rational {
     pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Option<Rational> {
         if denominator == 0 {
             None
-        } else if let Some(gcd) = const_gcd(numerator, denominator) {
+        } else {
+            let gcd = const_gcd(numerator, denominator);
             Some(Rational {
                 sign: true,
                 numerator: Natural::const_from(numerator / gcd),
                 denominator: Natural::const_from(denominator / gcd),
             })
-        } else {
-            unreachable!()
         }
     }
 
@@ -203,28 +202,23 @@ impl Rational {
             let sign = numerator == 0 || (numerator > 0) == (denominator > 0);
             let numerator = numerator.unsigned_abs();
             let denominator = denominator.unsigned_abs();
-            if let Some(gcd) = const_gcd(numerator, denominator) {
-                Some(Rational {
-                    sign,
-                    numerator: Natural::const_from(numerator / gcd),
-                    denominator: Natural::const_from(denominator / gcd),
-                })
-            } else {
-                unreachable!()
-            }
+            let gcd = const_gcd(numerator, denominator);
+            Some(Rational {
+                sign,
+                numerator: Natural::const_from(numerator / gcd),
+                denominator: Natural::const_from(denominator / gcd),
+            })
         }
     }
 
-    /// Converts two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`], taking the
-    /// [`Natural`](malachite_nz::natural::Natural)s by value.
+    /// Converts two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by value.
     ///
     /// The [`Natural`]s become the [`Rational`]'s numerator and denominator. Only non-negative
     /// [`Rational`]s can be produced with this function.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Natural`](malachite_nz::natural::Natural)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Natural`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -259,16 +253,14 @@ impl Rational {
         }
     }
 
-    /// Converts two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`], taking the
-    /// [`Natural`](malachite_nz::natural::Natural)s by reference.
+    /// Converts two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by reference.
     ///
-    /// The [`Natural`](malachite_nz::natural::Natural)s become the [`Rational`]'s numerator and
-    /// denominator. Only non-negative [`Rational`]s can be produced with this function.
+    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator. Only non-negative
+    /// [`Rational`]s can be produced with this function.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Natural`](malachite_nz::natural::Natural)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Natural`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -339,17 +331,14 @@ impl Rational {
         Rational::from_naturals(Natural::from(numerator), Natural::from(denominator))
     }
 
-    /// Converts two [`Integer`](malachite_nz::integer::Integer)s to a [`Rational`], taking the
-    /// [`Integer`](malachite_nz::integer::Integer)s by value.
+    /// Converts two [`Integer`]s to a [`Rational`], taking the [`Integer`]s by value.
     ///
-    /// The absolute values of the [`Integer`](malachite_nz::integer::Integer)s become the
-    /// [`Rational`]'s numerator and denominator. The sign of the [`Rational`] is the sign of the
-    /// [`Integer`](malachite_nz::integer::Integer)s' quotient.
+    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and
+    /// denominator. The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Integer`](malachite_nz::integer::Integer)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Integer`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -387,17 +376,14 @@ impl Rational {
         q
     }
 
-    /// Converts two [`Integer`](malachite_nz::integer::Integer)s to a [`Rational`], taking the
-    /// [`Integer`](malachite_nz::integer::Integer)s by reference.
+    /// Converts two [`Integer`]s to a [`Rational`], taking the [`Integer`]s by reference.
     ///
-    /// The absolute values of the [`Integer`](malachite_nz::integer::Integer)s become the
-    /// [`Rational`]'s numerator and denominator. The sign of the [`Rational`] is the sign of the
-    /// [`Integer`](malachite_nz::integer::Integer)s' quotient.
+    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and
+    /// denominator. The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Integer`](malachite_nz::integer::Integer)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Integer`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -475,17 +461,15 @@ impl Rational {
         Rational::from_integers(Integer::from(numerator), Integer::from(denominator))
     }
 
-    /// Converts a sign and two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`],
-    /// taking the [`Natural`](malachite_nz::natural::Natural)s by value.
+    /// Converts a sign and two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by value.
     ///
-    /// The [`Natural`](malachite_nz::natural::Natural)s become the [`Rational`]'s numerator and
-    /// denominator, and the sign indicates whether the [`Rational`] should be non-negative. If the
-    /// numerator is zero, then the [`Rational`] will be non-negative regardless of the sign.
+    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign
+    /// indicates whether the [`Rational`] should be non-negative. If the numerator is zero, then
+    /// the [`Rational`] will be non-negative regardless of the sign.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Natural`](malachite_nz::natural::Natural)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Natural`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -535,17 +519,16 @@ impl Rational {
         }
     }
 
-    /// Converts a sign and two [`Natural`](malachite_nz::natural::Natural)s to a [`Rational`],
-    /// taking the [`Natural`](malachite_nz::natural::Natural)s by reference.
+    /// Converts a sign and two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by
+    /// reference.
     ///
-    /// The [`Natural`](malachite_nz::natural::Natural)s become the [`Rational`]'s numerator and
-    /// denominator, and the sign indicates whether the [`Rational`] should be non-negative. If the
-    /// numerator is zero, then the [`Rational`] will be non-negative regardless of the sign.
+    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign
+    /// indicates whether the [`Rational`] should be non-negative. If the numerator is zero, then
+    /// the [`Rational`] will be non-negative regardless of the sign.
     ///
     /// The denominator may not be zero.
     ///
-    /// The input [`Natural`](malachite_nz::natural::Natural)s may have common factors; this
-    /// function reduces them.
+    /// The input [`Natural`]s may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

@@ -13,6 +13,7 @@ use malachite_nz::test_util::generators::{
     natural_signed_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_11,
 };
 use std::ops::Shr;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 macro_rules! test_mod_power_of_2_shr {
@@ -48,6 +49,24 @@ macro_rules! test_mod_power_of_2_shr {
 #[test]
 fn test_mod_power_of_2_shr() {
     apply_to_signeds!(test_mod_power_of_2_shr);
+}
+
+fn mod_power_of_2_shr_fail_helper<T: PrimitiveSigned>()
+where
+    Natural: ModPowerOf2Shr<T, Output = Natural> + ModPowerOf2ShrAssign<T>,
+    for<'a> &'a Natural: ModPowerOf2Shr<T, Output = Natural>,
+{
+    assert_panic!(Natural::ONE.mod_power_of_2_shr(T::exact_from(3u8), 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_shr(T::exact_from(3u8), 0));
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_shr_assign(T::exact_from(3u8), 0)
+    });
+}
+
+#[test]
+fn mod_power_of_2_shr_fail() {
+    apply_fn_to_signeds!(mod_power_of_2_shr_fail_helper);
 }
 
 fn properties_helper<T: PrimitiveSigned>()

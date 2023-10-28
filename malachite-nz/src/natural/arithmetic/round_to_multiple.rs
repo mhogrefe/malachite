@@ -502,9 +502,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
     /// greater than the original value.
     ///
-    /// See the
-    /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
-    /// for details.
+    /// See the [`RoundToMultiple`] documentation for details.
     ///
     /// The following two expressions are equivalent:
     /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
@@ -645,9 +643,7 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
     /// to, or greater than the original value.
     ///
-    /// See the
-    /// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) documentation
-    /// for details.
+    /// See the [`RoundToMultiple`] documentation for details.
     ///
     /// The following two expressions are equivalent:
     /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`

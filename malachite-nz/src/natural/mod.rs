@@ -137,5 +137,6 @@ pub mod exhaustive;
 pub mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+#[cfg(feature = "random")]
 /// Iterators that generate [`Natural`]s randomly.
 pub mod random;

@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{CheckedLogBase, CheckedSqrt, Square, SquareAssign};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase, CheckedLogBase2, CheckedSqrt, PowerOf2, Square, SquareAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::test_util::common::rle_decode;
@@ -3497,6 +3499,15 @@ fn test_square() {
     test("123", "15129");
     test("1000", "1000000");
     test("123456789", "15241578750190521");
+}
+
+#[test]
+fn test_squaring_large_powers_of_2() {
+    for i in 0..400_000 {
+        let p = Natural::power_of_2(i).square();
+        assert!(p.is_valid());
+        assert_eq!(p.checked_log_base_2(), Some(i << 1));
+    }
 }
 
 fn limbs_square_basecase_helper_2(out: &[Limb], xs: &[Limb]) -> Vec<Limb> {

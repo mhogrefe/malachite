@@ -11,6 +11,7 @@ use malachite_base::test_util::generators::{
     unsigned_quadruple_gen_var_5, unsigned_triple_gen_var_12,
 };
 use malachite_base::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_test_invert_u32_table() {
@@ -122,6 +123,37 @@ fn test_mod_mul() {
     apply_fn_to_unsigneds!(mod_mul_helper);
 }
 
+fn mod_mul_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_mul(T::ZERO, T::ZERO));
+    assert_panic!(T::from(123u8).mod_mul(T::from(200u8), T::from(200u8)));
+    assert_panic!(T::from(200u8).mod_mul(T::from(123u8), T::from(200u8)));
+}
+
+#[test]
+fn mod_mul_fail() {
+    apply_fn_to_unsigneds!(mod_mul_fail_helper);
+}
+
+fn mod_mul_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_mul_assign(T::ZERO, T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_mul_assign(T::from(200u8), T::from(200u8))
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_mul_assign(T::from(123u8), T::from(200u8))
+    });
+}
+
+#[test]
+fn mod_mul_assign_fail() {
+    apply_fn_to_unsigneds!(mod_mul_assign_fail_helper);
+}
+
 #[test]
 fn invert_limb_u32_properties() {
     unsigned_gen_var_12().test_properties(|x| {
@@ -190,8 +222,10 @@ fn mod_mul_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_16::<T>().test_properties(|(x, m)| {
         assert_eq!(x.mod_mul(T::ZERO, m), T::ZERO);
         assert_eq!(T::ZERO.mod_mul(x, m), T::ZERO);
-        assert_eq!(x.mod_mul(T::ONE, m), x);
-        assert_eq!(T::ONE.mod_mul(x, m), x);
+        if m > T::ONE {
+            assert_eq!(x.mod_mul(T::ONE, m), x);
+            assert_eq!(T::ONE.mod_mul(x, m), x);
+        }
     });
 
     unsigned_quadruple_gen_var_4::<T>().test_properties(|(x, y, z, m)| {

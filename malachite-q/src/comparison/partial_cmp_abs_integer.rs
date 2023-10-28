@@ -9,8 +9,7 @@ use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrdAbs<Integer> for Rational {
-    /// Compares the absolute values of a [`Rational`] and an
-    /// [`Integer`](malachite_nz::integer::Integer).
+    /// Compares the absolute values of a [`Rational`] and an [`Integer`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -78,8 +77,7 @@ impl PartialOrdAbs<Integer> for Rational {
 }
 
 impl PartialOrdAbs<Rational> for Integer {
-    /// Compares the absolute values of an [`Integer`](malachite_nz::integer::Integer) and a
-    /// [`Rational`].
+    /// Compares the absolute values of an [`Integer`] and a [`Rational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

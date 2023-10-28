@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2Shl, ModPowerOf2Sub, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
@@ -24,6 +24,7 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -284,6 +285,39 @@ fn test_mod_power_of_2_add() {
     test("123", "456", 9, "67");
     test("1267650600228229401496703205375", "3", 100, "2");
     test("3", "1267650600228229401496703205375", 100, "2");
+}
+
+#[test]
+fn mod_power_of_2_add_fail() {
+    assert_panic!(Natural::ZERO.mod_power_of_2_add(Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_add(Natural::ZERO, 0));
+
+    assert_panic!(Natural::ZERO.mod_power_of_2_add(&Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_add(&Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_add(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_add(Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_add(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_add(Natural::ZERO, 0));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_add_assign(Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_add_assign(Natural::ZERO, 0)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_add_assign(&Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_add_assign(&Natural::ZERO, 0)
+    });
 }
 
 #[test]

@@ -6,6 +6,8 @@ pub type SignedHalfLimb = i32;
 pub type SignedDoubleLimb = i128;
 pub type FloatWithLimbWidth = f64;
 
+pub const MAX_DIGITS_PER_LIMB: usize = 20;
+
 pub const AORSMUL_FASTER_2AORSLSH: bool = true;
 pub const AORSMUL_FASTER_3AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
@@ -2087,3 +2089,7 @@ pub const TABLE_LIMIT_2N_MINUS_POPC_2N: u64 = 81;
 pub const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
 
 pub const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];
+
+// Use these tables to match FLINT for debugging
+// pub const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
+// pub const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];

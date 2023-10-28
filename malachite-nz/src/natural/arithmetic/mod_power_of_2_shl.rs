@@ -6,12 +6,17 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shl_unsigned_nz<T: PrimitiveUnsigned>(x: &Natural, bits: T, pow: u64) -> Natural
 where
     u64: ExactFrom<T>,
 {
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     let bits = u64::exact_from(bits);
     if bits >= pow {
         Natural::ZERO
@@ -24,6 +29,10 @@ fn mod_power_of_2_shl_assign_unsigned_nz<T: PrimitiveUnsigned>(x: &mut Natural, 
 where
     u64: ExactFrom<T>,
 {
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     let bits = u64::exact_from(bits);
     if bits >= pow {
         *x = Natural::ZERO;
@@ -38,8 +47,9 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
         impl ModPowerOf2Shl<$t> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. Assumes the
-            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
+            /// value.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
             ///
@@ -49,6 +59,9 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
@@ -62,8 +75,9 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
         impl<'a> ModPowerOf2Shl<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. Assumes the
-            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
+            /// reference.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
             ///
@@ -73,6 +87,9 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
@@ -84,7 +101,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
 
         impl ModPowerOf2ShlAssign<$t> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$, in place.
-            /// Assumes the input is already reduced modulo $2^k$.
+            /// The [`Natural`] must be already reduced modulo $2^k$.
             ///
             /// $x \gets y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
             ///
@@ -94,6 +111,9 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).
@@ -114,6 +134,10 @@ fn mod_power_of_2_shl_signed_nz<'a, U, S: PrimitiveSigned + UnsignedAbs<Output =
 where
     &'a Natural: ModPowerOf2Shl<U, Output = Natural> + Shr<U, Output = Natural>,
 {
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     if bits >= S::ZERO {
         x.mod_power_of_2_shl(bits.unsigned_abs(), pow)
     } else {
@@ -128,6 +152,10 @@ fn mod_power_of_2_shl_assign_signed_nz<U, S: PrimitiveSigned + UnsignedAbs<Outpu
 ) where
     Natural: ModPowerOf2ShlAssign<U> + ShrAssign<U>,
 {
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     if bits >= S::ZERO {
         x.mod_power_of_2_shl_assign(bits.unsigned_abs(), pow);
     } else {
@@ -140,8 +168,9 @@ macro_rules! impl_mod_power_of_2_shl_signed {
         impl ModPowerOf2Shl<$t> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. Assumes the
-            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
+            /// value.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
             ///
@@ -151,6 +180,9 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
@@ -164,8 +196,9 @@ macro_rules! impl_mod_power_of_2_shl_signed {
         impl<'a> ModPowerOf2Shl<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. Assumes the
-            /// input is already reduced modulo $2^k$. The [`Natural`] is taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
+            /// reference.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
             ///
@@ -175,6 +208,9 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
@@ -186,7 +222,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
 
         impl ModPowerOf2ShlAssign<$t> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$, in place.
-            /// Assumes the input is already reduced modulo $2^k$.
+            /// The [`Natural`] must be already reduced modulo $2^k$.
             ///
             /// $x \gets y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
             ///
@@ -196,6 +232,9 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             /// $M(n) = O(n)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).

@@ -24,6 +24,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
 // # Worst-case complexity
@@ -338,7 +339,7 @@ pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<L
 impl ModPowerOf2Square for Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// Squares a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by value.
     ///
     /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
@@ -349,6 +350,9 @@ impl ModPowerOf2Square for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -374,7 +378,7 @@ impl ModPowerOf2Square for Natural {
 impl<'a> ModPowerOf2Square for &'a Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// Squares a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by reference.
     ///
     /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
@@ -385,6 +389,9 @@ impl<'a> ModPowerOf2Square for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -403,6 +410,10 @@ impl<'a> ModPowerOf2Square for &'a Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_square(self, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match self {
             &Natural::ZERO => Natural::ZERO,
             Natural(Small(x)) if pow <= Limb::WIDTH => Natural(Small(x.mod_power_of_2_square(pow))),
@@ -422,7 +433,7 @@ impl<'a> ModPowerOf2Square for &'a Natural {
 }
 
 impl ModPowerOf2SquareAssign for Natural {
-    /// Squares a [`Natural`] modulo $2^k$, in place. Assumes the input is already reduced modulo
+    /// Squares a [`Natural`] modulo $2^k$, in place. The input must be already reduced modulo
     /// $2^k$.
     ///
     /// $x \gets y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
@@ -433,6 +444,9 @@ impl ModPowerOf2SquareAssign for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -455,6 +469,10 @@ impl ModPowerOf2SquareAssign for Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_square_assign(&mut self, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match self {
             &mut Natural::ZERO => {}
             Natural(Small(ref mut x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),

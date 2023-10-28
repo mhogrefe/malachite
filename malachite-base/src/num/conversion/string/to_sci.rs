@@ -205,9 +205,9 @@ macro_rules! impl_to_sci_unsigned {
             /// Converts an unsigned number to a string using a specified base, possibly formatting
             /// the number using scientific notation.
             ///
-            /// See [`ToSciOptions`](super::options::ToSciOptions) for details on the available
-            /// options. Note that setting `neg_exp_threshold` has no effect, since there is never
-            /// a need to use negative exponents when representing an integer.
+            /// See [`ToSciOptions`] for details on the available options. Note that setting
+            /// `neg_exp_threshold` has no effect, since there is never a need to use negative
+            /// exponents when representing an integer.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -251,9 +251,9 @@ macro_rules! impl_to_sci_signed {
             /// Converts a signed number to a string using a specified base, possibly formatting
             /// the number using scientific notation.
             ///
-            /// See [`ToSciOptions`](super::options::ToSciOptions) for details on the available
-            /// options. Note that setting `neg_exp_threshold` has no effect, since there is never
-            /// a need to use negative exponents when representing an integer.
+            /// See [`ToSciOptions`] for details on the available options. Note that setting
+            /// `neg_exp_threshold` has no effect, since there is never a need to use negative
+            /// exponents when representing an integer.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

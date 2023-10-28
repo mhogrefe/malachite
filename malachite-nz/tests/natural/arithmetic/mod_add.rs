@@ -8,6 +8,7 @@ use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_pair_gen_var_8, natural_quadruple_gen_var_1, natural_triple_gen_var_3,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
@@ -84,6 +85,93 @@ fn test_mod_add() {
     test("123", "456", "512", "67");
     test("0", "3", "5", "3");
     test("7", "5", "10", "2");
+}
+
+#[test]
+fn mod_add_fail() {
+    assert_panic!(Natural::ZERO.mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_add(Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_add(Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_add(Natural::ZERO, &Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_add(Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_add(Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_add(&Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_add(&Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_add(&Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_add(&Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_add(Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_add(Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_add(Natural::ZERO, &Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_add(Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_add(Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_add(&Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_add(&Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_add(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_add(&Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_add(&Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_add_assign(Natural::ZERO, Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_add_assign(Natural::from(3u8), Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_add_assign(Natural::from(30u8), Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_add_assign(Natural::ZERO, &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_add_assign(Natural::from(3u8), &Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_add_assign(Natural::from(30u8), &Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_add_assign(Natural::ZERO, Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_add_assign(&Natural::from(3u8), Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_add_assign(&Natural::from(30u8), Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_add_assign(Natural::ZERO, &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_add_assign(&Natural::from(3u8), &Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_add_assign(&Natural::from(30u8), &Natural::from(30u8))
+    });
 }
 
 #[test]

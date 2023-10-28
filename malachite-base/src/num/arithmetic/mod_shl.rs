@@ -5,22 +5,27 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use std::ops::{Shr, ShrAssign};
 
-fn mod_shl_unsigned<T: PrimitiveUnsigned, U>(x: T, other: U, m: T) -> T
+fn mod_shl_unsigned<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, other: U, m: T) -> T
 where
     u64: ExactFrom<U>,
 {
-    if m == T::ONE {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    if other == U::ZERO {
+        x
+    } else if m == T::ONE || m == T::TWO {
         T::ZERO
     } else {
         x.mod_mul(T::TWO.mod_pow(u64::exact_from(other), m), m)
     }
 }
 
-fn mod_shl_assign_unsigned<T: PrimitiveUnsigned, U>(x: &mut T, other: U, m: T)
+fn mod_shl_assign_unsigned<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(x: &mut T, other: U, m: T)
 where
     u64: ExactFrom<U>,
 {
-    if m == T::ONE {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
+    if other == U::ZERO {
+    } else if m == T::ONE || m == T::TWO {
         *x = T::ZERO;
     } else {
         x.mod_mul_assign(T::TWO.mod_pow(u64::exact_from(other), m), m);
@@ -35,7 +40,7 @@ macro_rules! impl_mod_shl_unsigned {
                     type Output = $t;
 
                     /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$.
-                    /// Assumes the input is already reduced modulo $m$.
+                    /// The number must be already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
@@ -47,6 +52,9 @@ macro_rules! impl_mod_shl_unsigned {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
                     ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
+                    ///
                     /// # Examples
                     /// See [here](super::mod_shl#mod_shl).
                     #[inline]
@@ -57,7 +65,7 @@ macro_rules! impl_mod_shl_unsigned {
 
                 impl ModShlAssign<$u, $t> for $t {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
-                    /// in place. Assumes the input is already reduced modulo $m$.
+                    /// in place. The number must be already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
@@ -68,6 +76,9 @@ macro_rules! impl_mod_shl_unsigned {
                     ///
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
+                    ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
                     ///
                     /// # Examples
                     /// See [here](super::mod_shl#mod_shl_assign).
@@ -92,6 +103,7 @@ fn mod_shl_signed<
     other: S,
     m: T,
 ) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         x.mod_shl(other_abs, m)
@@ -114,6 +126,7 @@ fn mod_shl_assign_signed<
     other: S,
     m: T,
 ) {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         x.mod_shl_assign(other_abs, m);
@@ -135,7 +148,7 @@ macro_rules! impl_mod_shl_signed {
                     type Output = $t;
 
                     /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$.
-                    /// Assumes the input is already reduced modulo $m$.
+                    /// The number must be already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
@@ -148,6 +161,9 @@ macro_rules! impl_mod_shl_signed {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
                     ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
+                    ///
                     /// # Examples
                     /// See [here](super::mod_shl#mod_shl).
                     #[inline]
@@ -158,7 +174,7 @@ macro_rules! impl_mod_shl_signed {
 
                 impl ModShlAssign<$u, $t> for $t {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
-                    /// in place. Assumes the input is already reduced modulo $m$.
+                    /// in place. The number must be already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
@@ -170,6 +186,9 @@ macro_rules! impl_mod_shl_signed {
                     ///
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
+                    ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
                     ///
                     /// # Examples
                     /// See [here](super::mod_shl#mod_shl_assign).

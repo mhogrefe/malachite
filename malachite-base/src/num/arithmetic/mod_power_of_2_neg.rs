@@ -3,11 +3,19 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_power_of_2_neg<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     x.wrapping_neg().mod_power_of_2(pow)
 }
 
 fn mod_power_of_2_neg_assign<T: PrimitiveUnsigned>(x: &mut T, pow: u64) {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     x.wrapping_neg_assign();
     x.mod_power_of_2_assign(pow);
 }
@@ -17,7 +25,7 @@ macro_rules! impl_mod_power_of_2_neg {
         impl ModPowerOf2Neg for $t {
             type Output = $t;
 
-            /// Negates a number modulo another number $2^k$. Assumes the input is already reduced
+            /// Negates a number modulo another number $2^k$. The input must be already reduced
             /// modulo $2^k$.
             ///
             /// $f(x, k) = y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
@@ -26,7 +34,8 @@ macro_rules! impl_mod_power_of_2_neg {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_neg#mod_power_of_2_neg).
@@ -37,8 +46,8 @@ macro_rules! impl_mod_power_of_2_neg {
         }
 
         impl ModPowerOf2NegAssign for $t {
-            /// Negates a number modulo another number $2^k$, in place. Assumes the input is
-            /// already reduced modulo $2^k$.
+            /// Negates a number modulo another number $2^k$, in place. The input must be already
+            /// reduced modulo $2^k$.
             ///
             /// $x \gets y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
             ///
@@ -46,7 +55,8 @@ macro_rules! impl_mod_power_of_2_neg {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_neg#mod_power_of_2_neg_assign).

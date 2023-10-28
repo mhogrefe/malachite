@@ -2,11 +2,12 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2NegAssign, NegModPowerOf2, NegModPowerOf2Assign,
 };
+use malachite_base::num::logic::traits::SignificantBits;
 
 impl ModPowerOf2Neg for Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// Negates a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by value.
     ///
     /// $f(x, k) = y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
@@ -17,6 +18,9 @@ impl ModPowerOf2Neg for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -34,6 +38,10 @@ impl ModPowerOf2Neg for Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_neg(mut self, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         self.neg_mod_power_of_2_assign(pow);
         self
     }
@@ -42,7 +50,7 @@ impl ModPowerOf2Neg for Natural {
 impl<'a> ModPowerOf2Neg for &'a Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo $2^k$. Assumes the input is already reduced modulo $2^k$. The
+    /// Negates a [`Natural`] modulo $2^k$. The input must be already reduced modulo $2^k$. The
     /// [`Natural`] is taken by reference.
     ///
     /// $f(x, k) = y$, where $x, y < 2^k$ and $-x \equiv y \mod 2^k$.
@@ -53,6 +61,9 @@ impl<'a> ModPowerOf2Neg for &'a Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -70,12 +81,16 @@ impl<'a> ModPowerOf2Neg for &'a Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_neg(self, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         self.neg_mod_power_of_2(pow)
     }
 }
 
 impl ModPowerOf2NegAssign for Natural {
-    /// Negates a [`Natural`] modulo $2^k$, in place. Assumes the input is already reduced modulo
+    /// Negates a [`Natural`] modulo $2^k$, in place. The input must be already reduced modulo
     /// $2^k$.
     ///
     /// $x \gets y$, where $x, y < 2^p$ and $-x \equiv y \mod 2^p$.
@@ -86,6 +101,9 @@ impl ModPowerOf2NegAssign for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -111,6 +129,10 @@ impl ModPowerOf2NegAssign for Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_neg_assign(&mut self, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         self.neg_mod_power_of_2_assign(pow);
     }
 }

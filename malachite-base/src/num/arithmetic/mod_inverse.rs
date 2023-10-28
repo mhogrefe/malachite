@@ -13,7 +13,7 @@ pub_test! {mod_inverse_binary<
     m: U,
 ) -> Option<U> {
     assert_ne!(x, U::ZERO);
-    assert!(x < m);
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let mut u1 = S::ONE;
     let mut v2 = S::ONE;
     let mut u2 = S::ZERO;
@@ -139,8 +139,8 @@ macro_rules! impl_mod_inverse {
         impl ModInverse<$u> for $u {
             type Output = $u;
 
-            /// Computes the multiplicative inverse of a number modulo another number $m$. Assumes
-            /// the first number is already reduced modulo $m$.
+            /// Computes the multiplicative inverse of a number modulo another number $m$. The
+            /// input must be already reduced modulo $m$.
             ///
             /// Returns `None` if $x$ and $m$ are not coprime.
             ///
@@ -153,6 +153,9 @@ macro_rules! impl_mod_inverse {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
             /// `max(self.significant_bits(), m.significant_bits())`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_inverse#mod_inverse).

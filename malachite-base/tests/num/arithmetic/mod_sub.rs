@@ -1,5 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_16, unsigned_triple_gen_var_12};
+use std::panic::catch_unwind;
 
 fn mod_sub_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, y: T, m, out| {
@@ -30,6 +31,37 @@ fn mod_sub_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_sub() {
     apply_fn_to_unsigneds!(mod_sub_helper);
+}
+
+fn mod_sub_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_sub(T::ZERO, T::ZERO));
+    assert_panic!(T::from(123u8).mod_sub(T::from(200u8), T::from(200u8)));
+    assert_panic!(T::from(200u8).mod_sub(T::from(123u8), T::from(200u8)));
+}
+
+#[test]
+fn mod_sub_fail() {
+    apply_fn_to_unsigneds!(mod_sub_fail_helper);
+}
+
+fn mod_sub_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_sub_assign(T::ZERO, T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_sub_assign(T::from(200u8), T::from(200u8))
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_sub_assign(T::from(123u8), T::from(200u8))
+    });
+}
+
+#[test]
+fn mod_sub_assign_fail() {
+    apply_fn_to_unsigneds!(mod_sub_assign_fail_helper);
 }
 
 fn mod_sub_properties_helper<T: PrimitiveUnsigned>() {

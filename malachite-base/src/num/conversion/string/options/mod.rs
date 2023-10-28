@@ -295,6 +295,7 @@ impl FromSciStringOptions {
 /// Iterators that generate [`SciSizeOptions`], [`ToSciOptions`], and [`FromSciStringOptions`]
 /// without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`SciSizeOptions`], [`ToSciOptions`], and [`FromSciStringOptions`]
 /// randomly.
 pub mod random;

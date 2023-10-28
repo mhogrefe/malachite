@@ -3,16 +3,17 @@ use malachite_base::num::arithmetic::traits::{ModIsReduced, ModShr, ModShrAssign
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::test_util::generators::{
     signed_gen_var_5, unsigned_signed_unsigned_triple_gen_var_2,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
-    natural_natural_signed_triple_gen_var_1, natural_pair_gen_var_10, natural_signed_pair_gen_var_3,
+    natural_natural_signed_triple_gen_var_1, natural_pair_gen_var_8, natural_signed_pair_gen_var_3,
 };
 use std::ops::Shr;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 macro_rules! test_mod_shr_signed {
@@ -65,6 +66,51 @@ fn test_mod_shr() {
     apply_to_signeds!(test_mod_shr_signed);
 }
 
+fn mod_shr_fail_helper<T: PrimitiveSigned>()
+where
+    for<'a> Natural: ModShrAssign<T, Natural>
+        + ModShrAssign<T, &'a Natural>
+        + ModShr<T, Natural, Output = Natural>
+        + ModShr<T, &'a Natural, Output = Natural>,
+    for<'a, 'b> &'a Natural:
+        ModShr<T, Natural, Output = Natural> + ModShr<T, &'b Natural, Output = Natural>,
+{
+    assert_panic!(Natural::ZERO.mod_shr(T::exact_from(3u8), Natural::ZERO));
+    assert_panic!(Natural::exact_from(30).mod_shr(T::exact_from(3u8), Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_shr(T::exact_from(3u8), &Natural::ZERO));
+    assert_panic!(Natural::exact_from(30).mod_shr(T::exact_from(3u8), &Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_shr(T::exact_from(3u8), Natural::ZERO));
+    assert_panic!((&Natural::exact_from(30)).mod_shr(T::exact_from(3u8), Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_shr(T::exact_from(3u8), &Natural::ZERO));
+    assert_panic!((&Natural::exact_from(30)).mod_shr(T::exact_from(3u8), &Natural::ONE));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_shr_assign(T::exact_from(3u8), Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::exact_from(30);
+        x.mod_shr_assign(T::exact_from(3u8), Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_shr_assign(T::exact_from(3u8), &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::exact_from(30);
+        x.mod_shr_assign(T::exact_from(3u8), &Natural::ONE)
+    });
+}
+
+#[test]
+fn mod_shr_fail() {
+    apply_fn_to_signeds!(mod_shr_fail_helper);
+}
+
 #[allow(clippy::trait_duplication_in_bounds)]
 fn properties_helper<U: PrimitiveUnsigned + WrappingFrom<T>, T: PrimitiveSigned + WrappingFrom<U>>()
 where
@@ -112,7 +158,7 @@ where
         }
     });
 
-    natural_pair_gen_var_10().test_properties(|(n, m)| {
+    natural_pair_gen_var_8().test_properties(|(n, m)| {
         assert_eq!((&n).mod_shr(T::ZERO, m), n);
     });
 

@@ -221,10 +221,10 @@ pub fn random_negative_integers(
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// [`geometric_random_nonzero_signeds`](geometric_random_nonzero_signeds)); $m$ must be greater
-/// than 1. Then an [`Integer`] is chosen uniformly among all positive [`Integer`]s with that bit
-/// length, and its sign is set to the sign of the signed bit length. The resulting distribution
-/// has no mean or higher-order statistics (unless $m < 2$, which is not typical).
+/// [`geometric_random_nonzero_signeds`]); $m$ must be greater than 1. Then an [`Integer`] is
+/// chosen uniformly among all positive [`Integer`]s with that bit length, and its sign is set to
+/// the sign of the signed bit length. The resulting distribution has no mean or higher-order
+/// statistics (unless $m < 2$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
@@ -280,10 +280,10 @@ pub fn random_nonzero_integers(
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// [`geometric_random_signeds`](geometric_random_signeds)); $m$ must be greater than 0. Then an
-/// [`Integer`] is chosen uniformly among all [`Integer`]s with that bit length, and its sign is
-/// set to the sign of the signed bit length. The resulting distribution has no mean or
-/// higher-order statistics (unless $m < 1$, which is not typical).
+/// [`geometric_random_signeds`]); $m$ must be greater than 0. Then an [`Integer`] is chosen
+/// uniformly among all [`Integer`]s with that bit length, and its sign is set to the sign of the
+/// signed bit length. The resulting distribution has no mean or higher-order statistics (unless
+/// $m < 1$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
@@ -365,8 +365,7 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -425,8 +424,7 @@ pub fn striped_random_natural_integers(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -485,8 +483,7 @@ pub fn striped_random_positive_integers(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -548,8 +545,7 @@ pub fn striped_random_negative_integers(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -602,16 +598,15 @@ pub fn striped_random_nonzero_integers(
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// [`geometric_random_signeds`](geometric_random_signeds)); $m$ must be greater than 0. A striped
-/// bit sequence with the given stripe parameter is generated and truncated at the bit length. The
-/// highest bit is forced to be 1, an [`Integer`] is generated from the sequence, and its sign is
-/// set to the sign of the signed bit length. The resulting distribution has no mean or
-/// higher-order statistics (unless $m < 1$, which is not typical).
+/// [`geometric_random_signeds`]); $m$ must be greater than 0. A striped bit sequence with the
+/// given stripe parameter is generated and truncated at the bit length. The highest bit is forced
+/// to be 1, an [`Integer`] is generated from the sequence, and its sign is set to the sign of the
+/// signed bit length. The resulting distribution has no mean or higher-order statistics (unless
+/// $m < 1$, which is not typical).
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -1197,8 +1192,7 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1260,8 +1254,7 @@ pub fn striped_random_integer_range(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1436,8 +1429,7 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$
@@ -1523,8 +1515,7 @@ pub fn striped_random_integer_range_to_infinity(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$

@@ -12,9 +12,8 @@ pub struct NaturalFromRationalError;
 impl TryFrom<Rational> for Natural {
     type Error = NaturalFromRationalError;
 
-    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
-    /// [`Rational`] by value. If the [`Rational`] is negative or not an integer, an error is
-    /// returned.
+    /// Converts a [`Rational`] to a [`Natural`], taking the [`Rational`] by value. If the
+    /// [`Rational`] is negative or not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -44,9 +43,8 @@ impl TryFrom<Rational> for Natural {
 impl<'a> TryFrom<&'a Rational> for Natural {
     type Error = NaturalFromRationalError;
 
-    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), taking the
-    /// [`Rational`] by reference. If the [`Rational`] is negative or not an integer, an error is
-    /// returned.
+    /// Converts a [`Rational`] to a [`Natural`], taking the [`Rational`] by reference. If the
+    /// [`Rational`] is negative or not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -78,9 +76,8 @@ impl<'a> TryFrom<&'a Rational> for Natural {
 }
 
 impl<'a> ConvertibleFrom<&'a Rational> for Natural {
-    /// Determines whether a [`Rational`] can be converted to a
-    /// [`Natural`](malachite_nz::natural::Natural) (when the [`Rational`] is non-negative and an
-    /// integer), taking the [`Rational`] by reference.
+    /// Determines whether a [`Rational`] can be converted to a [`Natural`] (when the [`Rational`]
+    /// is non-negative and an integer), taking the [`Rational`] by reference.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -102,14 +99,12 @@ impl<'a> ConvertibleFrom<&'a Rational> for Natural {
 }
 
 impl RoundingFrom<Rational> for Natural {
-    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), using a
-    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
+    /// Converts a [`Rational`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
     /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the returned
     /// value is less than, equal to, or greater than the original value.
     ///
-    /// If the [`Rational`] is negative, then it will be rounded to zero when the
-    /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) is `Ceiling`, `Down`, or
-    /// `Nearest`. Otherwise, this function will panic.
+    /// If the [`Rational`] is negative, then it will be rounded to zero when the [`RoundingMode`]
+    /// is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -189,14 +184,12 @@ impl RoundingFrom<Rational> for Natural {
 }
 
 impl<'a> RoundingFrom<&'a Rational> for Natural {
-    /// Converts a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural), using a
-    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
+    /// Converts a [`Rational`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
     /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
     /// returned value is less than, equal to, or greater than the original value.
     ///
-    /// If the [`Rational`] is negative, then it will be rounded to zero when the
-    /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) is `Ceiling`, `Down`, or
-    /// `Nearest`. Otherwise, this function will panic.
+    /// If the [`Rational`] is negative, then it will be rounded to zero when the [`RoundingMode`]
+    /// is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

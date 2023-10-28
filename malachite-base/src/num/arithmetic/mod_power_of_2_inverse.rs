@@ -6,7 +6,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 pub_test! {mod_power_of_2_inverse_fast<T: PrimitiveUnsigned>(x: T, pow: u64) -> Option<T> {
     assert_ne!(x, T::ZERO);
     assert!(pow <= T::WIDTH);
-    assert!(x.significant_bits() <= pow);
+    assert!(x.significant_bits() <= pow, "x must be reduced mod 2^pow, but {x} >= 2^{pow}");
     if x.even() {
         return None;
     } else if x == T::ONE {
@@ -36,7 +36,7 @@ macro_rules! impl_mod_power_of_2_inverse {
         impl ModPowerOf2Inverse for $u {
             type Output = $u;
 
-            /// Computes the multiplicative inverse of a number modulo $2^k$. Assumes the number is
+            /// Computes the multiplicative inverse of a number modulo $2^k$. The input must be
             /// already reduced modulo $2^k$.
             ///
             /// Returns `None` if $x$ is even.
@@ -49,6 +49,10 @@ macro_rules! impl_mod_power_of_2_inverse {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            ///
+            /// # Panics
+            /// Panics if `pow` is greater than `Self::WIDTH`, if `self` is zero, or if `self` is
+            /// greater than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_inverse#mod_power_of_2_inverse).

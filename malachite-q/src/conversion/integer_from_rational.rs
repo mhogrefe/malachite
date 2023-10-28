@@ -11,8 +11,8 @@ pub struct IntegerFromRationalError;
 impl TryFrom<Rational> for Integer {
     type Error = IntegerFromRationalError;
 
-    /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), taking the
-    /// [`Rational`] by value. If the [`Rational`] is not an integer, an error is returned.
+    /// Converts a [`Rational`] to an [`Integer`], taking the [`Rational`] by value. If the
+    /// [`Rational`] is not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -42,8 +42,8 @@ impl TryFrom<Rational> for Integer {
 impl<'a> TryFrom<&'a Rational> for Integer {
     type Error = IntegerFromRationalError;
 
-    /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), taking the
-    /// [`Rational`] by reference. If the [`Rational`] is not an integer, an error is returned.
+    /// Converts a [`Rational`] to an [`Integer`], taking the [`Rational`] by reference. If the
+    /// [`Rational`] is not an integer, an error is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -75,8 +75,8 @@ impl<'a> TryFrom<&'a Rational> for Integer {
 }
 
 impl<'a> ConvertibleFrom<&'a Rational> for Integer {
-    /// Determines whether a [`Rational`] can be converted to an
-    /// [`Integer`](malachite_nz::integer::Integer), taking the [`Rational`] by reference.
+    /// Determines whether a [`Rational`] can be converted to an [`Integer`], taking the
+    /// [`Rational`] by reference.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -98,10 +98,9 @@ impl<'a> ConvertibleFrom<&'a Rational> for Integer {
 }
 
 impl RoundingFrom<Rational> for Integer {
-    /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), using a
-    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
-    /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the returned
-    /// value is less than, equal to, or greater than the original value.
+    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking
+    /// the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the
+    /// returned value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -195,9 +194,8 @@ impl RoundingFrom<Rational> for Integer {
 }
 
 impl<'a> RoundingFrom<&'a Rational> for Integer {
-    /// Converts a [`Rational`] to an [`Integer`](malachite_nz::integer::Integer), using a
-    /// specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode) and taking the
-    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking
+    /// the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
     /// returned value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity

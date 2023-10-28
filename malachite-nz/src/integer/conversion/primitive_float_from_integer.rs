@@ -10,9 +10,8 @@ macro_rules! float_impls {
     ($f: ident) => {
         impl<'a> RoundingFrom<&'a Integer> for $f {
             /// Converts an [`Integer`] to a primitive float according to a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode). An [`Ordering`] is
-            /// also returned, indicating whether the returned value is less than, equal to, or
-            /// greater than the original value.
+            /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
+            /// value is less than, equal to, or greater than the original value.
             ///
             /// - If the rounding mode is `Floor` the largest float less than or equal to the
             ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite

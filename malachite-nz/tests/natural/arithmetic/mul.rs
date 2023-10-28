@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivMod, Square};
+use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivMod, PowerOf2, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -12220,6 +12220,18 @@ fn test_mul() {
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
     );
+    let large_power_of_2 = Natural::power_of_2(100_000) * Natural::power_of_2(100_000);
+    assert!(large_power_of_2.is_valid());
+    assert_eq!(large_power_of_2.checked_log_base_2(), Some(200_000));
+}
+
+#[test]
+fn test_multiplying_large_powers_of_2() {
+    for i in 0..400_000 {
+        let p = Natural::power_of_2(i) * Natural::power_of_2(i);
+        assert!(p.is_valid());
+        assert_eq!(p.checked_log_base_2(), Some(i << 1));
+    }
 }
 
 #[test]

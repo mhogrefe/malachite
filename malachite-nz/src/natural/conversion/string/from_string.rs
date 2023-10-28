@@ -1,5 +1,6 @@
+use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
-use crate::platform::Limb;
+use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
@@ -190,7 +191,7 @@ impl FromStringBase for Natural {
     /// assert!(Natural::from_string_base(2, "2").is_none());
     /// ```
     #[inline]
-    fn from_string_base(base: u8, s: &str) -> Option<Natural> {
+    fn from_string_base(base: u8, mut s: &str) -> Option<Natural> {
         assert!((2..=36).contains(&base), "base out of range");
         if s.is_empty() {
             None
@@ -199,6 +200,20 @@ impl FromStringBase for Natural {
                 2 => from_binary_str(s),
                 8 => from_oct_str(s),
                 16 => from_hex_str(s),
+                10 => {
+                    if s.len() < MAX_DIGITS_PER_LIMB {
+                        Limb::from_str(s).ok().map(|x| Natural(Small(x)))
+                    } else {
+                        if let Some(prefix_s) = s.strip_prefix('+') {
+                            s = prefix_s;
+                        }
+                        Natural::from_digits_desc(
+                            &10,
+                            s.bytes()
+                                .map(|b| if b >= b'0' { b - b'0' } else { u8::MAX }),
+                        )
+                    }
+                }
                 _ => {
                     for b in s.bytes() {
                         let digit = digit_from_display_byte(b)?;

@@ -12,6 +12,7 @@ fn mod_shl_ref_val_unsigned<T: PrimitiveUnsigned>(x: &Natural, bits: T, m: Natur
 where
     Natural: From<T>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     if bits == T::ZERO {
         x.clone()
     } else {
@@ -26,6 +27,7 @@ fn mod_shl_ref_ref_unsigned<T: PrimitiveUnsigned>(x: &Natural, bits: T, m: &Natu
 where
     Natural: From<T>,
 {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     if bits == T::ZERO {
         x.clone()
     } else {
@@ -40,6 +42,7 @@ fn mod_shl_assign_unsigned_nz<T: PrimitiveUnsigned>(x: &mut Natural, bits: T, m:
 where
     Natural: From<T>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     if bits != T::ZERO {
         match m {
             Natural::ONE | Natural::TWO => *x = Natural::ZERO,
@@ -52,6 +55,7 @@ fn mod_shl_assign_ref_unsigned<T: PrimitiveUnsigned>(x: &mut Natural, bits: T, m
 where
     Natural: From<T>,
 {
+    assert!(*x < *m, "x must be reduced mod m, but {x} >= {m}");
     if bits != T::ZERO {
         match m {
             &Natural::ONE | &Natural::TWO => *x = Natural::ZERO,
@@ -66,8 +70,8 @@ macro_rules! impl_mod_shl_unsigned {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by value.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
+            /// [`Natural`]s are taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -78,6 +82,9 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -92,8 +99,8 @@ macro_rules! impl_mod_shl_unsigned {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. The first
-            /// [`Natural`] is taken by value and the second by reference.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
+            /// first [`Natural`] is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -104,6 +111,9 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -118,8 +128,8 @@ macro_rules! impl_mod_shl_unsigned {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. The first
-            /// [`Natural`] is taken by reference and the second by value.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
+            /// first [`Natural`] is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -130,6 +140,9 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -143,8 +156,8 @@ macro_rules! impl_mod_shl_unsigned {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by reference.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
+            /// [`Natural`]s are taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -156,6 +169,9 @@ macro_rules! impl_mod_shl_unsigned {
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
             ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
+            ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
             #[inline]
@@ -166,8 +182,8 @@ macro_rules! impl_mod_shl_unsigned {
 
         impl ModShlAssign<$t, Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. Assumes the input is already reduced modulo $m$. The
-            /// [`Natural`] on the right-hand side is taken by value.
+            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
+            /// $m$. The [`Natural`] on the right-hand side is taken by value.
             ///
             /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -178,6 +194,9 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).
@@ -189,8 +208,8 @@ macro_rules! impl_mod_shl_unsigned {
 
         impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. Assumes the input is already reduced modulo $m$. The
-            /// [`Natural`] on the right-hand side is taken by reference.
+            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
+            /// $m$. The [`Natural`] on the right-hand side is taken by reference.
             ///
             /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -201,6 +220,9 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).
@@ -222,6 +244,7 @@ where
     Natural: From<U>,
     &'a Natural: Shr<U, Output = Natural>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => x.clone(),
@@ -242,6 +265,7 @@ where
     Natural: From<U>,
     &'a Natural: Shr<U, Output = Natural>,
 {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => x.clone(),
@@ -260,6 +284,7 @@ fn mod_shl_assign_signed_nz<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
 ) where
     Natural: From<U> + ShrAssign<U>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => {}
@@ -278,6 +303,7 @@ fn mod_shl_assign_ref_signed<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
 ) where
     Natural: From<U> + ShrAssign<U>,
 {
+    assert!(*x < *m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => {}
@@ -295,8 +321,8 @@ macro_rules! impl_mod_shl_signed {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by value.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
+            /// [`Natural`]s are taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -307,6 +333,9 @@ macro_rules! impl_mod_shl_signed {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -321,8 +350,8 @@ macro_rules! impl_mod_shl_signed {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. The first
-            /// [`Natural`] is taken by value and the second by reference.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
+            /// first [`Natural`] is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -333,6 +362,9 @@ macro_rules! impl_mod_shl_signed {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -347,8 +379,8 @@ macro_rules! impl_mod_shl_signed {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. The first
-            /// [`Natural`] is taken by reference and the second by value.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
+            /// first [`Natural`] is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -359,6 +391,9 @@ macro_rules! impl_mod_shl_signed {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
@@ -372,8 +407,8 @@ macro_rules! impl_mod_shl_signed {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by reference.
+            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
+            /// [`Natural`]s are taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -385,6 +420,9 @@ macro_rules! impl_mod_shl_signed {
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
             ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
+            ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl).
             #[inline]
@@ -395,8 +433,8 @@ macro_rules! impl_mod_shl_signed {
 
         impl ModShlAssign<$t, Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. Assumes the input is already reduced modulo $m$. The
-            /// [`Natural`] on the right-hand side is taken by value.
+            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
+            /// $m$. The [`Natural`] on the right-hand side is taken by value.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -407,6 +445,9 @@ macro_rules! impl_mod_shl_signed {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).
@@ -418,8 +459,8 @@ macro_rules! impl_mod_shl_signed {
 
         impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. Assumes the input is already reduced modulo $m$. The
-            /// [`Natural`] on the right-hand side is taken by reference.
+            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
+            /// $m$. The [`Natural`] on the right-hand side is taken by reference.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -430,6 +471,9 @@ macro_rules! impl_mod_shl_signed {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shl#mod_shl_assign).

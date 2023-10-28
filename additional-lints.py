@@ -60,16 +60,16 @@ MAX_LINE_LENGTH = 100
 line_length_exceptions = set((
     # long Markdown table rows and/or links
     ('./malachite-base/src/lib.rs', 57),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 309),
     ('./malachite-base/src/num/arithmetic/mod.rs', 310),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1311),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1551),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 311),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1312),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1552),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1553),
     ('./malachite-base/src/num/arithmetic/mod.rs', 1554),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1555),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 77),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 236),
-    ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 111),
+    ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 110),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 148),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 150),
     ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 428),
@@ -108,13 +108,11 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/conversion/mod.rs', 212),
     ('./malachite-q/src/arithmetic/mod.rs', 73),
     ('./malachite-q/src/arithmetic/mod.rs', 75),
-    ('./malachite-q/src/conversion/string/from_sci_string.rs', 14),
-    ('./malachite-q/src/conversion/string/from_sci_string.rs', 81),
-    ('./malachite-q/src/conversion/string/from_sci_string.rs', 120),
-    ('./malachite-q/src/conversion/string/from_sci_string.rs', 203),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 118),
+    ('./malachite-q/src/conversion/string/from_sci_string.rs', 201),
     ('./malachite-q/src/exhaustive/mod.rs', 45),
     ('./malachite-q/src/exhaustive/mod.rs', 47),
-    ('./malachite-q/src/lib.rs', 47),
+    ('./malachite-q/src/lib.rs', 46),
 ))
 
 def lint(filename):

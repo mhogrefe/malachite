@@ -124,8 +124,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// The only rounding modes that are guaranteed to return without a panic are `Down`
             /// and `Floor`.
             ///
-            /// See the [`RoundToMultiple`](super::traits::RoundToMultiple) documentation for
-            /// details.
+            /// See the [`RoundToMultiple`] documentation for details.
             ///
             /// The following two expressions are equivalent:
             /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`
@@ -247,8 +246,7 @@ macro_rules! impl_round_to_multiple_signed {
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
-            /// See the [`RoundToMultiple`](super::traits::RoundToMultiple) documentation for
-            /// details.
+            /// See the [`RoundToMultiple`] documentation for details.
             ///
             /// The following two expressions are equivalent:
             /// - `x.round_to_multiple_assign(other, RoundingMode::Exact);`

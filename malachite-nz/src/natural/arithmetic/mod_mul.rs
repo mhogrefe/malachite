@@ -230,7 +230,7 @@ impl ModMulPrecomputed<Natural, Natural> for Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
@@ -243,6 +243,9 @@ impl ModMulPrecomputed<Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -300,7 +303,7 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
     /// reference.
     ///
@@ -314,6 +317,9 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -371,7 +377,7 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first and third [`Natural`]s are taken by value and the second by
     /// reference.
     ///
@@ -385,6 +391,9 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -442,7 +451,7 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] is taken by value and the second and third by
     /// reference.
     ///
@@ -456,6 +465,9 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -518,7 +530,7 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] is taken by reference and the second and third by
     /// value.
     ///
@@ -532,6 +544,9 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -568,6 +583,8 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` is
     /// taken by reference and `c` and `m` are taken by value.
     fn mod_mul_precomputed(self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         match (self, other, m, data) {
             (&Natural::ZERO, _, _, _) | (_, Natural::ZERO, _, _) => Natural::ZERO,
             (x, Natural::ONE, _, _) => x.clone(),
@@ -603,13 +620,16 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the second
     /// by value.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
     /// [`precompute_mod_mul_data`](ModMulPrecomputed::precompute_mod_mul_data).
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -674,7 +694,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third by
     /// value.
     ///
@@ -688,6 +708,9 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -724,6 +747,11 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
     /// `c` are taken by reference and `m` is taken by value.
     fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(
+            *other < m,
+            "other must be reduced mod m, but {other} >= {m}"
+        );
         match (self, other, m, data) {
             (&Natural::ZERO, _, _, _) | (_, &Natural::ZERO, _, _) => Natural::ZERO,
             (x, &Natural::ONE, _, _) => x.clone(),
@@ -759,7 +787,7 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
         precompute_mod_mul_data_helper(m)
     }
 
-    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`] modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
@@ -772,6 +800,9 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -808,6 +839,8 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from fmpz_mod/mul.c, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by reference.
     fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         match (self, other, m, data) {
             (&Natural::ZERO, _, _, _) | (_, &Natural::ZERO, _, _) => Natural::ZERO,
             (x, &Natural::ONE, _, _) => x.clone(),
@@ -828,9 +861,8 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
-    /// value.
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
@@ -842,6 +874,9 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -866,6 +901,8 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b`, `c`,
     /// and `m` are taken by value and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: Natural, data: &ModMulData) {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         match (&mut *self, other, m, data) {
             (&mut Natural::ZERO, _, _, _) | (_, Natural::ONE, _, _) => {}
             (x, Natural::ZERO, _, _) => *x = Natural::ZERO,
@@ -889,9 +926,9 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
-    /// value and the second by reference.
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value
+    /// and the second by reference.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
@@ -903,6 +940,9 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -927,6 +967,11 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
     /// `c` are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: &'a Natural, data: &ModMulData) {
+        assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(
+            other < *m,
+            "other must be reduced mod m, but {other} >= {m}"
+        );
         match (&mut *self, other, m, data) {
             (&mut Natural::ZERO, _, _, _) | (_, Natural::ONE, _, _) => {}
             (x, Natural::ZERO, _, _) => *x = Natural::ZERO,
@@ -950,8 +995,8 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
     /// reference and the second by value.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
@@ -964,6 +1009,9 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -988,6 +1036,11 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
     /// `m` are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: &'a Natural, m: Natural, data: &ModMulData) {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(
+            *other < m,
+            "other must be reduced mod m, but {other} >= {m}"
+        );
         match (&mut *self, other, m, data) {
             (&mut Natural::ZERO, _, _, _) | (_, &Natural::ONE, _, _) => {}
             (x, &Natural::ZERO, _, _) => *x = Natural::ZERO,
@@ -1011,8 +1064,8 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
     /// reference.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
@@ -1025,6 +1078,9 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1054,6 +1110,8 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
         m: &'b Natural,
         data: &ModMulData,
     ) {
+        assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
+        assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
         match (&mut *self, other, m, data) {
             (&mut Natural::ZERO, _, _, _) | (_, &Natural::ONE, _, _) => {}
             (x, &Natural::ZERO, _, _) => *x = Natural::ZERO,
@@ -1079,7 +1137,7 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
 impl ModMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
     /// $f(x, y, m) = z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
@@ -1090,6 +1148,9 @@ impl ModMul<Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1112,7 +1173,7 @@ impl ModMul<Natural, Natural> for Natural {
 impl<'a> ModMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
     /// reference.
     ///
@@ -1124,6 +1185,9 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1145,7 +1209,7 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
 impl<'a> ModMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first and third [`Natural`]s are taken by value and the second by
     /// reference.
     ///
@@ -1157,6 +1221,9 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1179,7 +1246,7 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] is taken by value and the second and third by
     /// reference.
     ///
@@ -1191,6 +1258,9 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1212,7 +1282,7 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
 impl<'a> ModMul<Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first [`Natural`] is taken by reference and the second and third by
     /// value.
     ///
@@ -1224,6 +1294,9 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1246,7 +1319,7 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the second
     /// by value.
     ///
@@ -1258,6 +1331,9 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1279,7 +1355,7 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third by
     /// value.
     ///
@@ -1291,6 +1367,9 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1313,7 +1392,7 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. Assumes the inputs are already
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$. The inputs must be already
     /// reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
     /// $f(x, y, m) = z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
@@ -1324,6 +1403,9 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1346,9 +1428,8 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
 }
 
 impl ModMulAssign<Natural, Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
-    /// value.
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by value.
     ///
     /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
     ///
@@ -1358,6 +1439,9 @@ impl ModMulAssign<Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1383,9 +1467,9 @@ impl ModMulAssign<Natural, Natural> for Natural {
 }
 
 impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
-    /// value and the second by reference.
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by value
+    /// and the second by reference.
     ///
     /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
     ///
@@ -1395,6 +1479,9 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1419,8 +1506,8 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
 }
 
 impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. The first [`Natural`] on the right-hand side is taken by
     /// reference and the second by value.
     ///
     /// # Worst-case complexity
@@ -1429,6 +1516,9 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -1454,8 +1544,8 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
 }
 
 impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. Assumes the inputs
-    /// are already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
+    /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
     /// reference.
     ///
     /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
@@ -1466,6 +1556,9 @@ impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// ```

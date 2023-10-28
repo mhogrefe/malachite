@@ -33,7 +33,7 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::arithmetic::traits::{
-    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ,
+    CheckedDiv, WrappingAddAssign, WrappingMulAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -2088,11 +2088,9 @@ impl<'a> Div<Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, mut other: Natural) -> Natural {
-        if *self == other {
-            return Natural::ONE;
-        }
         match (self, &mut other) {
             (_, &mut Natural::ZERO) => panic!("division by zero"),
+            (x, y) if x == y => Natural::ONE,
             (n, &mut Natural::ONE) => n.clone(),
             (n, &mut Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
@@ -2145,11 +2143,9 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, other: &'b Natural) -> Natural {
-        if self == other {
-            return Natural::ONE;
-        }
         match (self, other) {
             (_, &Natural::ZERO) => panic!("division by zero"),
+            (x, y) if x == y => Natural::ONE,
             (n, &Natural::ONE) => n.clone(),
             (n, &Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
@@ -2195,12 +2191,11 @@ impl DivAssign<Natural> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign(&mut self, other: Natural) {
-        if *self == other {
-            *self = Natural::ONE;
-            return;
-        }
         match (&mut *self, other) {
             (_, Natural::ZERO) => panic!("division by zero"),
+            (x, y) if *x == y => {
+                *self = Natural::ONE;
+            }
             (_, Natural::ONE) => {}
             (n, Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
@@ -2251,12 +2246,11 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign(&mut self, other: &'a Natural) {
-        if self == other {
-            *self = Natural::ONE;
-            return;
-        }
         match (&mut *self, other) {
             (_, &Natural::ZERO) => panic!("division by zero"),
+            (x, y) if x == y => {
+                *self = Natural::ONE;
+            }
             (_, &Natural::ONE) => {}
             (n, &Natural(Small(d))) => n.div_assign_limb(d),
             (Natural(Small(_)), _) => *self = Natural::ZERO,
@@ -2272,6 +2266,256 @@ impl<'a> DivAssign<&'a Natural> for Natural {
                     self.trim();
                 }
             }
+        }
+    }
+}
+
+impl CheckedDiv<Natural> for Natural {
+    type Output = Natural;
+
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value. The quotient is rounded
+    /// towards negative infinity. The quotient and remainder (which is not computed) satisfy
+    /// $x = qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is zero,
+    /// `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \left \lfloor \frac{x}{y} \right \rfloor \right ) &
+    ///         \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     Natural::from(23u32).checked_div(Natural::from(10u32)).to_debug_string(),
+    ///     "Some(2)"
+    /// );
+    /// assert_eq!(Natural::ONE.checked_div(Natural::ZERO), None);
+    /// ```
+    #[inline]
+    fn checked_div(self, mut other: Natural) -> Option<Natural> {
+        match (self, &mut other) {
+            (_, &mut Natural::ZERO) => None,
+            (x, y) if x == *y => Some(Natural::ONE),
+            (n, &mut Natural::ONE) => Some(n),
+            (mut n, &mut Natural(Small(d))) => {
+                n.div_assign_limb(d);
+                Some(n)
+            }
+            (Natural(Small(_)), _) => Some(Natural::ZERO),
+            (Natural(Large(mut ns)), &mut Natural(Large(ref mut ds))) => {
+                let ns_len = ns.len();
+                let ds_len = ds.len();
+                Some(if ns_len < ds_len {
+                    Natural::ZERO
+                } else {
+                    let mut qs = vec![0; ns_len - ds_len + 1];
+                    limbs_div_to_out(&mut qs, &mut ns, ds);
+                    Natural::from_owned_limbs_asc(qs)
+                })
+            }
+        }
+    }
+}
+
+impl<'a> CheckedDiv<&'a Natural> for Natural {
+    type Output = Natural;
+
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
+    /// reference. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// (which is not computed) satisfy $x = qy + r$ and $0 \leq r < y$. Returns `None` when the
+    /// second [`Natural`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \left \lfloor \frac{x}{y} \right \rfloor \right ) &
+    ///         \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     Natural::from(23u32).checked_div(&Natural::from(10u32)).to_debug_string(),
+    ///     "Some(2)"
+    /// );
+    /// assert_eq!(Natural::ONE.checked_div(&Natural::ZERO), None);
+    /// ```
+    #[inline]
+    fn checked_div(self, other: &'a Natural) -> Option<Natural> {
+        match (self, other) {
+            (_, &Natural::ZERO) => None,
+            (x, y) if x == *y => Some(Natural::ONE),
+            (n, &Natural::ONE) => Some(n.clone()),
+            (mut n, &Natural(Small(d))) => {
+                n.div_assign_limb(d);
+                Some(n)
+            }
+            (Natural(Small(_)), _) => Some(Natural::ZERO),
+            (Natural(Large(mut ns)), &Natural(Large(ref ds))) => {
+                let ns_len = ns.len();
+                let ds_len = ds.len();
+                Some(if ns_len < ds_len {
+                    Natural::ZERO
+                } else {
+                    let mut qs = vec![0; ns_len - ds_len + 1];
+                    limbs_div_to_out_val_ref(&mut qs, &mut ns, ds);
+                    Natural::from_owned_limbs_asc(qs)
+                })
+            }
+        }
+    }
+}
+
+impl<'a> CheckedDiv<Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value. The quotient is rounded towards negative infinity. The quotient and remainder
+    /// (which is not computed) satisfy $x = qy + r$ and $0 \leq r < y$. Returns `None` when the
+    /// second [`Natural`] is zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \left \lfloor \frac{x}{y} \right \rfloor \right ) &
+    ///         \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).checked_div(Natural::from(10u32)).to_debug_string(),
+    ///     "Some(2)"
+    /// );
+    /// assert_eq!((&Natural::ONE).checked_div(Natural::ZERO), None);
+    /// ```
+    fn checked_div(self, mut other: Natural) -> Option<Natural> {
+        match (self, &mut other) {
+            (_, &mut Natural::ZERO) => None,
+            (x, y) if x == y => Some(Natural::ONE),
+            (n, &mut Natural::ONE) => Some(n.clone()),
+            (n, &mut Natural(Small(d))) => Some(n.div_limb_ref(d)),
+            (Natural(Small(_)), _) => Some(Natural::ZERO),
+            (&Natural(Large(ref ns)), &mut Natural(Large(ref mut ds))) => {
+                let ns_len = ns.len();
+                let ds_len = ds.len();
+                Some(if ns_len < ds_len {
+                    Natural::ZERO
+                } else {
+                    let mut qs = vec![0; ns_len - ds_len + 1];
+                    limbs_div_to_out_ref_val(&mut qs, ns, ds);
+                    Natural::from_owned_limbs_asc(qs)
+                })
+            }
+        }
+    }
+}
+
+impl<'a, 'b> CheckedDiv<&'b Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The quotient is
+    /// rounded towards negative infinity. The quotient and remainder (which is not computed)
+    /// satisfy $x = qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is
+    /// zero, `Some` otherwise.
+    ///
+    /// $$
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \left \lfloor \frac{x}{y} \right \rfloor \right ) &
+    /// \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::CheckedDiv;
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).checked_div(&Natural::from(10u32)).to_debug_string(),
+    ///     "Some(2)"
+    /// );
+    /// assert_eq!((&Natural::ONE).checked_div(&Natural::ZERO), None);
+    /// ```
+    fn checked_div(self, other: &'b Natural) -> Option<Natural> {
+        match (self, other) {
+            (_, &Natural::ZERO) => None,
+            (x, y) if x == y => Some(Natural::ONE),
+            (n, &Natural::ONE) => Some(n.clone()),
+            (n, &Natural(Small(d))) => Some(n.div_limb_ref(d)),
+            (Natural(Small(_)), _) => Some(Natural::ZERO),
+            (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => Some(if ns.len() < ds.len() {
+                Natural::ZERO
+            } else {
+                Natural::from_owned_limbs_asc(limbs_div(ns, ds))
+            }),
         }
     }
 }

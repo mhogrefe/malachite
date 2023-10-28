@@ -244,7 +244,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
-                    /// See the [`ShrRound`](super::traits::ShrRound) documentation for details.
+                    /// See the [`ShrRound`] documentation for details.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -510,7 +510,7 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
                     ///
-                    /// See the [`ShrRound`](super::traits::ShrRound) documentation for details.
+                    /// See the [`ShrRound`] documentation for details.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

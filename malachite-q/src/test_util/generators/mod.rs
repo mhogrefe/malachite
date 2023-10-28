@@ -1,6 +1,7 @@
 use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
-    rational_pair_1_rm, rational_pair_nrm, rational_pair_rm, rational_rm, rational_vec_nrm,
+    rational_pair_1_rm, rational_pair_nm, rational_pair_nrm, rational_pair_rm, rational_rm,
+    rational_vec_nrm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -528,6 +529,14 @@ pub fn rational_pair_gen_rm() -> Generator<((rug::Rational, rug::Rational), (Rat
         &|| rational_pair_rm(exhaustive_rational_pair_gen()),
         &|config| rational_pair_rm(random_rational_pair_gen(config)),
         &|config| rational_pair_rm(special_random_rational_pair_gen(config)),
+    )
+}
+
+pub fn rational_pair_gen_nm() -> Generator<((BigRational, BigRational), (Rational, Rational))> {
+    Generator::new(
+        &|| rational_pair_nm(exhaustive_rational_pair_gen()),
+        &|config| rational_pair_nm(random_rational_pair_gen(config)),
+        &|config| rational_pair_nm(special_random_rational_pair_gen(config)),
     )
 }
 

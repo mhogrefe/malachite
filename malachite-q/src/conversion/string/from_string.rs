@@ -48,6 +48,9 @@ impl FromStr for Rational {
     #[inline]
     fn from_str(s: &str) -> Result<Rational, ()> {
         let (abs_string, sign) = if let Some(abs_string) = s.strip_prefix('-') {
+            if abs_string.starts_with('+') {
+                return Err(());
+            }
             (abs_string, false)
         } else {
             (s, true)

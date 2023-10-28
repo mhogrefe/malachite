@@ -221,6 +221,7 @@ union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 /// );
 /// ```
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate unions randomly.
 ///
 /// # random_union2s

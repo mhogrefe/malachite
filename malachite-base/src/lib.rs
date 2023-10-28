@@ -103,8 +103,11 @@
 )]
 
 extern crate itertools;
+#[cfg(feature = "random")]
 extern crate rand;
+#[cfg(feature = "random")]
 extern crate rand_chacha;
+#[cfg(feature = "random")]
 extern crate sha3;
 
 #[cfg(any(feature = "bin_build", feature = "test_build"))]
@@ -157,6 +160,7 @@ pub mod num;
 pub mod options;
 /// Functions for working with [`Option`]s.
 pub mod orderings;
+#[cfg(feature = "random")]
 /// Functions for generating random values.
 pub mod random;
 /// [`RationalSequence`](rational_sequences::RationalSequence), a type representing a sequence that

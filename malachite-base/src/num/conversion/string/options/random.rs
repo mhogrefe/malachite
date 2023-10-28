@@ -8,7 +8,7 @@ use crate::num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiv
 use crate::random::Seed;
 use crate::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
 
-/// Generates random [`SciSizeOptions`](super::SciSizeOptions)s.
+/// Generates random [`SciSizeOptions`]s.
 ///
 /// This struct is created by [`random_sci_size_options`]; see its documentation for more.
 pub struct RandomSciSizeOptions {
@@ -33,7 +33,7 @@ impl Iterator for RandomSciSizeOptions {
     }
 }
 
-/// Generates random [`SciSizeOptions`](super::SciSizeOptions)s.
+/// Generates random [`SciSizeOptions`]s.
 ///
 /// The scales and precisions are chosen from a geometric distribution whose mean is the
 /// ratio `m_size_numerator / m_size_denominator`.
@@ -54,7 +54,7 @@ pub fn random_sci_size_options(
     }
 }
 
-/// Generates random [`ToSciOptions`](super::ToSciOptions)s.
+/// Generates random [`ToSciOptions`]s.
 ///
 /// This struct is created by [`random_to_sci_options`]; see its documentation for more.
 pub struct RandomToSciOptions {
@@ -82,7 +82,7 @@ impl Iterator for RandomToSciOptions {
     }
 }
 
-/// Generates random [`ToSciOptions`](super::ToSciOptions)s.
+/// Generates random [`ToSciOptions`]s.
 ///
 /// The scales, precisions, and the negative of the negative exponenet threshold are chosen from a
 /// geometric distribution whose mean is the ratio `m_size_numerator / m_size_denominator`.
@@ -110,7 +110,7 @@ pub fn random_to_sci_options(
     }
 }
 
-/// Generates random [`FromSciStringOptions`](super::FromSciStringOptions)s.
+/// Generates random [`FromSciStringOptions`]s.
 ///
 /// This struct is created by [`random_from_sci_string_options`]; see its documentation for more.
 pub struct RandomFromSciStringOptions {
@@ -129,7 +129,7 @@ impl Iterator for RandomFromSciStringOptions {
     }
 }
 
-/// Generates random [`FromSciStringOptions`](super::FromSciStringOptions)s.
+/// Generates random [`FromSciStringOptions`]s.
 ///
 /// The output length is infinite.
 pub fn random_from_sci_string_options(seed: Seed) -> RandomFromSciStringOptions {

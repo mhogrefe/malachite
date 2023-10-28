@@ -264,9 +264,9 @@ macro_rules! impl_from_sci_string {
         impl FromSciString for $t {
             /// Converts a [`String`], possibly in scientfic notation, to a primitive integer.
             ///
-            /// Use [`FromSciStringOptions`](super::options::FromSciStringOptions) to specify the
-            /// base (from 2 to 36, inclusive) and the rounding mode, in case rounding is necessary
-            /// because the string represents a non-integer.
+            /// Use [`FromSciStringOptions`] to specify the base (from 2 to 36, inclusive) and the
+            /// rounding mode, in case rounding is necessary because the string represents a
+            /// non-integer.
             ///
             /// If the base is greater than 10, the higher digits are represented by the letters
             /// `'a'` through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't

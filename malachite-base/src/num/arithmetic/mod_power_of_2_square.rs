@@ -7,7 +7,7 @@ macro_rules! impl_mod_power_of_2_square {
         impl ModPowerOf2Square for $t {
             type Output = $t;
 
-            /// Squares a number modulo another number $2^k$. Assumes the input is already reduced
+            /// Squares a number modulo another number $2^k$. The input must be already reduced
             /// modulo $2^k$.
             ///
             /// $f(x, k) = y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
@@ -16,7 +16,8 @@ macro_rules! impl_mod_power_of_2_square {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_square#mod_power_of_2_square).
@@ -27,8 +28,8 @@ macro_rules! impl_mod_power_of_2_square {
         }
 
         impl ModPowerOf2SquareAssign for $t {
-            /// Squares a number modulo another number $2^k$, in place. Assumes the input is
-            /// already reduced modulo $2^k$.
+            /// Squares a number modulo another number $2^k$, in place. The input must be already
+            /// reduced modulo $2^k$.
             ///
             /// $x \gets y$, where $x, y < 2^k$ and $x^2 \equiv y \mod 2^k$.
             ///
@@ -36,7 +37,8 @@ macro_rules! impl_mod_power_of_2_square {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_square#mod_power_of_2_square_assign).

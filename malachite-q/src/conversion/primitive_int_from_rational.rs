@@ -196,8 +196,7 @@ macro_rules! impl_from_unsigned {
         }
 
         impl<'a> RoundingFrom<&'a Rational> for $u {
-            /// Converts a [`Rational`] to an unsigned integer, using a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
+            /// Converts a [`Rational`] to an unsigned integer, using a specified [`RoundingMode`].
             ///
             /// If the [`Rational`] is negative, then it will be rounded to zero when `rm` is
             /// `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.
@@ -265,8 +264,7 @@ macro_rules! impl_from_signed {
         }
 
         impl<'a> RoundingFrom<&'a Rational> for $s {
-            /// Converts a [`Rational`] to a signed integer, using a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
+            /// Converts a [`Rational`] to a signed integer, using a specified [`RoundingMode`].
             ///
             /// If the [`Rational`] is smaller than the minimum value of the unsigned type, then it
             /// will be rounded to the minimum value when `rm` is `Ceiling`, `Down`, or `Nearest`.

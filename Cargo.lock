@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "aho-corasick"
-version = "1.1.1"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea5d730647d4fadd988536d06fecce94b7b4f2a7efdae548f1cf4b63205518ab"
+checksum = "b2969dcb958b36655471fc61f7e416fa76033bdd4bfed0678d8fee1e2d07a1f0"
 dependencies = [
  "memchr",
 ]
@@ -105,9 +105,9 @@ dependencies = [
 
 [[package]]
 name = "cpufeatures"
-version = "0.2.9"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a17b76ff3a4162b0b27f354a0c87015ddad39d35f9c0c36607a3bdd175dde1f1"
+checksum = "ce420fe07aecd3e67c5f910618fe65e94158f6dcc0adf44e00d69ce2bdfe0fd0"
 dependencies = [
  "libc",
 ]
@@ -214,9 +214,12 @@ dependencies = [
 
 [[package]]
 name = "deranged"
-version = "0.3.8"
+version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2696e8a945f658fd14dc3b87242e6b80cd0f36ff04ea560fa39082368847946"
+checksum = "0f32d04922c60427da6f9fef14d042d9edddef64cb9d4ce0d64d0685fbeb1fd3"
+dependencies = [
+ "powerfmt",
+]
 
 [[package]]
 name = "digest"
@@ -365,24 +368,38 @@ checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 
 [[package]]
 name = "malachite"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
- "malachite-base",
- "malachite-float",
- "malachite-nz",
- "malachite-q",
+ "malachite-base 0.4.2",
+ "malachite-float 0.4.2",
+ "malachite-nz 0.4.2",
+ "malachite-q 0.4.2",
  "serde",
 ]
 
 [[package]]
 name = "malachite-base"
 version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "306a2a1e7e1505b379bd68ee49a9ccf63d4fb0fb74c5b74ee6200db20f9ddf23"
+dependencies = [
+ "getrandom",
+ "itertools 0.11.0",
+ "rand",
+ "rand_chacha",
+ "ryu",
+ "sha3",
+]
+
+[[package]]
+name = "malachite-base"
+version = "0.4.3"
 dependencies = [
  "clap",
  "getrandom",
  "gnuplot",
  "itertools 0.11.0",
- "malachite-base",
+ "malachite-base 0.4.3",
  "maplit",
  "rand",
  "rand_chacha",
@@ -394,11 +411,11 @@ dependencies = [
 
 [[package]]
 name = "malachite-criterion-bench"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "criterion",
- "malachite-base",
- "malachite-nz",
+ "malachite-base 0.4.3",
+ "malachite-nz 0.4.3",
  "num",
  "rug",
 ]
@@ -406,11 +423,23 @@ dependencies = [
 [[package]]
 name = "malachite-float"
 version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "909d84e4c0d3082cf7eaa3c214ca528cd26aeb8851ca1057dcc30d2ff40dfce0"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base",
- "malachite-nz",
- "malachite-q",
+ "malachite-base 0.4.2",
+ "malachite-nz 0.4.2",
+ "malachite-q 0.4.2",
+]
+
+[[package]]
+name = "malachite-float"
+version = "0.4.3"
+dependencies = [
+ "itertools 0.11.0",
+ "malachite-base 0.4.3",
+ "malachite-nz 0.4.3",
+ "malachite-q 0.4.3",
  "num",
  "rug",
  "serde",
@@ -420,11 +449,23 @@ dependencies = [
 [[package]]
 name = "malachite-nz"
 version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3812179625a8515a9af0fa632501e1cf773b67c28c4d2eec5133e9704379dbc"
 dependencies = [
  "embed-doc-image",
  "itertools 0.11.0",
- "malachite-base",
- "malachite-nz",
+ "malachite-base 0.4.2",
+ "serde",
+]
+
+[[package]]
+name = "malachite-nz"
+version = "0.4.3"
+dependencies = [
+ "embed-doc-image",
+ "itertools 0.11.0",
+ "malachite-base 0.4.3",
+ "malachite-nz 0.4.3",
  "num",
  "rug",
  "serde",
@@ -434,11 +475,23 @@ dependencies = [
 [[package]]
 name = "malachite-q"
 version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96767d8736f0a56024bbd7dfa73c6dae0836b6ee6ce6c6155f0be7eb12fcdf6d"
 dependencies = [
  "itertools 0.11.0",
- "malachite-base",
- "malachite-nz",
- "malachite-q",
+ "malachite-base 0.4.2",
+ "malachite-nz 0.4.2",
+ "serde",
+]
+
+[[package]]
+name = "malachite-q"
+version = "0.4.3"
+dependencies = [
+ "itertools 0.11.0",
+ "malachite-base 0.4.3",
+ "malachite-nz 0.4.3",
+ "malachite-q 0.4.3",
  "num",
  "rug",
  "serde",
@@ -586,6 +639,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "powerfmt"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "439ee305def115ba05938db6eb1644ff94165c5ab5e9420d1c1bcedbba909391"
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -593,9 +652,9 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b1106fec09662ec6dd98ccac0f81cef56984d0b49f75c92d8cbad76e20c005c"
+checksum = "134c189feb4956b20f6f547d2cf727d4c0fe06722b20a0eec87ed445a97f92da"
 dependencies = [
  "unicode-ident",
 ]
@@ -661,9 +720,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.9.6"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebee201405406dbf528b8b672104ae6d6d63e6d118cb10e4d51abbc7b58044ff"
+checksum = "380b951a9c5e80ddfd6136919eef32310721aa4aacd4889a8d39124b026ab343"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -673,9 +732,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.3.9"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59b23e92ee4318893fa3fe3e6fb365258efbfe6ac6ab30f090cdcbb7aa37efa9"
+checksum = "5f804c7828047e88b2d32e2d7fe5a105da8ee3264f01902f796c8e067dc2483f"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -684,9 +743,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.7.5"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbb5fb1acd8a1a18b3dd5be62d25485eb770e05afb408a9627d14d451bae12da"
+checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
 name = "rug"
@@ -723,9 +782,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "serde"
-version = "1.0.188"
+version = "1.0.190"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf9e0fcba69a370eed61bcf2b728575f726b50b55cba78064753d708ddc7549e"
+checksum = "91d3c334ca1ee894a2c6f6ad698fe8c435b76d504b13d436f0685d648d6d96f7"
 dependencies = [
  "serde_derive",
 ]
@@ -742,9 +801,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.188"
+version = "1.0.190"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4eca7ac642d82aa35b60049a6eccb4be6be75e599bd2e9adb5f875a737654af2"
+checksum = "67c5609f394e5c2bd7fc51efda478004ea80ef42fee983d5c67a65e34f32c0e3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -811,11 +870,12 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.29"
+version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "426f806f4089c493dcac0d24c29c01e2c38baf8e30f1b716ee37e83d200b18fe"
+checksum = "c4a34ab300f2dee6e562c10a046fc05e358b29f9bf92277f30c3c8d82275f6f5"
 dependencies = [
  "deranged",
+ "powerfmt",
  "serde",
  "time-core",
 ]

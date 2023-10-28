@@ -90,7 +90,9 @@ impl<'a> Div<&'a Rational> for Rational {
     /// ```
     #[inline]
     fn div(self, other: &'a Rational) -> Rational {
-        if self == 0u32 {
+        if *other == 0u32 {
+            panic!("division by zero");
+        } else if self == 0u32 {
             Rational::ZERO
         } else {
             (other / self).reciprocal()
@@ -204,11 +206,14 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
 impl CheckedDiv<Rational> for Rational {
     type Output = Rational;
 
-    /// Divides a [`Rational`] by another [`Rational`], taking both by value.
-    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    /// Divides a [`Rational`] by another [`Rational`], taking both by value. Returns `None` when
+    /// the second [`Rational`] is zero, `Some` otherwise.
     ///
     /// $$
-    /// f(x, y) = \frac{x}{y}.
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \frac{x}{y} \right ) & \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
     /// $$
     ///
     /// # Worst-case complexity
@@ -257,11 +262,13 @@ impl<'a> CheckedDiv<&'a Rational> for Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by value and the second by
-    /// reference.
-    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    /// reference. Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
     ///
     /// $$
-    /// f(x, y) = \frac{x}{y}.
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \frac{x}{y} \right ) & \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
     /// $$
     ///
     /// # Worst-case complexity
@@ -302,11 +309,13 @@ impl<'a> CheckedDiv<Rational> for &'a Rational {
     type Output = Rational;
 
     /// Divides a [`Rational`] by another [`Rational`], taking the first by reference and the second
-    /// by value.
-    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    /// by value. Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
     ///
     /// $$
-    /// f(x, y) = \frac{x}{y}.
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \frac{x}{y} \right ) & \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
     /// $$
     ///
     /// # Worst-case complexity
@@ -354,11 +363,14 @@ impl<'a> CheckedDiv<Rational> for &'a Rational {
 impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
     type Output = Rational;
 
-    /// Divides a [`Rational`] by another [`Rational`], taking both by reference.
-    /// Returns `None` when the second [`Rational`] is zero, `Some` otherwise.
+    /// Divides a [`Rational`] by another [`Rational`], taking both by reference. Returns `None`
+    /// when the second [`Rational`] is zero, `Some` otherwise.
     ///
     /// $$
-    /// f(x, y) = \frac{x}{y}.
+    /// f(x, y) = \begin{cases}
+    ///     \operatorname{Some}\left ( \frac{x}{y} \right ) & \text{if} \\quad y \neq 0 \\\\
+    ///     \text{None} & \text{otherwise}
+    /// \end{cases}
     /// $$
     ///
     /// # Worst-case complexity

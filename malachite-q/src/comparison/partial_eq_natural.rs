@@ -2,8 +2,7 @@ use crate::Rational;
 use malachite_nz::natural::Natural;
 
 impl PartialEq<Natural> for Rational {
-    /// Determines whether a [`Rational`] is equal to a
-    /// [`Natural`](malachite_nz::natural::Natural).
+    /// Determines whether a [`Rational`] is equal to a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -27,8 +26,7 @@ impl PartialEq<Natural> for Rational {
 }
 
 impl PartialEq<Rational> for Natural {
-    /// Determines whether a [`Natural`](malachite_nz::natural::Natural) is equal to a
-    /// [`Rational`].
+    /// Determines whether a [`Natural`] is equal to a [`Rational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

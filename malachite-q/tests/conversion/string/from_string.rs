@@ -37,6 +37,14 @@ fn test_from_str() {
     test_err("-", true);
     test_err("1/0", true);
     test_err("/1", true);
+    test_err("--0", true);
+    test_err("-+0", true);
+    test_err("+-0", true);
+    test_err("++0", true);
+    test_err("--1", true);
+    test_err("-+1", true);
+    test_err("+-1", true);
+    test_err("++1", true);
 }
 
 #[allow(unused_must_use)]

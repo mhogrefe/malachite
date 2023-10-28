@@ -8,6 +8,7 @@ use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_12, unsigned_pair_gen_var_17, unsigned_pair_gen_var_23,
     unsigned_signed_unsigned_triple_gen_var_1, unsigned_triple_gen_var_17,
 };
+use std::panic::catch_unwind;
 
 #[test]
 fn test_mod_power_of_2_shl() {
@@ -33,6 +34,38 @@ fn test_mod_power_of_2_shl() {
     test::<u8, i64>(10, -2, 4, 2);
     test::<u8, i64>(10, -100, 4, 0);
     test::<u128, i8>(10, -100, 4, 0);
+}
+
+fn mod_power_of_2_shl_fail_helper<
+    T: PrimitiveUnsigned + ModPowerOf2Shl<U, Output = T>,
+    U: PrimitiveInt,
+>() {
+    assert_panic!(T::ONE.mod_power_of_2_shl(U::TWO, 0));
+    assert_panic!(T::from(200u8).mod_power_of_2_shl(U::TWO, 7));
+}
+
+#[test]
+fn mod_power_of_2_shl_fail() {
+    apply_fn_to_unsigneds_and_primitive_ints!(mod_power_of_2_shl_fail_helper);
+}
+
+fn mod_power_of_2_shl_assign_fail_helper<
+    T: PrimitiveUnsigned + ModPowerOf2ShlAssign<U>,
+    U: PrimitiveInt,
+>() {
+    assert_panic!({
+        let mut x = T::ONE;
+        x.mod_power_of_2_shl_assign(U::TWO, 0)
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_power_of_2_shl_assign(U::TWO, 7)
+    });
+}
+
+#[test]
+fn mod_power_of_2_shl_assign_fail() {
+    apply_fn_to_unsigneds_and_primitive_ints!(mod_power_of_2_shl_assign_fail_helper);
 }
 
 fn mod_power_of_2_shl_properties_unsigned_unsigned_helper<

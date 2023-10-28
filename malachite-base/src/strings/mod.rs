@@ -240,5 +240,6 @@ pub const fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(
 
 /// Iterators that generate [`String`]s without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`String`]s randomly.
 pub mod random;

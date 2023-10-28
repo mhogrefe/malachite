@@ -191,6 +191,7 @@ pub mod cmp;
 pub mod conversion;
 /// Functions for generating all [`RationalSequence`]s over a set of elements.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Functions for generating random [`RationalSequence`]s from a set of elements.
 pub mod random;
 /// Functions for displaying a [`RationalSequence`].

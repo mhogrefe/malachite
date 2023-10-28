@@ -6,6 +6,8 @@ pub type SignedHalfLimb = i16;
 pub type SignedDoubleLimb = i64;
 pub type FloatWithLimbWidth = f32;
 
+pub const MAX_DIGITS_PER_LIMB: usize = 10;
+
 //TODO tune
 pub const AORSMUL_FASTER_2AORSLSH: bool = true;
 //TODO tune

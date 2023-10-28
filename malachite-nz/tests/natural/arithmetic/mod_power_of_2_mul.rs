@@ -16,6 +16,7 @@ use malachite_nz::test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -149,6 +150,39 @@ fn test_mod_power_of_2_mul() {
 }
 
 #[test]
+fn mod_power_of_2_mul_fail() {
+    assert_panic!(Natural::ZERO.mod_power_of_2_mul(Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_mul(Natural::ZERO, 0));
+
+    assert_panic!(Natural::ZERO.mod_power_of_2_mul(&Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_mul(&Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_mul(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_mul(Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_mul(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_mul(Natural::ZERO, 0));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_mul_assign(Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_mul_assign(Natural::ZERO, 0)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_mul_assign(&Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_mul_assign(&Natural::ZERO, 0)
+    });
+}
+
+#[test]
 fn limbs_mod_power_of_2_mul_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
@@ -227,8 +261,10 @@ fn mod_power_of_2_mul_properties() {
     natural_unsigned_pair_gen_var_11().test_properties(|(ref x, pow)| {
         assert_eq!(x.mod_power_of_2_mul(Natural::ZERO, pow), 0);
         assert_eq!(Natural::ZERO.mod_power_of_2_mul(x, pow), 0);
-        assert_eq!(x.mod_power_of_2_mul(Natural::ONE, pow), *x);
-        assert_eq!(Natural::ONE.mod_power_of_2_mul(x, pow), *x);
+        if pow != 0 {
+            assert_eq!(x.mod_power_of_2_mul(Natural::ONE, pow), *x);
+            assert_eq!(Natural::ONE.mod_power_of_2_mul(x, pow), *x);
+        }
         assert_eq!(x.mod_power_of_2_mul(x, pow), x.mod_power_of_2_square(pow))
     });
 

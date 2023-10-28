@@ -18,6 +18,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::natural::arithmetic::mod_pow::simple_binary_mod_pow;
 use num::BigUint;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 fn verify_limbs_mod_pow(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
@@ -402,6 +403,69 @@ fn test_mod_pow() {
         "12345678987654321",
         "10973935643347062",
     );
+}
+
+#[test]
+fn mod_pow_fail() {
+    assert_panic!(Natural::ZERO.mod_pow(Natural::from(3u32), Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_pow(Natural::from(3u32), Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_pow(Natural::from(3u32), &Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_pow(Natural::from(3u32), &Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_pow(&Natural::from(3u32), Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_pow(&Natural::from(3u32), Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_pow(&Natural::from(3u32), &Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_pow(&Natural::from(3u32), &Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_pow(Natural::from(3u32), Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_pow(Natural::from(3u32), Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_pow(Natural::from(3u32), &Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_pow(Natural::from(3u32), &Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_pow(&Natural::from(3u32), Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_pow(&Natural::from(3u32), Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_pow(&Natural::from(3u32), &Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_pow(&Natural::from(3u32), &Natural::ONE));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_pow_assign(Natural::from(3u32), Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_pow_assign(Natural::from(3u32), &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_pow_assign(&Natural::from(3u32), Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_pow_assign(&Natural::from(3u32), &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_pow_assign(Natural::from(3u32), Natural::ONE)
+    });
 }
 
 #[test]

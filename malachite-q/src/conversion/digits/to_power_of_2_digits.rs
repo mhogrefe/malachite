@@ -35,9 +35,8 @@ impl Rational {
     /// Returns the base-$2^k$ digits of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a
-    /// [`RationalSequence`](malachite_base::rational_sequences::RationalSequence) of the digits of
-    /// the fractional portion.
+    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of
+    /// the digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(2^k-1)$s.
@@ -88,9 +87,8 @@ impl Rational {
     /// Returns the base-$2^k$ digits of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a
-    /// [`RationalSequence`](malachite_base::rational_sequences::RationalSequence) of the digits of
-    /// the fractional portion.
+    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of
+    /// the digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(2^k-1)$s.

@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
 // Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
@@ -208,8 +209,8 @@ impl Natural {
 impl ModPowerOf2Mul<Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. Both [`Natural`]s are taken by value.
+    /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
@@ -219,6 +220,9 @@ impl ModPowerOf2Mul<Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -238,8 +242,8 @@ impl ModPowerOf2Mul<Natural> for Natural {
 impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. The first [`Natural`] is taken by value and the second by reference.
+    /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by value and the second by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
@@ -249,6 +253,9 @@ impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -268,8 +275,8 @@ impl<'a> ModPowerOf2Mul<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. The first [`Natural`] is taken by reference and the second by value.
+    /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by reference and the second by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
@@ -279,6 +286,9 @@ impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -298,8 +308,8 @@ impl<'a> ModPowerOf2Mul<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Multiplies two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. Both [`Natural`]s are taken by reference.
+    /// Multiplies two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
     ///
@@ -310,6 +320,9 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
@@ -319,6 +332,14 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
     /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_mul(&Natural::from(14u32), 4), 12);
     /// ```
     fn mod_power_of_2_mul(self, other: &'b Natural, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (self, other) {
             (x, &Natural(Small(y))) => x.mod_power_of_2_mul_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_2_mul_limb_ref(x, pow),
@@ -330,7 +351,7 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
 }
 
 impl ModPowerOf2MulAssign<Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced
+    /// Multiplies two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced
     /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
@@ -341,6 +362,9 @@ impl ModPowerOf2MulAssign<Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -356,6 +380,14 @@ impl ModPowerOf2MulAssign<Natural> for Natural {
     /// assert_eq!(x, 12);
     /// ```
     fn mod_power_of_2_mul_assign(&mut self, mut other: Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, &mut other) {
             (x, &mut Natural(Small(y))) => x.mod_power_of_2_mul_limb_assign(y, pow),
             (&mut Natural(Small(x)), y) => {
@@ -371,7 +403,7 @@ impl ModPowerOf2MulAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2MulAssign<&'a Natural> for Natural {
-    /// Multiplies two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced
+    /// Multiplies two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced
     /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
@@ -382,6 +414,9 @@ impl<'a> ModPowerOf2MulAssign<&'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -397,6 +432,14 @@ impl<'a> ModPowerOf2MulAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 12);
     /// ```
     fn mod_power_of_2_mul_assign(&mut self, other: &'a Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, other) {
             (x, &Natural(Small(y))) => x.mod_power_of_2_mul_limb_assign(y, pow),
             (&mut Natural(Small(x)), y) => {

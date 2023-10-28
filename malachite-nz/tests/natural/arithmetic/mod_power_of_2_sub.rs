@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2SubAssign, ModSub, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
@@ -21,6 +21,7 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -230,6 +231,39 @@ fn test_mod_power_of_2_sub() {
         165,
         "46762343404498631680132551366007801946215309901791",
     )
+}
+
+#[test]
+fn mod_power_of_2_sub_fail() {
+    assert_panic!(Natural::ZERO.mod_power_of_2_sub(Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_sub(Natural::ZERO, 0));
+
+    assert_panic!(Natural::ZERO.mod_power_of_2_sub(&Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_sub(&Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_sub(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_sub(Natural::ZERO, 0));
+
+    assert_panic!((&Natural::ZERO).mod_power_of_2_sub(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_sub(Natural::ZERO, 0));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_sub_assign(Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_sub_assign(Natural::ZERO, 0)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_power_of_2_sub_assign(&Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_sub_assign(&Natural::ZERO, 0)
+    });
 }
 
 #[test]

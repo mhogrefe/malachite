@@ -80,6 +80,7 @@ pub mod exhaustive;
 pub mod from_str;
 /// Functions for negating a [`RoundingMode`].
 pub mod neg;
+#[cfg(feature = "random")]
 /// Iterators that generate [`RoundingMode`]s randomly.
 pub mod random;
 /// Functions for displaying a [`RoundingMode`].

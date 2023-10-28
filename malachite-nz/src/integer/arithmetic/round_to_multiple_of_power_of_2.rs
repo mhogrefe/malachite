@@ -216,7 +216,7 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
     /// equal to, or greater than the original value.
     ///
-    /// See the [`RoundToMultipleOfPowerOf2`](RoundToMultipleOfPowerOf2) documentation for details.
+    /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
     /// The following two expressions are equivalent:
     /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`

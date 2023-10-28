@@ -128,7 +128,7 @@ macro_rules! impl_shl_round {
                     /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
                     /// necessary if `bits` is negative.
                     ///
-                    /// See the [`ShlRound`](super::traits::ShlRound) documentation for details.
+                    /// See the [`ShlRound`] documentation for details.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

@@ -1,6 +1,6 @@
 [package]
 name = "malachite-float"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -22,9 +22,9 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = "0.11.0"
-malachite-base = { version = "0.4.2" }
-malachite-nz = { version = "0.4.2", features = ["float_helpers"] }
-malachite-q = { version = "0.4.2" }
+malachite-base = { version = "0.4.3" }
+malachite-nz = { version = "0.4.3", features = ["float_helpers"] }
+malachite-q = { version = "0.4.3" }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 serde_json = { version = "1.0.105", optional = true }
@@ -33,8 +33,9 @@ rug = { version = "1.21.0", default-features = false, optional = true, features 
 
 [features]
 enable_serde = ["serde", "malachite-nz/enable_serde"]
+random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs"]
-test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "serde", "serde_json", "num", "rug"]
+test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "random", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
 
 [package.metadata.docs.rs]

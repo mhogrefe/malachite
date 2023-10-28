@@ -13,7 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 
 // Raise an n-limb number to a power and return the lowest n limbs of the result.
@@ -114,8 +114,8 @@ pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
 impl ModPowerOf2Pow<Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
-    /// reduced mod $2^k$. Both [`Natural`]s are taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
+    /// modulo $2^k$. Both [`Natural`]s are taken by value.
     ///
     /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -126,6 +126,9 @@ impl ModPowerOf2Pow<Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -148,8 +151,8 @@ impl ModPowerOf2Pow<Natural> for Natural {
 impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
-    /// reduced mod $2^k$. The first [`Natural`] is taken by value and the second by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
+    /// modulo $2^k$. The first [`Natural`] is taken by value and the second by reference.
     ///
     /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -160,6 +163,9 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -182,8 +188,8 @@ impl<'a> ModPowerOf2Pow<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
-    /// reduced mod $2^k$. The first [`Natural`] is taken by reference and the second by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
+    /// modulo $2^k$. The first [`Natural`] is taken by reference and the second by value.
     ///
     /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -194,6 +200,9 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -215,8 +224,8 @@ impl<'a> ModPowerOf2Pow<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. Assumes the input is already
-    /// reduced mod $2^k$. Both [`Natural`]s are taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$. The base must be already reduced
+    /// modulo $2^k$. Both [`Natural`]s are taken by reference.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(mn \log n \log\log n)$
@@ -225,6 +234,9 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -239,6 +251,10 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_pow(self, exp: &Natural, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match (self, exp) {
             _ if pow == 0 => Natural::ZERO,
             (_, &Natural::ZERO) => Natural::ONE,
@@ -263,8 +279,8 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
 }
 
 impl ModPowerOf2PowAssign<Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. Assumes the input is
-    /// already reduced mod $2^k$. The [`Natural`] on the right-hand side is taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be
+    /// already reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -275,6 +291,9 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -296,8 +315,8 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. Assumes the input is
-    /// already reduced mod $2^k$. The [`Natural`] on the right-hand side is taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be
+    /// already reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -308,6 +327,9 @@ impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `pow`, and $m$ is
     /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -323,6 +345,10 @@ impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 289109473);
     /// ```
     fn mod_power_of_2_pow_assign(&mut self, exp: &Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match (&mut *self, exp) {
             _ if pow == 0 => *self = Natural::ZERO,
             (_, &Natural::ZERO) => *self = Natural::ONE,

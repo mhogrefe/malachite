@@ -3,6 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_1, unsigned_pair_gen_var_16, unsigned_triple_gen_var_12,
 };
+use std::panic::catch_unwind;
 
 fn mod_square_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, m, out| {
@@ -33,6 +34,32 @@ fn mod_square_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_square() {
     apply_fn_to_unsigneds!(mod_square_helper);
+}
+
+fn mod_square_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_square(T::ZERO));
+    assert_panic!(T::from(123u8).mod_square(T::from(123u8)));
+}
+
+#[test]
+fn mod_square_fail() {
+    apply_fn_to_unsigneds!(mod_square_fail_helper);
+}
+
+fn mod_square_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_square_assign(T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_square_assign(T::from(123u8))
+    });
+}
+
+#[test]
+fn mod_square_assign_fail() {
+    apply_fn_to_unsigneds!(mod_square_assign_fail_helper);
 }
 
 fn mod_square_properties_helper<T: PrimitiveUnsigned>() {

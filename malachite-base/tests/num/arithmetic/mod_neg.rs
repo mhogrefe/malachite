@@ -2,6 +2,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_16,
 };
+use std::panic::catch_unwind;
 
 fn mod_neg_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, m, out| {
@@ -22,6 +23,32 @@ fn mod_neg_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_neg() {
     apply_fn_to_unsigneds!(mod_neg_helper);
+}
+
+fn mod_neg_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_neg(T::ZERO));
+    assert_panic!(T::from(123u8).mod_neg(T::from(123u8)));
+}
+
+#[test]
+fn mod_neg_fail() {
+    apply_fn_to_unsigneds!(mod_neg_fail_helper);
+}
+
+fn mod_neg_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_neg_assign(T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_neg_assign(T::from(123u8))
+    });
+}
+
+#[test]
+fn mod_neg_assign_fail() {
+    apply_fn_to_unsigneds!(mod_neg_assign_fail_helper);
 }
 
 fn mod_neg_properties_helper<T: PrimitiveUnsigned>() {

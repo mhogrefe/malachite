@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -264,8 +265,8 @@ impl Natural {
 impl ModPowerOf2Add<Natural> for Natural {
     type Output = Natural;
 
-    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
-    /// Both [`Natural`]s are taken by value.
+    /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. Both
+    /// [`Natural`]s are taken by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
@@ -276,6 +277,9 @@ impl ModPowerOf2Add<Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -295,8 +299,8 @@ impl ModPowerOf2Add<Natural> for Natural {
 impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
-    /// The first [`Natural`] is taken by value and the second by reference.
+    /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. The
+    /// first [`Natural`] is taken by value and the second by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
@@ -306,6 +310,9 @@ impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -326,8 +333,8 @@ impl<'a> ModPowerOf2Add<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
-    /// The first [`Natural`] is taken by reference and the second by value.
+    /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. The
+    /// first [`Natural`] is taken by reference and the second by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
@@ -337,6 +344,9 @@ impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -357,8 +367,8 @@ impl<'a> ModPowerOf2Add<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Adds two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
-    /// Both [`Natural`]s are taken by reference.
+    /// Adds two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$. Both
+    /// [`Natural`]s are taken by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
     ///
@@ -370,6 +380,9 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
@@ -380,6 +393,14 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     /// assert_eq!((&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4), 8);
     /// ```
     fn mod_power_of_2_add(self, other: &'a Natural, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (self, other) {
             (x, y) if std::ptr::eq(x, y) => self.mod_power_of_2_shl(1, pow),
             (x, &Natural(Small(y))) => x.mod_power_of_2_add_limb_ref(y, pow),
@@ -392,7 +413,7 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
 }
 
 impl ModPowerOf2AddAssign<Natural> for Natural {
-    /// Adds two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced modulo
+    /// Adds two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
@@ -404,6 +425,9 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -420,6 +444,14 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     /// assert_eq!(x, 8);
     /// ```
     fn mod_power_of_2_add_assign(&mut self, mut other: Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, &mut other) {
             (x, &mut Natural(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_add_limb_ref(x, pow),
@@ -436,7 +468,7 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
-    /// Adds two [`Natural`]s modulo $2^k$, in place. Assumes the inputs are already reduced modulo
+    /// Adds two [`Natural`]s modulo $2^k$, in place. The inputs must be already reduced modulo
     /// $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x + y \equiv z \mod 2^k$.
@@ -447,6 +479,9 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -463,6 +498,14 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 8);
     /// ```
     fn mod_power_of_2_add_assign(&mut self, other: &'a Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, other) {
             (x, y) if std::ptr::eq(x, y) => {
                 self.mod_power_of_2_shl_assign(pow, 1);

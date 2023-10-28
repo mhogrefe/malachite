@@ -37,6 +37,22 @@ pub(crate) fn limbs_neg_in_place(xs: &mut [Limb]) -> bool {
     true
 }
 
+// This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1, where rp != up.
+pub(crate) fn limbs_neg_to_out(out: &mut [Limb], xs: &[Limb]) -> bool {
+    let n = xs.len();
+    let zeros = slice_leading_zeros(xs);
+    if zeros == n {
+        return false;
+    }
+    slice_set_zero(&mut out[..zeros]);
+    out[zeros] = xs[zeros].wrapping_neg();
+    let offset = zeros + 1;
+    if offset != n {
+        limbs_not_to_out(&mut out[offset..], &xs[offset..]);
+    }
+    true
+}
+
 impl Neg for Natural {
     type Output = Integer;
 

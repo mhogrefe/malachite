@@ -18,6 +18,7 @@ fn mod_inverse_helper<
 
     test(U::ONE, U::exact_from(5), Some(U::ONE));
     test(U::exact_from(7), U::exact_from(10), Some(U::exact_from(3)));
+    test(U::exact_from(6), U::exact_from(10), None);
     test(
         U::exact_from(100),
         U::exact_from(101),
@@ -33,7 +34,9 @@ fn test_mod_inverse() {
 }
 
 fn mod_inverse_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ZERO.mod_inverse(T::ZERO));
     assert_panic!(T::ZERO.mod_inverse(T::from(10u8)));
+    assert_panic!(T::from(123u8).mod_inverse(T::from(123u8)));
 }
 
 #[test]

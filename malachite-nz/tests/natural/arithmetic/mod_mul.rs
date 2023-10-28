@@ -19,6 +19,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs_naive, limbs_precompute_mod_mul_two_limbs_alt,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -185,6 +186,93 @@ fn limbs_mod_mul_two_limbs_properties() {
 }
 
 #[test]
+fn mod_mul_fail() {
+    assert_panic!(Natural::ZERO.mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_mul(Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_mul(Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_mul(Natural::ZERO, &Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_mul(Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_mul(Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_mul(&Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_mul(&Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!(Natural::ZERO.mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!(Natural::from(30u8).mod_mul(&Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!(Natural::from(3u8).mod_mul(&Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_mul(Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_mul(Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_mul(Natural::ZERO, &Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_mul(Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_mul(Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_mul(&Natural::from(3u8), Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_mul(&Natural::from(30u8), Natural::from(30u8)));
+
+    assert_panic!((&Natural::ZERO).mod_mul(Natural::ZERO, Natural::ZERO));
+    assert_panic!((&Natural::from(30u8)).mod_mul(&Natural::from(3u8), &Natural::from(30u8)));
+    assert_panic!((&Natural::from(3u8)).mod_mul(&Natural::from(30u8), &Natural::from(30u8)));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_mul_assign(Natural::ZERO, Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_mul_assign(Natural::from(3u8), Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_mul_assign(Natural::from(30u8), Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_mul_assign(Natural::ZERO, &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_mul_assign(Natural::from(3u8), &Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_mul_assign(Natural::from(30u8), &Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_mul_assign(Natural::ZERO, Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_mul_assign(&Natural::from(3u8), Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_mul_assign(&Natural::from(30u8), Natural::from(30u8))
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_mul_assign(Natural::ZERO, &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u8);
+        x.mod_mul_assign(&Natural::from(3u8), &Natural::from(30u8))
+    });
+    assert_panic!({
+        let mut x = Natural::from(3u8);
+        x.mod_mul_assign(&Natural::from(30u8), &Natural::from(30u8))
+    });
+}
+
+#[test]
 fn mod_mul_properties() {
     natural_triple_gen_var_3().test_properties(|(x, y, m)| {
         assert!(x.mod_is_reduced(&m));
@@ -284,8 +372,10 @@ fn mod_mul_properties() {
     natural_pair_gen_var_8().test_properties(|(x, m)| {
         assert_eq!((&x).mod_mul(Natural::ZERO, &m), 0);
         assert_eq!(Natural::ZERO.mod_mul(&x, &m), 0);
-        assert_eq!((&x).mod_mul(Natural::ONE, &m), x);
-        assert_eq!(Natural::ONE.mod_mul(&x, &m), x);
+        if m > 1 {
+            assert_eq!((&x).mod_mul(Natural::ONE, &m), x);
+            assert_eq!(Natural::ONE.mod_mul(&x, &m), x);
+        }
         assert_eq!((&x).mod_mul(&x, &m), x.mod_square(m));
     });
 

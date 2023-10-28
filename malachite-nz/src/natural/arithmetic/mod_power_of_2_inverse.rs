@@ -50,8 +50,8 @@ fn mod_power_of_2_inverse_helper(xs: &[Limb], pow: u64) -> Option<Natural> {
 impl ModPowerOf2Inverse for Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. Assumes the [`Natural`]
-    /// is already reduced modulo $2^k$. The [`Natural`] is taken by value.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be
+    /// already reduced modulo $2^k$. The [`Natural`] is taken by value.
     ///
     /// Returns `None` if $x$ is even.
     ///
@@ -64,6 +64,9 @@ impl ModPowerOf2Inverse for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to $2^k$.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
@@ -74,7 +77,10 @@ impl ModPowerOf2Inverse for Natural {
     /// ```
     fn mod_power_of_2_inverse(self, pow: u64) -> Option<Natural> {
         assert_ne!(self, 0u32);
-        assert!(self.significant_bits() <= pow);
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match (self, pow) {
             (Natural::ONE, _) => Some(Natural::ONE),
             (x, _) if x.even() => None,
@@ -101,8 +107,8 @@ impl ModPowerOf2Inverse for Natural {
 impl<'a> ModPowerOf2Inverse for &'a Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. Assumes the [`Natural`]
-    /// is already reduced modulo $2^k$. The [`Natural`] is taken by reference.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be
+    /// already reduced modulo $2^k$. The [`Natural`] is taken by reference.
     ///
     /// Returns `None` if $x$ is even.
     ///
@@ -115,6 +121,9 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
     ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to $2^k$.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Inverse;
@@ -125,7 +134,10 @@ impl<'a> ModPowerOf2Inverse for &'a Natural {
     /// ```
     fn mod_power_of_2_inverse(self, pow: u64) -> Option<Natural> {
         assert_ne!(*self, 0u32);
-        assert!(self.significant_bits() <= pow);
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
         match (self, pow) {
             (&Natural::ONE, _) => Some(Natural::ONE),
             (x, _) if x.even() => None,

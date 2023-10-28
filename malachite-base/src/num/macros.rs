@@ -182,6 +182,15 @@ macro_rules! apply_fn_to_unsigneds_and_signeds {
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! apply_fn_to_unsigneds_and_primitive_ints {
+    ($f: ident) => {
+        apply_fn_to_unsigneds_and_unsigneds!($f);
+        apply_fn_to_unsigneds_and_signeds!($f);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! apply_fn_to_unsigneds_and_unsigned_signed_pairs {
     ($f: ident) => {
         $f::<u8, u8, i8>();

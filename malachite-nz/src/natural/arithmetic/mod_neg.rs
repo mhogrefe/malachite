@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Zero;
 impl ModNeg<Natural> for Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by value.
     ///
     /// $f(x, m) = y$, where $x, y < m$ and $-x \equiv y \mod m$.
@@ -16,6 +16,9 @@ impl ModNeg<Natural> for Natural {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -37,7 +40,7 @@ impl ModNeg<Natural> for Natural {
 impl<'a> ModNeg<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
     ///
     /// # Worst-case complexity
@@ -46,6 +49,9 @@ impl<'a> ModNeg<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -67,7 +73,7 @@ impl<'a> ModNeg<&'a Natural> for Natural {
 impl<'a> ModNeg<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by reference and the second by value.
     ///
     /// # Worst-case complexity
@@ -76,6 +82,9 @@ impl<'a> ModNeg<Natural> for &'a Natural {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -88,6 +97,7 @@ impl<'a> ModNeg<Natural> for &'a Natural {
     /// assert_eq!((&Natural::from(7u32)).mod_neg(Natural::from(10u32).pow(12)), 999999999993u64);
     /// ```
     fn mod_neg(self, m: Natural) -> Natural {
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         if *self == 0 {
             Natural::ZERO
         } else {
@@ -99,7 +109,7 @@ impl<'a> ModNeg<Natural> for &'a Natural {
 impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by reference.
     ///
     /// # Worst-case complexity
@@ -108,6 +118,9 @@ impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -123,6 +136,7 @@ impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn mod_neg(self, m: &'b Natural) -> Natural {
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         if *self == 0 {
             Natural::ZERO
         } else {
@@ -132,7 +146,7 @@ impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
 }
 
 impl ModNegAssign<Natural> for Natural {
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.
@@ -143,6 +157,9 @@ impl ModNegAssign<Natural> for Natural {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -169,7 +186,7 @@ impl ModNegAssign<Natural> for Natural {
 }
 
 impl<'a> ModNegAssign<&'a Natural> for Natural {
-    /// Negates a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Negates a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.
@@ -180,6 +197,9 @@ impl<'a> ModNegAssign<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -200,6 +220,7 @@ impl<'a> ModNegAssign<&'a Natural> for Natural {
     /// assert_eq!(n, 999999999993u64);
     /// ```
     fn mod_neg_assign(&mut self, m: &'a Natural) {
+        assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         if *self != 0 {
             assert!(!self.sub_right_assign_no_panic(m));
         }

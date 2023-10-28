@@ -84,8 +84,7 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///
-            /// See the [`RoundToMultipleOfPowerOf2`](super::traits::RoundToMultipleOfPowerOf2)
-            /// documentation for details.
+            /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
             ///
             /// The following two expressions are equivalent:
             /// - `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`

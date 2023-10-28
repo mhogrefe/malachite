@@ -23,6 +23,18 @@ pub trait UnsignedAbs {
     fn unsigned_abs(self) -> Self::Output;
 }
 
+/// Subtracts two numbers and takes the absolute value of the difference.
+pub trait AbsDiff<RHS = Self> {
+    type Output;
+
+    fn abs_diff(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a number with the absolute value of its difference with another number.
+pub trait AbsDiffAssign<RHS = Self> {
+    fn abs_diff_assign(&mut self, other: RHS);
+}
+
 /// Adds a number and the product of two other numbers.
 pub trait AddMul<Y = Self, Z = Self> {
     type Output;
@@ -480,20 +492,20 @@ pub trait CeilingLogBasePowerOf2<POW> {
     fn ceiling_log_base_power_of_2(self, pow: POW) -> Self::Output;
 }
 
-/// Adds two numbers modulo a third number $m$. Assumes the inputs are already reduced modulo $m$.
+/// Adds two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 pub trait ModAdd<RHS = Self, M = Self> {
     type Output;
 
     fn mod_add(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Adds two numbers modulo a third number $m$, in place. Assumes the inputs are already reduced
-/// modulo $m$.
+/// Adds two numbers modulo a third number $m$, in place. The inputs must be already reduced modulo
+/// $m$.
 pub trait ModAddAssign<RHS = Self, M = Self> {
     fn mod_add_assign(&mut self, other: RHS, m: M);
 }
 
-/// Finds the multiplicative inverse of a number modulo another number $m$. Assumes the input is
+/// Finds the multiplicative inverse of a number modulo another number $m$. The input must be
 /// already reduced modulo $m$.
 pub trait ModInverse<M = Self> {
     type Output;
@@ -506,7 +518,7 @@ pub trait ModIsReduced<M = Self> {
     fn mod_is_reduced(&self, m: &M) -> bool;
 }
 
-/// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already reduced mod
+/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
 /// $m$.
 pub trait ModMul<RHS = Self, M = Self> {
     type Output;
@@ -514,13 +526,13 @@ pub trait ModMul<RHS = Self, M = Self> {
     fn mod_mul(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Multiplies two numbers modulo a third number $m$, in place. Assumes the inputs are already
-/// reduced modulo $m$.
+/// Multiplies two numbers modulo a third number $m$, in place. The inputs must be already reduced
+/// modulo $m$.
 pub trait ModMulAssign<RHS = Self, M = Self> {
     fn mod_mul_assign(&mut self, other: RHS, m: M);
 }
 
-/// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already reduced mod
+/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
 /// $m$.
 ///
 /// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
@@ -536,8 +548,8 @@ pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     fn mod_mul_precomputed(self, other: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Multiplies two numbers modulo a third number $m$, in place. Assumes the inputs are already
-/// reduced modulo $m$.
+/// Multiplies two numbers modulo a third number $m$, in place.The inputs must be already reduced
+/// modulo $m$.
 ///
 /// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
@@ -548,15 +560,15 @@ pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, 
     fn mod_mul_precomputed_assign(&mut self, other: RHS, m: M, data: &Self::Data);
 }
 
-/// Negates a number modulo another number $m$. Assumes the input is already reduced modulo $m$.
+/// Negates a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModNeg<M = Self> {
     type Output;
 
     fn mod_neg(self, m: M) -> Self::Output;
 }
 
-/// Negates a number modulo another number $m$, in place. Assumes the input is already reduced
-/// modulo $m$.
+/// Negates a number modulo another number $m$, in place. The input must be already reduced modulo
+/// $m$.
 pub trait ModNegAssign<M = Self> {
     fn mod_neg_assign(&mut self, m: M);
 }
@@ -620,22 +632,22 @@ pub trait CeilingModAssign<RHS = Self> {
     fn ceiling_mod_assign(&mut self, other: RHS);
 }
 
-/// Raises a number to a power modulo another number $m$. Assumes the input is already reduced
-/// modulo $m$.
+/// Raises a number to a power modulo another number $m$. The base must be already reduced modulo
+/// $m$.
 pub trait ModPow<RHS = Self, M = Self> {
     type Output;
 
     fn mod_pow(self, exp: RHS, m: M) -> Self::Output;
 }
 
-/// Raises a number to a power modulo another number $m$, in place. Assumes the input is already
+/// Raises a number to a power modulo another number $m$, in place. The base must be already
 /// reduced modulo $m$.
 pub trait ModPowAssign<RHS = Self, M = Self> {
     fn mod_pow_assign(&mut self, exp: RHS, m: M);
 }
 
-/// Raises a number to a power modulo another number $m$. Assumes the input is already reduced
-/// modulo $m$.
+/// Raises a number to a power modulo another number $m$. The base must be already reduced modulo
+/// $m$.
 ///
 /// If multiple modular exponentiations with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the exponentiation calls. This trait provides a
@@ -653,7 +665,7 @@ where
     fn mod_pow_precomputed(self, exp: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Raises a number to a power modulo another number $m$, in place. Assumes the input is already
+/// Raises a number to a power modulo another number $m$, in place. The base must be already
 /// reduced modulo $m$.
 ///
 /// If multiple modular exponentiations with the same modulus are necessary, it can be quicker to
@@ -665,19 +677,19 @@ pub trait ModPowPrecomputedAssign<RHS: Two = Self, M = Self>: ModPowPrecomputed<
     fn mod_pow_precomputed_assign(&mut self, exp: RHS, m: M, data: &Self::Data);
 }
 
-/// Adds two numbers modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+/// Adds two numbers modulo $2^k$. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Add<RHS = Self> {
     type Output;
 
     fn mod_power_of_2_add(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Adds two numbers modulo $2^k$, in place. Assumes the inputs are already reduced modulo $2^k$.
+/// Adds two numbers modulo $2^k$, in place. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2AddAssign<RHS = Self> {
     fn mod_power_of_2_add_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Finds the multiplicative inverse of a number modulo $2^k$. Assumes the input is already reduced
+/// Finds the multiplicative inverse of a number modulo $2^k$. The input must be already reduced
 /// modulo $2^k$.
 pub trait ModPowerOf2Inverse {
     type Output;
@@ -690,45 +702,44 @@ pub trait ModPowerOf2IsReduced {
     fn mod_power_of_2_is_reduced(&self, pow: u64) -> bool;
 }
 
-/// Multiplies two numbers modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+/// Multiplies two numbers modulo $2^k$. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Mul<RHS = Self> {
     type Output;
 
     fn mod_power_of_2_mul(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Multiplies two numbers modulo $2^k$, in place. Assumes the inputs are already reduced modulo
-/// $2^k$.
+/// Multiplies two numbers modulo $2^k$, in place. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2MulAssign<RHS = Self> {
     fn mod_power_of_2_mul_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Negates a number modulo $2^k$. Assumes the input is already reduced modulo $2^k$.
+/// Negates a number modulo $2^k$. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Neg {
     type Output;
 
     fn mod_power_of_2_neg(self, pow: u64) -> Self::Output;
 }
 
-/// Negates a number modulo $2^k$ in place. Assumes the input is already reduced modulo $2^k$.
+/// Negates a number modulo $2^k$ in place. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2NegAssign {
     fn mod_power_of_2_neg_assign(&mut self, pow: u64);
 }
 
-/// Raises a number to a power modulo $2^k$. Assumes the input is already reduced modulo $2^k$.
+/// Raises a number to a power modulo $2^k$. The base must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Pow<RHS = Self> {
     type Output;
 
     fn mod_power_of_2_pow(self, exp: RHS, pow: u64) -> Self::Output;
 }
 
-/// Raises a number to a power modulo $2^k$, in place. Assumes the input is already reduced modulo
+/// Raises a number to a power modulo $2^k$, in place. The base must be already reduced modulo
 /// $2^k$.
 pub trait ModPowerOf2PowAssign<RHS = Self> {
     fn mod_power_of_2_pow_assign(&mut self, exp: RHS, pow: u64);
 }
 
-/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. Assumes the input is already
+/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. The number must be already
 /// reduced modulo $2^k$.
 pub trait ModPowerOf2Shl<RHS> {
     type Output;
@@ -736,13 +747,13 @@ pub trait ModPowerOf2Shl<RHS> {
     fn mod_power_of_2_shl(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place. Assumes the input
-/// is already reduced modulo $2^k$.
+/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place. The number must
+/// be already reduced modulo $2^k$.
 pub trait ModPowerOf2ShlAssign<RHS> {
     fn mod_power_of_2_shl_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Right-shifts a number (divides it by a power of 2) modulo $2^k$. Assumes the input is already
+/// Right-shifts a number (divides it by a power of 2) modulo $2^k$. The number must be already
 /// reduced modulo $2^k$.
 pub trait ModPowerOf2Shr<RHS> {
     type Output;
@@ -750,33 +761,32 @@ pub trait ModPowerOf2Shr<RHS> {
     fn mod_power_of_2_shr(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Right-shifts a number (divides it by a power of 2) modulo $2^k$, in place. Assumes the input is
+/// Right-shifts a number (divides it by a power of 2) modulo $2^k$, in place. The number must be
 /// already reduced modulo $2^k$.
 pub trait ModPowerOf2ShrAssign<RHS> {
     fn mod_power_of_2_shr_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Squares a number modulo $2^k$. Assumes the input is already reduced modulo $2^k$.
+/// Squares a number modulo $2^k$. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Square {
     type Output;
 
     fn mod_power_of_2_square(self, pow: u64) -> Self::Output;
 }
 
-/// Squares a number modulo $2^k$ in place. Assumes the input is already reduced modulo $2^k$.
+/// Squares a number modulo $2^k$ in place. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2SquareAssign {
     fn mod_power_of_2_square_assign(&mut self, pow: u64);
 }
 
-/// Subtracts two numbers modulo $2^k$. Assumes the inputs are already reduced modulo $2^k$.
+/// Subtracts two numbers modulo $2^k$. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Sub<RHS = Self> {
     type Output;
 
     fn mod_power_of_2_sub(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Subtracts two numbers modulo $2^k$, in place. Assumes the inputs are already reduced modulo
-/// $2^k$.
+/// Subtracts two numbers modulo $2^k$, in place. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2SubAssign<RHS = Self> {
     fn mod_power_of_2_sub_assign(&mut self, other: RHS, pow: u64);
 }
@@ -857,48 +867,48 @@ pub trait CeilingModPowerOf2Assign {
     fn ceiling_mod_power_of_2_assign(&mut self, other: u64);
 }
 
-/// Left-shifts a number (multiplies it by a power of 2) modulo another number $m$. Assumes the
-/// input is already reduced modulo $m$.
+/// Left-shifts a number (multiplies it by a power of 2) modulo another number $m$. The number must
+/// be already reduced modulo $m$.
 pub trait ModShl<RHS, M = Self> {
     type Output;
 
     fn mod_shl(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Left-shifts a number (multiplies it by a power of 2) modulo another number $m$, in place.
-/// Assumes the input is already reduced modulo $m$.
+/// Left-shifts a number (multiplies it by a power of 2) modulo another number $m$, in place. The
+/// number must be already reduced modulo $m$.
 pub trait ModShlAssign<RHS, M = Self> {
     fn mod_shl_assign(&mut self, other: RHS, m: M);
 }
 
-/// Left-shifts a number (divides it by a power of 2) modulo another number $m$. Assumes the input
-/// is already reduced modulo $m$.
+/// Left-shifts a number (divides it by a power of 2) modulo another number $m$. The number must be
+/// already reduced modulo $m$.
 pub trait ModShr<RHS, M = Self> {
     type Output;
 
     fn mod_shr(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Left-shifts a number (divides it by a power of 2) modulo another number $m$, in place. Assumes
-/// the input is already reduced modulo $m$.
+/// Left-shifts a number (divides it by a power of 2) modulo another number $m$, in place. The
+/// number must be already reduced modulo $m$.
 pub trait ModShrAssign<RHS, M = Self> {
     fn mod_shr_assign(&mut self, other: RHS, m: M);
 }
 
-/// Squares a number modulo another number $m$. Assumes the input is already reduced modulo $m$.
+/// Squares a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModSquare<M = Self> {
     type Output;
 
     fn mod_square(self, m: M) -> Self::Output;
 }
 
-/// Squares a number modulo another number $m$, in place. Assumes the input is already reduced
-/// modulo $m$.
+/// Squares a number modulo another number $m$, in place. The input must be already reduced modulo
+/// $m$.
 pub trait ModSquareAssign<M = Self> {
     fn mod_square_assign(&mut self, m: M);
 }
 
-/// Squares a number modulo another number $m$. Assumes the input is already reduced modulo $m$.
+/// Squares a number modulo another number $m$. The input must be already reduced modulo $m$.
 ///
 /// If multiple modular squarings with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data using
@@ -911,8 +921,8 @@ where
     fn mod_square_precomputed(self, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Squares a number modulo another number $m$, in place. Assumes the input is already reduced
-/// modulo $m$.
+/// Squares a number modulo another number $m$, in place. The input must be already reduced modulo
+/// $m$.
 ///
 /// If multiple modular squarings with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data using
@@ -922,15 +932,15 @@ pub trait ModSquarePrecomputedAssign<RHS = Self, M = Self>: ModPowPrecomputed<RH
     fn mod_square_precomputed_assign(&mut self, m: M, data: &Self::Data);
 }
 
-/// Adds two numbers modulo a third number $m$. Assumes the inputs are already reduced modulo $m$.
+/// Adds two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 pub trait ModSub<RHS = Self, M = Self> {
     type Output;
 
     fn mod_sub(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Adds two numbers modulo a third number $m$, in place. Assumes the inputs are already reduced
-/// modulo $m$.
+/// Adds two numbers modulo a third number $m$, in place. The inputs must be already reduced modulo
+/// $m$.
 pub trait ModSubAssign<RHS = Self, M = Self> {
     fn mod_sub_assign(&mut self, other: RHS, m: M);
 }

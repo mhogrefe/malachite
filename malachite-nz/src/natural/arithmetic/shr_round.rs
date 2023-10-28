@@ -516,8 +516,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
-            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
-            /// documentation for details.
+            /// See the [`ShrRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -716,8 +715,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// To test whether `RoundingMode::Exact` can be passed, use
             /// `self.divisible_by_power_of_2(bits)`.
             ///
-            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
-            /// documentation for details.
+            /// See the [`ShrRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$

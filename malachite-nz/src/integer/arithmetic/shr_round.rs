@@ -194,8 +194,7 @@ macro_rules! impl_shr_round_unsigned {
             /// `self.divisible_by_power_of_2(bits)`. An [`Ordering`] is returned, indicating
             /// whether the assigned value is less than, equal to, or greater than the exact value.
             ///
-            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
-            /// documentation for details.
+            /// See the [`ShrRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -390,8 +389,7 @@ macro_rules! impl_shr_round_signed {
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
-            /// See the [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound)
-            /// documentation for details.
+            /// See the [`ShrRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$

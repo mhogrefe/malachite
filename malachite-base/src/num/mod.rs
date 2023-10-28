@@ -21,5 +21,6 @@ pub mod float;
 pub mod iterators;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+#[cfg(feature = "random")]
 /// Iterators that generate numbers randomly.
 pub mod random;

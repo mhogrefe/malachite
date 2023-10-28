@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Two;
 impl ModSquare<Natural> for Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by value.
     ///
     /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
@@ -16,6 +16,9 @@ impl ModSquare<Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -33,7 +36,7 @@ impl ModSquare<Natural> for Natural {
 impl<'a> ModSquare<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
     ///
     /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
@@ -44,6 +47,9 @@ impl<'a> ModSquare<&'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -61,7 +67,7 @@ impl<'a> ModSquare<&'a Natural> for Natural {
 impl<'a> ModSquare<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by reference and the second by value.
     ///
     /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
@@ -72,6 +78,9 @@ impl<'a> ModSquare<Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -89,7 +98,7 @@ impl<'a> ModSquare<Natural> for &'a Natural {
 impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$. Assumes the input is already reduced
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by reference.
     ///
     /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
@@ -100,6 +109,9 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -115,8 +127,8 @@ impl<'a, 'b> ModSquare<&'b Natural> for &'a Natural {
 }
 
 impl ModSquareAssign<Natural> for Natural {
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. Assumes the input is
-    /// already reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
+    /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
     ///
@@ -126,6 +138,9 @@ impl ModSquareAssign<Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -147,8 +162,8 @@ impl ModSquareAssign<Natural> for Natural {
 }
 
 impl<'a> ModSquareAssign<&'a Natural> for Natural {
-    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. Assumes the input is
-    /// already reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
+    /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
     ///
@@ -158,6 +173,9 @@ impl<'a> ModSquareAssign<&'a Natural> for Natural {
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```

@@ -41,10 +41,10 @@ impl ContinuedFraction for Rational {
     /// Returns the continued fraction of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The output has two components. The first is the first value of the continued fraction,
-    /// which may be any [`Integer`](malachite_nz::integer::Integer) and is equal to the floor of
-    /// the [`Rational`]. The second is an iterator that produces the remaining values, which are
-    /// all positive. Using the standard notation for continued fractions, the first value is the
-    /// number before the semicolon, and the second value produces the remaining numbers.
+    /// which may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is
+    /// an iterator that produces the remaining values, which are all positive. Using the standard
+    /// notation for continued fractions, the first value is the number before the semicolon, and
+    /// the second value produces the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. The shorter of the two
     /// representations (the one that does not end in 1) is returned.
@@ -98,10 +98,10 @@ impl<'a> ContinuedFraction for &'a Rational {
     /// Returns the continued fraction of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The output has two components. The first is the first value of the continued fraction,
-    /// which may be any [`Integer`](malachite_nz::integer::Integer) and is equal to the floor of
-    /// the [`Rational`]. The second is an iterator that produces the remaining values, which are
-    /// all positive. Using the standard notation for continued fractions, the first value is the
-    /// number before the semicolon, and the second value produces the remaining numbers.
+    /// which may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is
+    /// an iterator that produces the remaining values, which are all positive. Using the standard
+    /// notation for continued fractions, the first value is the number before the semicolon, and
+    /// the second value produces the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. The shorter of the two
     /// representations (the one that does not end in 1) is returned.

@@ -484,8 +484,7 @@ impl DivRoundAssign<Natural> for Natural {
     /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
     /// greater than the exact value.
     ///
-    /// See the [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) documentation for
-    /// details.
+    /// See the [`DivRound`] documentation for details.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -573,8 +572,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// [`Ordering`] is returned, indicating whether the assigned value is less than, equal to, or
     /// greater than the exact value.
     ///
-    /// See the [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) documentation for
-    /// details.
+    /// See the [`DivRound`] documentation for details.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$

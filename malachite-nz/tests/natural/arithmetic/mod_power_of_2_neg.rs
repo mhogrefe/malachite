@@ -2,11 +2,12 @@ use malachite_base::num::arithmetic::traits::{
     ModNeg, ModPowerOf2, ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg,
     ModPowerOf2NegAssign, PowerOf2,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_11;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
@@ -34,6 +35,17 @@ fn test_mod_power_of_2_neg() {
     test("1", 32, "4294967295");
     test("100", 100, "1267650600228229401496703205276");
     test("1267650600228229401496703205276", 100, "100");
+}
+
+#[test]
+fn mod_power_of_2_neg_fail() {
+    assert_panic!(Natural::ONE.mod_power_of_2_neg(0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_neg(0));
+
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_neg_assign(0)
+    });
 }
 
 #[test]

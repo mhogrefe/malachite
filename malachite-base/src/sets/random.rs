@@ -207,8 +207,7 @@ pub fn random_hash_sets_from_length_iterator<
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
 /// $$
-/// where $P_g(n)$ is the probability function described in
-/// [`geometric_random_unsigneds`](crate::num::random::geometric::geometric_random_unsigneds).
+/// where $P_g(n)$ is the probability function described in [`geometric_random_unsigneds`].
 ///
 /// `xs_gen` must be infinite.
 ///
@@ -287,8 +286,8 @@ where
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
 /// $$
 /// where $P_g(n)$ is the probability function described in
-/// [`geometric_random_unsigned_inclusive_range`](geometric_random_unsigned_inclusive_range) with
-/// $a$ equal to `min_length` and `b` to `u64::MAX`.
+/// [`geometric_random_unsigned_inclusive_range`] with $a$ equal to `min_length` and `b` to
+/// `u64::MAX`.
 ///
 /// `xs_gen` must be infinite.
 ///
@@ -724,8 +723,7 @@ pub fn random_b_tree_sets_from_length_iterator<
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
 /// $$
-/// where $P_g(n)$ is the probability function described in
-/// [`geometric_random_unsigneds`](crate::num::random::geometric::geometric_random_unsigneds).
+/// where $P_g(n)$ is the probability function described in [`geometric_random_unsigneds`].
 ///
 /// `xs_gen` must be infinite.
 ///
@@ -804,8 +802,8 @@ where
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
 /// $$
 /// where $P_g(n)$ is the probability function described in
-/// [`geometric_random_unsigned_inclusive_range`](geometric_random_unsigned_inclusive_range), with
-/// $a$ equal to `min_length` and `b` to `u64::MAX`.
+/// [`geometric_random_unsigned_inclusive_range`], with $a$ equal to `min_length` and `b` to
+/// `u64::MAX`.
 ///
 /// `xs_gen` must be infinite.
 ///

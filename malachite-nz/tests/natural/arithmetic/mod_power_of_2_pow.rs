@@ -21,6 +21,7 @@ use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_11, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21,
 };
 use malachite_nz::test_util::natural::arithmetic::mod_power_of_2_pow::*;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 fn verify_limbs_pow_low(xs: &[Limb], es: &[Limb], out: &[Limb]) {
@@ -187,6 +188,22 @@ fn test_mod_power_of_2_pow() {
         100,
         "1180978940853570377595087681537",
     );
+}
+
+#[test]
+fn mod_power_of_2_pow_fail() {
+    assert_panic!(Natural::ONE.mod_power_of_2_pow(Natural::ONE, 0));
+    assert_panic!(Natural::ONE.mod_power_of_2_pow(&Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_pow(Natural::ONE, 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_pow(&Natural::ONE, 0));
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_pow_assign(Natural::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_pow_assign(&Natural::ONE, 0)
+    });
 }
 
 #[test]

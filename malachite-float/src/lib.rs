@@ -271,6 +271,7 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Float`]s without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`Float`]s randomly.
 pub mod random;
 

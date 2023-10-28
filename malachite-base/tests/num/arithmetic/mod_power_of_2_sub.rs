@@ -1,5 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_17, unsigned_triple_gen_var_11};
+use std::panic::catch_unwind;
 
 fn mod_power_of_2_sub_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, y: T, pow, out| {
@@ -27,6 +28,42 @@ fn mod_power_of_2_sub_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_power_of_2_sub() {
     apply_fn_to_unsigneds!(mod_power_of_2_sub_helper);
+}
+
+fn mod_power_of_2_sub_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.mod_power_of_2_sub(T::ZERO, 0));
+    assert_panic!(T::ZERO.mod_power_of_2_sub(T::ONE, 0));
+    assert_panic!(T::from(123u8).mod_power_of_2_sub(T::from(200u8), 7));
+    assert_panic!(T::from(200u8).mod_power_of_2_sub(T::from(123u8), 7));
+}
+
+#[test]
+fn mod_power_of_2_sub_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_sub_fail_helper);
+}
+
+fn mod_power_of_2_sub_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ONE;
+        x.mod_power_of_2_sub_assign(T::ZERO, 0)
+    });
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_power_of_2_sub_assign(T::ONE, 0)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_power_of_2_sub_assign(T::from(200u8), 7)
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_power_of_2_sub_assign(T::from(123u8), 7)
+    });
+}
+
+#[test]
+fn mod_power_of_2_sub_assign_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_sub_assign_fail_helper);
 }
 
 fn mod_power_of_2_sub_properties_helper<T: PrimitiveUnsigned>() {

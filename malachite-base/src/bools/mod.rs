@@ -8,5 +8,6 @@ pub mod constants;
 pub mod exhaustive;
 /// The implementation of [`NotAssign`](crate::num::logic::traits::NotAssign) for [`bool`].
 pub mod not_assign;
+#[cfg(feature = "random")]
 /// Iterators that generate [`bool`]s randomly.
 pub mod random;

@@ -1,8 +1,9 @@
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModNeg, ModShl, ModShlAssign, ModShr};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::test_util::generators::{
     signed_gen_var_5, unsigned_gen_var_5, unsigned_signed_unsigned_triple_gen_var_2,
     unsigned_triple_gen_var_18,
@@ -11,9 +12,10 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_natural_signed_triple_gen_var_1, natural_natural_unsigned_triple_gen_var_6,
-    natural_pair_gen_var_10, natural_signed_pair_gen_var_3, natural_unsigned_pair_gen_var_12,
+    natural_pair_gen_var_8, natural_signed_pair_gen_var_3, natural_unsigned_pair_gen_var_12,
 };
 use std::ops::Shl;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 macro_rules! test_mod_shl_unsigned {
@@ -111,6 +113,51 @@ fn test_mod_shl() {
     apply_to_signeds!(test_mod_shl_signed);
 }
 
+fn mod_shl_fail_helper<T: PrimitiveInt>()
+where
+    for<'a> Natural: ModShlAssign<T, Natural>
+        + ModShlAssign<T, &'a Natural>
+        + ModShl<T, Natural, Output = Natural>
+        + ModShl<T, &'a Natural, Output = Natural>,
+    for<'a, 'b> &'a Natural:
+        ModShl<T, Natural, Output = Natural> + ModShl<T, &'b Natural, Output = Natural>,
+{
+    assert_panic!(Natural::ZERO.mod_shl(T::exact_from(3u8), Natural::ZERO));
+    assert_panic!(Natural::exact_from(30).mod_shl(T::exact_from(3u8), Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_shl(T::exact_from(3u8), &Natural::ZERO));
+    assert_panic!(Natural::exact_from(30).mod_shl(T::exact_from(3u8), &Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_shl(T::exact_from(3u8), Natural::ZERO));
+    assert_panic!((&Natural::exact_from(30)).mod_shl(T::exact_from(3u8), Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_shl(T::exact_from(3u8), &Natural::ZERO));
+    assert_panic!((&Natural::exact_from(30)).mod_shl(T::exact_from(3u8), &Natural::ONE));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_shl_assign(T::exact_from(3u8), Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::exact_from(30);
+        x.mod_shl_assign(T::exact_from(3u8), Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_shl_assign(T::exact_from(3u8), &Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::exact_from(30);
+        x.mod_shl_assign(T::exact_from(3u8), &Natural::ONE)
+    });
+}
+
+#[test]
+fn mod_shl_fail() {
+    apply_fn_to_primitive_ints!(mod_shl_fail_helper);
+}
+
 #[allow(clippy::trait_duplication_in_bounds)]
 fn unsigned_properties<T: PrimitiveUnsigned>()
 where
@@ -157,7 +204,7 @@ where
         );
     });
 
-    natural_pair_gen_var_10().test_properties(|(n, m)| {
+    natural_pair_gen_var_8().test_properties(|(n, m)| {
         assert_eq!((&n).mod_shl(T::ZERO, m), n);
     });
 
@@ -224,7 +271,7 @@ where
         }
     });
 
-    natural_pair_gen_var_10().test_properties(|(n, m)| {
+    natural_pair_gen_var_8().test_properties(|(n, m)| {
         assert_eq!((&n).mod_shl(T::ZERO, m), n);
     });
 

@@ -414,8 +414,7 @@ impl RoundToMultipleAssign<Rational> for Rational {
     /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
     /// greater than the original value.
     ///
-    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
-    /// documentation for details.
+    /// See the [`RoundToMultiple`] documentation for details.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -528,8 +527,7 @@ impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// An [`Ordering`] is returned, indicating whether the returned value is less than, equal to,
     /// or greater than the original value.
     ///
-    /// See the [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
-    /// documentation for details.
+    /// See the [`RoundToMultiple`] documentation for details.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

@@ -18,6 +18,12 @@ pub fn rational_pair_rm(
     Box::new(ps.map(|(x, y)| ((rug::Rational::from(&x), rug::Rational::from(&y)), (x, y))))
 }
 
+pub fn rational_pair_nm(
+    ps: It<(Rational, Rational)>,
+) -> It<((BigRational, BigRational), (Rational, Rational))> {
+    Box::new(ps.map(|(x, y)| ((BigRational::from(&x), BigRational::from(&y)), (x, y))))
+}
+
 #[allow(clippy::type_complexity)]
 pub fn rational_pair_nrm(
     ps: It<(Rational, Rational)>,

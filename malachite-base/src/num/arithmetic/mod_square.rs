@@ -8,13 +8,16 @@ macro_rules! impl_mod_square {
         impl ModSquare for $t {
             type Output = $t;
 
-            /// Squares a number modulo another number $m$. Assumes the input is already reduced
+            /// Squares a number modulo another number $m$. The input must be already reduced
             /// modulo $m$.
             ///
             /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_square#mod_square).
@@ -25,13 +28,16 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquareAssign for $t {
-            /// Squares a number modulo another number $m$, in place. Assumes the input is already
+            /// Squares a number modulo another number $m$, in place. The input must be already
             /// reduced modulo $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_square#mod_square_assign).
@@ -42,7 +48,7 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquarePrecomputed<u64, $t> for $t {
-            /// Squares a number modulo another number $m$. Assumes the input is already reduced
+            /// Squares a number modulo another number $m$. The input must be already reduced
             /// modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
@@ -51,6 +57,9 @@ macro_rules! impl_mod_square {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_square#mod_square_precomputed).
@@ -61,7 +70,7 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquarePrecomputedAssign<u64, $t> for $t {
-            /// Squares a number modulo another number $m$, in place. Assumes the input is already
+            /// Squares a number modulo another number $m$, in place. The input must be already
             /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
@@ -70,6 +79,9 @@ macro_rules! impl_mod_square {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_square#mod_square_precomputed_assign).

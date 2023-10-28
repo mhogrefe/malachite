@@ -8,8 +8,8 @@ macro_rules! impl_partial_ord_abs {
         impl PartialOrdAbs<$t> for $t {
             /// Compares the absolute values of two numbers, taking both by reference.
             ///
-            /// The [`PartialOrdAbs`](super::traits::PartialOrdAbs) interface allows for pairs of
-            /// incomparable elements, but for primitive integers these never occur.
+            /// The [`PartialOrdAbs`] interface allows for pairs of incomparable elements, but for
+            /// primitive integers these never occur.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

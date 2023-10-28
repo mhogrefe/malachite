@@ -9,10 +9,10 @@ impl Rational {
     /// Converts a finite continued fraction to a [`Rational`], taking the inputs by value.
     ///
     /// The input has two components. The first is the first value of the continued fraction, which
-    /// may be any [`Integer`](malachite_nz::integer::Integer) and is equal to the floor of the
-    /// [`Rational`]. The second is an iterator of the remaining values, which must all be
-    /// positive. Using the standard notation for continued fractions, the first value is the
-    /// number before the semicolon, and the second value contains the remaining numbers.
+    /// may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is an
+    /// iterator of the remaining values, which must all be positive. Using the standard notation
+    /// for continued fractions, the first value is the number before the semicolon, and the second
+    /// value contains the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. Either one is a valid
     /// input.
@@ -29,7 +29,7 @@ impl Rational {
     /// `xs.count()`.
     ///
     /// # Panics
-    /// Panics if any [`Natural`](malachite_nz::natural::Natural) in `xs` is zero.
+    /// Panics if any [`Natural`] in `xs` is zero.
     ///
     /// # Examples
     /// ```
@@ -66,10 +66,10 @@ impl Rational {
     /// Converts a finite continued fraction to a [`Rational`], taking the inputs by reference.
     ///
     /// The input has two components. The first is the first value of the continued fraction, which
-    /// may be any [`Integer`](malachite_nz::integer::Integer) and is equal to the floor of the
-    /// [`Rational`]. The second is an iterator of the remaining values, which must all be
-    /// positive. Using the standard notation for continued fractions, the first value is the
-    /// number before the semicolon, and the second value contains the remaining numbers.
+    /// may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is an
+    /// iterator of the remaining values, which must all be positive. Using the standard notation
+    /// for continued fractions, the first value is the number before the semicolon, and the second
+    /// value contains the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. Either one is a valid
     /// input.
@@ -86,7 +86,7 @@ impl Rational {
     /// `xs.count()`.
     ///
     /// # Panics
-    /// Panics if any [`Natural`](malachite_nz::natural::Natural) in `xs` is zero.
+    /// Panics if any [`Natural`] in `xs` is zero.
     ///
     /// # Examples
     /// ```

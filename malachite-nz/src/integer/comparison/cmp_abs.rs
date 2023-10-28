@@ -5,8 +5,7 @@ use std::cmp::Ordering;
 impl PartialOrdAbs for Integer {
     /// Compares the absolute values of two [`Integer`]s.
     ///
-    /// See the documentation for the
-    /// [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) implementation.
+    /// See the documentation for the [`OrdAbs`] implementation.
     #[inline]
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         Some(self.cmp_abs(other))

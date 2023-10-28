@@ -1,5 +1,32 @@
 /// Comparison of [`Natural`](crate::natural::Natural)s.
 pub mod cmp;
+/// Equality of the absolute values of a [`Natural`](crate::natural::Natural)s and a primitive
+/// integer.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(Natural::from(123u32).eq_abs(&123u32), true);
+/// assert_eq!(Natural::from(123u32).eq_abs(&5u32), false);
+///
+/// assert_eq!(Natural::from(123u32).eq_abs(&123u64), true);
+/// assert_eq!(Natural::from(123u32).eq_abs(&5u64), false);
+///
+/// assert_eq!(Natural::from(123u32).eq_abs(&123i64), true);
+/// assert_eq!(Natural::from(123u32).eq_abs(&-123i64), true);
+///
+/// assert_eq!(123u8.eq_abs(&Natural::from(123u32)), true);
+/// assert_eq!(5u8.eq_abs(&Natural::from(123u32)), false);
+///
+/// assert_eq!(123u64.eq_abs(&Natural::from(123u32)), true);
+/// assert_eq!(5u64.eq_abs(&Natural::from(123u32)), false);
+///
+/// assert_eq!(123i64.eq_abs(&Natural::from(123u32)), true);
+/// assert_eq!((-123i64).eq_abs(&Natural::from(123u32)), true);
+/// ```
+pub mod eq_abs_primitive_int;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
 /// (a trait for comparing the absolute values of numbers by order) for
 /// [`Natural`](crate::natural::Natural)s and primitive floats.

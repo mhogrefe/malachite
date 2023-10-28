@@ -306,7 +306,7 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
 impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// Subtracts a [`Natural`] by the product of two other [`Natural`]s in place, taking the first
     /// [`Natural`] on the right-hand side by reference and the second by value and replacing the
-    /// left-hand side [`Natural`](crate::natural::Natural) with 0 if the result is negative.
+    /// left-hand side [`Natural`] with 0 if the result is negative.
     ///
     /// $$
     /// x \gets \max(x - yz, 0).

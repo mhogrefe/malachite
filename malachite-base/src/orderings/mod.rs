@@ -31,5 +31,6 @@ pub fn ordering_from_str(src: &str) -> Option<Ordering> {
 
 /// Iterators that generate [`Ordering`]s without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`Ordering`]s randomly.
 pub mod random;

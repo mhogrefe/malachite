@@ -88,5 +88,6 @@ pub mod constants;
 pub mod crement;
 /// Iterators that generate [`char`]s without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`char`]s randomly.
 pub mod random;

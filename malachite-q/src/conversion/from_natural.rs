@@ -3,8 +3,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 
 impl From<Natural> for Rational {
-    /// Converts a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`], taking the
-    /// [`Natural`](malachite_nz::natural::Natural) by value.
+    /// Converts a [`Natural`] to a [`Rational`], taking the [`Natural`] by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -26,8 +25,7 @@ impl From<Natural> for Rational {
 }
 
 impl<'a> From<&'a Natural> for Rational {
-    /// Converts a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`], taking the
-    /// [`Natural`](malachite_nz::natural::Natural) by reference.
+    /// Converts a [`Natural`] to a [`Rational`], taking the [`Natural`] by reference.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

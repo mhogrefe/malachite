@@ -27,9 +27,8 @@ fn mod_inverse_helper(x: Natural, m: Natural) -> Option<Natural> {
 impl ModInverse for Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$.
-    /// Assumes the first [`Natural`] is already reduced modulo $m$. Both [`Natural`]s are taken by
-    /// value.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
+    /// input must be already reduced modulo $m$. Both [`Natural`]s are taken by value.
     ///
     /// Returns `None` if $x$ and $m$ are not coprime.
     ///
@@ -42,6 +41,9 @@ impl ModInverse for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `max(self.significant_bits(), m.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -56,7 +58,7 @@ impl ModInverse for Natural {
     /// ```
     fn mod_inverse(self, m: Natural) -> Option<Natural> {
         assert_ne!(self, 0u32);
-        assert!(self < m);
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
             (x @ Natural::ONE, _) => Some(x),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
@@ -68,9 +70,9 @@ impl ModInverse for Natural {
 impl<'a> ModInverse<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$.
-    /// Assumes the first [`Natural`] is already reduced modulo $m$. The first [`Natural`] is taken
-    /// by value and the second by reference.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
+    /// input must be already reduced modulo $m$. The first [`Natural`] is taken by value and the
+    /// second by reference.
     ///
     /// Returns `None` if $x$ and $m$ are not coprime.
     ///
@@ -83,6 +85,9 @@ impl<'a> ModInverse<&'a Natural> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `max(self.significant_bits(), m.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -97,7 +102,7 @@ impl<'a> ModInverse<&'a Natural> for Natural {
     /// ```
     fn mod_inverse(self, m: &'a Natural) -> Option<Natural> {
         assert_ne!(self, 0u32);
-        assert!(self < *m);
+        assert!(self < *m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
             (x @ Natural::ONE, _) => Some(x),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(*y).map(Natural::from),
@@ -109,9 +114,9 @@ impl<'a> ModInverse<&'a Natural> for Natural {
 impl<'a> ModInverse<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$.
-    /// Assumes the first [`Natural`] is already reduced modulo $m$. The first [`Natural`]s is
-    /// taken by reference and the second by value.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
+    /// input must be already reduced modulo $m$. The first [`Natural`]s is taken by reference and
+    /// the second by value.
     ///
     /// Returns `None` if $x$ and $m$ are not coprime.
     ///
@@ -124,6 +129,9 @@ impl<'a> ModInverse<Natural> for &'a Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `max(self.significant_bits(), m.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -138,7 +146,7 @@ impl<'a> ModInverse<Natural> for &'a Natural {
     /// ```
     fn mod_inverse(self, m: Natural) -> Option<Natural> {
         assert_ne!(*self, 0u32);
-        assert!(*self < m);
+        assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
             (&Natural::ONE, _) => Some(Natural::ONE),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(y).map(Natural::from),
@@ -150,9 +158,8 @@ impl<'a> ModInverse<Natural> for &'a Natural {
 impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$.
-    /// Assumes  the first [`Natural`] is already reduced modulo $m$. Both [`Natural`]s are taken
-    /// by reference.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo another [`Natural`] $m$. The
+    /// input must be already reduced modulo $m$. Both [`Natural`]s are taken by reference.
     ///
     /// Returns `None` if $x$ and $m$ are not coprime.
     ///
@@ -165,6 +172,9 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `max(self.significant_bits(), m.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
     ///
     /// # Examples
     /// ```
@@ -179,7 +189,7 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     /// ```
     fn mod_inverse(self, m: &'a Natural) -> Option<Natural> {
         assert_ne!(*self, 0u32);
-        assert!(self < m);
+        assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         match (self, m) {
             (&Natural::ONE, _) => Some(Natural::ONE),
             (Natural(Small(x)), Natural(Small(y))) => x.mod_inverse(*y).map(Natural::from),

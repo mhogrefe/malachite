@@ -732,14 +732,11 @@ macro_rules! exhaustive_tuples_1_input {
         /// Generates all length-$n$ tuples with elements from a single iterator.
         ///
         /// These functions differ from `exhaustive_[n-tuples]_from_single` in that different
-        /// [`BitDistributorOutputType`](BitDistributorOutputType)s may be specified for each
-        /// output element.
+        /// [`BitDistributorOutputType`]s may be specified for each output element.
         ///
-        /// The $i$th parameter `output_types_[x_i]` is a
-        /// [`BitDistributorOutputType`](BitDistributorOutputType) that determines how quickly the
-        /// $i$th output slot advances through the iterator; see the
-        /// [`BitDistributor`](BitDistributor) documentation for a description of the different
-        /// types.
+        /// The $i$th parameter `output_types_[x_i]` is a [`BitDistributorOutputType`] that
+        /// determines how quickly the $i$th output slot advances through the iterator; see the
+        /// [`BitDistributor`] documentation for a description of the different types.
         ///
         /// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$
         /// is the width of the tuples. If `xs` is infinite, the output is also infinite.
@@ -998,11 +995,9 @@ macro_rules! exhaustive_tuples {
         /// Generates all $n$-tuples with elements from $n$ iterators, possibly with different
         /// output growth rates.
         ///
-        /// The $i$th `output_type_[x_i]` parameter is a
-        /// [`BitDistributorOutputType`](BitDistributorOutputType) that determines how quickly the
-        /// $i$th output slot advances through its iterator; see the
-        /// [`BitDistributor`](BitDistributor) documentation for a description of the different
-        /// types.
+        /// The $i$th `output_type_[x_i]` parameter is a [`BitDistributorOutputType`] that
+        /// determines how quickly the $i$th output slot advances through its iterator; see the
+        /// [`BitDistributor`] documentation for a description of the different types.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, the output length is the product of their
         /// lengths. If any of `xs`, `ys`, `zs`, ... are infinite, the output is also infinite.

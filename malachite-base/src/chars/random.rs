@@ -202,8 +202,7 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 
 /// Generates random [`char`]s, weighting graphic and non-graphic [`char`]s separately.
 ///
-/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
-/// [`char`].
+/// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///
 /// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///
@@ -258,8 +257,7 @@ pub fn graphic_weighted_random_chars(
 
 /// Generates random ASCII [`char`]s, weighting graphic and non-graphic [`char`]s separately.
 ///
-/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
-/// [`char`].
+/// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///
 /// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///
@@ -318,8 +316,7 @@ pub fn graphic_weighted_random_ascii_chars(
 /// Generates random [`char`]s in the half-open interval $[a, b)$, weighting graphic and
 /// non-graphic [`char`]s separately.
 ///
-/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
-/// [`char`].
+/// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///
 /// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///
@@ -383,8 +380,7 @@ pub fn graphic_weighted_random_char_range(
 /// Generates random [`char`]s in the closed interval $[a, b]$, weighting graphic and
 /// non-graphic [`char`]s separately.
 ///
-/// See [`char_is_graphic`](crate::chars::char_is_graphic) for the definition of a graphic
-/// [`char`].
+/// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///
 /// Let $n_p$ be `p_numerator` and $d_p$ be `p_denominator`, and let $p = p_n/p_d$.
 ///

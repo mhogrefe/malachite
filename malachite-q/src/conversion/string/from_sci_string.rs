@@ -10,9 +10,8 @@ use malachite_nz::natural::conversion::string::from_sci_string::FromSciStringHel
 impl FromSciString for Rational {
     /// Converts a string, possibly in scientfic notation, to a [`Rational`].
     ///
-    /// Use
-    /// [`FromSciStringOptions`](malachite_base::num::conversion::string::options::FromSciStringOptions)
-    /// to specify the base (from 2 to 36, inclusive). The rounding mode option is ignored.
+    /// Use [`FromSciStringOptions`] to specify the base (from 2 to 36, inclusive). The rounding
+    /// mode option is ignored.
     ///
     /// If the base is greater than 10, the higher digits are represented by the letters `'a'`
     /// through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't need to be
@@ -77,9 +76,8 @@ impl Rational {
     /// the simplest [`Rational`] which rounds to the target string according to the precision
     /// implied by the string.
     ///
-    /// Use
-    /// [`FromSciStringOptions`](malachite_base::num::conversion::string::options::FromSciStringOptions)
-    /// to specify the base (from 2 to 36, inclusive). The rounding mode option is ignored.
+    /// Use [`FromSciStringOptions`] to specify the base (from 2 to 36, inclusive). The rounding
+    /// mode option is ignored.
     ///
     /// If the base is greater than 10, the higher digits are represented by the letters `'a'`
     /// through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't need to be

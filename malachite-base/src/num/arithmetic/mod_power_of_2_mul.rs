@@ -1,15 +1,31 @@
 use crate::num::arithmetic::traits::{ModPowerOf2Mul, ModPowerOf2MulAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_power_of_2_mul<T: PrimitiveUnsigned>(x: T, other: T, pow: u64) -> T {
+fn mod_power_of_2_mul<T: PrimitiveUnsigned>(x: T, y: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
-    x.wrapping_mul(other).mod_power_of_2(pow)
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
+    assert!(
+        y.significant_bits() <= pow,
+        "y must be reduced mod 2^pow, but {y} >= 2^{pow}"
+    );
+    x.wrapping_mul(y).mod_power_of_2(pow)
 }
 
 #[inline]
-fn mod_power_of_2_mul_assign<T: PrimitiveUnsigned>(x: &mut T, other: T, pow: u64) {
+fn mod_power_of_2_mul_assign<T: PrimitiveUnsigned>(x: &mut T, y: T, pow: u64) {
     assert!(pow <= T::WIDTH);
-    x.wrapping_mul_assign(other);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
+    assert!(
+        y.significant_bits() <= pow,
+        "y must be reduced mod 2^pow, but {y} >= 2^{pow}"
+    );
+    x.wrapping_mul_assign(y);
     x.mod_power_of_2_assign(pow);
 }
 
@@ -18,7 +34,7 @@ macro_rules! impl_mod_power_of_2_mul {
         impl ModPowerOf2Mul<$t> for $t {
             type Output = $t;
 
-            /// Multiplies two numbers modulo a third number $2^k$. Assumes the inputs are already
+            /// Multiplies two numbers modulo a third number $2^k$. The inputs must be already
             /// reduced modulo $2^k$.
             ///
             /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
@@ -27,7 +43,8 @@ macro_rules! impl_mod_power_of_2_mul {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` or `other` are greater
+            /// than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_mul#mod_power_of_2_mul).
@@ -38,8 +55,8 @@ macro_rules! impl_mod_power_of_2_mul {
         }
 
         impl ModPowerOf2MulAssign<$t> for $t {
-            /// Multiplies two numbers modulo a third number $2^k$, in place. Assumes the inputs
-            /// are already reduced modulo $2^k$.
+            /// Multiplies two numbers modulo a third number $2^k$, in place. The inputs must be
+            /// already reduced modulo $2^k$.
             ///
             /// $x \gets z$, where $x, y, z < 2^k$ and $xy \equiv z \mod 2^k$.
             ///
@@ -47,7 +64,8 @@ macro_rules! impl_mod_power_of_2_mul {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` or `other` are greater
+            /// than or equal to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_mul#mod_power_of_2_mul_assign).

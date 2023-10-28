@@ -37,6 +37,7 @@
 /// assert_eq!(NiceFloat(x), NiceFloat(100.0));
 /// ```
 pub mod abs;
+
 /// [`AddMul`](traits::AddMul) and [`AddMulAssign`](traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 ///

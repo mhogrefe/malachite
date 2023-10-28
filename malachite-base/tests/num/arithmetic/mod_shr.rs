@@ -7,6 +7,7 @@ use malachite_base::test_util::generators::{
     signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_pair_gen_var_16,
     unsigned_signed_unsigned_triple_gen_var_2,
 };
+use std::panic::catch_unwind;
 
 #[test]
 fn test_mod_shr() {
@@ -33,6 +34,32 @@ fn test_mod_shr() {
     test::<u8, i64>(10, 2, 15, 2);
     test::<u8, i64>(10, 100, 19, 0);
     test::<u128, i8>(10, 100, 19, 0);
+}
+
+fn mod_shr_fail_helper<T: PrimitiveUnsigned + ModShr<U, T, Output = T>, U: PrimitiveSigned>() {
+    assert_panic!(T::ZERO.mod_shr(U::TWO, T::ZERO));
+    assert_panic!(T::from(123u8).mod_shr(U::TWO, T::from(123u8)));
+}
+
+#[test]
+fn mod_shr_fail() {
+    apply_fn_to_unsigneds_and_signeds!(mod_shr_fail_helper);
+}
+
+fn mod_shr_assign_fail_helper<T: PrimitiveUnsigned + ModShrAssign<U, T>, U: PrimitiveSigned>() {
+    assert_panic!({
+        let mut x = T::ZERO;
+        x.mod_shr_assign(U::TWO, T::ZERO)
+    });
+    assert_panic!({
+        let mut x = T::from(123u8);
+        x.mod_shr_assign(U::TWO, T::from(123u8))
+    });
+}
+
+#[test]
+fn mod_shr_assign_fail() {
+    apply_fn_to_unsigneds_and_signeds!(mod_shr_assign_fail_helper);
 }
 
 fn mod_shr_properties_helper<

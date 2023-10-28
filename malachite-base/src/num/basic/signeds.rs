@@ -7,9 +7,14 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::traits::NegativeOne;
 use crate::num::logic::traits::CheckedHammingDistance;
+#[cfg(feature = "random")]
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use std::ops::Neg;
 
+// When the `random` feature is enabled, the HasRandomSignedRange and RandomSignedChunkable bounds
+// are included.
+
+#[cfg(feature = "random")]
 /// Defines functions on primitive signed integer types: ixx and isize.
 pub trait PrimitiveSigned:
     Abs<Output = Self>
@@ -32,6 +37,37 @@ pub trait PrimitiveSigned:
     + OverflowingAbsAssign
     + PrimitiveInt
     + RandomSignedChunkable
+    + SaturatingAbs<Output = Self>
+    + SaturatingAbsAssign
+    + SaturatingNeg<Output = Self>
+    + SaturatingNegAssign
+    + UnsignedAbs
+    + WrappingAbs<Output = Self>
+    + WrappingAbsAssign
+{
+}
+
+#[cfg(not(feature = "random"))]
+/// Defines functions on primitive signed integer types: ixx and isize.
+pub trait PrimitiveSigned:
+    Abs<Output = Self>
+    + AbsAssign
+    + CeilingDivAssignMod<Self, ModOutput = Self>
+    + CeilingDivMod<Self, DivOutput = Self, ModOutput = Self>
+    + CeilingMod<Self, Output = Self>
+    + CeilingModAssign<Self>
+    + CeilingModPowerOf2<Output = Self>
+    + CeilingModPowerOf2Assign
+    + CheckedAbs<Output = Self>
+    + CheckedHammingDistance
+    + ExtendedGcd<Self, Cofactor = Self>
+    + From<i8>
+    + Neg<Output = Self>
+    + NegAssign
+    + NegativeOne
+    + OverflowingAbs<Output = Self>
+    + OverflowingAbsAssign
+    + PrimitiveInt
     + SaturatingAbs<Output = Self>
     + SaturatingAbsAssign
     + SaturatingNeg<Output = Self>

@@ -12,6 +12,7 @@ fn mod_shr_signed<
     other: S,
     m: T,
 ) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         let width = U::wrapping_from(T::WIDTH);
@@ -34,6 +35,7 @@ fn mod_shr_assign_signed<
     other: S,
     m: T,
 ) {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         let width = U::wrapping_from(T::WIDTH);
@@ -54,8 +56,8 @@ macro_rules! impl_mod_shr_signed {
                 impl ModShr<$u, $t> for $t {
                     type Output = $t;
 
-                    /// Right-shifts a number (divides it by a power of 2) modulo a number $m$.
-                    /// Assumes the input is already reduced modulo $m$.
+                    /// Right-shifts a number (divides it by a power of 2) modulo a number $m$. The
+                    /// number must be already reduced modulo $m$.
                     ///
                     /// $f(x, n, m) = y$, where $x, y < m$ and
                     /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
@@ -68,6 +70,9 @@ macro_rules! impl_mod_shr_signed {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
                     ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
+                    ///
                     /// # Examples
                     /// See [here](super::mod_shr#mod_shr).
                     #[inline]
@@ -78,7 +83,7 @@ macro_rules! impl_mod_shr_signed {
 
                 impl ModShrAssign<$u, $t> for $t {
                     /// Right-shifts a number (divides it by a power of 2) modulo a number $m$, in
-                    /// place. Assumes the input is already reduced modulo $m$.
+                    /// place. The number must be already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and
                     /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
@@ -90,6 +95,9 @@ macro_rules! impl_mod_shr_signed {
                     ///
                     /// where $T$ is time, $M$ is additional memory, and $n$ is
                     /// `other.significant_bits()`.
+                    ///
+                    /// # Panics
+                    /// Panics if `self` is greater than or equal to `m`.
                     ///
                     /// # Examples
                     /// See [here](super::mod_shr#mod_shr).

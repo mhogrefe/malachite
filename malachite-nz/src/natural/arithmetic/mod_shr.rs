@@ -16,6 +16,7 @@ where
     Natural: From<U>,
     &'a Natural: Shr<U, Output = Natural>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => x.clone(),
@@ -36,6 +37,7 @@ where
     Natural: From<U>,
     &'a Natural: Shr<U, Output = Natural>,
 {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => x.clone(),
@@ -54,6 +56,7 @@ fn mod_shr_assign<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
 ) where
     Natural: From<U> + ShrAssign<U>,
 {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => {}
@@ -72,6 +75,7 @@ fn mod_shr_assign_ref<U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
 ) where
     Natural: From<U> + ShrAssign<U>,
 {
+    assert!(*x < *m, "x must be reduced mod m, but {x} >= {m}");
     let bits_abs = bits.unsigned_abs();
     match bits.cmp(&S::ZERO) {
         Ordering::Equal => {}
@@ -89,8 +93,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s are taken
-            /// by value.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s
+            /// are taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -101,6 +105,9 @@ macro_rules! impl_mod_shr {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr).
@@ -115,8 +122,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. Assumes the input is already reduced modulo $m$. The first [`Natural`] is
-            /// taken by value and the second by reference.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first
+            /// [`Natural`] is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -127,6 +134,9 @@ macro_rules! impl_mod_shr {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr).
@@ -141,8 +151,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. Assumes the input is already reduced modulo $m$. The first [`Natural`] is
-            /// taken by reference and the second by value.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first
+            /// [`Natural`] is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -153,6 +163,9 @@ macro_rules! impl_mod_shr {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr).
@@ -166,8 +179,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. Assumes the input is already reduced modulo $m$. Both [`Natural`]s are taken
-            /// by reference.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s
+            /// are taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -179,6 +192,9 @@ macro_rules! impl_mod_shr {
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
             ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
+            ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr).
             #[inline]
@@ -189,8 +205,8 @@ macro_rules! impl_mod_shr {
 
         impl ModShrAssign<$t, Natural> for Natural {
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$, in place. Assumes the input is already reduced modulo $m$. The [`Natural`] on
-            /// the right-hand side is taken by value.
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by value.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -201,6 +217,9 @@ macro_rules! impl_mod_shr {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr_assign).
@@ -212,8 +231,8 @@ macro_rules! impl_mod_shr {
 
         impl<'a> ModShrAssign<$t, &'a Natural> for Natural {
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$, in place. Assumes the input is already reduced modulo $m$. The [`Natural`] on
-            /// the right-hand side is taken by reference.
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by reference.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -224,6 +243,9 @@ macro_rules! impl_mod_shr {
             ///
             /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$
             /// is `bits`.
+            ///
+            /// # Panics
+            /// Panics if `self` is greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_shr#mod_shr_assign).

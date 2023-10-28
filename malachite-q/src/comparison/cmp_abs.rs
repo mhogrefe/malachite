@@ -6,8 +6,7 @@ use std::cmp::Ordering;
 impl PartialOrdAbs for Rational {
     /// Compares the absolute values of two [`Rational`]s.
     ///
-    /// See the documentation for the
-    /// [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) implementation.
+    /// See the documentation for the [`OrdAbs`] implementation.
     #[inline]
     fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
         Some(self.cmp_abs(other))

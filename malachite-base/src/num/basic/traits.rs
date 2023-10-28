@@ -55,22 +55,22 @@ pub trait NaN {
 }
 
 // Implementation for `NonZero*` types:
-// * `One` and `Two` for both signed and unsigned variants
-// * `NegativeOne` for the signed variant
+// - `One` and `Two` for both signed and unsigned variants
+// - `NegativeOne` for the signed variant
 macro_rules! impl_non_zero {
     ($($t:ident),+) => {
         $(
             impl One for $t {
                 const ONE: Self = match Self::new(1) {
                     Some(v) => v,
-                    None => unreachable!() // 1 is a valid non zero value
+                    None => unreachable!() // 1 is a valid nonzero value
                 };
             }
 
             impl Two for $t {
                 const TWO: Self = match Self::new(2) {
                     Some(v) => v,
-                    None => unreachable!() // 2 is a valid non zero value
+                    None => unreachable!() // 2 is a valid nonzero value
                 };
             }
         )+

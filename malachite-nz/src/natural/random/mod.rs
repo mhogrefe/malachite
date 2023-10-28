@@ -134,8 +134,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
 ///
 /// [`Natural`]s with bit lengths smaller than the maximum may also be generated.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity
 /// $T(n) = O(n)$
@@ -167,8 +166,7 @@ pub fn get_striped_random_natural_with_up_to_bits(xs: &mut StripedBitSource, bit
 
 /// Generates a striped random [`Natural`] with a given bit length.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity
 /// $T(n) = O(n)$
@@ -359,8 +357,7 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// sequence with the given stripe parameter is generated and truncated at the bit length. The
 /// highest bit is forced to be 1, and the [`Natural`] is generated from the sequence.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// The output length is infinite.
 ///
@@ -419,8 +416,7 @@ pub fn striped_random_naturals(
 /// sequence with the given stripe parameter is generated and truncated at the bit length. The
 /// highest bit is forced to be 1, and the [`Natural`] is generated from the sequence.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// The output length is infinite.
 ///
@@ -1068,8 +1064,7 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 /// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
 /// run length.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1127,8 +1122,7 @@ pub fn striped_random_natural_range(
 /// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
 /// run length.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
@@ -1231,8 +1225,7 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](StripedBitSource) for information about generating striped random
-/// numbers.
+/// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n, m) = O(n + m)$

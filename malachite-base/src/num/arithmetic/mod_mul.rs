@@ -8,6 +8,8 @@ use crate::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf
 use crate::num::logic::traits::LeadingZeros;
 
 pub_test! {naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let (product_1, product_0) = T::x_mul_y_to_zz(x, y);
     T::xx_div_mod_y_to_qr(product_1, product_0, m).1
 }}
@@ -248,7 +250,8 @@ pub_test! {fast_mod_mul<
     m: T,
     inv: T,
 ) -> T {
-    assert_ne!(m, T::ZERO);
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
     limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
 }}
@@ -270,7 +273,7 @@ macro_rules! impl_mod_mul_precomputed_fast {
                 $invert_limb(m << LeadingZeros::leading_zeros(m))
             }
 
-            /// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
             /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
@@ -280,6 +283,9 @@ macro_rules! impl_mod_mul_precomputed_fast {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_mul#mod_mul_precomputed).
@@ -311,7 +317,7 @@ macro_rules! impl_mod_mul_precomputed_promoted {
                 u32::precompute_mod_mul_data(&u32::from(m))
             }
 
-            /// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
             /// reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
@@ -321,6 +327,9 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_mul#mod_mul_precomputed).
@@ -350,8 +359,8 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// Constant time and additional memory.
     fn precompute_mod_mul_data(_m: &u128) {}
 
-    /// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already reduced
-    /// modulo $m$.
+    /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
+    /// $m$.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
@@ -359,6 +368,9 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// See [here](super::mod_mul#mod_mul_precomputed).
@@ -389,8 +401,8 @@ impl ModMulPrecomputed<usize, usize> for usize {
         }
     }
 
-    /// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already reduced
-    /// modulo $m$.
+    /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
+    /// $m$.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
@@ -398,6 +410,9 @@ impl ModMulPrecomputed<usize, usize> for usize {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to `m`.
     ///
     /// # Examples
     /// See [here](super::mod_mul#mod_mul_precomputed).
@@ -423,7 +438,7 @@ impl ModMulPrecomputed<usize, usize> for usize {
 macro_rules! impl_mod_mul {
     ($t:ident) => {
         impl ModMulPrecomputedAssign<$t, $t> for $t {
-            /// Multiplies two numbers modulo a third number $m$, in place. Assumes the inputs are
+            /// Multiplies two numbers modulo a third number $m$, in place. The inputs must be
             /// already reduced modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
@@ -433,6 +448,9 @@ macro_rules! impl_mod_mul {
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_mul#mod_mul_precomputed_assign).
@@ -448,13 +466,16 @@ macro_rules! impl_mod_mul {
         impl ModMul<$t> for $t {
             type Output = $t;
 
-            /// Multiplies two numbers modulo a third number $m$. Assumes the inputs are already
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
             /// reduced modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_mul#mod_mul).
@@ -467,7 +488,7 @@ macro_rules! impl_mod_mul {
         }
 
         impl ModMulAssign<$t> for $t {
-            /// Multiplies two numbers modulo a third number $m$, in place. Assumes the inputs are
+            /// Multiplies two numbers modulo a third number $m$, in place. The inputs must be
             /// already reduced modulo $m$.
             ///
             /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
@@ -477,6 +498,9 @@ macro_rules! impl_mod_mul {
             ///
             /// # Examples
             /// See [here](super::mod_mul#mod_mul_assign).
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// This is equivalent to `nmod_mul` from `nmod_vec.h`, FLINT 2.7.1, where the result
             /// is assigned to `a`.

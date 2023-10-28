@@ -258,8 +258,7 @@ impl ToSci for Rational {
     /// Converts a [`Rational` ]to a string using a specified base, possibly formatting the number
     /// using scientific notation.
     ///
-    /// See [`ToSciOptions`](malachite_base::num::conversion::string::options::ToSciOptions) for
-    /// details on the available options.
+    /// See [`ToSciOptions`] for details on the available options.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

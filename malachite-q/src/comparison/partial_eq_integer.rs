@@ -2,8 +2,7 @@ use crate::Rational;
 use malachite_nz::integer::Integer;
 
 impl PartialEq<Integer> for Rational {
-    /// Determines whether a [`Rational`] is equal to an
-    /// [`Integer`](malachite_nz::integer::Integer).
+    /// Determines whether a [`Rational`] is equal to an [`Integer`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -29,8 +28,7 @@ impl PartialEq<Integer> for Rational {
 }
 
 impl PartialEq<Rational> for Integer {
-    /// Determines whether an [`Integer`](malachite_nz::integer::Integer) is equal to a
-    /// [`Rational`].
+    /// Determines whether an [`Integer`] is equal to a [`Rational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

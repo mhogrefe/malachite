@@ -1,9 +1,14 @@
 use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::traits::Zero;
+#[cfg(feature = "random")]
 use crate::num::conversion::traits::ExactFrom;
+#[cfg(feature = "random")]
 use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+#[cfg(feature = "random")]
 use crate::random::Seed;
+#[cfg(feature = "random")]
 use rand::prelude::SliceRandom;
+#[cfg(feature = "random")]
 use rand_chacha::ChaCha20Rng;
 
 /// Sets all values in a slice to 0.
@@ -227,6 +232,7 @@ macro_rules! split_into_chunks_mut {
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random reference to a value from a nonempty slice.
 ///
 /// This `struct` is created by [`random_values_from_slice`]; see its documentation for more.
@@ -236,6 +242,7 @@ pub struct RandomValuesFromSlice<'a, T> {
     indices: RandomUnsignedsLessThan<u64>,
 }
 
+#[cfg(feature = "random")]
 impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
     type Item = &'a T;
 
@@ -245,6 +252,7 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random reference to a value from a nonempty slice.
 ///
 /// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the
@@ -385,6 +393,7 @@ pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random permutation of references to a slice.
 ///
 /// This `struct` is created by [`random_slice_permutations`]; see its documentation for more.
@@ -395,6 +404,7 @@ pub struct RandomSlicePermutations<'a, T> {
     rng: ChaCha20Rng,
 }
 
+#[cfg(feature = "random")]
 impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
     type Item = Vec<&'a T>;
 
@@ -404,6 +414,7 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random permutation of references to a slice.
 ///
 /// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the

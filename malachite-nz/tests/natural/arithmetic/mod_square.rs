@@ -8,6 +8,7 @@ use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_gen_var_2, natural_pair_gen_var_8, natural_triple_gen_var_3,
 };
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
@@ -52,6 +53,39 @@ fn test_mod_square() {
     test("200", "497", "240");
     test("300", "497", "43");
     test("1234567890", "123456789876", "100296296172");
+}
+
+#[test]
+fn mod_square_fail() {
+    assert_panic!(Natural::ZERO.mod_square(Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_square(Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_square(&Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_square(&Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_square(Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_square(Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_square(&Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_square(&Natural::ONE));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_square_assign(Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_square_assign(Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_square_assign(&Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_square_assign(&Natural::ONE)
+    });
 }
 
 #[test]

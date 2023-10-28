@@ -5,7 +5,7 @@ use crate::natural::arithmetic::add::{
 use crate::natural::arithmetic::mul::{
     limbs_mul_same_length_to_out, limbs_mul_same_length_to_out_scratch_len,
 };
-use crate::natural::arithmetic::neg::{limbs_neg, limbs_neg_in_place};
+use crate::natural::arithmetic::neg::{limbs_neg, limbs_neg_in_place, limbs_neg_to_out};
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
@@ -111,15 +111,32 @@ fn limbs_fft_mulmod_2expp1_basecase_same2_scratch_len(b: usize) -> usize {
 // This is equivalent to `flint_mpn_mulmod_2expp1_internal` from
 // `mpn_extras/mulmod_2expp1_basecase.c`, FLINT 2.8.0, where xp == yp == zp. Asserts that b is a
 // multiple of `Limb::WIDTH`.
-fn limbs_fft_mulmod_2expp1_basecase_same2(xs: &mut [Limb], b: usize, scratch: &mut [Limb]) -> bool {
-    let n = (b + U_WIDTH - 1) >> Limb::LOG_WIDTH;
-    let k = (n << Limb::LOG_WIDTH) - b;
-    assert_eq!(k, 0);
-    let xs = &mut xs[..n];
-    let (scratch, square_scratch) = scratch.split_at_mut(n << 1);
-    limbs_square_to_out(scratch, xs, square_scratch);
-    split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
-    limbs_sub_same_length_to_out(xs, scratch_lo, scratch_hi) && limbs_slice_add_limb_in_place(xs, 1)
+fn limbs_fft_mulmod_2expp1_basecase_same2(
+    xs: &mut [Limb],
+    carry: Limb,
+    b: usize,
+    scratch: &mut [Limb],
+) -> bool {
+    match carry {
+        0 => {
+            let n = (b + U_WIDTH - 1) >> Limb::LOG_WIDTH;
+            let k = (n << Limb::LOG_WIDTH) - b;
+            assert_eq!(k, 0);
+            let xs = &mut xs[..n];
+            let (scratch, square_scratch) = scratch.split_at_mut(n << 1);
+            limbs_square_to_out(scratch, xs, square_scratch);
+            split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
+            limbs_sub_same_length_to_out(xs, scratch_lo, scratch_hi)
+                && limbs_slice_add_limb_in_place(xs, 1)
+        }
+        3 => {
+            xs[0] = 1;
+            let xs_len = xs.len();
+            slice_set_zero(&mut xs[1..xs_len - 1]);
+            false
+        }
+        _ => panic!("Unexpected carry: {carry}"),
+    }
 }
 
 fn limbs_fft_mulmod_2expp1_basecase_same_scratch_len(xs_len: usize) -> usize {
@@ -129,28 +146,43 @@ fn limbs_fft_mulmod_2expp1_basecase_same_scratch_len(xs_len: usize) -> usize {
 // c is the top bits of the inputs, must be fully reduced
 //
 // This is equivalent to `flint_mpn_mulmod_2expp1_basecase` from
-// `mpn_extras/mulmod_2expp1_basecase.c`, FLINT 2.8.0, where xp == yp != zp, c is 0 or 1, k is
-// passed in, and n is the length of xp and zp.
+// `mpn_extras/mulmod_2expp1_basecase.c`, FLINT 2.8.0, where xp == yp != zp, k is passed in, and n
+// is the length of xp and zp.
 fn limbs_fft_mulmod_2expp1_basecase_same(
     xs: &mut [Limb],
     ys: &[Limb],
-    carry: bool,
+    carry: Limb,
     k: usize,
     scratch: &mut [Limb],
 ) -> bool {
-    if carry {
-        let out = limbs_neg_in_place(xs) && limbs_slice_add_limb_in_place(xs, 1);
-        *xs.last_mut().unwrap() &= Limb::MAX >> k;
-        out
-    } else {
-        assert_eq!(k, 0);
-        let n = xs.len();
-        assert_eq!(ys.len(), n);
-        let (scratch, mul_scratch) = scratch.split_at_mut(n << 1);
-        limbs_mul_same_length_to_out(scratch, xs, ys, mul_scratch);
-        split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
-        limbs_sub_same_length_to_out(xs, scratch_lo, scratch_hi)
-            && limbs_slice_add_limb_in_place(xs, 1)
+    assert_eq!(k, 0);
+    let n = xs.len();
+    assert_eq!(ys.len(), n);
+    match carry {
+        0 => {
+            let (scratch, mul_scratch) = scratch.split_at_mut(n << 1);
+            limbs_mul_same_length_to_out(scratch, xs, ys, mul_scratch);
+            split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
+            limbs_sub_same_length_to_out(xs, scratch_lo, scratch_hi)
+                && limbs_slice_add_limb_in_place(xs, 1)
+        }
+        1 => {
+            let out = limbs_neg_in_place(xs) && limbs_slice_add_limb_in_place(xs, 1);
+            *xs.last_mut().unwrap() &= Limb::MAX >> k;
+            out
+        }
+        2 => {
+            let out = limbs_neg_to_out(xs, ys) && limbs_slice_add_limb_in_place(xs, 1);
+            *xs.last_mut().unwrap() &= Limb::MAX >> k;
+            out
+        }
+        3 => {
+            xs[0] = 1;
+            let xs_len = xs.len();
+            slice_set_zero(&mut xs[1..xs_len - 1]);
+            false
+        }
+        _ => panic!("Unexpected carry: {carry}"),
     }
 }
 
@@ -1597,7 +1629,7 @@ fn limbs_fft_mulmod_2expp1<'a>(
         *ps.last_mut().unwrap() = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
             &mut ps[..n_2],
             &qs[..n_2],
-            false,
+            0,
             k,
             scratch,
         ));
@@ -1738,7 +1770,7 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
     for ps in &mut *xss {
         assert_eq!(*ps.last_mut().unwrap(), 0);
         *ps.last_mut().unwrap() =
-            Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(ps, nw, scratch));
+            Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(ps, 0, nw, scratch));
     }
     limbs_ifft_negacyclic(xss, w, ts, us, ss);
     let x = xss0[0];
@@ -2294,13 +2326,11 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
             limbs_fft_normmod_2expp1(ys);
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
             let (ys_last, ys_init) = ys.split_last().unwrap();
-            assert_eq!(*xs_last, 0);
-            let c = *ys_last;
-            assert!(c < 2);
+            let c = (*xs_last << 1) + *ys_last;
             *xs_last = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                 xs_init,
                 ys_init,
-                c == 1,
+                c,
                 k,
                 combine_scratch,
             ));
@@ -2380,7 +2410,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                     xs[limbs] = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                         &mut xs[..n_2],
                         &ys[..n_2],
-                        false,
+                        0,
                         k,
                         misc_scratch,
                     ));
@@ -2398,7 +2428,7 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
                     xs[limbs] = Limb::from(limbs_fft_mulmod_2expp1_basecase_same(
                         &mut xs[..n_2],
                         &ys[..n_2],
-                        false,
+                        0,
                         k,
                         misc_scratch,
                     ));
@@ -2671,9 +2701,9 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
         for xs in &mut xss[..trunc] {
             limbs_fft_normmod_2expp1(xs);
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
-            assert_eq!(*xs_last, 0);
             *xs_last = Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(
                 xs_init,
+                *xs_last * 3,
                 b,
                 combine_scratch,
             ));
@@ -2732,7 +2762,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 for xs in &mut *xss_hi {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
-                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
+                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, 0, nw, misc_scratch));
                 }
                 limbs_ifft_radix2(xss_hi, wy, &mut ts, &mut us);
             }
@@ -2742,7 +2772,7 @@ pub_test! {limbs_square_to_out_fft_with_cutoff(
                 for xs in &mut *xss_chunk {
                     limbs_fft_normmod_2expp1(xs);
                     xs[limbs] =
-                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, nw, misc_scratch));
+                        Limb::from(limbs_fft_mulmod_2expp1_basecase_same2(xs, 0, nw, misc_scratch));
                 }
                 limbs_ifft_radix2(xss_chunk, wy, &mut ts, &mut us);
             }

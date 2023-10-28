@@ -345,7 +345,7 @@ pub fn test_to_sci_with_options() {
 #[test]
 fn to_sci_properties() {
     let mut powers_of_10 = HashMap::new();
-    let ten = Natural::from(10u8);
+    const TEN: Natural = Natural::const_from(10);
     let default_p = 16;
     natural_gen().test_properties(|x| {
         assert!(x.fmt_sci_valid(ToSciOptions::default()));
@@ -364,13 +364,13 @@ fn to_sci_properties() {
         if x == 0u32 {
             assert_eq!(x_from, 0u32);
         } else {
-            let log = x.floor_log_base(&ten);
+            let log = x.floor_log_base(&TEN);
             if log < default_p {
                 assert_eq!(x_from, x);
             } else {
                 let pow = powers_of_10
                     .entry(log - default_p + 1)
-                    .or_insert_with_key(|&p| (&ten).pow(p));
+                    .or_insert_with_key(|&p| (&TEN).pow(p));
                 assert_eq!(x.round_to_multiple(&*pow, RoundingMode::Nearest).0, x_from);
             }
         }

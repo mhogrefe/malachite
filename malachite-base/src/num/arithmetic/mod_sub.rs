@@ -1,9 +1,11 @@
 use crate::num::arithmetic::traits::{ModSub, ModSubAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_sub<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
-    let diff = x.wrapping_sub(other);
-    if x < other {
+fn mod_sub<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
+    let diff = x.wrapping_sub(y);
+    if x < y {
         m.wrapping_add(diff)
     } else {
         diff
@@ -15,13 +17,16 @@ macro_rules! impl_mod_sub {
         impl ModSub<$t> for $t {
             type Output = $t;
 
-            /// Subtracts two numbers modulo a third number $m$. Assumes the inputs are already
-            /// reduced modulo $m$.
+            /// Subtracts two numbers modulo a third number $m$. The inputs must be already reduced
+            /// modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_sub#mod_sub).
@@ -34,13 +39,16 @@ macro_rules! impl_mod_sub {
         }
 
         impl ModSubAssign<$t> for $t {
-            /// Subtracts two numbers modulo a third number $m$, in place. Assumes the inputs are
+            /// Subtracts two numbers modulo a third number $m$, in place. The inputs must be
             /// already reduced modulo $m$.
             ///
             /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_sub#mod_sub_assign).

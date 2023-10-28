@@ -318,13 +318,13 @@ pub mod mod_power_of_2_sub;
 /// );
 ///
 /// assert_eq!(Natural::from(8u32).mod_shl(2i8, Natural::from(10u32)), 2);
-/// assert_eq!(Natural::from(10u32).mod_shl(-100i32, Natural::from(10u32)), 0);
+/// assert_eq!(Natural::from(5u32).mod_shl(-100i32, Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     Natural::from(123456u32).mod_shl(100i64, Natural::from_str("12345678987654321").unwrap()),
 ///     7436663564915145u64
 /// );
 /// assert_eq!(Natural::from(8u32).mod_shl(2i8, &Natural::from(10u32)), 2);
-/// assert_eq!(Natural::from(10u32).mod_shl(-100i32, &Natural::from(10u32)), 0);
+/// assert_eq!(Natural::from(5u32).mod_shl(-100i32, &Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     Natural::from(123456u32).mod_shl(
 ///         100i64,
@@ -333,7 +333,7 @@ pub mod mod_power_of_2_sub;
 ///     7436663564915145u64
 /// );
 /// assert_eq!((&Natural::from(8u32)).mod_shl(2i8, Natural::from(10u32)), 2);
-/// assert_eq!((&Natural::from(10u32)).mod_shl(-100i32, Natural::from(10u32)), 0);
+/// assert_eq!((&Natural::from(5u32)).mod_shl(-100i32, Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     (&Natural::from(123456u32)).mod_shl(
 ///         100i64,
@@ -342,7 +342,7 @@ pub mod mod_power_of_2_sub;
 ///     7436663564915145u64
 /// );
 /// assert_eq!((&Natural::from(8u32)).mod_shl(2i8, &Natural::from(10u32)), 2);
-/// assert_eq!((&Natural::from(10u32)).mod_shl(-100i32, &Natural::from(10u32)), 0);
+/// assert_eq!((&Natural::from(5u32)).mod_shl(-100i32, &Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     (&Natural::from(123456u32)).mod_shl(
 ///         100i64,
@@ -378,7 +378,7 @@ pub mod mod_power_of_2_sub;
 /// x.mod_shl_assign(2i8, Natural::from(10u32));
 /// assert_eq!(x, 2);
 ///
-/// let mut x = Natural::from(10u32);
+/// let mut x = Natural::from(5u32);
 /// x.mod_shl_assign(-100i32, Natural::from(10u32));
 /// assert_eq!(x, 0);
 ///
@@ -390,7 +390,7 @@ pub mod mod_power_of_2_sub;
 /// x.mod_shl_assign(2i8, &Natural::from(10u32));
 /// assert_eq!(x, 2);
 ///
-/// let mut x = Natural::from(10u32);
+/// let mut x = Natural::from(5u32);
 /// x.mod_shl_assign(-100i32, &Natural::from(10u32));
 /// assert_eq!(x, 0);
 ///
@@ -410,7 +410,7 @@ pub mod mod_shl;
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(Natural::from(8u32).mod_shr(-2i8, Natural::from(10u32)), 2);
-/// assert_eq!(Natural::from(10u32).mod_shr(100i32, Natural::from(10u32)), 0);
+/// assert_eq!(Natural::from(5u32).mod_shr(100i32, Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     Natural::from(123456u32).mod_shr(
 ///         -100i64,
@@ -419,7 +419,7 @@ pub mod mod_shl;
 ///     7436663564915145u64
 /// );
 /// assert_eq!(Natural::from(8u32).mod_shr(-2i8, &Natural::from(10u32)), 2);
-/// assert_eq!(Natural::from(10u32).mod_shr(100i32, &Natural::from(10u32)), 0);
+/// assert_eq!(Natural::from(5u32).mod_shr(100i32, &Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     Natural::from(123456u32).mod_shr(
 ///         -100i64,
@@ -428,7 +428,7 @@ pub mod mod_shl;
 ///     7436663564915145u64
 /// );
 /// assert_eq!((&Natural::from(8u32)).mod_shr(-2i8, Natural::from(10u32)), 2);
-/// assert_eq!((&Natural::from(10u32)).mod_shr(100i32, Natural::from(10u32)), 0);
+/// assert_eq!((&Natural::from(5u32)).mod_shr(100i32, Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     (&Natural::from(123456u32)).mod_shr(
 ///         -100i64,
@@ -437,7 +437,7 @@ pub mod mod_shl;
 ///     7436663564915145u64
 /// );
 /// assert_eq!((&Natural::from(8u32)).mod_shr(-2i8, &Natural::from(10u32)), 2);
-/// assert_eq!((&Natural::from(10u32)).mod_shr(100i32, &Natural::from(10u32)), 0);
+/// assert_eq!((&Natural::from(5u32)).mod_shr(100i32, &Natural::from(10u32)), 0);
 /// assert_eq!(
 ///     (&Natural::from(123456u32)).mod_shr(
 ///         -100i64,
@@ -457,7 +457,7 @@ pub mod mod_shl;
 /// x.mod_shr_assign(-2i8, Natural::from(10u32));
 /// assert_eq!(x, 2);
 ///
-/// let mut x = Natural::from(10u32);
+/// let mut x = Natural::from(5u32);
 /// x.mod_shr_assign(100i32, Natural::from(10u32));
 /// assert_eq!(x, 0);
 ///
@@ -469,7 +469,7 @@ pub mod mod_shl;
 /// x.mod_shr_assign(-2i8, &Natural::from(10u32));
 /// assert_eq!(x, 2);
 ///
-/// let mut x = Natural::from(10u32);
+/// let mut x = Natural::from(5u32);
 /// x.mod_shr_assign(100i32, &Natural::from(10u32));
 /// assert_eq!(x, 0);
 ///

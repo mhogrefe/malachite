@@ -41,9 +41,8 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 
 /// Generates all [`String`]s of a given length in lexicographic order.
 ///
-/// The order is lexicographic with respect to the order of
-/// [`exhaustive_chars`](crate::chars::exhaustive::exhaustive_chars), which is not the default
-/// lexicographic order for [`char`]s. (For example, the first characters are not control
+/// The order is lexicographic with respect to the order of [`exhaustive_chars`], which is not the
+/// default lexicographic order for [`char`]s. (For example, the first characters are not control
 /// characters, but lowercase Latin letters.) If you want the default [`char`] order, use
 /// `lex_fixed_length_strings_using_chars(len, chars_increasing())`.
 ///
@@ -181,10 +180,9 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// Shortlex order means that the [`String`]s are output from shortest to longest, and [`String`]s
 /// of the same length are output in lexicographic order with respect to the order of
-/// [`exhaustive_chars`](crate::chars::exhaustive::exhaustive_chars), which is not the default
-/// lexicographic order for [`char`]s. (For example, the first characters are not control
-/// characters, but lowercase Latin letters.) If you want the default [`char`] order, use
-/// `shortlex_strings_using_chars(chars_increasing())`.
+/// [`exhaustive_chars`], which is not the default lexicographic order for [`char`]s. (For example,
+/// the first characters are not control characters, but lowercase Latin letters.) If you want the
+/// default [`char`] order, use `shortlex_strings_using_chars(chars_increasing())`.
 ///
 /// The output is infinite.
 ///

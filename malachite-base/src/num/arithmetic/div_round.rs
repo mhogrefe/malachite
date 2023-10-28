@@ -87,7 +87,7 @@ macro_rules! impl_div_round_unsigned {
             /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
             /// is less than, equal to, or greater than the exact value.
             ///
-            /// See the [`DivRound`](super::traits::DivRound) documentation for details.
+            /// See the [`DivRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -193,7 +193,7 @@ macro_rules! impl_div_round_signed {
             /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
             /// is less than, equal to, or greater than the exact value.
             ///
-            /// See the [`DivRound`](super::traits::DivRound) documentation for details.
+            /// See the [`DivRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

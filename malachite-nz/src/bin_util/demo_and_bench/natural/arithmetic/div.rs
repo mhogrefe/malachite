@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivMod};
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_2_3_diff_vec_len_bucketer, quadruple_2_vec_len_bucketer,
     quadruple_3_vec_len_bucketer, triple_1_vec_len_bucketer, triple_2_vec_len_bucketer,
@@ -26,17 +26,19 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::test_util::bench::bucketers::{
     limbs_div_to_out_balancing_bucketer, pair_1_natural_bit_bucketer,
-    triple_3_pair_1_natural_bit_bucketer,
+    pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_pair_gen_var_5,
-    natural_pair_gen_var_5_nrm, unsigned_vec_quadruple_gen_var_1, unsigned_vec_triple_gen_var_42,
+    large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_pair_gen,
+    natural_pair_gen_nm, natural_pair_gen_var_5, natural_pair_gen_var_5_nrm,
+    unsigned_vec_quadruple_gen_var_1, unsigned_vec_triple_gen_var_42,
     unsigned_vec_triple_gen_var_43, unsigned_vec_triple_gen_var_44, unsigned_vec_triple_gen_var_45,
     unsigned_vec_unsigned_unsigned_triple_gen_var_9,
 };
 use malachite_nz::test_util::natural::arithmetic::div::{
     limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
+use num::CheckedDiv as NumCheckedDiv;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_div_limb);
@@ -64,6 +66,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_div_val_ref);
     register_demo!(runner, demo_natural_div_ref_val);
     register_demo!(runner, demo_natural_div_ref_ref);
+    register_demo!(runner, demo_natural_checked_div);
+    register_demo!(runner, demo_natural_checked_div_val_ref);
+    register_demo!(runner, demo_natural_checked_div_ref_val);
+    register_demo!(runner, demo_natural_checked_div_ref_ref);
 
     register_bench!(runner, benchmark_limbs_div_limb);
     register_bench!(runner, benchmark_limbs_div_limb_to_out_algorithms);
@@ -93,6 +99,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_div_library_comparison);
     register_bench!(runner, benchmark_natural_div_algorithms);
     register_bench!(runner, benchmark_natural_div_evaluation_strategy);
+    register_bench!(runner, benchmark_natural_checked_div_library_comparison);
+    register_bench!(runner, benchmark_natural_checked_div_evaluation_strategy);
 }
 
 fn demo_limbs_div_limb(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -339,6 +347,44 @@ fn demo_natural_div_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_natural_div_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in natural_pair_gen_var_5().get(gm, config).take(limit) {
         println!("&{} / &{} = {}", x, y, &x / &y);
+    }
+}
+
+fn demo_natural_checked_div(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).checked_div({}) = {:?}",
+            x_old,
+            y_old,
+            x.checked_div(y)
+        );
+    }
+}
+
+fn demo_natural_checked_div_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).checked_div(&{}) = {:?}", x_old, y, x.checked_div(&y));
+    }
+}
+
+fn demo_natural_checked_div_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
+        let y_old = y.clone();
+        println!(
+            "(&{}).checked_div({}) = {:?}",
+            x,
+            y_old,
+            (&x).checked_div(y)
+        );
+    }
+}
+
+fn demo_natural_checked_div_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, config).take(limit) {
+        println!("(&{}).checked_div(&{}) = {:?}", x, y, (&x).checked_div(&y));
     }
 }
 
@@ -847,6 +893,58 @@ fn benchmark_natural_div_evaluation_strategy(
             ("Natural / &Natural", &mut |(x, y)| no_out!(x / &y)),
             ("&Natural / Natural", &mut |(x, y)| no_out!(&x / y)),
             ("&Natural / &Natural", &mut |(x, y)| no_out!(&x / &y)),
+        ],
+    );
+}
+
+fn benchmark_natural_checked_div_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.checked_div(Natural)",
+        BenchmarkType::LibraryComparison,
+        natural_pair_gen_nm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_pair_1_natural_bit_bucketer("x"),
+        &mut [
+            ("Malachite", &mut |(_, (x, y))| no_out!(x.checked_div(&y))),
+            ("num", &mut |((x, y), _)| no_out!(x.checked_div(&y))),
+        ],
+    );
+}
+
+fn benchmark_natural_checked_div_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.checked_div(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        natural_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_natural_bit_bucketer("x"),
+        &mut [
+            ("Natural.checked_div(Natural)", &mut |(x, y)| {
+                no_out!(x.checked_div(y))
+            }),
+            ("Natural.checked_div(&Natural)", &mut |(x, y)| {
+                no_out!(x.checked_div(&y))
+            }),
+            ("(&Natural).checked_div(Natural)", &mut |(x, y)| {
+                no_out!((&x).checked_div(y))
+            }),
+            ("(&Natural).checked_div(&Natural)", &mut |(x, y)| {
+                no_out!((&x).checked_div(&y))
+            }),
         ],
     );
 }

@@ -22,8 +22,7 @@ macro_rules! float_impls {
     ($f: ident) => {
         impl RoundingFrom<Rational> for $f {
             /// Converts a [`Rational`] to a value of a primitive float according to a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode), taking the
-            /// [`Rational`] by value.
+            /// [`RoundingMode`], taking the [`Rational`] by value.
             ///
             /// - If the rounding mode is `Floor`, the largest float less than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
@@ -234,8 +233,7 @@ macro_rules! float_impls {
 
         impl<'a> RoundingFrom<&'a Rational> for $f {
             /// Converts a [`Rational`] to a value of a primitive float according to a specified
-            /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode), taking the
-            /// [`Rational`] by reference.
+            /// [`RoundingMode`], taking the [`Rational`] by reference.
             ///
             /// - If the rounding mode is `Floor`, the largest float less than or equal to the
             ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite

@@ -65,6 +65,7 @@ fn test_partial_eq_i32() {
     test("0", 0, true);
     test("0", 5, false);
     test("123", 123, true);
+    test("123", -123, false);
     test("123", 5, false);
     test("1000000000000", 123, false);
 }
@@ -81,6 +82,7 @@ fn test_partial_eq_i64() {
     test("0", 0, true);
     test("0", 5, false);
     test("123", 123, true);
+    test("123", -123, false);
     test("123", 5, false);
     test("1000000000000", 1000000000000, true);
     test("1000000000000", 1000000000001, false);

@@ -10,6 +10,10 @@ fn mod_power_of_2_shl_unsigned<T: PrimitiveUnsigned + Shl<U, Output = T>, U: Pri
     pow: u64,
 ) -> T {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     if other >= U::exact_from(T::WIDTH) {
         T::ZERO
     } else {
@@ -23,6 +27,10 @@ fn mod_power_of_2_shl_assign_unsigned<T: PrimitiveUnsigned + ShlAssign<U>, U: Pr
     pow: u64,
 ) {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     if other >= U::exact_from(T::WIDTH) {
         *x = T::ZERO;
     } else {
@@ -38,8 +46,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. Assumes
-                    /// the input is already reduced modulo $2^k$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. The
+                    /// number must be already reduced modulo $2^k$.
                     ///
                     /// $f(x, n, k) = y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
                     ///
@@ -47,7 +55,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than
+                    /// or equal to $2^k$.
                     ///
                     /// # Examples
                     /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl).
@@ -59,7 +68,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
-                    /// place. Assumes the input is already reduced modulo $2^k$.
+                    /// place. The number must be already reduced modulo $2^k$.
                     ///
                     /// $x \gets y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
                     ///
@@ -67,7 +76,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than
+                    /// or equal to $2^k$.
                     ///
                     /// # Examples
                     /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).
@@ -93,6 +103,10 @@ fn mod_power_of_2_shl_signed<
     pow: u64,
 ) -> T {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         x.mod_power_of_2_shl(other_abs, pow)
@@ -116,6 +130,10 @@ fn mod_power_of_2_shl_assign_signed<
     pow: u64,
 ) {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
         x.mod_power_of_2_shl_assign(other_abs, pow);
@@ -136,14 +154,15 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. Assumes
-                    /// the input is already reduced modulo $2^k$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. The
+                    /// number must be already reduced modulo $2^k$.
                     ///
                     /// $f(x, n, k) = y$, where $x, y < 2^k$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
                     ///
                     /// # Panics
-                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than
+                    /// or equal to $2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -158,7 +177,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
-                    /// place. Assumes the input is already reduced modulo $2^k$.
+                    /// place. The number must be already reduced modulo $2^k$.
                     ///
                     /// $x \gets y$, where $x, y < 2^k$ and
                     /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
@@ -167,7 +186,8 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    /// Panics if `pow` is greater than `Self::WIDTH`.
+                    /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than
+                    /// or equal to $2^k$.
                     ///
                     /// # Examples
                     /// See [here](super::mod_power_of_2_shl#mod_power_of_2_shl_assign).

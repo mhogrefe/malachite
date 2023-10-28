@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Neg, ModPowerOf2Shl,
     ModPowerOf2ShlAssign, ModPowerOf2Shr,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -16,6 +17,7 @@ use malachite_nz::test_util::generators::{
     natural_unsigned_unsigned_triple_gen_var_6,
 };
 use std::ops::Shl;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 macro_rules! test_mod_power_of_2_shl_unsigned {
@@ -82,6 +84,24 @@ macro_rules! test_mod_power_of_2_shl_signed {
 fn test_mod_power_of_2_shl() {
     apply_to_unsigneds!(test_mod_power_of_2_shl_unsigned);
     apply_to_signeds!(test_mod_power_of_2_shl_signed);
+}
+
+fn mod_power_of_2_shl_fail_helper<T: PrimitiveInt>()
+where
+    Natural: ModPowerOf2Shl<T, Output = Natural> + ModPowerOf2ShlAssign<T>,
+    for<'a> &'a Natural: ModPowerOf2Shl<T, Output = Natural>,
+{
+    assert_panic!(Natural::ONE.mod_power_of_2_shl(T::exact_from(3u8), 0));
+    assert_panic!((&Natural::ONE).mod_power_of_2_shl(T::exact_from(3u8), 0));
+    assert_panic!({
+        let mut x = Natural::ONE;
+        x.mod_power_of_2_shl_assign(T::exact_from(3u8), 0)
+    });
+}
+
+#[test]
+fn mod_power_of_2_shl_fail() {
+    apply_fn_to_primitive_ints!(mod_power_of_2_shl_fail_helper);
 }
 
 fn unsigned_properties<T: PrimitiveUnsigned>()

@@ -4,6 +4,10 @@ use crate::num::logic::traits::BitIterable;
 
 fn mod_power_of_2_pow<T: PrimitiveUnsigned>(x: T, exp: u64, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
+    assert!(
+        x.significant_bits() <= pow,
+        "x must be reduced mod 2^pow, but {x} >= 2^{pow}"
+    );
     if pow == 0 {
         return T::ZERO;
     }
@@ -22,8 +26,8 @@ macro_rules! impl_mod_power_of_2_pow {
         impl ModPowerOf2Pow<u64> for $t {
             type Output = $t;
 
-            /// Raises a number to a power modulo another number $2^k$. Assumes the input is
-            /// already reduced modulo $2^k$.
+            /// Raises a number to a power modulo another number $2^k$. The base must be already
+            /// reduced modulo $2^k$.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
             ///
@@ -35,7 +39,8 @@ macro_rules! impl_mod_power_of_2_pow {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_pow#mod_power_of_2_pow).
@@ -46,8 +51,8 @@ macro_rules! impl_mod_power_of_2_pow {
         }
 
         impl ModPowerOf2PowAssign<u64> for $t {
-            /// Raises a number to a power modulo another number $2^k$, in place. Assumes the input
-            /// is already reduced modulo $2^k$.
+            /// Raises a number to a power modulo another number $2^k$, in place. The base must be
+            /// already reduced modulo $2^k$.
             ///
             /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
             ///
@@ -59,7 +64,8 @@ macro_rules! impl_mod_power_of_2_pow {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than `Self::WIDTH`.
+            /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
+            /// to $2^k$.
             ///
             /// # Examples
             /// See [here](super::mod_power_of_2_pow#mod_power_of_2_pow_assign).

@@ -102,7 +102,7 @@ pub trait ToSci: Sized {
     }
 
     /// Converts a number to a string, possibly in scientific notation, using the default
-    /// [`ToSciOptions`](super::string::options::ToSciOptions).
+    /// [`ToSciOptions`].
     #[inline]
     fn to_sci(&self) -> SciWrapper<Self> {
         SciWrapper {
@@ -118,7 +118,7 @@ pub trait FromSciString: Sized {
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self>;
 
     /// Converts a `&str`, possibly in scientific notation, to a number, using the default
-    /// [`FromSciStringOptions`](super::string::options::FromSciStringOptions).
+    /// [`FromSciStringOptions`].
     #[inline]
     fn from_sci_string(s: &str) -> Option<Self> {
         Self::from_sci_string_with_options(s, FromSciStringOptions::default())
@@ -230,17 +230,15 @@ impl<T, U: OverflowingFrom<T>> OverflowingInto<U> for T {
 }
 
 /// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is also
-/// returned, indicating whether the returned value is less than, equal to, or greater than the
-/// original value.
+/// specified [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
+/// value is less than, equal to, or greater than the original value.
 pub trait RoundingFrom<T>: Sized {
     fn rounding_from(value: T, rm: RoundingMode) -> (Self, Ordering);
 }
 
 /// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is also
-/// returned, indicating whether the returned value is less than, equal to, or greater than the
-/// original value.
+/// specified [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
+/// value is less than, equal to, or greater than the original value.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when [`RoundingFrom`] is implemented.

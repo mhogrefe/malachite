@@ -97,7 +97,11 @@ impl FromStringBase for Integer {
     #[inline]
     fn from_string_base(base: u8, s: &str) -> Option<Integer> {
         if let Some(abs_string) = s.strip_prefix('-') {
-            Natural::from_string_base(base, abs_string).map(Neg::neg)
+            if abs_string.starts_with('+') {
+                None
+            } else {
+                Natural::from_string_base(base, abs_string).map(Neg::neg)
+            }
         } else {
             Natural::from_string_base(base, s).map(Integer::from)
         }

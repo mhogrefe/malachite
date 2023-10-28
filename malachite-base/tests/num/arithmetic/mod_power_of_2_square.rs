@@ -2,6 +2,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_9, unsigned_pair_gen_var_17, unsigned_triple_gen_var_11,
 };
+use std::panic::catch_unwind;
 
 fn mod_power_of_2_square_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, pow: u64, out| {
@@ -23,6 +24,32 @@ fn mod_power_of_2_square_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_power_of_2_square() {
     apply_fn_to_unsigneds!(mod_power_of_2_square_helper);
+}
+
+fn mod_power_of_2_square_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.mod_power_of_2_square(0));
+    assert_panic!(T::from(200u8).mod_power_of_2_square(7));
+}
+
+#[test]
+fn mod_power_of_2_square_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_square_fail_helper);
+}
+
+fn mod_power_of_2_square_assign_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!({
+        let mut x = T::ONE;
+        x.mod_power_of_2_square_assign(0)
+    });
+    assert_panic!({
+        let mut x = T::from(200u8);
+        x.mod_power_of_2_square_assign(7)
+    });
+}
+
+#[test]
+fn mod_power_of_2_square_assign_fail() {
+    apply_fn_to_unsigneds!(mod_power_of_2_square_assign_fail_helper);
 }
 
 fn mod_power_of_2_square_properties_helper<T: PrimitiveUnsigned>() {

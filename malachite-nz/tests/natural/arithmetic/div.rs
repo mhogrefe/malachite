@@ -1,7 +1,8 @@
-use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivMod};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_vec_unsigned_pair_gen_var_22,
@@ -23,7 +24,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_gen,
-    natural_gen_var_2, natural_pair_gen_var_5, natural_pair_gen_var_6,
+    natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_5, natural_pair_gen_var_6,
     unsigned_vec_triple_gen_var_42, unsigned_vec_triple_gen_var_43, unsigned_vec_triple_gen_var_44,
     unsigned_vec_unsigned_unsigned_triple_gen_var_9,
 };
@@ -31,6 +32,7 @@ use malachite_nz::test_util::natural::arithmetic::div::{
     limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
 use num::BigUint;
+use num::CheckedDiv as NumCheckedDiv;
 use rug;
 use std::str::FromStr;
 
@@ -31513,44 +31515,132 @@ fn test_div() {
 
 #[test]
 #[should_panic]
-fn div_assign_fail() {
+fn div_assign_fail_1() {
     let mut x = Natural::from(10u32);
     x /= Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
-fn div_assign_ref_fail() {
+fn div_assign_fail_2() {
+    let mut x = Natural::ZERO;
+    x /= Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
+fn div_assign_ref_fail_1() {
     let mut x = Natural::from(10u32);
     x /= &Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
+fn div_assign_ref_fail_2() {
+    let mut x = Natural::ZERO;
+    x /= &Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
 #[allow(unused_must_use, clippy::unnecessary_operation)]
-fn div_fail() {
+fn div_fail_1() {
     Natural::from(10u32) / Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
+fn div_fail_2() {
+    Natural::ZERO / Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
 #[allow(unused_must_use, clippy::unnecessary_operation)]
-fn div_val_ref_fail() {
+fn div_val_ref_fail_1() {
     Natural::from(10u32) / &Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
-#[allow(unused_must_use, clippy::unnecessary_operation)]
-fn div_ref_val_fail() {
-    &Natural::from(10u32) / Natural::ZERO;
+#[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
+fn div_val_ref_fail_2() {
+    Natural::ZERO / &Natural::ZERO;
 }
 
 #[test]
 #[should_panic]
 #[allow(unused_must_use, clippy::unnecessary_operation)]
-fn div_ref_ref_fail() {
+fn div_ref_val_fail_1() {
+    &Natural::from(10u32) / Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
+#[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
+fn div_ref_val_fail_2() {
+    &Natural::ZERO / Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
+#[allow(unused_must_use, clippy::unnecessary_operation)]
+fn div_ref_ref_fail_1() {
     &Natural::from(10u32) / &Natural::ZERO;
+}
+
+#[test]
+#[should_panic]
+#[allow(unused_must_use, clippy::no_effect, clippy::unnecessary_operation)]
+fn div_ref_ref_fail_2() {
+    &Natural::ZERO / &Natural::ZERO;
+}
+
+#[test]
+fn test_checked_div() {
+    let test = |s, t, quotient| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let q = u.clone().checked_div(v.clone());
+        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = u.clone().checked_div(&v);
+        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = (&u).checked_div(v.clone());
+        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = (&u).checked_div(&v);
+        assert!(q.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = BigUint::from_str(s)
+            .unwrap()
+            .checked_div(&BigUint::from_str(t).unwrap());
+        assert_eq!(q.to_debug_string(), quotient);
+    };
+    test("0", "1", "Some(0)");
+    test("0", "123", "Some(0)");
+    test("1", "1", "Some(1)");
+    test("123", "1", "Some(123)");
+    test("123", "123", "Some(1)");
+    test("123", "456", "Some(0)");
+    test("456", "123", "Some(3)");
+    test("4294967295", "1", "Some(4294967295)");
+    test("4294967295", "4294967295", "Some(1)");
+    test("1000000000000", "1", "Some(1000000000000)");
+    test("1000000000000", "3", "Some(333333333333)");
+    test("1000000000000", "123", "Some(8130081300)");
+    test("1000000000000", "4294967295", "Some(232)");
+    test("0", "0", "None");
+    test("1", "0", "None");
+    test("123", "0", "None");
+    test("1000000000000000000000000", "0", "None");
 }
 
 #[test]
@@ -31781,6 +31871,8 @@ fn div_properties_helper(x: Natural, y: Natural) {
     assert!(q_alt.is_valid());
     assert_eq!(q_alt, q);
 
+    assert_eq!((&x).checked_div(&y).unwrap(), q);
+
     let q_alt = (&x).div_mod(&y).0;
     assert_eq!(q_alt, q);
 
@@ -31823,4 +31915,43 @@ fn div_properties() {
 
     unsigned_pair_gen_var_12::<Limb, Limb>()
         .test_properties(|(x, y)| assert_eq!(Natural::from(x) / Natural::from(y), x / y));
+}
+
+#[test]
+fn checked_div_properties() {
+    natural_pair_gen().test_properties(|(x, y)| {
+        let quotient_val_val = x.clone().checked_div(y.clone());
+        let quotient_val_ref = x.clone().checked_div(&y);
+        let quotient_ref_val = (&x).checked_div(y.clone());
+        let quotient = (&x).checked_div(&y);
+        assert!(quotient_val_val.as_ref().map_or(true, Natural::is_valid));
+        assert!(quotient_val_ref.as_ref().map_or(true, Natural::is_valid));
+        assert!(quotient_ref_val.as_ref().map_or(true, Natural::is_valid));
+        assert!(quotient.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(quotient_val_val, quotient);
+        assert_eq!(quotient_val_ref, quotient);
+        assert_eq!(quotient_ref_val, quotient);
+
+        if y != 0u32 {
+            assert_eq!(quotient, Some(&x / &y));
+        }
+
+        assert_eq!(
+            BigUint::from(&x)
+                .checked_div(&BigUint::from(&y))
+                .map(|n| Natural::from(&n)),
+            quotient
+        );
+    });
+
+    natural_gen().test_properties(|ref x| {
+        assert_eq!(x.checked_div(Natural::ZERO), None);
+        assert_eq!(x.checked_div(Natural::ONE), Some(x.clone()));
+    });
+
+    natural_gen_var_2().test_properties(|ref x| {
+        assert_eq!(Natural::ZERO.checked_div(x), Some(Natural::ZERO));
+        assert_eq!(Natural::ONE.checked_div(x), Some(Natural::from(*x == 1u32)));
+        assert_eq!(x.checked_div(x), Some(Natural::ONE));
+    });
 }

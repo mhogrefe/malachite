@@ -9,7 +9,7 @@ In `malachite-q`'s doctests you will frequently see import paths beginning with
 `malachite_q::`. When using the `malachite` crate, replace this part of the paths with
 `malachite::`.
 
-The import path of the `Rational` type is shortened further, to `malachite::Rational`.
+The import path of the `Rational` type is shortened to `malachite::Rational`.
 
 # malachite-q
 This crate defines
@@ -73,11 +73,14 @@ browsing through
 - `32_bit_limbs`: Sets the type of `Limb` to
   [`u32`](https://doc.rust-lang.org/nightly/std/primitive.u32.html) instead of the default,
   [`u64`](https://doc.rust-lang.org/nightly/std/primitive.u64.html).
+- `random`: This feature provides some functions for randomly generating values. It is off by
+  default to avoid pulling in some extra dependencies.
 - `enable_serde`: Enables serialization and deserialization using [serde](`https://serde.rs/`).
 - `test_build`: A large proportion of the code in this crate is only used for testing. For a
   typical user, building this code would result in an unnecessarily long compilation time and
   an unnecessarily large binary. My solution is to only build this code when the `test_build`
   feature is enabled. If you want to run unit tests, you must enable `test_build`. However,
-  doctests don't require it, since they only test the public interface.
+  doctests don't require it, since they only test the public interface. Enabling this feature also
+  enables `random`.
 - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
-  takes a long time to build. Enabling this feature also enables `test_build`.
+  takes a long time to build. Enabling this feature also enables `test_build` and `random`.

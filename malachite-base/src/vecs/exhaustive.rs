@@ -712,14 +712,13 @@ macro_rules! exhaustive_vecs_fixed_length {
         /// output [`Vec`]s, and how quickly each output slot advances through its iterator. The
         /// length of the output [`Vec`]s, $n$, is specified by the length of `output_types`.
         ///
-        /// The $i$th element of `output_types` is a pair of
-        /// [`BitDistributorOutputType`](BitDistributorOutputType) and `usize`. The
-        /// [`BitDistributorOutputType`](BitDistributorOutputType) determines how quickly the $i$th
-        /// output slot advances through its iterator; see the [`BitDistributor`](BitDistributor)
-        /// documentation for a description of the different types. The `usize` is an index from 0
-        /// to $m-1$ which specifies which iterator the $i$th output slot is populated with.
-        /// Together, the `usize`s must include all indices from 0 to $m-1$, inclusive, possibly
-        /// with repetitions.
+        /// The $i$th element of `output_types` is a pair of [`BitDistributorOutputType`] and
+        /// `usize`. The [`BitDistributorOutputType`] determines how quickly the $i$th output slot
+        /// advances through its iterator; see the [`BitDistributor`] documentation for a
+        /// description of the different types. The `usize` is an index from 0 to $m-1$ which
+        /// specifies which iterator the $i$th output slot is populated with. Together, the
+        /// `usize`s must include all indices from 0 to $m-1$, inclusive, possibly with
+        /// repetitions.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, the output length is the product of their
         /// lengths. If any of `xs`, `ys`, `zs`, ... are infinite, the output is also infinite.
@@ -908,15 +907,12 @@ where
 /// Generates all length-$n$ [`Vec`]s with elements from a single iterator.
 ///
 /// This function differs from [`exhaustive_vecs_fixed_length_from_single`] in that different
-/// [`BitDistributorOutputType`](crate::iterators::bit_distributor::BitDistributorOutputType)s may
-/// be specified for each output element.
+/// [`BitDistributorOutputType`]s may be specified for each output element.
 ///
-/// The $i$th element of `output_types` is a
-/// [`BitDistributorOutputType`](crate::iterators::bit_distributor::BitDistributorOutputType) that
-/// determines how quickly the $i$th output slot advances through the iterator; see the
-/// [`BitDistributor`](crate::iterators::bit_distributor::BitDistributor) documentation for a
-/// description of the different types. The length of the output [`Vec`]s, $n$, is specified by the
-/// length of `output_types`.
+/// The $i$th element of `output_types` is a [`BitDistributorOutputType`] that determines how
+/// quickly the $i$th output slot advances through the iterator; see the [`BitDistributor`]
+/// documentation for a description of the different types. The length of the output [`Vec`]s, $n$,
+/// is specified by the length of `output_types`.
 ///
 /// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$ is `len`.
 /// If `xs` is infinite, the output is also infinite.

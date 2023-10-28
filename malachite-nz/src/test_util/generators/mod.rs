@@ -7,8 +7,9 @@ use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
     integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
     integer_rm, integer_triple_1_rm, integer_vec_nrm, natural_natural_triple_1_2_rm, natural_nrm,
-    natural_pair_1_nm, natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm,
-    natural_rm, natural_triple_1_rm, natural_triple_nrm, natural_triple_rm, natural_vec_nrm,
+    natural_pair_1_nm, natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nm, natural_pair_nrm,
+    natural_pair_rm, natural_rm, natural_triple_1_rm, natural_triple_nrm, natural_triple_rm,
+    natural_vec_nrm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -1162,6 +1163,14 @@ pub fn natural_pair_gen_rm() -> Generator<((rug::Integer, rug::Integer), (Natura
         &|| natural_pair_rm(exhaustive_natural_pair_gen()),
         &|config| natural_pair_rm(random_natural_pair_gen(config)),
         &|config| natural_pair_rm(special_random_natural_pair_gen(config)),
+    )
+}
+
+pub fn natural_pair_gen_nm() -> Generator<((BigUint, BigUint), (Natural, Natural))> {
+    Generator::new(
+        &|| natural_pair_nm(exhaustive_natural_pair_gen()),
+        &|config| natural_pair_nm(random_natural_pair_gen(config)),
+        &|config| natural_pair_nm(special_random_natural_pair_gen(config)),
     )
 }
 

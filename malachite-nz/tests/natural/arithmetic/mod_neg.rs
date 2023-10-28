@@ -1,10 +1,11 @@
 use malachite_base::num::arithmetic::traits::{Mod, ModAdd, ModIsReduced, ModNeg, ModNegAssign};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::natural_pair_gen_var_8;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
@@ -48,6 +49,39 @@ fn test_mod_neg() {
     test("1", "4294967295", "4294967294");
     test("7", "1000000000000", "999999999993");
     test("999999999993", "1000000000000", "7");
+}
+
+#[test]
+fn mod_neg_fail() {
+    assert_panic!(Natural::ZERO.mod_neg(Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_neg(Natural::ONE));
+
+    assert_panic!(Natural::ZERO.mod_neg(&Natural::ZERO));
+    assert_panic!(Natural::from(30u32).mod_neg(&Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_neg(Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_neg(Natural::ONE));
+
+    assert_panic!((&Natural::ZERO).mod_neg(&Natural::ZERO));
+    assert_panic!((&Natural::from(30u32)).mod_neg(&Natural::ONE));
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_neg_assign(Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_neg_assign(Natural::ONE)
+    });
+
+    assert_panic!({
+        let mut x = Natural::ZERO;
+        x.mod_neg_assign(&Natural::ZERO)
+    });
+    assert_panic!({
+        let mut x = Natural::from(30u32);
+        x.mod_neg_assign(&Natural::ONE)
+    });
 }
 
 #[test]

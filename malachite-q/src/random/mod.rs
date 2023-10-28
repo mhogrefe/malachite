@@ -17,8 +17,8 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::natural::Natural;
 
-/// Generates random non-negative [`Rational`]s, given an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) numerators and denominators.
+/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators
+/// and denominators.
 #[derive(Clone, Debug)]
 pub struct RandomRationalsFromSingle<I: Iterator<Item = Natural>> {
     xs: I,
@@ -40,8 +40,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingle<I> {
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
 /// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then the numerator
-/// and denominator are chosen from all positive [`Natural`](malachite_nz::natural::Natural)s with
-/// that bit length.
+/// and denominator are chosen from all positive [`Natural`]s with that bit length.
 ///
 /// The output length is infinite.
 ///
@@ -82,9 +81,8 @@ pub fn random_positive_rationals(
     }
 }
 
-/// Generates random non-negative [`Rational`]s, given an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) numerators and an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) denominators.
+/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators
+/// and an iterator of random [`Natural`] denominators.
 #[derive(Clone, Debug)]
 pub struct RandomRationalsFromDouble<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> {
     xs: I,
@@ -179,8 +177,8 @@ impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
 /// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then the numerator
-/// and denominator are chosen from all positive [`Natural`](malachite_nz::natural::Natural)s with
-/// that bit length. Finally, the resulting [`Rational`] is reduced and negated.
+/// and denominator are chosen from all positive [`Natural`]s with that bit length. Finally, the
+/// resulting [`Rational`] is reduced and negated.
 ///
 /// The output length is infinite.
 ///
@@ -222,8 +220,8 @@ pub fn random_negative_rationals(
     }
 }
 
-/// Generates random non-negative [`Rational`]s, given an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) numerators and an iterator of [`bool`] signs.
+/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators
+/// and an iterator of [`bool`] signs.
 #[derive(Clone, Debug)]
 pub struct RandomRationalsFromSingleAndSign<I: Iterator<Item = Natural>> {
     bs: RandomBools,
@@ -284,9 +282,8 @@ pub fn random_nonzero_rationals(
     }
 }
 
-/// Generates random non-negative [`Rational`]s, given an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) numerators, an iterator of random
-/// [`Natural`](malachite_nz::natural::Natural) denominators, and an iterator of [`bool`] signs.
+/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`]
+/// numerators, an iterator of random [`Natural`] denominators, and an iterator of [`bool`] signs.
 #[derive(Clone, Debug)]
 pub struct RandomRationalsFromDoubleAndSign<
     I: Iterator<Item = Natural>,

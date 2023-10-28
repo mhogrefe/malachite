@@ -1,21 +1,25 @@
 use crate::num::arithmetic::traits::{ModAdd, ModAddAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_add<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
+fn mod_add<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let neg = m - x;
-    if neg > other {
-        x + other
+    if neg > y {
+        x + y
     } else {
-        other - neg
+        y - neg
     }
 }
 
-fn mod_add_assign<T: PrimitiveUnsigned>(x: &mut T, other: T, m: T) {
+fn mod_add_assign<T: PrimitiveUnsigned>(x: &mut T, y: T, m: T) {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
+    assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let neg = m - *x;
-    if neg > other {
-        *x += other;
+    if neg > y {
+        *x += y;
     } else {
-        *x = other - neg;
+        *x = y - neg;
     }
 }
 
@@ -24,13 +28,16 @@ macro_rules! impl_mod_add {
         impl ModAdd<$t> for $t {
             type Output = $t;
 
-            /// Adds two numbers modulo a third number $m$. Assumes the inputs are already reduced
+            /// Adds two numbers modulo a third number $m$. The inputs must be already reduced
             /// modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_add#mod_add).
@@ -43,13 +50,16 @@ macro_rules! impl_mod_add {
         }
 
         impl ModAddAssign<$t> for $t {
-            /// Adds two numbers modulo a third number $m$, in place. Assumes the inputs are
-            /// already reduced modulo $m$.
+            /// Adds two numbers modulo a third number $m$, in place. The inputs must be already
+            /// reduced modulo $m$.
             ///
             /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
             /// # Examples
             /// See [here](super::mod_add#mod_add_assign).

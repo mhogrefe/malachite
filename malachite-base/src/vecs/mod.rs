@@ -1,8 +1,13 @@
+#[cfg(feature = "random")]
 use crate::num::conversion::traits::ExactFrom;
+#[cfg(feature = "random")]
 use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+#[cfg(feature = "random")]
 use crate::random::Seed;
 use crate::slices::advance_indices;
+#[cfg(feature = "random")]
 use rand::prelude::SliceRandom;
+#[cfg(feature = "random")]
 use rand_chacha::ChaCha20Rng;
 use std::str::FromStr;
 
@@ -147,6 +152,7 @@ pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Optio
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random value from a nonempty [`Vec`].
 ///
 /// This `struct` is created by [`random_values_from_vec`]; see its documentation for more.
@@ -156,6 +162,7 @@ pub struct RandomValuesFromVec<T: Clone> {
     indices: RandomUnsignedsLessThan<u64>,
 }
 
+#[cfg(feature = "random")]
 impl<T: Clone> Iterator for RandomValuesFromVec<T> {
     type Item = T;
 
@@ -165,6 +172,7 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random value from a nonempty [`Vec`].
 ///
 /// The iterator owns the data. It may be more convenient for the iterator to return references to a
@@ -261,6 +269,7 @@ pub fn exhaustive_vec_permutations<T: Clone>(xs: Vec<T>) -> ExhaustiveVecPermuta
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random [`Vec`] of values cloned from an original [`Vec`].
 ///
 /// This `struct` is created by [`random_vec_permutations`]; see its documentation for more.
@@ -271,6 +280,7 @@ pub struct RandomVecPermutations<T: Clone> {
     rng: ChaCha20Rng,
 }
 
+#[cfg(feature = "random")]
 impl<T: Clone> Iterator for RandomVecPermutations<T> {
     type Item = Vec<T>;
 
@@ -280,6 +290,7 @@ impl<T: Clone> Iterator for RandomVecPermutations<T> {
     }
 }
 
+#[cfg(feature = "random")]
 /// Uniformly generates a random [`Vec`] of values cloned from an original [`Vec`].
 ///
 /// The permutations are [`Vec`]s of cloned items. It may be more convenient for the iterator to
@@ -475,6 +486,7 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate [`Vec`]s randomly.
 ///
 /// # random_vecs_length_2

@@ -1,6 +1,9 @@
+#[cfg(feature = "random")]
 use crate::bools::random::{weighted_random_bools, WeightedRandomBools};
 use crate::num::basic::traits::Zero;
+#[cfg(feature = "random")]
 use crate::random::Seed;
+#[cfg(feature = "random")]
 use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 use itertools::Itertools;
 use std::collections::{HashSet, VecDeque};
@@ -239,6 +242,7 @@ where
         .collect()
 }
 
+#[cfg(feature = "random")]
 /// An iterator that randomly produces another iterator's values, or produces a special value.
 ///
 /// This `struct` is created by [`with_special_value`]; see its documentation for more.
@@ -252,6 +256,7 @@ where
     xs: I,
 }
 
+#[cfg(feature = "random")]
 impl<I: Iterator> Iterator for WithSpecialValue<I>
 where
     I::Item: Clone,
@@ -267,6 +272,7 @@ where
     }
 }
 
+#[cfg(feature = "random")]
 /// An iterator that randomly produces another iterator's values, or produces a special value.
 ///
 /// Let $n_p$ be `p_numerator`, $d_p$ be `p_denominator`, and let $p=n_p/d_p$.
@@ -312,6 +318,7 @@ where
     }
 }
 
+#[cfg(feature = "random")]
 /// An iterator that randomly produces another iterator's values, or samples from a [`Vec`] of
 /// special values.
 ///
@@ -326,6 +333,7 @@ where
     xs: I,
 }
 
+#[cfg(feature = "random")]
 impl<I: Iterator> Iterator for WithSpecialValues<I>
 where
     I::Item: Clone,
@@ -341,6 +349,7 @@ where
     }
 }
 
+#[cfg(feature = "random")]
 /// An iterator that randomly produces another iterator's values, or produces a random special
 /// value from a [`Vec`].
 ///

@@ -2,6 +2,7 @@ use crate::num::arithmetic::traits::{ModNeg, ModNegAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_neg<T: PrimitiveUnsigned>(x: T, m: T) -> T {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     if x == T::ZERO {
         T::ZERO
     } else {
@@ -10,6 +11,7 @@ fn mod_neg<T: PrimitiveUnsigned>(x: T, m: T) -> T {
 }
 
 fn mod_neg_assign<T: PrimitiveUnsigned>(x: &mut T, m: T) {
+    assert!(*x < m, "x must be reduced mod m, but {x} >= {m}");
     if *x != T::ZERO {
         *x = m - *x;
     }
@@ -20,7 +22,7 @@ macro_rules! impl_mod_neg {
         impl ModNeg for $t {
             type Output = $t;
 
-            /// Negates a number modulo another number $m$, in place. Assumes the input is already
+            /// Negates a number modulo another number $m$, in place. The input must be already
             /// reduced modulo $m$.
             ///
             /// $f(x, m) = y$, where $x, y < m$ and $-x \equiv y \mod m$.
@@ -39,7 +41,7 @@ macro_rules! impl_mod_neg {
         }
 
         impl ModNegAssign for $t {
-            /// Negates a number modulo another number $m$. Assumes the input is already reduced
+            /// Negates a number modulo another number $m$. The input must be already reduced
             /// modulo $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.

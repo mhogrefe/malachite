@@ -4,14 +4,14 @@ use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::arithmetic::traits::{CoprimeWith, Gcd, Parity};
 
 pub_test! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
-    (x.odd() || y.odd()) && x.gcd(y) == 1
+    (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
 #[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd())
         && (!(&x).divisible_by(Natural::from(3u32)) || !(&y).divisible_by(Natural::from(3u32)))
-        && x.gcd(y) == 1
+        && x.gcd(y) == 1u32
 }
 
 #[cfg(feature = "test_build")]
@@ -21,28 +21,30 @@ pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     } else {
         let x15 = &x % Natural::from(15u32);
         let y15 = &y % Natural::from(15u32);
-        if (x15 == 0 || x15 == 3 || x15 == 6 || x15 == 9 || x15 == 12)
-            && (y15 == 0 || y15 == 3 || y15 == 6 || y15 == 9 || y15 == 12)
+        if (x15 == 0u32 || x15 == 3u32 || x15 == 6u32 || x15 == 9u32 || x15 == 12u32)
+            && (y15 == 0u32 || y15 == 3u32 || y15 == 6u32 || y15 == 9u32 || y15 == 12u32)
         {
             return false;
         }
-        if (x15 == 0 || x15 == 5 || x15 == 10) && (y15 == 0 || y15 == 5 || y15 == 10) {
+        if (x15 == 0u32 || x15 == 5u32 || x15 == 10u32)
+            && (y15 == 0u32 || y15 == 5u32 || y15 == 10u32)
+        {
             return false;
         }
-        x.gcd(y) == 1
+        x.gcd(y) == 1u32
     }
 }
 
 pub_test! {coprime_with_check_2_val_ref(x: Natural, y: &Natural) -> bool {
-    (x.odd() || y.odd()) && x.gcd(y) == 1
+    (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
 pub_test! {coprime_with_check_2_ref_val(x: &Natural, y: Natural) -> bool {
-    (x.odd() || y.odd()) && x.gcd(y) == 1
+    (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
 pub_test! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
-    (x.odd() || y.odd()) && x.gcd(y) == 1
+    (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
 impl CoprimeWith<Natural> for Natural {

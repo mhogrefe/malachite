@@ -557,9 +557,8 @@ macro_rules! impl_from_float_unsigned {
                 impl RoundingFrom<$u> for $f {
                     /// Converts a value of an unsigned type to a value of a floating point type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the original value.
+                    /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
+                    /// returned value is less than, equal to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor` or `Down`, the largest float less than or
                     ///   equal to the value is returned.
@@ -588,10 +587,9 @@ macro_rules! impl_from_float_unsigned {
 
                 impl RoundingFrom<$f> for $u {
                     /// Converts a value of a floating point type to a value of an unsigned type
-                    /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also
+                    /// returned, indicating whether the returned value is less than, equal to, or
+                    /// greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -911,9 +909,8 @@ macro_rules! impl_from_float_signed {
                 impl RoundingFrom<$i> for $f {
                     /// Converts a value of a signed type to a value of a floating point type
                     /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the original value.
+                    /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
+                    /// returned value is less than, equal to, or greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest float less than or equal to
                     ///   the value is returned.
@@ -946,10 +943,9 @@ macro_rules! impl_from_float_signed {
 
                 impl RoundingFrom<$f> for $i {
                     /// Converts a value of a floating point type to a value of a signed type
-                    /// according to a specified
-                    /// [`RoundingMode`](crate::rounding_modes::RoundingMode). An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also
+                    /// returned, indicating whether the returned value is less than, equal to, or
+                    /// greater than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum

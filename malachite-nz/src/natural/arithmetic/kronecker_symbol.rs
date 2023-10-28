@@ -661,8 +661,7 @@ pub_crate_test! {
 impl LegendreSymbol<Natural> for Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both by value.
     ///
-    /// This implementation is identical to that of
-    /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), since there is no
+    /// This implementation is identical to that of [`JacobiSymbol`], since there is no
     /// computational benefit to requiring that the denominator be prime.
     ///
     /// $$
@@ -701,8 +700,7 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking the first by value and the second
     /// by reference.
     ///
-    /// This implementation is identical to that of
-    /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), since there is no
+    /// This implementation is identical to that of [`JacobiSymbol`], since there is no
     /// computational benefit to requiring that the denominator be prime.
     ///
     /// $$
@@ -741,8 +739,7 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both the first by reference and
     /// the second by value.
     ///
-    /// This implementation is identical to that of
-    /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), since there is no
+    /// This implementation is identical to that of [`JacobiSymbol`], since there is no
     /// computational benefit to requiring that the denominator be prime.
     ///
     /// $$
@@ -780,8 +777,7 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
 impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
     /// Computes the Legendre symbol of two [`Natural`]s, taking both by reference.
     ///
-    /// This implementation is identical to that of
-    /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), since there is no
+    /// This implementation is identical to that of [`JacobiSymbol`], since there is no
     /// computational benefit to requiring that the denominator be prime.
     ///
     /// $$

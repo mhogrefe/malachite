@@ -19,6 +19,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use std::mem::swap;
 
@@ -278,8 +279,8 @@ impl Natural {
 impl ModPowerOf2Sub<Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. Both [`Natural`]s are taken by value.
+    /// Subtracts two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -289,6 +290,9 @@ impl ModPowerOf2Sub<Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -308,8 +312,8 @@ impl ModPowerOf2Sub<Natural> for Natural {
 impl<'a> ModPowerOf2Sub<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. The first [`Natural`] is taken by value and the second by reference.
+    /// Subtracts two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by value and the second by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -319,6 +323,9 @@ impl<'a> ModPowerOf2Sub<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -339,8 +346,8 @@ impl<'a> ModPowerOf2Sub<&'a Natural> for Natural {
 impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts two [`Natural`]s modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. The first [`Natural`] is taken by reference and the second by value.
+    /// Subtracts two [`Natural`]s modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// The first [`Natural`] is taken by reference and the second by value.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -350,6 +357,9 @@ impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -362,6 +372,14 @@ impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
     /// ```
     #[inline]
     fn mod_power_of_2_sub(self, mut other: Natural, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (self, &mut other) {
             (x, Natural(Small(y))) => x.mod_power_of_2_sub_limb_ref(*y, pow),
             (&Natural(Small(x)), y) => {
@@ -380,8 +398,8 @@ impl<'a> ModPowerOf2Sub<Natural> for &'a Natural {
 impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
-    /// Subtracts two [`Natural`] modulo $2^k$. Assumes the inputs are already reduced modulo
-    /// $2^k$. Both [`Natural`]s are taken by reference.
+    /// Subtracts two [`Natural`] modulo $2^k$. The inputs must be already reduced modulo $2^k$.
+    /// Both [`Natural`]s are taken by reference.
     ///
     /// $f(x, y, k) = z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -391,6 +409,9 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -402,6 +423,14 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
     /// assert_eq!((&Natural::from(56u32)).mod_power_of_2_sub(&Natural::from(123u32), 9), 445);
     /// ```
     fn mod_power_of_2_sub(self, other: &'a Natural, pow: u64) -> Natural {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (self, other) {
             (x, y) if std::ptr::eq(x, y) => Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_limb_ref(y, pow),
@@ -414,8 +443,8 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
 }
 
 impl ModPowerOf2SubAssign<Natural> for Natural {
-    /// Subtracts two [`Natural`] modulo $2^k$, in place. Assumes the inputs are already reduced
-    /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
+    /// Subtracts two [`Natural`] modulo $2^k$, in place. The inputs must be already reduced modulo
+    /// $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -425,6 +454,9 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -441,6 +473,14 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
     /// assert_eq!(x, 445);
     /// ```
     fn mod_power_of_2_sub_assign(&mut self, mut other: Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, &mut other) {
             (x, &mut Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => {
@@ -458,8 +498,8 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
-    /// Subtracts two [`Natural`] modulo $2^k$, in place. Assumes the inputs are already reduced
-    /// modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
+    /// Subtracts two [`Natural`] modulo $2^k$, in place. The inputs must be already reduced modulo
+    /// $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets z$, where $x, y, z < 2^k$ and $x - y \equiv z \mod 2^k$.
     ///
@@ -469,6 +509,9 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+    ///
+    /// # Panics
+    /// Panics if `self` or `other` are greater than or equal to $2^k$.
     ///
     /// # Examples
     /// ```
@@ -485,6 +528,14 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 445);
     /// ```
     fn mod_power_of_2_sub_assign(&mut self, other: &'a Natural, pow: u64) {
+        assert!(
+            self.significant_bits() <= pow,
+            "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
+        );
+        assert!(
+            other.significant_bits() <= pow,
+            "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
+        );
         match (&mut *self, other) {
             (x, y) if std::ptr::eq(x, y) => *self = Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),

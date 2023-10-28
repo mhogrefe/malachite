@@ -544,6 +544,7 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 pub mod exhaustive;
+#[cfg(feature = "random")]
 /// Iterators that generate tuples randomly.
 ///
 /// # random_pairs

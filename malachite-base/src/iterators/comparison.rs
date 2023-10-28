@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 
-/// An iterator that generates the [`Ordering`](std::cmp::Ordering)s of adjacent elements of a
-/// given iterator.
+/// An iterator that generates the [`Ordering`]s of adjacent elements of a given iterator.
 ///
 /// This `struct` is created by [`delta_directions`]; see its documentation for more.
 #[derive(Clone, Debug)]
@@ -35,8 +34,8 @@ where
     }
 }
 
-/// Returns an iterator that generates the [`Ordering`](std::cmp::Ordering)s of adjacent pairs of
-/// elements of a given iterator.
+/// Returns an iterator that generates the [`Ordering`]s of adjacent pairs of elements of a given
+/// iterator.
 ///
 /// To put it another way (at least for types where subtraction is defined), the returned iterator
 /// produces the signs of the finite differences of the input iterator.

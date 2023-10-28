@@ -7,7 +7,7 @@ use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 
 impl PartialOrd<Natural> for Rational {
-    /// Compares a [`Rational`] to a [`Natural`](malachite_nz::natural::Natural).
+    /// Compares a [`Rational`] to a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -67,7 +67,7 @@ impl PartialOrd<Natural> for Rational {
 }
 
 impl PartialOrd<Rational> for Natural {
-    /// Compares a [`Natural`](malachite_nz::natural::Natural) to a [`Rational`].
+    /// Compares a [`Natural`] to a [`Rational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

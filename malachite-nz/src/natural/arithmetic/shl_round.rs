@@ -176,8 +176,7 @@ macro_rules! impl_natural_shl_round_signed {
             /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
             /// necessary if `bits` is negative.
             ///
-            /// See the [`ShlRound`](malachite_base::num::arithmetic::traits::ShlRound)
-            /// documentation for details.
+            /// See the [`ShlRound`] documentation for details.
             ///
             /// # Worst-case complexity
             /// $T(n, m) = O(n + m)$

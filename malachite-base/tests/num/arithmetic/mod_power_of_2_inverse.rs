@@ -32,6 +32,8 @@ fn mod_power_of_2_inverse_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!(T::ZERO.mod_power_of_2_inverse(5));
     assert_panic!(T::from(30u8).mod_power_of_2_inverse(3));
     assert_panic!(T::from(3u8).mod_power_of_2_inverse(200));
+    assert_panic!(T::ONE.mod_power_of_2_inverse(0));
+    assert_panic!(T::from(200u8).mod_power_of_2_inverse(7));
 }
 
 #[test]

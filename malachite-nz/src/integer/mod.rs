@@ -110,5 +110,6 @@ pub mod conversion;
 pub mod exhaustive;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+#[cfg(feature = "random")]
 /// Iterators that generate [`Integer`]s randomly.
 pub mod random;

@@ -1,6 +1,6 @@
 [package]
 name = "malachite-nz"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -23,7 +23,7 @@ path = "src/bin.rs"
 [dependencies]
 embed-doc-image = "0.1.4"
 itertools = "0.11.0"
-malachite-base = { version = "0.4.2" }
+malachite-base = { version = "0.4.3" }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 serde_json = { version = "1.0.105", optional = true }
@@ -35,8 +35,9 @@ malachite-nz = { path = ".", features = ["test_build"] }
 
 [features]
 32_bit_limbs = []
+random = ["malachite-base/random"]
 enable_serde = ["serde"]
-test_build = ["malachite-base/test_build", "serde", "serde_json", "num", "rug"]
+test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
 float_helpers = []
 doc-images = []
