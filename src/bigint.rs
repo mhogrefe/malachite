@@ -280,7 +280,7 @@ impl Num for BigInt {
 impl num_integer::Integer for BigInt {
     #[inline]
     fn div_floor(&self, other: &Self) -> Self {
-        (&self.0).div_round(&other.0, RoundingMode::Floor).into()
+        (&self.0).div_round(&other.0, RoundingMode::Floor).0.into()
     }
 
     #[inline]

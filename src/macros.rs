@@ -397,7 +397,7 @@ macro_rules! impl_from_primitive_fn_float {
                 if !n.is_finite() {
                     return None;
                 }
-                Some(Self(n.rounding_into(RoundingMode::Down)))
+                Some(Self(n.rounding_into(RoundingMode::Down).0))
             }
         }
     };
@@ -432,11 +432,12 @@ macro_rules! impl_to_primitive_fn_float {
         paste! {
             #[inline]
             fn [<to_ $t>](&self) -> Option<$t> {
-                let val: $t = (&self.0).rounding_into(RoundingMode::Nearest);
-                if val == $t::MAX || val == $t::MIN {
-                    (self.0 == val).then_some(val)
-                } else {
-                    Some(val)
+                match (&self.0).rounding_into(RoundingMode::Nearest) {
+                    // returned value is $t::MAX but still less than the original
+                    (val, std::cmp::Ordering::Less) if val == $t::MAX => None,
+                    // returned value is $t::MIN but still greater than the original
+                    (val, std::cmp::Ordering::Greater) if val == $t::MIN => None,
+                    (val, _) => Some(val),
                 }
             }
         }
