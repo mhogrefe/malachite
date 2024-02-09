@@ -1,6 +1,6 @@
-use crate::itertools::Itertools;
 use crate::test_util::stats::common_values_map::common_values_map_debug;
 use crate::test_util::stats::median;
+use itertools::Itertools;
 use std::fmt::Debug;
 use std::hash::Hash;
 

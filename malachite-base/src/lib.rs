@@ -101,7 +101,7 @@
     clippy::upper_case_acronyms,
     unstable_name_collisions
 )]
-#![no_std]
+#![cfg_attr(not(feature = "test_build"), no_std)]
 
 #[macro_use]
 extern crate alloc;
