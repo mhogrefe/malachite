@@ -9,7 +9,7 @@ use crate::num::basic::traits::NegativeOne;
 use crate::num::logic::traits::CheckedHammingDistance;
 #[cfg(feature = "random")]
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
-use std::ops::Neg;
+use core::ops::Neg;
 
 // When the `random` feature is enabled, the HasRandomSignedRange and RandomSignedChunkable bounds
 // are included.

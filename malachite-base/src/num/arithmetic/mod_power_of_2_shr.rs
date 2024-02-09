@@ -4,7 +4,7 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use std::ops::{Shr, ShrAssign};
+use core::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shr_signed<
     T: ModPowerOf2Shl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,

@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 /// Determines equality between the absolute values of two numbers.
 pub trait EqAbs<Rhs: ?Sized = Self> {

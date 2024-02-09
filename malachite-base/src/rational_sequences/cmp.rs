@@ -1,5 +1,5 @@
 use crate::rational_sequences::RationalSequence;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl<T: Eq + Ord> PartialOrd for RationalSequence<T> {
     /// Compares a [`RationalSequence`] to another [`RationalSequence`].

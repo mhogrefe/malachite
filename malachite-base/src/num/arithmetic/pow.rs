@@ -83,7 +83,7 @@ macro_rules! impl_pow_primitive_float {
             /// [this one](f32::powi).
             #[inline]
             fn pow(self, exp: i64) -> $t {
-                self.powi(i32::exact_from(exp))
+                libm::Libm::<$t>::pow(self, exp as $t)
             }
         }
 
@@ -97,7 +97,7 @@ macro_rules! impl_pow_primitive_float {
             /// See [here](super::pow#pow_assign).
             #[inline]
             fn pow_assign(&mut self, exp: i64) {
-                *self = self.powi(i32::exact_from(exp));
+                *self = libm::Libm::<$t>::pow(*self, exp as $t);
             }
         }
 
@@ -108,7 +108,7 @@ macro_rules! impl_pow_primitive_float {
             /// [this one](f32::powf).
             #[inline]
             fn pow(self, exp: $t) -> $t {
-                self.powf(exp)
+                libm::Libm::<$t>::pow(self, exp)
             }
         }
 
@@ -122,7 +122,7 @@ macro_rules! impl_pow_primitive_float {
             /// See [here](super::pow#pow_assign).
             #[inline]
             fn pow_assign(&mut self, exp: $t) {
-                *self = self.powf(exp);
+                *self = libm::Libm::<$t>::pow(*self, exp);
             }
         }
     };

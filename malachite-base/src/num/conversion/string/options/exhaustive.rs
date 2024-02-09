@@ -7,6 +7,7 @@ use crate::num::logic::traits::NotAssign;
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::rounding_modes::RoundingMode;
 use crate::tuples::exhaustive::{exhaustive_triples, lex_pairs, lex_quadruples_from_single};
+use alloc::boxed::Box;
 
 /// Generates all [`SciSizeOptions`]s.
 ///

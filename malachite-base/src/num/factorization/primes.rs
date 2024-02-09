@@ -5,7 +5,8 @@ use crate::num::factorization::prime_sieve::{
 };
 use crate::num::factorization::traits::Primes;
 use crate::num::logic::traits::TrailingZeros;
-use std::marker::PhantomData;
+use alloc::vec::Vec;
+use core::marker::PhantomData;
 
 // This differs from the identically-named function in malachite-nz; this one returns None if there
 // are no more false bits.
@@ -57,7 +58,7 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
         if n < 5 {
             sieve = Vec::with_capacity(0);
         } else {
-            sieve = vec![0; limbs_prime_sieve_size::<u64>(n)];
+            sieve = alloc::vec![0; limbs_prime_sieve_size::<u64>(n)];
             limbs_prime_sieve_u64(&mut sieve, n);
         }
         PrimesLessThanIterator {

@@ -1,7 +1,9 @@
 use crate::named::Named;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
+use hashbrown::HashSet;
 use itertools::Itertools;
-use std::collections::HashSet;
-use std::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
 
 /// Sorts the characters of a string slice and returns them in a new [`String`].
 ///
@@ -104,7 +106,7 @@ impl<T: Debug> ToDebugString for T {
     /// ```
     #[inline]
     fn to_debug_string(&self) -> String {
-        format!("{self:?}")
+        ::alloc::format!("{self:?}")
     }
 }
 
@@ -126,7 +128,7 @@ impl<T: Binary> ToBinaryString for T {
     /// ```
     #[inline]
     fn to_binary_string(&self) -> String {
-        format!("{self:b}")
+        ::alloc::format!("{self:b}")
     }
 }
 
@@ -148,7 +150,7 @@ impl<T: Octal> ToOctalString for T {
     /// ```
     #[inline]
     fn to_octal_string(&self) -> String {
-        format!("{self:o}")
+        ::alloc::format!("{self:o}")
     }
 }
 
@@ -170,7 +172,7 @@ impl<T: LowerHex> ToLowerHexString for T {
     /// ```
     #[inline]
     fn to_lower_hex_string(&self) -> String {
-        format!("{self:x}")
+        ::alloc::format!("{self:x}")
     }
 }
 
@@ -192,7 +194,7 @@ impl<T: UpperHex> ToUpperHexString for T {
     /// ```
     #[inline]
     fn to_upper_hex_string(&self) -> String {
-        format!("{self:X}")
+        ::alloc::format!("{self:X}")
     }
 }
 

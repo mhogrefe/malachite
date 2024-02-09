@@ -1,5 +1,7 @@
 use crate::rounding_modes::RoundingMode;
-use std::str::FromStr;
+use alloc::string::String;
+use alloc::string::ToString;
+use core::str::FromStr;
 
 impl FromStr for RoundingMode {
     type Err = String;

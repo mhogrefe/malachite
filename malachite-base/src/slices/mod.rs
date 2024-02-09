@@ -6,6 +6,7 @@ use crate::num::conversion::traits::ExactFrom;
 use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 #[cfg(feature = "random")]
 use crate::random::Seed;
+use alloc::vec::Vec;
 #[cfg(feature = "random")]
 use rand::prelude::SliceRandom;
 #[cfg(feature = "random")]

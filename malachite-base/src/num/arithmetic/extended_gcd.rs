@@ -4,7 +4,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::rounding_modes::RoundingMode;
-use std::mem::swap;
+use core::mem::swap;
 
 fn extended_gcd_signed<
     U: ExtendedGcd<Cofactor = S> + PrimitiveUnsigned,

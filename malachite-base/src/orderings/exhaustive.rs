@@ -1,7 +1,7 @@
 use crate::orderings::ORDERINGS;
-use std::cmp::Ordering;
-use std::iter::Cloned;
-use std::slice::Iter;
+use core::cmp::Ordering;
+use core::iter::Cloned;
+use core::slice::Iter;
 
 pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 

@@ -1,5 +1,7 @@
-use std::fmt::{self, Display, Formatter};
-use std::str::FromStr;
+use alloc::string::String;
+use alloc::string::ToString;
+use core::fmt::{self, Display, Formatter};
+use core::str::FromStr;
 
 /// This is the error type for the unions' [`FromStr`] implementations.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]

@@ -1,4 +1,4 @@
-use std::num::*;
+use core::num::*;
 
 /// Provides the constant 0.
 #[allow(clippy::declare_interior_mutable_const)]

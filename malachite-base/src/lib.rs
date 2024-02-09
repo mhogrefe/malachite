@@ -101,23 +101,10 @@
     clippy::upper_case_acronyms,
     unstable_name_collisions
 )]
+#![no_std]
 
-extern crate itertools;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-extern crate rand_chacha;
-#[cfg(feature = "random")]
-extern crate sha3;
-
-#[cfg(any(feature = "bin_build", feature = "test_build"))]
-extern crate clap;
-#[cfg(any(feature = "bin_build", feature = "test_build"))]
-extern crate gnuplot;
-#[cfg(any(feature = "bin_build", feature = "test_build"))]
-extern crate time;
-#[cfg(feature = "bin_build")]
-extern crate walkdir;
+#[macro_use]
+extern crate alloc;
 
 #[cfg(feature = "test_build")]
 #[doc(hidden)]

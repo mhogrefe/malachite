@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::{ModShl, ModShlAssign, ModShr, ModShrAssign, UnsignedAbs};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use std::ops::{Shr, ShrAssign};
+use core::ops::{Shr, ShrAssign};
 
 fn mod_shr_signed<
     T: ModShl<U, T, Output = T> + PrimitiveUnsigned + Shr<U, Output = T>,

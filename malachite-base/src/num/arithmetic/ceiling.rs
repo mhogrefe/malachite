@@ -5,11 +5,10 @@ macro_rules! impl_ceiling {
         impl Ceiling for $f {
             type Output = $f;
 
-            /// This is a wrapper over the `ceil` functions in the standard library, for example
-            /// [this one](f32::ceil).
+            /// This is a wrapper over the `ceil` functions in [`libm`]
             #[inline]
             fn ceiling(self) -> $f {
-                $f::ceil(self)
+                libm::Libm::<$f>::ceil(self)
             }
         }
 

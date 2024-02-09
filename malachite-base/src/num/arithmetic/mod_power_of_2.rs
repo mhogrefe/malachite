@@ -5,7 +5,7 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 

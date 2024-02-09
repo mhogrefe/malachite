@@ -3,7 +3,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use std::cmp::min;
+use core::cmp::min;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 

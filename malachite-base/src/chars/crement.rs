@@ -56,9 +56,9 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     const ONE_BELOW_FIRST_SURROGATE_CODE_POINT: u32 = FIRST_SURROGATE_CODE_POINT - 1;
     const ONE_BELOW_NUMBER_OF_CHARS: u32 = NUMBER_OF_CHARS - 1;
     match u {
-        0..=ONE_BELOW_FIRST_SURROGATE_CODE_POINT => std::char::from_u32(u),
+        0..=ONE_BELOW_FIRST_SURROGATE_CODE_POINT => core::char::from_u32(u),
         FIRST_SURROGATE_CODE_POINT..=ONE_BELOW_NUMBER_OF_CHARS => {
-            std::char::from_u32(u + NUMBER_OF_SURROGATE_CODE_POINTS)
+            core::char::from_u32(u + NUMBER_OF_SURROGATE_CODE_POINTS)
         }
         _ => None,
     }

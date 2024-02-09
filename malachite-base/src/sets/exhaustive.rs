@@ -2,8 +2,13 @@ use crate::vecs::exhaustive::{
     ExhaustiveOrderedUniqueCollections, LexFixedLengthOrderedUniqueCollections,
     LexOrderedUniqueCollections, ShortlexOrderedUniqueCollections,
 };
+#[cfg(not(feature = "std"))]
+use alloc::collections::BTreeSet;
+use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
+#[cfg(feature = "std")]
 use std::collections::{BTreeSet, HashSet};
-use std::hash::Hash;
 
 /// Generates [`HashSet`]s of a given size with elements from a single iterator.
 ///

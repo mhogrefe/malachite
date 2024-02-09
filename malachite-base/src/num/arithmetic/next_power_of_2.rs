@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::{NextPowerOf2, NextPowerOf2Assign, PowerOf2, Sign};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::conversion::traits::SciMantissaAndExponent;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 macro_rules! impl_next_power_of_2_unsigned {
     ($t:ident) => {

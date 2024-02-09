@@ -5,7 +5,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::OverflowingFrom;
 use crate::num::exhaustive::primitive_int_increasing_inclusive_range;
-use std::cmp::min;
+use core::cmp::min;
 
 fn checked_binomial_coefficient_unsigned<T: PrimitiveUnsigned>(n: T, mut k: T) -> Option<T> {
     if k > n {

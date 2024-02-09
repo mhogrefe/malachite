@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 macro_rules! impl_partial_ord_abs {
     ($t:ident) => {

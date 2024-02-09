@@ -14,16 +14,20 @@ use crate::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };
 use crate::vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::{max, min, Ordering};
+use core::iter::{empty, once, FromIterator, Once, Zip};
+use core::marker::PhantomData;
+use core::mem::take;
+use core::ops::RangeFrom;
 use itertools::{repeat_n, Itertools};
-use std::cmp::{max, min, Ordering};
-use std::iter::{empty, once, FromIterator, Once, Zip};
-use std::marker::PhantomData;
-use std::mem::take;
-use std::ops::RangeFrom;
 
 #[doc(hidden)]
 pub fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
-    let oi_sorted_unique = xs.unique().sorted().collect_vec();
+    let mut oi_unique = hashbrown::HashSet::new();
+    oi_unique.extend(xs);
+    let oi_sorted_unique = oi_unique.into_iter().sorted().collect_vec();
     assert_eq!(oi_sorted_unique.len(), max_input_index + 1);
     assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
     assert_eq!(*oi_sorted_unique.last().unwrap(), max_input_index);

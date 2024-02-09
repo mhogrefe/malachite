@@ -1,5 +1,5 @@
 use crate::rational_sequences::RationalSequence;
-use std::fmt::{Debug, Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 impl<T: Display + Eq> Display for RationalSequence<T> {
     /// Converts a [`RationalSequence`] to a [`String`].

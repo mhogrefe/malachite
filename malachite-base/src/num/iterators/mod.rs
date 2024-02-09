@@ -2,8 +2,8 @@ use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType
 use crate::num::arithmetic::traits::{DivMod, DivisibleBy};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
-use std::cmp::Ordering;
-use std::marker::PhantomData;
+use core::cmp::Ordering;
+use core::marker::PhantomData;
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]

@@ -8,8 +8,13 @@ use crate::num::random::{
     RandomUnsignedRange,
 };
 use crate::random::Seed;
+#[cfg(not(feature = "std"))]
+use alloc::collections::BTreeSet;
+use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
+#[cfg(feature = "std")]
 use std::collections::{BTreeSet, HashSet};
-use std::hash::Hash;
 
 /// Generates random [`HashSet`]s of a fixed length, where the [`Vec`]s have no repeated elements,
 /// and the elements are in ascending order.

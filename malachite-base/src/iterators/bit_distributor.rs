@@ -1,6 +1,7 @@
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::logic::traits::{BitConvertible, NotAssign};
-use std::fmt::Debug;
+use alloc::vec::Vec;
+use core::fmt::Debug;
 
 const COUNTER_WIDTH: usize = u64::WIDTH as usize;
 

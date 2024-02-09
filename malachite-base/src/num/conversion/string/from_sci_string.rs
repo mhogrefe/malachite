@@ -4,12 +4,13 @@ use crate::num::conversion::string::from_string::digit_from_display_byte;
 use crate::num::conversion::string::options::FromSciStringOptions;
 use crate::num::conversion::traits::FromSciString;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::str::FromStr;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::str::FromStr;
 
 #[doc(hidden)]
 pub fn parse_exponent(s: &[u8]) -> Option<i64> {
-    i64::from_str(std::str::from_utf8(s).ok()?).ok()
+    i64::from_str(core::str::from_utf8(s).ok()?).ok()
 }
 
 #[doc(hidden)]
@@ -106,7 +107,7 @@ fn parse_int<T: PrimitiveInt>(cs: &[u8], base: u8) -> Option<T> {
         }
         Some(T::ZERO)
     } else {
-        T::from_string_base(base, std::str::from_utf8(cs).ok()?)
+        T::from_string_base(base, core::str::from_utf8(cs).ok()?)
     }
 }
 

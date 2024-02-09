@@ -10,7 +10,7 @@ use crate::num::conversion::traits::{
 };
 use crate::num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 fn raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
     let bits = x.to_bits();

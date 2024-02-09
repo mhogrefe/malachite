@@ -10,8 +10,8 @@ use crate::num::conversion::traits::{
 };
 use crate::num::float::NiceFloat;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::Neg;
+use core::cmp::Ordering;
+use core::ops::Neg;
 
 // This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {

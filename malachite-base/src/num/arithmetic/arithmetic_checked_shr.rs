@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::{ArithmeticCheckedShl, ArithmeticCheckedShr, UnsignedAbs};
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use std::ops::Shr;
+use core::ops::Shr;
 
 fn arithmetic_checked_shr_unsigned_signed<
     T: ArithmeticCheckedShl<U, Output = T> + PrimitiveUnsigned + Shr<U, Output = T>,

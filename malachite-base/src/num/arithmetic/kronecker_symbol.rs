@@ -6,7 +6,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::SplitInHalf;
 use crate::num::logic::traits::NotAssign;
-use std::mem::swap;
+use core::mem::swap;
 
 pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: T) -> i8 {
     assert_ne!(n, T::ZERO);

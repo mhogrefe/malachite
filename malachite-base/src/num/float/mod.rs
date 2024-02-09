@@ -1,8 +1,8 @@
 use crate::num::basic::floats::PrimitiveFloat;
-use std::cmp::Ordering;
-use std::fmt::{self, Debug, Display, Formatter};
-use std::hash::{Hash, Hasher};
-use std::str::FromStr;
+use core::cmp::Ordering;
+use core::fmt::{self, Debug, Display, Formatter};
+use core::hash::{Hash, Hasher};
+use core::str::FromStr;
 
 /// `NiceFloat` is a wrapper around primitive float types that provides nicer [`Eq`], [`Ord`],
 /// [`Hash`], [`Display`], and [`FromStr`] instances.
@@ -201,14 +201,14 @@ macro_rules! impl_fmt_ryu_string {
                     f.write_str(printed)
                 } else {
                     if let Some(e_index) = e_index {
-                        let mut out_bytes = vec![0; printed.len() + 2];
+                        let mut out_bytes = ::alloc::vec![0; printed.len() + 2];
                         let (in_bytes_lo, in_bytes_hi) = printed.as_bytes().split_at(e_index);
                         let (out_bytes_lo, out_bytes_hi) = out_bytes.split_at_mut(e_index);
                         out_bytes_lo.copy_from_slice(in_bytes_lo);
                         out_bytes_hi[0] = b'.';
                         out_bytes_hi[1] = b'0';
                         out_bytes_hi[2..].copy_from_slice(in_bytes_hi);
-                        f.write_str(std::str::from_utf8(&out_bytes).unwrap())
+                        f.write_str(core::str::from_utf8(&out_bytes).unwrap())
                     } else {
                         panic!("Unexpected Ryu string: {}", printed);
                     }
@@ -217,7 +217,9 @@ macro_rules! impl_fmt_ryu_string {
         }
     };
 }
+
 impl_fmt_ryu_string!(f32);
+
 impl_fmt_ryu_string!(f64);
 
 impl<T: PrimitiveFloat> Display for NiceFloat<T> {

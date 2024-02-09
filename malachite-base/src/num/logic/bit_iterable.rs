@@ -2,10 +2,10 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::BitIterable;
-use std::cmp::min;
-use std::cmp::Ordering;
-use std::marker::PhantomData;
-use std::ops::Index;
+use core::cmp::min;
+use core::cmp::Ordering;
+use core::marker::PhantomData;
+use core::ops::Index;
 
 /// A double-ended iterator over the bits of an unsigned primitive integer.
 ///

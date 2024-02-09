@@ -48,11 +48,10 @@ macro_rules! impl_abs_primitive_float {
         impl Abs for $f {
             type Output = $f;
 
-            /// This is a wrapper over the `abs` functions in the standard library, for example
-            /// [this one](f32::abs).
+            /// This is a wrapper over the `abs` functions from [`libm`].
             #[inline]
             fn abs(self) -> $f {
-                $f::abs(self)
+                libm::Libm::<$f>::fabs(self)
             }
         }
 

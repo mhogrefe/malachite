@@ -4,8 +4,8 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_round_unsigned_unsigned<
     T: PrimitiveUnsigned + Shl<U, Output = T> + Shr<U, Output = T>,

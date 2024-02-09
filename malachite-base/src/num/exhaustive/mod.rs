@@ -13,10 +13,11 @@ use crate::tuples::exhaustive::{
     exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
     ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };
+use alloc::vec::IntoIter;
+use alloc::vec::Vec;
+use core::iter::{once, Chain, Once, Rev};
+use core::marker::PhantomData;
 use itertools::{Interleave, Itertools};
-use std::iter::{once, Chain, Once, Rev};
-use std::marker::PhantomData;
-use std::vec::IntoIter;
 
 /// Generates all primitive integers in an interval.
 ///
@@ -1454,7 +1455,7 @@ pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![T::ZERO, T::NEGATIVE_ZERO]
+    ::alloc::vec![T::ZERO, T::NEGATIVE_ZERO]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
@@ -1566,7 +1567,7 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![T::INFINITY, T::NEGATIVE_INFINITY]
+    ::alloc::vec![T::INFINITY, T::NEGATIVE_INFINITY]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
@@ -1603,7 +1604,7 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![T::NAN, T::INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
+    ::alloc::vec![T::NAN, T::INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
         .into_iter()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
