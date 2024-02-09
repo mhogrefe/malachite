@@ -1,7 +1,7 @@
 use crate::num::arithmetic::traits::{RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 fn round_to_multiple_of_power_of_2<T: PrimitiveInt>(
     x: T,

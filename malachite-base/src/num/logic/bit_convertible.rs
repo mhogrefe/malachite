@@ -2,6 +2,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::{BitConvertible, LeadingZeros};
+use alloc::vec::Vec;
 
 fn to_bits_asc_unsigned<T: PrimitiveUnsigned>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();

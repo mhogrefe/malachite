@@ -1,5 +1,5 @@
 use crate::rounding_modes::RoundingMode;
-use std::fmt::{Debug, Display, Formatter, Result};
+use core::fmt::{Debug, Display, Formatter, Result};
 
 impl Display for RoundingMode {
     /// Converts a [`RoundingMode`] to a [`String`].

@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 /// Remembers values produced by an iterator.
 ///
 /// After wrapping an iterator with an `IteratorCache`, you can retrieve a reference to the $n$th

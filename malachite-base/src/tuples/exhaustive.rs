@@ -6,11 +6,13 @@ use crate::num::logic::traits::SignificantBits;
 use crate::vecs::exhaustive::{
     fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
 };
-use std::cmp::max;
-use std::fmt::Debug;
-use std::iter::{once, Once};
-use std::marker::PhantomData;
-use std::mem::take;
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::max;
+use core::fmt::Debug;
+use core::iter::{once, Once};
+use core::marker::PhantomData;
+use core::mem::take;
 
 /// Generates the only unit: `()`.
 ///

@@ -5,11 +5,13 @@ use crate::num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 #[cfg(feature = "random")]
 use crate::random::Seed;
 use crate::slices::advance_indices;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::str::FromStr;
 #[cfg(feature = "random")]
 use rand::prelude::SliceRandom;
 #[cfg(feature = "random")]
 use rand_chacha::ChaCha20Rng;
-use std::str::FromStr;
 
 /// Inserts several copies of a value at the left (beginning) of a [`Vec`].
 ///

@@ -8,3 +8,4 @@ src/integer_old.rs
 *.history/*
 */.history/*
 
+.direnv/

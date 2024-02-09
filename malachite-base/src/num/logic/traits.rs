@@ -1,4 +1,5 @@
-use std::ops::Index;
+use alloc::vec::Vec;
+use core::ops::Index;
 
 /// Defines functions that access or modify individual bits in a number.
 pub trait BitAccess {

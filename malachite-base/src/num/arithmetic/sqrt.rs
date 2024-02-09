@@ -8,7 +8,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::SignificantBits;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 const U8_SQUARES: [u8; 16] = [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
 
@@ -1170,7 +1170,7 @@ macro_rules! impl_sqrt_primitive_float {
 
             #[inline]
             fn sqrt(self) -> $f {
-                $f::sqrt(self)
+                libm::Libm::<$f>::sqrt(self)
             }
         }
 

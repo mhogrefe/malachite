@@ -3,7 +3,7 @@ use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use std::ops::{Shr, ShrAssign};
+use core::ops::{Shr, ShrAssign};
 
 fn mod_shl_unsigned<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, other: U, m: T) -> T
 where

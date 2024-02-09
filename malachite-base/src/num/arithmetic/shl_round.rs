@@ -4,8 +4,8 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::{Shl, ShlAssign};
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 
 fn shl_round<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,

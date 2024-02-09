@@ -1,6 +1,6 @@
 use crate::num::basic::traits::Two;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 /// Takes the absolute value of a number. Assumes that the number has a representable absolute
 /// number.

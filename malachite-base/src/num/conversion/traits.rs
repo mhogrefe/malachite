@@ -1,8 +1,10 @@
 use crate::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use crate::num::conversion::string::to_sci::SciWrapper;
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::fmt::{Formatter, Result};
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::fmt::{Formatter, Result};
 
 /// Expresses a value as a [`Vec`] of digits, or reads a value from an iterator of digits.
 ///

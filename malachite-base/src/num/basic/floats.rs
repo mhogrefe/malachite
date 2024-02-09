@@ -16,14 +16,14 @@ use crate::num::conversion::traits::{
 };
 use crate::num::float::FmtRyuString;
 use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
-use std::cmp::Ordering;
-use std::fmt::{Debug, Display, LowerExp, UpperExp};
-use std::iter::{Product, Sum};
-use std::num::FpCategory;
-use std::ops::{
+use core::cmp::Ordering;
+use core::fmt::{Debug, Display, LowerExp, UpperExp};
+use core::iter::{Product, Sum};
+use core::num::FpCategory;
+use core::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
-use std::str::FromStr;
+use core::str::FromStr;
 
 /// This trait defines functions on primitive float types: [`f32`] and [`f64`].
 ///
@@ -587,9 +587,9 @@ macro_rules! impl_basic_traits_primitive_float {
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
-            const MANTISSA_WIDTH: u64 = (std::$t::MANTISSA_DIGITS as u64) - 1;
+            const MANTISSA_WIDTH: u64 = (core::$t::MANTISSA_DIGITS as u64) - 1;
 
-            const MAX_FINITE: Self = std::$t::MAX;
+            const MAX_FINITE: Self = core::$t::MAX;
             const MIN_POSITIVE_SUBNORMAL: Self = $min_positive_subnormal;
             const MAX_SUBNORMAL: Self = $max_subnormal;
             const MIN_POSITIVE_NORMAL: Self = $min_positive_normal;
@@ -679,17 +679,17 @@ macro_rules! impl_basic_traits_primitive_float {
 
         /// The constant Infinity for primitive floating-point types.
         impl Infinity for $t {
-            const INFINITY: $t = std::$t::INFINITY;
+            const INFINITY: $t = core::$t::INFINITY;
         }
 
         /// The constant -Infinity for primitive floating-point types.
         impl NegativeInfinity for $t {
-            const NEGATIVE_INFINITY: $t = std::$t::NEG_INFINITY;
+            const NEGATIVE_INFINITY: $t = core::$t::NEG_INFINITY;
         }
 
         /// The constant NaN for primitive floating-point types.
         impl NaN for $t {
-            const NAN: $t = std::$t::NAN;
+            const NAN: $t = core::$t::NAN;
         }
 
         /// The lowest value representable by this type, negative infinity.

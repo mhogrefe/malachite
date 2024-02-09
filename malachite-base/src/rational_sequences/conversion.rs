@@ -1,4 +1,6 @@
 use crate::rational_sequences::{rational_sequence_reduce, RationalSequence};
+use alloc::vec;
+use alloc::vec::Vec;
 
 impl<T: Eq> RationalSequence<T> {
     /// Converts a [`Vec`] to a finite [`RationalSequence`].

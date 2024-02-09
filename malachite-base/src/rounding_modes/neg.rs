@@ -1,6 +1,6 @@
 use crate::num::arithmetic::traits::NegAssign;
 use crate::rounding_modes::RoundingMode;
-use std::ops::Neg;
+use core::ops::Neg;
 
 /// Returns the negative of a [`RoundingMode`].
 ///

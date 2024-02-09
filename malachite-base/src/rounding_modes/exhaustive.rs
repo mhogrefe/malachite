@@ -1,6 +1,6 @@
 use crate::rounding_modes::{RoundingMode, ROUNDING_MODES};
-use std::iter::Cloned;
-use std::slice::Iter;
+use core::iter::Cloned;
+use core::slice::Iter;
 
 pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
 

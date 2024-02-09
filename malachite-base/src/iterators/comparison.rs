@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 /// An iterator that generates the [`Ordering`]s of adjacent elements of a given iterator.
 ///

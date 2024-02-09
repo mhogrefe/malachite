@@ -1,5 +1,5 @@
 use crate::num::arithmetic::traits::Sign;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 macro_rules! impl_sign_primitive_int {
     ($t:ident) => {

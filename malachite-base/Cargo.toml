@@ -22,12 +22,15 @@ path = "src/bin.rs"
 test = false
 
 [dependencies]
-itertools = "0.11.0"
-ryu = "1.0.15"
-sha3 = { version = "0.10.8", optional = true }
-rand = { version = "0.8.5", optional = true }
-rand_chacha = { version = "0.3.1", optional = true }
-getrandom = { version = "0.2", features = ["js"], optional = true }
+itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
+ryu = { version = "1.0.15", default-features = false }
+hashbrown = { version = "0.14", default-features = false, features = ["ahash", "inline-more"] }
+libm = { version = "0.2.8", default-features = false }
+
+sha3 = { version = "0.10.8", optional = true, default-features = false }
+rand = { version = "0.8.5", optional = true, default-features = false }
+rand_chacha = { version = "0.3.1", optional = true, default-features = false }
+getrandom = { version = "0.2", default-features = false, features = ["js"], optional = true }
 
 clap = { version = "2.33.1", optional = true }
 gnuplot = { version = "0.0.39", optional = true }

@@ -39,7 +39,7 @@ impl Max for char {
     ///
     /// This is a character in
     /// [Supplementary Private Use Area-B](https://www.unicode.org/charts/PDF/U10FF80.pdf).
-    const MAX: char = std::char::MAX;
+    const MAX: char = core::char::MAX;
 }
 
 impl_named!(char);

@@ -5,11 +5,10 @@ macro_rules! impl_floor {
         impl Floor for $f {
             type Output = $f;
 
-            /// This is a wrapper over the `floor` functions in the standard library, for example
-            /// [this one](f32::floor).
+            /// This is a wrapper over the `floor` functions in [`libm`].
             #[inline]
             fn floor(self) -> $f {
-                $f::floor(self)
+                libm::Libm::<$f>::floor(self)
             }
         }
 

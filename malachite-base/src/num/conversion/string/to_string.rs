@@ -2,7 +2,9 @@ use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::traits::Zero;
 use crate::num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
 use crate::vecs::vec_pad_left;
-use std::fmt::{Debug, Display, Formatter, Result, Write};
+use alloc::string::String;
+use alloc::string::ToString;
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 /// A `struct` that allows for formatting a numeric type and rendering its digits in a specified
 /// base.
@@ -124,7 +126,7 @@ fn fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     if w.x == T::ZERO {
         digits.push(b'0');
     }
-    f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
+    f.pad_integral(true, "", core::str::from_utf8(&digits).unwrap())
 }
 
 fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u8) -> String {

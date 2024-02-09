@@ -1,4 +1,4 @@
-use std::iter::{once, Chain, Once};
+use core::iter::{once, Chain, Once};
 
 /// Generates all [`Option`]s except `None`, with values from a given iterator.
 ///

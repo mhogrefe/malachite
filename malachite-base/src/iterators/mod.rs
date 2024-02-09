@@ -5,10 +5,14 @@ use crate::num::basic::traits::Zero;
 use crate::random::Seed;
 #[cfg(feature = "random")]
 use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
+use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+use core::fmt::Display;
+use core::hash::Hash;
+use hashbrown::HashSet;
 use itertools::Itertools;
-use std::collections::{HashSet, VecDeque};
-use std::fmt::Display;
-use std::hash::Hash;
 
 /// Generates all the nonzero values of a provided iterator.
 ///

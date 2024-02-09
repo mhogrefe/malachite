@@ -10,7 +10,8 @@ use crate::num::conversion::string::to_string::{
 use crate::num::conversion::traits::{ExactFrom, ToSci};
 use crate::rounding_modes::RoundingMode;
 use crate::slices::slice_trailing_zeros;
-use std::fmt::{Display, Formatter, Write};
+use alloc::string::String;
+use core::fmt::{Display, Formatter, Write};
 
 /// A `struct` that can be used to format a number in scientific notation.
 pub struct SciWrapper<'a, T: ToSci> {
@@ -20,7 +21,7 @@ pub struct SciWrapper<'a, T: ToSci> {
 
 impl<'a, T: ToSci> Display for SciWrapper<'a, T> {
     #[inline]
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter) -> core::fmt::Result {
         self.x.fmt_sci(f, self.options)
     }
 }
@@ -30,7 +31,7 @@ pub fn write_exponent<T: PrimitiveInt>(
     f: &mut Formatter,
     options: ToSciOptions,
     exp: T,
-) -> std::fmt::Result {
+) -> core::fmt::Result {
     f.write_char(if options.get_e_lowercase() { 'e' } else { 'E' })?;
     if exp > T::ZERO && (options.get_force_exponent_plus_sign() || options.get_base() >= 15) {
         f.write_char('+')?;
@@ -38,7 +39,7 @@ pub fn write_exponent<T: PrimitiveInt>(
     write!(f, "{exp}")
 }
 
-fn write_helper<T>(x: T, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result
+fn write_helper<T>(x: T, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result
 where
     BaseFmtWrapper<T>: Display,
 {
@@ -79,7 +80,7 @@ fn fmt_sci_unsigned<T: PrimitiveUnsigned>(
     mut x: T,
     f: &mut Formatter,
     options: ToSciOptions,
-) -> std::fmt::Result
+) -> core::fmt::Result
 where
     BaseFmtWrapper<T>: Display,
 {
@@ -171,7 +172,7 @@ fn fmt_sci_signed<T: PrimitiveSigned>(
     x: T,
     f: &mut Formatter,
     mut options: ToSciOptions,
-) -> std::fmt::Result
+) -> core::fmt::Result
 where
     <T as UnsignedAbs>::Output: PrimitiveUnsigned,
 {
@@ -223,7 +224,7 @@ macro_rules! impl_to_sci_unsigned {
             /// # Examples
             /// See [here](super::to_sci).
             #[inline]
-            fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
+            fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
                 fmt_sci_unsigned(*self, f, options)
             }
         }
@@ -269,7 +270,7 @@ macro_rules! impl_to_sci_signed {
             /// # Examples
             /// See [here](super::to_sci).
             #[inline]
-            fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
+            fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
                 fmt_sci_signed(*self, f, options)
             }
         }

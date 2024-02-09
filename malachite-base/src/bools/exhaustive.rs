@@ -1,5 +1,5 @@
-use std::iter::Cloned;
-use std::slice::Iter;
+use core::iter::Cloned;
+use core::slice::Iter;
 
 /// An iterator that generates both [`bool`]s.
 ///

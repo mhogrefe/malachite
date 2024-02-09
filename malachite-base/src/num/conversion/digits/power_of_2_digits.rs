@@ -1,5 +1,6 @@
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{PowerOf2Digits, WrappingFrom};
+use alloc::vec::Vec;
 
 fn to_power_of_2_digits_asc<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>>(
     x: &T,

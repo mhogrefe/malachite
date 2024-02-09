@@ -14,7 +14,7 @@ use crate::num::conversion::traits::{
 };
 use crate::num::logic::traits::{LowMask, SignificantBits};
 use crate::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 const U8_CUBES: [u8; 7] = [0, 1, 8, 27, 64, 125, 216];
 

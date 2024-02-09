@@ -1,6 +1,6 @@
-use crate::itertools::Itertools;
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::float::NiceFloat;
+use itertools::Itertools;
 
 pub fn exhaustive_primitive_floats_helper_helper_with_limit<
     T: PrimitiveFloat,

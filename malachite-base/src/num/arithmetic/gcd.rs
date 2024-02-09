@@ -1,6 +1,6 @@
 use crate::num::arithmetic::traits::{Gcd, GcdAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use std::cmp::min;
+use core::cmp::min;
 
 #[cfg(feature = "test_build")]
 pub fn gcd_euclidean<T: PrimitiveUnsigned>(x: T, y: T) -> T {

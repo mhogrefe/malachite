@@ -1,5 +1,6 @@
 use crate::slices::min_repeating_len;
-use std::iter::{Chain, Cycle};
+use alloc::vec::Vec;
+use core::iter::{Chain, Cycle};
 
 fn rational_sequence_reduce<T: Eq>(non_repeating: &mut Vec<T>, repeating: &mut Vec<T>) {
     if repeating.is_empty() {
@@ -163,7 +164,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     &[1, 2, 3, 4, 3, 4, 3, 4, 3, 4]
     /// );
     /// ```
-    pub fn iter(&self) -> Chain<std::slice::Iter<T>, Cycle<std::slice::Iter<T>>> {
+    pub fn iter(&self) -> Chain<core::slice::Iter<T>, Cycle<core::slice::Iter<T>>> {
         self.non_repeating
             .iter()
             .chain(self.repeating.iter().cycle())

@@ -1,6 +1,6 @@
-use std::fmt::{Display, Formatter};
-use std::iter::{empty, Empty};
-use std::str::FromStr;
+use core::fmt::{Display, Formatter};
+use core::iter::{empty, Empty};
+use core::str::FromStr;
 
 /// `Never` is a type that cannot be instantiated.
 ///
@@ -17,7 +17,7 @@ pub enum Never {}
 
 impl Display for Never {
     /// Would convert a [`Never`] to a [`String`].
-    fn fmt(&self, _f: &mut Formatter) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut Formatter) -> core::fmt::Result {
         unreachable!()
     }
 }

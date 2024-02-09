@@ -1,5 +1,5 @@
 use crate::rational_sequences::{rational_sequence_reduce, RationalSequence};
-use std::ops::Index;
+use core::ops::Index;
 
 impl<T: Eq> Index<usize> for RationalSequence<T> {
     type Output = T;

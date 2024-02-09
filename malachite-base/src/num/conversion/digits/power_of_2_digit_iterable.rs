@@ -5,7 +5,7 @@ use crate::num::conversion::traits::{
 };
 use crate::num::logic::traits::BitBlockAccess;
 use crate::rounding_modes::RoundingMode;
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 /// A double-ended iterator over the base-$2^k$ digits of an unsigned primitive integer.
 ///

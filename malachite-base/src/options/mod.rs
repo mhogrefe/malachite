@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 /// Converts a string to an `Option<T>`, where `T` implements [`FromStr`].
 ///

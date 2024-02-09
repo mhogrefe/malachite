@@ -38,14 +38,14 @@ use crate::num::logic::traits::{
 };
 #[cfg(feature = "random")]
 use crate::num::random::HasRandomPrimitiveInts;
-use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
-use std::hash::Hash;
-use std::iter::{Product, Sum};
-use std::ops::{
+use core::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
+use core::hash::Hash;
+use core::iter::{Product, Sum};
+use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
 };
-use std::str::FromStr;
+use core::str::FromStr;
 
 // When the `random` feature is enabled, the HasRandomPrimitiveInts bound is included.
 
@@ -1039,7 +1039,7 @@ macro_rules! impl_basic_traits_primitive_int {
         /// # Examples
         /// See [here](self).
         impl Min for $t {
-            const MIN: $t = std::$t::MIN;
+            const MIN: $t = core::$t::MIN;
         }
 
         /// The highest value representable by this type.
@@ -1049,7 +1049,7 @@ macro_rules! impl_basic_traits_primitive_int {
         /// # Examples
         /// See [here](self).
         impl Max for $t {
-            const MAX: $t = std::$t::MAX;
+            const MAX: $t = core::$t::MAX;
         }
     };
 }
