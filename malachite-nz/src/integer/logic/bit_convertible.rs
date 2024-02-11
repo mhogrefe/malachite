@@ -3,6 +3,7 @@ use crate::integer::Integer;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb};
+use alloc::vec::Vec;
 use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -190,7 +191,7 @@ impl BitConvertible for Integer {
     /// ```
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
-    /// use std::iter::empty;
+    /// use core::iter::empty;
     ///
     /// assert_eq!(Integer::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
@@ -255,7 +256,7 @@ impl BitConvertible for Integer {
     /// ```
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::integer::Integer;
-    /// use std::iter::empty;
+    /// use core::iter::empty;
     ///
     /// assert_eq!(Integer::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b

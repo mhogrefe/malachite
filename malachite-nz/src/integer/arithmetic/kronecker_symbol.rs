@@ -9,6 +9,7 @@ use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, Parity,
 };
@@ -16,7 +17,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-use std::mem::swap;
 
 // # Worst-case complexity
 // Constant time and additional memory.

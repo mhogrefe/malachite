@@ -21,14 +21,16 @@ name = "malachite_nz_main"
 path = "src/bin.rs"
 
 [dependencies]
-embed-doc-image = "0.1.4"
-itertools = "0.11.0"
-malachite-base = { version = "0.4.4" }
-serde = { version = "1.0.188", optional = true, features = ["derive"] }
+itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
+libm = { version = "0.2.8", default-features = false }
+malachite-base = { version = "0.4.4", default-features = false, path = "../malachite-base" }
+serde = { version = "1.0.188", optional = true, default-features = false, features = ["derive"] }
 
 serde_json = { version = "1.0.105", optional = true }
 num = { version = "0.4.1", optional = true, features = ["serde"] }
 rug = { version = "1.21.0", default-features = false, optional = true, features = ["integer", "serde"] }
+
+embed-doc-image = { version = "0.1.4", optional = true }
 
 [dev-dependencies]
 malachite-nz = { path = ".", features = ["test_build"] }
@@ -40,7 +42,7 @@ enable_serde = ["serde"]
 test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
 float_helpers = []
-doc-images = []
+doc-images = ["embed-doc-image"]
 
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we

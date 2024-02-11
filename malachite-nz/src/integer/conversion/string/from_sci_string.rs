@@ -16,7 +16,7 @@ impl FromSciStringHelper for Integer {
                 _ => {}
             }
         }
-        Integer::from_string_base(base, std::str::from_utf8(cs).ok()?)
+        Integer::from_string_base(base, core::str::from_utf8(cs).ok()?)
     }
 
     fn up_1(self, neg: bool) -> Option<Integer> {

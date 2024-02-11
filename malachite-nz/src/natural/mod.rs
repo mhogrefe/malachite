@@ -1,5 +1,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::platform::Limb;
+use alloc::string::String;
+use alloc::vec::Vec;
 #[cfg(feature = "doc-images")]
 use embed_doc_image::embed_doc_image;
 use malachite_base::comparison::traits::Min;

@@ -16,6 +16,8 @@ use crate::platform::{
     Limb, BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use itertools::Itertools;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -31,7 +33,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use std::cmp::Ordering;
 
 //TODO tune
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
@@ -2339,7 +2340,7 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from_digits_asc(
@@ -2404,7 +2405,7 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from_digits_desc(

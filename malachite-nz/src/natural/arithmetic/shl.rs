@@ -1,6 +1,8 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -8,7 +10,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` left-shifted by a `Limb`.

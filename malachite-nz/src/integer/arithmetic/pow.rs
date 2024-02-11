@@ -20,7 +20,7 @@ impl Pow<u64> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(-3).pow(100).to_string(),
@@ -57,7 +57,7 @@ impl<'a> Pow<u64> for &'a Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(-3)).pow(100).to_string(),
@@ -94,7 +94,7 @@ impl PowAssign<u64> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// let mut x = Integer::from(-3);
     /// x.pow_assign(100);

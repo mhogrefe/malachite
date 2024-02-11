@@ -390,7 +390,7 @@ impl EqMod<Integer, Natural> for Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(123).eq_mod(Integer::from(223), Natural::from(100u32)),
@@ -444,7 +444,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(123).eq_mod(Integer::from(223), &Natural::from(100u32)),
@@ -498,7 +498,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(123).eq_mod(&Integer::from(223), Natural::from(100u32)),
@@ -552,7 +552,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Integer::from(123).eq_mod(&Integer::from(223), &Natural::from(100u32)),
@@ -606,7 +606,7 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(123)).eq_mod(Integer::from(223), Natural::from(100u32)),
@@ -660,7 +660,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(123)).eq_mod(Integer::from(223), &Natural::from(100u32)),
@@ -714,7 +714,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(123)).eq_mod(&Integer::from(223), Natural::from(100u32)),
@@ -768,7 +768,7 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Integer::from(123)).eq_mod(&Integer::from(223), &Natural::from(100u32)),

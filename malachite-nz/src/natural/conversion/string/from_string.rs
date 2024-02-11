@@ -1,12 +1,12 @@
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
+use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use std::str::FromStr;
 
 impl FromStr for Natural {
     type Err = ();
@@ -27,7 +27,7 @@ impl FromStr for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::from_str("123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_str("00123456").unwrap(), 123456);

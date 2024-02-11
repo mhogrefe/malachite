@@ -1,5 +1,6 @@
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
@@ -7,7 +8,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // quotient limbs of a `Limb` divided by the `Natural` and rounded according to a specified
@@ -123,7 +123,7 @@ impl DivRound<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(Natural::from(4u32), RoundingMode::Down),
@@ -221,7 +221,7 @@ impl<'a> DivRound<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(&Natural::from(4u32), RoundingMode::Down),
@@ -319,7 +319,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(Natural::from(4u32), RoundingMode::Down),
@@ -424,7 +424,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(&Natural::from(4u32), RoundingMode::Down),
@@ -501,7 +501,7 @@ impl DivRoundAssign<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut n = Natural::from(10u32);
     /// assert_eq!(n.div_round_assign(Natural::from(4u32), RoundingMode::Down), Ordering::Less);
@@ -589,7 +589,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut n = Natural::from(10u32);
     /// assert_eq!(n.div_round_assign(&Natural::from(4u32), RoundingMode::Down), Ordering::Less);

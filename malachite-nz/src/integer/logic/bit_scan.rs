@@ -5,11 +5,11 @@ use crate::natural::logic::bit_scan::{
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 // `Integer`, finds the lowest index greater than or equal to `starting_index` at which the

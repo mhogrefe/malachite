@@ -32,6 +32,8 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
+use alloc::vec::Vec;
+use core::cmp::{max, min, Ordering};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,
@@ -41,7 +43,6 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-use std::cmp::{max, min, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //

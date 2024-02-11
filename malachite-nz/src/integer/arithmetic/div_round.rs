@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 impl DivRound<Integer> for Integer {
     type Output = Integer;
@@ -62,7 +62,7 @@ impl DivRound<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Down),
@@ -205,7 +205,7 @@ impl<'a> DivRound<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Down),
@@ -347,7 +347,7 @@ impl<'a> DivRound<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Down),
@@ -492,7 +492,7 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Down),
@@ -601,7 +601,7 @@ impl DivRoundAssign<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(-10);
     /// assert_eq!(n.div_round_assign(Integer::from(4), RoundingMode::Down), Ordering::Greater);
@@ -721,7 +721,7 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::{DivRoundAssign, Pow};
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(-10);
     /// assert_eq!(n.div_round_assign(&Integer::from(4), RoundingMode::Down), Ordering::Greater);

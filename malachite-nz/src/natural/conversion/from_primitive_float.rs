@@ -1,4 +1,5 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::ShlRound;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
@@ -6,7 +7,6 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident) => {

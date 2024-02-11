@@ -38,6 +38,7 @@ use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use core::cmp::{max, Ordering};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
@@ -46,7 +47,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use std::cmp::{max, Ordering};
 
 //TODO tune
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;

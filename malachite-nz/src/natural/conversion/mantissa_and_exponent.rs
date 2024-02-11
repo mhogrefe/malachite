@@ -5,6 +5,7 @@ use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, Sign,
 };
@@ -16,7 +17,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-use std::cmp::Ordering;
 
 impl Natural {
     /// Returns a [`Natural`]'s scientific mantissa and exponent, rounding according to the
@@ -47,7 +47,7 @@ impl Natural {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let test = |n: Natural, rm: RoundingMode, out: Option<(f32, u64, Ordering)>| {
     ///     assert_eq!(
@@ -261,8 +261,8 @@ impl Natural {
     /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
-    /// use std::str::FromStr;
+    /// use core::cmp::Ordering;
+    /// use core::str::FromStr;
     ///
     /// let test = |
     ///     mantissa: f32,

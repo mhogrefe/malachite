@@ -25,11 +25,12 @@ use crate::platform::{
     MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD,
     MUL_TOOM8H_THRESHOLD,
 };
+use alloc::vec::Vec;
+use core::cmp::max;
+use core::iter::Product;
+use core::ops::{Mul, MulAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
-use std::cmp::max;
-use std::iter::Product;
-use std::ops::{Mul, MulAssign};
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 // the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
@@ -489,7 +490,7 @@ impl Mul<Natural> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ONE * Natural::from(123u32), 123);
     /// assert_eq!(Natural::from(123u32) * Natural::ZERO, 0);
@@ -528,7 +529,7 @@ impl<'a> Mul<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ONE * &Natural::from(123u32), 123);
     /// assert_eq!(Natural::from(123u32) * &Natural::ZERO, 0);
@@ -567,7 +568,7 @@ impl<'a> Mul<Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Natural::ONE * Natural::from(123u32), 123);
     /// assert_eq!(&Natural::from(123u32) * Natural::ZERO, 0);
@@ -606,7 +607,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     /// ```
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Natural::ONE * &Natural::from(123u32), 123);
     /// assert_eq!(&Natural::from(123u32) * &Natural::ZERO, 0);
@@ -648,7 +649,7 @@ impl MulAssign<Natural> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::ONE;
     /// x *= Natural::from_str("1000").unwrap();
@@ -692,7 +693,7 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::ONE;
     /// x *= &Natural::from_str("1000").unwrap();
@@ -732,7 +733,7 @@ impl Product for Natural {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::Product;
+    /// use core::iter::Product;
     ///
     /// assert_eq!(
     ///     Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()),
@@ -781,7 +782,7 @@ impl<'a> Product<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::Product;
+    /// use core::iter::Product;
     ///
     /// assert_eq!(Natural::product(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 210);
     /// ```

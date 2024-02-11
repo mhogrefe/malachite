@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use std::cmp::Ordering;
-use std::ops::{Shr, ShrAssign};
+use core::cmp::Ordering;
+use core::ops::{Shr, ShrAssign};
 
 fn mod_shr_ref_val<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,

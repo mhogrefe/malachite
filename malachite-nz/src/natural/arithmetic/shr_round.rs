@@ -7,6 +7,9 @@ use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -16,8 +19,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
-use std::cmp::Ordering;
-use std::ops::{Shl, ShlAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.

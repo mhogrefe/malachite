@@ -173,7 +173,7 @@ impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::from(100u32).checked_log_base_power_of_2(2), None);
     /// assert_eq!(Natural::from(4294967296u64).checked_log_base_power_of_2(8), Some(4));

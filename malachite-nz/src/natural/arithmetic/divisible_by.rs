@@ -11,6 +11,7 @@ use crate::natural::Natural;
 use crate::platform::{
     Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD,
 };
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -478,7 +479,7 @@ impl DivisibleBy<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.divisible_by(Natural::ZERO), true);
     /// assert_eq!(Natural::from(100u32).divisible_by(Natural::from(3u32)), false);
@@ -523,7 +524,7 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.divisible_by(&Natural::ZERO), true);
     /// assert_eq!(Natural::from(100u32).divisible_by(&Natural::from(3u32)), false);
@@ -568,7 +569,7 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).divisible_by(Natural::ZERO), true);
     /// assert_eq!((&Natural::from(100u32)).divisible_by(Natural::from(3u32)), false);
@@ -612,7 +613,7 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).divisible_by(&Natural::ZERO), true);
     /// assert_eq!((&Natural::from(100u32)).divisible_by(&Natural::from(3u32)), false);

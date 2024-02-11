@@ -1,7 +1,7 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl RoundToMultiple<Integer> for Integer {
     type Output = Integer;
@@ -618,7 +618,7 @@ impl RoundToMultipleAssign<Integer> for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut x = Integer::from(-5);
     /// assert_eq!(
@@ -764,7 +764,7 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut x = Integer::from(-5);
     /// assert_eq!(

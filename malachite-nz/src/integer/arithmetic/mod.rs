@@ -65,7 +65,7 @@ pub mod kronecker_symbol;
 /// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod)       | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
 /// | towards $\infty$  | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
 ///
-/// The [`Rem`](std::ops::Rem) trait in the standard library rounds towards 0.
+/// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
 pub mod mod_op;
 /// Implementations of traits for finding the remainder of a number divided by $2^k$, subject to
 /// various rounding rules.
@@ -300,7 +300,7 @@ pub mod shl;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
-/// use std::cmp::Ordering;
+/// use core::cmp::Ordering;
 ///
 /// let mut n = Integer::from(0x101);
 /// assert_eq!(n.shl_round_assign(-8i8, RoundingMode::Down), Ordering::Less);
@@ -593,7 +593,7 @@ pub mod shr;
 /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::integer::Integer;
-/// use std::cmp::Ordering;
+/// use core::cmp::Ordering;
 ///
 /// let mut n = Integer::from(0x101);
 /// assert_eq!(n.shr_round_assign(8u8, RoundingMode::Down), Ordering::Less);

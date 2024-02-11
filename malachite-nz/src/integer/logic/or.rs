@@ -3,11 +3,12 @@ use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::{max, Ordering};
+use core::ops::{BitOr, BitOrAssign};
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-use std::cmp::{max, Ordering};
-use std::ops::{BitOr, BitOrAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 // `Integer`, returns the limbs of the bitwise or of the `Integer` and a `Limb`. `xs` cannot be

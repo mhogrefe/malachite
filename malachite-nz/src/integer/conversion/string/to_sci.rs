@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::fmt::{Formatter, Write};
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ToSci;
-use std::fmt::{Formatter, Write};
 
 impl ToSci for Integer {
     /// Determines whether an [`Integer`] can be converted to a string using
@@ -93,7 +93,7 @@ impl ToSci for Integer {
     /// options.set_include_trailing_zeros(true);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.111000100e16");
     /// ```
-    fn fmt_sci(&self, f: &mut Formatter, mut options: ToSciOptions) -> std::fmt::Result {
+    fn fmt_sci(&self, f: &mut Formatter, mut options: ToSciOptions) -> core::fmt::Result {
         let abs = self.unsigned_abs_ref();
         if *self >= 0u32 {
             abs.fmt_sci(f, options)

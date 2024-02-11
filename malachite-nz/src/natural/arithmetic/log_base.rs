@@ -1,4 +1,5 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
@@ -7,7 +8,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 impl Natural {
     /// Calculates the approximate natural logarithm of a nonzero [`Natural`].
@@ -38,7 +38,7 @@ impl Natural {
     pub fn approx_log(&self) -> f64 {
         assert_ne!(*self, 0);
         let (mantissa, exponent): (f64, u64) = self.sci_mantissa_and_exponent();
-        mantissa.ln() + (exponent as f64) * std::f64::consts::LN_2
+        libm::log(mantissa) + (exponent as f64) * core::f64::consts::LN_2
     }
 }
 

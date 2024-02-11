@@ -10,6 +10,7 @@ use crate::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -273,7 +274,7 @@ impl BitBlockAccess for Integer {
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (-Natural::from(0xabcdef0112345678u64)).get_bits(16, 48),
@@ -334,7 +335,7 @@ impl BitBlockAccess for Integer {
     /// use malachite_base::num::logic::traits::BitBlockAccess;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (-Natural::from(0xabcdef0112345678u64)).get_bits_owned(16, 48),

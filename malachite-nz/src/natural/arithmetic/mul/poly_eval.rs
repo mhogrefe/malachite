@@ -7,12 +7,12 @@ use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place
 use crate::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
-use std::cmp::Ordering;
 
 // Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 // the last, which has width `n_high` limbs.

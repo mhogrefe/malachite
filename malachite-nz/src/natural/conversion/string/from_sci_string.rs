@@ -1,4 +1,6 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
+use core::ops::Mul;
 use malachite_base::num::arithmetic::traits::{CheckedSub, Parity, Pow};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::string::from_sci_string::{
@@ -7,8 +9,6 @@ use malachite_base::num::conversion::string::from_sci_string::{
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::Mul;
 
 #[doc(hidden)]
 pub trait FromSciStringHelper: Sized {
@@ -43,7 +43,7 @@ impl FromSciStringHelper for Natural {
                     _ => {}
                 }
             }
-            Natural::from_string_base(base, std::str::from_utf8(cs).ok()?)
+            Natural::from_string_base(base, core::str::from_utf8(cs).ok()?)
         }
     }
 

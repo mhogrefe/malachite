@@ -5,6 +5,10 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::string::String;
+#[cfg(feature = "test_build")]
+use core::fmt::Write;
+use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 #[cfg(feature = "test_build")]
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
@@ -18,9 +22,6 @@ use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, W
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-#[cfg(feature = "test_build")]
-use std::fmt::Write;
-use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 
 /// A `struct` that allows for formatting a [`Natural`] or [`Integer`](crate::integer::Integer) and
 /// rendering its digits in a specified base.
@@ -124,7 +125,7 @@ impl<'a> Display for BaseFmtWrapper<&'a Natural> {
                     *digit = digit_to_display_byte_lower(*digit).unwrap();
                 }
             }
-            f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
+            f.pad_integral(true, "", core::str::from_utf8(&digits).unwrap())
         }
     }
 }
@@ -255,7 +256,7 @@ impl Display for Natural {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_string(), "123");
@@ -276,7 +277,7 @@ impl Display for Natural {
                 for digit in &mut digits {
                     *digit = digit_to_display_byte_lower(*digit).unwrap();
                 }
-                f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
+                f.pad_integral(true, "", core::str::from_utf8(&digits).unwrap())
             }
         }
     }
@@ -299,7 +300,7 @@ impl Debug for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_debug_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_debug_string(), "123");
@@ -397,7 +398,7 @@ impl Binary for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_binary_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_binary_string(), "1111011");
@@ -432,7 +433,7 @@ impl Binary for Natural {
                     limb >>= 1;
                     remaining_bits -= 1;
                 }
-                f.pad_integral(true, "0b", std::str::from_utf8(&bits).unwrap())
+                f.pad_integral(true, "0b", core::str::from_utf8(&bits).unwrap())
             }
         }
     }
@@ -582,7 +583,7 @@ impl Octal for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_octal_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_octal_string(), "173");
@@ -652,7 +653,7 @@ impl Octal for Natural {
                         }
                     }
                 }
-                f.pad_integral(true, "0o", std::str::from_utf8(&digits).unwrap())
+                f.pad_integral(true, "0o", core::str::from_utf8(&digits).unwrap())
             }
         }
     }
@@ -739,7 +740,7 @@ impl LowerHex for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_lower_hex_string(), "7b");
@@ -782,7 +783,7 @@ impl LowerHex for Natural {
                     limb >>= 4;
                     remaining_digits -= 1;
                 }
-                f.pad_integral(true, "0x", std::str::from_utf8(&digits).unwrap())
+                f.pad_integral(true, "0x", core::str::from_utf8(&digits).unwrap())
             }
         }
     }
@@ -805,7 +806,7 @@ impl UpperHex for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_upper_hex_string(), "7B");
@@ -848,7 +849,7 @@ impl UpperHex for Natural {
                     limb >>= 4;
                     remaining_digits -= 1;
                 }
-                f.pad_integral(true, "0x", std::str::from_utf8(&digits).unwrap())
+                f.pad_integral(true, "0x", core::str::from_utf8(&digits).unwrap())
             }
         }
     }

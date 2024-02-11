@@ -1,8 +1,8 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::conversion::traits::FromStringBase;
-use std::ops::Neg;
-use std::str::FromStr;
+use core::ops::Neg;
+use core::str::FromStr;
 
 impl FromStr for Integer {
     type Err = ();
@@ -24,7 +24,7 @@ impl FromStr for Integer {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::from_str("123456").unwrap(), 123456);
     /// assert_eq!(Integer::from_str("00123456").unwrap(), 123456);

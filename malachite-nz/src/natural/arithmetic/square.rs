@@ -34,6 +34,8 @@ use crate::platform::{
     DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+use alloc::vec::Vec;
+use core::cmp::{max, Ordering};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
@@ -43,7 +45,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::{max, Ordering};
 
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 

@@ -1,7 +1,7 @@
 use crate::integer::Integer;
 use itertools::{Interleave, Itertools};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use std::iter::{once, Chain, Once, Rev};
+use core::iter::{once, Chain, Once, Rev};
 
 /// Generates all [`Integer`]s in a finite interval, in ascending order.
 ///

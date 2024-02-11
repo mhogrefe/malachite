@@ -40,7 +40,7 @@ impl IsPowerOf2 for Natural {
     /// use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow};
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.is_power_of_2(), false);
     /// assert_eq!(Natural::from(123u32).is_power_of_2(), false);

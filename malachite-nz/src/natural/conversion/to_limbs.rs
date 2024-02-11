@@ -1,9 +1,10 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::ops::Index;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use std::ops::Index;
 
 /// A double-ended iterator over the [limbs](crate#limbs) of a [`Natural`].
 ///

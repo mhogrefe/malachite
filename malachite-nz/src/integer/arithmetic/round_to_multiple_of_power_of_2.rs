@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl RoundToMultipleOfPowerOf2<u64> for Integer {
     type Output = Integer;
@@ -240,7 +240,7 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut n = Integer::from(10);
     /// assert_eq!(

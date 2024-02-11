@@ -1,7 +1,7 @@
 use crate::integer::Integer;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromIntegerError;

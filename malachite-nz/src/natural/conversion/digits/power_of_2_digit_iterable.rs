@@ -3,6 +3,9 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::{min, Ordering};
+use core::marker::PhantomData;
+use core::slice::Chunks;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, DivRound, FloorLogBase2, ModPowerOf2, PowerOf2, SaturatingSubAssign, ShrRound,
 };
@@ -15,9 +18,6 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::{min, Ordering};
-use std::marker::PhantomData;
-use std::slice::Chunks;
 
 #[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

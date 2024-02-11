@@ -6,7 +6,7 @@ use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 // whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;

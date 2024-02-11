@@ -1,5 +1,5 @@
 use crate::integer::Integer;
-use std::ops::{Div, DivAssign};
+use core::ops::{Div, DivAssign};
 
 impl Div<Integer> for Integer {
     type Output = Integer;

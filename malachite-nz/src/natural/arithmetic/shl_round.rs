@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::{Shl, ShlAssign};
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 
 fn shl_round_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,

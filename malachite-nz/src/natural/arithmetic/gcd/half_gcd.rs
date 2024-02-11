@@ -22,6 +22,8 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{DoubleLimb, Limb};
+use core::cmp::{max, min, Ordering};
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivMod, Gcd, Parity, WrappingAddAssign, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
@@ -30,8 +32,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, NotAssign, TrailingZeros};
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use std::cmp::{max, min, Ordering};
-use std::mem::swap;
 
 pub(crate) trait GcdSubdivideStepContext {
     fn gcd_subdiv_step_hook(

@@ -31,7 +31,7 @@ impl DivExact<Integer> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!(Integer::from(-56088).div_exact(Integer::from(456)), -123);
@@ -80,7 +80,7 @@ impl<'a> DivExact<&'a Integer> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!(Integer::from(-56088).div_exact(&Integer::from(456)), -123);
@@ -129,7 +129,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!((&Integer::from(-56088)).div_exact(Integer::from(456)), -123);
@@ -173,7 +173,7 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// assert_eq!((&Integer::from(-56088)).div_exact(&Integer::from(456)), -123);
@@ -222,7 +222,7 @@ impl DivExactAssign<Integer> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// let mut x = Integer::from(-56088);
@@ -268,7 +268,7 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // -123 * 456 = -56088
     /// let mut x = Integer::from(-56088);

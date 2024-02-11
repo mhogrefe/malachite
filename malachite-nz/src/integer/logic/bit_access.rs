@@ -4,12 +4,13 @@ use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
-use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 // action equivalent to taking the two's complement of the limbs and getting the bit at the

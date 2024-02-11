@@ -2,7 +2,7 @@ use crate::integer::Integer;
 use crate::natural::logic::bit_iterable::NaturalBitIterator;
 use crate::natural::Natural;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable};
-use std::ops::Index;
+use core::ops::Index;
 
 /// A double-ended iterator over the two's complement bits of the negative of an [`Integer`].
 ///

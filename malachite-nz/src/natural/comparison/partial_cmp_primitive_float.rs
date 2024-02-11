@@ -1,7 +1,7 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
 use malachite_base::num::logic::traits::SignificantBits;
-use std::cmp::Ordering;
 
 macro_rules! impl_float {
     ($t: ident) => {

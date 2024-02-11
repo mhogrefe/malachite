@@ -1,9 +1,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where

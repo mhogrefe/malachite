@@ -16,11 +16,12 @@ use crate::natural::arithmetic::sub_mul::{
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::slices::slice_test_zero;
-use std::cmp::Ordering;
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, returning the
 // limbs of the absolute value and the sign (true means non-negative). `xs` and `ys` should be

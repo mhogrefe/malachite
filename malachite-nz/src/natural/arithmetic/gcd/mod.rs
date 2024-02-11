@@ -6,14 +6,14 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use core::cmp::{min, Ordering};
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_leading_zeros;
-use std::cmp::{min, Ordering};
-use std::mem::swap;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -237,7 +237,7 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
         match (self, other) {
             (x, &Natural::ZERO) => x.clone(),
             (&Natural::ZERO, y) => y.clone(),
-            (x, y) if std::ptr::eq(x, y) => x.clone(),
+            (x, y) if core::ptr::eq(x, y) => x.clone(),
             (Natural(Small(x)), Natural(Small(y))) => Natural::from(x.gcd(*y)),
             (Natural(Large(ref xs)), Natural(Small(y))) => Natural::from(limbs_gcd_limb(xs, *y)),
             (Natural(Small(x)), Natural(Large(ref ys))) => Natural::from(limbs_gcd_limb(ys, *x)),

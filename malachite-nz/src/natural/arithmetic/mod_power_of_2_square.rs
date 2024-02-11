@@ -18,6 +18,7 @@ use crate::platform::{
     DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQRLO_DC_THRESHOLD,
     SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Square, ModPowerOf2SquareAssign, Parity, ShrRound, Square, WrappingSquare,
 };
@@ -359,7 +360,7 @@ impl ModPowerOf2Square for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.mod_power_of_2_square(2), 0);
     /// assert_eq!(Natural::from(5u32).mod_power_of_2_square(3), 1);
@@ -398,7 +399,7 @@ impl<'a> ModPowerOf2Square for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Natural::ZERO).mod_power_of_2_square(2), 0);
     /// assert_eq!((&Natural::from(5u32)).mod_power_of_2_square(3), 1);
@@ -453,7 +454,7 @@ impl ModPowerOf2SquareAssign for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// let mut n = Natural::ZERO;
     /// n.mod_power_of_2_square_assign(2);

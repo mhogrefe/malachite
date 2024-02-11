@@ -2,7 +2,7 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
-use std::ops::Not;
+use core::ops::Not;
 
 impl Not for Integer {
     type Output = Integer;

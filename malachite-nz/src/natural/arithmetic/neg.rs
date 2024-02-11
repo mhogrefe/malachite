@@ -4,7 +4,7 @@ use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-use std::ops::Neg;
+use core::ops::Neg;
 
 // This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1.
 pub(crate) fn limbs_neg(out: &mut [Limb], xs: &[Limb]) -> bool {

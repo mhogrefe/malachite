@@ -1,6 +1,6 @@
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::Sign;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl Sign for Integer {
     /// Compares an [`Integer`] to zero.
@@ -16,7 +16,7 @@ impl Sign for Integer {
     /// use malachite_base::num::arithmetic::traits::Sign;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// assert_eq!(Integer::ZERO.sign(), Ordering::Equal);
     /// assert_eq!(Integer::from(123).sign(), Ordering::Greater);

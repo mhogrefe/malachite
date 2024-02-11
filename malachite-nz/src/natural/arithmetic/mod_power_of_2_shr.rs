@@ -1,10 +1,10 @@
 use crate::natural::Natural;
+use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shr_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,

@@ -1,11 +1,13 @@
 use crate::integer::Integer;
 use crate::natural::conversion::string::to_string::BaseFmtWrapper;
+use alloc::string::String;
+use alloc::string::ToString;
+use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
-use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 
 impl<'a> Display for BaseFmtWrapper<&'a Integer> {
     /// Writes a wrapped [`Integer`] to a string using a specified base.
@@ -203,7 +205,7 @@ impl Display for Integer {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_string(), "0");
     ///
@@ -254,7 +256,7 @@ impl Debug for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_debug_string(), "0");
     ///
@@ -299,7 +301,7 @@ impl Binary for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_binary_string(), "0");
     /// assert_eq!(Integer::from(123).to_binary_string(), "1111011");
@@ -375,7 +377,7 @@ impl Octal for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_octal_string(), "0");
     /// assert_eq!(Integer::from(123).to_octal_string(), "173");
@@ -451,7 +453,7 @@ impl LowerHex for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_lower_hex_string(), "7b");
@@ -527,7 +529,7 @@ impl UpperHex for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_upper_hex_string(), "7B");

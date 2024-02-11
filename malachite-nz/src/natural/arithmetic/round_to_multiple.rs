@@ -2,7 +2,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;
@@ -527,7 +527,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut x = Natural::from(5u32);
     /// assert_eq!(x.round_to_multiple_assign(Natural::ZERO, RoundingMode::Down), Ordering::Less);
@@ -668,7 +668,7 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// let mut x = Natural::from(5u32);
     /// assert_eq!(x.round_to_multiple_assign(&Natural::ZERO, RoundingMode::Down), Ordering::Less);

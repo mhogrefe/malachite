@@ -12,6 +12,7 @@ use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
 };
@@ -20,7 +21,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_trailing_zeros;
-use std::cmp::Ordering;
 
 // See the description for `limbs_mod_exact_odd_limb`. divisor must be odd.
 //
@@ -727,7 +727,7 @@ impl EqMod<Natural, Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(Natural::from(223u32), Natural::from(100u32)),
@@ -795,7 +795,7 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
@@ -863,7 +863,7 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
@@ -931,7 +931,7 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(123u32).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
@@ -999,7 +999,7 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(Natural::from(223u32), Natural::from(100u32)),
@@ -1067,7 +1067,7 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
@@ -1135,7 +1135,7 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
@@ -1203,7 +1203,7 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::EqMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),

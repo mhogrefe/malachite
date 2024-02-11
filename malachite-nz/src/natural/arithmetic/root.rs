@@ -14,6 +14,8 @@ use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, DivMod, DivRound,
@@ -26,7 +28,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_trailing_zeros};
-use std::cmp::Ordering;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
