@@ -7,6 +7,7 @@ use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Mul, ModPowerOf2MulAssign, ShrRound,
 };
@@ -31,7 +32,7 @@ use malachite_base::rounding_modes::RoundingMode;
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
 pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
-    if std::ptr::eq(xs.as_slice(), ys.as_slice()) {
+    if core::ptr::eq(xs.as_slice(), ys.as_slice()) {
         return limbs_mod_power_of_2_square(xs, pow);
     }
     let xs_len = xs.len();
@@ -80,7 +81,7 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
     ys: &[Limb],
     pow: u64
 ) -> Vec<Limb> {
-    if std::ptr::eq(xs.as_slice(), ys) {
+    if core::ptr::eq(xs.as_slice(), ys) {
         return limbs_mod_power_of_2_square(xs, pow);
     }
     let xs_len = xs.len();
@@ -129,7 +130,7 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
 pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
-    if std::ptr::eq(xs, ys) {
+    if core::ptr::eq(xs, ys) {
         return limbs_mod_power_of_2_square_ref(xs, pow);
     }
     let xs_len = xs.len();

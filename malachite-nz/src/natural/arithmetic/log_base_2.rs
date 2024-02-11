@@ -171,7 +171,7 @@ impl<'a> CheckedLogBase2 for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Natural::from(3u32).checked_log_base_2(), None);
     /// assert_eq!(Natural::from(4u32).checked_log_base_2(), Some(2));

@@ -17,6 +17,8 @@ use crate::platform::{
     ONE_LIMB_ODD_CENTRAL_BINOMIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_INVERSES_TABLE,
     ONE_LIMB_ODD_FACTORIAL_TABLE, TABLE_2N_MINUS_POPC_2N,
 };
+use alloc::vec::Vec;
+use core::cmp::{max, min, Ordering};
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, BinomialCoefficient, DivAssignMod, DivExact, Parity, PowerOf2, Square,
     WrappingAddAssign,
@@ -30,7 +32,6 @@ use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
 use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
 use malachite_base::num::logic::traits::{CountOnes, LeadingZeros, SignificantBits};
-use std::cmp::{max, min, Ordering};
 
 // This is similar to `mulfunc` from `mpz/bin_uiui.c`, GMP 6.2.1.
 const fn apply_mul_func(n: Limb, m: Limb) -> Limb {

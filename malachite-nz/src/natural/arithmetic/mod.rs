@@ -139,7 +139,7 @@ pub mod mod_neg;
 /// equal to zero. This allows the remainder to have an unsigned type, but modifies the usual
 /// relation $x = qy + r$ to $x = qy - r$.
 ///
-/// The [`Rem`](std::ops::Rem) trait in the standard library rounds towards 0.
+/// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
 pub mod mod_op;
 /// Implementations of traits for raising a number to a power modulo another number.
 ///
@@ -286,7 +286,7 @@ pub mod mod_power_of_2_sub;
 ///
 /// # mod_shl
 /// ```
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShl;
 /// use malachite_nz::natural::Natural;
 ///
@@ -354,7 +354,7 @@ pub mod mod_power_of_2_sub;
 ///
 /// # mod_shl_assign
 /// ```
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShlAssign;
 /// use malachite_nz::natural::Natural;
 ///
@@ -405,7 +405,7 @@ pub mod mod_shl;
 ///
 /// # mod_shr
 /// ```
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShr;
 /// use malachite_nz::natural::Natural;
 ///
@@ -449,7 +449,7 @@ pub mod mod_shl;
 ///
 /// # mod_shr_assign
 /// ```
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 /// use malachite_base::num::arithmetic::traits::ModShrAssign;
 /// use malachite_nz::natural::Natural;
 ///
@@ -710,7 +710,7 @@ pub mod shl;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
-/// use std::cmp::Ordering;
+/// use core::cmp::Ordering;
 ///
 /// let mut n = Natural::from(0x101u32);
 /// assert_eq!(n.shl_round_assign(-8i8, RoundingMode::Down), Ordering::Less);
@@ -988,7 +988,7 @@ pub mod shr;
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::Natural;
-/// use std::cmp::Ordering;
+/// use core::cmp::Ordering;
 ///
 /// let mut n = Natural::from(0x101u32);
 /// assert_eq!(n.shr_round_assign(8u8, RoundingMode::Down), Ordering::Less);

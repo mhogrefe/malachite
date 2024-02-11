@@ -237,7 +237,7 @@ pub mod limb_count;
 /// ```
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 ///
 /// let test = |mantissa: f32, exponent: u64, out: Option<Natural>| {
 ///     assert_eq!(
@@ -273,8 +273,8 @@ pub mod mantissa_and_exponent;
 /// use malachite_base::num::conversion::traits::RoundingFrom;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::Natural;
-/// use std::cmp::Ordering;
-/// use std::str::FromStr;
+/// use core::cmp::Ordering;
+/// use core::str::FromStr;
 ///
 /// assert_eq!(
 ///     f32::rounding_from(&Natural::from_str("123").unwrap(), RoundingMode::Exact),
@@ -301,7 +301,7 @@ pub mod mantissa_and_exponent;
 /// ```
 /// use malachite_nz::natural::conversion::primitive_float_from_natural::*;
 /// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 ///
 /// assert_eq!(f32::try_from(&Natural::from_str("123").unwrap()), Ok(123.0));
 /// assert_eq!(f32::try_from(&Natural::from_str("1000000000").unwrap()), Ok(1.0e9));
@@ -321,7 +321,7 @@ pub mod mantissa_and_exponent;
 /// ```
 /// use malachite_base::num::conversion::traits::ConvertibleFrom;
 /// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
+/// use core::str::FromStr;
 ///
 /// assert_eq!(f32::convertible_from(&Natural::from_str("123").unwrap()), true);
 /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000000").unwrap()), true);

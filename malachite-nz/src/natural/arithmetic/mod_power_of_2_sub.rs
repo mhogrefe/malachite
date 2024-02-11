@@ -13,6 +13,8 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ShrRound,
 };
@@ -21,7 +23,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use std::mem::swap;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -432,7 +433,7 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (self, other) {
-            (x, y) if std::ptr::eq(x, y) => Natural::ZERO,
+            (x, y) if core::ptr::eq(x, y) => Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_2_right_sub_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
@@ -537,7 +538,7 @@ impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (&mut *self, other) {
-            (x, y) if std::ptr::eq(x, y) => *self = Natural::ZERO,
+            (x, y) if core::ptr::eq(x, y) => *self = Natural::ZERO,
             (x, &Natural(Small(y))) => x.mod_power_of_2_sub_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_2_right_sub_limb_ref(x, pow),
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {

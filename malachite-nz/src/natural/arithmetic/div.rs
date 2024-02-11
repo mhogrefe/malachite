@@ -29,6 +29,12 @@ use crate::natural::Natural;
 use crate::platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
 };
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::iter::once;
+use core::mem::swap;
+use core::ops::{Div, DivAssign};
 use malachite_base::fail_on_untested_path;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivRem;
@@ -40,10 +46,6 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-use std::cmp::Ordering;
-use std::iter::once;
-use std::mem::swap;
-use std::ops::{Div, DivAssign};
 
 // Divide an number by a divisor of B - 1, where B is the limb base.
 //
@@ -1372,9 +1374,11 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_Q_THRESHOLD
         || n_len < MU_DIV_Q_THRESHOLD << 1
-        || (((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64)
-            .mul_add(d_64, MUPI_DIV_Q_THRESHOLD as f64 * n_64)
-            > d_64 * n_64
+        || libm::fma(
+            ((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64,
+            d_64,
+            MUPI_DIV_Q_THRESHOLD as f64 * n_64,
+        ) > d_64 * n_64
 }
 
 // Division when n_len >= 2 * d_len - FUDGE.
@@ -1996,7 +2000,7 @@ impl Div<Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) / Natural::from(10u32), 2);
@@ -2035,7 +2039,7 @@ impl<'a> Div<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) / &Natural::from(10u32), 2);
@@ -2075,7 +2079,7 @@ impl<'a> Div<Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) / Natural::from(10u32), 2);
@@ -2130,7 +2134,7 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) / &Natural::from(10u32), 2);
@@ -2178,7 +2182,7 @@ impl DivAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2233,7 +2237,7 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);

@@ -24,6 +24,8 @@ use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
@@ -34,7 +36,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
-use std::cmp::Ordering;
 
 // Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
 //

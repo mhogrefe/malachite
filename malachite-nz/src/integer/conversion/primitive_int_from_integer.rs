@@ -1,5 +1,6 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::ops::Neg;
 use malachite_base::comparison::traits::Min;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, WrappingNeg};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -8,7 +9,6 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use std::ops::Neg;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct UnsignedFromIntegerError;

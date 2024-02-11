@@ -9,6 +9,7 @@ use crate::platform::{
     ODD_FACTORIAL_TABLE_LIMIT, ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_TABLE,
     TABLE_2N_MINUS_POPC_2N, TABLE_LIMIT_2N_MINUS_POPC_2N,
 };
+use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square, Subfactorial,

@@ -1,12 +1,12 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
+use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShl, ModShlAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use std::cmp::Ordering;
-use std::ops::{Shr, ShrAssign};
 
 fn mod_shl_ref_val_unsigned<T: PrimitiveUnsigned>(x: &Natural, bits: T, m: Natural) -> Natural
 where

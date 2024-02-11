@@ -1,8 +1,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::ops::Not;
 use malachite_base::num::logic::traits::NotAssign;
-use std::ops::Not;
 
 // Returns the bitwise not of a slice of limbs.
 //

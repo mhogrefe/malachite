@@ -23,7 +23,7 @@ impl DivisibleBy<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.divisible_by(Integer::ZERO), true);
     /// assert_eq!(Integer::from(-100).divisible_by(Integer::from(-3)), false);
@@ -62,7 +62,7 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.divisible_by(&Integer::ZERO), true);
     /// assert_eq!(Integer::from(-100).divisible_by(&Integer::from(-3)), false);
@@ -101,7 +101,7 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Integer::ZERO).divisible_by(Integer::ZERO), true);
     /// assert_eq!((&Integer::from(-100)).divisible_by(Integer::from(-3)), false);
@@ -139,7 +139,7 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::DivisibleBy;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!((&Integer::ZERO).divisible_by(&Integer::ZERO), true);
     /// assert_eq!((&Integer::from(-100)).divisible_by(&Integer::from(-3)), false);

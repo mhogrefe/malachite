@@ -32,6 +32,10 @@ use crate::platform::{
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
     MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::mem::swap;
+use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, OverflowingAddAssign, Parity, PowerOf2,
     WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
@@ -41,9 +45,6 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::ops::{Rem, RemAssign};
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -736,9 +737,11 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < MU_DIV_QR_THRESHOLD << 1
-        || (((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64)
-            .mul_add(d_64, MUPI_DIV_QR_THRESHOLD as f64 * n_64)
-            > d_64 * n_64
+        || libm::fma(
+            ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
+            d_64,
+            MUPI_DIV_QR_THRESHOLD as f64 * n_64,
+        ) > d_64 * n_64
 }
 
 // This function is optimized for the case when the numerator has at least twice the length of the
@@ -1495,7 +1498,7 @@ impl Mod<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).mod_op(Natural::from(10u32)), 3);
@@ -1540,7 +1543,7 @@ impl<'a> Mod<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).mod_op(&Natural::from(10u32)), 3);
@@ -1585,7 +1588,7 @@ impl<'a> Mod<Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!((&Natural::from(23u32)).mod_op(Natural::from(10u32)), 3);
@@ -1630,7 +1633,7 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!((&Natural::from(23u32)).mod_op(&Natural::from(10u32)), 3);
@@ -1673,7 +1676,7 @@ impl ModAssign<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -1716,7 +1719,7 @@ impl<'a> ModAssign<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -1761,7 +1764,7 @@ impl Rem<Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) % Natural::from(10u32), 3);
@@ -1808,7 +1811,7 @@ impl<'a> Rem<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32) % &Natural::from(10u32), 3);
@@ -1855,7 +1858,7 @@ impl<'a> Rem<Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) % Natural::from(10u32), 3);
@@ -1912,7 +1915,7 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(&Natural::from(23u32) % &Natural::from(10u32), 3);
@@ -1928,7 +1931,7 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
         match (self, other) {
             (_, &Natural::ZERO) => panic!("division by zero"),
             (_, &Natural::ONE) => Natural::ZERO,
-            (n, d) if std::ptr::eq(n, d) => Natural::ZERO,
+            (n, d) if core::ptr::eq(n, d) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(*d))),
             (Natural(Small(_)), _) => self.clone(),
             (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {
@@ -1968,7 +1971,7 @@ impl RemAssign<Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2012,7 +2015,7 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2069,7 +2072,7 @@ impl NegMod<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(Natural::from(23u32).neg_mod(Natural::from(10u32)), 7);
@@ -2115,7 +2118,7 @@ impl<'a> NegMod<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(Natural::from(23u32).neg_mod(&Natural::from(10u32)), 7);
@@ -2161,7 +2164,7 @@ impl<'a> NegMod<Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!((&Natural::from(23u32)).neg_mod(Natural::from(10u32)), 7);
@@ -2210,7 +2213,7 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!((&Natural::from(23u32)).neg_mod(&Natural::from(10u32)), 7);
@@ -2257,7 +2260,7 @@ impl NegModAssign<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
@@ -2302,7 +2305,7 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::NegModAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);

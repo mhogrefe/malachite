@@ -1,8 +1,9 @@
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::fmt::Display;
+use core::ops::{Sub, SubAssign};
 use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
-use std::fmt::Display;
-use std::ops::{Sub, SubAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
 // `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether

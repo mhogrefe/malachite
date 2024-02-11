@@ -1,6 +1,6 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl PartialOrd<Natural> for Integer {
     /// Compares an [`Integer`] to a [`Natural`].

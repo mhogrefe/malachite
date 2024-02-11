@@ -4,6 +4,7 @@ use crate::integer::conversion::to_twos_complement_limbs::{
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 

@@ -32,6 +32,9 @@ use crate::platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
     INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use alloc::vec::Vec;
+use core::cmp::{min, Ordering};
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
@@ -41,8 +44,6 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-use std::cmp::{min, Ordering};
-use std::mem::swap;
 
 // The highest bit of the input must be set.
 //
@@ -1524,9 +1525,11 @@ fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < MU_DIV_QR_THRESHOLD << 1
-        || (((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64)
-            .mul_add(d_64, MUPI_DIV_QR_THRESHOLD as f64 * n_64)
-            > d_64 * n_64
+        || libm::fma(
+            ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
+            d_64,
+            MUPI_DIV_QR_THRESHOLD as f64 * n_64,
+        ) > d_64 * n_64
 }
 
 // This function is optimized for the case when the numerator has at least twice the length of the
@@ -1918,7 +1921,7 @@ impl DivMod<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).div_mod(Natural::from(10u32)).to_debug_string(), "(2, 3)");
@@ -1967,7 +1970,7 @@ impl<'a> DivMod<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2019,7 +2022,7 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2089,7 +2092,7 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2161,7 +2164,7 @@ impl DivAssignMod<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2235,7 +2238,7 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivAssignMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2312,7 +2315,7 @@ impl DivRem<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(Natural::from(23u32).div_rem(Natural::from(10u32)).to_debug_string(), "(2, 3)");
@@ -2362,7 +2365,7 @@ impl<'a> DivRem<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2415,7 +2418,7 @@ impl<'a> DivRem<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2468,7 +2471,7 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::DivRem;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// assert_eq!(
@@ -2521,7 +2524,7 @@ impl DivAssignRem<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2572,7 +2575,7 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivAssignRem;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
@@ -2623,7 +2626,7 @@ impl CeilingDivNegMod<Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
@@ -2676,7 +2679,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
@@ -2729,7 +2732,7 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
@@ -2785,7 +2788,7 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// assert_eq!(
@@ -2841,7 +2844,7 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);
@@ -2897,7 +2900,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 3 * 10 - 7 = 23
     /// let mut x = Natural::from(23u32);

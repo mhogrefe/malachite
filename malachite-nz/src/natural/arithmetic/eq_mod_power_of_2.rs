@@ -2,10 +2,10 @@ use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_powe
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use std::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 // whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether

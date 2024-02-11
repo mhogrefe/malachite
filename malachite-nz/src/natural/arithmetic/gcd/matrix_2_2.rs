@@ -10,7 +10,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{Limb, MATRIX22_STRASSEN_THRESHOLD};
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 // # Worst-case complexity
 // $T(n) = O(n)$

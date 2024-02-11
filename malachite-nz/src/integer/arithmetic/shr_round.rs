@@ -3,8 +3,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
-use std::ops::{Shl, ShlAssign};
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 
 fn shr_round_unsigned_ref_i<'a, T>(x: &'a Integer, bits: T, rm: RoundingMode) -> (Integer, Ordering)
 where

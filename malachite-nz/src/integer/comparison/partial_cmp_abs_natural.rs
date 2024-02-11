@@ -1,7 +1,7 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl PartialOrdAbs<Natural> for Integer {
     /// Compares the absolute values of an [`Integer`] and a [`Natural`].

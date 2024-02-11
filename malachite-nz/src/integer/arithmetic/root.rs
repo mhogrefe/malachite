@@ -3,7 +3,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, UnsignedAbs,
 };
-use std::ops::Neg;
+use core::ops::Neg;
 
 impl FloorRoot<u64> for Integer {
     type Output = Integer;

@@ -1,8 +1,8 @@
 use crate::integer::Integer;
+use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
 };
-use std::ops::{Rem, RemAssign};
 
 impl Mod<Integer> for Integer {
     type Output = Integer;

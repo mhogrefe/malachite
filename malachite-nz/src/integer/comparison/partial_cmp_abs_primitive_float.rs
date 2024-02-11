@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use std::cmp::Ordering;
 
 macro_rules! impl_float {
     ($t: ident) => {
@@ -18,6 +18,8 @@ macro_rules! impl_float {
             /// # Examples
             /// See [here](super::partial_cmp_abs_primitive_float#partial_cmp_abs).
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
+                #[cfg(not(feature = "test_build"))]
+                use $crate::malachite_base::num::arithmetic::traits::Abs;
                 self.unsigned_abs().partial_cmp(&other.abs())
             }
         }

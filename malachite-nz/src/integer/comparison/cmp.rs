@@ -1,5 +1,5 @@
 use crate::integer::Integer;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl PartialOrd for Integer {
     /// Compares two [`Integer`]s.
@@ -32,7 +32,7 @@ impl Ord for Integer {
     /// assert!(Integer::from(-123) >= Integer::from(-124));
     /// ```
     fn cmp(&self, other: &Integer) -> Ordering {
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             Ordering::Equal
         } else {
             match (self.sign, other.sign) {

@@ -12,6 +12,8 @@ use crate::natural::Natural;
 #[cfg(feature = "test_build")]
 use crate::platform::DoubleLimb;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     EqModPowerOf2, Parity, Pow, PowAssign, Square, SquareAssign,
 };
@@ -30,7 +32,6 @@ use malachite_base::num::logic::traits::{
 #[cfg(feature = "test_build")]
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_leading_zeros;
-use std::mem::swap;
 
 /// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.
 const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
@@ -540,7 +541,7 @@ impl Pow<u64> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     Natural::from(3u32).pow(100).to_string(),
@@ -577,7 +578,7 @@ impl<'a> Pow<u64> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(
     ///     (&Natural::from(3u32)).pow(100).to_string(),
@@ -630,7 +631,7 @@ impl PowAssign<u64> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// let mut x = Natural::from(3u32);
     /// x.pow_assign(100);

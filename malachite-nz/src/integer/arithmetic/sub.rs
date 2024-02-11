@@ -3,8 +3,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
-use std::mem::swap;
-use std::ops::{Sub, SubAssign};
+use core::mem::swap;
+use core::ops::{Sub, SubAssign};
 
 impl Sub<Integer> for Integer {
     type Output = Integer;
@@ -155,7 +155,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     /// ```
     fn sub(self, other: &'a Integer) -> Integer {
         match (self, other) {
-            (x, y) if std::ptr::eq(x, y) => Integer::ZERO,
+            (x, y) if core::ptr::eq(x, y) => Integer::ZERO,
             (integer_zero!(), y) => -y.clone(),
             (x, &integer_zero!()) => x.clone(),
             // e.g. 10 - -5 or -10 - 5; sign of result is sign of self

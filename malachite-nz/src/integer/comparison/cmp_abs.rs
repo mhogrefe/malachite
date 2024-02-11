@@ -1,6 +1,6 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use std::cmp::Ordering;
 
 impl PartialOrdAbs for Integer {
     /// Compares the absolute values of two [`Integer`]s.

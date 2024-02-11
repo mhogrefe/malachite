@@ -1,9 +1,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::conversion::from::{SignedFromFloatError, UnsignedFromFloatError};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -55,6 +55,8 @@ macro_rules! float_impls {
             /// # Examples
             /// See [here](super::from_primitive_float#try_from).
             fn try_from(value: $f) -> Result<Integer, Self::Error> {
+                #[cfg(not(feature = "test_build"))]
+                use $crate::malachite_base::num::arithmetic::traits::Abs;
                 Natural::try_from(value.abs())
                     .map(|n| Integer {
                         sign: value >= 0.0,
@@ -81,6 +83,8 @@ macro_rules! float_impls {
             /// # Examples
             /// See [here](super::from_primitive_float#convertible_from).
             fn convertible_from(value: $f) -> bool {
+                #[cfg(not(feature = "test_build"))]
+                use $crate::malachite_base::num::arithmetic::traits::Abs;
                 Natural::convertible_from(value.abs())
             }
         }

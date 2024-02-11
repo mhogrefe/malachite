@@ -7,7 +7,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::ops::{Shr, ShrAssign};
+use core::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shl_unsigned_nz<T: PrimitiveUnsigned>(x: &Natural, bits: T, pow: u64) -> Natural
 where

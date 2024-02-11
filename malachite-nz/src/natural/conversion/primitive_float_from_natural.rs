@@ -1,4 +1,5 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -7,7 +8,6 @@ use malachite_base::num::conversion::traits::{
     WrappingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromNaturalError;

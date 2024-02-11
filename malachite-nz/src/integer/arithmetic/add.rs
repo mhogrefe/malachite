@@ -1,9 +1,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::iter::Sum;
+use core::mem::swap;
+use core::ops::{Add, AddAssign};
 use malachite_base::num::basic::traits::Zero;
-use std::iter::Sum;
-use std::mem::swap;
-use std::ops::{Add, AddAssign};
 
 impl Add<Integer> for Integer {
     type Output = Integer;
@@ -156,7 +156,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     /// ```
     fn add(self, other: &'a Integer) -> Integer {
         match (self, other) {
-            (x, y) if std::ptr::eq(x, y) => x << 1,
+            (x, y) if core::ptr::eq(x, y) => x << 1,
             (&integer_zero!(), y) => y.clone(),
             (x, &integer_zero!()) => x.clone(),
             // e.g. 10 + 5 or -10 + -5; sign of result is sign of self
@@ -353,7 +353,7 @@ impl Sum for Integer {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use std::iter::Sum;
+    /// use core::iter::Sum;
     ///
     /// assert_eq!(
     ///     Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().into_iter()),
@@ -391,7 +391,7 @@ impl<'a> Sum<&'a Integer> for Integer {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::integer::Integer;
-    /// use std::iter::Sum;
+    /// use core::iter::Sum;
     ///
     /// assert_eq!(Integer::sum(vec_from_str::<Integer>("[2, -3, 5, 7]").unwrap().iter()), 11);
     /// ```

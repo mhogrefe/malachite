@@ -1,6 +1,7 @@
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -104,7 +105,7 @@ impl BitConvertible for Natural {
     /// ```
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::empty;
+    /// use core::iter::empty;
     ///
     /// assert_eq!(Natural::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
@@ -141,7 +142,7 @@ impl BitConvertible for Natural {
     /// ```
     /// use malachite_base::num::logic::traits::BitConvertible;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::empty;
+    /// use core::iter::empty;
     ///
     /// assert_eq!(Natural::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b

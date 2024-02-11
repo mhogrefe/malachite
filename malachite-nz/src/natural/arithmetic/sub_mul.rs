@@ -3,12 +3,13 @@ use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::fmt::Display;
 use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
 };
 use malachite_base::num::conversion::traits::SplitInHalf;
-use std::cmp::Ordering;
-use std::fmt::Display;
 
 // Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
 // y * z > x, `None` is returned.

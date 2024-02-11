@@ -33,6 +33,9 @@ use crate::platform::{
     DoubleLimb, Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD,
     MU_BDIV_Q_THRESHOLD,
 };
+use alloc::vec::Vec;
+use core::cmp::{max, min, Ordering};
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingAddAssign,
@@ -44,8 +47,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
-use std::cmp::{max, min, Ordering};
-use std::mem::swap;
 
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
 
@@ -1869,7 +1870,7 @@ impl DivExact<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)), 123);
@@ -1918,7 +1919,7 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// assert_eq!(Natural::from(56088u32).div_exact(&Natural::from(456u32)), 123);
@@ -1967,7 +1968,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// assert_eq!((&Natural::from(56088u32)).div_exact(Natural::from(456u32)), 123);
@@ -2034,7 +2035,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExact;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// assert_eq!((&Natural::from(56088u32)).div_exact(&Natural::from(456u32)), 123);
@@ -2099,7 +2100,7 @@ impl DivExactAssign<Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);
@@ -2165,7 +2166,7 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivExactAssign;
     /// use malachite_nz::natural::Natural;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// // 123 * 456 = 56088
     /// let mut x = Natural::from(56088u32);

@@ -1,6 +1,6 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
-use std::cmp::Ordering;
 
 macro_rules! impl_float {
     ($t: ident) => {

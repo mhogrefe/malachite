@@ -6,6 +6,7 @@ use crate::natural::logic::bit_access::limbs_clear_bit;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ShrRound,
 };
@@ -402,7 +403,7 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (self, other) {
-            (x, y) if std::ptr::eq(x, y) => self.mod_power_of_2_shl(1, pow),
+            (x, y) if core::ptr::eq(x, y) => self.mod_power_of_2_shl(1, pow),
             (x, &Natural(Small(y))) => x.mod_power_of_2_add_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_2_add_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
@@ -507,7 +508,7 @@ impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
             "other must be reduced mod 2^pow, but {other} >= 2^{pow}"
         );
         match (&mut *self, other) {
-            (x, y) if std::ptr::eq(x, y) => {
+            (x, y) if core::ptr::eq(x, y) => {
                 self.mod_power_of_2_shl_assign(pow, 1);
             }
             (x, &Natural(Small(y))) => x.mod_power_of_2_add_assign_limb(y, pow),

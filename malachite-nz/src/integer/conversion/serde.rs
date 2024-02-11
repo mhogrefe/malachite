@@ -1,7 +1,8 @@
 use crate::integer::{Integer, SerdeInteger};
 use crate::natural::Natural;
+use alloc::string::String;
+use core::convert::TryFrom;
 use malachite_base::num::conversion::traits::FromStringBase;
-use std::convert::TryFrom;
 
 impl From<Integer> for SerdeInteger {
     #[inline]

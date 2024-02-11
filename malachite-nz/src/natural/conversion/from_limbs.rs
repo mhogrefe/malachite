@@ -1,6 +1,7 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 
 // # Worst-case complexity

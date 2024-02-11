@@ -1,6 +1,8 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::{min, Ordering};
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivRound, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -11,7 +13,6 @@ use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
-use std::cmp::{min, Ordering};
 
 impl Natural {
     pub_test! {to_power_of_2_digits_asc_naive<

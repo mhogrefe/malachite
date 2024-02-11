@@ -141,6 +141,10 @@
     clippy::uninlined_format_args,
     clippy::unused_self
 )]
+#![cfg_attr(not(feature = "test_build"), no_std)]
+
+#[macro_use]
+extern crate alloc;
 
 extern crate itertools;
 #[macro_use]

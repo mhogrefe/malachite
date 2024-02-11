@@ -3,7 +3,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
 use malachite_base::num::logic::traits::HammingDistance;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 // Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading

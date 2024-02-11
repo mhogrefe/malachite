@@ -6,11 +6,12 @@ use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use alloc::vec::Vec;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
-use std::mem::swap;
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
 // and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result

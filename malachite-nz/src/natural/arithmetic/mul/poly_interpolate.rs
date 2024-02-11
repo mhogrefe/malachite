@@ -21,12 +21,12 @@ use crate::platform::{
     Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
     AORSMUL_FASTER_AORS_AORSLSH,
 };
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::slice_test_zero;
-use std::mem::swap;
 
 // # Worst-case complexity
 // $T(n) = O(n)$

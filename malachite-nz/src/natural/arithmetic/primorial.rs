@@ -2,6 +2,7 @@ use crate::natural::arithmetic::factorial::log_n_max;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{PowerOf2, Primorial, RotateLeftAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};

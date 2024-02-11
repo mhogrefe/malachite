@@ -4,6 +4,7 @@ use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_leading_zeros;

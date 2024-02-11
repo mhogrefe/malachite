@@ -1,11 +1,12 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::mem::swap;
+use core::ops::{BitAnd, BitAndAssign};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::slices::slice_set_zero;
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::ops::{BitAnd, BitAndAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.

@@ -11,6 +11,8 @@ use crate::natural::arithmetic::gcd::half_gcd::{
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::{DoubleLimb, Limb};
+use core::cmp::max;
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivMod, JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, Parity, XXSubYYToZZ,
@@ -20,8 +22,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{JoinHalves, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_trailing_zeros;
-use std::cmp::max;
-use std::mem::swap;
 
 // This is equivalent to `jacobi_table` from `mpn/jacobi.c`, GMP 6.2.1.
 const JACOBI_TABLE: [u8; 208] = [

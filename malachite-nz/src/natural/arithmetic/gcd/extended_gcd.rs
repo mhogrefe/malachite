@@ -29,8 +29,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use std::cmp::{max, Ordering};
-use std::mem::swap;
+use core::cmp::{max, Ordering};
+use core::mem::swap;
 
 // This is equivalent to `gcdext_ctx` from `gmp-impl.h`, GMP 6.2.1.
 struct ExtendedGcdContext<'a> {

@@ -2,6 +2,8 @@ use crate::natural::arithmetic::log_base::log_base_helper_with_pow;
 use crate::natural::conversion::string::to_string::BaseFmtWrapper;
 use crate::natural::slice_trailing_zeros;
 use crate::natural::Natural;
+use alloc::string::String;
+use core::fmt::{Display, Formatter, Write};
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, DivExact, DivRound, DivisibleBy, DivisibleByPowerOf2, FloorLogBase,
     FloorLogBasePowerOf2, Pow, ShrRound,
@@ -14,9 +16,8 @@ use malachite_base::num::conversion::string::to_string::{
 };
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
-use std::fmt::{Display, Formatter, Write};
 
-fn write_helper<T>(x: &T, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result
+fn write_helper<T>(x: &T, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result
 where
     for<'a> BaseFmtWrapper<&'a T>: Display,
 {
@@ -139,7 +140,7 @@ impl ToSci for Natural {
     /// options.set_include_trailing_zeros(true);
     /// assert_eq!(n.to_sci_with_options(options).to_string(), "1.111000100e16");
     /// ```
-    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
+    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
         match options.get_size_options() {
             SciSizeOptions::Complete | SciSizeOptions::Scale(0) => write_helper(self, f, options),
             SciSizeOptions::Scale(scale) => {

@@ -14,6 +14,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
 use crate::platform::{Limb, SignedLimb, FFT_TAB, MULMOD_TAB};
+use alloc::vec::Vec;
+use core::cmp::{max, min, Ordering};
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingSubAssign, XXAddYYToZZ,
@@ -23,8 +26,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::slices::slice_set_zero;
-use std::cmp::{max, min, Ordering};
-use std::mem::swap;
 
 // This is equivalent to `mpn_addmod_2expp1_1` from `fft.h`, FLINT 2.7.1. `limbs` is one less than
 // the length of `r`.

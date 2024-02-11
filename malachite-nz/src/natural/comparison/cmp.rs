@@ -1,11 +1,11 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
+use core::mem::swap;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
-use std::cmp::Ordering;
-use std::mem::swap;
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, compares the two `Natural`s.
@@ -164,7 +164,7 @@ impl Ord for Natural {
     /// assert!(Natural::from(123u32) <= Natural::from(124u32));
     /// ```
     fn cmp(&self, other: &Natural) -> Ordering {
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         match (self, other) {
@@ -201,7 +201,7 @@ impl Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use std::cmp::Ordering;
+    /// use core::cmp::Ordering;
     ///
     /// // 1 == 1.0 * 2^0, 4 == 1.0 * 2^2
     /// // 1.0 == 1.0
@@ -222,7 +222,7 @@ impl Natural {
     pub fn cmp_normalized(&self, other: &Natural) -> Ordering {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         match (self, other) {
@@ -245,7 +245,7 @@ impl Natural {
     pub fn cmp_normalized_no_shift(&self, other: &Natural) -> Ordering {
         assert_ne!(*self, 0);
         assert_ne!(*other, 0);
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         match (self, other) {

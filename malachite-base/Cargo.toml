@@ -39,7 +39,7 @@ walkdir = { version = "2.3.3", optional = true }
 
 [features]
 random = ["sha3", "rand", "rand_chacha", "getrandom"]
-test_build = ["gnuplot", "time", "clap", "random"]
+test_build = ["gnuplot", "time", "clap", "random", "itertools/use_std"]
 bin_build = ["walkdir", "test_build"]
 
 [dev-dependencies]

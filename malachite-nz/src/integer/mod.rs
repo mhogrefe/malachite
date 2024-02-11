@@ -1,4 +1,5 @@
 use crate::natural::Natural;
+use alloc::string::String;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 

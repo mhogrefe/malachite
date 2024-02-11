@@ -2,11 +2,12 @@ use crate::natural::arithmetic::shl::{limbs_shl, limbs_vec_shl_in_place};
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::iter::Sum;
+use core::ops::{Add, AddAssign};
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use std::iter::Sum;
-use std::ops::{Add, AddAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // limbs of the sum of the `Natural` and a `Limb`.
@@ -150,7 +151,7 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
 // long as the second, and the output is returned.
 pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    if std::ptr::eq(xs, ys) {
+    if core::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
     }
     let xs_len = xs.len();
@@ -379,7 +380,7 @@ pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Li
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the first input.
 pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
-    if std::ptr::eq(xs.as_slice(), ys) {
+    if core::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
         return;
     }
@@ -817,7 +818,7 @@ impl Sum for Natural {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::Sum;
+    /// use core::iter::Sum;
     ///
     /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().into_iter()), 17);
     /// ```
@@ -852,7 +853,7 @@ impl<'a> Sum<&'a Natural> for Natural {
     /// ```
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
-    /// use std::iter::Sum;
+    /// use core::iter::Sum;
     ///
     /// assert_eq!(Natural::sum(vec_from_str::<Natural>("[2, 3, 5, 7]").unwrap().iter()), 17);
     /// ```

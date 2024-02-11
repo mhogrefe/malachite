@@ -2,6 +2,7 @@ use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2, NegModPowerOf2Assign, RemPowerOf2,
     RemPowerOf2Assign, ShrRound,

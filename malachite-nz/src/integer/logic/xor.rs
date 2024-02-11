@@ -10,12 +10,13 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use alloc::vec::Vec;
+use core::cmp::{max, Ordering};
+use core::ops::{BitXor, BitXorAssign};
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
-use std::cmp::{max, Ordering};
-use std::ops::{BitXor, BitXorAssign};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 // `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `xs` cannot be
@@ -1253,7 +1254,7 @@ impl<'a> BitXor<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) ^ Integer::from(-456), 445);
     /// assert_eq!(
@@ -1285,7 +1286,7 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::integer::Integer;
-    /// use std::str::FromStr;
+    /// use core::str::FromStr;
     ///
     /// assert_eq!(&Integer::from(-123) ^ &Integer::from(-456), 445);
     /// assert_eq!(

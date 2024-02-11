@@ -1,6 +1,7 @@
 use crate::natural::{Natural, SerdeNatural};
+use alloc::string::String;
+use core::convert::TryFrom;
 use malachite_base::num::conversion::traits::FromStringBase;
-use std::convert::TryFrom;
 
 impl From<Natural> for SerdeNatural {
     #[inline]
