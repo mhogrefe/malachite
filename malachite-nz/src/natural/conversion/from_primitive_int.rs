@@ -91,8 +91,8 @@ macro_rules! impl_signed {
         impl TryFrom<$t> for Natural {
             type Error = NaturalFromSignedError;
 
-            /// Converts a signed primitive integer to a [`Natural`]. If the integer is negative,
-            /// an error is returned.
+            /// Converts a signed primitive integer to a [`Natural`]. If the integer is negative, an
+            /// error is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

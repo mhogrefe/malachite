@@ -1,12 +1,69 @@
 use crate::Float;
+use crate::InnerFloat::Finite;
+use core::cmp::Ordering;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
+use malachite_nz::platform::Limb;
+
+const fn const_limb_significant_bits(x: Limb) -> u64 {
+    Limb::WIDTH - (x.leading_zeros() as u64)
+}
+
+const fn const_u64_power_of_2(pow: u64) -> u64 {
+    assert!(pow < Limb::WIDTH);
+    1 << pow
+}
+
+const fn const_u64_low_mask(bits: u64) -> u64 {
+    assert!(bits <= Limb::WIDTH);
+    if bits == Limb::WIDTH {
+        u64::MAX
+    } else {
+        const_u64_power_of_2(bits) - 1
+    }
+}
+
+const fn const_u64_mod_power_of_2(x: u64, pow: u64) -> u64 {
+    if x == 0 || pow >= Limb::WIDTH {
+        x
+    } else {
+        x & const_u64_low_mask(pow)
+    }
+}
+
+const fn const_u64_neg_mod_power_of_2(x: u64, pow: u64) -> u64 {
+    assert!(x == 0 || pow <= Limb::WIDTH);
+    const_u64_mod_power_of_2(x.wrapping_neg(), pow)
+}
+
+const fn const_i64_convertible_from_limb(value: Limb) -> bool {
+    (value as i64 as Limb) == value
+}
 
 impl Float {
+    // TODO test
+    pub const fn const_from_unsigned(x: Limb) -> Float {
+        if x == 0 {
+            return Float::ZERO;
+        }
+        assert!(const_i64_convertible_from_limb(x));
+        let bits = const_limb_significant_bits(x);
+        Float(Finite {
+            sign: true,
+            exponent: bits as i64,
+            precision: bits,
+            significand: Natural::const_from(
+                // TODO simplify?
+                x << const_u64_neg_mod_power_of_2(bits, Limb::LOG_WIDTH),
+            ),
+        })
+    }
+
     #[doc(hidden)]
     #[inline]
     pub fn from_unsigned_times_power_of_2<T: PrimitiveUnsigned>(x: T, pow: i64) -> Float
@@ -45,8 +102,8 @@ impl Float {
 
     /// Converts a primitive unsigned integer to a [`Float`]. If the [`Float`] is nonzero, it has
     /// the specified precision. If rounding is needed, the specified rounding mode is used. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the original value.
     ///
     /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_unsigned_prec`]
     /// instead.
@@ -79,8 +136,8 @@ impl Float {
     /// If you want the [`Float`]'s precision to be equal to the integer's number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_unsigned_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_unsigned_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -137,8 +194,8 @@ impl Float {
 
     /// Converts a primitive signed integer to a [`Float`]. If the [`Float`] is nonzero, it has the
     /// specified precision. If rounding is needed, the specified rounding mode is used. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the original value.
     ///
     /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_signed_prec`]
     /// instead.
@@ -165,14 +222,14 @@ impl Float {
     }
 
     /// Converts a signed primitive integer to a [`Float`]. If the [`Float`] is nonzero, it has the
-    /// specified precision. An [`Ordering`] is also returned, indicating whether the returned
-    /// value is less than, equal to, or greater than the original value.
+    /// specified precision. An [`Ordering`] is also returned, indicating whether the returned value
+    /// is less than, equal to, or greater than the original value.
     ///
     /// If you want the [`Float`]'s precision to be equal to the integer's number of significant
     /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_signed_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_signed_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

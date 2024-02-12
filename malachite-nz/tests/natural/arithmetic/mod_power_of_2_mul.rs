@@ -42,22 +42,22 @@ fn test_limbs_mod_power_of_2_mul() {
             product
         );
     };
-    // max_len <= xs_len + ys_len + 1
-    // xs_len >= limit && ys_len >= limit
-    // xs_len == max_len
-    // ys_len == max_len
+    // - max_len <= xs_len + ys_len + 1
+    // - xs_len >= limit && ys_len >= limit
+    // - xs_len == max_len
+    // - ys_len == max_len
     test(&[1], &[1], 1, &[1]);
     test(&[1], &[1], 5, &[1]);
-    // xs_len < max_len
-    // ys_len < max_len
+    // - xs_len < max_len
+    // - ys_len < max_len
     test(&[1], &[1], 33, &[1, 0]);
     test(&[2], &[1], 3, &[2]);
     test(&[1], &[2], 3, &[2]);
     test(&[2], &[3], 2, &[2]);
-    // xs_len < limit || ys_len < limit
+    // - xs_len < limit || ys_len < limit
     test(&[1, 2, 3], &[6, 7], 100, &[6, 19, 32, 5]);
     test(&[6, 7], &[1, 2, 3], 100, &[6, 19, 32, 5]);
-    // max_len > xs_len + ys_len + 1
+    // - max_len > xs_len + ys_len + 1
     test(&[3255925883], &[3653042335], 131, &[2997571685, 2769295845]);
 }
 

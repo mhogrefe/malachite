@@ -136,8 +136,8 @@ pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
-// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
+// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y`
+// and whose other limbs are full of `true` bits. `xs` may not be empty.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -163,10 +163,10 @@ pub_test! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
-// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-// `y` and whose other limbs are full of `true` bits to an output slice. `xs` may not be empty or
-// only contain zeros. The output slice must be at least as long as the input slice. Returns
-// whether there is a carry.
+// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y`
+// and whose other limbs are full of `true` bits to an output slice. `xs` may not be empty or only
+// contain zeros. The output slice must be at least as long as the input slice. Returns whether
+// there is a carry.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -427,8 +427,8 @@ pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-// longer of `xs` and `ys`.
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the longer of
+// `xs` and `ys`.
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where the first input is positive
 // and the second is negative.
@@ -557,8 +557,8 @@ fn limbs_xor_pos_neg_in_place_left_helper(
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
@@ -657,8 +657,8 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
@@ -838,8 +838,8 @@ pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-// longer of `xs` and `ys`.
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the longer of
+// `xs` and `ys`.
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -916,8 +916,8 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
@@ -1170,8 +1170,8 @@ impl BitXor<Integer> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1207,9 +1207,8 @@ impl<'a> BitXor<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -1245,9 +1244,8 @@ impl<'a> BitXor<Integer> for &'a Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -1278,8 +1276,8 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     /// f(x, y) = x \oplus y.
     /// $$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1317,8 +1315,8 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
 }
 
 impl BitXorAssign<Integer> for Integer {
-    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
-    /// the right-hand side by value.
+    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by value.
     ///
     /// $$
     /// x \gets x \oplus y.
@@ -1329,8 +1327,8 @@ impl BitXorAssign<Integer> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1361,8 +1359,8 @@ impl BitXorAssign<Integer> for Integer {
 }
 
 impl<'a> BitXorAssign<&'a Integer> for Integer {
-    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
-    /// the right-hand side by reference.
+    /// Bitwise-xors an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by reference.
     ///
     /// $$
     /// x \gets x \oplus y.
@@ -1373,9 +1371,8 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```

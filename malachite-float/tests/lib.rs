@@ -96,13 +96,13 @@ pub mod conversion {
 pub mod exhaustive {
     pub mod exhaustive_finite_floats;
     pub mod exhaustive_floats;
-    pub mod exhaustive_floats_with_sci_exponent;
-    pub mod exhaustive_floats_with_sci_exponent_and_precision;
     pub mod exhaustive_negative_finite_floats;
     pub mod exhaustive_non_negative_finite_floats;
     pub mod exhaustive_non_positive_finite_floats;
     pub mod exhaustive_nonzero_finite_floats;
     pub mod exhaustive_positive_finite_floats;
+    pub mod exhaustive_positive_floats_with_sci_exponent;
+    pub mod exhaustive_positive_floats_with_sci_exponent_and_precision;
 }
 pub mod random {
     pub mod random_finite_floats;

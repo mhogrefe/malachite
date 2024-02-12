@@ -20,7 +20,7 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 
-//TODO tune
+// TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
 
 // # Worst-case complexity
@@ -80,10 +80,10 @@ pub(crate) const fn limbs_mul_mod_base_pow_n_minus_1_scratch_len(
 }
 
 // Interpreting two equal-length, nonempty slices of `Limb`s as the limbs (in ascending order) of
-// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1, where n is the
-// length of either slice. The result is semi-normalized: zero is represented as either 0 or
-// `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written to `out`. `out` should have
-// length at least n, and `scratch` at least 2 * n. This is the basecase algorithm.
+// two `Natural`s, multiplies the `Natural`s mod `2 ^ (Limb::WIDTH * n) - 1`, where n is the length
+// of either slice. The result is semi-normalized: zero is represented as either 0 or `Limb::WIDTH ^
+// n - 1`. The limbs of the result are written to `out`. `out` should have length at least n, and
+// `scratch` at least 2 * n. This is the basecase algorithm.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -134,8 +134,8 @@ pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], 
 }
 
 // Interpreting the first n + 1 limbs of two slices of `Limb`s as the limbs (in ascending order) of
-// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> + 1. The limbs of
-// the result are written to `out`, which should have length at least 2 * n + 2.
+// two `Natural`s, multiplies the `Natural`s mod `2 ^ (Limb::WIDTH * n) + 1`. The limbs of the
+// result are written to `out`, which should have length at least 2 * n + 2.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -147,8 +147,8 @@ pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], 
 // # Panics
 // Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
 //
-// This is equivalent to `mpn_bc_mulmod_bnp1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1, where
-// `rp == tp`.
+// This is equivalent to `mpn_bc_mulmod_bnp1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1, where `rp
+// == tp`.
 fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     let m = n + 1;
@@ -158,22 +158,19 @@ fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &
 }
 
 // Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are
-// written to `out`.
+// multiplies the `Natural`s mod `2 ^ (Limb::WIDTH * n) - 1`. The limbs of the result are written to
+// `out`.
 //
-// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
-// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
-// This should not be a problem if `limbs_mul_mod_base_pow_n_minus_1` is used to combine results
-// and obtain a natural number when one knows in advance that the final value is less than
-// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
-// `limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
-// `ys.len()` <= n, because this condition implies
-// (2<sup>`Limb::WIDTH` * `xs.len()`</sup> - 1)(2<sup>`Limb::WIDTH` * `ys.len()`</sup> - 1) <
-// 2<sup>`Limb::WIDTH` * n</sup> - 1.
+// The result is expected to be 0 if and only if one of the operands already is. Otherwise the class
+// 0 mod `(Limb::WIDTH ^ n - 1)` is represented by `2 ^ (n * Limb::WIDTH) - 1`. This should not be a
+// problem if `limbs_mul_mod_base_pow_n_minus_1` is used to combine results and obtain a natural
+// number when one knows in advance that the final value is less than `2 ^ (n * Limb::WIDTH) - 1`.
+// Moreover it should not be a problem if `limbs_mul_mod_base_pow_n_minus_1` is used to compute the
+// full product with `xs.len() + ys.len() <= n`, because this condition implies `(2 ^ (Limb::WIDTH *
+// xs.len()) - 1)(2 ^ (Limb::WIDTH * ys.len()) - 1) < 2 ^ (Limb::WIDTH * n) - 1`.
 //
-// Requires 0 < `ys.len()` <= `xs.len()` <= n and an + `ys.len()` > n / 2.
-// Scratch need: n + (need for recursive call OR n + 4). This gives
-// S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
+// Requires 0 < `ys.len()` <= `xs.len()` <= n and an + `ys.len()` > n / 2. Scratch need: n + (need
+// for recursive call OR n + 4). This gives S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -218,14 +215,13 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
         let half_n = n >> 1;
         // We need at least xs_len + ys_len >= half_n, to be able to fit one of the recursive
         // products at out. Requiring strict inequality makes the code slightly simpler. If desired,
-        // we could avoid this restriction by initially halving n as long as n is even and
-        // xs_len + ys_len <= n / 2.
+        // we could avoid this restriction by initially halving n as long as n is even and xs_len +
+        // ys_len <= n / 2.
         assert!(sum > half_n);
-        // Compute xm = a * b mod (2 ^ (Limb::WIDTH * half_n) - 1),
-        // xp = a * b mod (2 ^ (Limb::WIDTH * half_n) + 1), and Chinese-Remainder-Theorem together
-        // as
-        // x = -xp * 2 ^ (Limb::WIDTH * half_n) + (2 ^ (Limb::WIDTH * half_n) + 1) *
-        // ((xp + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1))
+        // Compute xm = a * b mod (2 ^ (Limb::WIDTH * half_n) - 1), xp = a * b mod (2 ^ (Limb::WIDTH
+        // * half_n) + 1), and Chinese-Remainder-Theorem together as x = -xp * 2 ^ (Limb::WIDTH *
+        // half_n) + (2 ^ (Limb::WIDTH * half_n) + 1) * ((xp + xm) / 2 mod (2 ^ (Limb::WIDTH *
+        // half_n) - 1))
         let m = half_n + 1;
         if xs_len <= half_n {
             limbs_mul_mod_base_pow_n_minus_1(out, half_n, xs, ys, scratch);
@@ -313,14 +309,13 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
         }
         // Here the Chinese Remainder Theorem recomposition begins.
         //
-        // let xm = (scratch + xm) / 2 = (scratch + xm) * 2 ^ (Limb::WIDTH * half_n) / 2 mod
-        // (2 ^ (Limb::WIDTH * half_n) - 1).
-        // Division by 2 is a bitwise rotation.
+        // let xm = (scratch + xm) / 2 = (scratch + xm) * 2 ^ (Limb::WIDTH * half_n) / 2 mod (2 ^
+        // (Limb::WIDTH * half_n) - 1). Division by 2 is a bitwise rotation.
         //
         // Assumes scratch normalised mod (2 ^ (Limb::WIDTH * half_n) + 1).
         //
-        // The residue class 0 is represented by [2 ^ (Limb::WIDTH * half_n) - 1]; except when
-        // both inputs are zero.
+        // The residue class 0 is represented by [2 ^ (Limb::WIDTH * half_n) - 1]; except when both
+        // inputs are zero.
         //
         // scratch[half_n] == 1 implies slice_test_zero(scratch[..half_n]).
         let mut carry = scratch[half_n];
@@ -342,16 +337,14 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
             }
             _ => assert_eq!(carry, 0),
         }
-        // Compute the highest half:
-        // ([(scratch + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1)] - scratch) *
-        // 2 ^ (Limb::WIDTH * half_n)
+        // Compute the highest half: ([(scratch + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1)] -
+        // scratch) * 2 ^ (Limb::WIDTH * half_n)
         if sum < n {
             let a = sum - half_n;
-            // Note that in this case, the only way the result can equal zero mod
-            // 2 ^ (Limb::WIDTH * n) - 1 is if one of the inputs is zero, and then the output of
-            // both the recursive calls and this CRT reconstruction is zero, not
-            // 2 ^ (Limb::WIDTH * n) - 1. Which is good, since the latter representation doesn't fit
-            // in the output area.
+            // Note that in this case, the only way the result can equal zero mod 2 ^ (Limb::WIDTH
+            // * n) - 1 is if one of the inputs is zero, and then the output of both the recursive
+            // calls and this CRT reconstruction is zero, not 2 ^ (Limb::WIDTH * n) - 1. Which is
+            // good, since the latter representation doesn't fit in the output area.
             let borrow = limbs_sub_same_length_to_out(out_hi, &out_lo[..a], &scratch[..a]);
             let mut carry = scratch[half_n];
             let scratch = &mut scratch[..n - half_n];

@@ -97,8 +97,8 @@ pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     remaining_bits
 }}
 
-// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-// writes the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+// the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(n + m)$
@@ -124,10 +124,10 @@ pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
-// output slice must be at least as long as the input slice. The `Limb` must be between 1 and
-// `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
-// input slice, is returned. The carry is not complemented.
+// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The output
+// slice must be at least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH`
+// - 1, inclusive. The carry, or the bits that are shifted past the width of the input slice, is
+// returned. The carry is not complemented.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -308,8 +308,8 @@ macro_rules! impl_natural_shl_signed {
         impl Shl<$t> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
-            /// of 2 and takes the floor), taking it by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power of
+            /// 2 and takes the floor), taking it by value.
             ///
             /// $$
             /// f(x, k) = \lfloor x2^k \rfloor.
@@ -335,8 +335,8 @@ macro_rules! impl_natural_shl_signed {
         impl<'a> Shl<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
-            /// of 2 and takes the floor), taking it by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power of
+            /// 2 and takes the floor), taking it by reference.
             ///
             /// $$
             /// f(x, k) = \lfloor x2^k \rfloor.
@@ -359,8 +359,8 @@ macro_rules! impl_natural_shl_signed {
         }
 
         impl ShlAssign<$t> for Natural {
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power
-            /// of 2 and takes the floor), in place.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2 or divides it by a power of
+            /// 2 and takes the floor), in place.
             ///
             /// $$
             /// x \gets \lfloor x2^k \rfloor.

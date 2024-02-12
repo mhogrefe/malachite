@@ -35,8 +35,8 @@ use malachite_base::slices::slice_test_zero;
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
-// positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
-// `w_sign` is also returned.
+// positive, `sub` is negative, and `w` is returned instead of overwriting the first input. `w_sign`
+// is also returned.
 pub_crate_test! {limbs_overflowing_sub_mul_limb(
     xs: &[Limb],
     ys: &[Limb],
@@ -63,8 +63,8 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb(
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, and `w_sign` is returned.
@@ -82,8 +82,8 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_left(
         // submul of absolute values
         let mut borrow = limbs_sub_mul_limb_same_length_in_place_left(xs, ys_lo, z);
         // ys bigger than xs, so want ys * limb - xs. Submul has given xs - ys * limb, so take twos'
-        // complement and use an limbs_mul_limb_with_carry_to_out for the rest.
-        // -(-borrow * b ^ n + xs - ys * limb) = (borrow - 1) * b ^ n + ~(xs - ys * limb) + 1
+        // complement and use an limbs_mul_limb_with_carry_to_out for the rest. -(-borrow * b ^ n +
+        // xs - ys * limb) = (borrow - 1) * b ^ n + ~(xs - ys * limb) + 1
         limbs_not_in_place(xs);
         if !limbs_slice_add_limb_in_place(xs, 1) {
             borrow.wrapping_sub_assign(1);
@@ -146,8 +146,8 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, the limbs of the result are written to the second input rather than
@@ -196,15 +196,15 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
     // submul of absolute values
     let mut borrow = limbs_sub_mul_limb_same_length_in_place_right(xs, ys_lo, z);
     // ys bigger than xs, so want ys * z - xs. Submul has given xs - ys * z, so take twos'
-    // complement and use an limbs_mul_limb_with_carry_to_out for the rest.
-    // -(-borrow * b ^ n + xs - ys * z) = (borrow - 1) * b ^ n + ~(xs - ys * z) + 1
+    // complement and use an limbs_mul_limb_with_carry_to_out for the rest. -(-borrow * b ^ n + xs
+    // - ys * z) = (borrow - 1) * b ^ n + ~(xs - ys * z) + 1
     limbs_not_in_place(ys_lo);
     if !limbs_slice_add_limb_in_place(ys_lo, 1) {
         borrow.wrapping_sub_assign(1);
     }
     // If borrow - 1 == -1, then hold that -1 for later.
-    // limbs_sub_mul_limb_same_length_in_place_left never returns borrow == Limb::MAX, so that
-    // value always indicates a -1.
+    // limbs_sub_mul_limb_same_length_in_place_left never returns borrow == Limb::MAX, so that value
+    // always indicates a -1.
     let negative_one = borrow == Limb::MAX;
     if negative_one {
         borrow.wrapping_add_assign(1);
@@ -218,10 +218,10 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 }
 
 // Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
-// limbs of the absolute value to whichever input is longer. The first `bool` returned is `false`
-// if the result is written to the first input, and `true` if it is written to the second. The
-// second `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be
-// nonempty and have no trailing zeros, and `z` should be nonzero.
+// limbs of the absolute value to whichever input is longer. The first `bool` returned is `false` if
+// the result is written to the first input, and `true` if it is written to the second. The second
+// `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be nonempty and
+// have no trailing zeros, and `z` should be nonzero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -231,8 +231,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
-// positive, `sub` is negative, the result is written to the longer input, and `w_sign` is
-// returned.
+// positive, `sub` is negative, the result is written to the longer input, and `w_sign` is returned.
 pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -251,8 +250,8 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
     }
 }}
 
-// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, returning the limbs of
-// the absolute value and the sign (true means non-negative). All of the input slices should be
+// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, returning the limbs of the
+// absolute value and the sign (true means non-negative). All of the input slices should be
 // non-empty and have no trailing zeros.
 //
 // # Worst-case complexity
@@ -267,8 +266,8 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
 // Panics if `ys` or `zs` are empty.
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
-// positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
-// `w_sign` is also returned.
+// positive, `sub` is negative, and `w` is returned instead of overwriting the first input. `w_sign`
+// is also returned.
 pub_crate_test! {limbs_overflowing_sub_mul(
     xs: &[Limb],
     ys: &[Limb],
@@ -280,8 +279,8 @@ pub_crate_test! {limbs_overflowing_sub_mul(
 }}
 
 // Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, writing the limbs of the
-// absolute value to the first (left) slice and returning the sign (true means non-negative). All
-// of the input slices should be non-empty and have no trailing zeros.
+// absolute value to the first (left) slice and returning the sign (true means non-negative). All of
+// the input slices should be non-empty and have no trailing zeros.
 //
 // # Worst-case complexity
 // $T(n, m) = O(m + n \log n \log\log n)$
@@ -351,8 +350,8 @@ impl SubMul<Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -386,8 +385,8 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -421,8 +420,8 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -446,8 +445,8 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
-    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first by
-    /// value and the second and third by reference.
+    /// Subtracts an [`Integer`] by the product of two other [`Integer`]s, taking the first by value
+    /// and the second and third by reference.
     ///
     /// $f(x, y, z) = x - yz$.
     ///
@@ -456,8 +455,8 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -491,8 +490,8 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     ///
     /// $M(n, m) = O(m + n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -533,8 +532,8 @@ impl SubMulAssign<Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -565,8 +564,8 @@ impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -597,8 +596,8 @@ impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -629,8 +628,8 @@ impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```

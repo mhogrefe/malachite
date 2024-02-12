@@ -86,10 +86,10 @@ pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
 }}
 
-// Let n be out.len().
-// Let x be xs[..2 * n] before execution.
-// Let s be out after execution.
-// Let r be xs[..n] after execution.
+// - Let n be out.len().
+// - Let x be xs[..2 * n] before execution.
+// - Let s be out after execution.
+// - Let r be xs[..n] after execution.
 //
 // xs[2 * n - 1].leading_zeros() must be less than 2.
 //
@@ -206,15 +206,15 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
     });
 }
 
-// Let n be out.len().
-// Let m be xs.len().
-// n must be ceiling(m / 2).
-// odd must be m.odd().
-// shift must be floor(xs[m - 1].leading_zeros() / 2).
-// Let x be xs before execution.
-// Let s be out after execution.
-// Then s = floor(sqrt(x)).
-// The return value is true iff there is a remainder (that is, x is not a perfect square).
+// - Let n be out.len().
+// - Let m be xs.len().
+// - n must be ceiling(m / 2).
+// - odd must be m.odd().
+// - shift must be floor(xs[m - 1].leading_zeros() / 2).
+// - Let x be xs before execution.
+// - Let s be out after execution.
+// - Then s = floor(sqrt(x)).
+// - The return value is true iff there is a remainder (that is, x is not a perfect square).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -277,9 +277,8 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
         }
         let s = (Limb::WIDTH >> odd) - shift - 1;
         if (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) == 0 {
-            // Approximation is not good enough, the extra limb(+ shift bits)
-            // is smaller than needed to absorb the possible error.
-            // {qs + 1, h1 + 1} equals 2*{out, h1}
+            // Approximation is not good enough, the extra limb(+ shift bits) is smaller than needed
+            // to absorb the possible error. {qs + 1, h1 + 1} equals 2*{out, h1}
             let mut mul_scratch =
                 vec![0; limbs_mul_greater_to_out_scratch_len(out_hi.len(), qs_tail.len())];
             assert_eq!(
@@ -344,9 +343,9 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
 
 // Computes the floor of the square root of a `Natural`.
 //
-// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
-// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out`. Then
-// $s = \lfloor \sqrt x \rfloor$.
+// - Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`.
+// - Let $s$ be the `Natural` whose limbs are the first $\lceil n/2 \rceil$ limbs of `out`.
+// - Then $s = \lfloor \sqrt x \rfloor$.
 //
 // All limbs are in ascending order (least-significant first).
 //
@@ -421,9 +420,9 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
 // Computes the square root and remainder of a `Natural`.
 //
 // Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
-// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out_sqrt`, $m$ the return value, and
-// $r$ be the `Natural` whose limbs are the first $m$ limbs of `out_rem`. Then
-// $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
+// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out_sqrt`, $m$ the return value, and $r$
+// be the `Natural` whose limbs are the first $m$ limbs of `out_rem`. Then $s = \lfloor \sqrt x
+// \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
 //
 // All limbs are in ascending order (least-significant first).
 //
@@ -547,8 +546,8 @@ pub_test! {limbs_sqrt_rem_to_out(
 
 // Computes the floor of the square root of a `Natural`.
 //
-// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-// returned. Then $s = \lfloor \sqrt x \rfloor$.
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are returned.
+// Then $s = \lfloor \sqrt x \rfloor$.
 //
 // All limbs are in ascending order (least-significant first).
 //
@@ -566,8 +565,8 @@ pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 
 // Computes the ceiling of the square root of a `Natural`.
 //
-// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-// returned. Then $s = \lceil \sqrt x \rceil$.
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are returned.
+// Then $s = \lceil \sqrt x \rceil$.
 //
 // All limbs are in ascending order (least-significant first).
 //
@@ -587,8 +586,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // Computes the square root of a `Natural`, returning `None` if the `Natural` is not a perfect
 // square.
 //
-// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-// returned.
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are returned.
 //
 // $$
 // s = \\begin{cases}
@@ -619,11 +617,10 @@ pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 
 // Computes the square root and remainder of a `Natural`.
 //
-// Let `out_sqrt` and `out_rem` be the two returned `Limb` `Vec`s. Let $n$ be `xs.len()` and $x$
-// be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural` whose limbs are the first
-// $\lceil n/2 \rceil$ limbs of `out_sqrt` and $r$ be the `Natural` whose limbs are the first $n$
-// limbs of `out_rem`.  Then $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that
-// $r \leq 2x$.
+// Let `out_sqrt` and `out_rem` be the two returned `Limb` `Vec`s. Let $n$ be `xs.len()` and $x$ be
+// the `Natural` whose limbs are `xs`. Let $s$ be the `Natural` whose limbs are the first $\lceil
+// n/2 \rceil$ limbs of `out_sqrt` and $r$ be the `Natural` whose limbs are the first $n$ limbs of
+// `out_rem`.  Then $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
 //
 // All limbs are in ascending order (least-significant first).
 //
@@ -978,8 +975,7 @@ impl<'a> SqrtRem for &'a Natural {
     type RemOutput = Natural;
 
     /// Returns the floor of the square root of a [`Natural`] and the remainder (the difference
-    /// between the [`Natural`] and the square of the floor). The [`Natural`] is taken by
-    /// reference.
+    /// between the [`Natural`] and the square of the floor). The [`Natural`] is taken by reference.
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///

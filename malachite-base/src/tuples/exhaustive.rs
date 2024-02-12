@@ -43,9 +43,8 @@ clone_helper<T: Clone>(x: &T, _i: usize) -> T {
 ///
 /// Malachite provides [`lex_pairs`] and [`lex_pairs_from_single`], but you can also define
 /// `lex_triples`, `lex_quadruples`, and so on, and `lex_triples_from_single`,
-/// `lex_quadruples_from_single`, and so on, in your program using the code below. The
-/// documentation for [`lex_pairs`] and [`lex_pairs_from_single`] describes these other functions
-/// as well.
+/// `lex_quadruples_from_single`, and so on, in your program using the code below. The documentation
+/// for [`lex_pairs`] and [`lex_pairs_from_single`] describes these other functions as well.
 ///
 /// See usage examples [here](self#lex_pairs) and [here](self#lex_pairs_from_single).
 ///
@@ -499,15 +498,15 @@ macro_rules! lex_custom_tuples {
         //
         // The order is lexicographic with respect to the order of the element iterators.
         //
-        // The mapping from iterators to tuple slots is indicated by the function name; for
-        // example, `lex_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the
-        // elements in the first and third slots of the output triples, and `ys` generates the
-        // elements in the second slots.
+        // The mapping from iterators to tuple slots is indicated by the function name; for example,
+        // `lex_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the elements in the
+        // first and third slots of the output triples, and `ys` generates the elements in the
+        // second slots.
         //
         // Let `xs` be the input iterator mapped to the first slot of the output tuples. All the
         // input iterators, except possibly `xs`, must be finite. If `xs` is finite, the output
-        // length is the product of the lengths of all the input iterators. If `xs` is infinite,
-        // the output is also infinite.
+        // length is the product of the lengths of all the input iterators. If `xs` is infinite, the
+        // output is also infinite.
         //
         // If any of the input iterators is empty, the output is also empty.
         //
@@ -740,8 +739,8 @@ macro_rules! exhaustive_tuples_1_input {
         /// determines how quickly the $i$th output slot advances through the iterator; see the
         /// [`BitDistributor`] documentation for a description of the different types.
         ///
-        /// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$
-        /// is the width of the tuples. If `xs` is infinite, the output is also infinite.
+        /// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$ is the
+        /// width of the tuples. If `xs` is infinite, the output is also infinite.
         ///
         /// If `xs` is empty, the output is also empty.
         ///
@@ -800,8 +799,8 @@ exhaustive_tuples_1_input!(
 
 /// Defines exhaustive tuple generators.
 ///
-/// Malachite provides [`exhaustive_pairs`] and [`exhaustive_pairs_custom_output`], but you can
-/// also define `exhaustive_triples`, `exhaustive_quadruples`, and so on, and
+/// Malachite provides [`exhaustive_pairs`] and [`exhaustive_pairs_custom_output`], but you can also
+/// define `exhaustive_triples`, `exhaustive_quadruples`, and so on, and
 /// `exhaustive_triples_custom_output`, `exhaustive_quadruples_custom_output`, and so on, in your
 /// program using the code below. The documentation for [`exhaustive_pairs`] and
 /// [`exhaustive_pairs_custom_output`] describes these other functions as well.
@@ -1274,8 +1273,8 @@ macro_rules! custom_tuples {
         //
         // The mapping from iterators to tuple slots is indicated by the struct name; for example,
         // in `TriplesXYX` there are two iterators, `X`, and `Y`; `X` generates the elements in the
-        // first and third slots of the output triples, and `Y` generates the elements in the
-        // second slots.
+        // first and third slots of the output triples, and `Y` generates the elements in the second
+        // slots.
         #[derive(Clone, Debug)]
         $($vis)* struct $exhaustive_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
             i: u64,
@@ -1377,9 +1376,9 @@ macro_rules! custom_tuples {
         // Generates all $n$-tuples with elements from $m$ iterators, where $m \leq n$, possibly
         // with different output growth rates.
         //
-        // The mapping from iterators to tuple slots is indicated by the function name; for
-        // example, `exhaustive_triples_xyx_custom_output` takes two iterators, `xs`, and `ys`;
-        // `xs` generates the elements in the first and third slots of the output triples, and `ys`
+        // The mapping from iterators to tuple slots is indicated by the function name; for example,
+        // `exhaustive_triples_xyx_custom_output` takes two iterators, `xs`, and `ys`; `xs`
+        // generates the elements in the first and third slots of the output triples, and `ys`
         // generates the elements in the second slots.
         //
         // Let $i$ be the index of the input iterators and $j$ be the index of the output slots. So
@@ -1388,9 +1387,9 @@ macro_rules! custom_tuples {
         //
         // The $j$th `output_type_[i_j]` parameter is a
         // [`BitDistributorOutputType`](crate::iterators::bit_distributor::BitDistributorOutputType)
-        // that determines how quickly the $j$th output slot advances through its iterator; see
-        // the [`BitDistributor`](crate::iterators::bit_distributor::BitDistributor) documentation
-        // for a description of the different types.
+        // that determines how quickly the $j$th output slot advances through its iterator; see the
+        // [`BitDistributor`](crate::iterators::bit_distributor::BitDistributor) documentation for a
+        // description of the different types.
         //
         // If all of `xs`, `ys`, `zs`, ... are finite, then the output length may be obtained by
         // raising the length of each input iterator to power of the number of outputs it maps to,
@@ -1420,10 +1419,10 @@ macro_rules! custom_tuples {
 
         // Generates all $n$-tuples with elements from $m$ iterators, where $m \leq n$.
         //
-        // The mapping from iterators to tuple slots is indicated by the function name; for
-        // example, `exhaustive_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates
-        // the elements in the first and third slots of the output triples, and `ys` generates the
-        // elements in the second slots.
+        // The mapping from iterators to tuple slots is indicated by the function name; for example,
+        // `exhaustive_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the elements
+        // in the first and third slots of the output triples, and `ys` generates the elements in
+        // the second slots.
         //
         // If all of `xs`, `ys`, `zs`, ... are finite, then the output length may be obtained by
         // raising the length of each input iterator to power of the number of outputs it maps to,
@@ -2228,8 +2227,8 @@ macro_rules! lex_ordered_unique_tuples {
         /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
         /// repetitions and are ordered the same way as in the iterator.
         ///
-        /// The tuples are generated in lexicographic order with respect to the order of the
-        /// element iterator.
+        /// The tuples are generated in lexicographic order with respect to the order of the element
+        /// iterator.
         #[derive(Clone, Debug)]
         $($vis)* struct $struct<I: Iterator> where I::Item: Clone {
             first: bool,
@@ -2278,8 +2277,8 @@ macro_rules! lex_ordered_unique_tuples {
         /// [`lex_ordered_unique_tuples`] for more information.
         ///
         /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
-        /// repeated elements, and the elements in each [`Vec`] are ordered the same way as they
-        /// are in the source iterator.
+        /// repeated elements, and the elements in each [`Vec`] are ordered the same way as they are
+        /// in the source iterator.
         ///
         /// The source iterator should not repeat any elements, but this is not enforced.
         ///
@@ -2459,8 +2458,8 @@ macro_rules! exhaustive_ordered_unique_tuples {
         /// See [`exhaustive_ordered_unique_tuples`] for more information.
         ///
         /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
-        /// repeated elements, and the elements in each [`Vec`] are ordered the same way as they
-        /// are in the source iterator.
+        /// repeated elements, and the elements in each [`Vec`] are ordered the same way as they are
+        /// in the source iterator.
         ///
         /// The source iterator should not repeat any elements, but this is not enforced.
         ///
@@ -2586,15 +2585,14 @@ macro_rules! lex_unique_tuples {
         $fn: ident,
         [$($i: expr),*]
     ) => {
-        /// This documentation applies not only to `LexUniquePairs`, but also to
-        /// `LexUniqueTriples`, `LexUniqueQuadruples`, and so on. See [`lex_unique_tuples`] for
-        /// more information.
+        /// This documentation applies not only to `LexUniquePairs`, but also to `LexUniqueTriples`,
+        /// `LexUniqueQuadruples`, and so on. See [`lex_unique_tuples`] for more information.
         ///
         /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
         /// repetitions.
         ///
-        /// The tuples are generated in lexicographic order with respect to the order of the
-        /// element iterator.
+        /// The tuples are generated in lexicographic order with respect to the order of the element
+        /// iterator.
         #[derive(Clone)]
         $($vis)* struct $struct<I: Iterator> where I::Item: Clone {
             first: bool,

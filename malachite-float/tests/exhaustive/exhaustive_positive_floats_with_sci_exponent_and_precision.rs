@@ -1,7 +1,8 @@
-use malachite_float::exhaustive::exhaustive_floats_with_sci_exponent_and_precision;
+use malachite_float::exhaustive::exhaustive_positive_floats_with_sci_exponent_and_precision;
 use malachite_float::test_util::exhaustive::exhaustive_floats_helper_helper_with_limit;
+use std::panic::catch_unwind;
 
-fn exhaustive_floats_with_sci_exponent_and_precision_helper(
+fn exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
     sci_exponent: i64,
     prec: u64,
     out: &[&str],
@@ -9,34 +10,34 @@ fn exhaustive_floats_with_sci_exponent_and_precision_helper(
 ) {
     exhaustive_floats_helper_helper_with_limit(
         20,
-        exhaustive_floats_with_sci_exponent_and_precision(sci_exponent, prec),
+        exhaustive_positive_floats_with_sci_exponent_and_precision(sci_exponent, prec),
         out,
         out_hex,
     );
 }
 
 #[test]
-fn test_exhaustive_floats_with_sci_exponent_and_precision() {
-    exhaustive_floats_with_sci_exponent_and_precision_helper(0, 1, &["1.0"], &["0x1.0#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+fn test_exhaustive_positive_floats_with_sci_exponent_and_precision() {
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(0, 1, &["1.0"], &["0x1.0#1"]);
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         0,
         2,
         &["1.0", "1.5"],
         &["0x1.0#2", "0x1.8#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         0,
         3,
         &["1.0", "1.2", "1.5", "1.8"],
         &["0x1.0#3", "0x1.4#3", "0x1.8#3", "0x1.c#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         0,
         4,
         &["1.0", "1.1", "1.2", "1.4", "1.5", "1.6", "1.8", "1.9"],
         &["0x1.0#4", "0x1.2#4", "0x1.4#4", "0x1.6#4", "0x1.8#4", "0x1.a#4", "0x1.c#4", "0x1.e#4"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         0,
         5,
         &[
@@ -49,26 +50,26 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
         ],
     );
 
-    exhaustive_floats_with_sci_exponent_and_precision_helper(1, 1, &["2.0"], &["0x2.0#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(1, 1, &["2.0"], &["0x2.0#1"]);
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         1,
         2,
         &["2.0", "3.0"],
         &["0x2.0#2", "0x3.0#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         1,
         3,
         &["2.0", "2.5", "3.0", "3.5"],
         &["0x2.0#3", "0x2.8#3", "0x3.0#3", "0x3.8#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         1,
         4,
         &["2.0", "2.2", "2.5", "2.8", "3.0", "3.2", "3.5", "3.8"],
         &["0x2.0#4", "0x2.4#4", "0x2.8#4", "0x2.c#4", "0x3.0#4", "0x3.4#4", "0x3.8#4", "0x3.c#4"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         1,
         5,
         &[
@@ -81,20 +82,25 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
         ],
     );
 
-    exhaustive_floats_with_sci_exponent_and_precision_helper(4, 1, &["2.0e1"], &["0x1.0E+1#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
+        4,
+        1,
+        &["2.0e1"],
+        &["0x1.0E+1#1"],
+    );
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         4,
         2,
         &["16.0", "24.0"],
         &["0x10.0#2", "0x18.0#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         4,
         3,
         &["16.0", "20.0", "24.0", "28.0"],
         &["0x10.0#3", "0x14.0#3", "0x18.0#3", "0x1c.0#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         4,
         4,
         &["16.0", "18.0", "20.0", "22.0", "24.0", "26.0", "28.0", "30.0"],
@@ -103,7 +109,7 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
             "0x1e.0#4",
         ],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         4,
         5,
         &[
@@ -117,20 +123,25 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
         ],
     );
 
-    exhaustive_floats_with_sci_exponent_and_precision_helper(100, 1, &["1.0e30"], &["0x1.0E+25#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
+        100,
+        1,
+        &["1.0e30"],
+        &["0x1.0E+25#1"],
+    );
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         100,
         2,
         &["1.0e30", "2.0e30"],
         &["0x1.0E+25#2", "0x1.8E+25#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         100,
         3,
         &["1.3e30", "1.6e30", "1.9e30", "2.2e30"],
         &["0x1.0E+25#3", "0x1.4E+25#3", "0x1.8E+25#3", "0x1.cE+25#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         100,
         4,
         &["1.3e30", "1.4e30", "1.6e30", "1.7e30", "1.9e30", "2.1e30", "2.2e30", "2.4e30"],
@@ -145,7 +156,7 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
             "0x1.eE+25#4",
         ],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         100,
         5,
         &[
@@ -171,7 +182,7 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
             "0x1.fE+25#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         100,
         30,
         &[
@@ -220,26 +231,31 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
         ],
     );
 
-    exhaustive_floats_with_sci_exponent_and_precision_helper(-1, 1, &["0.5"], &["0x0.8#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
+        -1,
+        1,
+        &["0.5"],
+        &["0x0.8#1"],
+    );
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -1,
         2,
         &["0.5", "0.8"],
         &["0x0.8#2", "0x0.c#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -1,
         3,
         &["0.5", "0.6", "0.8", "0.9"],
         &["0x0.8#3", "0x0.a#3", "0x0.c#3", "0x0.e#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -1,
         4,
         &["0.5", "0.56", "0.62", "0.7", "0.75", "0.81", "0.88", "0.94"],
         &["0x0.8#4", "0x0.9#4", "0x0.a#4", "0x0.b#4", "0x0.c#4", "0x0.d#4", "0x0.e#4", "0x0.f#4"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -1,
         5,
         &[
@@ -253,20 +269,25 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
         ],
     );
 
-    exhaustive_floats_with_sci_exponent_and_precision_helper(-10, 1, &["0.001"], &["0x0.004#1"]);
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
+        -10,
+        1,
+        &["0.001"],
+        &["0x0.004#1"],
+    );
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -10,
         2,
         &["0.00098", "0.0015"],
         &["0x0.004#2", "0x0.006#2"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -10,
         3,
         &["0.00098", "0.0012", "0.0015", "0.0017"],
         &["0x0.004#3", "0x0.005#3", "0x0.006#3", "0x0.007#3"],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -10,
         4,
         &["0.00098", "0.0011", "0.0012", "0.0013", "0.0015", "0.0016", "0.0017", "0.0018"],
@@ -281,7 +302,7 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
             "0x0.0078#4",
         ],
     );
-    exhaustive_floats_with_sci_exponent_and_precision_helper(
+    exhaustive_positive_floats_with_sci_exponent_and_precision_helper(
         -10,
         5,
         &[
@@ -307,4 +328,11 @@ fn test_exhaustive_floats_with_sci_exponent_and_precision() {
             "0x0.007c#5",
         ],
     );
+}
+
+#[test]
+fn exhaustive_positive_floats_with_sci_exponent_and_precision_fail() {
+    assert_panic!(exhaustive_positive_floats_with_sci_exponent_and_precision(
+        1, 0
+    ));
 }

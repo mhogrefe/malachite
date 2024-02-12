@@ -1,10 +1,10 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
-use core::ops::{Shl, ShlAssign};
 
 fn shr_round_unsigned_ref_i<'a, T>(x: &'a Integer, bits: T, rm: RoundingMode) -> (Integer, Ordering)
 where
@@ -253,11 +253,11 @@ macro_rules! impl_shr_round_signed {
         impl ShrRound<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts an [`Integer`] right (divides or multiplies it by a power of 2), taking it
-            /// by value, and rounds according to the specified rounding mode. An [`Ordering`] is
-            /// also returned, indicating whether the returned value is less than, equal to, or
-            /// greater than the exact value. If `bits` is negative, then the returned [`Ordering`]
-            /// is always `Equal`, even if the higher bits of the result are lost.
+            /// Shifts an [`Integer`] right (divides or multiplies it by a power of 2), taking it by
+            /// value, and rounds according to the specified rounding mode. An [`Ordering`] is also
+            /// returned, indicating whether the returned value is less than, equal to, or greater
+            /// than the exact value. If `bits` is negative, then the returned [`Ordering`] is
+            /// always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
@@ -318,9 +318,9 @@ macro_rules! impl_shr_round_signed {
         impl<'a> ShrRound<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts an [`Integer`] right (divides or multiplies it by a power of 2), taking it
-            /// by reference, and rounds according to the specified rounding mode. An [`Ordering`]
-            /// is also returned, indicating whether the returned value is less than, equal to, or
+            /// Shifts an [`Integer`] right (divides or multiplies it by a power of 2), taking it by
+            /// reference, and rounds according to the specified rounding mode. An [`Ordering`] is
+            /// also returned, indicating whether the returned value is less than, equal to, or
             /// greater than the exact value. If `bits` is negative, then the returned [`Ordering`]
             /// is always `Equal`, even if the higher bits of the result are lost.
             ///

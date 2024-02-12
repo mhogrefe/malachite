@@ -27,9 +27,9 @@ use malachite_base::slices::slice_trailing_zeros;
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_modexact_1c_odd`, from `mpn/generic/mode1o.c`, GMP 6.2.1, where
-// `size == 1`. Pass `carry = 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1, where
-// `size == 1`.
+// This is equivalent to `mpn_modexact_1c_odd`, from `mpn/generic/mode1o.c`, GMP 6.2.1, where `size
+// == 1`. Pass `carry = 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1, where `size ==
+// 1`.
 pub_const_test! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
     if n > carry {
         let result = (n - carry) % d;
@@ -47,17 +47,17 @@ pub_const_test! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) ->
 //
 // r * B ^ k + n - c == q * d
 //
-// where B = 2<sup>`Limb::WIDTH`</sup>, k is either `ns.len()` or `ns.len()` - 1 (the caller won't
-// know which), c is `carry`, and q is the quotient (discarded). `d` must be odd and `carry` can be
-// any limb value.
+// where B = `2 ^ Limb::WIDTH`, k is either `ns.len()` or `ns.len()` - 1 (the caller won't know
+// which), c is `carry`, and q is the quotient (discarded). `d` must be odd and `carry` can be any
+// limb value.
 //
 // If c < d then r will be in the range 0 <= r < d, or if c >= d then 0 <= r <= d.
 //
-// This slightly strange function suits the initial N x 1 reduction for GCDs or Jacobi symbols
-// since the factors of 2 in B ^ k can be ignored, leaving -r == a mod d (by passing c = 0). For a
-// GCD the factor of -1 on r can be ignored, or for the Jacobi symbol it can be accounted for. The
-// function also suits divisibility and congruence testing, since if r = 0 (or r = d) is obtained,
-// then a ≡ c mod d.
+// This slightly strange function suits the initial N x 1 reduction for GCDs or Jacobi symbols since
+// the factors of 2 in B ^ k can be ignored, leaving -r == a mod d (by passing c = 0). For a GCD the
+// factor of -1 on r can be ignored, or for the Jacobi symbol it can be accounted for. The function
+// also suits divisibility and congruence testing, since if r = 0 (or r = d) is obtained, then a ≡
+// c mod d.
 //
 // ns must be nonempty and divisor must be odd.
 //
@@ -68,8 +68,8 @@ pub_const_test! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) ->
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_modexact_1c_odd` from mpn/generic/mode1o.c, GMP 6.2.1. Pass
-// `carry = 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1.
+// This is equivalent to `mpn_modexact_1c_odd` from mpn/generic/mode1o.c, GMP 6.2.1. Pass `carry =
+// 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1.
 pub_crate_test! {limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {
@@ -118,8 +118,8 @@ pub_crate_test! {limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb)
 // # Panics
 // Panics if the length of `xs` is less than 2 or `m` is zero.
 //
-// This is equivalent to `mpz_congruent_ui_p` from `mpz/cong_ui.c`, GMP 6.2.1, where `a` is
-// positive and the `ABOVE_THRESHOLD` branch is excluded.
+// This is equivalent to `mpz_congruent_ui_p` from `mpz/cong_ui.c`, GMP 6.2.1, where `a` is positive
+// and the `ABOVE_THRESHOLD` branch is excluded.
 pub_crate_test! {limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     assert_ne!(m, 0);
     assert!(xs.len() > 1);
@@ -191,8 +191,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 // Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `d` are longer than one limb, and `c` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -222,8 +222,8 @@ pub_test! {limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 // Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `d` are longer than one limb, and `c` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -253,8 +253,8 @@ pub_test! {limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> b
 // Panics if the length of `xs` or `m` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `d` are longer than one limb, and `c` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -282,8 +282,8 @@ pub_test! {limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> b
 // Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 // is zero, or if `y` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `d` are longer than one limb, and `c` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `d` are longer than one limb, and `c` is one limb long.
 pub_test! {limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -330,8 +330,8 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 // Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 // is zero, or if `m` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `c` are longer than one limb, and `m` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `c` are longer than one limb, and `m` is one limb long.
 pub_test! {limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_ref_greater(xs, ys, m)
@@ -378,8 +378,8 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 // Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 // is zero, or if `m` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `c` are longer than one limb, and `m` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `c` are longer than one limb, and `m` is one limb long.
 pub_test! {limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_val_greater(xs, ys, m)
@@ -429,8 +429,8 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 // Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 // is zero, or if `m` is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive, `a` and `c` are longer than one limb, and `m` is one limb long.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive, `a` and `c` are longer than one limb, and `m` is one limb long.
 pub_test! {limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_val_ref_greater(xs, ys, m)
@@ -474,8 +474,8 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
         Some(true)
     } else if m_len > x_len || !xs[0].eq_mod_power_of_2(ys[0], TrailingZeros::trailing_zeros(m[0]))
     {
-        // Either: x < m, y < m, and x != y, so x != y mod m
-        // Or: xs != ys mod low zero bits of m_0
+        // - Either: x < m, y < m, and x != y, so x != y mod m
+        // - Or: xs != ys mod low zero bits of m_0
         Some(false)
     } else {
         None
@@ -500,8 +500,8 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
 // Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 // slices is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive and each is longer than one limb.
 pub_test! {limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_ref(xs, ys, ms)
@@ -541,11 +541,11 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
-// of the slices is zero.
+// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+// slices is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive and each is longer than one limb.
 pub_test! {limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_val(xs, ys, ms)
@@ -585,11 +585,11 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
-// of the slices is zero.
+// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+// slices is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive and each is longer than one limb.
 pub_test! {limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_ref(xs, ys, ms)
@@ -647,11 +647,11 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
-// of the slices is zero.
+// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+// slices is zero.
 //
-// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d`
-// are positive and each is longer than one limb.
+// This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
+// positive and each is longer than one limb.
 pub_test! {limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_val(xs, ys, ms)
@@ -706,8 +706,8 @@ impl Natural {
 
 impl EqMod<Natural, Natural> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
-    /// whether the difference between the first two is a multiple of the third. All three are
-    /// taken by value.
+    /// whether the difference between the first two is a multiple of the third. All three are taken
+    /// by value.
     ///
     /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
     ///
@@ -720,8 +720,8 @@ impl EqMod<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -788,8 +788,8 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -842,8 +842,8 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
 
 impl<'a> EqMod<&'a Natural, Natural> for Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
-    /// whether the difference between the first two is a multiple of the third. The first and
-    /// third are taken by value and the second by reference.
+    /// whether the difference between the first two is a multiple of the third. The first and third
+    /// are taken by value and the second by reference.
     ///
     /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
     ///
@@ -856,8 +856,8 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -924,8 +924,8 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -992,8 +992,8 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1046,8 +1046,8 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
 
 impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
-    /// whether the difference between the first two is a multiple of the third. The first and
-    /// third are taken by reference and the second by value.
+    /// whether the difference between the first two is a multiple of the third. The first and third
+    /// are taken by reference and the second by value.
     ///
     /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
     ///
@@ -1060,8 +1060,8 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1128,8 +1128,8 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1182,8 +1182,8 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
 
 impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// Returns whether a [`Natural`] is equivalent to another [`Natural`] modulo a third; that is,
-    /// whether the difference between the first two is a multiple of the third. All three are
-    /// taken by reference.
+    /// whether the difference between the first two is a multiple of the third. All three are taken
+    /// by reference.
     ///
     /// Two [`Natural`]s are equal to each other modulo 0 iff they are equal.
     ///
@@ -1196,8 +1196,8 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

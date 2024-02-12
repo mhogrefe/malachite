@@ -52,7 +52,7 @@ const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
 
 const INVERT_LIMB_TABLE_SIZE: usize = 1 << INVERT_LIMB_TABLE_LOG_SIZE;
 
-// The entry at index `i` is the multiplicative inverse of 2 * `i` + 1 mod 2<sup>8</sup>.
+// The entry at index `i` is the multiplicative inverse of `2 * i + 1 mod 2 ^ 8`.
 const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
     0x01, 0xab, 0xcd, 0xb7, 0x39, 0xa3, 0xc5, 0xef, 0xf1, 0x1b, 0x3d, 0xa7, 0x29, 0x13, 0x35, 0xdf,
     0xe1, 0x8b, 0xad, 0x97, 0x19, 0x83, 0xa5, 0xcf, 0xd1, 0xfb, 0x1d, 0x87, 0x09, 0xf3, 0x15, 0xbf,
@@ -77,9 +77,8 @@ pub fn test_invert_limb_table() {
     }
 }
 
-// Finds the inverse of a `Limb` mod 2<sup>`Limb::WIDTH`</sup>; given x, returns y such that
-// x * y ≡ 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
-// be odd.
+// Finds the inverse of a `Limb` mod `2 ^ Limb::WIDTH`; given x, returns y such that x * y ≡ 1 mod
+// `2 ^ Limb::WIDTH`. This inverse only exists for odd `Limb`s, so `x` must be odd.
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -101,9 +100,9 @@ pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
-// the behavior of this function is undefined.
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the limb
+// slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
+// behavior of this function is undefined.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -191,8 +190,8 @@ pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where
-// `dst == src`.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where `dst ==
+// src`.
 pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -247,8 +246,8 @@ pub(crate) const MAX_OVER_3: Limb = Limb::MAX / 3;
 const MAX_OVER_3: Limb = Limb::MAX / 3;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural`
-// must be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
+// quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural` must
+// be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -343,9 +342,9 @@ pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
-// the behavior of this function is undefined.
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the limb
+// slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
+// behavior of this function is undefined.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -369,8 +368,8 @@ pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the quotient of the `Natural` and a `Limb` to the input slice. The divisor limb cannot
-// be zero and the input limb slice must be nonempty. The `Natural` must be exactly divisible by
-// the `Limb`. If it isn't, the behavior of this function is undefined.
+// be zero and the input limb slice must be nonempty. The `Natural` must be exactly divisible by the
+// `Limb`. If it isn't, the behavior of this function is undefined.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -382,8 +381,8 @@ pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 // # Panics
 // Panics if `ns` is empty or if `d` is zero.
 //
-// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where
-// `dest == src`.
+// This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where `dest ==
+// src`.
 pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)
@@ -429,9 +428,9 @@ pub_test! {limbs_modular_invert_small(
     }
 }}
 
-// Finds the inverse of a slice `Limb` mod 2<sup>`ds.len() * Limb::WIDTH`</sup>; given x, returns y
-// such that x * y ≡ 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
-// x, so the least-significant limb of `ds` must be odd.
+// Finds the inverse of a slice `Limb` mod `2 ^ (ds.len() * Limb::WIDTH)`; given x, returns y such
+// that x * y ≡ 1 mod `2 ^ (ds.len() * Limb::WIDTH)`. This inverse only exists for odd x, so the
+// least-significant limb of `ds` must be odd.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log \log n)$
@@ -484,8 +483,10 @@ pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mu
 // (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 //
 // Output:
+// ```
 //    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
 //    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+// ```
 //
 // Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
 // the subtraction N - Q * D.
@@ -584,8 +585,8 @@ fn limbs_modular_div_mod_helper(
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
-///
-/// This is equivalent to `mpn_dcpi1_bdiv_qr_n` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
+//
+// This is equivalent to `mpn_dcpi1_bdiv_qr_n` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
 fn limbs_modular_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -628,8 +629,10 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
 // `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 //
 // Output:
+// ```
 //    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
 //    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+// ```
 //
 // Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
 // the subtraction N - Q * D.
@@ -777,8 +780,11 @@ fn limbs_modular_div_mod_barrett_unbalanced(
     let q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
     let rs = &mut rs[..d_len];
+    // ```
     // |_______________________| dividend
     // |________| divisor
+    // ```
+    //
     // Compute an inverse size that is a nice partition of the quotient.
     let blocks = (q_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
     let i_len = (q_len - 1) / blocks + 1; // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
@@ -892,9 +898,12 @@ fn limbs_modular_div_mod_barrett_balanced(
     let q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
     let rs = &mut rs[..d_len];
+    // ```
     // |_______________________| dividend
     // |________________| divisor
-    // Compute half-sized inverse.
+    // ```
+    //
+    // Compute a half-sized inverse.
     let i_len = q_len - (q_len >> 1);
     let (is, scratch) = scratch.split_at_mut(i_len);
     let (qs_lo, qs_hi) = qs.split_at_mut(i_len);
@@ -966,8 +975,10 @@ fn limbs_modular_div_mod_barrett_balanced(
 // `ds.len()`. D must be odd.
 //
 // Output:
+// ```
 //    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
 //    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+// ```
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log \log n)$
@@ -977,9 +988,9 @@ fn limbs_modular_div_mod_barrett_balanced(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
-// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()` + 2, `qs` has
-// length less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or
-// the last limb of `ds` is even.
+// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()` + 2, `qs` has length
+// less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or the last
+// limb of `ds` is even.
 //
 // This is equivalent to `mpn_mu_bdiv_qr` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
 pub_crate_test! {limbs_modular_div_mod_barrett(
@@ -1062,8 +1073,8 @@ pub_crate_test! {limbs_modular_div_schoolbook(
     qs[last_index] = d_inv.wrapping_mul(ns[last_index]);
 }}
 
-// This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1, where
-// qp == up.
+// This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1, where qp
+// == up.
 pub fn limbs_modular_div_schoolbook_in_place(mut ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1121,9 +1132,9 @@ pub_const_test! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usiz
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
-///
-/// This is equivalent to `mpn_dcpi1_bdiv_q_n` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
-/// Investigate changes from 6.1.2?
+//
+// This is equivalent to `mpn_dcpi1_bdiv_q_n` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
+// Investigate changes from 6.1.2?
 fn limbs_modular_div_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -1299,8 +1310,11 @@ fn limbs_modular_div_barrett_greater(
 ) {
     let n_len = ns.len();
     let d_len = ds.len();
+    // ```
     // |_______________________| dividend
     // |________| divisor
+    // ```
+    //
     // Compute an inverse size that is a nice partition of the quotient.
     let blocks = (n_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
     let i_len = (n_len - 1) / blocks + 1; // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
@@ -1417,9 +1431,12 @@ fn limbs_modular_div_barrett_same_length(
     scratch: &mut [Limb],
 ) {
     let n_len = ns.len();
+    // ```
     // |________________| dividend
     // |________________| divisor
-    // Compute half-sized inverse.
+    // ```
+    //
+    // Compute a half-sized inverse.
     let i_len = n_len - (n_len >> 1);
     let (is, scratch) = scratch.split_at_mut(i_len);
     limbs_modular_invert(is, &ds[..i_len], scratch);
@@ -1575,11 +1592,10 @@ pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scra
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
-// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
-// zero.
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is zero.
 //
-// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, where `scratch`
-// is allocated internally and `qp` is returned.
+// This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, where `scratch` is
+// allocated internally and `qp` is returned.
 pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
@@ -1900,9 +1916,9 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// f(x, y) = \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `self / &other` instead. If
-    /// you're unsure and you want to know, use `self.div_mod(&other)` and check whether the
-    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// If you are unsure whether the division will be exact, use `self / &other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(&other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round(&other, RoundingMode::Exact)`.
     ///
     /// # Worst-case complexity
@@ -1949,9 +1965,9 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// f(x, y) = \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `&self / other` instead. If
-    /// you're unsure and you want to know, use `self.div_mod(other)` and check whether the
-    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// If you are unsure whether the division will be exact, use `&self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
     /// `(&self).div_round(other, RoundingMode::Exact)`.
     ///
     /// # Worst-case complexity
@@ -2009,8 +2025,8 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The first
-    /// [`Natural`] must be exactly divisible by the second. If it isn't, this function may panic
-    /// or return a meaningless result.
+    /// [`Natural`] must be exactly divisible by the second. If it isn't, this function may panic or
+    /// return a meaningless result.
     ///
     /// $$
     /// f(x, y) = \frac{x}{y}.
@@ -2081,8 +2097,8 @@ impl DivExactAssign<Natural> for Natural {
     /// x \gets \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `self /= other` instead. If
-    /// you're unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// If you are unsure whether the division will be exact, use `self /= other` instead. If you're
+    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round_assign(other, RoundingMode::Exact)`.
     ///
@@ -2140,8 +2156,8 @@ impl DivExactAssign<Natural> for Natural {
 
 impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
-    /// right-hand side by reference. The first [`Natural`] must be exactly divisible by the
-    /// second. If it isn't, this function may panic or return a meaningless result.
+    /// right-hand side by reference. The first [`Natural`] must be exactly divisible by the second.
+    /// If it isn't, this function may panic or return a meaningless result.
     ///
     /// $$
     /// x \gets \frac{x}{y}.

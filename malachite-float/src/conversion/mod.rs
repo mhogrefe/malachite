@@ -222,8 +222,7 @@ pub mod is_integer;
 /// The traits are
 /// [`RawMantissaAndExponent`](malachite_base::num::conversion::traits::RawMantissaAndExponent),
 /// [`IntegerMantissaAndExponent`](malachite_base::num::conversion::traits::IntegerMantissaAndExponent),
-/// and
-/// [`SciMantissaAndExponent`](malachite_base::num::conversion::traits::SciMantissaAndExponent).
+/// and [`SciMantissaAndExponent`](malachite_base::num::conversion::traits::SciMantissaAndExponent).
 ///
 /// Here are some examples of the macro-generated functions:
 ///

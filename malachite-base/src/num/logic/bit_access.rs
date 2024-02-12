@@ -240,8 +240,8 @@ macro_rules! impl_bit_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if $n < 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is
-            /// the width of the type.
+            /// Panics if $n < 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is the
+            /// width of the type.
             ///
             /// # Examples
             /// See [here](super::bit_access#clear_bit).

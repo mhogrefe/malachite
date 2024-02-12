@@ -35,8 +35,8 @@ impl Iterator for RandomSciSizeOptions {
 
 /// Generates random [`SciSizeOptions`]s.
 ///
-/// The scales and precisions are chosen from a geometric distribution whose mean is the
-/// ratio `m_size_numerator / m_size_denominator`.
+/// The scales and precisions are chosen from a geometric distribution whose mean is the ratio
+/// `m_size_numerator / m_size_denominator`.
 ///
 /// # Panics
 /// Panics if `m_size_numerator` or `m_size_denominator` are zero, or, if after being reduced to

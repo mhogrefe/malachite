@@ -228,8 +228,8 @@ macro_rules! impl_primorials_b {
 
             /// Computes the product of the first $n$ primes.
             ///
-            /// The [`primorial`](Primorial::primorial) function is similar; it computes the
-            /// product of all primes less than or equal to $n$.
+            /// The [`primorial`](Primorial::primorial) function is similar; it computes the product
+            /// of all primes less than or equal to $n$.
             ///
             /// If the input is too large, the function panics. For a function that returns `None`
             /// instead, try
@@ -240,11 +240,11 @@ macro_rules! impl_primorials_b {
             /// $$
             /// where $p_n$ is the $n$th prime number.
             ///
-            /// $p_n\\# = O\left ( \left ( \frac{1}{e}k\log k\left ( \frac{\log k}{e^2}k
-            /// \right )^{1/\log k} \right )^k \omega(1)\right )$.
+            /// $p_n\\# = O\left ( \left ( \frac{1}{e}k\log k\left ( \frac{\log k}{e^2}k \right
+            /// )^{1/\log k} \right )^k \omega(1)\right )$.
             ///
-            /// This asymptotic approximation is due to
-            /// [Bart Michels](https://math.stackexchange.com/a/1594930).
+            /// This asymptotic approximation is due to [Bart
+            /// Michels](https://math.stackexchange.com/a/1594930).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

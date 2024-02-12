@@ -59,8 +59,8 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
         matches!(self.partial_cmp_abs(other), Some(Ordering::Greater))
     }
 
-    /// Determines whether the absolute value of one number is greater than or equal to the
-    /// absolute value of another.
+    /// Determines whether the absolute value of one number is greater than or equal to the absolute
+    /// value of another.
     ///
     /// # Worst-case complexity
     /// Same as the time and additional memory complexity of

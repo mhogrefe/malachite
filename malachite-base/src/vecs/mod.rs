@@ -78,8 +78,8 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 ///
 /// Substrings representing `T`s may contain commas. Sometimes this may lead to ambiguities: for
 /// example, the two `Vec<&str>`s `vec!["a, b"]` and `vec!["a", "b"]` both have the string
-/// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as
-/// `vec!["a", "b"]`.
+/// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as `vec!["a",
+/// "b"]`.
 ///
 /// # Examples
 /// ```
@@ -104,8 +104,8 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
 ///
 /// Substrings representing `T`s may contain commas. Sometimes this may lead to ambiguities: for
 /// example, the two `Vec<&str>`s `vec!["a, b"]` and `vec!["a", "b"]` both have the string
-/// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as
-/// `vec!["a", "b"]`.
+/// representation `"[a, b]"`. The parser is greedy, so it will interpet this string as `vec!["a",
+/// "b"]`.
 ///
 /// # Examples
 /// ```
@@ -237,8 +237,7 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
 ///
 /// The permutations are [`Vec`]s of cloned items. It may be more convenient for the iterator to
 /// return references to a slice, in which case you may use
-/// [`exhaustive_slice_permutations`](crate::slices::exhaustive_slice_permutations).
-/// instead.
+/// [`exhaustive_slice_permutations`](crate::slices::exhaustive_slice_permutations) instead.
 ///
 /// The permutations are generated in lexicographic order with respect to the ordering in the
 /// [`Vec`].

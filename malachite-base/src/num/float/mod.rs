@@ -9,11 +9,11 @@ use core::str::FromStr;
 ///
 /// In most languages, floats behave weirdly due to the IEEE 754 standard. The `NiceFloat` type
 /// ignores the standard in favor of more intuitive behavior.
-/// - Using `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
+/// * Using `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
 ///   concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal to
 ///   each other.
-/// - The `NiceFloat` hash respects this equality.
-/// - `NiceFloat` has a total order. These are the classes of floats, in ascending order:
+/// * The `NiceFloat` hash respects this equality.
+/// * `NiceFloat` has a total order. These are the classes of floats, in ascending order:
 ///   - Negative infinity
 ///   - Negative nonzero finite floats
 ///   - Negative zero
@@ -21,7 +21,7 @@ use core::str::FromStr;
 ///   - Positive zero
 ///   - Positive nonzero finite floats
 ///   - Positive infinity
-/// - `NiceFloat` uses a different [`Display`] implementation than floats do by default in Rust. For
+/// * `NiceFloat` uses a different [`Display`] implementation than floats do by default in Rust. For
 ///   example, Rust will format `f32::MIN_POSITIVE_SUBNORMAL` as something with many zeros, but
 ///   `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just formats it as `"1.0e-45"`. The conversion
 ///   function uses David Tolnay's [`ryu`](https://docs.rs/ryu/latest/ryu/) crate, with a few
@@ -30,7 +30,7 @@ use core::str::FromStr;
 ///     `f32::MIN_POSITIVE_SUBNORMAL` to `"1e-45"`.
 ///   - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
 ///     `"-Infinity"`, and "`NaN`", respectively.
-/// - [`FromStr`] accepts these strings.
+/// * [`FromStr`] accepts these strings.
 #[derive(Clone, Copy, Default)]
 pub struct NiceFloat<T: PrimitiveFloat>(pub T);
 
@@ -121,8 +121,8 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     /// Compares two `NiceFloat`s.
     ///
     /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
-    /// respects the expected properties of antisymmetry, reflexivity, and transitivity.
-    /// `NiceFloat` has a total order. These are the classes of floats, in ascending order:
+    /// respects the expected properties of antisymmetry, reflexivity, and transitivity. `NiceFloat`
+    /// has a total order. These are the classes of floats, in ascending order:
     ///   - Negative infinity
     ///   - Negative nonzero finite floats
     ///   - Negative zero
@@ -180,8 +180,8 @@ macro_rules! impl_fmt_ryu_string {
             fn fmt_ryu_string(self, f: &mut Formatter<'_>) -> fmt::Result {
                 let mut buffer = ryu::Buffer::new();
                 let printed = buffer.format_finite(self);
-                // Convert e.g. "1e100" to "1.0e100".
-                // `printed` is ASCII, so we can manipulate bytes rather than chars.
+                // Convert e.g. "1e100" to "1.0e100". `printed` is ASCII, so we can manipulate bytes
+                // rather than chars.
                 let mut e_index = None;
                 let mut found_dot = false;
                 for (i, &b) in printed.as_bytes().iter().enumerate() {

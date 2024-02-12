@@ -1,10 +1,10 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CheckedLogBase2, FloorLogBase2, IsPowerOf2,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::cmp::Ordering;
 
 impl Rational {
     /// Returns the floor of the base-2 logarithm of the absolute value of a nonzero [`Rational`].
@@ -45,8 +45,7 @@ impl Rational {
         }
     }
 
-    /// Returns the ceiling of the base-2 logarithm of the absolute value of a nonzero
-    /// [`Rational`].
+    /// Returns the ceiling of the base-2 logarithm of the absolute value of a nonzero [`Rational`].
     ///
     /// $f(x) = \lfloor\log_2 |x|\rfloor$.
     ///

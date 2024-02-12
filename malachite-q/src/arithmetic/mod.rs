@@ -7,8 +7,8 @@ pub mod add;
 /// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
 pub mod approximate;
 /// Implementations of [`Ceiling`](malachite_base::num::arithmetic::traits::Ceiling) and
-/// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking
-/// the ceiling of a number.
+/// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
+/// ceiling of a number.
 pub mod ceiling;
 /// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
 /// interval.
@@ -38,8 +38,7 @@ pub mod log_base_2;
 ///
 /// The traits are
 /// [`FloorLogBasePowerOf2`](malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2),
-/// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2),
-/// and
+/// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2), and
 /// [`CheckedLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2).
 pub mod log_base_power_of_2;
 /// Multiplication of [`Rational`](super::Rational)s.
@@ -64,9 +63,8 @@ pub mod reciprocal;
 /// Implementations of [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot), a
 /// trait for computing the root of a number, if the number is a perfect power.
 pub mod root;
-/// Implementations of
-/// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) and
-/// [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
+/// Implementations of [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+/// and [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
 /// traits for rounding a number to a multiple of another number.
 pub mod round_to_multiple;
 /// Implementations of

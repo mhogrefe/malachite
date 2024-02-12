@@ -2,8 +2,8 @@ use crate::natural::logic::count_ones::limbs_count_ones;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
-use malachite_base::num::logic::traits::HammingDistance;
 use core::cmp::Ordering;
+use malachite_base::num::logic::traits::HammingDistance;
 
 // Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 // Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading
@@ -90,8 +90,8 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

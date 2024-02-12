@@ -1,5 +1,6 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
+use core::cmp::{min, Ordering};
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -10,7 +11,6 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::{min, Ordering};
 
 impl Float {
     /// Returns a [`Float`]'s scientific mantissa and exponent, rounding according to the specified
@@ -111,8 +111,8 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
     /// components of `self`. When `self` is finite and nonzero, the raw mantissa is an integer
     /// whose number of significant bits is a multiple of the limb width, and which is equal to the
-    /// absolute value of `self` multiplied by some integer power of 2. The raw exponent is one
-    /// more than the floor of the base-2 logarithm of the absolute value of `self`.
+    /// absolute value of `self` multiplied by some integer power of 2. The raw exponent is one more
+    /// than the floor of the base-2 logarithm of the absolute value of `self`.
     ///
     /// The inverse operation is [`Self::from_raw_mantissa_and_exponent`].
     ///
@@ -153,20 +153,22 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     /// }
     /// ```
     fn raw_mantissa_and_exponent(self) -> (Natural, i64) {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => (significand, exponent),
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            (significand, exponent)
+        } else {
+            panic!()
         }
     }
 
     /// Returns the raw exponent of a [`Float`], taking the [`Float`] by value.
     ///
-    /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value
-    /// of `self`.
+    /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value of
+    /// `self`.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -192,9 +194,10 @@ impl RawMantissaAndExponent<Natural, i64> for Float {
     /// );
     /// ```
     fn raw_exponent(self) -> i64 {
-        match self {
-            Float(Finite { exponent, .. }) => exponent,
-            _ => panic!(),
+        if let Float(Finite { exponent, .. }) = self {
+            exponent
+        } else {
+            panic!()
         }
     }
 
@@ -264,8 +267,8 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
     /// components of `self`. When `self` is finite and nonzero, the raw mantissa is an integer
     /// whose number of significant bits is a multiple of the limb width, and which is equal to the
-    /// absolute value of `self` multiplied by some integer power of 2. The raw exponent is one
-    /// more than the floor of the base-2 logarithm of the absolute value of `self`.
+    /// absolute value of `self` multiplied by some integer power of 2. The raw exponent is one more
+    /// than the floor of the base-2 logarithm of the absolute value of `self`.
     ///
     /// The inverse operation is [`Float::from_raw_mantissa_and_exponent`].
     ///
@@ -311,20 +314,22 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// }
     /// ```
     fn raw_mantissa_and_exponent(self) -> (Natural, i64) {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => (significand.clone(), *exponent),
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            (significand.clone(), *exponent)
+        } else {
+            panic!()
         }
     }
 
     /// Returns the raw exponent of a [`Float`], taking the [`Float`] by reference.
     ///
-    /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value
-    /// of `self`.
+    /// The raw exponent is one more than the floor of the base-2 logarithm of the absolute value of
+    /// `self`.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -350,9 +355,10 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// );
     /// ```
     fn raw_exponent(self) -> i64 {
-        match self {
-            Float(Finite { exponent, .. }) => *exponent,
-            _ => panic!(),
+        if let Float(Finite { exponent, .. }) = self {
+            *exponent
+        } else {
+            panic!()
         }
     }
 
@@ -417,8 +423,8 @@ impl<'a> RawMantissaAndExponent<Natural, i64, Float> for &'a Float {
 impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by value.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     /// $$
     /// f(x) = (\frac{|x|}{2^{e_i}}, e_i),
     /// $$
@@ -463,25 +469,25 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// );
     /// ```
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => {
-                let zeros = significand.trailing_zeros().unwrap();
-                let shifted = significand >> zeros;
-                let bits = shifted.significant_bits();
-                (shifted, exponent - i64::exact_from(bits))
-            }
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            let zeros = significand.trailing_zeros().unwrap();
+            let shifted = significand >> zeros;
+            let bits = shifted.significant_bits();
+            (shifted, exponent - i64::exact_from(bits))
+        } else {
+            panic!()
         }
     }
 
     /// Returns a [`Float`]'s integer exponent, taking the [`Float`] by value.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     /// $$
     /// f(x) = e_i,
     /// $$
@@ -512,25 +518,25 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// );
     /// ```
     fn integer_exponent(self) -> i64 {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => {
-                exponent
-                    - i64::exact_from(
-                        significand.significant_bits() - significand.trailing_zeros().unwrap(),
-                    )
-            }
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            exponent
+                - i64::exact_from(
+                    significand.significant_bits() - significand.trailing_zeros().unwrap(),
+                )
+        } else {
+            panic!()
         }
     }
 
     /// Constructs a [`Float`] from its integer mantissa and exponent.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     ///
     /// $$
     /// f(x) = 2^{e_i}m_i.
@@ -593,8 +599,8 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
 impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// Returns a [`Float`]'s integer mantissa and exponent, taking the [`Float`] by reference.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     /// $$
     /// f(x) = (\frac{|x|}{2^{e_i}}, e_i),
     /// $$
@@ -639,25 +645,25 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// );
     /// ```
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => {
-                let zeros = significand.trailing_zeros().unwrap();
-                let shifted = significand >> zeros;
-                let bits = shifted.significant_bits();
-                (shifted, exponent - i64::exact_from(bits))
-            }
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            let zeros = significand.trailing_zeros().unwrap();
+            let shifted = significand >> zeros;
+            let bits = shifted.significant_bits();
+            (shifted, exponent - i64::exact_from(bits))
+        } else {
+            panic!()
         }
     }
 
     /// Returns a [`Float`]'s integer exponent, taking the [`Float`] by reference.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     /// $$
     /// f(x) = e_i,
     /// $$
@@ -689,25 +695,25 @@ impl<'a> IntegerMantissaAndExponent<Natural, i64, Float> for &'a Float {
     /// );
     /// ```
     fn integer_exponent(self) -> i64 {
-        match self {
-            Float(Finite {
-                exponent,
-                significand,
-                ..
-            }) => {
-                exponent
-                    - i64::exact_from(
-                        significand.significant_bits() - significand.trailing_zeros().unwrap(),
-                    )
-            }
-            _ => panic!(),
+        if let Float(Finite {
+            exponent,
+            significand,
+            ..
+        }) = self
+        {
+            exponent
+                - i64::exact_from(
+                    significand.significant_bits() - significand.trailing_zeros().unwrap(),
+                )
+        } else {
+            panic!()
         }
     }
 
     /// Constructs a [`Float`] from its integer mantissa and exponent.
     ///
-    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer
-    /// and $m_i$ is an odd integer.
+    /// When $x$ is finite and nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
     ///
     /// $$
     /// f(x) = 2^{e_i}m_i.
@@ -818,14 +824,13 @@ impl SciMantissaAndExponent<Float, i64> for Float {
     /// ```
     #[inline]
     fn sci_mantissa_and_exponent(mut self) -> (Float, i64) {
-        match &mut self {
-            Float(Finite { sign, exponent, .. }) => {
-                let old_exponent = *exponent;
-                *exponent = 1;
-                *sign = true;
-                (self, old_exponent - 1)
-            }
-            _ => panic!(),
+        if let Float(Finite { sign, exponent, .. }) = &mut self {
+            let old_exponent = *exponent;
+            *exponent = 1;
+            *sign = true;
+            (self, old_exponent - 1)
+        } else {
+            panic!()
         }
     }
 
@@ -920,11 +925,10 @@ impl SciMantissaAndExponent<Float, i64> for Float {
         if sci_mantissa.is_sign_negative() || (&sci_mantissa).raw_exponent() != 1 {
             return None;
         }
-        match &mut sci_mantissa {
-            Float(Finite { exponent, .. }) => {
-                *exponent = sci_exponent + 1;
-            }
-            _ => panic!(),
+        if let Float(Finite { exponent, .. }) = &mut sci_mantissa {
+            *exponent = sci_exponent + 1;
+        } else {
+            panic!()
         }
         Some(sci_mantissa)
     }
@@ -980,13 +984,14 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
     /// ```
     #[inline]
     fn sci_mantissa_and_exponent(self) -> (Float, i64) {
-        match self {
-            Float(Finite {
-                exponent,
-                precision,
-                significand,
-                ..
-            }) => (
+        if let Float(Finite {
+            exponent,
+            precision,
+            significand,
+            ..
+        }) = self
+        {
+            (
                 Float(Finite {
                     sign: true,
                     exponent: 1,
@@ -994,8 +999,9 @@ impl<'a> SciMantissaAndExponent<Float, i64, Float> for &'a Float {
                     significand: significand.clone(),
                 }),
                 exponent - 1,
-            ),
-            _ => panic!(),
+            )
+        } else {
+            panic!()
         }
     }
 
@@ -1142,8 +1148,8 @@ macro_rules! impl_mantissa_and_exponent {
             /// f(x) = 2^{e_i}m_i.
             /// $$
             ///
-            /// If the mantissa is zero or not finite, this function panics. If it is finite but
-            /// not in the interval $[1, 2)$, this function returns `None`.
+            /// If the mantissa is zero or not finite, this function panics. If it is finite but not
+            /// in the interval $[1, 2)$, this function returns `None`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

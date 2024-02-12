@@ -33,52 +33,52 @@ fn test_limbs_odd_factorial() {
         let zeros = f.trailing_zeros().unwrap_or(0);
         assert_eq!(x, f >> zeros);
     }
-    // n <= ODD_FACTORIAL_TABLE_LIMIT
+    // - n <= ODD_FACTORIAL_TABLE_LIMIT
     test(0, false, &[1]);
     test(1, false, &[1]);
     test(2, false, &[1]);
     test(3, false, &[3]);
     test(4, false, &[3]);
     test(5, false, &[15]);
-    // n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
-    // tn >= FAC_DSC_THRESHOLD
-    // prod <= max_prod
-    // i <= tn
-    // prod > max_prod
-    // i > tn
-    // tn > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
-    // tn <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
-    // s != 0 first time
-    // limbs_2_multiswing_odd: prod <= max_prod for prime == 3
-    // limbs_2_multiswing_odd: q.even() for prime == 3
-    // limbs_2_multiswing_odd: q >= 3
-    // limbs_2_multiswing_odd: q < 3
-    // limbs_2_multiswing_odd: sieve[index] & mask == 0 first time
-    // limbs_2_multiswing_odd: prod <= max_prod
-    // limbs_2_multiswing_odd: q.odd()
-    // limbs_2_multiswing_odd: q >= prime
-    // limbs_2_multiswing_odd: q < prime
-    // limbs_2_multiswing_odd: i <= max_i first time
-    // limbs_2_multiswing_odd: q.even()
-    // limbs_2_multiswing_odd: i > max_i first time
-    // limbs_2_multiswing_odd: sieve[index] & mask == 0 second time
-    // limbs_2_multiswing_odd: (n / prime).odd()
-    // limbs_2_multiswing_odd: prod <= l_max_prod
-    // limbs_2_multiswing_odd: i <= max_i second time
-    // limbs_2_multiswing_odd: (n / prime).even()
-    // limbs_2_multiswing_odd: sieve[index] & mask != 0 second time
-    // limbs_2_multiswing_odd: prod > l_max_prod
-    // limbs_2_multiswing_odd: i > max_i second time
-    // limbs_2_multiswing_odd: sieve[index] & mask != 0 third time
-    // limbs_2_multiswing_odd: i <= max_i third time
-    // limbs_2_multiswing_odd: sieve[index] & mask == 0 third time
-    // limbs_2_multiswing_odd: prod <= max_prod during store
-    // limbs_2_multiswing_odd: prod > max_prod during store
-    // limbs_2_multiswing_odd: i > max_i third time
-    // limbs_2_multiswing_odd: j != 0
-    // s != double
-    // s == 0 second time
-    // *out.last().unwrap() != 0
+    // - n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
+    // - tn >= FAC_DSC_THRESHOLD
+    // - prod <= max_prod
+    // - i <= tn
+    // - prod > max_prod
+    // - i > tn
+    // - tn > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
+    // - tn <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
+    // - s != 0 first time
+    // - limbs_2_multiswing_odd: prod <= max_prod for prime == 3
+    // - limbs_2_multiswing_odd: q.even() for prime == 3
+    // - limbs_2_multiswing_odd: q >= 3
+    // - limbs_2_multiswing_odd: q < 3
+    // - limbs_2_multiswing_odd: sieve[index] & mask == 0 first time
+    // - limbs_2_multiswing_odd: prod <= max_prod
+    // - limbs_2_multiswing_odd: q.odd()
+    // - limbs_2_multiswing_odd: q >= prime
+    // - limbs_2_multiswing_odd: q < prime
+    // - limbs_2_multiswing_odd: i <= max_i first time
+    // - limbs_2_multiswing_odd: q.even()
+    // - limbs_2_multiswing_odd: i > max_i first time
+    // - limbs_2_multiswing_odd: sieve[index] & mask == 0 second time
+    // - limbs_2_multiswing_odd: (n / prime).odd()
+    // - limbs_2_multiswing_odd: prod <= l_max_prod
+    // - limbs_2_multiswing_odd: i <= max_i second time
+    // - limbs_2_multiswing_odd: (n / prime).even()
+    // - limbs_2_multiswing_odd: sieve[index] & mask != 0 second time
+    // - limbs_2_multiswing_odd: prod > l_max_prod
+    // - limbs_2_multiswing_odd: i > max_i second time
+    // - limbs_2_multiswing_odd: sieve[index] & mask != 0 third time
+    // - limbs_2_multiswing_odd: i <= max_i third time
+    // - limbs_2_multiswing_odd: sieve[index] & mask == 0 third time
+    // - limbs_2_multiswing_odd: prod <= max_prod during store
+    // - limbs_2_multiswing_odd: prod > max_prod during store
+    // - limbs_2_multiswing_odd: i > max_i third time
+    // - limbs_2_multiswing_odd: j != 0
+    // - s != double
+    // - s == 0 second time
+    // - *out.last().unwrap() != 0
     test(
         236,
         false,
@@ -106,7 +106,7 @@ fn test_limbs_odd_factorial() {
             17502,
         ],
     );
-    // limbs_2_multiswing_odd: q.odd() for prime == 3
+    // - limbs_2_multiswing_odd: q.odd() for prime == 3
     test(
         253,
         false,
@@ -136,10 +136,10 @@ fn test_limbs_odd_factorial() {
             64,
         ],
     );
-    // s != 0 second time
-    // limbs_2_multiswing_odd: sieve[index] & mask != 0 first time
-    // limbs_2_multiswing_odd: prod > max_prod
-    // *out.last().unwrap() == 0
+    // - s != 0 second time
+    // - limbs_2_multiswing_odd: sieve[index] & mask != 0 first time
+    // - limbs_2_multiswing_odd: prod > max_prod
+    // - *out.last().unwrap() == 0
     test(
         2225,
         false,
@@ -448,7 +448,7 @@ fn test_limbs_odd_factorial() {
             17717653663975693,
         ],
     );
-    // s == double
+    // - s == double
     test(
         2225,
         true,
@@ -1906,9 +1906,9 @@ fn test_limbs_odd_factorial() {
             427717306190904666,
         ],
     );
-    // ODD_FACTORIAL_TABLE_LIMIT < n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
+    // - ODD_FACTORIAL_TABLE_LIMIT < n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1
     test(26, false, &[11182600415380068643, 2]);
-    // s == 0 first time
+    // - s == 0 first time
     test(35, false, &[13586117418673889649, 130422663336]);
 }
 
@@ -1926,27 +1926,27 @@ fn test_factorial() {
             out
         );
     }
-    // n < limit first time
+    // - n < limit first time
     test(0, "1");
-    // n.odd()
+    // - n.odd()
     test(1, "1");
     test(2, "2");
     test(3, "6");
     test(4, "24");
     test(5, "120");
     test(10, "3628800");
-    // 32 bits: prod > max_prod
+    // - 32 bits: prod > max_prod
     test(20, "2432902008176640000");
-    // limit <= n < FAC_ODD_THRESHOLD
-    // n < limit second time
+    // - limit <= n < FAC_ODD_THRESHOLD
+    // - n < limit second time
     test(21, "51090942171709440000");
-    // n >= limit second time
-    // prod <= max_prod
+    // - n >= limit second time
+    // - prod <= max_prod
     test(22, "1124000727777607680000");
-    // n >= FAC_ODD_THRESHOLD
-    // n <= TABLE_LIMIT_2N_MINUS_POPC_2N
+    // - n >= FAC_ODD_THRESHOLD
+    // - n <= TABLE_LIMIT_2N_MINUS_POPC_2N
     test(24, "620448401733239439360000");
-    // n > TABLE_LIMIT_2N_MINUS_POPC_2N
+    // - n > TABLE_LIMIT_2N_MINUS_POPC_2N
     test(
         82,
         "47536433370128417484213820698940494664381329406799332861716093407674399473489914861300713\
@@ -1973,13 +1973,13 @@ fn test_double_factorial() {
             out
         );
     }
-    // n.even()
-    // n > TABLE_LIMIT_2N_MINUS_POPC_2N || n == 0
+    // - n.even()
+    // - n > TABLE_LIMIT_2N_MINUS_POPC_2N || n == 0
     test(0, "1");
-    // n.odd()
-    // n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT first time
+    // - n.odd()
+    // - n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT first time
     test(1, "1");
-    // n <= TABLE_LIMIT_2N_MINUS_POPC_2N && n != 0
+    // - n <= TABLE_LIMIT_2N_MINUS_POPC_2N && n != 0
     test(2, "2");
     test(3, "3");
     test(4, "8");
@@ -1988,13 +1988,13 @@ fn test_double_factorial() {
     test(7, "105");
     test(19, "654729075");
     test(20, "3715891200");
-    // ODD_DOUBLEFACTORIAL_TABLE_LIMIT < n < FAC_2DSC_THRESHOLD
-    // n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT second time
+    // - ODD_DOUBLEFACTORIAL_TABLE_LIMIT < n < FAC_2DSC_THRESHOLD
+    // - n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT second time
     test(35, "221643095476699771875");
-    // n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT second time
-    // prod <= max_prod
+    // - n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT second time
+    // - prod <= max_prod
     test(37, "8200794532637891559375");
-    // prod > max_prod
+    // - prod > max_prod
     test(55, "8687364368561751199826958100282265625");
     test(
         99,
@@ -2004,7 +2004,7 @@ fn test_double_factorial() {
         100,
         "34243224702511976248246432895208185975118675053719198827915654463488000000000000",
     );
-    // n >= FAC_2DSC_THRESHOLD
+    // - n >= FAC_2DSC_THRESHOLD
     test(
         473,
         "24105348290207984100197317421171182490921899413623319647593979414961419154254094380115999\
@@ -2030,18 +2030,18 @@ fn test_multifactorial() {
             out,
         );
     }
-    // n < 3 || n - 3 < m - 1
-    // n == 0
+    // - n < 3 || n - 3 < m - 1
+    // - n == 0
     test(0, 1, "1");
-    // n != 0
+    // - n != 0
     test(1, 1, "1");
     test(2, 1, "2");
-    // n >= 3 && n - 3 >= m - 1
-    // g <= 1 first time
-    // m <= 2
-    // m == 1
-    // g <= 2
-    // g != 2
+    // - n >= 3 && n - 3 >= m - 1
+    // - g <= 1 first time
+    // - m <= 2
+    // - m == 1
+    // - g <= 2
+    // - g != 2
     test(3, 1, "6");
     test(4, 1, "24");
     test(5, 1, "120");
@@ -2050,11 +2050,11 @@ fn test_multifactorial() {
     test(1, 2, "1");
     test(2, 2, "2");
     test(3, 2, "3");
-    // g > 1 first time
-    // g == 2
+    // - g > 1 first time
+    // - g == 2
     test(4, 2, "8");
-    // m != 1
-    // g <= 1 second time
+    // - m != 1
+    // - g <= 1 second time
     test(5, 2, "15");
     test(6, 2, "48");
     test(7, 2, "105");
@@ -2064,25 +2064,25 @@ fn test_multifactorial() {
     test(2, 3, "2");
     test(3, 3, "3");
     test(4, 3, "4");
-    // m > 2
-    // g <= 1 third time
+    // - m > 2
+    // - g <= 1 third time
     test(5, 3, "10");
-    // g > 2
+    // - g > 2
     test(6, 3, "18");
-    // prod <= max_prod
+    // - prod <= max_prod
     test(7, 3, "28");
     test(8, 3, "80");
     test(9, 3, "162");
 
-    // g > 1 second time
+    // - g > 1 second time
     test(6, 4, "12");
-    // g > 1 third time
+    // - g > 1 third time
     test(8, 6, "16");
 
     test(10, 1, "3628800");
     test(20, 2, "3715891200");
     test(25, 3, "608608000");
-    // prod > max_prod
+    // - prod > max_prod
     test(44, 3, "5577337931669504000");
 
     test(

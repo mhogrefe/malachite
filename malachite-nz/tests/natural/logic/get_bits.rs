@@ -29,15 +29,15 @@ fn test_limbs_slice_get_bits() {
         assert_eq!(limbs_slice_get_bits(xs, start, end), out);
         verify_limbs_get_bits(xs, start, end, out);
     };
-    // limb_start >= len
+    // - limb_start >= len
     test(&[], 10, 20, &[]);
-    // limb_start < len
-    // limb_end >= len
-    // offset != 0
+    // - limb_start < len
+    // - limb_end >= len
+    // - offset != 0
     test(&[0x12345678, 0xabcdef01], 16, 48, &[0xef011234]);
-    // limb_end < len
+    // - limb_end < len
     test(&[0x12345678, 0xabcdef01], 4, 16, &[0x567]);
-    // offset == 0
+    // - offset == 0
     test(&[0x12345678, 0xabcdef01], 0, 100, &[0x12345678, 0xabcdef01]);
     test(&[0x12345678, 0xabcdef01], 10, 10, &[]);
 }

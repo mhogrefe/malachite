@@ -9,8 +9,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 
 impl Integer {
-    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that
-    /// less significant limbs have lower indices in the input slice.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that less
+    /// significant limbs have lower indices in the input slice.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
     /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
@@ -105,15 +105,15 @@ impl Integer {
         Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect())
     }
 
-    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that
-    /// less significant limbs have lower indices in the input slice.
+    /// Converts a slice of [limbs](crate#limbs) to an [`Integer`], in ascending order, so that less
+    /// significant limbs have lower indices in the input slice.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
     /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
     /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead,
-    /// use [`from_twos_complement_limbs_asc`](`Self::from_twos_complement_limbs_asc`)
+    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead, use
+    /// [`from_twos_complement_limbs_asc`](`Self::from_twos_complement_limbs_asc`)
     ///
     /// This function is more efficient than
     /// [`from_owned_twos_complement_limbs_desc`](`Self::from_owned_twos_complement_limbs_desc`).
@@ -166,8 +166,8 @@ impl Integer {
     /// sign; if the bit is zero, the [`Integer`] is non-negative, and if the bit is one it is
     /// negative. If the slice is empty, zero is returned.
     ///
-    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead,
-    /// use [`from_twos_complement_limbs_desc`](`Self::from_twos_complement_limbs_desc`).
+    /// This function takes ownership of a [`Vec`]. If it's necessary to borrow a slice instead, use
+    /// [`from_twos_complement_limbs_desc`](`Self::from_twos_complement_limbs_desc`).
     ///
     /// This function is less efficient than
     /// [`from_owned_twos_complement_limbs_asc`](`Self::from_owned_twos_complement_limbs_asc`).

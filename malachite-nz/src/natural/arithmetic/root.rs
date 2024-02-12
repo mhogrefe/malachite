@@ -203,8 +203,8 @@ fn limbs_root_to_out_internal(
         (xs_hi << leading_zeros) | xs[i] >> (Limb::WIDTH - leading_zeros)
     };
     assert!(xs_len != 1 || xs[xs_len - 1] >> (Limb::WIDTH - leading_zeros) == 1);
-    // root_bits + 1 is the number of bits of the root R
-    // APPROX_BITS + 1 is the number of bits of the current approximation S
+    // - root_bits + 1 is the number of bits of the root R
+    // - APPROX_BITS + 1 is the number of bits of the current approximation S
     let mut root_bits = log_based_root(&mut out_root[0], xs_hi, bit_count, exp);
     const APPROX_BITS: u64 = LOGROOT_RETURNED_BITS - 1;
     let mut input_bits = exp * root_bits; // number of truncated bits in the input
@@ -225,8 +225,8 @@ fn limbs_root_to_out_internal(
         // of root_bits, this means that we'll go from a root of c + 1 bits (say s') to a root of
         // root_bits + 1 bits. It is proved in the book "Modern Computer Arithmetic" by Brent and
         // Zimmermann, Chapter 1, that if s' >= exp * beta, then at most one correction is
-        // necessary. Here beta = 2 ^ (root_bits - c), and s' >= 2 ^ c, thus it suffices that
-        // c >= ceil((root_bits + log_2(exp)) / 2).
+        // necessary. Here beta = 2 ^ (root_bits - c), and s' >= 2 ^ c, thus it suffices that c >=
+        // ceil((root_bits + log_2(exp)) / 2).
         sizes[i] = root_bits;
         if root_bits <= APPROX_BITS {
             break;
@@ -242,20 +242,19 @@ fn limbs_root_to_out_internal(
     out_root[0] >>= APPROX_BITS - root_bits;
     input_bits -= root_bits;
     assert!(i < usize::wrapping_from(Limb::WIDTH + 1));
-    // We have sizes[0] = next_bits > sizes[1] > ... > sizes[ni] = 0, with
-    // sizes[i] <= 2 * sizes[i + 1]. Newton iteration will first compute sizes[i - 1] extra bits,
-    // then sizes[i - 2], ..., then sizes[0] = next_bits. qs and ws need enough space to store
-    // S' ^ exp, where S' is an approximate root. Since S' can be as large as S + 2, the worst case
-    // is when S = 2 and S' = 4. But then since we know the number of bits of S in advance, S' can
-    // only be 3 at most. Similarly for S = 4, then S' can be 6 at most. So the worst case is
-    // S' / S = 3 / 2, thus S' ^ exp <= (3 / 2) ^ exp * S ^ exp. Since S ^ exp fits in xs_len
-    // limbs, the number of extra limbs needed is bounded by ceil(exp * log_2(3 / 2) / B), where B
-    // is `Limb::WIDTH`.
+    // We have sizes[0] = next_bits > sizes[1] > ... > sizes[ni] = 0, with sizes[i] <= 2 * sizes[i +
+    // 1]. Newton iteration will first compute sizes[i - 1] extra bits, then sizes[i - 2], ..., then
+    // sizes[0] = next_bits. qs and ws need enough space to store S' ^ exp, where S' is an
+    // approximate root. Since S' can be as large as S + 2, the worst case is when S = 2 and S' = 4.
+    // But then since we know the number of bits of S in advance, S' can only be 3 at most.
+    // Similarly for S = 4, then S' can be 6 at most. So the worst case is S' / S = 3 / 2, thus S' ^
+    // exp <= (3 / 2) ^ exp * S ^ exp. Since S ^ exp fits in xs_len limbs, the number of extra limbs
+    // needed is bounded by ceil(exp * log_2(3 / 2) / B), where B is `Limb::WIDTH`.
     let extra = (((0.585 * (exp as f64)) / (Limb::WIDTH as f64)) as usize) + 2;
     let mut big_scratch = vec![0; 3 * xs_len + 2 * extra + 1];
     let (scratch, remainder) = big_scratch.split_at_mut(xs_len + 1);
-    // qs will contain quotient and remainder of R / (exp * S ^ (exp - 1)).
-    // ws will contain S ^ (k-1) and exp *S^(k-1).
+    // - qs will contain quotient and remainder of R / (exp * S ^ (exp - 1)).
+    // - ws will contain S ^ (k-1) and exp *S^(k-1).
     let (qs, ws) = remainder.split_at_mut(xs_len + extra);
     let rs = if !out_rem_is_some {
         scratch
@@ -273,8 +272,8 @@ fn limbs_root_to_out_internal(
     let mut pow_cmp;
     while i != 0 {
         // Loop invariant:
-        // - &ss[..ss_len] is the current approximation of the root, which has exactly
-        //   1 + sizes[i] bits.
+        // - &ss[..ss_len] is the current approximation of the root, which has exactly 1 + sizes[i]
+        //   bits.
         // - &rs[..rs_len] is the current remainder.
         // - &ws[..ws_len] = ss[..ss_len] ^ (exp - 1)
         // - input_bits = number of truncated bits of the input
@@ -295,8 +294,8 @@ fn limbs_root_to_out_internal(
         let mut correction = 0;
         let mut ws_len;
         loop {
-            // Compute S ^ exp in &qs[..qs_len]
-            // W <- S ^ (exp - 1) for the next iteration, and S ^ k = W * S.
+            // - Compute S ^ exp in &qs[..qs_len]
+            // - W <- S ^ (exp - 1) for the next iteration, and S ^ k = W * S.
             let ss_trimmed = &mut ss[..ss_len];
             let pow_xs = limbs_pow(ss_trimmed, exp - 1);
             ws[..pow_xs.len()].copy_from_slice(&pow_xs);
@@ -321,8 +320,8 @@ fn limbs_root_to_out_internal(
             }
             correction += 1;
         }
-        // Current buffers: &ss[..ss_len], &rs[..rs_len], &qs[..qs_len], &ws[..ws_len]
-        // Sometimes two corrections are needed with logbased_root.
+        // - Current buffers: &ss[..ss_len], &rs[..rs_len], &qs[..qs_len], &ws[..ws_len]
+        // - Sometimes two corrections are needed with logbased_root.
         assert!(correction <= NEEDED_CORRECTIONS);
         assert!(rs_len >= qs_len);
         // next_bits is the number of bits to compute in the next iteration.
@@ -333,20 +332,18 @@ fn limbs_root_to_out_internal(
         input_bits -= next_bits;
         let input_len = usize::exact_from(input_bits >> Limb::LOG_WIDTH);
         let input_bits_rem = input_bits & Limb::WIDTH_MASK;
-        // n_len is the number of limbs in x which contain bits
-        // [input_bits, input_bits + next_bits - 1]
+        // - n_len is the number of limbs in x which contain bits
+        // - [input_bits, input_bits + next_bits - 1]
         //
-        // n_len = 1 + floor((input_bits + next_bits - 1) / B) - floor(input_bits / B)
-        // <= 1 + (input_bits + next_bits - 1) / B - (input_bits - B + 1) / B
-        // = 2 + (next_bits - 2) / B,
+        // n_len = 1 + floor((input_bits + next_bits - 1) / B) - floor(input_bits / B) <= 1 +
+        // (input_bits + next_bits - 1) / B - (input_bits - B + 1) / B = 2 + (next_bits - 2) / B,
         // where B is `Limb::WIDTH`.
         //
-        // Thus, since n_len is an integer:
-        // n_len <= 2 + floor(next_bits / B) <= 2 + next_len.
+        // Thus, since n_len is an integer: n_len <= 2 + floor(next_bits / B) <= 2 + next_len.
         let n_len =
             usize::exact_from((input_bits + next_bits - 1) >> Limb::LOG_WIDTH) + 1 - input_len;
-        // Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
-        // R = R - Q = floor(X / 2 ^ input_bits) - S ^ exp
+        // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
+        // - R = R - Q = floor(X / 2 ^ input_bits) - S ^ exp
         if pow_cmp == Ordering::Equal {
             rs_len = next_len;
             save_2 = 0;
@@ -368,8 +365,8 @@ fn limbs_root_to_out_internal(
                 save_2 = rs[next_len + 1];
             }
         }
-        // Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
-        // Now insert bits [input_bits, input_bits + next_bits - 1] from the input X
+        // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
+        // - Now insert bits [input_bits, input_bits + next_bits - 1] from the input X
         shr_helper(rs, &xs[input_len..input_len + n_len], input_bits_rem);
         // Set to zero high bits of rs[next_len]
         rs[next_len].mod_power_of_2_assign(next_bits_rem);
@@ -380,15 +377,15 @@ fn limbs_root_to_out_internal(
             // rs[0], so they use at most ceil(next_bits / B) limbs
             rs[next_len + 1] = save_2;
         }
-        // Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
-        // Compute &ws[..ws_len] = exp * &ss[..ss_len] ^ (exp-1).
+        // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
+        // - Compute &ws[..ws_len] = exp * &ss[..ss_len] ^ (exp-1).
         let carry = limbs_slice_mul_limb_in_place(&mut ws[..ws_len], Limb::exact_from(exp));
         ws[ws_len] = carry;
         if carry != 0 {
             ws_len += 1;
         }
-        // Current buffers: &ss[..ss_len], &qs[..qs_len]
-        // Multiply the root approximation by 2 ^ next_bits
+        // - Current buffers: &ss[..ss_len], &qs[..qs_len]
+        // - Multiply the root approximation by 2 ^ next_bits
         let carry = limbs_shl_helper(ss, ss_len, next_len, next_bits_rem);
         ss_len += next_len;
         if carry != 0 {
@@ -399,8 +396,8 @@ fn limbs_root_to_out_internal(
         // Number of limbs used by next_bits bits, when least significant bit is aligned to least
         // limb
         let b_rem = usize::exact_from((next_bits - 1) >> Limb::LOG_WIDTH) + 1;
-        // Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
-        // Now divide &rs[..rs_len] by &ws[..ws_len] to get the low part of the root
+        // - Current buffers: &ss[..ss_len], &rs[..rs_len], &ws[..ws_len]
+        // - Now divide &rs[..rs_len] by &ws[..ws_len] to get the low part of the root
         if rs_len < ws_len {
             slice_set_zero(&mut ss[..b_rem]);
         } else {
@@ -414,9 +411,9 @@ fn limbs_root_to_out_internal(
             } else {
                 fail_on_untested_path("limbs_root_to_out_internal, qs_len > b_rem");
             }
-            // Current buffers: &ss[..ss_len], &qs[..qs_len]
-            // Note: &rs[..rs_len]is not needed any more since we'll compute it from scratch at
-            // the end of the loop.
+            // - Current buffers: &ss[..ss_len], &qs[..qs_len]
+            // - Note: &rs[..rs_len]is not needed any more since we'll compute it from scratch at
+            //   the end of the loop.
             //
             // The quotient should be smaller than 2 ^ next_bits, since the previous approximation
             // was correctly rounded toward zero.
@@ -432,8 +429,8 @@ fn limbs_root_to_out_internal(
                 }
                 ss[qs_len - 1] = Limb::low_mask(((next_bits - 1) & Limb::WIDTH_MASK) + 1);
             } else {
-                // Current buffers: &ss[..ss_len], &qs[..qs_len]
-                // Combine sB and q to form sB + q.
+                // - Current buffers: &ss[..ss_len], &qs[..qs_len]
+                // - Combine sB and q to form sB + q.
                 let (ss_lo, ss_hi) = ss.split_at_mut(qs_len);
                 ss_lo.copy_from_slice(&qs[..qs_len]);
                 slice_set_zero(&mut ss_hi[..b_rem - qs_len]);
@@ -447,8 +444,8 @@ fn limbs_root_to_out_internal(
     if !approx || ss[0] <= 1 {
         let mut c = 0;
         loop {
-            // Compute S ^ exp in &qs[..qs_len].
-            // Last iteration: we don't need W anymore.
+            // - Compute S ^ exp in &qs[..qs_len].
+            // - Last iteration: we don't need W anymore.
             let pow_xs = limbs_pow(&ss[..ss_len], exp);
             qs[..pow_xs.len()].copy_from_slice(&pow_xs);
             qs_len = pow_xs.len();
@@ -526,15 +523,15 @@ pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64)
         let ws_len = xs_len + u_exp;
         let ss_len = (xs_len - 1) / u_exp + 2; // ceil(xs_len / exp) + 1
         let mut scratch = vec![0; ws_len + ss_len];
-        // ws will contain the padded input.
-        // ss is the approximate root of padded input.
+        // - ws will contain the padded input.
+        // - ss is the approximate root of padded input.
         let (ws, ss) = scratch.split_at_mut(ws_len);
         ws[u_exp..].copy_from_slice(xs);
         let rs_len = limbs_root_to_out_internal(ss, None, ws, exp, true);
         // The approximate root S = ss is either the correct root of ss, or 1 too large. Thus,
         // unless the least significant limb of S is 0 or 1, we can deduce the root of xs is S
-        // truncated by one limb. (In case xs[0] = 1, we can deduce the root, but not decide
-        // whether it is exact or not.)
+        // truncated by one limb. (In case xs[0] = 1, we can deduce the root, but not decide whether
+        // it is exact or not.)
         out_root[..ss_len - 1].copy_from_slice(&ss[1..]);
         rs_len != 0
     } else {
@@ -753,8 +750,7 @@ impl CeilingRoot<u64> for Natural {
 impl<'a> CeilingRoot<u64> for &'a Natural {
     type Output = Natural;
 
-    /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by
-    /// reference.
+    /// Returns the ceiling of the $n$th root of a [`Natural`], taking the [`Natural`] by reference.
     ///
     /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
@@ -1013,9 +1009,9 @@ impl<'a> RootRem<u64> for &'a Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 
-    /// Returns the floor of the $n$th root of a [`Natural`], and the
-    /// remainder (the difference between the [`Natural`] and the $n$th
-    /// power of the floor). The [`Natural`] is taken by reference.
+    /// Returns the floor of the $n$th root of a [`Natural`], and the remainder (the difference
+    /// between the [`Natural`] and the $n$th power of the floor). The [`Natural`] is taken by
+    /// reference.
     ///
     /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
     ///

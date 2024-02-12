@@ -29,8 +29,8 @@ macro_rules! impl_xxx_add_yyy_to_zzz {
             /// Adds two numbers, each composed of three `Self` values, returning the sum as a
             /// triple of `Self` values.
             ///
-            /// The more significant value always comes first. Addition is wrapping, and overflow
-            /// is not indicated.
+            /// The more significant value always comes first. Addition is wrapping, and overflow is
+            /// not indicated.
             ///
             /// $$
             /// f(x_2, x_1, x_0, y_2, y_1, y_0) = (z_2, z_1, z_0),
@@ -49,8 +49,8 @@ macro_rules! impl_xxx_add_yyy_to_zzz {
             /// # Examples
             /// See [here](super::xxx_add_yyy_to_zzz#xxx_add_yyy_to_zzz).
             ///
-            /// This is equivalent to `add_sssaaaaaa` from `longlong.h`, FLINT 2.7.1, where
-            /// `(sh, sm, sl)` is returned.
+            /// This is equivalent to `add_sssaaaaaa` from `longlong.h`, FLINT 2.7.1, where `(sh,
+            /// sm, sl)` is returned.
             #[inline]
             fn xxx_add_yyy_to_zzz(
                 x_2: $t,

@@ -18,9 +18,9 @@ impl FromSciString for Rational {
     /// consistent.
     ///
     /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the base is
-    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or
-    /// an exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after
-    /// the exponent indicator when the base is 15 or greater.
+    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or an
+    /// exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after the
+    /// exponent indicator when the base is 15 or greater.
     ///
     /// The exponent itself is always parsed using base 10.
     ///
@@ -28,11 +28,11 @@ impl FromSciString for Rational {
     ///
     /// If the string is unparseable, `None` is returned.
     ///
-    /// This function is very literal; given `"0.333"`, it will return $333/1000$ rather than
-    /// $1/3$. If you'd prefer that it return $1/3$, consider using
+    /// This function is very literal; given `"0.333"`, it will return $333/1000$ rather than $1/3$.
+    /// If you'd prefer that it return $1/3$, consider using
     /// [`from_sci_string_simplest`](Rational::from_sci_string_simplest) instead. However, that
-    /// function has its quirks too: given `"0.1"`, it will not return $1/10$ (see its
-    /// documentation for an explanation of this behavior). This function _does_ return $1/10$.
+    /// function has its quirks too: given `"0.1"`, it will not return $1/10$ (see its documentation
+    /// for an explanation of this behavior). This function _does_ return $1/10$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(m^n n \log m (\log n + \log\log m))$
@@ -84,9 +84,9 @@ impl Rational {
     /// consistent.
     ///
     /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the base is
-    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or
-    /// an exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after
-    /// the exponent indicator when the base is 15 or greater.
+    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or an
+    /// exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after the
+    /// exponent indicator when the base is 15 or greater.
     ///
     /// The exponent itself is always parsed using base 10.
     ///
@@ -94,12 +94,12 @@ impl Rational {
     ///
     /// If the string is unparseable, `None` is returned.
     ///
-    /// Here's a more precise description of the function's behavior. Suppose we are using base
-    /// $b$, and the literal value of the string (as parsed by
+    /// Here's a more precise description of the function's behavior. Suppose we are using base $b$,
+    /// and the literal value of the string (as parsed by
     /// [`from_sci_string`](Rational::from_sci_string)) is $q$, and the implied scale is $s$
     /// (meaning $s$ digits are provided after the point; if the string is `"123.456"`, then $s$ is
-    /// 3). Then this function computes $\epsilon = b^{-s}/2$ and finds the simplest [`Rational`]
-    /// in the closed interval $[q - \epsilon, q + \epsilon]$. The simplest [`Rational`] is the one
+    /// 3). Then this function computes $\epsilon = b^{-s}/2$ and finds the simplest [`Rational`] in
+    /// the closed interval $[q - \epsilon, q + \epsilon]$. The simplest [`Rational`] is the one
     /// with minimal denominator; if there are multiple such [`Rational`]s, the one with the
     /// smallest absolute numerator is chosen.
     ///
@@ -110,8 +110,8 @@ impl Rational {
     /// low, some unexpected behavior may occur. For example, `"0.1"` will be converted into $1/7$
     /// rather than $1/10$, since $1/7$ is the simplest [`Rational`] in $[0.05, 0.15]$. If you'd
     /// prefer that result be $1/10$, you have a few options:
-    /// - Use [`from_sci_string_with_options`](Rational::from_sci_string_with_options) instead.
-    ///   This function interprets its input literally; it converts `"0.333"` to $333/1000$.
+    /// - Use [`from_sci_string_with_options`](Rational::from_sci_string_with_options) instead. This
+    ///   function interprets its input literally; it converts `"0.333"` to $333/1000$.
     /// - Increase the scale of the input; `"0.10"` is converted to $1/10$.
     /// - Use [`from_sci_string_with_options`](Rational::from_sci_string_with_options), and round
     ///   the result manually using functions like
@@ -180,12 +180,12 @@ impl Rational {
     ///
     /// If the string is unparseable, `None` is returned.
     ///
-    /// Here's a more precise description of the function's behavior. Suppose that the literal
-    /// value of the string (as parsed by [`from_sci_string`](Rational::from_sci_string)) is $q$,
-    /// and the implied scale is $s$ (meaning $s$ digits are provided after the point; if the
-    /// string is `"123.456"`, then $s$ is 3). Then this function computes $\epsilon = 10^{-s}/2$
-    /// and finds the simplest [`Rational`] in the closed interval $[q - \epsilon, q + \epsilon]$.
-    /// The simplest [`Rational`] is the one with minimal denominator; if there are multiple such
+    /// Here's a more precise description of the function's behavior. Suppose that the literal value
+    /// of the string (as parsed by [`from_sci_string`](Rational::from_sci_string)) is $q$, and the
+    /// implied scale is $s$ (meaning $s$ digits are provided after the point; if the string is
+    /// `"123.456"`, then $s$ is 3). Then this function computes $\epsilon = 10^{-s}/2$ and finds
+    /// the simplest [`Rational`] in the closed interval $[q - \epsilon, q + \epsilon]$. The
+    /// simplest [`Rational`] is the one with minimal denominator; if there are multiple such
     /// [`Rational`]s, the one with the smallest absolute numerator is chosen.
     ///
     /// This method allows the function to convert `"0.333"` to $1/3$, since $1/3$ is the simplest

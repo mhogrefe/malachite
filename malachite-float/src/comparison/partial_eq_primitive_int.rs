@@ -1,10 +1,10 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn float_partial_eq_unsigned<T: PrimitiveUnsigned>(x: &Float, y: &T) -> bool
 where

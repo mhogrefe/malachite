@@ -1,9 +1,9 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct IntegerFromRationalError;
@@ -98,9 +98,9 @@ impl<'a> ConvertibleFrom<&'a Rational> for Integer {
 }
 
 impl RoundingFrom<Rational> for Integer {
-    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking
-    /// the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the
-    /// returned value is less than, equal to, or greater than the original value.
+    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking the
+    /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -194,9 +194,9 @@ impl RoundingFrom<Rational> for Integer {
 }
 
 impl<'a> RoundingFrom<&'a Rational> for Integer {
-    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking
-    /// the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
-    /// returned value is less than, equal to, or greater than the original value.
+    /// Converts a [`Rational`] to an [`Integer`], using a specified [`RoundingMode`] and taking the
+    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

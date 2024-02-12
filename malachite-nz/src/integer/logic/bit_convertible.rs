@@ -82,9 +82,9 @@ impl BitConvertible for Integer {
     /// least- to most-significant.
     ///
     /// The most significant bit indicates the sign; if the bit is `false`, the [`Integer`] is
-    /// positive, and if the bit is `true` it is negative. There are no trailing `false` bits if
-    /// the [`Integer`] is positive or trailing `true` bits if the [`Integer`] is negative, except
-    /// as necessary to include the correct sign bit. Zero is a special case: it contains no bits.
+    /// positive, and if the bit is `true` it is negative. There are no trailing `false` bits if the
+    /// [`Integer`] is positive or trailing `true` bits if the [`Integer`] is negative, except as
+    /// necessary to include the correct sign bit. Zero is a special case: it contains no bits.
     ///
     /// This function is more efficient than [`to_bits_desc`](`Self::to_bits_desc`).
     ///
@@ -123,8 +123,8 @@ impl BitConvertible for Integer {
         bits
     }
 
-    /// Returns a [`Vec`] containing the twos-complement bits of an [`Integer`] in descending
-    /// order: most- to least-significant.
+    /// Returns a [`Vec`] containing the twos-complement bits of an [`Integer`] in descending order:
+    /// most- to least-significant.
     ///
     /// The most significant bit indicates the sign; if the bit is `false`, the [`Integer`] is
     /// positive, and if the bit is `true` it is negative. There are no leading `false` bits if the

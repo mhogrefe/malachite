@@ -88,8 +88,8 @@ macro_rules! impl_overflowing_pow_primitive_int {
         impl OverflowingPowAssign<u64> for $t {
             /// Raises a number to a power, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

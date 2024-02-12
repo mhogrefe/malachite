@@ -53,8 +53,8 @@ macro_rules! impl_mod_sub {
             /// # Examples
             /// See [here](super::mod_sub#mod_sub_assign).
             ///
-            /// This is equivalent to `nmod_sub` from `nmod_vec.h`, FLINT 2.7.1, where the result
-            /// is assigned to `a`.
+            /// This is equivalent to `nmod_sub` from `nmod_vec.h`, FLINT 2.7.1, where the result is
+            /// assigned to `a`.
             #[inline]
             fn mod_sub_assign(&mut self, other: $t, m: $t) {
                 *self = self.mod_sub(other, m);

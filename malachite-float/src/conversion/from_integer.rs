@@ -1,8 +1,8 @@
 use crate::Float;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering;
 
 impl Float {
     #[doc(hidden)]
@@ -47,10 +47,10 @@ impl Float {
         Float::from_integer_times_power_of_2_prec_round(x, pow, prec, RoundingMode::Nearest)
     }
 
-    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`]
-    /// is nonzero, it has the specified precision. If rounding is needed, the specified rounding
-    /// mode is used. An [`Ordering`] is also returned, indicating whether the returned value is
-    /// less than, equal to, or greater than the original value.
+    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`] is
+    /// nonzero, it has the specified precision. If rounding is needed, the specified rounding mode
+    /// is used. An [`Ordering`] is also returned, indicating whether the returned value is less
+    /// than, equal to, or greater than the original value.
     ///
     /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_integer_prec`]
     /// instead.
@@ -125,15 +125,15 @@ impl Float {
         Float::from_integer_times_power_of_2_prec_round(x, 0, prec, rm)
     }
 
-    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`]
-    /// is nonzero, it has the specified precision. An [`Ordering`] is also returned, indicating
+    /// Converts an [`Integer`] to a [`Float`], taking the [`Integer`] by value. If the [`Float`] is
+    /// nonzero, it has the specified precision. An [`Ordering`] is also returned, indicating
     /// whether the returned value is less than, equal to, or greater than the original value.
     ///
-    /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of
-    /// significant bits, try just using `Float::from` instead.
+    /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
+    /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_integer_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -314,11 +314,11 @@ impl Float {
     /// indicating whether the returned value is less than, equal to, or greater than the original
     /// value.
     ///
-    /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of
-    /// significant bits, try just using `Float::from` instead.
+    /// If you want the [`Float`]'s precision to be equal to the [`Integer`]'s number of significant
+    /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_integer_prec_round_ref`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -370,8 +370,8 @@ impl From<Integer> for Float {
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
     /// number of significant bits. If you want to specify a different precision, try
     /// [`Float::from_integer_prec`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision,
-    /// try [`Float::from_integer_prec_round`].
+    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -403,8 +403,8 @@ impl<'a> From<&'a Integer> for Float {
     /// If the [`Integer`] is nonzero, the precision of the [`Float`] is equal to the [`Integer`]'s
     /// number of significant bits. If you want to specify a different precision, try
     /// [`Float::from_integer_prec_ref`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision,
-    /// try [`Float::from_integer_prec_round_ref`].
+    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_integer_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

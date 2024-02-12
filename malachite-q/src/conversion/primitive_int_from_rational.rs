@@ -1,4 +1,6 @@
 use crate::Rational;
+use core::cmp::Ordering;
+use core::ops::Neg;
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{DivRound, DivisibleByPowerOf2};
@@ -9,8 +11,6 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
-use std::ops::Neg;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct UnsignedFromRationalError;
@@ -181,8 +181,7 @@ macro_rules! impl_from_unsigned {
         }
 
         impl<'a> ConvertibleFrom<&'a Rational> for $u {
-            /// Determines whether a [`Rational`] can be converted to an unsigned primitive
-            /// integer.
+            /// Determines whether a [`Rational`] can be converted to an unsigned primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -214,9 +213,9 @@ macro_rules! impl_from_unsigned {
             ///
             /// # Panics
             /// Panics if the [`Rational`] is not an integer and `rm` is `Exact`, if the
-            /// [`Rational`] is less than zero and `rm` is not `Down`, `Ceiling`, or
-            /// `Nearest`, or if the [`Rational`] is greater than `T::MAX` and `rm` is not
-            /// `Down`, `Floor`, or `Nearest`.
+            /// [`Rational`] is less than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`, or
+            /// if the [`Rational`] is greater than `T::MAX` and `rm` is not `Down`, `Floor`, or
+            /// `Nearest`.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_rational#rounding_from).
@@ -249,8 +248,7 @@ macro_rules! impl_from_signed {
         }
 
         impl<'a> ConvertibleFrom<&'a Rational> for $s {
-            /// Determines whether a [`Rational`] can be converted to a signed primitive
-            /// integer.
+            /// Determines whether a [`Rational`] can be converted to a signed primitive integer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

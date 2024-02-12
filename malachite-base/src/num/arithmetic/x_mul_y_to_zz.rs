@@ -51,8 +51,8 @@ macro_rules! implicit_x_mul_y_to_zz {
             /// # Examples
             /// See [here](super::x_mul_y_to_zz#x_mul_y_to_zz).
             ///
-            /// This is equivalent to `umul_ppmm` from `longlong.h`, GMP 6.2.1, where `(w1, w0)`
-            /// is returned.
+            /// This is equivalent to `umul_ppmm` from `longlong.h`, GMP 6.2.1, where `(w1, w0)` is
+            /// returned.
             #[inline]
             fn x_mul_y_to_zz(x: $t, y: $t) -> ($t, $t) {
                 implicit_x_mul_y_to_zz::<$t, $dt>(x, y)

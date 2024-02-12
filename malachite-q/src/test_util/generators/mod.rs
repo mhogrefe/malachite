@@ -224,8 +224,8 @@ pub fn rational_natural_natural_triple_gen() -> Generator<(Rational, Natural, Na
     )
 }
 
-// All `(Rational, Natural, Natural)` where the both `Natural`s are positive and the first
-// `Natural` is smaller than the second.
+// All `(Rational, Natural, Natural)` where the both `Natural`s are positive and the first `Natural`
+// is smaller than the second.
 pub fn rational_natural_natural_triple_gen_var_1() -> Generator<(Rational, Natural, Natural)> {
     Generator::new(
         &exhaustive_rational_natural_natural_triple_gen_var_1,
@@ -484,8 +484,8 @@ pub fn rational_unsigned_pair_gen_var_5() -> Generator<(Rational, u8)> {
     )
 }
 
-// All `(Rational, u8)`s where the numerator and denominator of the `Rational` is small and the
-// `u8` is between 2 and 36, inclusive.
+// All `(Rational, u8)`s where the numerator and denominator of the `Rational` is small and the `u8`
+// is between 2 and 36, inclusive.
 pub fn rational_unsigned_pair_gen_var_6() -> Generator<(Rational, u8)> {
     Generator::new_no_special(
         &exhaustive_rational_unsigned_pair_gen_var_4,
@@ -619,8 +619,8 @@ pub fn rational_pair_gen_var_5() -> Generator<(Rational, Rational)> {
     )
 }
 
-// All pairs of `Rational`s where the first is less than or equal to the second, and the
-// numerators and denominators are small.
+// All pairs of `Rational`s where the first is less than or equal to the second, and the numerators
+// and denominators are small.
 pub fn rational_pair_gen_var_6() -> Generator<(Rational, Rational)> {
     Generator::new_no_special(
         &exhaustive_rational_pair_gen_var_4,
@@ -792,8 +792,7 @@ pub fn rational_rounding_mode_pair_gen() -> Generator<(Rational, RoundingMode)> 
     )
 }
 
-// All `(Rational, RoundingMode)` pairs that are valid inputs to
-// `Natural::rounding_from(Rational)`.
+// All `(Rational, RoundingMode)` pairs that are valid inputs to `Natural::rounding_from(Rational)`.
 pub fn rational_rounding_mode_pair_gen_var_1() -> Generator<(Rational, RoundingMode)> {
     Generator::new(
         &exhaustive_rational_rounding_mode_pair_gen_var_1,
@@ -802,8 +801,7 @@ pub fn rational_rounding_mode_pair_gen_var_1() -> Generator<(Rational, RoundingM
     )
 }
 
-// All `(Rational, RoundingMode)` pairs that are valid inputs to
-// `Integer::rounding_from(Rational)`.
+// All `(Rational, RoundingMode)` pairs that are valid inputs to `Integer::rounding_from(Rational)`.
 pub fn rational_rounding_mode_pair_gen_var_2() -> Generator<(Rational, RoundingMode)> {
     Generator::new(
         &exhaustive_rational_rounding_mode_pair_gen_var_2,
@@ -812,8 +810,8 @@ pub fn rational_rounding_mode_pair_gen_var_2() -> Generator<(Rational, RoundingM
     )
 }
 
-// All `(Rational, RoundingMode)` pairs that are valid inputs to `T::rounding_from(Rational)` for
-// an primitive integer type `T`.
+// All `(Rational, RoundingMode)` pairs that are valid inputs to `T::rounding_from(Rational)` for an
+// primitive integer type `T`.
 pub fn rational_rounding_mode_pair_gen_var_3<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveInt,
 >() -> Generator<(Rational, RoundingMode)>
@@ -836,8 +834,8 @@ pub fn rational_rounding_mode_pair_gen_var_4() -> Generator<(Rational, RoundingM
     )
 }
 
-// All `(Rational, RoundingMode)` pairs that are valid inputs to `T::rounding_from(Rational)` for
-// an primitive float type `T`.
+// All `(Rational, RoundingMode)` pairs that are valid inputs to `T::rounding_from(Rational)` for an
+// primitive float type `T`.
 pub fn rational_rounding_mode_pair_gen_var_5<
     T: for<'a> ConvertibleFrom<&'a Rational> + PrimitiveFloat,
 >() -> Generator<(Rational, RoundingMode)>

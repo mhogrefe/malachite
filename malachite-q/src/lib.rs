@@ -92,6 +92,9 @@
     clippy::uninlined_format_args,
     clippy::unused_self
 )]
+#![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
+
+extern crate alloc;
 
 #[macro_use]
 extern crate malachite_base;
@@ -116,9 +119,9 @@ use malachite_nz::natural::Natural;
 
 /// A rational number.
 ///
-/// `Rational`s whose numerator and denominator have 64 significant bits or fewer can be
-/// represented without any memory allocation. (Unless Malachite is compiled with `32_bit_limbs`,
-/// in which case the limit is 32).
+/// `Rational`s whose numerator and denominator have 64 significant bits or fewer can be represented
+/// without any memory allocation. (Unless Malachite is compiled with `32_bit_limbs`, in which case
+/// the limit is 32).
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Rational {

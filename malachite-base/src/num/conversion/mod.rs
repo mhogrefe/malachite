@@ -225,8 +225,8 @@ pub mod half;
 pub mod is_integer;
 /// Traits for converting numbers to and from mantissa and exponent representations.
 ///
-/// See [`PrimitiveFloat`](super::basic::floats::PrimitiveFloat) for a description of the
-/// different types of mantissas and exponents. The traits are
+/// See [`PrimitiveFloat`](super::basic::floats::PrimitiveFloat) for a description of the different
+/// types of mantissas and exponents. The traits are
 /// [`RawMantissaAndExponent`](traits::RawMantissaAndExponent),
 /// [`IntegerMantissaAndExponent`](traits::IntegerMantissaAndExponent), and
 /// [`SciMantissaAndExponent`](traits::SciMantissaAndExponent).

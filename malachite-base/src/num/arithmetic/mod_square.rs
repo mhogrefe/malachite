@@ -8,8 +8,8 @@ macro_rules! impl_mod_square {
         impl ModSquare for $t {
             type Output = $t;
 
-            /// Squares a number modulo another number $m$. The input must be already reduced
-            /// modulo $m$.
+            /// Squares a number modulo another number $m$. The input must be already reduced modulo
+            /// $m$.
             ///
             /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
             ///
@@ -48,8 +48,8 @@ macro_rules! impl_mod_square {
         }
 
         impl ModSquarePrecomputed<u64, $t> for $t {
-            /// Squares a number modulo another number $m$. The input must be already reduced
-            /// modulo $m$.
+            /// Squares a number modulo another number $m$. The input must be already reduced modulo
+            /// $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular squarings with the same modulus. The precomputed data should be obtained

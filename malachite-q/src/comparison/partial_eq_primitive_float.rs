@@ -1,4 +1,6 @@
 use crate::Rational;
+#[cfg(not(any(feature = "test_build", feature = "random")))]
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -12,9 +14,8 @@ macro_rules! impl_float {
             ///
             /// $M(m) = O(m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is
-            /// `max(self.significant_bits(), other.sci_exponent().abs())`, and $m$ is
-            /// `other.sci_exponent().abs()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+            /// other.sci_exponent().abs())`, and $m$ is `other.sci_exponent().abs()`.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_float#partial_eq).
@@ -42,9 +43,8 @@ macro_rules! impl_float {
             ///
             /// $M(m) = O(m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is
-            /// `max(self.sci_exponent().abs(), other.significant_bits())`, and $m$ is
-            /// `self.sci_exponent().abs()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.sci_exponent().abs(),
+            /// other.significant_bits())`, and $m$ is `self.sci_exponent().abs()`.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_float#partial_eq).

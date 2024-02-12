@@ -57,8 +57,10 @@ use malachite_base::test_util::runner::Runner;
 #[cfg(feature = "bin_build")]
 // Examples:
 //
+// ```
 // cargo run --features bin_build -- -g max_base
 // cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_mod_pow_u32
+// ```
 #[cfg(feature = "bin_build")]
 fn main() {
     let args = read_command_line_arguments("malachite-base");

@@ -80,8 +80,8 @@ pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option
 }}
 
 impl<'a> BitScan for &'a Natural {
-    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index
-    /// of a `false` bit that is greater than or equal to the starting index.
+    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index of
+    /// a `false` bit that is greater than or equal to the starting index.
     ///
     /// Since every [`Natural`] has an implicit prefix of infinitely-many zeros, this function
     /// always returns a value.
@@ -116,8 +116,8 @@ impl<'a> BitScan for &'a Natural {
         }
     }
 
-    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index
-    /// of a `true` bit that is greater than or equal to the starting index.
+    /// Given a [`Natural`] and a starting index, searches the [`Natural`] for the smallest index of
+    /// a `true` bit that is greater than or equal to the starting index.
     ///
     /// If the starting index is greater than or equal to the [`Natural`]'s width, the result is
     /// `None` since there are no `true` bits past that point.

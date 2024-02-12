@@ -1,4 +1,5 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     DivRound, DivisibleByPowerOf2, IsPowerOf2, NegAssign,
 };
@@ -9,7 +10,6 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 fn abs_is_neg_power_of_2(x: &Rational) -> bool {
     x.numerator == 1u32 && x.denominator.is_power_of_2()
@@ -29,11 +29,11 @@ macro_rules! float_impls {
             ///   float, then the maximum finite float is returned. If it is smaller than the
             ///   minimum finite float, then negative infinity is returned. If it is between zero
             ///   and the minimum positive float, then positive zero is returned.
-            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to
-            ///   the [`Rational`] is returned. If the [`Rational`] is greater than the maximum
-            ///   finite float, then positive infinity is returned. If it is smaller than the
-            ///   minimum finite float, then the minimum finite float is returned. If it is between
-            ///   zero and the maximum negative float, then negative zero is returned.
+            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
+            ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
+            ///   float, then positive infinity is returned. If it is smaller than the minimum
+            ///   finite float, then the minimum finite float is returned. If it is between zero and
+            ///   the maximum negative float, then negative zero is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Rational`] is non-negative and as with `Ceiling` if the [`Rational`] is
             ///   negative. If the [`Rational`] is between the maximum negative float and the
@@ -41,8 +41,8 @@ macro_rules! float_impls {
             ///   non-negative and negative zero otherwise.
             /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the
             ///   [`Rational`] is non-negative and as with `Floor` if the [`Rational`] is negative.
-            ///   Positive zero is only returned when the [`Rational`] is zero, and negative zero
-            ///   is never returned.
+            ///   Positive zero is only returned when the [`Rational`] is zero, and negative zero is
+            ///   never returned.
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Rational`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Rational`] is
@@ -240,11 +240,11 @@ macro_rules! float_impls {
             ///   float, then the maximum finite float is returned. If it is smaller than the
             ///   minimum finite float, then negative infinity is returned. If it is between zero
             ///   and the minimum positive float, then positive zero is returned.
-            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to
-            ///   the [`Rational`] is returned. If the [`Rational`] is greater than the maximum
-            ///   finite float, then positive infinity is returned. If it is smaller than the
-            ///   minimum finite float, then the minimum finite float is returned. If it is between
-            ///   zero and the maximum negative float, then negative zero is returned.
+            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
+            ///   [`Rational`] is returned. If the [`Rational`] is greater than the maximum finite
+            ///   float, then positive infinity is returned. If it is smaller than the minimum
+            ///   finite float, then the minimum finite float is returned. If it is between zero and
+            ///   the maximum negative float, then negative zero is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Rational`] is non-negative and as with `Ceiling` if the [`Rational`] is
             ///   negative. If the [`Rational`] is between the maximum negative float and the
@@ -252,8 +252,8 @@ macro_rules! float_impls {
             ///   non-negative and negative zero otherwise.
             /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the
             ///   [`Rational`] is non-negative and as with `Floor` if the [`Rational`] is negative.
-            ///   Positive zero is only returned when the [`Rational`] is zero, and negative zero
-            ///   is never returned.
+            ///   Positive zero is only returned when the [`Rational`] is zero, and negative zero is
+            ///   never returned.
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Rational`] is exactly between two floats, the float with the zero
             ///   least-significant bit in its representation is selected. If the [`Rational`] is

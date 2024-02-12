@@ -53,17 +53,20 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: 
     }
 }
 
-/// xs: nnnnnnnb000
-/// ys:   nnb000000
-///
-/// or
-///
-/// xs:   nnnnnb000
-/// ys: nnnnb000000
-///
-/// where 0 is a zero limb, n is a nonzero limb, and b is the boundary (least-significant) nonzero
-/// limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may
-/// be shorter, longer, or the same length as ys.
+// ```
+// xs: nnnnnnnb000
+// ys:   nnb000000
+// ```
+//
+// or
+// ```
+// xs:   nnnnnb000
+// ys: nnnnb000000
+// ```
+//
+// where 0 is a zero limb, n is a nonzero limb, and b is the boundary (least-significant) nonzero
+// limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may be
+// shorter, longer, or the same length as ys.
 fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i: usize) -> u64 {
     let mut distance = CountOnes::count_ones(xs[xs_i].wrapping_neg());
     let xs_len = xs.len();
@@ -149,8 +152,8 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

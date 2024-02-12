@@ -1,9 +1,9 @@
 use crate::Rational;
+use core::ops::{Div, DivAssign};
 use malachite_base::num::arithmetic::traits::{
     CheckedDiv, DivExact, DivExactAssign, Gcd, Reciprocal,
 };
 use malachite_base::num::basic::traits::Zero;
-use std::ops::{Div, DivAssign};
 
 impl Div<Rational> for Rational {
     type Output = Rational;
@@ -19,8 +19,8 @@ impl Div<Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.
@@ -71,8 +71,8 @@ impl<'a> Div<&'a Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.
@@ -115,8 +115,8 @@ impl<'a> Div<Rational> for &'a Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.
@@ -166,8 +166,8 @@ impl<'a, 'b> Div<&'a Rational> for &'b Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.
@@ -221,8 +221,8 @@ impl CheckedDiv<Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -276,8 +276,8 @@ impl<'a> CheckedDiv<&'a Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -323,8 +323,8 @@ impl<'a> CheckedDiv<Rational> for &'a Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -378,8 +378,8 @@ impl<'a, 'b> CheckedDiv<&'a Rational> for &'b Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -428,8 +428,8 @@ impl DivAssign<Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.
@@ -479,8 +479,8 @@ impl<'a> DivAssign<&'a Rational> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if the second [`Rational`] is zero.

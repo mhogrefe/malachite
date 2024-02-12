@@ -105,10 +105,10 @@ where
     natural_signed_pair_gen::<T>().test_properties(|(n, i)| {
         let eq = n.eq_abs(&i);
         assert_ne!(n.ne_abs(&i), eq);
-        //TODO assert_eq!(n.eq_abs(&Integer::from(i)), eq);
+        // TODO assert_eq!(n.eq_abs(&Integer::from(i)), eq);
 
         assert_eq!(i.eq_abs(&n), eq);
-        //TODO assert_eq!(Integer::from(i).eq_abs(&n), eq);
+        // TODO assert_eq!(Integer::from(i).eq_abs(&n), eq);
         assert_eq!(n.partial_cmp_abs(&i) == Some(Ordering::Equal), eq);
     });
 

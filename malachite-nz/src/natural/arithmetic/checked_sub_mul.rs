@@ -141,8 +141,8 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -197,8 +197,8 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -238,8 +238,8 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
 impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and
-    /// third by value and the second by reference and returning `None` if the result is negative.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
+    /// by value and the second by reference and returning `None` if the result is negative.
     ///
     /// $$
     /// f(x, y, z) = \\begin{cases}
@@ -253,8 +253,8 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -309,8 +309,8 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -365,8 +365,8 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// $M(n, m) = O(m + n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```

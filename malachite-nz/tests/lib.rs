@@ -264,6 +264,7 @@ pub mod natural {
     pub mod comparison {
         pub mod cmp;
         pub mod eq;
+        pub mod eq_abs_primitive_float;
         pub mod eq_abs_primitive_int;
         pub mod hash;
         pub mod partial_cmp_abs_primitive_float;

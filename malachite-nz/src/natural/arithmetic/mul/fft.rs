@@ -104,10 +104,10 @@ fn limbs_fft_mulmod_2expp1_basecase_same2_scratch_len(b: usize) -> usize {
     (n << 1) + limbs_square_to_out_scratch_len(n)
 }
 
-// ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1
-// needs (tp,2n) temp space, everything reduced mod 2^b
-// inputs, outputs are fully reduced
-// NOTE: 2n is not the same as 2b rounded up to nearest limb
+// - ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1
+// - needs (tp,2n) temp space, everything reduced mod 2^b
+// - inputs, outputs are fully reduced
+// - NOTE: 2n is not the same as 2b rounded up to nearest limb
 //
 // This is equivalent to `flint_mpn_mulmod_2expp1_internal` from
 // `mpn_extras/mulmod_2expp1_basecase.c`, FLINT 2.8.0, where xp == yp == zp. Asserts that b is a
@@ -230,8 +230,8 @@ fn limbs_fft_adjust(out: &mut [Limb], xs: &[Limb], i: usize, w: usize) {
     }
 }
 
-// This is equivalent to `fft_adjust_sqrt` from `fft/adjust_sqrt.c`, FLINT 2.7.1. limbs is one
-// less than the length of out, xs, and scratch.
+// This is equivalent to `fft_adjust_sqrt` from `fft/adjust_sqrt.c`, FLINT 2.7.1. limbs is one less
+// than the length of out, xs, and scratch.
 fn limbs_fft_adjust_sqrt(out: &mut [Limb], xs: &[Limb], i: usize, w: usize, scratch: &mut [Limb]) {
     let n = out.len();
     assert_ne!(n, 0);
@@ -291,8 +291,8 @@ fn limbs_fft_adjust_sqrt(out: &mut [Limb], xs: &[Limb], i: usize, w: usize, scra
     }
 }
 
-// This is equivalent to `fft_sumdiff` from `fft.h`, FLINT 2.8.0, where all the inputs are
-// distinct. n is the length of xs and ys.
+// This is equivalent to `fft_sumdiff` from `fft.h`, FLINT 2.8.0, where all the inputs are distinct.
+// n is the length of xs and ys.
 fn limbs_fft_sumdiff(sum: &mut [Limb], diff: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     assert_eq!(xs.len(), ys.len());
     if xs.is_empty() {
@@ -1355,8 +1355,8 @@ fn limbs_fft_mfa_truncate_sqrt_outer<'a>(
     let (xss_lo, xss_hi) = xss.split_at_mut(two_n);
     let half_ys_len = ys_len >> 1;
     let wx = w * xs_len;
-    // first half matrix fourier FFT : ys_len rows, xs_len cols
-    // FFTs on columns
+    // - first half matrix fourier FFT : ys_len rows, xs_len cols
+    // - FFTs on columns
     for i in 0..xs_len {
         // relevant part of first layer of full sqrt FFT
         if w.odd() {
@@ -1399,8 +1399,8 @@ fn limbs_fft_mfa_truncate_sqrt_outer<'a>(
                 j += xs_len;
             }
         }
-        //  FFT of length ys_len on column i, applying z^{r*i} for rows going up in steps
-        //  of 1 starting at row 0, where z => w bits
+        //  FFT of length ys_len on column i, applying z^{r*i} for rows going up in steps of 1
+        //  starting at row 0, where z => w bits
         let xss_mid = &mut xss_lo[i..];
         limbs_fft_radix2_twiddle(xss_mid, xs_len, half_ys_len, wx, ts, us, w, 0, i, 1);
         let mut k = 0;
@@ -1412,11 +1412,11 @@ fn limbs_fft_mfa_truncate_sqrt_outer<'a>(
             k += xs_len;
         }
     }
-    // second half matrix fourier FFT : ys_len rows, xs_len cols
-    // FFTs on columns
+    // - second half matrix fourier FFT : ys_len rows, xs_len cols
+    // - FFTs on columns
     for i in 0..xs_len {
-        //  FFT of length ys_len on column i, applying z^{r*i} for rows going up in steps
-        //  of 1 starting at row 0, where z => w bits
+        //  FFT of length ys_len on column i, applying z^{r*i} for rows going up in steps of 1
+        //  starting at row 0, where z => w bits
         let xss_hi = &mut xss_hi[i..];
         limbs_fft_truncate1_twiddle(xss_hi, xs_len, half_ys_len, wx, ts, us, w, 0, i, 1, trunc2);
         let mut k = 0;
@@ -1565,8 +1565,8 @@ fn limbs_fft_mulmod_2expp1_scratch_len(n: usize, w: usize) -> usize {
     ) + (n << 1)
 }
 
-// This is equivalent to `fft_mulmod_2expp1` from `fft/mulmod_2expp1.c`, FLINT 2.8.0, where
-// r == i1 != i2 and (n * w) >> Limb::LOG_WIDTH > cutoff
+// This is equivalent to `fft_mulmod_2expp1` from `fft/mulmod_2expp1.c`, FLINT 2.8.0, where r == i1
+// != i2 and (n * w) >> Limb::LOG_WIDTH > cutoff
 #[allow(clippy::mut_mut)]
 fn limbs_fft_mulmod_2expp1<'a>(
     xs: &mut [Limb],
@@ -1667,8 +1667,8 @@ fn limbs_fft_mulmod_2expp1<'a>(
     }
     slice_set_zero(xs);
     limbs_fft_combine_bits(xs, &mut xss[..two_n - 1], bits, size, scratch);
-    // as the negacyclic convolution has effectively done subtractions
-    // some of the coefficients will be negative, so need to subtract p
+    // as the negacyclic convolution has effectively done subtractions some of the coefficients will
+    // be negative, so need to subtract p
     let limb_add = bits >> Limb::LOG_WIDTH;
     let mut xs_hi = &mut xs[1..];
     for j in 0..two_n - 2 {
@@ -1724,8 +1724,8 @@ fn limbs_fft_mulmod_2expp1_same_scratch_len(n: usize, w: usize) -> usize {
     ) + (n << 1)
 }
 
-// This is equivalent to `fft_mulmod_2expp1` from `fft/mulmod_2expp1.c`, FLINT 2.8.0, where
-// r == i1 == i2 and (n * w) >> Limb::LOG_WIDTH > cutoff.
+// This is equivalent to `fft_mulmod_2expp1` from `fft/mulmod_2expp1.c`, FLINT 2.8.0, where r == i1
+// == i2 and (n * w) >> Limb::LOG_WIDTH > cutoff.
 #[allow(clippy::mut_mut)]
 fn limbs_fft_mulmod_2expp1_same<'a>(
     xs: &mut [Limb],
@@ -1807,8 +1807,8 @@ fn limbs_fft_mulmod_2expp1_same<'a>(
     }
     slice_set_zero(xs);
     limbs_fft_combine_bits(xs, &mut xss[..two_n - 1], bits, size, scratch);
-    // as the negacyclic convolution has effectively done subtractions
-    // some of the coefficients will be negative, so need to subtract p
+    // as the negacyclic convolution has effectively done subtractions some of the coefficients will
+    // be negative, so need to subtract p
     let limb_add = bits >> Limb::LOG_WIDTH;
     let mut xs_hi = &mut xs[1..];
     for j in 0..two_n - 2 {
@@ -1911,8 +1911,7 @@ fn limbs_ifft_radix2_twiddle<'a>(
     }
 }
 
-// This is equivalent to `ifft_truncate1_twiddle` from `fft/ifft_mfa_truncate_sqrt.c`,
-// FLINT 2.8.0.
+// This is equivalent to `ifft_truncate1_twiddle` from `fft/ifft_mfa_truncate_sqrt.c`, FLINT 2.8.0.
 #[allow(clippy::mut_mut)]
 fn limbs_ifft_truncate1_twiddle<'a>(
     xss: &mut [&'a mut [Limb]],
@@ -1978,8 +1977,8 @@ fn limbs_ifft_truncate1_twiddle<'a>(
     }
 }
 
-// This is equivalent to `ifft_mfa_truncate_sqrt_outer` from `fft/ifft_mfa_truncate_sqrt.c`,
-// FLINT 2.8.0.
+// This is equivalent to `ifft_mfa_truncate_sqrt_outer` from `fft/ifft_mfa_truncate_sqrt.c`, FLINT
+// 2.8.0.
 #[allow(clippy::mut_mut)]
 fn limbs_ifft_mfa_truncate_sqrt_outer<'a>(
     xss: &mut [&'a mut [Limb]],
@@ -1998,8 +1997,8 @@ fn limbs_ifft_mfa_truncate_sqrt_outer<'a>(
     let depth2 = xs_len.ceiling_log_base_2();
     let half_ys_len = ys_len >> 1;
     let wx = w * xs_len;
-    // first half mfa IFFT : ys_len rows, xs_len cols
-    // column IFFTs
+    // - first half mfa IFFT : ys_len rows, xs_len cols
+    // - column IFFTs
     let mut xss_hi = &mut *xss;
     for i in 0..xs_len {
         let mut k = 0;
@@ -2010,8 +2009,8 @@ fn limbs_ifft_mfa_truncate_sqrt_outer<'a>(
             }
             k += xs_len;
         }
-        //  IFFT of length ys_len on column i, applying z^{r*i} for rows going up in steps
-        //  of 1 starting at row 0, where z => w bits
+        //  IFFT of length ys_len on column i, applying z^{r*i} for rows going up in steps of 1
+        //  starting at row 0, where z => w bits
         limbs_ifft_radix2_twiddle(xss_hi, xs_len, half_ys_len, wx, ts, us, w, 0, i, 1);
         xss_hi = &mut xss_hi[1..];
     }
@@ -2043,8 +2042,8 @@ fn limbs_ifft_mfa_truncate_sqrt_outer<'a>(
             }
             j += xs_len;
         }
-        // IFFT of length ys_len on column i, applying z^{r*i} for rows going up in steps
-        // of 1 starting at row 0, where z => w bits
+        // IFFT of length ys_len on column i, applying z^{r*i} for rows going up in steps of 1
+        // starting at row 0, where z => w bits
         limbs_ifft_truncate1_twiddle(xss_hi, xs_len, half_ys_len, wx, ts, us, w, 0, i, 1, trunc2);
         // relevant components of final sqrt layer of IFFT
         let mut j = 0;
@@ -2219,8 +2218,8 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff_scratch_len(
     }
 }}
 
-// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where
-// i1 != i2.
+// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where i1
+// != i2.
 pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
     out: &mut [Limb],
     xs: &[Limb],
@@ -2526,8 +2525,8 @@ pub_test! {limbs_mul_greater_to_out_fft_with_cutoff(
     }
 }}
 
-// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where
-// i1 != i2.
+// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where i1
+// != i2.
 pub_crate_test! {
     #[inline]
     limbs_mul_greater_to_out_fft(
@@ -2853,8 +2852,8 @@ limbs_square_to_out_fft_scratch_len(xs_len: usize) -> usize {
     limbs_square_to_out_fft_with_cutoff_scratch_len(xs_len, FFT_MULMOD_2EXPP1_CUTOFF)
 }}
 
-// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where
-// i1 == i2.
+// This is equivalent to `flint_mpn_mul_fft_main` from `fft/mul_fft_main.c`, FLINT 2.8.0, where i1
+// == i2.
 pub_crate_test! {
 #[inline]
 limbs_square_to_out_fft(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {

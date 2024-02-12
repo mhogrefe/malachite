@@ -18,8 +18,8 @@ pub mod bit_scan;
 /// An implementation of [`CountOnes`](malachite_base::num::logic::traits::CountOnes), a trait for
 /// counting the number of ones in the binary representation of a number.
 pub mod count_ones;
-/// An implementation of [`HammingDistance`](malachite_base::num::logic::traits::HammingDistance),
-/// a trait for computing the Hamming distance between two numbers.
+/// An implementation of [`HammingDistance`](malachite_base::num::logic::traits::HammingDistance), a
+/// trait for computing the Hamming distance between two numbers.
 pub mod hamming_distance;
 /// An implementation of [`LowMask`](malachite_base::num::logic::traits::LowMask), a trait for
 /// generating a low bit mask (a number in which only the $k$ least-significant bits are 1).
@@ -28,8 +28,8 @@ pub mod low_mask;
 pub mod not;
 /// Bitwise or of [`Natural`](super::Natural)s.
 pub mod or;
-/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits),
-/// a trait for determining how many significant bits a number has.
+/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits), a
+/// trait for determining how many significant bits a number has.
 pub mod significant_bits;
 /// An implementation of [`TrailingZeros`](malachite_base::num::logic::traits::TrailingZeros), a
 /// trait for determining the number of zeros that a number ends with when written in binary.

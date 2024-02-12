@@ -1,11 +1,11 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
+use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShr, ModShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use core::cmp::Ordering;
-use core::ops::{Shr, ShrAssign};
 
 fn mod_shr_ref_val<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
@@ -93,8 +93,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by value.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -122,8 +122,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first
-            /// [`Natural`] is taken by value and the second by reference.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -151,8 +151,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first
-            /// [`Natural`] is taken by reference and the second by value.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///
@@ -179,8 +179,8 @@ macro_rules! impl_mod_shr {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo another [`Natural`]
-            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s
-            /// are taken by reference.
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
             ///

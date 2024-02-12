@@ -1,4 +1,7 @@
 use crate::Rational;
+use core::cmp::Ordering;
+#[cfg(not(any(feature = "test_build", feature = "random")))]
+use malachite_base::num::arithmetic::traits::Ln;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, FloorLogBase, FloorLogBasePowerOf2, Pow,
@@ -6,11 +9,10 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::conversion::traits::{RoundingFrom, SciMantissaAndExponent};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 fn approx_log_helper(x: &Rational) -> f64 {
     let (mantissa, exponent): (f64, i64) = x.sci_mantissa_and_exponent();
-    mantissa.ln() + (exponent as f64) * std::f64::consts::LN_2
+    mantissa.ln() + (exponent as f64) * core::f64::consts::LN_2
 }
 
 impl Rational {

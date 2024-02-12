@@ -18,9 +18,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
 // Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
-// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
-// are already reduced mod 2<sup>`pow`</sup>. The input `Vec`s may be mutated. Neither input may be
-// empty or have trailing zeros.
+// `Vec` of the limbs of the product of the `Natural`s mod `2 ^ pow`. Assumes the inputs are already
+// reduced mod `2 ^ pow`. The input `Vec`s may be mutated. Neither input may be empty or have
+// trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -63,9 +63,9 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
 }}
 
 // Interpreting a slice of `Limb` and a `Vec<Limb>` as the limbs (in ascending order) of two
-// `Natural`s, returns a `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>.
-// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated.
-// Neither input may be empty or have trailing zeros.
+// `Natural`s, returns a `Vec` of the limbs of the product of the `Natural`s mod `2 ^ pow`. Assumes
+// the inputs are already reduced mod `2 ^ pow`. The input `Vec` may be mutated. Neither input may
+// be empty or have trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -117,8 +117,8 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
 }}
 
 // Interpreting two slices of `Limb` as the limbs (in ascending order) of two `Natural`s, returns a
-// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
-// are already reduced mod 2<sup>`pow`</sup>. Neither input may be empty or have trailing zeros.
+// `Vec` of the limbs of the product of the `Natural`s mod `2 ^ pow`. Assumes the inputs are already
+// reduced mod `2 ^ pow`. Neither input may be empty or have trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$

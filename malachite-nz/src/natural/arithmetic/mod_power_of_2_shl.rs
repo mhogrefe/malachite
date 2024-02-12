@@ -1,4 +1,5 @@
 use crate::natural::Natural;
+use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs,
 };
@@ -7,7 +8,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use core::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shl_unsigned_nz<T: PrimitiveUnsigned>(x: &Natural, bits: T, pow: u64) -> Natural
 where
@@ -48,8 +48,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
-            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
-            /// value.
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by value.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
             ///
@@ -169,8 +168,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             type Output = Natural;
 
             /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo $2^k$. The
-            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
-            /// value.
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by value.
             ///
             /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
             ///

@@ -35,8 +35,8 @@ use malachite_base::slices::slice_test_zero;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `k`.
 //
-// This is equivalent to `mpn_toom_interpolate_5pts` in `mpn/generic/toom_interpolate_5pts.c`,
-// GMP 6.2.1.
+// This is equivalent to `mpn_toom_interpolate_5pts` in `mpn/generic/toom_interpolate_5pts.c`, GMP
+// 6.2.1.
 pub(crate) fn limbs_mul_toom_interpolate_5_points(
     c: &mut [Limb],
     v_2: &mut [Limb],
@@ -53,13 +53,16 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
     assert!(two_r <= two_k);
     let v_1 = &c[two_k..four_k_plus_1]; // v_1 length: 2 * k + 1
     let v_2 = &mut v_2[..two_k_plus_1];
+    // ```
     // (1) v_2 <- v_2 - v_neg_1 < v_2 + |v_neg_1|,            (16 8 4 2 1) - (1 -1 1 -1  1) =
     // thus 0 <= v_2 < 50 * B ^ (2 * k) < 2 ^ 6 * B ^ (2 * k) (15 9 3  3  0)
+    // ```
     if v_neg_1_neg {
         assert!(!limbs_slice_add_same_length_in_place_left(v_2, v_neg_1));
     } else {
         assert!(!limbs_sub_same_length_in_place_left(v_2, v_neg_1));
     }
+    // ```
     // {c,2k} {c + 2k,2k + 1} {c + 4k + 1,2r - 1} {t,2k + 1} {t + 2k + 1,2k + 1} {t + 4k + 2,2r}
     //   v0        v_1             hi(v_inf)      |v_neg_1|     v_2-v_neg_1          EMPTY
     // v_2 <- v_2 / 3
@@ -69,9 +72,9 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
     //
     // (2) v_neg_1 <- tm1 := (v_1 - v_neg_1) / 2  [(1 1 1 1 1) - (1 -1 1 -1 1)] / 2 =
     // tm1 >= 0                                    (0  1 0  1 0)
-    // No carry comes out from {v_1, two_k_plus_1} +/- {v_neg_1, two_k_plus_1},
-    // and the division by two is exact.
-    // If v_neg_1_neg the sign of v_neg_1 is negative
+    // ```
+    // No carry comes out from {v_1, two_k_plus_1} +/- {v_neg_1, two_k_plus_1}, and the division by
+    // two is exact. If v_neg_1_neg the sign of v_neg_1 is negative
     limbs_div_exact_3_in_place(v_2);
     if v_neg_1_neg {
         assert!(!limbs_slice_add_same_length_in_place_left(v_neg_1, v_1));
@@ -79,35 +82,42 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
         assert!(!limbs_sub_same_length_in_place_right(v_1, v_neg_1));
     }
     assert_eq!(limbs_slice_shr_in_place(v_neg_1, 1), 0);
+    // ```
     // {c,2k} {c + 2k,2k + 1} {c + 4k + 1,2r - 1} {t,2k + 1} {t + 2k + 1,2k + 1} {t + 4k + 2,2r}
     //   v0       v_1             hi(v_inf)          tm1       (v_2-v_neg_1)/3        EMPTY
     //
     // (3) v_1 <- t1 := v_1 - v0  (1 1 1 1 1) - (0 0 0 0 1) = (1 1 1 1 0)
     // t1 >= 0
+    // ```
     let (c_lo, v_1) = c.split_at_mut(two_k);
     if limbs_sub_same_length_in_place_left(&mut v_1[..two_k], c_lo) {
         v_1[two_k].wrapping_sub_assign(1);
     }
     let v_1 = &mut v_1[..two_k_plus_1];
+    // ```
     // {c,2k} {c + 2k,2k + 1} {c + 4k + 1,2r - 1} {t,2k + 1} {t + 2k + 1,2k + 1} {t + 4k + 2,2r}
     //   v0       v_1-v0           hi(v_inf)          tm1      (v_2-v_neg_1)/3        EMPTY
     //
     // (4) v_2 <- t2 := ((v_2 - v_neg_1) / 3 - t1) / 2 = (v_2 - v_neg_1 - 3 * t1) / 6
     // t2 >= 0                  [(5 3 1 1 0) - (1 1 1 1 0)]/2 = (2 1 0 0 0)
-    //
+    // ```
     assert!(!limbs_sub_same_length_in_place_left(v_2, v_1));
     assert_eq!(limbs_slice_shr_in_place(v_2, 1), 0);
+    // ```
     // {c,2k} {c + 2k,2k + 1} {c + 4k + 1,2r - 1} {t,2k + 1} {t + 2k + 1,2k + 1} {t + 4k + 2,2r}
     //   v0      v_1 - v0        hi(v_inf)          tm1    (v_2 - v_neg_1 - 3t1) / 6    EMPTY
     //
     // (5) v_1 <- t1 - tm1           (1 1 1 1 0) - (0 1 0 1 0) = (1 0 1 0 0)
     // result is v_1 >= 0
-    //
+    // ```
     assert!(!limbs_sub_same_length_in_place_left(v_1, v_neg_1));
     // We do not need to read the value in v_neg_1, so we add it in {c + k, ..}
     let (c_lo, c_hi) = c.split_at_mut(3 * k + 1);
     if limbs_slice_add_same_length_in_place_left(&mut c_lo[k..], v_neg_1) {
+        // ```
         // 2 * n - (3 * k + 1) = 2 * r + k - 1
+        // ```
+        //
         // Memory allocated for v_neg_1 is now free, it can be recycled
         assert!(!limbs_slice_add_limb_in_place(
             &mut c_hi[..two_r + k - 1],
@@ -115,7 +125,10 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
         ));
     }
     let v_inf = &mut c_hi[k - 1..two_r + k - 1];
+    // ```
     // (6) v_2 <- v_2 - 2 * v_inf, (2 1 0 0 0) - 2 * (1 0 0 0 0) = (0 1 0 0 0)
+    // ```
+    //
     // result is v_2 >= 0
     let saved = v_inf[0]; // Remember v1's highest byte (will be overwritten).
     v_inf[0] = v_inf_0; // Set the right value for v_inf_0
@@ -125,22 +138,30 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
         carry += 1;
     }
     assert!(!limbs_sub_limb_in_place(&mut v_2[two_r..], carry));
-    //  Current matrix is
-    //  [1 0 0 0 0; v_inf
-    //   0 1 0 0 0; v_2
-    //   1 0 1 0 0; v1
-    //   0 1 0 1 0; v_neg_1
-    //   0 0 0 0 1] v0
-    //  Some values already are in-place (we added v_neg_1 in the correct position)
-    //  | v_inf|  v1 |  v0 |
-    //       | v_neg_1 |
-    //  One still is in a separated area
+    // Current matrix is
+    // ```
+    // [1 0 0 0 0; v_inf
+    //  0 1 0 0 0; v_2
+    //  1 0 1 0 0; v1
+    //  0 1 0 1 0; v_neg_1
+    //  0 0 0 0 1] v0
+    // ```
+    // Some values already are in-place (we added v_neg_1 in the correct position)
+    // ```
+    // | v_inf|  v1 |  v0 |
+    // | v_neg_1 |
+    // ```
+    // One still is in a separated area
+    // ```
     // | +v_2 |
-    //  We have to compute v1-=v_inf; v_neg_1 -= v_2,
-    //    |-v_inf|
-    //       | -v_2 |
-    //  Carefully reordering operations we can avoid to compute twice the sum
-    //  of the high half of v_2 plus the low half of v_inf.
+    // ```
+    // We have to compute v1-=v_inf; v_neg_1 -= v_2,
+    // ```
+    // | -v_inf|
+    // | -v_2 |
+    // ```
+    // Carefully reordering operations we can avoid to compute twice the sum of the high half of v_2
+    // plus the low half of v_inf.
     //
     // Add the high half of t2 in {v_inf}
     if two_r > k + 1 {
@@ -154,19 +175,19 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
             ));
         }
     } else {
-        // triggered only by very unbalanced cases like (k+k+(k-2))x(k+k+1), should be handled by
-        // toom32
-        // two_r < k + 1 so k + two_r < two_k, the size of v_2
+        // - triggered only by very unbalanced cases like (k+k+(k-2))x(k+k+1), should be handled by
+        //   toom32
+        // - two_r < k + 1 so k + two_r < two_k, the size of v_2
         assert!(!limbs_slice_add_same_length_in_place_left(
             &mut c[k << 2..(k << 2) + two_r],
             &v_2[k..k + two_r],
         ));
     }
     split_into_chunks_mut!(c, k << 1, [_unused, v_1], v_inf);
-    // (7) v_1 <- v_1 - v_inf,       (1 0 1 0 0) - (1 0 0 0 0) = (0 0 1 0 0)
-    // result is >= 0
-    // Side effect: we also subtracted (high half) v_neg_1 -= v_2
-    // v_inf is at most two_r long.
+    // - (7) v_1 <- v_1 - v_inf,       (1 0 1 0 0) - (1 0 0 0 0) = (0 0 1 0 0)
+    // - result is >= 0
+    // - Side effect: we also subtracted (high half) v_neg_1 -= v_2
+    // - v_inf is at most two_r long.
     let carry = limbs_sub_same_length_in_place_left(&mut v_1[..two_r], &v_inf[..two_r]);
     v_inf_0 = v_inf[0]; // Save again the right value for v_inf_0
     v_inf[0] = saved;
@@ -175,16 +196,15 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
     if carry {
         assert!(!limbs_sub_limb_in_place(&mut v1[two_r..], 1)); // Treat the last bytes.
     }
-    // (8) v_neg_1 <- v_neg_1 - v_2 (0 1 0 1 0) - (0 1 0 0 0) = (0 0 0 1 0)
-    // Operate only on the low half.
-    //
+    // - (8) v_neg_1 <- v_neg_1 - v_2 (0 1 0 1 0) - (0 1 0 0 0) = (0 0 0 1 0)
+    // - Operate only on the low half.
     if limbs_sub_same_length_in_place_left(c1, &v_2[..k]) {
         assert!(!limbs_sub_limb_in_place(v1, 1));
     }
     let (c3, v_inf) = c[3 * k..].split_at_mut(k);
-    // Beginning the final phase
-    // Most of the recomposition was done
-    // add t2 in {c + 3 * k, ...}, but only the low half
+    // - Beginning the final phase
+    // - Most of the recomposition was done
+    // - add t2 in {c + 3 * k, ...}, but only the low half
     if limbs_slice_add_same_length_in_place_left(c3, &v_2[..k]) {
         v_inf[0].wrapping_add_assign(1);
         assert!(v_inf[0] >= 1); // No carry
@@ -197,12 +217,14 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
 // we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 5, given the six
 // values
 //
+// ```
 // w5 = f(0),
 // w4 = f(-1),
 // w3 = f(1)
 // w2 = f(-2),
 // w1 = f(2),
 // w0 = limit at infinity of f(x) / x^5,
+// ```
 //
 // The result is stored in {out, 5 * n + n_high}. At entry, w5 is stored at {out, 2 * n}, w3 is
 // stored at {out + 2 * n, 2 * n + 1}, and w0 is stored at {out + 5 * n, n_high}. The other values
@@ -221,8 +243,8 @@ pub(crate) fn limbs_mul_toom_interpolate_5_points(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is equivalent to `mpn_toom_interpolate_6pts` from `mpn/generic/toom_interpolate_6pts.c`,
-// GMP 6.2.1, but the argument `w0n == n_high` is moved to immediately after `n`.
+// This is equivalent to `mpn_toom_interpolate_6pts` from `mpn/generic/toom_interpolate_6pts.c`, GMP
+// 6.2.1, but the argument `w0n == n_high` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_6_points(
     out: &mut [Limb],
     n: usize,
@@ -241,20 +263,21 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
     assert_eq!(w2.len(), m);
     assert_eq!(w4.len(), m);
     // w5 length: 2 * n
+    //
     // Interpolate with sequence:
-    // w2 = (w1 - w2) >> 2
-    // w1 = (w1 - w5) >> 1
-    // w1 = (w1 - w2) >> 1
-    // w4 = (w3 - w4) >> 1
-    // w2 = (w2 - w4) / 3
-    // w3 =  w3 - w4 - w5
-    // w1 = (w1 - w3) / 3
+    // - w2 = (w1 - w2) >> 2
+    // - w1 = (w1 - w5) >> 1
+    // - w1 = (w1 - w2) >> 1
+    // - w4 = (w3 - w4) >> 1
+    // - w2 = (w2 - w4) / 3
+    // - w3 =  w3 - w4 - w5
+    // - w1 = (w1 - w3) / 3
     //
     // Last steps are mixed with recomposition:
-    // w2 = w2 - w0 << 2
-    // w4 = w4 - w2
-    // w3 = w3 - w1
-    // w2 = w2 - w0
+    // - w2 = w2 - w0 << 2
+    // - w4 = w4 - w2
+    // - w3 = w3 - w1
+    // - w2 = w2 - w0
     //
     // w2 = (w1 - w2) >> 2
     let (w5, w3) = out[..4 * n + 1].split_at_mut(n << 1);
@@ -292,31 +315,39 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
     // w1 = (w1 - w3) / 3
     limbs_sub_same_length_in_place_left(w1, w3);
     limbs_div_exact_3_in_place(w1);
+    // ```
     // [1 0 0 0 0 0;
     //  0 1 0 0 0 0;
     //  1 0 1 0 0 0;
     //  0 1 0 1 0 0;
     //  1 0 1 0 1 0;
     //  0 0 0 0 0 1]
+    // ```
     //
     // out[] prior to operations:
-    //  |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
+    // ```
+    // |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
+    // ```
     //
     // summation scheme for remaining operations:
-    //  |______________5|n_____4|n_____3|n_____2|n______|n______| out
-    //  |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
-    //                 || H w4  | L w4  |
-    //         || H w2  | L w2  |
-    //     || H w1  | L w1  |
-    //             ||-H w1  |-L w1  |
-    //          |-H w0  |-L w0 ||-H w2  |-L w2  |
-    //
+    // ```
+    // |______________5|n_____4|n_____3|n_____2|n______|n______| out
+    // |_H w0__|_L w0__|______||_H w3__|_L w3__|_H w5__|_L w5__|
+    //                || H w4  | L w4  |
+    //        || H w2  | L w2  |
+    //    || H w1  | L w1  |
+    //            ||-H w1  |-L w1  |
+    //         |-H w0  |-L w0 ||-H w2  |-L w2  |
+    // ```
     let out = &mut out[n..];
     let (out_lo, out_hi) = out.split_at_mut(m);
     if limbs_slice_add_same_length_in_place_left(out_lo, w4) {
         assert!(!limbs_slice_add_limb_in_place(&mut out_hi[..n], 1));
     }
+    // ```
     // w2 -= w0 << 2
+    // ```
+    //
     // {w4, 2 * n + 1} is now free and can be overwritten.
     let out_hi = &out[n << 2..];
     let mut carry = limbs_shl_to_out(w4, &out_hi[..n_high], 2);
@@ -360,9 +391,11 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
         carry_2 = 1;
     }
     // summation scheme for the next operation:
-    //  |...____5|n_____4|n_____3|n_____2|n______|n______| out
-    //  |...w0___|_w1_w2_|_H w3__|_L w3__|_H w5__|_L w5__|
-    //          ...-w0___|-w1_w2 |
+    // ```
+    // |...____5|n_____4|n_____3|n_____2|n______|n______| out
+    // |...w0___|_w1_w2_|_H w3__|_L w3__|_H w5__|_L w5__|
+    //         ...-w0___|-w1_w2 |
+    // ```
     //
     // if (LIKELY(n_high > n)) the two operands below DO overlap!
     let out = &mut out[..3 * n + n_high];
@@ -399,18 +432,18 @@ const WANT_ASSERT: bool = true;
 // Interpolation for toom4, using the evaluation points 0, infinity, 1, -1, 2, -2, 1 / 2. More
 // precisely, we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given
 // the seven values
-// w0 = f(0),
-// w1 = f(-2),
-// w2 = f(1),
-// w3 = f(-1),
-// w4 = f(2)
-// w5 = 64 * f(1/2)
-// w6 = limit at infinity of f(x) / x ^ 6,
+// - w0 = f(0),
+// - w1 = f(-2),
+// - w2 = f(1),
+// - w3 = f(-1),
+// - w4 = f(2)
+// - w5 = 64 * f(1/2)
+// - w6 = limit at infinity of f(x) / x ^ 6,
 //
-// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out, 2 * n}, w2 is stored
-// at {out + 2 * n, 2 * n + 1}, and w6 is stored at {out + 6 * n, n_high}. The other
-// values are 2 * n + 1 limbs each (with most significant limbs small). f(-1) and f(-1/2) may be
-// negative, signs determined by the flag bits. Inputs are destroyed.
+// The result is 6 * n + n_high limbs. At entry, w0 is stored at {out, 2 * n}, w2 is stored at {out
+// + 2 * n, 2 * n + 1}, and w6 is stored at {out + 6 * n, n_high}. The other values are 2 * n + 1
+// limbs each (with most significant limbs small). f(-1) and f(-1/2) may be negative, signs
+// determined by the flag bits. Inputs are destroyed.
 //
 // Needs 2 * n + 1 limbs of temporary storage.
 //
@@ -421,8 +454,8 @@ const WANT_ASSERT: bool = true;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is equivalent to `mpn_toom_interpolate_7pts` from `mpn/generic/toom_interpolate_7pts.c`,
-// GMP 6.2.1, but the argument `w6n == n_high` is moved to immediately after `n`.
+// This is equivalent to `mpn_toom_interpolate_7pts` from `mpn/generic/toom_interpolate_7pts.c`, GMP
+// 6.2.1, but the argument `w6n == n_high` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_7_points(
     out: &mut [Limb],
     n: usize,
@@ -448,32 +481,31 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     let w6 = &mut w6[..n_high];
     // Using formulas similar to Marco Bodrato's
     //
-    // w5 =  w5 + w4
-    // w1 = (w4 - w1) / 2
-    // w4 =  w4 - w0
-    // w4 = (w4 - w1) / 4 - w6 * 16
-    // w3 = (w2 - w3) / 2
-    // w2 =  w2 - w3
+    // - w5 =  w5 + w4
+    // - w1 = (w4 - w1) / 2
+    // - w4 =  w4 - w0
+    // - w4 = (w4 - w1) / 4 - w6 * 16
+    // - w3 = (w2 - w3) / 2
+    // - w2 =  w2 - w3
     //
-    // w5 =  w5 - w2 * 65 May be negative.
-    // w2 =  w2 - w6 - w0
-    // w5 = (w5 + w2 * 45) / 2 Now >= 0 again.
-    // w4 = (w4 - w2) / 3
-    // w2 =  w2 - w4
+    // - w5 =  w5 - w2 * 65 May be negative.
+    // - w2 =  w2 - w6 - w0
+    // - w5 = (w5 + w2 * 45) / 2 Now >= 0 again.
+    // - w4 = (w4 - w2) / 3
+    // - w2 =  w2 - w4
     //
-    // w1 =  w5 - w1 May be negative.
-    // w5 = (w5 - w3 * 8) / 9
-    // w3 =  w3 - w5
-    // w1 = (w1 / 15 + w5) / 2 Now >= 0 again.
-    // w5 =  w5 - w1
+    // - w1 =  w5 - w1 May be negative.
+    // - w5 = (w5 - w3 * 8) / 9
+    // - w3 =  w3 - w5
+    // - w1 = (w1 / 15 + w5) / 2 Now >= 0 again.
+    // - w5 =  w5 - w1
     //
-    // where w0 = f(0), w1 = f(-2), w2 = f(1), w3 = f(-1),
-    //   w4 = f(2), w5 = f(1/2), w6 = f(infinity),
+    // where w0 = f(0), w1 = f(-2), w2 = f(1), w3 = f(-1), w4 = f(2), w5 = f(1/2), w6 = f(infinity).
     //
     // Note that most intermediate results are positive; the ones that may be negative are
     // represented in two's complement. We must never shift right a value that may be negative,
-    // since that would invalidate the sign bit. On the other hand, divexact by odd numbers
-    // works fine with two's complement.
+    // since that would invalidate the sign bit. On the other hand, divexact by odd numbers works
+    // fine with two's complement.
     limbs_slice_add_same_length_in_place_left(w5, w4);
     if w1_neg {
         limbs_slice_add_same_length_in_place_left(w1, w4);
@@ -515,8 +547,8 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     assert!(w1[0].even());
     limbs_slice_shr_in_place(w1, 1); // w1 >= 0 now
     limbs_sub_same_length_in_place_left(w5, w1);
-    // These bounds are valid for the 4x4 polynomial product of toom44,
-    // and they are conservative for toom53 and toom62.
+    // These bounds are valid for the 4x4 polynomial product of toom44, and they are conservative
+    // for toom53 and toom62.
     let two_n = n << 1;
     assert!(w1[two_n] < 2);
     assert!(w2[two_n] < 3);
@@ -526,8 +558,9 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     // Addition chain. Note carries and the 2n'th limbs that need to be added in.
     //
     // Special care is needed for w2[2 * n] and the corresponding carry, since the "simple" way of
-    // adding it all together would overwrite the limb at wp[2 * n] and out[4 * n] (same
-    // location) with the sum of the high half of w3 and the low half of w4.
+    // adding it all together would overwrite the limb at wp[2 * n] and out[4 * n] (same location)
+    // with the sum of the high half of w3 and the low half of w4.
+    // ```
     //
     //         7    6    5    4    3    2    1    0
     //    |    |    |    |    |    |    |    |    |
@@ -538,6 +571,7 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     //  -----------------------------------------------
     //  r |    |    |    |    |    |    |    |    |
     //        c7   c6   c5   c4   c3                 Carries to propagate
+    // ```
     let (out_lo, out_hi) = out[n..].split_at_mut(m);
     if limbs_slice_add_same_length_in_place_left(out_lo, w1) {
         assert!(!limbs_slice_add_limb_in_place(&mut out_hi[..n], 1));
@@ -632,17 +666,17 @@ fn limbs_shl_and_sub_special(
 }
 
 // Interpolation for Toom-4.5 (or Toom-4), using the evaluation points: infinity(4.5 only), 4, -4,
-// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial
-// f of degree 7 (or 6), given the 8 (rsp. 7) values:
+// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f
+// of degree 7 (or 6), given the 8 (rsp. 7) values:
 //
-// r1 = limit at infinity of f(x) / x ^ 7,
-// r2 = f(4),
-// r3 = f(-4),
-// r4 = f(2),
-// r5 = f(-2),
-// r6 = f(1),
-// r7 = f(-1),
-// r8 = f(0).
+// - r1 = limit at infinity of f(x) / x ^ 7,
+// - r2 = f(4),
+// - r3 = f(-4),
+// - r4 = f(2),
+// - r5 = f(-2),
+// - r6 = f(1),
+// - r7 = f(-1),
+// - r8 = f(0).
 //
 // All couples of the form f(n),f(-n) must be already mixed with
 // `limbs_toom_couple_handling`(f(n),..., f(-n), ...)
@@ -661,8 +695,8 @@ fn limbs_shl_and_sub_special(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is equivalent to `mpn_toom_interpolate_8pts` from `mpn/generic/toom_interpolate_8pts.c`,
-// GMP 6.2.1, but the argument spt == `s_plus_t` is moved to immediately after `n`.
+// This is equivalent to `mpn_toom_interpolate_8pts` from `mpn/generic/toom_interpolate_8pts.c`, GMP
+// 6.2.1, but the argument spt == `s_plus_t` is moved to immediately after `n`.
 pub(crate) fn limbs_mul_toom_interpolate_8_points(
     out: &mut [Limb],
     n: usize,
@@ -705,17 +739,20 @@ pub(crate) fn limbs_mul_toom_interpolate_8_points(
     // Last interpolation steps are mixed with recomposition.
     //
     // out[] prior to operations:
+    // ```
     // |_H r1|_L r1|____||_H r5|_M_r5|_L r5|_____|_H r8|_L r8|out
+    // ```
     //
     // summation scheme for remaining operations:
+    // ```
     // |____8|n___7|n___6|n___5|n___4|n___3|n___2|n____|n____|out
     // |_H r1|_L r1|____||_H*r5|_M r5|_L r5|_____|_H_r8|_L r8|out
     //  ||_H r3|_M r3|_L*r3|
     //              ||_H_r7|_M_r7|_L_r7|
     //          ||-H r3|-M r3|-L*r3|
     //              ||-H*r5|-M_r5|-L_r5|
-    //
     // Hr8+Lr7-Lr5
+    // ```
     split_into_chunks_mut!(r5_lo, n, [r5_lo_0, r5_lo_1, r5_lo_2], r5_lo_3);
     let (r7_lo, r7) = r7.split_at_mut(n);
     let out = &mut out[n..];
@@ -878,27 +915,27 @@ fn limbs_aors_mul_or_aors_and_sh_aors_helper(
 }
 
 // Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
-// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
+// - Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
 //
-// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11
-// (or 10), given the 12 (resp. 11) values:
+// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11 (or
+// 10), given the 12 (resp. 11) values:
 //
-// r0 = limit at infinity of f(x) / x ^ 7,
-// r1 = f(4),f(-4),
-// r2 = f(2),f(-2),
-// r3 = f(1),f(-1),
-// r4 = f(1 / 4), f(-1 / 4),
-// r5 = f(1 / 2), f(-1 / 2),
-// r6 = f(0).
+// - r0 = limit at infinity of f(x) / x ^ 7,
+// - r1 = f(4),f(-4),
+// - r2 = f(2),f(-2),
+// - r3 = f(1),f(-1),
+// - r4 = f(1 / 4), f(-1 / 4),
+// - r5 = f(1 / 2), f(-1 / 2),
+// - r6 = f(0).
 //
-// All couples of the form f(n),f(-n) must be already mixed with
-// `limbs_toom_couple_handling`(f(n), ..., f(-n),...)
+// All couples of the form f(n),f(-n) must be already mixed with `limbs_toom_couple_handling`(f(n),
+// ..., f(-n),...)
 //
-// The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
-// At entry, r6 is stored at {out, 2 * n},
-// r4 is stored at {out +  3 * n, 3 * n + 1}.
-// r2 is stored at {out +  7 * n, 3 * n + 1}.
-// r0 is stored at {out + 11 * n, s_plus_t}.
+// - The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
+// - At entry, r6 is stored at {out, 2 * n},
+// - r4 is stored at {out +  3 * n, 3 * n + 1}.
+// - r2 is stored at {out +  7 * n, 3 * n + 1}.
+// - r0 is stored at {out + 11 * n, s_plus_t}.
 //
 // The other values are 3 * n + 1 limbs each (with most significant limbs small).
 //
@@ -990,17 +1027,23 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     assert!(!limbs_sub_same_length_in_place_left(r3, r1));
     assert!(!limbs_sub_same_length_in_place_left(r1, r5));
     // ...could be mixed with recomposition
+    // ```
     // ||H-r5|M-r5|L-r5|   ||H-r1|M-r1|L-r1|
+    // ```
     //
     // Recomposition
     //
     // out[] prior to operations:
+    // ```
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|out
+    // ```
     //
     // Summation scheme for remaining operations:
+    // ```
     // |__12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|out
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|____|H_r6|L r6|out
     // ||H r1|M r1|L r1|   ||H r3|M r3|L r3|   ||H_r5|M_r5|L_r5|
+    // ```
     split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
     split_into_chunks_mut!(r5, n, [r5_0, r5_1], r5_2);
     if limbs_slice_add_same_length_in_place_left(out_1, r5_0) {
@@ -1080,31 +1123,31 @@ const CORRECTED_WIDTH: u64 = 42 - Limb::WIDTH;
 #[cfg(not(feature = "32_bit_limbs"))]
 const CORRECTED_WIDTH: u64 = 42;
 
-// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
-// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
+// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points: Infinity(8.5 only), +-8,
+// +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
 //
-// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 15
-// (or 14), given the 16 (rsp. 15) values:
+// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 15 (or
+// 14), given the 16 (rsp. 15) values:
 //
-// r0 = limit at infinity of f(x) / x ^ 7,
-// r1 = f(8), f(-8),
-// r2 = f(4), f(-4),
-// r3 = f(2), f(-2),
-// r4 = f(1), f(-1),
-// r5 = f(1/4), f(-1/4),
-// r6 = f(1/2), f(-1/2),
-// r7 = f(1/8), f(-1/8),
-// r8 = f(0).
+// - r0 = limit at infinity of f(x) / x ^ 7,
+// - r1 = f(8), f(-8),
+// - r2 = f(4), f(-4),
+// - r3 = f(2), f(-2),
+// - r4 = f(1), f(-1),
+// - r5 = f(1/4), f(-1/4),
+// - r6 = f(1/2), f(-1/2),
+// - r7 = f(1/8), f(-1/8),
+// - r8 = f(0).
 //
 // All couples of the form f(n),f(-n) must be already mixed with
 // toom_couple_handling(f(n),...,f(-n),...)
 //
-// The result is stored in {out, s_plus_t + 7 * n (or 8 * n)}.
-// At entry, r8 is stored at {out, 2 * n},
-// r6 is stored at {out + 3 * n, 3 * n + 1}.
-// r4 is stored at {out + 7 * n, 3 * n + 1}.
-// r2 is stored at {out + 11 * n, 3 * n + 1}.
-// r0 is stored at {out + 15 * n, s_plus_t}.
+// - The result is stored in {out, s_plus_t + 7 * n (or 8 * n)}.
+// - At entry, r8 is stored at {out, 2 * n},
+// - r6 is stored at {out + 3 * n, 3 * n + 1}.
+// - r4 is stored at {out + 7 * n, 3 * n + 1}.
+// - r2 is stored at {out + 11 * n, 3 * n + 1}.
+// - r0 is stored at {out + 15 * n, s_plus_t}.
 //
 // The other values are 3 * n + 1 limbs each (with most significant limbs small).
 //
@@ -1195,7 +1238,6 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
         r7.last_mut().unwrap().wrapping_sub_assign(carry);
         limbs_shl_and_sub(r1_hi, pp_lo, 6, scratch);
     }
-    //
     // can be negative
     limbs_sub_same_length_to_out(scratch, r7, r1);
     // if BIT_CORRECTION, can give a carry.
@@ -1256,18 +1298,23 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     assert_eq!(limbs_slice_shr_in_place(r7, 1), 0);
     assert!(!limbs_sub_same_length_in_place_left(r1, r7));
     // Last interpolation steps could be mixed with recomposition.
-    //
+    // ```
     // ||H-r7|M-r7|L-r7|   ||H-r5|M-r5|L-r5|
+    // ```
     //
     // Recomposition
     //
     // out[] prior to operations:
+    // ```
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|___||H r6|M r6|L r6|____|H_r8|L r8|out
+    // ```
     //
     // summation scheme for remaining operations:
+    // ```
     // |__16|n_15|n_14|n_13|n_12|n_11|n_10|n__9|n__8|n__7|n__6|n__5|n__4|n__3|n__2|n___|n___|out
     // |M r0|L r0|___||H r2|M r2|L r2|___||H r4|M r4|L r4|___||H r6|M r6|L r6|____|H_r8|L r8|out
     // ||H r1|M r1|L r1|   ||H r3|M r3|L r3|   ||H_r5|M_r5|L_r5|   ||H r7|M r7|L r7|
+    // ```
     split_into_chunks_mut!(out, n, [_unused, out_1, out_2, out_3], out_4);
     split_into_chunks_mut!(r7, n, [r7_0, r7_1], r7_2);
     if limbs_slice_add_same_length_in_place_left(out_1, r7_0) {

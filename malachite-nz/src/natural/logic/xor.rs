@@ -73,9 +73,9 @@ pub_test! {limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the result is the
-// length of the longer input slice.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the result is the length
+// of the longer input slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -125,8 +125,8 @@ pub_test! {limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Lim
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-// the limbs of the bitwise xor of the `Natural`s to an output slice. The output must be at least
-// as long as the longer input slice.
+// the limbs of the bitwise xor of the `Natural`s to an output slice. The output must be at least as
+// long as the longer input slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -175,8 +175,8 @@ pub_test! {limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 }}
 
 // Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
-// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the `Vec`. If `ys` is
-// longer than `xs`, `xs` will be extended.
+// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the `Vec`. If `ys` is longer
+// than `xs`, `xs` will be extended.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -200,9 +200,9 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 }
 
 // Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-// the limbs of the bitwise xor of the `Natural`s to the longer slice (or the first one, if they
-// are equally long). Returns a `bool` which is `false` when the output is to the first slice and
-// `true` when it's to the second slice.
+// the limbs of the bitwise xor of the `Natural`s to the longer slice (or the first one, if they are
+// equally long). Returns a `bool` which is `false` when the output is to the first slice and `true`
+// when it's to the second slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -262,8 +262,8 @@ impl BitXor<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -370,8 +370,8 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -409,8 +409,8 @@ impl BitXorAssign<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

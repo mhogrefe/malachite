@@ -22,8 +22,7 @@ use malachite_base::slices::slice_leading_zeros;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is equivalent to `MPN_MOD_OR_MODEXACT_1_ODD` from `gmp-impl.h`, GMP 6.2.1, where
-// `size > 1`.
+// This is equivalent to `MPN_MOD_OR_MODEXACT_1_ODD` from `gmp-impl.h`, GMP 6.2.1, where `size > 1`.
 fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_mod_exact_odd_limb(ns, d, 0)
@@ -115,8 +114,8 @@ impl Gcd<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -150,8 +149,8 @@ impl<'a> Gcd<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -186,8 +185,8 @@ impl<'a> Gcd<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -221,8 +220,8 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -260,8 +259,8 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
 }
 
 impl GcdAssign<Natural> for Natural {
-    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`],
-    /// taking the [`Natural`] on the right-hand side by value.
+    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`], taking
+    /// the [`Natural`] on the right-hand side by value.
     ///
     /// $$
     /// x \gets \gcd(x, y).
@@ -272,8 +271,8 @@ impl GcdAssign<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -317,8 +316,8 @@ impl GcdAssign<Natural> for Natural {
 }
 
 impl<'a> GcdAssign<&'a Natural> for Natural {
-    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`],
-    /// taking the [`Natural`] on the right-hand side by reference.
+    /// Replaces a [`Natural`] by its GCD (greatest common divisor) with another [`Natural`], taking
+    /// the [`Natural`] on the right-hand side by reference.
     ///
     /// $$
     /// x \gets \gcd(x, y).
@@ -329,8 +328,8 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

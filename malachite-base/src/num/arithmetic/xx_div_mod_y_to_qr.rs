@@ -93,8 +93,8 @@ macro_rules! implicit_xx_div_mod_to_qr {
             /// # Examples
             /// See [here](super::xx_div_mod_y_to_qr#xx_div_mod_y_to_qr).
             ///
-            /// This is equivalent to `udiv_qrnnd` from `longlong.h`, FLINT 2.7.1, where `(q, r)`
-            /// is returned.
+            /// This is equivalent to `udiv_qrnnd` from `longlong.h`, FLINT 2.7.1, where `(q, r)` is
+            /// returned.
             #[inline]
             fn xx_div_mod_y_to_qr(x_1: $t, x_0: $t, y: $t) -> ($t, $t) {
                 implicit_xx_div_mod_y_to_qr::<$t, $dt>(x_1, x_0, y)

@@ -60,17 +60,17 @@ macro_rules! impl_shl_round {
                 impl ShlRound<$u> for $t {
                     type Output = $t;
 
-                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
-                    /// power of 2 and takes the floor) and rounds according to the specified
-                    /// rounding mode. An [`Ordering`] is also returned, indicating whether the
-                    /// returned value is less than, equal to, or greater than the exact value. If
-                    /// `bits` is non-negative, then the returned [`Ordering`] is always `Equal`,
-                    /// even if the higher bits of the result are lost.
+                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a power
+                    /// of 2 and takes the floor) and rounds according to the specified rounding
+                    /// mode. An [`Ordering`] is also returned, indicating whether the returned
+                    /// value is less than, equal to, or greater than the exact value. If `bits` is
+                    /// non-negative, then the returned [`Ordering`] is always `Equal`, even if the
+                    /// higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-                    /// necessary if `bits` is negative.
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
+                    /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
+                    /// `bits` is negative.
                     ///
                     /// Let $q = x2^k$, and let $g$ be the function that just returns the first
                     /// element of the pair, without the [`Ordering`]:
@@ -116,17 +116,17 @@ macro_rules! impl_shl_round {
                 }
 
                 impl ShlRoundAssign<$u> for $t {
-                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a
-                    /// power of 2 and takes the floor) and rounds according to the specified
-                    /// rounding mode, in place. An [`Ordering`] is returned, indicating whether
-                    /// the assigned value is less than, equal to, or greater than the exact value.
-                    /// If `bits` is non-negative, then the returned [`Ordering`] is always
-                    /// `Equal`, even if the higher bits of the result are lost.
+                    /// Left-shifts a number (multiplies it by a power of 2 or divides it by a power
+                    /// of 2 and takes the floor) and rounds according to the specified rounding
+                    /// mode, in place. An [`Ordering`] is returned, indicating whether the assigned
+                    /// value is less than, equal to, or greater than the exact value. If `bits` is
+                    /// non-negative, then the returned [`Ordering`] is always `Equal`, even if the
+                    /// higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-                    /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-                    /// necessary if `bits` is negative.
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
+                    /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
+                    /// `bits` is negative.
                     ///
                     /// See the [`ShlRound`] documentation for details.
                     ///

@@ -124,7 +124,7 @@ fn limbs_half_gcd_2_jacobi(
                 y_1 = (y_1 << HALF_WIDTH) + (y_0 >> HALF_WIDTH);
                 break;
             }
-            //  Subtract x -= q * y, and multiply m from the right by (1 q ; 0 1), affecting the
+            // Subtract x -= q * y, and multiply m from the right by (1 q ; 0 1), affecting the
             // second column of m.
             assert!(x_1 > y_1);
             (x_1, x_0) = Limb::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0);
@@ -180,8 +180,8 @@ fn limbs_half_gcd_2_jacobi(
             subtract_a_1 = true;
             break;
         }
-        // Subtract b -= q a, and multiply M from the right by (1 0 ; q
-        // 1), affecting the first column of M.
+        // Subtract b -= q a, and multiply M from the right by (1 0 ; q 1), affecting the first
+        // column of M.
         (y_1, y_0) = Limb::xx_sub_yy_to_zz(y_1, y_0, x_1, x_0);
         if y_1 < 2 {
             m.data[0][0] = u00;
@@ -309,11 +309,11 @@ fn limbs_half_gcd_2_jacobi(
 // If `limbs_half_gcd_2_jacobi` succeeds, needs temporary space for
 // `limbs_half_gcd_matrix_mul_matrix_1`, m.n limbs, and
 // `limbs_half_gcd_matrix_1_mul_inverse_vector`, n limbs. If `limbs_half_gcd_2_jacobi` fails, needs
-// space for the quotient, qs_len <= n - s + 1 limbs, for and `update_q`, qs_len +
-// (size of the appropriate column of M) <= resulting size of m.
+// space for the quotient, qs_len <= n - s + 1 limbs, for and `update_q`, qs_len + (size of the
+// appropriate column of M) <= resulting size of m.
 //
-// If n is the input size to the calling hgcd, then s = floor(N / 2) + 1, m.n < N, qs_len +
-// matrix size <= n - s + 1 + n - s = 2 (n - s) + 1 < N, so N is sufficient.
+// If n is the input size to the calling hgcd, then s = floor(N / 2) + 1, m.n < N, qs_len + matrix
+// size <= n - s + 1 + n - s = 2 (n - s) + 1 < N, so N is sufficient.
 //
 // This is equivalent to `hgcd_jacobi_step` from `mpn/hgcd_jacobi.c`, GMP 6.2.1, where `bitsp` is
 // returned along with the `usize`.
@@ -438,12 +438,12 @@ fn limbs_half_gcd_jacobi(
                 // We always have max(m) > 2^(-(W + 1)) * max(m1)
                 assert!(m.n + 2 >= m1.n);
                 // Furthermore, assume m ends with a quotient (1, q; 0, 1); then either q or q + 1
-                // is a correct quotient, and m1 will start with either (1, 0; 1, 1) or
-                // (2, 1; 1, 1). This rules out the case that the size of m * m1 is much smaller
-                // than the expected m.n + m1.n.
+                // is a correct quotient, and m1 will start with either (1, 0; 1, 1) or (2, 1; 1,
+                // 1). This rules out the case that the size of m * m1 is much smaller than the
+                // expected m.n + m1.n.
                 assert!(m.n + m1.n < m.s);
-                // Needs 2 * (p + m.n) <= 2 * (2 * s - nn + 1 + nn - s - 1) = 2 * s <=
-                // 2 * (floor(n / 2) + 1) <= n + 2.
+                // Needs 2 * (p + m.n) <= 2 * (2 * s - nn + 1 + nn - s - 1) = 2 * s <= 2 * (floor(n
+                // / 2) + 1) <= n + 2.
                 n = limbs_half_gcd_matrix_adjust(&m1, p + nn, xs, ys, p, scratch_hi);
                 // We need a bound for of m.n + m1.n. Let n be the original input size. Then
                 //
@@ -620,8 +620,8 @@ pub_crate_test! {
             );
             swap(&mut xs, &mut scratch);
         } else {
-            // `limbs_half_gcd_2_jacobi` has failed. Then either one of x or y is very small, or
-            // the difference is very small. Perform one subtraction followed by one division.
+            // `limbs_half_gcd_2_jacobi` has failed. Then either one of x or y is very small, or the
+            // difference is very small. Perform one subtraction followed by one division.
             n = limbs_gcd_subdivide_step(
                 &mut xs[..n],
                 &mut ys[..n],
@@ -673,8 +673,8 @@ impl LegendreSymbol<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -712,8 +712,8 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -736,8 +736,8 @@ impl<'a> LegendreSymbol<&'a Natural> for Natural {
 }
 
 impl<'a> LegendreSymbol<Natural> for &'a Natural {
-    /// Computes the Legendre symbol of two [`Natural`]s, taking both the first by reference and
-    /// the second by value.
+    /// Computes the Legendre symbol of two [`Natural`]s, taking both the first by reference and the
+    /// second by value.
     ///
     /// This implementation is identical to that of [`JacobiSymbol`], since there is no
     /// computational benefit to requiring that the denominator be prime.
@@ -751,8 +751,8 @@ impl<'a> LegendreSymbol<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -789,8 +789,8 @@ impl<'a, 'b> LegendreSymbol<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -824,8 +824,8 @@ impl JacobiSymbol<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -861,8 +861,8 @@ impl<'a> JacobiSymbol<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -886,8 +886,8 @@ impl<'a> JacobiSymbol<&'a Natural> for Natural {
 }
 
 impl<'a> JacobiSymbol<Natural> for &'a Natural {
-    /// Computes the Jacobi symbol of two [`Natural`]s, taking the first by reference and the
-    /// second by value.
+    /// Computes the Jacobi symbol of two [`Natural`]s, taking the first by reference and the second
+    /// by value.
     ///
     /// $$
     /// f(x, y) = \left ( \frac{x}{y} \right ).
@@ -898,8 +898,8 @@ impl<'a> JacobiSymbol<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -934,8 +934,8 @@ impl<'a, 'b> JacobiSymbol<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `other` is even.
@@ -970,8 +970,8 @@ impl KroneckerSymbol<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1003,8 +1003,8 @@ impl<'a> KroneckerSymbol<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1036,8 +1036,8 @@ impl<'a> KroneckerSymbol<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1068,8 +1068,8 @@ impl<'a, 'b> KroneckerSymbol<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

@@ -1,7 +1,7 @@
 use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
-    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, BinomialCoefficient,
+    AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, BinomialCoefficient,
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRoot,
     CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
@@ -56,10 +56,11 @@ use core::str::FromStr;
 /// widths. The width $W$ is the number of bits in the type. For example, the width of [`u32`] or
 /// [`i32`] is 32. Each type has $2^W$ distinct values.
 ///
-/// Let $n$ be a value of type `Self`. If `Self` is unsigned, $0 \leq n < 2^W$. If `Self`
-/// is signed, $2^{W-1} \leq n < 2^{W-1}$.
+/// Let $n$ be a value of type `Self`. If `Self` is unsigned, $0 \leq n < 2^W$. If `Self` is signed,
+/// $2^{W-1} \leq n < 2^{W-1}$.
 pub trait PrimitiveInt:
     'static
+    + AbsDiff<Self>
     + Add<Self, Output = Self>
     + AddAssign<Self>
     + AddMul<Self, Self, Output = Self>
@@ -530,10 +531,11 @@ pub trait PrimitiveInt:
 /// widths. The width $W$ is the number of bits in the type. For example, the width of [`u32`] or
 /// [`i32`] is 32. Each type has $2^W$ distinct values.
 ///
-/// Let $n$ be a value of type `Self`. If `Self` is unsigned, $0 \leq n < 2^W$. If `Self`
-/// is signed, $2^{W-1} \leq n < 2^{W-1}$.
+/// Let $n$ be a value of type `Self`. If `Self` is unsigned, $0 \leq n < 2^W$. If `Self` is signed,
+/// $2^{W-1} \leq n < 2^{W-1}$.
 pub trait PrimitiveInt:
     'static
+    + AbsDiff<Self>
     + Add<Self, Output = Self>
     + AddAssign<Self>
     + AddMul<Self, Self, Output = Self>

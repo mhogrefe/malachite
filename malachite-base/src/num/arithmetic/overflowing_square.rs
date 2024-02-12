@@ -9,8 +9,8 @@ macro_rules! impl_overflowing_square {
 
             /// Squares a number.
             ///
-            /// Returns a tuple containing the result and a boolean indicating whether an
-            /// arithmetic occurred. If an overflow occurred, then the wrapped value is returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
+            /// occurred. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -26,8 +26,8 @@ macro_rules! impl_overflowing_square {
         impl OverflowingSquareAssign for $t {
             /// Squares a number in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

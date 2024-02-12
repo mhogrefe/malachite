@@ -1,12 +1,13 @@
 use crate::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use crate::Rational;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     Abs, AbsAssign, CheckedLogBase2, Floor, UnsignedAbs,
 };
 use malachite_base::num::conversion::traits::Digits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
-use std::collections::HashMap;
 
 fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
     if let Some(log_base) = base.checked_log_base_2() {
@@ -15,7 +16,7 @@ fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSeque
     let floor = (&x).floor();
     let mut remainder = x - Rational::from(&floor);
     let before_point = floor.unsigned_abs().to_digits_asc(base);
-    let mut state_map = HashMap::new();
+    let mut state_map = BTreeMap::new();
     let mut digits = Vec::new();
     let base = Rational::from(base);
     for i in 0.. {
@@ -39,8 +40,8 @@ impl Rational {
     /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of
-    /// the digits of the fractional portion.
+    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.
@@ -85,8 +86,8 @@ impl Rational {
     /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of
-    /// the digits of the fractional portion.
+    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
     /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.

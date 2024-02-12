@@ -1,5 +1,6 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::NegModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -8,7 +9,6 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
 
 impl Float {
     #[doc(hidden)]
@@ -116,11 +116,11 @@ impl Float {
     /// nonzero, it has the specified precision. An [`Ordering`] is also returned, indicating
     /// whether the returned value is less than, equal to, or greater than the original value.
     ///
-    /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of
-    /// significant bits, try just using `Float::from` instead.
+    /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of significant
+    /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_natural_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_natural_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -202,10 +202,10 @@ impl Float {
         Float::from_natural_times_power_of_2_prec_round_ref(x, pow, prec, RoundingMode::Nearest)
     }
 
-    /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the
-    /// [`Float`] is nonzero, it has the specified precision. If rounding is needed, the specified
-    /// rounding mode is used. An [`Ordering`] is also returned, indicating whether the returned
-    /// value is less than, equal to, or greater than the original value.
+    /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the [`Float`]
+    /// is nonzero, it has the specified precision. If rounding is needed, the specified rounding
+    /// mode is used. An [`Ordering`] is also returned, indicating whether the returned value is
+    /// less than, equal to, or greater than the original value.
     ///
     /// If you're only using [`RoundingMode::Nearest`], try using [`Float::from_natural_prec_ref`]
     /// instead.
@@ -265,16 +265,15 @@ impl Float {
         Float::from_natural_times_power_of_2_prec_round_ref(x, 0, prec, rm)
     }
 
-    /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the
-    /// [`Float`] is nonzero, it has the specified precision. An [`Ordering`] is also returned,
-    /// indicating whether the returned value is less than, equal to, or greater than the original
-    /// value.
+    /// Converts a [`Natural`] to a [`Float`], taking the [`Natural`] by reference. If the [`Float`]
+    /// is nonzero, it has the specified precision. An [`Ordering`] is also returned, indicating
+    /// whether the returned value is less than, equal to, or greater than the original value.
     ///
-    /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of
-    /// significant bits, try just using `Float::from` instead.
+    /// If you want the [`Float`]'s precision to be equal to the [`Natural`]'s number of significant
+    /// bits, try just using `Float::from` instead.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_natural_prec_round_ref`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_natural_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -316,8 +315,8 @@ impl From<Natural> for Float {
     /// If the [`Natural`] is nonzero, the precision of the [`Float`] is equal to the [`Natural`]'s
     /// number of significant bits. If you want to specify a different precision, try
     /// [`Float::from_natural_prec`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision,
-    /// try [`Float::from_natural_prec_round`].
+    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_natural_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -348,8 +347,8 @@ impl<'a> From<&'a Natural> for Float {
     /// If the [`Natural`] is nonzero, the precision of the [`Float`] is equal to the [`Natural`]'s
     /// number of significant bits. If you want to specify a different precision, try
     /// [`Float::from_natural_prec_ref`]. This may require rounding, which uses
-    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision,
-    /// try [`Float::from_natural_prec_round_ref`].
+    /// [`RoundingMode::Nearest`] by default. To specify a rounding mode as well as a precision, try
+    /// [`Float::from_natural_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

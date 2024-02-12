@@ -40,10 +40,10 @@ impl Primes for Natural {
 
     /// Returns an iterator that generates all primes less than a given value.
     ///
-    /// The iterator produced by `primes_less_than(n)` generates the same primes as the
-    /// iterator produced by `primes().take_while(|&p| p < n)`, but the latter would be
-    /// slower because it doesn't know in advance how large its prime sieve should be, and
-    /// might have to create larger and larger prime sieves.
+    /// The iterator produced by `primes_less_than(n)` generates the same primes as the iterator
+    /// produced by `primes().take_while(|&p| p < n)`, but the latter would be slower because it
+    /// doesn't know in advance how large its prime sieve should be, and might have to create larger
+    /// and larger prime sieves.
     ///
     /// # Worst-case complexity (amortized)
     /// $T(i) = O(\log \log i)$
@@ -61,10 +61,10 @@ impl Primes for Natural {
 
     /// Returns an iterator that generates all primes less than or equal to a given value.
     ///
-    /// The iterator produced by `primes_less_than_or_equal_to(n)` generates the same
-    /// primes as the iterator produced by `primes().take_while(|&p| p <= n)`, but the
-    /// latter would be slower because it doesn't know in advance how large its prime sieve
-    /// should be, and might have to create larger and larger prime sieves.
+    /// The iterator produced by `primes_less_than_or_equal_to(n)` generates the same primes as the
+    /// iterator produced by `primes().take_while(|&p| p <= n)`, but the latter would be slower
+    /// because it doesn't know in advance how large its prime sieve should be, and might have to
+    /// create larger and larger prime sieves.
     ///
     /// # Worst-case complexity (amortized)
     /// $T(i) = O(\log \log i)$

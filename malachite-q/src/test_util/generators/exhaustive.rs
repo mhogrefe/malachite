@@ -394,7 +394,7 @@ pub fn exhaustive_rational_pair_gen_var_3() -> It<(Rational, Rational)> {
 }
 
 pub fn exhaustive_rational_pair_gen_var_4() -> It<(Rational, Rational)> {
-    //TODO
+    // TODO
     Box::new(exhaustive_pairs_from_single(exhaustive_rationals()).filter(|(x, y)| x <= y))
 }
 
@@ -554,7 +554,7 @@ pub fn exhaustive_rational_triple_gen_var_2() -> It<(Rational, Rational, Rationa
 }
 
 pub fn exhaustive_rational_triple_gen_var_3() -> It<(Rational, Rational, Rational)> {
-    //TODO
+    // TODO
     Box::new(
         exhaustive_triples_from_single(exhaustive_rationals()).filter(|(x, y, z)| x <= y && y <= z),
     )

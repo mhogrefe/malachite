@@ -189,12 +189,11 @@ macro_rules! lossy_conversion {
             ///
             /// Let $W$ be the width of the target type.
             ///
-            /// If the target type is unsigned, then
-            /// $f_W(n) = m$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+            /// If the target type is unsigned, then $f_W(n) = m$, where $m < 2^W$ and $n + 2^W k =
+            /// m$ for some $k \in \Z$.
             ///
-            /// If the target type is signed, then
-            /// $f_W(n) = m$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
-            /// $k \in \Z$.
+            /// If the target type is signed, then $f_W(n) = m$, where $-2^{W-1} \leq m < 2^{W-1}$
+            /// and $n + 2^W k = m$ for some $k \in \Z$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -250,12 +249,11 @@ macro_rules! lossy_conversion {
             ///
             /// Let $W$ be the width of the target type.
             ///
-            /// If the target type is unsigned, then
-            /// $f_W(n) = (m, k \neq 0)$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+            /// If the target type is unsigned, then $f_W(n) = (m, k \neq 0)$, where $m < 2^W$ and
+            /// $n + 2^W k = m$ for some $k \in \Z$.
             ///
-            /// If the target type is signed, then
-            /// $f_W(n) = (m, k \neq 0)$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for
-            /// some $k \in \Z$.
+            /// If the target type is signed, then $f_W(n) = (m, k \neq 0)$, where $-2^{W-1} \leq m
+            /// < 2^{W-1}$ and $n + 2^W k = m$ for some $k \in \Z$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -556,16 +554,16 @@ macro_rules! impl_from_float_unsigned {
             ($f:ident) => {
                 impl RoundingFrom<$u> for $f {
                     /// Converts a value of an unsigned type to a value of a floating point type
-                    /// according to a specified
-                    /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
-                    /// returned value is less than, equal to, or greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also returned,
+                    /// indicating whether the returned value is less than, equal to, or greater
+                    /// than the original value.
                     ///
                     /// - If the rounding mode is `Floor` or `Down`, the largest float less than or
                     ///   equal to the value is returned.
-                    /// - If the rounding mode is `Ceiling` or `Up`, the smallest float greater
-                    ///   than or equal to the value is returned.
-                    /// - If the rounding mode is `Nearest`, then the nearest float is returned.
-                    ///   If the value is exactly between two floats, the float with the zero
+                    /// - If the rounding mode is `Ceiling` or `Up`, the smallest float greater than
+                    ///   or equal to the value is returned.
+                    /// - If the rounding mode is `Nearest`, then the nearest float is returned. If
+                    ///   the value is exactly between two floats, the float with the zero
                     ///   least-significant bit in its representation is selected. If the value is
                     ///   larger than the maximum finite float (which can only happen when
                     ///   converting a `u128` to an `f32`), the maximum finite float is returned.
@@ -587,9 +585,9 @@ macro_rules! impl_from_float_unsigned {
 
                 impl RoundingFrom<$f> for $u {
                     /// Converts a value of a floating point type to a value of an unsigned type
-                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also
-                    /// returned, indicating whether the returned value is less than, equal to, or
-                    /// greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also returned,
+                    /// indicating whether the returned value is less than, equal to, or greater
+                    /// than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
@@ -599,15 +597,14 @@ macro_rules! impl_from_float_unsigned {
                     ///   equal to the value is returned. If the float is negative, zero is
                     ///   returned. If the float is greater than the maximum representable unsigned
                     ///   value, the function panics.
-                    /// - If the rounding mode is `Down`, then the rounding proceeds as with
-                    ///   `Floor` if the float is non-negative and as with `Ceiling` if the value
-                    ///   is negative.
-                    /// - If the rounding mode is `Up`, then the rounding proceeds as with
-                    ///   `Ceiling` if the value is non-negative and as with `Floor` if the value
-                    ///   is negative.
+                    /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor`
+                    ///   if the float is non-negative and as with `Ceiling` if the value is
+                    ///   negative.
+                    /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling`
+                    ///   if the value is non-negative and as with `Floor` if the value is negative.
                     /// - If the rounding mode is `Nearest`, then the nearest value is returned. If
-                    ///   the value is exactly between two numbers, the even one is selected. If
-                    ///   the float is greater than the maximum representable unsigned value, the
+                    ///   the value is exactly between two numbers, the even one is selected. If the
+                    ///   float is greater than the maximum representable unsigned value, the
                     ///   maximum unsigned value is returned. If the float is negative, zero is
                     ///   returned.
                     ///
@@ -618,8 +615,8 @@ macro_rules! impl_from_float_unsigned {
                     /// - If `value` is `NaN`.
                     /// - If `rm` is `Exact` but `value` is not exactly equal to any value of the
                     ///   unsigned type.
-                    /// - If `value` is greater than the maximum value of the unsigned type and
-                    ///   `rm` is `Ceiling` or `Up`.
+                    /// - If `value` is greater than the maximum value of the unsigned type and `rm`
+                    ///   is `Ceiling` or `Up`.
                     /// - If `value` is negative and `rm` is `Floor` or `Up`.
                     ///
                     /// # Examples
@@ -908,22 +905,21 @@ macro_rules! impl_from_float_signed {
             ($f:ident) => {
                 impl RoundingFrom<$i> for $f {
                     /// Converts a value of a signed type to a value of a floating point type
-                    /// according to a specified
-                    /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
-                    /// returned value is less than, equal to, or greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also returned,
+                    /// indicating whether the returned value is less than, equal to, or greater
+                    /// than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest float less than or equal to
                     ///   the value is returned.
                     /// - If the rounding mode is `Ceiling`, the smallest float greater than or
                     ///   equal to the value is returned.
-                    /// - If the rounding mode is `Down`, then the rounding proceeds as with
-                    ///   `Floor` if the value is non-negative and as with `Ceiling` if the value
-                    ///   is negative.
-                    /// - If the rounding mode is `Up`, then the rounding proceeds as with
-                    ///   `Ceiling` if the value is non-negative and as with `Floor` if the value
-                    ///   is negative.
-                    /// - If the rounding mode is `Nearest`, then the nearest float is returned.
-                    ///   If the value is exactly between two floats, the float with the zero
+                    /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor`
+                    ///   if the value is non-negative and as with `Ceiling` if the value is
+                    ///   negative.
+                    /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling`
+                    ///   if the value is non-negative and as with `Floor` if the value is negative.
+                    /// - If the rounding mode is `Nearest`, then the nearest float is returned. If
+                    ///   the value is exactly between two floats, the float with the zero
                     ///   least-significant bit in its representation is selected.
                     ///
                     /// # Worst-case complexity
@@ -943,31 +939,30 @@ macro_rules! impl_from_float_signed {
 
                 impl RoundingFrom<$f> for $i {
                     /// Converts a value of a floating point type to a value of a signed type
-                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also
-                    /// returned, indicating whether the returned value is less than, equal to, or
-                    /// greater than the original value.
+                    /// according to a specified [`RoundingMode`]. An [`Ordering`] is also returned,
+                    /// indicating whether the returned value is less than, equal to, or greater
+                    /// than the original value.
                     ///
                     /// - If the rounding mode is `Floor`, the largest number less than or equal to
                     ///   the value is returned. If the float is greater than the maximum
                     ///   representable signed value, the maximum signed value is returned. If the
-                    ///   float is smaller than the minimum representable signed value, the
-                    ///   function panics.
+                    ///   float is smaller than the minimum representable signed value, the function
+                    ///   panics.
                     /// - If the rounding mode is `Ceiling`, the smallest number greater than or
                     ///   equal to the value is returned. If the float is smaller than the minimum
                     ///   representable signed value, the minimum signed value is returned. If the
-                    ///   float is greater than the maximum representable signed value, the
-                    ///   function panics.
-                    /// - If the rounding mode is `Down`, then the rounding proceeds as with
-                    ///   `Floor` if the float is non-negative and as with `Ceiling` if the value
-                    ///   is negative.
-                    /// - If the rounding mode is `Up`, then the rounding proceeds as with
-                    ///   `Ceiling` if the value is non-negative and as with `Floor` if the value
-                    ///   is negative.
+                    ///   float is greater than the maximum representable signed value, the function
+                    ///   panics.
+                    /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor`
+                    ///   if the float is non-negative and as with `Ceiling` if the value is
+                    ///   negative.
+                    /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling`
+                    ///   if the value is non-negative and as with `Floor` if the value is negative.
                     /// - If the rounding mode is `Nearest`, then the nearest value is returned. If
-                    ///   the value is exactly between two numbers, the even one is selected. If
-                    ///   the float is greater than the maximum representable signed value, the
-                    ///   maximum signed value is returned. If the float is smaller than the
-                    ///   minimum representable signed value, the minimum signed value is returned.
+                    ///   the value is exactly between two numbers, the even one is selected. If the
+                    ///   float is greater than the maximum representable signed value, the maximum
+                    ///   signed value is returned. If the float is smaller than the minimum
+                    ///   representable signed value, the minimum signed value is returned.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

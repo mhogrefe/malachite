@@ -1,6 +1,6 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
-use std::cmp::Ordering;
 
 impl PartialOrd for Rational {
     /// Compares two [`Rational`]s.
@@ -20,8 +20,8 @@ impl Ord for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -33,7 +33,7 @@ impl Ord for Rational {
     /// assert!(Rational::from_str("-2/3").unwrap() < Rational::ONE_HALF);
     /// ```
     fn cmp(&self, other: &Rational) -> Ordering {
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         // First check signs

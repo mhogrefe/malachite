@@ -70,8 +70,8 @@
 /// ```
 pub mod general_digits;
 /// [`PowerOf2DigitIterable`](super::traits::PowerOf2DigitIterable), a trait for producing
-/// [`PrimitivePowerOf2DigitIterator`](power_of_2_digit_iterable::PrimitivePowerOf2DigitIterator),
-/// a double-ended iterator for iterating over a number's base-$2^k$ digits.
+/// [`PrimitivePowerOf2DigitIterator`](power_of_2_digit_iterable::PrimitivePowerOf2DigitIterator), a
+/// double-ended iterator for iterating over a number's base-$2^k$ digits.
 ///
 /// # power_of_2_digits
 /// ```

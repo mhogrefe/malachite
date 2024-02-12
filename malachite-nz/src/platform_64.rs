@@ -2070,8 +2070,8 @@ pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 23] = [
 
 // This table contains the values t in the formula binomial(2k, k) / 2 ^ t.
 //
-// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and
-// `CENTRAL_BINOMIAL_2FAC_TABLE` from `fac_table.h`, GMP 6.2.1.
+// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and `CENTRAL_BINOMIAL_2FAC_TABLE`
+// from `fac_table.h`, GMP 6.2.1.
 pub const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 23] =
     [3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3];
 
@@ -2091,5 +2091,7 @@ pub const FFT_TAB: [[u8; 2]; 5] = [[4, 4], [4, 3], [3, 2], [2, 1], [2, 1]];
 pub const MULMOD_TAB: [u8; 19] = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1];
 
 // Use these tables to match FLINT for debugging
+// ```
 // pub const FFT_TAB: [[u8; 2]; 5] = [[3, 3], [3, 2], [2, 1], [2, 1], [0, 0]];
 // pub const MULMOD_TAB: [u8; 15] = [4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 2, 1, 1];
+// ```

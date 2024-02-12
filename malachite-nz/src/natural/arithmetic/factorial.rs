@@ -43,9 +43,13 @@ pub_test! {subfactorial_naive(n: u64) -> Natural {
 // Returns an approximation of the square root of x.
 //
 // It gives:
-//   limb_apprsqrt(x) ^ 2 <= x < (limb_apprsqrt(x) + 1) ^ 2
+// ```
+// limb_apprsqrt(x) ^ 2 <= x < (limb_apprsqrt(x) + 1) ^ 2
+// ```
 // or
-//   x <= limb_apprsqrt(x) ^ 2 <= x * 9 / 8
+// ```
+// x <= limb_apprsqrt(x) ^ 2 <= x * 9 / 8
+// ```
 //
 // This is equivalent to `limb_apprsqrt` in `mpz/oddfac_1.c`, GMP 6.2.1.
 fn limbs_approx_sqrt(x: u64) -> u64 {
@@ -63,8 +67,8 @@ pub(crate) const fn bit_to_n(bit: u64) -> u64 {
 //
 // The algorithm is described by Peter Luschny in "Divide, Swing and Conquer the Factorial!".
 //
-// The pointer sieve points to `limbs_prime_sieve_size(n)` limbs containing a bit array where
-// primes are marked as 0. Enough limbs must be pointed by `factors`.
+// The pointer sieve points to `limbs_prime_sieve_size(n)` limbs containing a bit array where primes
+// are marked as 0. Enough limbs must be pointed by `factors`.
 //
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log\log n)$
@@ -208,11 +212,11 @@ pub(crate) fn log_n_max(n: Limb) -> u64 {
     ) + 1
 }
 
-// `limbs_odd_factorial` computes the odd part of the factorial of the parameter n, i.e.
-// n! = x * 2 ^ a, where x is the returned value: an odd positive integer.
+// `limbs_odd_factorial` computes the odd part of the factorial of the parameter n, i.e. n! = x * 2
+// ^ a, where x is the returned value: an odd positive integer.
 //
-// If `double` is `true`, a square is skipped in the DSC part, e.g. if n is odd,
-// n > FAC_DSC_THRESHOLD and `double` is true, x is set to n!!.
+// If `double` is `true`, a square is skipped in the DSC part, e.g. if n is odd, n >
+// FAC_DSC_THRESHOLD and `double` is true, x is set to n!!.
 //
 // If n is too small, `double` is ignored, and an assert can be triggered.
 //
@@ -290,8 +294,8 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             let mut size = (n >> Limb::LOG_WIDTH) + 4;
             let n_m_1 = u64::exact_from(n - 1);
             assert!(limbs_prime_sieve_size::<Limb>(n_m_1) < size - (size >> 1));
-            // 2-multiswing(n) < 2^(n - 1) * sqrt(n / pi) < 2 ^ (n + Limb::WIDTH);
-            // One more can be overwritten by mul, another for the sieve.
+            // 2-multiswing(n) < 2^(n - 1) * sqrt(n / pi) < 2 ^ (n + Limb::WIDTH); One more can be
+            // overwritten by mul, another for the sieve.
             let mut swing_and_sieve = vec![0; size];
             // Put the sieve on the second half; it will be overwritten by the last
             // `limbs_2_multiswing_odd`.

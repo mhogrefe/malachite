@@ -89,8 +89,8 @@ pub trait BitBlockAccess: Sized {
         self.get_bits(start, end)
     }
 
-    /// Assigns the least-significant `end - start` bits of `bits` to bits `start` through
-    /// `end - 1` (inclusive) of `self`.
+    /// Assigns the least-significant `end - start` bits of `bits` to bits `start` through `end - 1`
+    /// (inclusive) of `self`.
     fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }
 
@@ -105,12 +105,12 @@ pub trait BitConvertible {
     /// least-significant.
     fn to_bits_desc(&self) -> Vec<bool>;
 
-    /// Converts an iterator of bits into a number. The input bits are in ascending order: least-
-    /// to most-significant.
+    /// Converts an iterator of bits into a number. The input bits are in ascending order: least- to
+    /// most-significant.
     fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> Self;
 
-    /// Converts an iterator of bits into a value. The input bits are in descending order: most-
-    /// to least-significant.
+    /// Converts an iterator of bits into a value. The input bits are in descending order: most- to
+    /// least-significant.
     fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> Self;
 }
 
@@ -126,8 +126,8 @@ pub trait BitIterable {
 /// Defines functions that search for the next `true` or `false` bit in a number, starting at a
 /// specified index and searching in the more-significant direction.
 pub trait BitScan {
-    /// Given a number and a starting index, searches the number for the smallest index of a
-    /// `false` bit that is greater than or equal to the starting index.
+    /// Given a number and a starting index, searches the number for the smallest index of a `false`
+    /// bit that is greater than or equal to the starting index.
     fn index_of_next_false_bit(self, start: u64) -> Option<u64>;
 
     /// Given a number and a starting index, searches the number for the smallest index of a `true`
@@ -154,9 +154,8 @@ pub trait HammingDistance<RHS = Self> {
 /// Returns the Hamming distance between two numbers, or the number of bit flips needed to turn one
 /// into the other.
 ///
-/// This trait allows for the possibility of the distance being undefined for some pairs of
-/// numbers, in which case [`checked_hamming_distance`](Self::checked_hamming_distance) should
-/// return `None`.
+/// This trait allows for the possibility of the distance being undefined for some pairs of numbers,
+/// in which case [`checked_hamming_distance`](Self::checked_hamming_distance) should return `None`.
 pub trait CheckedHammingDistance<RHS = Self> {
     fn checked_hamming_distance(self, other: RHS) -> Option<u64>;
 }

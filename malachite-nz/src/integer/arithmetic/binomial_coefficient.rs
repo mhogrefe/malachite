@@ -6,8 +6,8 @@ use malachite_base::num::basic::traits::One;
 impl BinomialCoefficient for Integer {
     /// Computes the binomial coefficient of two [`Integer`]s, taking both by value.
     ///
-    /// The second argument must be non-negative, but the first may be negative. If it is,
-    /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
+    /// The second argument must be non-negative, but the first may be negative. If it is, the
+    /// identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
     ///
     /// $$
     /// f(n, k) = \\begin{cases}
@@ -60,8 +60,8 @@ impl BinomialCoefficient for Integer {
 impl<'a> BinomialCoefficient<&'a Integer> for Integer {
     /// Computes the binomial coefficient of two [`Integer`]s, taking both by reference.
     ///
-    /// The second argument must be non-negative, but the first may be negative. If it is,
-    /// the identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
+    /// The second argument must be non-negative, but the first may be negative. If it is, the
+    /// identity $\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$ is used.
     ///
     /// $$
     /// f(n, k) = \\begin{cases}

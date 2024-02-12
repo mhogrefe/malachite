@@ -8,8 +8,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 /// A double-ended iterator over the [limbs](crate#limbs) of a [`Natural`].
 ///
-/// The forward order is ascending (least-significant first). The iterator does not iterate over
-/// any implicit leading zero limbs.
+/// The forward order is ascending (least-significant first). The iterator does not iterate over any
+/// implicit leading zero limbs.
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero limbs is allowed.

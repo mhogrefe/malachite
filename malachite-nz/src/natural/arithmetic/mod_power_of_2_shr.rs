@@ -49,11 +49,10 @@ macro_rules! impl_mod_power_of_2_shr_signed {
             type Output = Natural;
 
             /// Right-shifts a [`Natural`] (divides it by a power of 2) modulo $2^k$. The
-            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
-            /// value.
+            /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by value.
             ///
-            /// $f(x, n, k) = y$, where $x, y < 2^k$ and
-            /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
+            /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod
+            /// 2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -81,8 +80,8 @@ macro_rules! impl_mod_power_of_2_shr_signed {
             /// [`Natural`] must be already reduced modulo $2^k$. The [`Natural`] is taken by
             /// reference.
             ///
-            /// $f(x, n, k) = y$, where $x, y < 2^k$ and
-            /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
+            /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod
+            /// 2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

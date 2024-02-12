@@ -292,8 +292,8 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// chunks of $B$ bits, and have the output iterator return each chunk.
 ///
 /// Let $(x\_i)\_{i=0}^{n-1}$ be the input iterator, where $n$ may be $\infty$. If $n$ is finite, we
-/// assume that $x\_{n-1} \neq 0$. Then we define the bit sequence $b\_{k=0}^\infty$ such that
-/// $b \in \\{0, 1\\}$, $b\_k=0$ for $k \geq An$, and
+/// assume that $x\_{n-1} \neq 0$. Then we define the bit sequence $b\_{k=0}^\infty$ such that $b
+/// \in \\{0, 1\\}$, $b\_k=0$ for $k \geq An$, and
 /// $$
 /// x_i = \sum_{k=0}^{A-1} b_{Ai+k}2^k.
 /// $$
@@ -301,9 +301,9 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// $$
 /// y_j = \sum_{k=0}^{B-1} b_{Bi+k}2^k.
 /// $$
-/// Then we have $f((x\_i)\_{i=0}^{n-1}) = (y\_j)\_{j=0}^{m-1}$.
-/// Note that the sequence $y$ is not uniquely specified, since it may contain arbitrarily many
-/// trailing zeros. However, if $x$ is finite, $y$ is guaranteed to also be finite.
+/// Then we have $f((x\_i)\_{i=0}^{n-1}) = (y\_j)\_{j=0}^{m-1}$. Note that the sequence $y$ is not
+/// uniquely specified, since it may contain arbitrarily many trailing zeros. However, if $x$ is
+/// finite, $y$ is guaranteed to also be finite.
 ///
 /// The output length is $An/B + O(1)$, where $n$ is `xs.count()`, $A$ is `in_chunk_size`, and $B$
 /// is `out_chunk_size`.
@@ -415,8 +415,8 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 /// The ruler sequence (<https://oeis.org/A007814>) is the number of times that 2 divides the
 /// numbers $1, 2, 3, \ldots$.
 ///
-/// $(x_i)_{i=1}^\infty = t_i$, where for each $i$, $i = (2k_i+1)2^{t_i}$ for some
-/// $k_i\in \mathbb{Z}$.
+/// $(x_i)_{i=1}^\infty = t_i$, where for each $i$, $i = (2k_i+1)2^{t_i}$ for some $k_i\in
+/// \mathbb{Z}$.
 ///
 /// The $n$th term of this sequence is no greater than $\log_2(n + 1)$. Every number occurs
 /// infinitely many times, and any number's first occurrence is after all smaller numbers have

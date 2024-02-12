@@ -38,18 +38,20 @@ pub_test! {limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Li
 
 // Standard Barrett reduction: (set r = `Limb::WIDTH`)
 //
-// We have m fits into 2 words and 2 ^ r < m < 2 ^ (2 * r). Therefore 2 ^ (3 * r) >
-// 2 ^ (4 * r) / m > 2 ^ (2 * r) and the precomputed number inv = floor(2 ^ (4 * r) / m) fits into
-// 3 words. The inputs x and y are < m and therefore fit into 2 words.
+// We have m fits into 2 words and 2 ^ r < m < 2 ^ (2 * r). Therefore 2 ^ (3 * r) > 2 ^ (4 * r) / m
+// > 2 ^ (2 * r) and the precomputed number inv = floor(2 ^ (4 * r) / m) fits into 3 words. The
+// inputs x and y are < m and therefore fit into 2 words.
 //
 // The computation of a = x*y mod m is:
+// ```
 // w = x * y               x < m ^ 2 and therefore fits into 4 words
 // z = (w >> r) * inv      z <= m * 2 ^ (3 * r) and therefore fits into 5 words
 // q = (z >> (3 * r)) * n  q fits into 4 words
 // w = w - q               w fits into 3 words after the subtraction
+// ```
 //
-// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or
-// a = w - 2 * m
+// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or a = w -
+// 2 * m
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -103,8 +105,8 @@ pub_test! {limbs_mod_mul_two_limbs(
     );
     let (z_4, z_3, _, _) = Limb::xxxx_add_yyyy_to_zzzz(z_4, z_3, z_2, z_1, v_4, v_3, v_2, v_1);
 
-    // q[3:0] = z[4:3] * n[1:0], q[3] is not needed
-    // x[3:0] -= q[3:0], w[3] should end up zero
+    // - q[3:0] = z[4:3] * n[1:0], q[3] is not needed
+    // - x[3:0] -= q[3:0], w[3] should end up zero
     let (q_1, q_0) = Limb::x_mul_y_to_zz(z_3, m_0);
     let (w_2, w_1) = DoubleLimb::join_halves(w_2, w_1)
         .wrapping_sub(DoubleLimb::from(z_4) * DoubleLimb::from(m_0))
@@ -353,8 +355,8 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value and `m` is taken by reference.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value and `m` is taken by reference.
     fn mod_mul_precomputed(mut self, other: Natural, m: &'a Natural, data: &ModMulData) -> Natural {
         self.mod_mul_precomputed_assign(other, m, data);
         self
@@ -427,8 +429,8 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by value and `c` is taken by reference.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value and `c` is taken by reference.
     fn mod_mul_precomputed(mut self, other: &'a Natural, m: Natural, data: &ModMulData) -> Natural {
         self.mod_mul_precomputed_assign(other, m, data);
         self
@@ -670,8 +672,8 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by reference and `c` is taken by value.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by reference and `c` is taken by value.
     #[inline]
     fn mod_mul_precomputed(self, other: Natural, m: &'b Natural, data: &ModMulData) -> Natural {
         other.mod_mul_precomputed(self, m, data)
@@ -744,8 +746,8 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by reference and `m` is taken by value.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by reference and `m` is taken by value.
     fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -836,8 +838,8 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from fmpz_mod/mul.c, FLINT 2.7.1, where `b`, `c`,
-    /// and `m` are taken by reference.
+    /// This is equivalent to `_fmpz_mod_mulN` from fmpz_mod/mul.c, FLINT 2.7.1, where `b`, `c`, and
+    /// `m` are taken by reference.
     fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(other < m, "other must be reduced mod m, but {other} >= {m}");
@@ -964,8 +966,8 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 8);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value, `m` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: &'a Natural, data: &ModMulData) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -1033,8 +1035,8 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 8);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by value, `c` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_mul_precomputed_assign(&mut self, other: &'a Natural, m: Natural, data: &ModMulData) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -1065,8 +1067,7 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
 
 impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
-    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
-    /// reference.
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by reference.
     ///
     /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
@@ -1198,8 +1199,8 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
     /// assert_eq!(Natural::from(7u32).mod_mul(Natural::from(6u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value and `m` is taken by reference.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value and `m` is taken by reference.
     #[inline]
     fn mod_mul(self, other: Natural, m: &'a Natural) -> Natural {
         self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
@@ -1234,8 +1235,8 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
     /// assert_eq!(Natural::from(7u32).mod_mul(&Natural::from(6u32), Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by value and `c` is taken by reference.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value and `c` is taken by reference.
     #[inline]
     fn mod_mul(self, other: &'a Natural, m: Natural) -> Natural {
         let data = precompute_mod_mul_data_helper(&m);
@@ -1344,8 +1345,8 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     /// assert_eq!((&Natural::from(7u32)).mod_mul(Natural::from(6u32), &Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by reference and `c` is taken by value.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by reference and `c` is taken by value.
     #[inline]
     fn mod_mul(self, other: Natural, m: &'b Natural) -> Natural {
         self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
@@ -1380,8 +1381,8 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     /// assert_eq!((&Natural::from(7u32)).mod_mul(&Natural::from(6u32), Natural::from(10u32)), 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by reference and `m` is taken by value.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by reference and `m` is taken by value.
     #[inline]
     fn mod_mul(self, other: &'b Natural, m: Natural) -> Natural {
         let data = precompute_mod_mul_data_helper(&m);
@@ -1497,8 +1498,8 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value, `m` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value, `m` is taken by reference, and `a == b`.
     #[inline]
     fn mod_mul_assign(&mut self, other: Natural, m: &'a Natural) {
         self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m))
@@ -1534,8 +1535,8 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 2);
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by value, `c` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_mulN` from `fmpz_mod/mul.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value, `c` is taken by reference, and `a == b`.
     #[inline]
     fn mod_mul_assign(&mut self, other: &'a Natural, m: Natural) {
         let data = precompute_mod_mul_data_helper(&m);
@@ -1545,8 +1546,7 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
 
 impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
     /// Multiplies two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
-    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
-    /// reference.
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by reference.
     ///
     /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
     ///

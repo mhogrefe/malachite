@@ -19,8 +19,8 @@ impl Add<Integer> for Integer {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -61,8 +61,8 @@ impl<'a> Add<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -99,8 +99,8 @@ impl<'a> Add<Integer> for &'a Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -137,8 +137,8 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -212,8 +212,8 @@ impl AddAssign<Integer> for Integer {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -275,8 +275,8 @@ impl<'a> AddAssign<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

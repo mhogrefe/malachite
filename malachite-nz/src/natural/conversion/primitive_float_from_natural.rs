@@ -19,9 +19,9 @@ macro_rules! float_impls {
             /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
             /// value is less than, equal to, or greater than the original value.
             ///
-            /// - If the rounding mode is `Floor` or `Down`, the largest float less than or equal
-            ///   to the [`Natural`] is returned. If the [`Natural`] is greater than the maximum
-            ///   finite float, then the maximum finite float is returned.
+            /// - If the rounding mode is `Floor` or `Down`, the largest float less than or equal to
+            ///   the [`Natural`] is returned. If the [`Natural`] is greater than the maximum finite
+            ///   float, then the maximum finite float is returned.
             /// - If the rounding mode is `Ceiling` or `Up`, the smallest float greater than or
             ///   equal to the [`Natural`] is returned. If the [`Natural`] is greater than the
             ///   maximum finite float, then positive infinity is returned.

@@ -181,7 +181,7 @@ where
 fn demo_const_from_unsigneds(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, d) in unsigned_pair_gen_var_27().get(gm, config).take(limit) {
         println!(
-            "Rational::const_from_unsigneds({}, {}) = {:?}",
+            "Rational::const_from_unsigneds({}, {}) = {}",
             n,
             d,
             Rational::const_from_unsigneds(n, d)
@@ -192,7 +192,7 @@ fn demo_const_from_unsigneds(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_const_from_signeds(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, d) in signed_pair_gen().get(gm, config).take(limit) {
         println!(
-            "Rational::const_from_signed({}, {}) = {:?}",
+            "Rational::const_from_signed({}, {}) = {}",
             n,
             d,
             Rational::const_from_signeds(n, d)

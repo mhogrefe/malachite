@@ -219,8 +219,8 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 /// Generates random [`Natural`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 0. Then a [`Natural`]
-/// is chosen uniformly among all [`Natural`]s with that bit length. The resulting distribution
+/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 0. Then a [`Natural`] is
+/// chosen uniformly among all [`Natural`]s with that bit length. The resulting distribution
 /// resembles a Pareto distribution. It has no mean or higher-order statistics (unless $m < 1$,
 /// which is not typical).
 ///
@@ -277,8 +277,8 @@ pub fn random_naturals(
 /// Generates random positive [`Natural`]s with a specified mean bit length.
 ///
 /// The actual bit length is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then a [`Natural`]
-/// is chosen uniformly among all [`Natural`]s with that bit length. The resulting distribution
+/// `mean_bits_numerator / mean_bits_denominator`; $m$ must be greater than 1. Then a [`Natural`] is
+/// chosen uniformly among all [`Natural`]s with that bit length. The resulting distribution
 /// resembles a Pareto distribution. It has no mean or higher-order statistics (unless $m < 2$,
 /// which is not typical).
 ///
@@ -301,8 +301,8 @@ pub fn random_naturals(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -370,10 +370,9 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if
+/// after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -429,9 +428,9 @@ pub fn striped_random_naturals(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -676,8 +675,8 @@ impl Iterator for RandomNaturalRangeToInfinity {
 
 /// Generates random [`Natural`]s greater than or equal to a lower bound $a$.
 ///
-/// The mean bit length $m$ of the [`Natural`]s is specified; it must be greater than the bit
-/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Natural`]s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
 /// Then a [`Natural`] is chosen uniformly among all [`Natural`]s with that bit length that are
@@ -805,8 +804,8 @@ impl Iterator for RandomNaturalRange {
 /// more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
-/// it approaches the mean bit length as $\log (b/a)$ approaches infinity. $m$ must be greater than
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though it
+/// approaches the mean bit length as $\log (b/a)$ approaches infinity. $m$ must be greater than
 /// $a$, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
 /// decrease as bit length increases. The larger it is, the more closely the distribution approaches
 /// a uniform distribution over the bit lengths.
@@ -823,8 +822,8 @@ impl Iterator for RandomNaturalRange {
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
+/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -877,8 +876,8 @@ pub fn random_natural_range(
 /// generated more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
-/// it approaches the mean bit length as $\log (b/a)$ approaches infinity. $m$ must be greater than
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though it
+/// approaches the mean bit length as $\log (b/a)$ approaches infinity. $m$ must be greater than
 /// $a$, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
 /// decrease as bit length increases. The larger it is, the more closely the distribution approaches
 /// a uniform distribution over the bit lengths.
@@ -908,8 +907,8 @@ pub fn random_natural_range(
 ///         \text{if} \\quad 0 < a \\ \text{and} \\ \alpha < \nu < \beta,
 /// \\end{cases}
 /// $$
-/// where $\alpha = \lfloor \log_2 a \rfloor$, $\beta = \lfloor \log_2 b \rfloor$, and
-/// $\nu = \lfloor \log_2 n \rfloor$.
+/// where $\alpha = \lfloor \log_2 a \rfloor$, $\beta = \lfloor \log_2 b \rfloor$, and $\nu =
+/// \lfloor \log_2 n \rfloor$.
 ///
 /// The output length is infinite.
 ///
@@ -918,13 +917,13 @@ pub fn random_natural_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
+/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio
-/// is less than or equal to $a$, or if they are too large and manipulating them leads to
-/// arithmetic overflow.
+/// is less than or equal to $a$, or if they are too large and manipulating them leads to arithmetic
+/// overflow.
 ///
 /// # Examples
 /// ```
@@ -1060,9 +1059,9 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 /// The [`Natural`] are generated using a striped bit sequence with mean run length $m$, which is
 /// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run
-/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
-/// run length.
+/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
 ///
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
@@ -1074,8 +1073,8 @@ impl Iterator for StripedRandomNaturalInclusiveRange {
 /// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1115,12 +1114,12 @@ pub fn striped_random_natural_range(
 
 /// Generates random striped [`Natural`]s in the range $[a, b]$.
 ///
-/// The [`Natural`]s are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The [`Natural`]s are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run
-/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
-/// run length.
+/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
 ///
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
@@ -1132,8 +1131,8 @@ pub fn striped_random_natural_range(
 /// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1209,19 +1208,19 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 
 /// Generates striped random [`Natural`]s greater than or equal to a lower bound $a$.
 ///
-/// The mean bit length $m$ of the [`Natural`]s is specified; it must be greater than the bit
-/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Natural`]s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
-/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
-/// which is not typical).
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$, which
+/// is not typical).
 ///
-/// The [`Natural`]s are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The [`Natural`]s are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
-/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run
-/// length will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean
-/// run length.
+/// Because the [`Natural`] are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
 ///
 /// The output length is infinite.
 ///
@@ -1236,10 +1235,10 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, if their ratio is less than or equal to $a$, or if they are
-/// too large and manipulating them leads to arithmetic overflow.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to $a$, or if they are too large and manipulating them leads to
+/// arithmetic overflow.
 ///
 /// # Examples
 /// ```

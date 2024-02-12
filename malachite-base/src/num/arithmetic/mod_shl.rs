@@ -64,8 +64,8 @@ macro_rules! impl_mod_shl_unsigned {
                 }
 
                 impl ModShlAssign<$u, $t> for $t {
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
-                    /// in place. The number must be already reduced modulo $m$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$, in
+                    /// place. The number must be already reduced modulo $m$.
                     ///
                     /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
@@ -150,8 +150,8 @@ macro_rules! impl_mod_shl_signed {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$.
                     /// The number must be already reduced modulo $m$.
                     ///
-                    /// $f(x, n, m) = y$, where $x, y < m$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
+                    /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod
+                    /// m$.
                     ///
                     /// # Worst-case complexity
                     /// $T(n) = O(n)$
@@ -173,11 +173,10 @@ macro_rules! impl_mod_shl_signed {
                 }
 
                 impl ModShlAssign<$u, $t> for $t {
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$,
-                    /// in place. The number must be already reduced modulo $m$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo a number $m$, in
+                    /// place. The number must be already reduced modulo $m$.
                     ///
-                    /// $x \gets y$, where $x, y < m$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
+                    /// $x \gets y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
                     ///
                     /// # Worst-case complexity
                     /// $T(n) = O(n)$

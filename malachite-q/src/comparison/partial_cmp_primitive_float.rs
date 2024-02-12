@@ -1,6 +1,8 @@
 use crate::Rational;
+use core::cmp::Ordering;
+#[cfg(not(any(feature = "test_build", feature = "random")))]
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::arithmetic::traits::FloorLogBase2;
-use std::cmp::Ordering;
 
 macro_rules! impl_float {
     ($t: ident) => {

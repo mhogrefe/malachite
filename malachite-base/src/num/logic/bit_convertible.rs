@@ -76,8 +76,7 @@ macro_rules! impl_bit_convertible_unsigned {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
             /// See [here](super::bit_convertible#to_bits_asc).
@@ -96,8 +95,7 @@ macro_rules! impl_bit_convertible_unsigned {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
             /// See [here](super::bit_convertible#to_bits_desc).

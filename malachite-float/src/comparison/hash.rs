@@ -1,6 +1,6 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use std::hash::{Hash, Hasher};
+use core::hash::{Hash, Hasher};
 
 impl Hash for ComparableFloat {
     /// Computes a hash of a `ComparableFloat`.

@@ -270,8 +270,8 @@ macro_rules! impl_from_sci_string {
             /// non-integer.
             ///
             /// If the base is greater than 10, the higher digits are represented by the letters
-            /// `'a'` through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't
-            /// need to be consistent.
+            /// `'a'` through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't need
+            /// to be consistent.
             ///
             /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the
             /// base is 15 or greater, an ambiguity arises where it may not be clear whether `'e'`

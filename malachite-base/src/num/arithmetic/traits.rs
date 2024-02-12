@@ -126,8 +126,8 @@ pub trait CheckedNeg {
     fn checked_neg(self) -> Option<Self::Output>;
 }
 
-/// Finds the smallest integer power of 2 greater than or equal to a number, returning `None` if
-/// the result is not representable.
+/// Finds the smallest integer power of 2 greater than or equal to a number, returning `None` if the
+/// result is not representable.
 pub trait CheckedNextPowerOf2 {
     type Output;
 
@@ -205,8 +205,8 @@ pub trait DivAssignMod<RHS = Self> {
     fn div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
 }
 
-/// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards
-/// zero, and the remainder has the same sign as the dividend (first input).
+/// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards zero,
+/// and the remainder has the same sign as the dividend (first input).
 ///
 /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait DivRem<RHS = Self> {
@@ -248,8 +248,8 @@ pub trait CeilingDivAssignNegMod<RHS = Self> {
 }
 
 /// Divides a number by another number, returning the quotient and remainder. The quotient is
-/// rounded towards positive infinity and the remainder has the opposite sign as the divisor
-/// (second input).
+/// rounded towards positive infinity and the remainder has the opposite sign as the divisor (second
+/// input).
 ///
 /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait CeilingDivMod<RHS = Self> {
@@ -260,8 +260,8 @@ pub trait CeilingDivMod<RHS = Self> {
 }
 
 /// Divides a number by another number in place, taking the quotient and returning the remainder.
-/// The quotient is rounded towards positive infinity and the remainder has the opposite sign of
-/// the divisor (second input).
+/// The quotient is rounded towards positive infinity and the remainder has the opposite sign of the
+/// divisor (second input).
 ///
 /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait CeilingDivAssignMod<RHS = Self> {
@@ -306,8 +306,8 @@ pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
 }
 
-/// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the
-/// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
+/// Computes the GCD (greatest common divisor) of two numbers $a$ and $b$, and also the coefficients
+/// $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$.
 ///
 /// The are infinitely many $x$, $y$ that satisfy the identity, so the full specification is more
 /// detailed:
@@ -317,9 +317,9 @@ pub trait EqMod<RHS = Self, M = Self> {
 /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
 /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
 /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-/// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
-///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and
-///   $y \leq \lfloor a/g \rfloor$.
+/// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$, where
+///   $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g
+///   \rfloor$.
 pub trait ExtendedGcd<RHS = Self> {
     type Gcd;
     type Cofactor;
@@ -327,36 +327,53 @@ pub trait ExtendedGcd<RHS = Self> {
     fn extended_gcd(self, other: RHS) -> (Self::Gcd, Self::Cofactor, Self::Cofactor);
 }
 
-// TODOOOOO
-
+/// Computes the factorial of a `u64`.
 pub trait Factorial {
     fn factorial(n: u64) -> Self;
 }
 
+/// Computes the factorial of a `u64`, returning `None` if the result is too large to be
+/// represented.
 pub trait CheckedFactorial: Sized {
     fn checked_factorial(n: u64) -> Option<Self>;
 }
 
+/// Computes the double factorial of a `u64`. The double factorial of a non-negative integer is the
+/// product of all the positive integers that are less than or equal to it and have the same parity
+/// as it.
 pub trait DoubleFactorial {
     fn double_factorial(n: u64) -> Self;
 }
 
+/// Computes the double factorial of a `u64`, returning `None` if the result is too large to be
+/// represented. The double factorial of a non-negative integer is the product of all the positive
+/// integers that are less than or equal to it and have the same parity as it.
 pub trait CheckedDoubleFactorial: Sized {
     fn checked_double_factorial(n: u64) -> Option<Self>;
 }
 
+/// Computes the $m$-multifactorial of a `u64`. The $m$-multifactorial of a non-negative integer $n$
+/// is the product of all integers $k$ such that $0<k\leq n$ and $k\equiv n \pmod m$.
 pub trait Multifactorial {
     fn multifactorial(n: u64, m: u64) -> Self;
 }
 
+/// Computes the $m$-multifactorial of a `u64`, returning `None` if the result is too large to be
+/// represented. The $m$-multifactorial of a non-negative integer $n$ is the product of all integers
+/// $k$ such that $0<k\leq n$ and $k\equiv n \pmod m$.
 pub trait CheckedMultifactorial: Sized {
     fn checked_multifactorial(n: u64, m: u64) -> Option<Self>;
 }
 
+/// Computes the subfactorial of a `u64`. The subfactorial of a non-negative integer $n$ counts the
+/// number of derangements of $n$ elements, which are the permutations in which no element is fixed.
 pub trait Subfactorial {
     fn subfactorial(n: u64) -> Self;
 }
 
+/// Computes the subfactorial of a `u64`, returning `None` if the result is too large to be
+/// represented. The subfactorial of a non-negative integer $n$ counts the number of derangements of
+/// $n$ elements, which are the permutations in which no element is fixed.
 pub trait CheckedSubfactorial: Sized {
     fn checked_subfactorial(n: u64) -> Option<Self>;
 }
@@ -402,8 +419,15 @@ pub trait LcmAssign<RHS = Self> {
     fn lcm_assign(&mut self, other: RHS);
 }
 
-/// Calculates the LCM (least common multiple) of two numbers, returning `None` if the result is
-/// not representable.
+/// Takes the natural logarithm of a number.
+pub trait Ln {
+    type Output;
+
+    fn ln(self) -> Self::Output;
+}
+
+/// Calculates the LCM (least common multiple) of two numbers, returning `None` if the result is not
+/// representable.
 pub trait CheckedLcm<RHS = Self> {
     type Output;
 
@@ -518,8 +542,7 @@ pub trait ModIsReduced<M = Self> {
     fn mod_is_reduced(&self, m: &M) -> bool;
 }
 
-/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
-/// $m$.
+/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 pub trait ModMul<RHS = Self, M = Self> {
     type Output;
 
@@ -532,8 +555,7 @@ pub trait ModMulAssign<RHS = Self, M = Self> {
     fn mod_mul_assign(&mut self, other: RHS, m: M);
 }
 
-/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo
-/// $m$.
+/// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 ///
 /// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
@@ -576,8 +598,8 @@ pub trait ModNegAssign<M = Self> {
 /// Divides a number by another number, returning just the remainder. The remainder has the same
 /// sign as the divisor (second number).
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
-/// $0 \leq |r| < |y|$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// |r| < |y|$.
 pub trait Mod<RHS = Self> {
     type Output;
 
@@ -587,36 +609,35 @@ pub trait Mod<RHS = Self> {
 /// Divides a number by another number, replacing the first number by the remainder. The remainder
 /// has the same sign as the divisor (second number).
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
-/// $0 \leq |r| < |y|$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// |r| < |y|$.
 pub trait ModAssign<RHS = Self> {
     fn mod_assign(&mut self, other: RHS);
 }
 
 /// Divides the negative of a number by another number, returning the remainder.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and
-/// $0 \leq r < y$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0 \leq
+/// r < y$.
 pub trait NegMod<RHS = Self> {
     type Output;
 
     fn neg_mod(self, other: RHS) -> Self::Output;
 }
 
-/// Divides the negative of a number by another number, replacing the first number by the
-/// remainder.
+/// Divides the negative of a number by another number, replacing the first number by the remainder.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and
-/// $0 \leq r < y$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0 \leq
+/// r < y$.
 pub trait NegModAssign<RHS = Self> {
     fn neg_mod_assign(&mut self, other: RHS);
 }
 
-/// Divides a number by another number, returning just the remainder. The remainder has the
-/// opposite sign as the divisor (second number).
+/// Divides a number by another number, returning just the remainder. The remainder has the opposite
+/// sign as the divisor (second number).
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
-/// $0 \leq |r| < |y|$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// |r| < |y|$.
 pub trait CeilingMod<RHS = Self> {
     type Output;
 
@@ -626,8 +647,8 @@ pub trait CeilingMod<RHS = Self> {
 /// Divides a number by another number, replacing the first number by the remainder. The remainder
 /// has the same sign as the divisor (second number).
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
-/// $0 \leq |r| < |y|$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// |r| < |y|$.
 pub trait CeilingModAssign<RHS = Self> {
     fn ceiling_mod_assign(&mut self, other: RHS);
 }
@@ -640,8 +661,8 @@ pub trait ModPow<RHS = Self, M = Self> {
     fn mod_pow(self, exp: RHS, m: M) -> Self::Output;
 }
 
-/// Raises a number to a power modulo another number $m$, in place. The base must be already
-/// reduced modulo $m$.
+/// Raises a number to a power modulo another number $m$, in place. The base must be already reduced
+/// modulo $m$.
 pub trait ModPowAssign<RHS = Self, M = Self> {
     fn mod_pow_assign(&mut self, exp: RHS, m: M);
 }
@@ -665,8 +686,8 @@ where
     fn mod_pow_precomputed(self, exp: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Raises a number to a power modulo another number $m$, in place. The base must be already
-/// reduced modulo $m$.
+/// Raises a number to a power modulo another number $m$, in place. The base must be already reduced
+/// modulo $m$.
 ///
 /// If multiple modular exponentiations with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the exponentiation calls. This trait provides a
@@ -747,8 +768,8 @@ pub trait ModPowerOf2Shl<RHS> {
     fn mod_power_of_2_shl(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place. The number must
-/// be already reduced modulo $2^k$.
+/// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place. The number must be
+/// already reduced modulo $2^k$.
 pub trait ModPowerOf2ShlAssign<RHS> {
     fn mod_power_of_2_shl_assign(&mut self, other: RHS, pow: u64);
 }
@@ -793,19 +814,18 @@ pub trait ModPowerOf2SubAssign<RHS = Self> {
 
 /// Divides a number by $2^k$, returning just the remainder. The remainder is non-negative.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq r < 2^k$.
 pub trait ModPowerOf2 {
     type Output;
 
     fn mod_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Divides a number by $2^k$, replacing the number by the remainder. The remainder is
-/// non-negative.
+/// Divides a number by $2^k$, replacing the number by the remainder. The remainder is non-negative.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq r < 2^k$.
 pub trait ModPowerOf2Assign {
     fn mod_power_of_2_assign(&mut self, other: u64);
 }
@@ -813,8 +833,8 @@ pub trait ModPowerOf2Assign {
 /// Divides a number by $2^k$, returning just the remainder. The remainder has the same sign as the
 /// number.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq |r| < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq |r| < 2^k$.
 pub trait RemPowerOf2 {
     type Output;
 
@@ -824,16 +844,16 @@ pub trait RemPowerOf2 {
 /// Divides a number by $2^k$, replacing the number by the remainder. The remainder has the same
 /// sign as the number.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq |r| < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq |r| < 2^k$.
 pub trait RemPowerOf2Assign {
     fn rem_power_of_2_assign(&mut self, other: u64);
 }
 
 /// Divides the negative of a number by $2^k$, returning the remainder.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
-/// $0 \leq r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and $0
+/// \leq r < 2^k$.
 pub trait NegModPowerOf2 {
     type Output;
 
@@ -842,27 +862,26 @@ pub trait NegModPowerOf2 {
 
 /// Divides the negative of a number by $2^k$, replacing the number by the remainder.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
-/// $0 \leq r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and $0
+/// \leq r < 2^k$.
 pub trait NegModPowerOf2Assign {
     fn neg_mod_power_of_2_assign(&mut self, other: u64);
 }
 
 /// Divides a number by $2^k$, returning just the remainder. The remainder is non-positive.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq -r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq -r < 2^k$.
 pub trait CeilingModPowerOf2 {
     type Output;
 
     fn ceiling_mod_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Divides a number by $2^k$, replacing the number by the remainder. The remainder is
-/// non-positive.
+/// Divides a number by $2^k$, replacing the number by the remainder. The remainder is non-positive.
 ///
-/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
-/// $0 \leq -r < 2^k$.
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0
+/// \leq -r < 2^k$.
 pub trait CeilingModPowerOf2Assign {
     fn ceiling_mod_power_of_2_assign(&mut self, other: u64);
 }
@@ -1274,8 +1293,8 @@ pub trait RoundToMultiple<RHS = Self> {
 }
 
 /// Rounds a number to a multiple of another number in place, according to a specified rounding
-/// mode. [`Ordering`] is returned, indicating whether the returned value is less than, equal to,
-/// or greater than the original value.
+/// mode. [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+/// greater than the original value.
 pub trait RoundToMultipleAssign<RHS = Self> {
     fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
@@ -1402,8 +1421,8 @@ pub trait SaturatingSubAssign<RHS = Self> {
     fn saturating_sub_assign(&mut self, other: RHS);
 }
 
-/// Subtracts a number by the product of two other numbers, saturating at the numeric bounds
-/// instead of overflowing.
+/// Subtracts a number by the product of two other numbers, saturating at the numeric bounds instead
+/// of overflowing.
 pub trait SaturatingSubMul<Y = Self, Z = Self> {
     type Output;
 
@@ -1417,8 +1436,8 @@ pub trait SaturatingSubMulAssign<Y = Self, Z = Self> {
 }
 
 /// Left-shifts a number (multiplies it by a power of 2), rounding the result according to a
-/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
-/// value is less than, equal to, or greater than the exact value.
+/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned value
+/// is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is negative.
 pub trait ShlRound<RHS> {
@@ -1436,9 +1455,9 @@ pub trait ShlRoundAssign<RHS> {
     fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
-/// Right-shifts a number (divides it by a power of 2), rounding the result according to a
-/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
-/// value is less than, equal to, or greater than the exact value.
+/// Right-shifts a number (divides it by a power of 2), rounding the result according to a specified
+/// rounding mode. An [`Ordering`] is also returned, indicating whether the returned value is less
+/// than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is positive.
 pub trait ShrRound<RHS> {
@@ -1448,8 +1467,8 @@ pub trait ShrRound<RHS> {
 }
 
 /// Right-shifts a number (divides it by a power of 2) in place, rounding the result according to a
-/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the assigned
-/// value is less than, equal to, or greater than the exact value.
+/// specified rounding mode. An [`Ordering`] is also returned, indicating whether the assigned value
+/// is less than, equal to, or greater than the exact value.
 ///
 /// Rounding might only be necessary if `other` is positive.
 pub trait ShrRoundAssign<RHS> {
@@ -1568,16 +1587,15 @@ pub trait WrappingAddAssign<RHS = Self> {
     fn wrapping_add_assign(&mut self, other: RHS);
 }
 
-/// Adds a number and the product of two other numbers, wrapping around at the boundary of the
-/// type.
+/// Adds a number and the product of two other numbers, wrapping around at the boundary of the type.
 pub trait WrappingAddMul<Y = Self, Z = Self> {
     type Output;
 
     fn wrapping_add_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Adds a number and the product of two other numbers, in place, wrapping around at the boundary
-/// of the type.
+/// Adds a number and the product of two other numbers, in place, wrapping around at the boundary of
+/// the type.
 pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
     fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
 }
@@ -1717,8 +1735,8 @@ pub trait XXXAddYYYToZZZ: Sized {
     ) -> (Self, Self, Self);
 }
 
-/// Subtracts two numbers, each composed of three `Self` values, returing the difference as a
-/// triple of `Self` values.
+/// Subtracts two numbers, each composed of three `Self` values, returing the difference as a triple
+/// of `Self` values.
 ///
 /// The more significant number always comes first. Subtraction is wrapping, and overflow is not
 /// indicated.

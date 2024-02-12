@@ -1,18 +1,17 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
-use malachite_base::num::conversion::traits::FromStringBase;
 use core::ops::Neg;
 use core::str::FromStr;
+use malachite_base::num::conversion::traits::FromStringBase;
 
 impl FromStr for Integer {
     type Err = ();
 
     /// Converts an string to an [`Integer`].
     ///
-    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid,
-    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, with an
-    /// optional leading `'-'`. Leading zeros are allowed, as is the string `"-0"`. The string
-    /// `"-"` is not.
+    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid, the
+    /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, with an optional
+    /// leading `'-'`. Leading zeros are allowed, as is the string `"-0"`. The string `"-"` is not.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -45,11 +44,11 @@ impl FromStr for Integer {
 impl FromStringBase for Integer {
     /// Converts an string, in a specified base, to an [`Integer`].
     ///
-    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid,
-    /// the string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'`
-    /// through `'z'`, and `'A'` through `'Z'`, with an optional leading `'-'`; and only characters
-    /// that represent digits smaller than the base are allowed. Leading zeros are allowed, as is
-    /// the string `"-0"`. The string `"-"` is not.
+    /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid, the
+    /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'` through
+    /// `'z'`, and `'A'` through `'Z'`, with an optional leading `'-'`; and only characters that
+    /// represent digits smaller than the base are allowed. Leading zeros are allowed, as is the
+    /// string `"-0"`. The string `"-"` is not.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

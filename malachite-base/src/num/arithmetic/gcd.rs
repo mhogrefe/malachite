@@ -89,8 +89,8 @@ pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
         }
     }
     while v != T::ZERO {
-        // Overflow is not possible due to top 2 bits of v not being set.
-        // Avoid divisions when quotient < 4.
+        // Overflow is not possible due to top 2 bits of v not being set. Avoid divisions when
+        // quotient < 4.
         if x < (v << 2) {
             d = x - v;
             x = v;
@@ -118,8 +118,7 @@ macro_rules! impl_gcd {
             /// Computes the GCD (greatest common divisor) of two numbers.
             ///
             /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which
-            /// makes sense if we interpret "greatest" to mean "greatest by the divisibility
-            /// order".
+            /// makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
             ///
             /// $$
             /// f(x, y) = \gcd(x, y).
@@ -145,8 +144,7 @@ macro_rules! impl_gcd {
             /// Replaces another with the GCD (greatest common divisor) of it and another number.
             ///
             /// The GCD of 0 and $n$, for any $n$, is 0. In particular, $\gcd(0, 0) = 0$, which
-            /// makes sense if we interpret "greatest" to mean "greatest by the divisibility
-            /// order".
+            /// makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
             ///
             /// $$
             /// x \gets \gcd(x, y).

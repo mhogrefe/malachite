@@ -84,7 +84,7 @@ fn test_limbs_to_digits_small_base_basecase() {
         verify_limbs_to_digits_small_base_basecase(out_before, len, xs, base, out_len, &out);
     }
     test(&[0; 20], 0, &[], 9, &[]);
-    // base != 10
+    // - base != 10
     test(&[0; 20], 0, &[1], 9, &[1]);
     test(
         &[0; 20],
@@ -97,7 +97,7 @@ fn test_limbs_to_digits_small_base_basecase() {
     test(&[0; 20], 0, &[123456], 6, &[2, 3, 5, 1, 3, 2, 0]);
     test(&[0; 20], 0, &[123456], 7, &[1, 0, 2, 2, 6, 3, 4]);
     test(&[0; 20], 0, &[123456], 9, &[2, 0, 7, 3, 1, 3]);
-    // base == 10
+    // - base == 10
     test(&[0; 20], 0, &[123456], 10, &[1, 2, 3, 4, 5, 6]);
     test(&[0; 20], 0, &[123456], 11, &[8, 4, 8, 3, 3]);
     test(&[0; 20], 0, &[123456], 12, &[5, 11, 5, 4, 0]);
@@ -107,7 +107,7 @@ fn test_limbs_to_digits_small_base_basecase() {
     test(&[0; 20], 0, &[123456], 100, &[12, 34, 56]);
     test(&[0; 20], 0, &[123456], 123, &[8, 19, 87]);
     test(&[0; 20], 0, &[123456], 255, &[1, 229, 36]);
-    // base != 10 && xs_len > 1
+    // - base != 10 && xs_len > 1
     test(
         &[0; 40],
         0,
@@ -115,7 +115,7 @@ fn test_limbs_to_digits_small_base_basecase() {
         5,
         &[1, 2, 0, 2, 3, 1, 3, 3, 2, 4, 0, 4, 2, 1, 4, 4, 1, 3, 0, 0, 0, 1, 3],
     );
-    // base == 10 && xs_len > 1
+    // - base == 10 && xs_len > 1
     test(
         &[0; 40],
         0,
@@ -138,7 +138,7 @@ fn test_limbs_to_digits_small_base_basecase() {
         &[12, 82, 251, 166, 147, 176, 78],
     );
 
-    // zero_len != 0
+    // - zero_len != 0
     test(&[0; 20], 8, &[123456], 9, &[0, 0, 2, 0, 7, 3, 1, 3]);
     test(&[0; 20], 8, &[123456], 10, &[0, 0, 1, 2, 3, 4, 5, 6]);
 }
@@ -172,9 +172,9 @@ fn test_limbs_to_digits_small_base() {
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_to_digits_small_base(out_before, xs, base, out_len, &out);
     }
-    // xs_len == 0
+    // - xs_len == 0
     test(&[0; 20], &[], 9, &[]);
-    // 0 < xs_len < GET_STR_PRECOMPUTE_THRESHOLD
+    // - 0 < xs_len < GET_STR_PRECOMPUTE_THRESHOLD
     test(&[0; 20], &[1], 9, &[1]);
     test(&[0; 20], &[123456], 3, &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]);
     test(&[0; 20], &[123456], 5, &[1, 2, 4, 2, 2, 3, 1, 1]);
@@ -214,29 +214,27 @@ fn test_limbs_to_digits_small_base() {
         255,
         &[12, 82, 251, 166, 147, 176, 78],
     );
-    // xs_len >= GET_STR_PRECOMPUTE_THRESHOLD
-    // power != 1 in limbs_choose_power_table_algorithm
-    // number_of_powers > 1 in limbs_choose_power_table_algorithm
-    // pow.odd() in limbs_choose_power_table_algorithm
-    // n != pow << (i - 1) in limbs_choose_power_table_algorithm
-    // pow.even() in limbs_choose_power_table_algorithm
-    // n == pow << (i - 1) in limbs_choose_power_table_algorithm
-    // n == pow << (i - 1) && pow.odd() in limbs_choose_power_table_algorithm
-    // mul_cost > div_cost in limbs_choose_power_table_algorithm
-    // number_of_powers > 0 in limbs_compute_power_table_using_div
-    // digits_in_base == exp in limbs_compute_power_table_using_div
-    // digits_in_base != exp in limbs_compute_power_table_using_div
-    // remainder[adjust] == 0
-    //      && remainder[adjust + 1].divisible_by_power_of_2(big_base_trailing_zeros)
-    //      in limbs_compute_power_table_using_div
-    // xs_len >= GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
-    // xs_len > total_len || xs_len == total_len
-    //      && limbs_cmp_same_length(&xs[shift..], power.power) == Ordering::Less
-    //      in limbs_to_digits_small_base_divide_and_conquer
-    // len == 0 in limbs_to_digits_small_base_divide_and_conquer
-    // xs_len < GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
-    // xs_len != 0 in limbs_to_digits_small_base_divide_and_conquer
-    // xs_len >= GET_STR_DC_THRESHOLD && len != 0
+    // - xs_len >= GET_STR_PRECOMPUTE_THRESHOLD
+    // - power != 1 in limbs_choose_power_table_algorithm
+    // - number_of_powers > 1 in limbs_choose_power_table_algorithm
+    // - pow.odd() in limbs_choose_power_table_algorithm
+    // - n != pow << (i - 1) in limbs_choose_power_table_algorithm
+    // - pow.even() in limbs_choose_power_table_algorithm
+    // - n == pow << (i - 1) in limbs_choose_power_table_algorithm
+    // - n == pow << (i - 1) && pow.odd() in limbs_choose_power_table_algorithm
+    // - mul_cost > div_cost in limbs_choose_power_table_algorithm
+    // - number_of_powers > 0 in limbs_compute_power_table_using_div
+    // - digits_in_base == exp in limbs_compute_power_table_using_div
+    // - digits_in_base != exp in limbs_compute_power_table_using_div
+    // - remainder[adjust] == 0 && remainder[adjust +
+    //   1].divisible_by_power_of_2(big_base_trailing_zeros) in limbs_compute_power_table_using_div
+    // - xs_len >= GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
+    // - xs_len > total_len || xs_len == total_len && limbs_cmp_same_length(&xs[shift..],
+    //   power.power) == Ordering::Less in limbs_to_digits_small_base_divide_and_conquer
+    // - len == 0 in limbs_to_digits_small_base_divide_and_conquer
+    // - xs_len < GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
+    // - xs_len != 0 in limbs_to_digits_small_base_divide_and_conquer
+    // - xs_len >= GET_STR_DC_THRESHOLD && len != 0
     test(
         &[0; 180],
         &[
@@ -260,7 +258,7 @@ fn test_limbs_to_digits_small_base() {
             52, 74, 32,
         ],
     );
-    // n == pow << (i - 1) && pow.even() in limbs_choose_power_table_algorithm
+    // - n == pow << (i - 1) && pow.even() in limbs_choose_power_table_algorithm
     test(
         &[0; 180],
         &[
@@ -283,16 +281,16 @@ fn test_limbs_to_digits_small_base() {
             19, 31, 58, 11, 63, 52, 58, 89, 56, 15, 19, 1, 88, 97, 54, 92, 60, 81, 85, 64,
         ],
     );
-    // mul_cost <= div_cost in limbs_choose_power_table_algorithm
-    // exponents[0] != chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
-    // (digits_in_base + chars_per_limb) << (power_len - 2) > exponents[0]
-    //      in limbs_compute_power_table_using_mul
-    // (digits_in_base + chars_per_limb) << i > exponents[0]
-    //      in limbs_compute_power_table_using_mul
-    // row.digits_in_base < exponent in limbs_compute_power_table_using_mul
-    // (digits_in_base + chars_per_limb) << i <= exponents[0]
-    //      in limbs_compute_power_table_using_mul
-    // row.digits_in_base >= exponent in limbs_compute_power_table_using_mul
+    // - mul_cost <= div_cost in limbs_choose_power_table_algorithm
+    // - exponents[0] != chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
+    // - (digits_in_base + chars_per_limb) << (power_len - 2) > exponents[0] in
+    //   limbs_compute_power_table_using_mul
+    // - (digits_in_base + chars_per_limb) << i > exponents[0] in
+    //   limbs_compute_power_table_using_mul
+    // - row.digits_in_base < exponent in limbs_compute_power_table_using_mul
+    // - (digits_in_base + chars_per_limb) << i <= exponents[0] in
+    //   limbs_compute_power_table_using_mul
+    // - row.digits_in_base >= exponent in limbs_compute_power_table_using_mul
     test(
         &[0; 150],
         &[
@@ -314,8 +312,8 @@ fn test_limbs_to_digits_small_base() {
             42, 134, 41,
         ],
     );
-    // (digits_in_base + chars_per_limb) << (power_len - 2) <= exponents[0]
-    //      in limbs_compute_power_table_using_mul
+    // - (digits_in_base + chars_per_limb) << (power_len - 2) <= exponents[0] in
+    //   limbs_compute_power_table_using_mul
     test(
         &[0; 210],
         &[
@@ -342,7 +340,7 @@ fn test_limbs_to_digits_small_base() {
             102, 102,
         ],
     );
-    // exponents[0] == chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
+    // - exponents[0] == chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
     test(
         &[0; 160],
         &[
@@ -547,26 +545,26 @@ fn test_to_digits_asc_limb() {
     }
     test::<u8>("0", 10, &[]);
     test::<u8>("0", 16, &[]);
-    // base is not a power of 2
-    // x is small
+    // - base is not a power of 2
+    // - x is small
     test::<u8>("123", 10, &[3, 2, 1]);
-    // base is a power of 2
+    // - base is a power of 2
     test::<u8>("123", 8, &[3, 7, 1]);
-    // x is large
-    // x is large and base < 256
+    // - x is large
+    // - x is large and base < 256
     test::<u8>(
         "1473250819553359898729024041508",
         77,
         &[44, 55, 51, 10, 43, 13, 36, 15, 70, 15, 19, 57, 50, 10, 22, 74],
     );
-    // x is large and base >= 256
-    // to_digits_asc_divide_and_conquer_limb: many digits
-    // to_digits_asc_divide_and_conquer_limb: few digits
-    // base <= SQRT_MAX_LIMB
-    // to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x small
-    // to_digits_asc_divide_and_conquer_limb: q != 0
-    // to_digits_asc_divide_and_conquer_limb: zero padding
-    // to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x large
+    // - x is large and base >= 256
+    // - to_digits_asc_divide_and_conquer_limb: many digits
+    // - to_digits_asc_divide_and_conquer_limb: few digits
+    // - base <= SQRT_MAX_LIMB
+    // - to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x small
+    // - to_digits_asc_divide_and_conquer_limb: q != 0
+    // - to_digits_asc_divide_and_conquer_limb: zero padding
+    // - to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x large
     test::<u32>(
         "1000000000000000000000000000000000000000000000000000000000000",
         1000,
@@ -580,13 +578,13 @@ fn test_to_digits_asc_limb() {
             188, 981,
         ],
     );
-    // to_digits_asc_divide_and_conquer_limb: base > SQRT_MAX_LIMB
+    // - to_digits_asc_divide_and_conquer_limb: base > SQRT_MAX_LIMB
     test::<u32>(
         "1000000000000000000000000000000000000000000000000000000000000",
         123456,
         &[115456, 7508, 27948, 11540, 30637, 92024, 26412, 41276, 18791, 86861, 49669, 9848],
     );
-    // to_digits_asc_divide_and_conquer_limb: q == 0
+    // - to_digits_asc_divide_and_conquer_limb: q == 0
     test::<u32>(
         "958147186852538842877959980138243879940342867265688956449364129",
         9238,
@@ -767,24 +765,24 @@ fn test_to_digits_asc_large() {
         to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, out);
     }
-    // x >= base
-    // base is not a power of 2
-    // bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    // - x >= base
+    // - base is not a power of 2
+    // - bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     test(
         "1000000000000",
         "10",
         &["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1"],
     );
-    // base is a power of 2
+    // - base is a power of 2
     test(
         "1000000000000",
         "16",
         &["0", "0", "0", "1", "5", "10", "4", "13", "8", "14"],
     );
-    // x < base
+    // - x < base
     test("1000000000000", "1000000000000000", &["1000000000000"]);
-    // bits / base.significant_bits() >= TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
-    // q != 0
+    // - bits / base.significant_bits() >= TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    // - q != 0
     test(
         "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
@@ -803,10 +801,10 @@ fn test_to_digits_asc_large() {
             "2", "3", "0", "1", "3", "0", "5", "2", "3", "5", "3", "2", "5", "2", "5", "0", "2",
             "3", "3", "1", "3", "3", "0", "0", "2", "3", "0", "3", "0", "5", "3", "0", "0", "4",
             "1", "5", "1", "4", "4", "1", "5", "4", "0", "0", "4", "1", "2", "1", "3", "5", "1",
-            "5", "5", "0", "1"
-        ]
+            "5", "5", "0", "1",
+        ],
     );
-    // pad with zeros
+    // - pad with zeros
     test(
         "14974892748479131847778931724116484851265511358392776602889616274416063303",
         "3",
@@ -823,7 +821,7 @@ fn test_to_digits_asc_large() {
             "1",
         ],
     );
-    // q == 0
+    // - q == 0
     test(
         "643945257796761196320314690988316858252541574945689186182369731847117890385280572047834937\
         1883212246436232738680605124294949600205450044993253033167972343988333612737978764297848348\
@@ -850,8 +848,8 @@ fn test_to_digits_asc_large() {
             "2", "3", "1", "6", "2", "1", "4", "1", "5", "5", "6", "3", "6", "3", "6", "4", "4",
             "5", "2", "3", "1", "6", "2", "1", "0", "0", "5", "0", "2", "5", "5", "4", "0", "5",
             "6", "5", "2", "2", "0", "3", "6", "5", "2", "4", "6", "4", "3", "6", "4", "4", "6",
-            "6"
-        ]
+            "6",
+        ],
     );
     test("1000000000000", "10000000000", &["0", "100"]);
     test(
@@ -864,10 +862,25 @@ fn test_to_digits_asc_large() {
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
         "6000000000",
         &[
-            "4373186134", "2564485756", "2124820161", "4270626619", "5254372654", "713959034",
-            "4750044302", "5833014701", "978351288", "4288991795", "972424917", "1439538405",
-            "5308114100", "1115837958", "2267585072", "4579628351", "3319271253", "139021832"
-        ]
+            "4373186134",
+            "2564485756",
+            "2124820161",
+            "4270626619",
+            "5254372654",
+            "713959034",
+            "4750044302",
+            "5833014701",
+            "978351288",
+            "4288991795",
+            "972424917",
+            "1439538405",
+            "5308114100",
+            "1115837958",
+            "2267585072",
+            "4579628351",
+            "3319271253",
+            "139021832",
+        ],
     );
 }
 
@@ -912,8 +925,8 @@ fn test_to_digits_desc_large() {
             "4", "0", "5", "4", "3", "3", "1", "1", "4", "3", "5", "5", "4", "0", "5", "2", "3",
             "2", "3", "4", "2", "1", "2", "2", "2", "1", "2", "4", "5", "1", "5", "5", "1", "3",
             "1", "5", "4", "2", "5", "3", "5", "1", "5", "0", "3", "5", "2", "4", "1", "2", "3",
-            "2", "3", "1", "4"
-        ]
+            "2", "3", "1", "4",
+        ],
     );
     test(
         "14974892748479131847778931724116484851265511358392776602889616274416063303",
@@ -957,8 +970,8 @@ fn test_to_digits_desc_large() {
             "0", "5", "0", "5", "2", "2", "0", "6", "1", "4", "6", "5", "3", "4", "4", "3", "1",
             "4", "5", "3", "0", "2", "3", "3", "0", "1", "2", "0", "4", "4", "6", "2", "4", "1",
             "3", "4", "6", "3", "0", "1", "0", "2", "6", "4", "2", "0", "6", "5", "4", "1", "5",
-            "4"
-        ]
+            "4",
+        ],
     );
     test("1000000000000", "10000000000", &["100", "0"]);
     test(
@@ -971,10 +984,25 @@ fn test_to_digits_desc_large() {
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
         "6000000000",
         &[
-            "139021832", "3319271253", "4579628351", "2267585072", "1115837958", "5308114100",
-            "1439538405", "972424917", "4288991795", "978351288", "5833014701", "4750044302",
-            "713959034", "5254372654", "4270626619", "2124820161", "2564485756", "4373186134"
-        ]
+            "139021832",
+            "3319271253",
+            "4579628351",
+            "2267585072",
+            "1115837958",
+            "5308114100",
+            "1439538405",
+            "972424917",
+            "4288991795",
+            "978351288",
+            "5833014701",
+            "4750044302",
+            "713959034",
+            "5254372654",
+            "4270626619",
+            "2124820161",
+            "2564485756",
+            "4373186134",
+        ],
     );
 }
 
@@ -1354,8 +1382,8 @@ fn test_to_digits_asc_natural() {
             "2", "3", "0", "1", "3", "0", "5", "2", "3", "5", "3", "2", "5", "2", "5", "0", "2",
             "3", "3", "1", "3", "3", "0", "0", "2", "3", "0", "3", "0", "5", "3", "0", "0", "4",
             "1", "5", "1", "4", "4", "1", "5", "4", "0", "0", "4", "1", "2", "1", "3", "5", "1",
-            "5", "5", "0", "1"
-        ]
+            "5", "5", "0", "1",
+        ],
     );
     test(
         "14974892748479131847778931724116484851265511358392776602889616274416063303",
@@ -1399,8 +1427,8 @@ fn test_to_digits_asc_natural() {
             "2", "3", "1", "6", "2", "1", "4", "1", "5", "5", "6", "3", "6", "3", "6", "4", "4",
             "5", "2", "3", "1", "6", "2", "1", "0", "0", "5", "0", "2", "5", "5", "4", "0", "5",
             "6", "5", "2", "2", "0", "3", "6", "5", "2", "4", "6", "4", "3", "6", "4", "4", "6",
-            "6"
-        ]
+            "6",
+        ],
     );
 }
 
@@ -1534,8 +1562,8 @@ fn test_to_digits_desc_natural() {
             "4", "0", "5", "4", "3", "3", "1", "1", "4", "3", "5", "5", "4", "0", "5", "2", "3",
             "2", "3", "4", "2", "1", "2", "2", "2", "1", "2", "4", "5", "1", "5", "5", "1", "3",
             "1", "5", "4", "2", "5", "3", "5", "1", "5", "0", "3", "5", "2", "4", "1", "2", "3",
-            "2", "3", "1", "4"
-        ]
+            "2", "3", "1", "4",
+        ],
     );
     test(
         "14974892748479131847778931724116484851265511358392776602889616274416063303",
@@ -1579,8 +1607,8 @@ fn test_to_digits_desc_natural() {
             "0", "5", "0", "5", "2", "2", "0", "6", "1", "4", "6", "5", "3", "4", "4", "3", "1",
             "4", "5", "3", "0", "2", "3", "3", "0", "1", "2", "0", "4", "4", "6", "2", "4", "1",
             "3", "4", "6", "3", "0", "1", "0", "2", "6", "4", "2", "0", "6", "5", "4", "1", "5",
-            "4"
-        ]
+            "4",
+        ],
     );
 }
 

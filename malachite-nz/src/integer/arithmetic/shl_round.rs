@@ -50,9 +50,9 @@ macro_rules! impl_shl_round_signed {
             /// always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
-            /// if `bits` is negative.
+            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -113,9 +113,9 @@ macro_rules! impl_shl_round_signed {
             /// [`Ordering`] is always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
-            /// if `bits` is negative.
+            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -172,9 +172,9 @@ macro_rules! impl_shl_round_signed {
             /// exact value.
             ///
             /// Passing `RoundingMode::Floor` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-            /// necessary if `bits` is negative.
+            /// `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// See the [`ShlRound`] documentation for details.
             ///

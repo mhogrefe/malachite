@@ -64,8 +64,8 @@ macro_rules! impl_mod_add {
             /// # Examples
             /// See [here](super::mod_add#mod_add_assign).
             ///
-            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1, where the result
-            /// is assigned to `a`.
+            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1, where the result is
+            /// assigned to `a`.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {
                 mod_add_assign(self, other, m);

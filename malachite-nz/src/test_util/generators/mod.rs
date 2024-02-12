@@ -5,11 +5,11 @@ use crate::natural::Natural;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
-    integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
-    integer_rm, integer_triple_1_rm, integer_vec_nrm, natural_natural_triple_1_2_rm, natural_nrm,
-    natural_pair_1_nm, natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nm, natural_pair_nrm,
-    natural_pair_rm, natural_rm, natural_triple_1_rm, natural_triple_nrm, natural_triple_rm,
-    natural_vec_nrm,
+    integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nm, integer_pair_nrm,
+    integer_pair_rm, integer_rm, integer_triple_1_rm, integer_vec_nrm,
+    natural_natural_triple_1_2_rm, natural_nrm, natural_pair_1_nm, natural_pair_1_nrm,
+    natural_pair_1_rm, natural_pair_nm, natural_pair_nrm, natural_pair_rm, natural_rm,
+    natural_triple_1_rm, natural_triple_nrm, natural_triple_rm, natural_vec_nrm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -193,6 +193,14 @@ pub fn integer_pair_gen_nrm() -> Generator<(
         &|| integer_pair_nrm(exhaustive_integer_pair_gen()),
         &|config| integer_pair_nrm(random_integer_pair_gen(config)),
         &|config| integer_pair_nrm(special_random_integer_pair_gen(config)),
+    )
+}
+
+pub fn integer_pair_gen_nm() -> Generator<((BigInt, BigInt), (Integer, Integer))> {
+    Generator::new(
+        &|| integer_pair_nm(exhaustive_integer_pair_gen()),
+        &|config| integer_pair_nm(random_integer_pair_gen(config)),
+        &|config| integer_pair_nm(special_random_integer_pair_gen(config)),
     )
 }
 
@@ -497,8 +505,8 @@ where
     )
 }
 
-// All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are not equal
-// mod 2 to the power of the `T`.
+// All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are not equal mod
+// 2 to the power of the `T`.
 pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
 ) -> Generator<(Integer, Integer, T)> {
     Generator::new(
@@ -977,8 +985,8 @@ pub fn integer_to_sci_options_pair_gen_var_1() -> Generator<(Integer, ToSciOptio
 
 // -- (Integer, Vec<bool>) --
 
-// All `(Integer, Vec<bool>)` pairs where the length of the `Vec` is the twos' complement limb
-// count of the `Integer`, including sign extension limbs if necessary.
+// All `(Integer, Vec<bool>)` pairs where the length of the `Vec` is the twos' complement limb count
+// of the `Integer`, including sign extension limbs if necessary.
 pub fn integer_bool_vec_pair_gen_var_1() -> Generator<(Integer, Vec<bool>)> {
     Generator::new(
         &exhaustive_integer_bool_vec_pair_gen_var_1,
@@ -1636,8 +1644,8 @@ pub fn natural_natural_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Nat
     )
 }
 
-// All `(Natural, Natural, T)` where the `T` is signed and small, and the first `Natural` is
-// smaller than the second.
+// All `(Natural, Natural, T)` where the `T` is signed and small, and the first `Natural` is smaller
+// than the second.
 pub fn natural_natural_signed_triple_gen_var_1<T: PrimitiveSigned>(
 ) -> Generator<(Natural, Natural, T)> {
     Generator::new(
@@ -1698,8 +1706,8 @@ where
     )
 }
 
-// All `(Natural, Natural, T)` where `T` is unsigned and small, and the `Natural`s are not equal
-// mod 2 to the power of the `T`.
+// All `(Natural, Natural, T)` where `T` is unsigned and small, and the `Natural`s are not equal mod
+// 2 to the power of the `T`.
 pub fn natural_natural_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
 ) -> Generator<(Natural, Natural, T)> {
     Generator::new(
@@ -1718,8 +1726,7 @@ pub fn natural_natural_unsigned_triple_gen_var_4() -> Generator<(Natural, Natura
     )
 }
 
-// All `(Natural, Natural, u64)` where the first `Natural` is less than 2 to the power of the
-// `u64`.
+// All `(Natural, Natural, u64)` where the first `Natural` is less than 2 to the power of the `u64`.
 pub fn natural_natural_unsigned_triple_gen_var_5() -> Generator<(Natural, Natural, u64)> {
     Generator::new(
         &exhaustive_natural_natural_unsigned_triple_gen_var_5,
@@ -1871,8 +1878,8 @@ pub fn natural_signed_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Natu
 // -- (Natural, PrimitiveSigned, PrimitiveUnsigned) --
 
 type T2<T> = Generator<(Natural, T, u64)>;
-// All `(Natural, T, u64)` where the `Natural` is less than 2 to the power of the `u64`, and the
-// `T` is small and signed.
+// All `(Natural, T, u64)` where the `Natural` is less than 2 to the power of the `u64`, and the `T`
+// is small and signed.
 pub fn natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>() -> T2<T> {
     Generator::new(
         &exhaustive_natural_signed_unsigned_triple_gen_var_1,
@@ -2082,8 +2089,8 @@ pub fn natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
-// All `(Natural, u64)`s where the `T` is unsigned and small, and the `Natural` is divisible by 2
-// to the power of the `T`.
+// All `(Natural, u64)`s where the `T` is unsigned and small, and the `Natural` is divisible by 2 to
+// the power of the `T`.
 pub fn natural_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
     Generator::new(
         &exhaustive_natural_unsigned_pair_gen_var_5,
@@ -2228,8 +2235,8 @@ pub fn natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
     )
 }
 
-// All `(Natural, T, u64)` where the `Natural` is less than 2 to the power of the `u64`, and the
-// `T` is small and unsigned.
+// All `(Natural, T, u64)` where the `Natural` is less than 2 to the power of the `u64`, and the `T`
+// is small and unsigned.
 pub fn natural_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
 ) -> Generator<(Natural, T, u64)> {
     Generator::new(
@@ -2455,9 +2462,8 @@ pub fn string_triple_gen_var_1() -> Generator<(String, String, String)> {
     )
 }
 
-// All triples of `String`s corresponding to the serialization of a `num::BigInt`, a
-// `rug::Integer`, and an `Integer`, respectively, into a string. The three numbers have the same
-// value.
+// All triples of `String`s corresponding to the serialization of a `num::BigInt`, a `rug::Integer`,
+// and an `Integer`, respectively, into a string. The three numbers have the same value.
 pub fn string_triple_gen_var_2() -> Generator<(String, String, String)> {
     Generator::new(
         &exhaustive_string_triple_gen_var_2,
@@ -2649,8 +2655,8 @@ pub fn unsigned_vec_unsigned_pair_gen_var_30() -> Generator<(Vec<Limb>, u64)> {
 // vars 1 through 5 are in malachite-base
 
 // All `(Vec<Limb>, Limb, Limb)`s where both `Limb`s are positive, the `Vec` contains at least two
-// elements, its last element is nonzero, and the first `Limb` is not equal to the second `Limb`
-// mod the `Natural` represented by the `Vec`.
+// elements, its last element is nonzero, and the first `Limb` is not equal to the second `Limb` mod
+// the `Natural` represented by the `Vec`.
 pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_6() -> Generator<(Vec<Limb>, Limb, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_6,
@@ -2672,8 +2678,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_9() -> Generator<(Vec<Limb>
 
 // var 10 is in malachite-base.
 
-// All triples of `(Vec<Limb>, Limb, Limb)` that are valid inputs to
-// `limbs_eq_limb_mod_limb`, such that `limbs_eq_limb_mod_limb` would return `true`.
+// All triples of `(Vec<Limb>, Limb, Limb)` that are valid inputs to `limbs_eq_limb_mod_limb`, such
+// that `limbs_eq_limb_mod_limb` would return `true`.
 pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_11() -> Generator<(Vec<Limb>, Limb, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_11,
@@ -2682,8 +2688,8 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_11() -> Generator<(Vec<Limb
     )
 }
 
-// All triples of `(Vec<Limb>, Limb, Limb)` that are valid inputs to
-// `limbs_eq_limb_mod_limb`, such that `limbs_eq_limb_mod_limb` would return `false`.
+// All triples of `(Vec<Limb>, Limb, Limb)` that are valid inputs to `limbs_eq_limb_mod_limb`, such
+// that `limbs_eq_limb_mod_limb` would return `false`.
 pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_12() -> Generator<(Vec<Limb>, Limb, Limb)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_12,
@@ -2762,8 +2768,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
     )
 }
 
-// All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`,
-// such that `limbs_eq_limb_mod` would return `true`.
+// All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`, such
+// that `limbs_eq_limb_mod` would return `true`.
 pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
 ) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
@@ -2773,8 +2779,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
     )
 }
 
-// All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`,
-// such that `limbs_eq_limb_mod` would return `false`.
+// All triples of `(Vec<Limb>, Limb, Vec<Limb>)` that are valid inputs to `limbs_eq_limb_mod`, such
+// that `limbs_eq_limb_mod` would return `false`.
 pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
 ) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
     Generator::new(
@@ -2835,8 +2841,7 @@ pub fn unsigned_vec_pair_gen_var_14() -> Generator<(Vec<Limb>, Vec<Limb>)> {
 
 // vars 15 through 16 are in malachite-base.
 
-// All `(Vec<Limb>, Vec<Limb>)` that are valid inputs to `limbs_div_exact` and
-// `limbs_divisible_by`.
+// All `(Vec<Limb>, Vec<Limb>)` that are valid inputs to `limbs_div_exact` and `limbs_divisible_by`.
 pub fn unsigned_vec_pair_gen_var_17() -> Generator<(Vec<Limb>, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_pair_gen_var_18,
@@ -2995,8 +3000,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
 
 // vars 9 through 13 are in malachite-base.
 
-// All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and positive, the first `Vec` is at least as
-// long as the second, and the second `Vec` is nonempty and represents a `Natural` divisible by the
+// All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and positive, the first `Vec` is at least as long
+// as the second, and the second `Vec` is nonempty and represents a `Natural` divisible by the
 // `Limb`.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
 ) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
@@ -3007,8 +3012,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
     )
 }
 
-// All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to
-// `limbs_eq_limb_mod`, such that `limbs_eq_limb_mod` would return `true`.
+// All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to `limbs_eq_limb_mod`, such
+// that `limbs_eq_limb_mod` would return `true`.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
 ) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
@@ -3018,8 +3023,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
     )
 }
 
-// All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to
-// `limbs_eq_limb_mod`, such that `limbs_eq_limb_mod` would return `false`.
+// All triples of `(Vec<Limb>, Vec<Limb>, Limb)` that are valid inputs to `limbs_eq_limb_mod`, such
+// that `limbs_eq_limb_mod` would return `false`.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16(
 ) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
     Generator::new(
@@ -3039,8 +3044,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17(
     )
 }
 
-// All `(Vec<Limb>, Vec<Limb>, u64)` where the `u64` is small and the number of significant bits
-// of both `Vec`s are less than or equal to the `u64`.
+// All `(Vec<Limb>, Vec<Limb>, u64)` where the `u64` is small and the number of significant bits of
+// both `Vec`s are less than or equal to the `u64`.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18(
 ) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
@@ -3073,8 +3078,8 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20(
     )
 }
 
-// All `(Vec<Limb>, Vec<Limb>, u64)` that are valid inputs to `limbs_mod_power_of_2_pow`, and
-// where the `u64` is small.
+// All `(Vec<Limb>, Vec<Limb>, u64)` that are valid inputs to `limbs_mod_power_of_2_pow`, and where
+// the `u64` is small.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21(
 ) -> Generator<(Vec<Limb>, Vec<Limb>, u64)> {
     Generator::new(
@@ -3328,8 +3333,8 @@ pub fn unsigned_vec_triple_gen_var_44() -> Generator<(Vec<Limb>, Vec<Limb>, Vec<
     )
 }
 
-// All triples of `Vec<Limb>` that are valid inputs to `limbs_div_to_out` and both the balanced
-// and unbalanced div helper functions.
+// All triples of `Vec<Limb>` that are valid inputs to `limbs_div_to_out` and both the balanced and
+// unbalanced div helper functions.
 pub fn unsigned_vec_triple_gen_var_45() -> Generator<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_triple_gen_var_45,
@@ -3568,8 +3573,8 @@ pub(crate) fn factors_of_limb_max() -> Vec<Limb> {
         .collect()
 }
 
-// All `(Vec<Limb>, Vec<Limb>, Limb, Limb)` where the first `Vec` is at least as long as the
-// second, and the first `Limb` is a divisor of `Limb::MAX`.
+// All `(Vec<Limb>, Vec<Limb>, Limb, Limb)` where the first `Vec` is at least as long as the second,
+// and the first `Limb` is a divisor of `Limb::MAX`.
 pub fn large_type_gen_var_10() -> Generator<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
     Generator::new(
         &exhaustive_large_type_gen_var_10,
@@ -3730,8 +3735,8 @@ pub fn large_type_gen_var_25() -> Generator<(Natural, Vec<Natural>, RationalSequ
     )
 }
 
-/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
-/// `Rational::from_digits` with `base` == 10.
+/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to `Rational::from_digits`
+/// with `base` == 10.
 pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natural>)> {
     Generator::new_no_special(
         &exhaustive_large_type_gen_var_26,

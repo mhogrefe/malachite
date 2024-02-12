@@ -28,13 +28,13 @@
 /// assert_eq!(u8::from_sci_string_with_options("ff", options), Some(255));
 /// ```
 pub mod from_sci_string;
-/// [`FromStringBase`](super::traits::FromStringBase), a trait for converting strings in a
-/// specified base to numbers.
+/// [`FromStringBase`](super::traits::FromStringBase), a trait for converting strings in a specified
+/// base to numbers.
 pub mod from_string;
 /// [`ToSciOptions`](options::ToSciOptions) and
-/// [`FromSciSringOptions`](options::FromSciStringOptions), `struct`s for specifying parameters
-/// when using the [`FromSciString`](super::traits::FromSciString) and
-/// [`ToSci`](super::traits::ToSci) traits.
+/// [`FromSciSringOptions`](options::FromSciStringOptions), `struct`s for specifying parameters when
+/// using the [`FromSciString`](super::traits::FromSciString) and [`ToSci`](super::traits::ToSci)
+/// traits.
 pub mod options;
 /// [`ToSci`](super::traits::ToSci), a trait for converting a number to string, possibly using
 /// scientific notation.

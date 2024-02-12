@@ -1,7 +1,7 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
-use malachite_base::num::comparison::traits::PartialOrdAbs;
 use core::cmp::Ordering;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 
 impl PartialOrdAbs<Natural> for Integer {
     /// Compares the absolute values of an [`Integer`] and a [`Natural`].
@@ -11,8 +11,8 @@ impl PartialOrdAbs<Natural> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -40,8 +40,8 @@ impl PartialOrdAbs<Integer> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

@@ -59,8 +59,8 @@ macro_rules! impl_mod_shr_signed {
                     /// Right-shifts a number (divides it by a power of 2) modulo a number $m$. The
                     /// number must be already reduced modulo $m$.
                     ///
-                    /// $f(x, n, m) = y$, where $x, y < m$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+                    /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y
+                    /// \mod m$.
                     ///
                     /// # Worst-case complexity
                     /// $T(n) = O(n)$
@@ -85,8 +85,7 @@ macro_rules! impl_mod_shr_signed {
                     /// Right-shifts a number (divides it by a power of 2) modulo a number $m$, in
                     /// place. The number must be already reduced modulo $m$.
                     ///
-                    /// $x \gets y$, where $x, y < m$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
+                    /// $x \gets y$, where $x, y < m$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
                     ///
                     /// # Worst-case complexity
                     /// $T(n) = O(n)$

@@ -81,8 +81,8 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
 impl<'a> SaturatingSub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
-    /// second by value and returning 0 if the result is negative.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and returning 0 if the result is negative.
     ///
     /// $$
     /// f(x, y) = \max(x - y, 0).

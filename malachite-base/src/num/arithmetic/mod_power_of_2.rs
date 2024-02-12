@@ -38,8 +38,8 @@ macro_rules! impl_mod_power_of_2_unsigned {
 
             /// Divides a number by $2^k$, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -59,8 +59,8 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl ModPowerOf2Assign for $s {
             /// Divides a number by $2^k$, replacing the first number by the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -80,12 +80,11 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl RemPowerOf2 for $s {
             type Output = $s;
 
-            /// Divides a number by $2^k$, returning just the remainder. For unsigned
-            /// integers, `rem_power_of_2` is equivalent to
-            /// [`mod_power_of_2`](super::traits::ModPowerOf2).
+            /// Divides a number by $2^k$, returning just the remainder. For unsigned integers,
+            /// `rem_power_of_2` is equivalent to [`mod_power_of_2`](super::traits::ModPowerOf2).
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -103,12 +102,12 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl RemPowerOf2Assign for $s {
-            /// Divides a number by $2^k$, replacing the first number by the remainder. For
-            /// unsigned integers, `rem_power_of_2_assign` is equivalent to
+            /// Divides a number by $2^k$, replacing the first number by the remainder. For unsigned
+            /// integers, `rem_power_of_2_assign` is equivalent to
             /// [`mod_power_of_2_assign`](super::traits::ModPowerOf2Assign).
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -130,8 +129,8 @@ macro_rules! impl_mod_power_of_2_unsigned {
 
             /// Divides the negative of a number by a $2^k$, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k - r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k -
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// f(x, k) = 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
@@ -154,8 +153,8 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl NegModPowerOf2Assign for $s {
             /// Divides the negative of a number by $2^k$, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k - r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k -
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// x \gets 2^k\left \lceil \frac{x}{2^k} \right \rceil - x.
@@ -240,8 +239,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, returning just the remainder. The remainder is
             /// non-negative.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -265,8 +264,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, replacing the first number by the remainder. The
             /// remainder is non-negative.
             ///
-            /// If the quotient were computed, he quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -292,8 +291,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, returning just the remainder. The remainder has the same
             /// sign as the first number.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq |r| < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq |r| < 2^k$.
             ///
             /// $$
             /// f(x, k) = x - 2^k\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^k} \right \rfloor.
@@ -314,8 +313,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, replacing the first number by the remainder. The
             /// remainder has the same sign as the first number.
             ///
-            /// If the quotient were computed, he quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+            /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq r < 2^k$.
             ///
             /// $$
             /// x \gets x - 2^k\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^k} \right \rfloor.
@@ -338,8 +337,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, returning just the remainder. The remainder is
             /// non-positive.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq -r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq -r < 2^k$.
             ///
             /// $$
             /// f(x, y) =  x - 2^k\left \lceil \frac{x}{2^k} \right \rceil.
@@ -364,8 +363,8 @@ macro_rules! impl_mod_power_of_2_signed {
             /// Divides a number by $2^k$, replacing the first number by the remainder. The
             /// remainder is non-positive.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = q2^k + r$ and $0 \leq -r < 2^k$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k +
+            /// r$ and $0 \leq -r < 2^k$.
             ///
             /// $$
             /// x \gets x - 2^k\left \lceil\frac{x}{2^k} \right \rceil.

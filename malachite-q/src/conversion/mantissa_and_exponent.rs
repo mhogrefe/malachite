@@ -1,4 +1,5 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
@@ -6,16 +7,15 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 impl Rational {
-    /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by
-    /// value. An [`Ordering`] is also returned, indicating whether the returned mantissa and
-    /// exponent represent a value that is less than, equal to, or greater than the absolute value
-    /// of the [`Rational`].
+    /// Returns a [`Rational`]'s scientific mantissa and exponent, taking the [`Rational`] by value.
+    /// An [`Ordering`] is also returned, indicating whether the returned mantissa and exponent
+    /// represent a value that is less than, equal to, or greater than the absolute value of the
+    /// [`Rational`].
     ///
     /// The [`Rational`]'s sign is ignored. This means that, for example, that rounding using
-    /// `Floor` is  equivalent to rounding using `Down`, even if the [`Rational] is negative.
+    /// `Floor` is  equivalent to rounding using `Down`, even if the [`Rational`] is negative.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
     /// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
@@ -266,9 +266,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// by value.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
-            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
-            /// mantissa as a float. The conversion might not be exact, so we round to the nearest
-            /// float using the `Nearest` rounding mode. To use other rounding modes, use
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational mantissa
+            /// as a float. The conversion might not be exact, so we round to the nearest float
+            /// using the `Nearest` rounding mode. To use other rounding modes, use
             /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
@@ -294,9 +294,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by value.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
-            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
-            /// mantissa as a float. The conversion might not be exact, so we round to the nearest
-            /// float using the `Nearest` rounding mode. To use other rounding modes, use
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational mantissa
+            /// as a float. The conversion might not be exact, so we round to the nearest float
+            /// using the `Nearest` rounding mode. To use other rounding modes, use
             /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.
@@ -372,9 +372,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// by reference.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
-            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
-            /// mantissa as a float. The conversion might not be exact, so we round to the nearest
-            /// float using the `Nearest` rounding mode. To use other rounding modes, use
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational mantissa
+            /// as a float. The conversion might not be exact, so we round to the nearest float
+            /// using the `Nearest` rounding mode. To use other rounding modes, use
             /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
@@ -400,9 +400,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// Returns a [`Rational`]'s scientific exponent, taking the [`Rational`] by reference.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
-            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
-            /// mantissa as a float. The conversion might not be exact, so we round to the nearest
-            /// float using the `Nearest` rounding mode. To use other rounding modes, use
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational mantissa
+            /// as a float. The conversion might not be exact, so we round to the nearest float
+            /// using the `Nearest` rounding mode. To use other rounding modes, use
             /// [`sci_mantissa_and_exponent_round`](Rational::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx \lfloor \log_2 x \rfloor.

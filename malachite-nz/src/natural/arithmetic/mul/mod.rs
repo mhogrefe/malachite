@@ -33,8 +33,8 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
-// cannot be empty.
+// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys` cannot
+// be empty.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -107,10 +107,10 @@ pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize 
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
-// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
-// as `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1`
-// (which may be zero).
+// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s to
+// an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long as
+// `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1` (which
+// may be zero).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -245,8 +245,8 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 // slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
-// `xs.len() + ys.len() - 1` (which may be zero).
+// long as `ys`, and `ys` cannot be empty. Returns the result limb at index `xs.len() + ys.len() -
+// 1` (which may be zero).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -434,8 +434,8 @@ pub_crate_test! {limbs_mul_to_out(
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
 // slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
-// `xs.len() + ys.len() - 1` (which may be zero).
+// long as `ys`, and `ys` cannot be empty. Returns the result limb at index `xs.len() + ys.len() -
+// 1` (which may be zero).
 //
 // This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
 // multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
@@ -483,8 +483,8 @@ impl Mul<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -522,8 +522,8 @@ impl<'a> Mul<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -561,8 +561,8 @@ impl<'a> Mul<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -600,8 +600,8 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -630,8 +630,8 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 }
 
 impl MulAssign<Natural> for Natural {
-    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the
-    /// right-hand side by value.
+    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the right-hand
+    /// side by value.
     ///
     /// $$
     /// x \gets = xy.
@@ -642,8 +642,8 @@ impl MulAssign<Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -674,8 +674,8 @@ impl MulAssign<Natural> for Natural {
 }
 
 impl<'a> MulAssign<&'a Natural> for Natural {
-    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the
-    /// right-hand side by reference.
+    /// Multiplies a [`Natural`] by a [`Natural`] in place, taking the [`Natural`] on the right-hand
+    /// side by reference.
     ///
     /// $$
     /// x \gets = xy.
@@ -686,8 +686,8 @@ impl<'a> MulAssign<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

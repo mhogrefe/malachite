@@ -26,11 +26,11 @@ fn index_of_next_true_bit_unsigned<T: PrimitiveUnsigned>(x: T, start: u64) -> Op
 macro_rules! impl_bit_scan_unsigned {
     ($t:ident) => {
         impl BitScan for $t {
-            /// Given a number and a starting index, searches the number for the smallest index of
-            /// a `false` bit that is greater than or equal to the starting index.
+            /// Given a number and a starting index, searches the number for the smallest index of a
+            /// `false` bit that is greater than or equal to the starting index.
             ///
-            /// Since the number is unsigned and therefore has an implicit prefix of
-            /// infinitely-many zeros, this function always returns a value.
+            /// Since the number is unsigned and therefore has an implicit prefix of infinitely-many
+            /// zeros, this function always returns a value.
             ///
             /// Starting beyond the type's width is allowed; the result is the starting index.
             ///
@@ -44,8 +44,8 @@ macro_rules! impl_bit_scan_unsigned {
                 Some(index_of_next_false_bit_unsigned(self, start))
             }
 
-            /// Given a number and a starting index, searches the number for the smallest index of
-            /// a `true` bit that is greater than or equal to the starting index.
+            /// Given a number and a starting index, searches the number for the smallest index of a
+            /// `true` bit that is greater than or equal to the starting index.
             ///
             /// If the starting index is greater than or equal to the type's width, the result is
             /// `None` since there are no `true` bits past that point.
@@ -101,13 +101,13 @@ fn index_of_next_true_bit_signed<T: PrimitiveSigned>(x: T, start: u64) -> Option
 macro_rules! impl_bit_scan_signed {
     ($t:ident) => {
         impl BitScan for $t {
-            /// Given a number and a starting index, searches the number for the smallest index of
-            /// a `false` bit that is greater than or equal to the starting index.
+            /// Given a number and a starting index, searches the number for the smallest index of a
+            /// `false` bit that is greater than or equal to the starting index.
             ///
             /// If the starting index is greater than or equal to the type's width, then the result
-            /// depends on whether the number is negative. If it is, then the result is `None`
-            /// since there are no `false` bits past that point. If the number is non-negative,
-            /// then the result is the starting index.
+            /// depends on whether the number is negative. If it is, then the result is `None` since
+            /// there are no `false` bits past that point. If the number is non-negative, then the
+            /// result is the starting index.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -119,8 +119,8 @@ macro_rules! impl_bit_scan_signed {
                 index_of_next_false_bit_signed(self, start)
             }
 
-            /// Given a number and a starting index, searches the number for the smallest index of
-            /// a `true` bit that is greater than or equal to the starting index.
+            /// Given a number and a starting index, searches the number for the smallest index of a
+            /// `true` bit that is greater than or equal to the starting index.
             ///
             /// If the starting index is greater than or equal to the type's width, then the result
             /// depends on whether the number is non-negative. If it is, then the result is `None`

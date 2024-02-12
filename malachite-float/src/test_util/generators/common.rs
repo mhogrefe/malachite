@@ -82,3 +82,39 @@ pub fn float_unsigned_rounding_mode_triple_rm<T: PrimitiveUnsigned>(
         )
     }))
 }
+
+pub fn float_float_rounding_mode_triple_rm(
+    xs: It<(Float, Float, RoundingMode)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::float::Round),
+    (Float, Float, RoundingMode),
+)> {
+    Box::new(xs.map(|(x, y, rm)| {
+        (
+            (
+                rug::Float::exact_from(&x),
+                rug::Float::exact_from(&y),
+                rug_round_exact_from_rounding_mode(rm),
+            ),
+            (x, y, rm),
+        )
+    }))
+}
+
+pub fn float_rational_rounding_mode_triple_rm(
+    xs: It<(Float, Rational, RoundingMode)>,
+) -> It<(
+    (rug::Float, rug::Rational, rug::float::Round),
+    (Float, Rational, RoundingMode),
+)> {
+    Box::new(xs.map(|(x, y, rm)| {
+        (
+            (
+                rug::Float::exact_from(&x),
+                rug::Rational::exact_from(&y),
+                rug_round_exact_from_rounding_mode(rm),
+            ),
+            (x, y, rm),
+        )
+    }))
+}

@@ -33,6 +33,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_twos_complement_limbs);
     register_demo!(runner, demo_integer_twos_complement_limbs_rev);
     register_demo!(runner, demo_integer_twos_complement_limbs_get);
+    register_demo!(runner, demo_integer_twos_complement_limb_count);
 
     register_bench!(runner, benchmark_limbs_twos_complement);
     register_bench!(
@@ -56,6 +57,7 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_integer_twos_complement_limbs_get_algorithms
     );
+    register_bench!(runner, benchmark_integer_twos_complement_limb_count);
 }
 
 fn demo_limbs_twos_complement(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -177,6 +179,16 @@ fn demo_integer_twos_complement_limbs_get(gm: GenMode, config: &GenConfig, limit
             n,
             i,
             n.twos_complement_limbs().get(i)
+        );
+    }
+}
+
+fn demo_integer_twos_complement_limb_count(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
+        println!(
+            "twos_complement_limb_count({}) = {}",
+            n,
+            n.twos_complement_limb_count()
         );
     }
 }
@@ -355,5 +367,26 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
                 },
             ),
         ],
+    );
+}
+
+fn benchmark_integer_twos_complement_limb_count(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.twos_complement_limb_count()",
+        BenchmarkType::Single,
+        integer_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &integer_bit_bucketer("n"),
+        &mut [(
+            "Malachite",
+            &mut |n| no_out!(n.twos_complement_limb_count()),
+        )],
     );
 }

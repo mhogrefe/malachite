@@ -1,6 +1,6 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl PartialEq for Float {
     /// Compares two [`Float`]s for equality.
@@ -17,8 +17,8 @@ impl PartialEq for Float {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -63,17 +63,16 @@ impl PartialEq for ComparableFloat {
     /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
     /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
     /// [`ComparableFloat`], `NaN`s are equal to themselves. There is a single, unique `NaN`;
-    /// there's no concept of signalling `NaN`s. Positive and negative zero are two distinct
-    /// values, not equal to each other. [`ComparableFloat`]s with different precisions are
-    /// unequal.
+    /// there's no concept of signalling `NaN`s. Positive and negative zero are two distinct values,
+    /// not equal to each other. [`ComparableFloat`]s with different precisions are unequal.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -103,17 +102,16 @@ impl<'a, 'b> PartialEq<ComparableFloatRef<'b>> for ComparableFloatRef<'a> {
     /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
     /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
     /// [`ComparableFloatRef`], `NaN`s are equal to themselves. There is a single, unique `NaN`;
-    /// there's no concept of signalling `NaN`s. Positive and negative zero are two distinct
-    /// values, not equal to each other. [`ComparableFloatRef`]s with different precisions are
-    /// unequal.
+    /// there's no concept of signalling `NaN`s. Positive and negative zero are two distinct values,
+    /// not equal to each other. [`ComparableFloatRef`]s with different precisions are unequal.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

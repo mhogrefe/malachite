@@ -14,6 +14,13 @@ fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y
     (a.unwrap(), b.unwrap(), c.unwrap())
 }
 
+#[allow(clippy::missing_const_for_fn)]
+fn unwrap_quadruple<X, Y, Z, W>(
+    (a, b, c, d): (Option<X>, Option<Y>, Option<Z>, Option<W>),
+) -> (X, Y, Z, W) {
+    (a.unwrap(), b.unwrap(), c.unwrap(), d.unwrap())
+}
+
 exhaustive_tuples_1_input!(
     (pub(crate)),
     ExhaustiveTriples1Input,
@@ -34,6 +41,18 @@ custom_tuples!(
     exhaustive_triples_xxy_custom_output,
     [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1]],
     [Y, J, ys, ys_done, [2, output_type_ys_2]]
+);
+custom_tuples!(
+    (pub(crate)),
+    ExhaustiveQuadruplesXXYZ,
+    (X, X, Y, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xxyz,
+    exhaustive_quadruples_xxyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1]],
+    [Y, J, ys, ys_done, [2, output_type_ys_2]],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
 );
 
 random_tuples!(
@@ -75,4 +94,13 @@ random_custom_tuples!(
     random_triples_xyy,
     [X, I, xs, xs_gen, [x_0, x_0]],
     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]]
+);
+random_custom_tuples!(
+   (pub(crate)),
+    RandomQuadruplesXXYZ,
+    (X, X, Y, Z),
+    random_quadruples_xxyz,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+    [Y, J, ys, ys_gen, [y_2, y_2]],
+    [Z, K, zs, zs_gen, [z_3, z_3]]
 );

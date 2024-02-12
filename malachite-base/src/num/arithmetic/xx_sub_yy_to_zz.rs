@@ -30,8 +30,8 @@ macro_rules! implicit_xx_sub_yy_to_zz {
             /// Subtracts two numbers, each composed of two `Self` values, returning the difference
             /// as a pair of `Self` values.
             ///
-            /// The more significant value always comes first. Subtraction is wrapping, and
-            /// overflow is not indicated.
+            /// The more significant value always comes first. Subtraction is wrapping, and overflow
+            /// is not indicated.
             ///
             /// $$
             /// f(x_1, x_0, y_1, y_0) = (z_1, z_0),
@@ -49,8 +49,8 @@ macro_rules! implicit_xx_sub_yy_to_zz {
             /// # Examples
             /// See [here](super::xx_sub_yy_to_zz#xx_sub_yy_to_zz).
             ///
-            /// This is equivalent to `sub_ddmmss` from `longlong.h`, GMP 6.2.1, where `(sh, sl)`
-            /// is returned.
+            /// This is equivalent to `sub_ddmmss` from `longlong.h`, GMP 6.2.1, where `(sh, sl)` is
+            /// returned.
             #[inline]
             fn xx_sub_yy_to_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
                 implicit_xx_sub_yy_to_zz::<$dt>(x_1, x_0, y_1, y_0)

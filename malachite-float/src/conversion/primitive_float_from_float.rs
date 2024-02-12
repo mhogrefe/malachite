@@ -1,5 +1,6 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, IsPowerOf2, ShrRound};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
@@ -7,7 +8,6 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 fn primitive_float_rounding_from_float<T: PrimitiveFloat>(
     f: Float,
@@ -340,8 +340,8 @@ macro_rules! impl_primitive_float_from {
             /// Converts a [`Float`] to a primitive float, using a specified [`RoundingMode`] and
             /// taking the [`Float`] by reference. An [`Ordering`] is also returned, indicating
             /// whether the returned value is less than, equal to, or greater than the original
-            /// value. (Although a NaN is not comparable to anything, converting a NaN to a NaN
-            /// will also return `Ordering::Equals`, indicating an exact conversion.)
+            /// value. (Although a NaN is not comparable to anything, converting a NaN to a NaN will
+            /// also return `Ordering::Equals`, indicating an exact conversion.)
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -362,8 +362,7 @@ macro_rules! impl_primitive_float_from {
             type Error = FloatFromFloatError;
 
             /// Converts a [`Float`] to a primitive float, taking the [`Float`] by value. If the
-            /// [`Float`] is not equal to a primitive float of the given type, an error is
-            /// returned.
+            /// [`Float`] is not equal to a primitive float of the given type, an error is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -379,9 +378,8 @@ macro_rules! impl_primitive_float_from {
         impl<'a> TryFrom<&'a Float> for $t {
             type Error = FloatFromFloatError;
 
-            /// Converts a [`Float`] to a primitive float, taking the [`Float`] by reference. If
-            /// the [`Float`] is not equal to a primitive float of the given type, an error is
-            /// returned.
+            /// Converts a [`Float`] to a primitive float, taking the [`Float`] by reference. If the
+            /// [`Float`] is not equal to a primitive float of the given type, an error is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

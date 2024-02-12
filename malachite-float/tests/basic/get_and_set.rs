@@ -277,6 +277,74 @@ fn get_prec_properties() {
 }
 
 #[test]
+fn test_get_min_prec() {
+    let test = |s, s_hex, out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let exponent = x.get_min_prec();
+        assert_eq!(exponent, out);
+    };
+    test("NaN", "NaN", None);
+    test("Infinity", "Infinity", None);
+    test("-Infinity", "-Infinity", None);
+    test("0.0", "0x0.0", None);
+    test("-0.0", "-0x0.0", None);
+
+    test("1.0", "0x1.0#1", Some(1));
+    test("2.0", "0x2.0#1", Some(1));
+    test("0.5", "0x0.8#1", Some(1));
+    test("0.33333333333333331", "0x0.55555555555554#53", Some(53));
+    test("1.4142135623730951", "0x1.6a09e667f3bcd#53", Some(53));
+    test("3.1415926535897931", "0x3.243f6a8885a30#53", Some(50));
+    test("3.0e120", "0x1.0E+100#1", Some(1));
+    test("4.0e-121", "0x1.0E-100#1", Some(1));
+    test(
+        "2.582249878086908589655919172003011874329705792829223512830659e120",
+        "0x1.00000000000000000000000000000000000000000000000000E+100#200",
+        Some(1),
+    );
+    test(
+        "3.872591914849318272818030633286351847570219192048790865487763e-121",
+        "0x1.00000000000000000000000000000000000000000000000000E-100#200",
+        Some(1),
+    );
+
+    test("-1.0", "-0x1.0#1", Some(1));
+    test("-2.0", "-0x2.0#1", Some(1));
+    test("-0.5", "-0x0.8#1", Some(1));
+    test("-0.33333333333333331", "-0x0.55555555555554#53", Some(53));
+    test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", Some(53));
+    test("-3.1415926535897931", "-0x3.243f6a8885a30#53", Some(50));
+    test("-3.0e120", "-0x1.0E+100#1", Some(1));
+    test("-4.0e-121", "-0x1.0E-100#1", Some(1));
+    test(
+        "-2.582249878086908589655919172003011874329705792829223512830659e120",
+        "-0x1.00000000000000000000000000000000000000000000000000E+100#200",
+        Some(1),
+    );
+    test(
+        "-3.872591914849318272818030633286351847570219192048790865487763e-121",
+        "-0x1.00000000000000000000000000000000000000000000000000E-100#200",
+        Some(1),
+    );
+}
+
+#[test]
+fn get_min_prec_properties() {
+    float_gen().test_properties(|x| {
+        x.get_min_prec().map_or_else(
+            || {
+                assert!(!x.is_normal());
+            },
+            |min_prec| {
+                assert!(min_prec <= x.get_prec().unwrap());
+            },
+        );
+    });
+}
+
+#[test]
 fn test_set_prec_round() {
     let test = |s, s_hex, prec, rm, out, out_hex, o| {
         let mut x = parse_hex_string(s_hex);

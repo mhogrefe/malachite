@@ -163,8 +163,8 @@ macro_rules! impl_from {
         impl<'a> SaturatingFrom<&'a Integer> for $u {
             /// Converts an [`Integer`] to an unsigned primitive integer.
             ///
-            /// If the [`Integer`] cannot be represented by the output type, then either zero or
-            /// the maximum representable value is returned, whichever is closer.
+            /// If the [`Integer`] cannot be represented by the output type, then either zero or the
+            /// maximum representable value is returned, whichever is closer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -243,8 +243,8 @@ macro_rules! impl_from {
         impl<'a> SaturatingFrom<&'a Integer> for $s {
             /// Converts an [`Integer`] to a signed primitive integer.
             ///
-            /// If the [`Integer`] cannot be represented by the output type, then either the
-            /// maximum or the minimum representable value is returned, whichever is closer.
+            /// If the [`Integer`] cannot be represented by the output type, then either the maximum
+            /// or the minimum representable value is returned, whichever is closer.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

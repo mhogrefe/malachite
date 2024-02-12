@@ -96,8 +96,8 @@ impl ModPowerOf2Assign for Integer {
     /// Divides an [`Integer`] by $2^k$, replacing the [`Integer`] by the remainder. The remainder
     /// is non-negative.
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k + r$ and
-    /// $0 \leq r < 2^k$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k + r$ and $0
+    /// \leq r < 2^k$.
     ///
     /// $$
     /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -229,8 +229,8 @@ impl RemPowerOf2Assign for Integer {
     /// Divides an [`Integer`] by $2^k$, replacing the [`Integer`] by the remainder. The remainder
     /// has the same sign as the [`Integer`].
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k + r$ and
-    /// $0 \leq r < 2^k$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = q2^k + r$ and $0
+    /// \leq r < 2^k$.
     ///
     /// $$
     /// x \gets x - 2^k\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^k} \right \rfloor.
@@ -360,8 +360,8 @@ impl CeilingModPowerOf2Assign for Integer {
     /// Divides an [`Integer`] by $2^k$, replacing the [`Integer`] by the remainder. The remainder
     /// is non-positive.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = q2^k + r$ and $0 \leq -r < 2^k$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq -r < 2^k$.
     ///
     /// $$
     /// x \gets x - 2^k\left \lceil\frac{x}{2^k} \right \rceil.

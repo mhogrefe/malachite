@@ -3,8 +3,9 @@ use crate::named::Named;
 use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
     CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
-    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
-    Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
+    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, Ln, NegAssign, NextPowerOf2,
+    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign,
+    SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
@@ -39,8 +40,8 @@ use core::str::FromStr;
 /// # raw form
 /// The raw exponent and raw mantissa are the actual bit patterns used to represent the components
 /// of $x$. The raw exponent $e_r$ is an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an
-/// integer in $[0, 2^M-1]$. Since we are dealing with a nonzero $x$, we forbid $e_r$ and $m_r$
-/// from both being zero. We have
+/// integer in $[0, 2^M-1]$. Since we are dealing with a nonzero $x$, we forbid $e_r$ and $m_r$ from
+/// both being zero. We have
 /// $$
 /// x = \\begin{cases}
 ///     2^{2-2^{E-1}-M}m_r & \text{if} \quad e_r = 0, \\\\
@@ -61,8 +62,8 @@ use core::str::FromStr;
 /// $$
 ///
 /// # scientific form
-/// We can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a rational number with
-/// $1 \leq m_s < 2$. If $x$ is a valid float, the scientific mantissa $m_s$ is always exactly
+/// We can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a rational number with $1
+/// \leq m_s < 2$. If $x$ is a valid float, the scientific mantissa $m_s$ is always exactly
 /// representable as a float of the same type. We have
 /// $$
 /// x = 2^{e_s}m_s,
@@ -128,6 +129,7 @@ pub trait PrimitiveFloat:
     + Into<f64>
     + IsInteger
     + IsPowerOf2
+    + Ln
     + LowerExp
     + Min
     + Max
@@ -421,8 +423,8 @@ pub trait PrimitiveFloat:
     /// adjacent integers.
     ///
     /// Negative infinity is mapped to 0, and positive infinity is mapped to the largest value,
-    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION).
-    /// Negative and positive zero are mapped to distinct adjacent values. Passing in `NaN` panics.
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION). Negative
+    /// and positive zero are mapped to distinct adjacent values. Passing in `NaN` panics.
     ///
     /// The inverse operation is
     /// [`from_ordered_representation`](PrimitiveFloat::from_ordered_representation).
@@ -462,9 +464,9 @@ pub trait PrimitiveFloat:
     /// float. The map preserves ordering, and adjacent integers are mapped to adjacent floats.
     ///
     /// Zero is mapped to negative infinity, and
-    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION) is
-    /// mapped to positive infinity. Negative and positive zero are produced by two distinct
-    /// adjacent integers. `NaN` is never produced.
+    /// [`LARGEST_ORDERED_REPRESENTATION`](PrimitiveFloat::LARGEST_ORDERED_REPRESENTATION) is mapped
+    /// to positive infinity. Negative and positive zero are produced by two distinct adjacent
+    /// integers. `NaN` is never produced.
     ///
     /// The inverse operation is
     /// [`to_ordered_representation`](PrimitiveFloat::to_ordered_representation).
@@ -505,9 +507,9 @@ pub trait PrimitiveFloat:
 
     /// Returns the precision of a nonzero finite floating-point number.
     ///
-    /// The precision is the number of significant bits of the integer mantissa. For example,
-    /// the floats with precision 1 are the powers of 2, those with precision 2 are 3 times a power
-    /// of 2, those with precision 3 are 5 or 7 times a power of 2, and so on.
+    /// The precision is the number of significant bits of the integer mantissa. For example, the
+    /// floats with precision 1 are the powers of 2, those with precision 2 are 3 times a power of
+    /// 2, those with precision 3 are 5 or 7 times a power of 2, and so on.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -552,8 +554,8 @@ pub trait PrimitiveFloat:
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `self` is less than [`MIN_EXPONENT`](PrimitiveFloat::MIN_EXPONENT) or greater
-    /// than [`MAX_EXPONENT`](PrimitiveFloat::MAX_EXPONENT).
+    /// Panics if `self` is less than [`MIN_EXPONENT`](PrimitiveFloat::MIN_EXPONENT) or greater than
+    /// [`MAX_EXPONENT`](PrimitiveFloat::MAX_EXPONENT).
     ///
     /// # Examples
     /// ```

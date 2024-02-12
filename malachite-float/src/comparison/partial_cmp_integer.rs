@@ -1,23 +1,23 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering;
 
 impl PartialOrd<Integer> for Float {
     /// Compares a [`Float`] to an [`Integer`].
     ///
     /// NaN is not comparable to any [`Integer`]. Infinity is greater than any [`Integer`], and
-    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are
-    /// equal to the [`Integer`] zero.
+    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are equal
+    /// to the [`Integer`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -77,8 +77,8 @@ impl PartialOrd<Float> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

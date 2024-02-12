@@ -84,8 +84,8 @@ macro_rules! impl_div_round_unsigned {
 
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
-            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
-            /// is less than, equal to, or greater than the exact value.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value is
+            /// less than, equal to, or greater than the exact value.
             ///
             /// See the [`DivRound`] documentation for details.
             ///
@@ -190,8 +190,8 @@ macro_rules! impl_div_round_signed {
 
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
-            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value
-            /// is less than, equal to, or greater than the exact value.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the assigned value is
+            /// less than, equal to, or greater than the exact value.
             ///
             /// See the [`DivRound`] documentation for details.
             ///

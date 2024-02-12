@@ -101,21 +101,21 @@ fn test_limbs_square_to_out_toom_2() {
     #[cfg(feature = "32_bit_limbs")]
     {
         test(&[0, 0], &[10; 5], &[0, 0, 0, 0, 10]);
-        // s == n
-        // limbs_cmp_same_length(&a0[..n], &a1[..n]) != Ordering::Less
-        // !TOOM2MAYBE_SQR_TOOM2 || a.len() < SQR_TOOM2_THRESHOLD
-        //      in limbs_square_to_out_toom_2recursive
-        // cy <= 2
+        // - s == n
+        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) != Ordering::Less
+        // - !TOOM2MAYBE_SQR_TOOM2 || a.len() < SQR_TOOM2_THRESHOLD in
+        //   limbs_square_to_out_toom_2recursive
+        // - cy <= 2
         test(&[1, 1], &[10; 5], &[1, 2, 1, 0, 10]);
-        // limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
+        // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
         test(&[123, 456], &[10; 5], &[15129, 112176, 207936, 0, 10]);
-        // s != n
-        // a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less
+        // - s != n
+        // - a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less
         test(&[0, 0, 1], &[0, 0, 0, 0, 0, 0], &[0, 0, 0, 0, 1, 0]);
-        // !(a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less)
+        // - !(a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less)
         test(&[0, 1, 1], &[0, 0, 0, 0, 0, 0], &[0, 0, 1, 2, 1, 0]);
-        // TOOM2MAYBE_SQR_TOOM2 && a.len() >= SQR_TOOM2_THRESHOLD
-        //      in limbs_square_to_out_toom_2recursive
+        // - TOOM2MAYBE_SQR_TOOM2 && a.len() >= SQR_TOOM2_THRESHOLD in
+        //   limbs_square_to_out_toom_2recursive
         test(
             &[
                 315937763, 473311027, 567550122, 1916950171, 4059671672, 732330624, 3931833255,
@@ -453,7 +453,7 @@ fn test_limbs_square_to_out_toom_2() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // cy > 2
+        // - cy > 2
         test(
             &rle_decode(&[
                 (0, 29),
@@ -533,28 +533,28 @@ fn test_limbs_square_to_out_toom_3() {
     #[cfg(feature = "32_bit_limbs")]
     {
         test(&[0; 3], &[10; 7], &[0, 0, 0, 0, 0, 0, 10]);
-        // carry != 0 || limbs_cmp_same_length(scratch_lo, xs_1) != Ordering::Less
-        // s == n
-        // SMALLER_RECURSION_TOOM_3
-        // TOOM3MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD in
-        //      limbs_square_to_out_toom_3recursive
-        // SMALLER_RECURSION_TOOM_3 && *asm1last == 0
-        // SMALLER_RECURSION_TOOM_3 && *as1last == 0
+        // - carry != 0 || limbs_cmp_same_length(scratch_lo, xs_1) != Ordering::Less
+        // - s == n
+        // - SMALLER_RECURSION_TOOM_3
+        // - TOOM3MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD in
+        //   limbs_square_to_out_toom_3recursive
+        // - SMALLER_RECURSION_TOOM_3 && *asm1last == 0
+        // - SMALLER_RECURSION_TOOM_3 && *as1last == 0
         test(&[1; 3], &[10; 7], &[1, 2, 3, 2, 1, 0, 10]);
-        // s != n
+        // - s != n
         test(&[1; 5], &[10; 11], &[1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 10]);
         test(
             &[123, 456, 789],
             &[10; 7],
             &[15129, 112176, 402030, 719568, 622521, 0, 10],
         );
-        // carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Ordering::Less
+        // - carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Ordering::Less
         test(
             &[0, 0, 0, 1, 1],
             &[10; 12],
             &[0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 10, 10],
         );
-        // SMALLER_RECURSION_TOOM_3 && *as1last == 1
+        // - SMALLER_RECURSION_TOOM_3 && *as1last == 1
         test(
             &[565087108, 3577014007, 448420006, 2768629557, 3704090824, 1883403892],
             &[10; 14],
@@ -563,7 +563,7 @@ fn test_limbs_square_to_out_toom_3() {
                 1104686790, 3937806198, 3714955349, 2353052328, 825899239, 10, 10,
             ],
         );
-        // SMALLER_RECURSION_TOOM_3 && *asm1last != 0
+        // - SMALLER_RECURSION_TOOM_3 && *asm1last != 0
         test(
             &[
                 1863564690, 1421495353, 3398346856, 3502315373, 3245074461, 3371098228, 1920119175,
@@ -580,7 +580,7 @@ fn test_limbs_square_to_out_toom_3() {
                 3348211714, 10, 10,
             ],
         );
-        // SMALLER_RECURSION_TOOM_3 && *as1last != 1 && *as1last != 0
+        // - SMALLER_RECURSION_TOOM_3 && *as1last != 1 && *as1last != 0
         test(
             &[
                 1340632901, 3164542962, 2229190317, 2072028339, 3600460563, 4242593376, 2627243024,
@@ -596,8 +596,8 @@ fn test_limbs_square_to_out_toom_3() {
                 1455459795, 3545238393, 10, 10,
             ],
         );
-        // (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) && TOOM3MAYBE_SQR_TOOM3 &&
-        //      n >= SQR_TOOM3THRESHOLD in limbs_square_to_out_toom_3recursive
+        // - (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) && TOOM3MAYBE_SQR_TOOM3 && n >=
+        //   SQR_TOOM3THRESHOLD in limbs_square_to_out_toom_3recursive
         test(
             &[
                 315937763, 473311027, 567550122, 1916950171, 4059671672, 732330624, 3931833255,
@@ -935,9 +935,8 @@ fn test_limbs_square_to_out_toom_3() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) &&
-        //      (!TOOM3MAYBE_SQR_TOOM3 || n < SQR_TOOM3THRESHOLD)
-        //      in limbs_square_to_out_toom_3recursive
+        // - (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) && (!TOOM3MAYBE_SQR_TOOM3 || n <
+        //   SQR_TOOM3THRESHOLD) in limbs_square_to_out_toom_3recursive
         test(
             &[
                 9525251150715707485,
@@ -1233,7 +1232,7 @@ fn test_limbs_square_to_out_toom_4() {
         limbs_square_to_out_toom_4(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // basecase in limbs_square_to_out_toom_4recursive
+    // - basecase in limbs_square_to_out_toom_4recursive
     test(&[0; 4], &[10; 10], &[0, 0, 0, 0, 0, 0, 0, 0, 10, 10]);
     test(&[1; 4], &[10; 10], &[1, 2, 3, 4, 3, 2, 1, 0, 10, 10]);
     test(
@@ -1241,7 +1240,7 @@ fn test_limbs_square_to_out_toom_4() {
         &[10; 10],
         &[15129, 112176, 402030, 962370, 1522665, 1557486, 974169, 0, 10, 10],
     );
-    // toom_4 in limbs_square_to_out_toom_4recursive
+    // - toom_4 in limbs_square_to_out_toom_4recursive
     test(
         &[
             4139948165, 1538275035, 3244920878, 2576965792, 584068468, 3054546876, 2629688518,

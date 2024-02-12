@@ -1,10 +1,10 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{NegAssign, RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering;
 
 impl RoundToMultiple<Rational> for Rational {
     type Output = Rational;
@@ -183,8 +183,8 @@ impl<'a> RoundToMultiple<Rational> for &'a Rational {
 
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`], according to a
     /// specified rounding mode. The first [`Rational`] is taken by reference and the second by
-    /// value. An [`Ordering`] is also returned, indicating whether the returned value is less
-    /// than, equal to, or greater than the original value.
+    /// value. An [`Ordering`] is also returned, indicating whether the returned value is less than,
+    /// equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -523,9 +523,9 @@ impl RoundToMultipleAssign<Rational> for Rational {
 
 impl<'a> RoundToMultipleAssign<&'a Rational> for Rational {
     /// Rounds a [`Rational`] to an integer multiple of another [`Rational`] in place, according to
-    /// a specified rounding mode. The [`Rational`] on the right-hand side is taken by reference.
-    /// An [`Ordering`] is returned, indicating whether the returned value is less than, equal to,
-    /// or greater than the original value.
+    /// a specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An
+    /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
+    /// greater than the original value.
     ///
     /// See the [`RoundToMultiple`] documentation for details.
     ///

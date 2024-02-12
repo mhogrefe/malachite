@@ -118,9 +118,8 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 
 /// Generates all [`Natural`]s in the half-open interval $[a, b)$, in ascending order.
 ///
-/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. To
-/// generate all [`Natural`]s in an infinite interval, use
-/// [`exhaustive_natural_range_to_infinity`].
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate
+/// all [`Natural`]s in an infinite interval, use [`exhaustive_natural_range_to_infinity`].
 ///
 /// The output is $(k)_{k=a}^{b-1}$.
 ///

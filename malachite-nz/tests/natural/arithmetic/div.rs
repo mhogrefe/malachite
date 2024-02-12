@@ -178,17 +178,17 @@ fn test_limbs_div_schoolbook() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len < d_len_m_1
-        // !highest_q first time
-        // !(!flag || n_1 < Limb::try_from(d_len).unwrap())
+        // - q_len < d_len_m_1
+        // - !highest_q first time
+        // - !(!flag || n_1 < Limb::try_from(d_len).unwrap())
         test(&[10], &[1, 2, 3], &[3, 4, 0x80000000], false, &[10]);
-        // q_len >= d_len_m_1
-        // !(n_1 == d_1 && ns[d_len_s_m_1] == d_2)
-        // !carry first time
-        // d_len_s >= 2
-        // !(!flag || n_1 >= d_1) first time
-        // !carry second time
-        // !(!flag || n_1 >= d_1) second time
+        // - q_len >= d_len_m_1
+        // - !(n_1 == d_1 && ns[d_len_s_m_1] == d_2)
+        // - !carry first time
+        // - d_len_s >= 2
+        // - !(!flag || n_1 >= d_1) first time
+        // - !carry second time
+        // - !(!flag || n_1 >= d_1) second time
         test(
             &[10, 10, 10, 10],
             &[1, 2, 3, 4, 5, 6],
@@ -196,19 +196,18 @@ fn test_limbs_div_schoolbook() {
             false,
             &[4294967207, 9, 12, 10],
         );
-        // !flag || n_1 < Limb::try_from(d_len).unwrap()
-        // !highest_q second time
-        // q_len != 0
-        // limbs_sub_limb_in_place(
-        //      ns_hi,
-        //      limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs, ds[i])) fourth time
-        // n_1 == 0 third time
+        // - !flag || n_1 < Limb::try_from(d_len).unwrap()
+        // - !highest_q second time
+        // - q_len != 0
+        // - limbs_sub_limb_in_place(ns_hi, limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs,
+        //   ds[i])) fourth time
+        // - n_1 == 0 third time
         test(&[10], &[0, 0, 0, 1], &[1, 0, 0x80000000], false, &[1]);
-        // q_len == 0 second time
+        // - q_len == 0 second time
         test(&[10], &[0; 3], &[0, 0, 0x80000000], false, &[10]);
-        // *ns_last >= carry
+        // - *ns_last >= carry
         test(&[10; 3], &[0; 5], &[0, 0, 0x80000000], false, &[0, 0, 10]);
-        // n_1 != 0 third time
+        // - n_1 != 0 third time
         test(
             &[10; 2],
             &[0, 0, 1, 1],
@@ -216,7 +215,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[2, 10],
         );
-        // highest_q first time
+        // - highest_q first time
         test(
             &[10, 10],
             &[
@@ -230,8 +229,8 @@ fn test_limbs_div_schoolbook() {
             true,
             &[10, 10],
         );
-        // !flag || n_1 >= d_1 second time
-        // n_1 == carry second time
+        // - !flag || n_1 >= d_1 second time
+        // - n_1 == carry second time
         test(
             &[10; 2],
             &[0, 0, 1, 0, 1],
@@ -239,7 +238,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[u32::MAX, 1],
         );
-        // carry second time
+        // - carry second time
         test(
             &[10; 2],
             &[0, 0, 0, 0, 1],
@@ -247,10 +246,10 @@ fn test_limbs_div_schoolbook() {
             false,
             &[u32::MAX, 1],
         );
-        // *ns_last < carry
-        // n_1 != 0 first time
-        // highest_q second time
-        // !carry third time
+        // - *ns_last < carry
+        // - n_1 != 0 first time
+        // - highest_q second time
+        // - !carry third time
         test(
             &[10; 20],
             &[
@@ -404,8 +403,8 @@ fn test_limbs_div_schoolbook() {
                 10, 10, 10, 10, 10, 10,
             ],
         );
-        // carry third time
-        // n_1 != 0 second time
+        // - carry third time
+        // - n_1 != 0 second time
         test(
             &[10; 8],
             &[
@@ -481,8 +480,8 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // !flag || n_1 >= d_1 first time
-        // n_1 == carry first time
+        // - !flag || n_1 >= d_1 first time
+        // - n_1 == carry first time
         test(
             &[10; 10],
             &[
@@ -538,7 +537,7 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // n_1 == 0 first time
+        // - n_1 == 0 first time
         test(
             &[10; 20],
             &[
@@ -745,8 +744,8 @@ fn test_limbs_div_schoolbook() {
                 91710029, 4264403435, 2579237268, 67618125, 523165989, 10,
             ],
         );
-        // n_1 != carry first time
-        // flag && n_1 < carry first time
+        // - n_1 != carry first time
+        // - flag && n_1 < carry first time
         test(
             &[10; 73],
             &[
@@ -1234,7 +1233,7 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // carry first time
+        // - carry first time
         test(
             &[10; 45],
             &[
@@ -1340,8 +1339,8 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // n_1 != carry second time
-        // flag && n_1 < carry second time
+        // - n_1 != carry second time
+        // - flag && n_1 < carry second time
         test(
             &[10; 10],
             &[
@@ -1537,7 +1536,7 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // !(flag && n_1 < carry) first time
+        // - !(flag && n_1 < carry) first time
         test(
             &[0; 3],
             &[
@@ -1636,7 +1635,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[u32::MAX, u32::MAX, 8191],
         );
-        // q_len == 0 first time
+        // - q_len == 0 first time
         test(
             &[0],
             &[0, 0, 0x80000000],
@@ -1647,9 +1646,8 @@ fn test_limbs_div_schoolbook() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // !limbs_sub_limb_in_place(
-        //      ns_hi,
-        //      limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs, ds[i])) fourth time
+        // - !limbs_sub_limb_in_place(ns_hi, limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs,
+        //   ds[i])) fourth time
         test(
             &[10],
             &[0, 0, 1, 1],
@@ -1657,8 +1655,8 @@ fn test_limbs_div_schoolbook() {
             false,
             &[2],
         );
-        // n_1 == d_1 && ns[d_len_s_m_1] == d_2
-        // !(flag && n_1 < carry) second time
+        // - n_1 == d_1 && ns[d_len_s_m_1] == d_2
+        // - !(flag && n_1 < carry) second time
         test(
             &[10; 518],
             &[
@@ -2790,7 +2788,7 @@ fn test_limbs_div_divide_and_conquer() {
         verify_limbs_div(qs_in, ns, ds, q_highest, &qs);
     };
     {
-        // *scratch_2_head != 0
+        // - *scratch_2_head != 0
         test(
             &[10; 4],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -2798,10 +2796,9 @@ fn test_limbs_div_divide_and_conquer() {
             false,
             &[4294967057, 15, 18, 10],
         );
-        // *scratch_2_head == 0
-        // !(highest_q &&
-        //      limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
-        //      || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater)
+        // - *scratch_2_head == 0
+        // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..],
+        //   ds) || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater)
         test(
             &[10; 3],
             &[0; 9],
@@ -2816,9 +2813,8 @@ fn test_limbs_div_divide_and_conquer() {
             false,
             &[0, 0, 2],
         );
-        // highest_q &&
-        //      limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
-        //      || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
+        // - highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
+        //   || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
         test(
             &[10; 3],
             &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
@@ -2898,18 +2894,18 @@ fn test_limbs_div_barrett() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len < d_len
-        // ghost_limb
-        // *scratch_2_head <= 6
-        // !highest_q third time
-        // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-        //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater)
+        // - q_len < d_len
+        // - ghost_limb
+        // - *scratch_2_head <= 6
+        // - !highest_q third time
+        // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds) ||
+        //   limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater)
         test(&[10; 3], &[1, 2, 3], &[0, 0x80000000], false, &[6, 10, 10]);
         test(&[10; 3], &[1, 2, 3], &[3, 0x80000000], false, &[6, 10, 10]);
-        // q_len >= d_len
-        // !highest_q first time
-        // !_limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch)
-        // *scratch_2_head > 4
+        // - q_len >= d_len
+        // - !highest_q first time
+        // - !_limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch)
+        // - *scratch_2_head > 4
         test(
             &[10; 3],
             &[1, 2, 3, 4],
@@ -2924,9 +2920,9 @@ fn test_limbs_div_barrett() {
             false,
             &[5, 8, 10],
         );
-        // *scratch_2_head > 6
+        // - *scratch_2_head > 6
         test(&[10; 3], &[0, 0, 1], &[0, 0x80000001], false, &[1, 10, 10]);
-        // !ghost_limb
+        // - !ghost_limb
         test(
             &[10; 3],
             &[0, 0, 0, 0],
@@ -2934,14 +2930,14 @@ fn test_limbs_div_barrett() {
             false,
             &[0, 10, 10],
         );
-        // highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-        //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
-        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) second time
+        // - highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds) ||
+        //   limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
+        // - !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) second time
         test(&[10; 3], &[0, 0, 1], &[1, 0x80000000], false, &[1, 10, 10]);
-        // *scratch_2_head <= 4
-        // !highest_q second time
-        // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
-        //      || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater)
+        // - *scratch_2_head <= 4
+        // - !highest_q second time
+        // - !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds) ||
+        //   limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater)
         test(
             &[10; 3],
             &[0, 0, 0, 0],
@@ -2949,9 +2945,9 @@ fn test_limbs_div_barrett() {
             false,
             &[0, 0, 10],
         );
-        // highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
-        //      || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
-        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) first time
+        // - highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds) ||
+        //   limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
+        // - !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) first time
         test(
             &[10; 3],
             &[0, 0, 1, 0],
@@ -2959,7 +2955,7 @@ fn test_limbs_div_barrett() {
             false,
             &[1, 0, 10],
         );
-        // highest_q first time
+        // - highest_q first time
         test(
             &[10; 337],
             &[
@@ -3071,7 +3067,7 @@ fn test_limbs_div_barrett() {
                 186019120,
             ],
         );
-        // highest_q third time
+        // - highest_q third time
         test(
             &[10; 37],
             &[
@@ -4815,7 +4811,7 @@ fn test_limbs_div_barrett() {
                 2097542169, 2497074010, 3595786574, 3396020653, 699180723, 799063684, 10, 10, 10,
             ],
         );
-        // limbs_sub_greater_to_out 2 in limbs_div_barrett
+        // - limbs_sub_greater_to_out 2 in limbs_div_barrett
         test(
             &[10; 69],
             &[
@@ -6006,7 +6002,7 @@ fn test_limbs_div_barrett() {
                 u32::MAX,
             ],
         );
-        // !limbs_div_barrett_approx
+        // - !limbs_div_barrett_approx
         test(
             &[10; 8],
             &[
@@ -6101,8 +6097,8 @@ fn test_limbs_div_schoolbook_approx() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len + 1 < d_len
-        // !highest_q
+        // - q_len + 1 < d_len
+        // - !highest_q
         test(
             &[10],
             &[1, 2, 3],
@@ -6111,11 +6107,11 @@ fn test_limbs_div_schoolbook_approx() {
             &[10],
             &[1, 2, 3],
         );
-        // !(!flag || n_1 >= d_1) second time
+        // - !(!flag || n_1 >= d_1) second time
         test(&[0], &[0; 4], &[0, 0, 0x80000000], false, &[0], &[0; 4]);
-        // q_len + 1 >= d_len
-        // !(!flag || n_1 >= d_1) first time
-        // !carry second time
+        // - q_len + 1 >= d_len
+        // - !(!flag || n_1 >= d_1) first time
+        // - !carry second time
         test(
             &[0, 0],
             &[0; 5],
@@ -6124,7 +6120,7 @@ fn test_limbs_div_schoolbook_approx() {
             &[0, 0],
             &[0; 5],
         );
-        // highest_q
+        // - highest_q
         test(
             &[
                 2694350779, 1945458005, 4130424186, 4267238024, 2588565427, 561074857, 3031728663,
@@ -6148,8 +6144,8 @@ fn test_limbs_div_schoolbook_approx() {
                 1188988289,
             ],
         );
-        // !(n_1 == d_1 && ns[j] == d_0)
-        // !carry first time
+        // - !(n_1 == d_1 && ns[j] == d_0)
+        // - !carry first time
         test(
             &[
                 2678906106, 1133029551, 3498992572, 3960506675, 2156562886, 2180928089, 4027866586,
@@ -6174,9 +6170,9 @@ fn test_limbs_div_schoolbook_approx() {
                 2707761200, 1588607308, 1519717633, 1232770303,
             ],
         );
-        // n_1 == d_1 && ns[j] == d_0
-        // !flag || n_1 >= d_1 first time
-        // n_1 == carry
+        // - n_1 == d_1 && ns[j] == d_0
+        // - !flag || n_1 >= d_1 first time
+        // - n_1 == carry
         test(
             &[10, 10, 10, 10],
             &[0, 0, 0, 1, 4, 0x80000000],
@@ -6185,7 +6181,7 @@ fn test_limbs_div_schoolbook_approx() {
             &[0xfffffffc, u32::MAX, u32::MAX, 10],
             &[0, 19, 0, 0x7ffffffe, 0x80000000, 0x80000000],
         );
-        // carry first time
+        // - carry first time
         test(
             &[10, 10, 10, 10, 10],
             &[0, 0, 0, 0, 0, 3],
@@ -6194,8 +6190,8 @@ fn test_limbs_div_schoolbook_approx() {
             &[u32::MAX, u32::MAX, 5, 10, 10],
             &[0, 3, 2147483630, u32::MAX, 0, 3],
         );
-        // !flag || n_1 >= d_1 second time
-        // !(flag && n_1 < carry)
+        // - !flag || n_1 >= d_1 second time
+        // - !(flag && n_1 < carry)
         test(
             &[10, 10, 10, 10],
             &[0, 0, 0, 3, u32::MAX, 0x80000000],
@@ -6204,7 +6200,7 @@ fn test_limbs_div_schoolbook_approx() {
             &[u32::MAX, u32::MAX, 10, 10],
             &[0, 0, 3, 0x80000000, 0x80000000, 0x80000000],
         );
-        // carry second time
+        // - carry second time
         test(
             &[10; 4],
             &[0, 0, 0, 0, 0, 0, 1, 0],
@@ -6213,8 +6209,8 @@ fn test_limbs_div_schoolbook_approx() {
             &[u32::MAX, u32::MAX, 1, 0],
             &[0, 0, 1, 0x7ffffffe, u32::MAX, 0, 1, 0],
         );
-        // n_1 != carry
-        // !flag || n_1 >= carry first time
+        // - n_1 != carry
+        // - !flag || n_1 >= carry first time
         test(
             &[
                 0,
@@ -8063,7 +8059,7 @@ fn test_limbs_div_schoolbook_approx() {
                 0,
             ],
         );
-        // limbs_div_schoolbook_approx, flag && n_1 < carry
+        // - limbs_div_schoolbook_approx, flag && n_1 < carry
         test(
             &[10; 115],
             &[
@@ -8662,7 +8658,7 @@ fn test_limbs_div_schoolbook_approx() {
                 2147450880,
             ],
         );
-        // !flag || n_1 >= carry second time
+        // - !flag || n_1 >= carry second time
         test(
             &[10; 24],
             &[
@@ -8927,8 +8923,8 @@ fn test_limbs_div_divide_and_conquer_approx() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len < d_len
-        // q_len < DC_DIVAPPR_Q_THRESHOLD
+        // - q_len < d_len
+        // - q_len < DC_DIVAPPR_Q_THRESHOLD
         test(
             &[10; 4],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -8936,13 +8932,13 @@ fn test_limbs_div_divide_and_conquer_approx() {
             false,
             &[4294967057, 15, 18, 10],
         );
-        // q_len >= d_len
-        // q_len_mod_d_len != 1
-        // q_len_mod_d_len == 2
-        // q_len_mod_d_len != d_len
-        // hi < DC_DIV_QR_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
-        // carry != 0 in limbs_div_divide_and_conquer_approx_helper
-        // lo < DC_DIVAPPR_Q_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
+        // - q_len >= d_len
+        // - q_len_mod_d_len != 1
+        // - q_len_mod_d_len == 2
+        // - q_len_mod_d_len != d_len
+        // - hi < DC_DIV_QR_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
+        // - carry != 0 in limbs_div_divide_and_conquer_approx_helper
+        // - lo < DC_DIVAPPR_Q_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
         test(
             &[
                 1745715367, 3242831492, 2189664406, 3695710048, 3400938664, 2983493477, 3450434346,
@@ -8964,7 +8960,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 1636315044, 2452324979, 2121986305, 4198504803, 1202996215, 3246857339, 376322562,
             ],
         );
-        // 2 < q_len_mod_d_len < DC_DIV_QR_THRESHOLD
+        // - 2 < q_len_mod_d_len < DC_DIV_QR_THRESHOLD
         test(
             &[
                 2955158159, 1759170654, 241992668, 2980193182, 840605220, 1045835548, 3208341497,
@@ -8988,7 +8984,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 60277520, 2139543466,
             ],
         );
-        // carry != 0
+        // - carry != 0
         test(
             &[
                 3168925666, 1401331420, 1768122255, 956650685, 3125577762, 275145267, 4000912215,
@@ -9012,7 +9008,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 4267483432, 1006590899,
             ],
         );
-        // highest_q second time
+        // - highest_q second time
         test(
             &[
                 2437003791, 645401979, 1378969963, 3859694962, 1591396376, 1173467855, 1717394161,
@@ -9030,8 +9026,8 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 212083904, 3972116836, 3930714191,
             ],
         );
-        // q_len_mod_d_len == 1
-        // !(n_2 == d_1 && n_1 == d_0)
+        // - q_len_mod_d_len == 1
+        // - !(n_2 == d_1 && n_1 == d_0)
         test(
             &[
                 4235270104, 498278423, 1233560634, 4293074805, 853780813, 1015040797, 3070872633,
@@ -9053,7 +9049,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 1794379685, 2200464811, 3921564486, 2468104993, 1989275393, 2102765265,
             ],
         );
-        // q_len >= d_len
+        // - q_len >= d_len
         test(
             &[
                 2046213120, 118064180, 676462636, 192405947, 987595058, 3117257430, 2648701979,
@@ -9077,7 +9073,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 243084170, 2889743198, 198170535, 2181413355,
             ],
         );
-        // highest_q first time
+        // - highest_q first time
         test(
             &[
                 2272242430, 2854406627, 1305900137, 1975858742, 4025222745, 212032770, 698550929,
@@ -9103,8 +9099,8 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 3092149152, 1384797257, 934398704, 1923839427,
             ],
         );
-        // q_len_mod_d_len >= DC_DIV_QR_THRESHOLD
-        // hi < DC_DIV_QR_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
+        // - q_len_mod_d_len >= DC_DIV_QR_THRESHOLD
+        // - hi < DC_DIV_QR_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
         test(
             &[
                 2108009976, 2838126990, 827008974, 4157613011, 3782799311, 839921672, 879731301,
@@ -9276,7 +9272,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 2433026108, 3791871978,
             ],
         );
-        // q_len >= DC_DIVAPPR_Q_THRESHOLD
+        // - q_len >= DC_DIVAPPR_Q_THRESHOLD
         test(
             &[
                 1253234102, 1407423154, 1496099965, 1695523232, 4087895045, 3633064637, 1918073940,
@@ -9480,7 +9476,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 2577805590, 2764027866, 2020028848, 3876787343,
             ],
         );
-        // highest_q in limbs_div_divide_and_conquer_approx_helper
+        // - highest_q in limbs_div_divide_and_conquer_approx_helper
         test(
             &[
                 2317066713, 3734873775, 217584598, 4283181214, 1987296898, 2029964730, 2841877055,
@@ -9701,7 +9697,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 2405900037, 3062309031, 2085261831, 707121842, 3173108868, 503413591, 73514434,
             ],
         );
-        // lo >= DC_DIVAPPR_Q_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
+        // - lo >= DC_DIVAPPR_Q_THRESHOLD in limbs_div_divide_and_conquer_approx_helper
         test(
             &[
                 3852468748, 3866732619, 592701608, 3778254743, 1280491238, 2834833773, 550923334,
@@ -10047,7 +10043,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
             false,
             &[3614, 4294966768, 4294967005, 19, 22, 10],
         );
-        // q_lo
+        // - q_lo
         test(
             &[0; 338],
             &[
@@ -11409,7 +11405,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 0,
             ],
         );
-        // n_2 == d_1 && n_1 == d_0
+        // - n_2 == d_1 && n_1 == d_0
         test(
             &[0; 780],
             &[
@@ -13370,9 +13366,9 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 u32::MAX,
             ],
         );
-        // carry
-        // !limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])
-        // q != 0
+        // - carry
+        // - !limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])
+        // - q != 0
         test(
             &[10; 10],
             &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -13380,7 +13376,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
             false,
             &[0, 0, 0xfffffffc, u32::MAX, u32::MAX, 1, 10, 10, 10, 10],
         );
-        // limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])
+        // - limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])
         test(
             &[10; 197],
             &[
@@ -15491,26 +15487,26 @@ fn test_limbs_div_barrett_approx() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len + 1 < d_len
-        // d_len_s == i_len
-        // !highest_q first time in limbs_div_barrett_approx_preinverted
-        // q_len == 0 first time in limbs_div_barrett_approx_preinverted
+        // - q_len + 1 < d_len
+        // - d_len_s == i_len
+        // - !highest_q first time in limbs_div_barrett_approx_preinverted
+        // - q_len == 0 first time in limbs_div_barrett_approx_preinverted
         test(&[10; 3], &[1, 2], &[0, 0x80000000], false, &[10, 10, 10]);
-        // q_len + 1 >= d_len
-        // d_len_s != i_len
-        // !limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1)
-        // q_len != 0 first time in limbs_div_barrett_approx_preinverted
-        // i_len == chunk_len in limbs_div_barrett_approx_preinverted
-        // q_len == 0 second time in limbs_div_barrett_approx_preinverted
-        // !(limbs_slice_add_limb_in_place(qs, 3) || carry)
-        //      in limbs_div_barrett_approx_preinverted
+        // - q_len + 1 >= d_len
+        // - d_len_s != i_len
+        // - !limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1)
+        // - q_len != 0 first time in limbs_div_barrett_approx_preinverted
+        // - i_len == chunk_len in limbs_div_barrett_approx_preinverted
+        // - q_len == 0 second time in limbs_div_barrett_approx_preinverted
+        // - !(limbs_slice_add_limb_in_place(qs, 3) || carry) in
+        //   limbs_div_barrett_approx_preinverted
         test(&[10; 3], &[1, 2, 3], &[0, 0x80000000], false, &[8, 10, 10]);
         test(&[10; 3], &[1, 2, 3], &[3, 0x80000000], false, &[8, 10, 10]);
-        // q_len != 0 second time in limbs_div_barrett_approx_preinverted
-        // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
-        // n != 0 in limbs_div_barrett_approx_preinverted
-        // limbs_cmp_same_length(rs, ds) == Ordering::Less
-        // i_len != chunk_len in limbs_div_barrett_approx_preinverted
+        // - q_len != 0 second time in limbs_div_barrett_approx_preinverted
+        // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
+        // - n != 0 in limbs_div_barrett_approx_preinverted
+        // - limbs_cmp_same_length(rs, ds) == Ordering::Less
+        // - i_len != chunk_len in limbs_div_barrett_approx_preinverted
         test(
             &[10; 100],
             &[
@@ -15561,8 +15557,8 @@ fn test_limbs_div_barrett_approx() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // n == 0 in limbs_div_barrett_approx_preinverted
-        // r != 0 in limbs_div_barrett_approx_preinverted
+        // - n == 0 in limbs_div_barrett_approx_preinverted
+        // - r != 0 in limbs_div_barrett_approx_preinverted
         test(
             &[10; 28],
             &[
@@ -15581,7 +15577,7 @@ fn test_limbs_div_barrett_approx() {
                 4256455092, 679164912, 4183948729, 591513024, 2958428852, 959546540, 1259575285,
             ],
         );
-        // limbs_slice_add_limb_in_place in limbs_div_barrett_approx_helper
+        // - limbs_slice_add_limb_in_place in limbs_div_barrett_approx_helper
         test(
             &[10; 1],
             &[
@@ -15854,7 +15850,7 @@ fn test_limbs_div_barrett_approx() {
             true,
             &[u32::MAX],
         );
-        // limbs_add_limb_to_out in limbs_div_barrett_approx_helper
+        // - limbs_add_limb_to_out in limbs_div_barrett_approx_helper
         test(
             &[10; 119],
             &[
@@ -16072,9 +16068,9 @@ fn test_limbs_div_barrett_approx() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // highest_q first time in limbs_div_barrett_approx_preinverted
-        // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
-        // limbs_cmp_same_length(rs, ds) >= Ordering::Equal
+        // - highest_q first time in limbs_div_barrett_approx_preinverted
+        // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_barrett_approx_preinverted
+        // - limbs_cmp_same_length(rs, ds) >= Ordering::Equal
         test(
             &[10; 100],
             &[
@@ -16469,10 +16465,10 @@ fn test_limbs_div() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len + FUDGE >= d_len
-        // bits != 0 in limbs_div_to_out_unbalanced
-        // bits != 0 and two-limb division in limbs_div_to_out_unbalanced
-        // carry == 0 in limbs_div_to_out_unbalanced
+        // - q_len + FUDGE >= d_len
+        // - bits != 0 in limbs_div_to_out_unbalanced
+        // - bits != 0 and two-limb division in limbs_div_to_out_unbalanced
+        // - carry == 0 in limbs_div_to_out_unbalanced
         test(&[10; 4], &[1, 2], &[3, 4], &[0, 10, 10, 10]);
         test(
             &[10; 4],
@@ -16480,8 +16476,8 @@ fn test_limbs_div() {
             &[5, 6],
             &[2624702236, 2863311530, 0, 10],
         );
-        // bits == 0 in limbs_div_to_out_unbalanced
-        // bits == 0 and schoolbook division in limbs_div_to_out_unbalanced
+        // - bits == 0 in limbs_div_to_out_unbalanced
+        // - bits == 0 and schoolbook division in limbs_div_to_out_unbalanced
         test(
             &[10; 256],
             &[
@@ -17170,15 +17166,15 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // bits != 0 and schoolbook division in limbs_div_to_out_unbalanced
+        // - bits != 0 and schoolbook division in limbs_div_to_out_unbalanced
         test(&[10; 3], &[0; 3], &[0, 0, 1], &[0, 10, 10]);
-        // carry != 0 and !highest_q in limbs_div_to_out_unbalanced
+        // - carry != 0 and !highest_q in limbs_div_to_out_unbalanced
         test(&[10; 3], &[0, 0, 2], &[0, 1], &[0, 2, 10]);
-        // q_len + FUDGE < d_len
-        // bits != 0 in limbs_div_to_out_balanced
-        // bits != 0 and schoolbook division in limbs_div_to_out_balanced
-        // carry == 0 in limbs_div_to_out_balanced
-        // *scratch_2_head > 4 in limbs_div_to_out_balanced
+        // - q_len + FUDGE < d_len
+        // - bits != 0 in limbs_div_to_out_balanced
+        // - bits != 0 and schoolbook division in limbs_div_to_out_balanced
+        // - carry == 0 in limbs_div_to_out_balanced
+        // - *scratch_2_head > 4 in limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -17193,8 +17189,8 @@ fn test_limbs_div() {
             ],
             &[839942670, 1, 10],
         );
-        // bits != 0 and two-limb division in limbs_div_to_out_balanced
-        // carry != 0 and !highest_q in limbs_div_to_out_balanced
+        // - bits != 0 and two-limb division in limbs_div_to_out_balanced
+        // - carry != 0 and !highest_q in limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -17209,7 +17205,7 @@ fn test_limbs_div() {
             ],
             &[1, 10, 10],
         );
-        // bits == 0 and two-limb division in limbs_div_to_out_unbalanced
+        // - bits == 0 and two-limb division in limbs_div_to_out_unbalanced
         test(
             &[10; 233],
             &[
@@ -17286,8 +17282,8 @@ fn test_limbs_div() {
                 3290134248, 0,
             ],
         );
-        // bits == 0 in limbs_div_to_out_balanced
-        // bits == 0 and two-limb division in limbs_div_to_out_balanced
+        // - bits == 0 in limbs_div_to_out_balanced
+        // - bits == 0 and two-limb division in limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -17300,7 +17296,7 @@ fn test_limbs_div() {
             ],
             &[0, 10, 10],
         );
-        // bits == 0 and schoolbook division in limbs_div_to_out_balanced
+        // - bits == 0 and schoolbook division in limbs_div_to_out_balanced
         test(
             &[10; 5],
             &[
@@ -17315,8 +17311,8 @@ fn test_limbs_div() {
             ],
             &[985368501, 2737353193, 3370693165, 1798455938, 0],
         );
-        // *scratch_2_head <= 4 in limbs_div_to_out_balanced
-        // !(r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less)
+        // - *scratch_2_head <= 4 in limbs_div_to_out_balanced
+        // - !(r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less)
         test(
             &[10; 3],
             &[
@@ -17350,7 +17346,7 @@ fn test_limbs_div() {
             ],
             &[4294950912, 0, 10],
         );
-        // bits == 0 and divide-and-conquer division in limbs_div_to_out_balanced
+        // - bits == 0 and divide-and-conquer division in limbs_div_to_out_balanced
         test(
             &[10; 265],
             &[
@@ -17531,7 +17527,7 @@ fn test_limbs_div() {
                 2696660773, 1238552336, 3193475557, 1525093066, 1459803910, 0,
             ],
         );
-        // bits != 0 and divide-and-conquer division in limbs_div_to_out_unbalanced
+        // - bits != 0 and divide-and-conquer division in limbs_div_to_out_unbalanced
         test(
             &[10; 744],
             &[
@@ -17814,7 +17810,7 @@ fn test_limbs_div() {
                 1828982470, 1,
             ],
         );
-        // bits != 0 and divide-and-conquer division in limbs_div_to_out_balanced
+        // - bits != 0 and divide-and-conquer division in limbs_div_to_out_balanced
         test(
             &[10; 276],
             &[
@@ -18115,7 +18111,7 @@ fn test_limbs_div() {
                 1956694410, 2508860583, 2,
             ],
         );
-        // bits == 0 and divide-and-conquer division in limbs_div_to_out_unbalanced
+        // - bits == 0 and divide-and-conquer division in limbs_div_to_out_unbalanced
         test(
             &[10; 166],
             &[
@@ -18216,7 +18212,7 @@ fn test_limbs_div() {
                 2938339245, 1916419568, 824070112, 65967478, 0,
             ],
         );
-        // bits == 0 and Barrett division in limbs_div_to_out_unbalanced
+        // - bits == 0 and Barrett division in limbs_div_to_out_unbalanced
         test(
             &[10; 1770],
             &[
@@ -24019,7 +24015,7 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // bits != 0 and Barrett division in limbs_div_to_out_balanced
+        // - bits != 0 and Barrett division in limbs_div_to_out_balanced
         test(
             &[10; 1401],
             &[123; 2800],
@@ -24227,7 +24223,7 @@ fn test_limbs_div() {
                 10, 10,
             ],
         );
-        // bits == 0 and Barrett division in limbs_div_to_out_balanced
+        // - bits == 0 and Barrett division in limbs_div_to_out_balanced
         let mut ds = vec![0; 1409];
         ds.push(u32::MAX);
         test(
@@ -24362,7 +24358,7 @@ fn test_limbs_div() {
                 861, 738, 615, 492, 369, 246, 123, 0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // bits != 0 and Barrett division in limbs_div_to_out_unbalanced
+        // - bits != 0 and Barrett division in limbs_div_to_out_unbalanced
         test(
             &[10; 1770],
             &[
@@ -31236,8 +31232,8 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less
-        //      in limbs_div_to_out_balanced
+        // - r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less in
+        //   limbs_div_to_out_balanced
         test(
             &[10; 5],
             &[
@@ -31509,7 +31505,7 @@ fn test_div() {
         "915607705283450388306561139234228660872677067256472842161753852459689688332903348325308112\
         7923093090598913",
         "11669177832462215441614364516705357863717491965951",
-        "784637716923245892498679555408392159158150581185689944063"
+        "784637716923245892498679555408392159158150581185689944063",
     );
 }
 
@@ -31711,7 +31707,7 @@ fn limbs_div_divisor_of_limb_max_with_carry_to_out_properties() {
     large_type_gen_var_10().test_properties_with_config(
         &config,
         |(mut out, xs, divisor, carry)| {
-            //TODO figure out what to test
+            // TODO figure out what to test
             limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, &xs, divisor, carry);
         },
     );
@@ -31725,7 +31721,7 @@ fn limbs_div_divisor_of_limb_max_with_carry_in_place_properties() {
     unsigned_vec_unsigned_unsigned_triple_gen_var_9().test_properties_with_config(
         &config,
         |(mut xs, divisor, carry)| {
-            //TODO figure out what to test
+            // TODO figure out what to test
             limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, divisor, carry);
         },
     );

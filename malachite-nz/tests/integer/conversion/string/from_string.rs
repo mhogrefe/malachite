@@ -203,15 +203,14 @@ fn from_string_base_properties() {
         }
         assert_eq!(Integer::from_string_base(base, &with_zero).unwrap(), n);
 
-        if let Ok(base) = u32::try_from(base) {
-            assert_eq!(BigInt::from_str_radix(&s, base).unwrap(), BigInt::from(&n));
-        }
-        if let Ok(base) = i32::try_from(base) {
-            assert_eq!(
-                rug::Integer::from_str_radix(&s, base).unwrap(),
-                rug::Integer::from(&n)
-            );
-        }
+        assert_eq!(
+            BigInt::from_str_radix(&s, u32::from(base)).unwrap(),
+            BigInt::from(&n)
+        );
+        assert_eq!(
+            rug::Integer::from_str_radix(&s, i32::from(base)).unwrap(),
+            rug::Integer::from(&n)
+        );
     });
 
     unsigned_pair_gen_var_19().test_properties(|(u, base)| {

@@ -10,8 +10,8 @@ impl Mod<Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the same sign as the second [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -60,8 +60,8 @@ impl<'a> Mod<&'a Integer> for Integer {
     /// reference and returning just the remainder. The remainder has the same sign as the second
     /// [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -110,8 +110,8 @@ impl<'a> Mod<Integer> for &'a Integer {
     /// by value and returning just the remainder. The remainder has the same sign as the second
     /// [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -164,8 +164,8 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
     /// the remainder. The remainder has the same sign as the second [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -217,8 +217,8 @@ impl ModAssign<Integer> for Integer {
     /// replacing the first by the remainder. The remainder has the same sign as the second
     /// [`Integer`].
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -274,8 +274,8 @@ impl<'a> ModAssign<&'a Integer> for Integer {
     /// and replacing the first by the remainder. The remainder has the same sign as the second
     /// [`Integer`].
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -332,8 +332,8 @@ impl Rem<Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the same sign as the first [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y \operatorname{sgn}(xy)
@@ -380,8 +380,8 @@ impl<'a> Rem<&'a Integer> for Integer {
     /// reference and returning just the remainder. The remainder has the same sign as the first
     /// [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y \operatorname{sgn}(xy)
@@ -428,8 +428,8 @@ impl<'a> Rem<Integer> for &'a Integer {
     /// by value and returning just the remainder. The remainder has the same sign as the first
     /// [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y \operatorname{sgn}(xy)
@@ -474,8 +474,8 @@ impl<'a, 'b> Rem<&'b Integer> for &'a Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
     /// the remainder. The remainder has the same sign as the first [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) = x - y \operatorname{sgn}(xy)
@@ -519,8 +519,8 @@ impl RemAssign<Integer> for Integer {
     /// replacing the first by the remainder. The remainder has the same sign as the first
     /// [`Integer`].
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y \operatorname{sgn}(xy)
@@ -573,8 +573,8 @@ impl<'a> RemAssign<&'a Integer> for Integer {
     /// and replacing the first by the remainder. The remainder has the same sign as the first
     /// [`Integer`].
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y \operatorname{sgn}(xy)
@@ -628,8 +628,8 @@ impl CeilingMod<Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning just the
     /// remainder. The remainder has the opposite sign as the second [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
@@ -676,8 +676,8 @@ impl<'a> CeilingMod<&'a Integer> for Integer {
     /// reference and returning just the remainder. The remainder has the opposite sign as the
     /// second [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
@@ -721,11 +721,11 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by reference and the second
-    /// by value and returning just the remainder. The remainder has the opposite sign as the
-    /// second [`Integer`].
+    /// by value and returning just the remainder. The remainder has the opposite sign as the second
+    /// [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
@@ -776,8 +776,8 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning just
     /// the remainder. The remainder has the opposite sign as the second [`Integer`].
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
@@ -823,12 +823,12 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
 }
 
 impl CeilingModAssign<Integer> for Integer {
-    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand
-    /// side by value and replacing the first number by the remainder. The remainder has the
-    /// opposite sign as the second number.
+    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand side
+    /// by value and replacing the first number by the remainder. The remainder has the opposite
+    /// sign as the second number.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.
@@ -880,12 +880,12 @@ impl CeilingModAssign<Integer> for Integer {
 }
 
 impl<'a> CeilingModAssign<&'a Integer> for Integer {
-    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand
-    /// side by reference and replacing the first number by the remainder. The remainder has the
-    /// opposite sign as the second number.
+    /// Divides an [`Integer`] by another [`Integer`], taking the [`Integer`] on the right-hand side
+    /// by reference and replacing the first number by the remainder. The remainder has the opposite
+    /// sign as the second number.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq |r| < |y|$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq |r| < |y|$.
     ///
     /// $$
     /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.

@@ -1,11 +1,11 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{Sign, UnsignedAbs};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn partial_cmp_abs_unsigned<T: Copy + One + Ord + Sign + SignificantBits>(
     x: &Rational,

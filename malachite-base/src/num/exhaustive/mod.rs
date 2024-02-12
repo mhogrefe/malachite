@@ -57,13 +57,13 @@ impl<T: PrimitiveInt> DoubleEndedIterator for PrimitiveIntIncreasingRange<T> {
 /// Generates all values of a signed integer type in an interval, in order of increasing absolute
 /// value.
 ///
-/// This `enum` is created by [`exhaustive_signed_range`] and
-/// [`exhaustive_signed_inclusive_range`]; see their documentation for more.
+/// This `enum` is created by [`exhaustive_signed_range`] and [`exhaustive_signed_inclusive_range`];
+/// see their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveSignedRange<T: PrimitiveSigned> {
     NonNegative(PrimitiveIntIncreasingRange<T>),
     NonPositive(Rev<PrimitiveIntIncreasingRange<T>>),
-    BothSigns(Chain<Once<T>, PrimitiveIntUpDown<T>>),
+    BothSigns(ExhaustiveSigneds<T>),
 }
 
 impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
@@ -133,13 +133,15 @@ pub fn exhaustive_positive_primitive_ints<T: PrimitiveInt>() -> PrimitiveIntIncr
     primitive_int_increasing_inclusive_range(T::ONE, T::MAX)
 }
 
+pub type ExhaustiveSigneds<T> = Chain<Once<T>, PrimitiveIntUpDown<T>>;
+
 /// Generates all signed integers in order of increasing absolute value.
 ///
 /// When two numbers have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [-2^{W-1}, 2^{W-1})$, where $W$ is the width of the type, and $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [-2^{W-1}, 2^{W-1})$, where $W$ is the width of
+/// the type, and $i < j$.
 ///
 /// The output length is $2^W$.
 ///
@@ -157,7 +159,7 @@ pub fn exhaustive_positive_primitive_ints<T: PrimitiveInt>() -> PrimitiveIntIncr
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveIntUpDown<T>> {
+pub fn exhaustive_signeds<T: PrimitiveSigned>() -> ExhaustiveSigneds<T> {
     once(T::ZERO).chain(exhaustive_nonzero_signeds())
 }
 
@@ -213,10 +215,9 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntIncr
 ///
 /// When two numbers have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [-2^{W-1}, 2^{W-1}) \\setminus \\{0\\}$, where $W$ is the width of the type, and
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [-2^{W-1}, 2^{W-1}) \\setminus \\{0\\}$, where
+/// $W$ is the width of the type, and $i < j$.
 ///
 /// The output length is $2^W-1$.
 ///
@@ -324,9 +325,8 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 /// than or equal to $b$. If $a$ and $b$ are equal, the range is empty. This function cannot create
 /// a range that includes `T::MAX`; for that, use [`exhaustive_signed_inclusive_range`].
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a)$ and $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [0, b - a)$ and $i < j$.
 ///
 /// The output length is $b - a$.
 ///
@@ -370,9 +370,8 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 /// When two numbers have the same absolute value, the positive one comes first. $a$ must be less
 /// than or equal to $b$. If $a$ and $b$ are equal, the range contains a single element.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a]$ and $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [0, b - a]$ and $i < j$.
 ///
 /// The output length is $b - a + 1$.
 ///
@@ -682,8 +681,8 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// Positive and negative zero are both excluded.
 ///
 /// [-`MAX_FINITE`](super::basic::floats::PrimitiveFloat::MAX_FINITE) is generated first and
-/// [`MAX_FINITE`](super::basic::floats::PrimitiveFloat::MAX_FINITE) is generated last. The
-/// returned iterator is double-ended, so it may be reversed.
+/// [`MAX_FINITE`](super::basic::floats::PrimitiveFloat::MAX_FINITE) is generated last. The returned
+/// iterator is double-ended, so it may be reversed.
 ///
 /// Let $\varphi$ be
 /// [`to_ordered_representation`](super::basic::floats::PrimitiveFloat::to_ordered_representation):
@@ -882,8 +881,8 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// The output is
 /// $$
-/// (\varphi^{-1}(k))_ {k=0}^{2^M(2^E-1)-1} ⧺ (\varphi^{-1}(k))_ {k=2^M(2^E-1)+2}^{2^{M+1}(2^E-1)+1}
-/// $$.
+/// (\varphi^{-1}(k))_ {k=0}^{2^M(2^E-1)-1} ⧺ (\varphi^{-1}(k))_
+/// {k=2^M(2^E-1)+2}^{2^{M+1}(2^E-1)+1} $$.
 ///
 /// The output length is $2^{M+1}(2^E-1)$.
 /// - For [`f32`], this is $2^{32}-2^{24}$, or 4278190080.
@@ -924,8 +923,8 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// Positive and negative zero are both included. Negative zero comes first.
 ///
-/// `NEGATIVE_INFINITY` is generated first and `INFINITY` is generated last. The returned
-/// iterator is double-ended, so it may be reversed.
+/// `NEGATIVE_INFINITY` is generated first and `INFINITY` is generated last. The returned iterator
+/// is double-ended, so it may be reversed.
 ///
 /// Let $\varphi$ be
 /// [`to_ordered_representation`](super::basic::floats::PrimitiveFloat::to_ordered_representation):
@@ -967,8 +966,8 @@ pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreas
 
 /// Generates all finite positive primitive floats with a specified `sci_exponent` and precision.
 ///
-/// This `struct` is created by [`exhaustive_primitive_floats_with_sci_exponent_and_precision`];
-/// see its documentation for more.
+/// This `struct` is created by [`exhaustive_primitive_floats_with_sci_exponent_and_precision`]; see
+/// its documentation for more.
 #[derive(Clone, Debug, Default)]
 pub struct ConstantPrecisionPrimitiveFloats<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
@@ -999,17 +998,17 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 ///
 /// Positive and negative zero are both excluded.
 ///
-/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where
-/// $1 \leq m_s < 2$ and $e_s$ is an integer; then $e_s$ is the sci-exponent. An integer $e_s$
-/// occurs as the sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
+/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s
+/// < 2$ and $e_s$ is an integer; then $e_s$ is the sci-exponent. An integer $e_s$ occurs as the
+/// sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
 /// In the above equation, $m$ is a dyadic rational. Let $p$ be the smallest integer such that
 /// $m2^{p-1}$ is an integer. Then $p$ is the float's precision. It is also the number of
 /// significant bits.
 ///
 /// For example, consider the float $100.0$. It may be written as $\frac{25}{16}2^6$, so
-/// $m=\frac{25}{16}$ and $e=6$. We can write $m$ in binary as $1.1001_2$. Thus, the sci-exponent
-/// is 6 and the precision is 5.
+/// $m=\frac{25}{16}$ and $e=6$. We can write $m$ in binary as $1.1001_2$. Thus, the sci-exponent is
+/// 6 and the precision is 5.
 ///
 /// If $p$ is 1, the output length is 1; otherwise, it is $2^{p-2}$.
 ///
@@ -1157,9 +1156,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// Positive and negative zero are both excluded.
 ///
-/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where
-/// $1 \leq m_s < 2$ and $e_s$ is an integer; then $e$ is the sci-exponent. An integer $e_s$ occurs
-/// as the sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
+/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s
+/// < 2$ and $e_s$ is an integer; then $e$ is the sci-exponent. An integer $e_s$ occurs as the
+/// sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
 /// If $e_s \geq 2-2^{E-1}$ (the float is normal), the output length is $2^M$.
 /// - For [`f32`], this is $2^{23}$, or 8388608.
@@ -1174,7 +1173,7 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// # Panics
 /// Panics if the sci-exponent is less than
-/// [`MIN_EXPONENT`](super::basic::floats::PrimitiveFloat::MIN_EXPONENT)` or greater than
+/// [`MIN_EXPONENT`](super::basic::floats::PrimitiveFloat::MIN_EXPONENT) or greater than
 /// [`MAX_EXPONENT`](super::basic::floats::PrimitiveFloat::MAX_EXPONENT).
 ///
 /// # Examples
@@ -1423,6 +1422,9 @@ pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
         x: T::ZERO,
     }
 }
+
+pub type ExhaustiveFinitePrimitiveFloats<T> =
+    Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>>;
 
 /// Generates all finite primitive floats.
 ///

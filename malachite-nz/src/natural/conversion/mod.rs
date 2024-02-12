@@ -210,8 +210,7 @@ pub mod limb_count;
 /// See [`PrimitiveFloat`](malachite_base::num::basic::floats::PrimitiveFloat) for a description of
 /// the different types of mantissas and exponents. The traits are
 /// [`IntegerMantissaAndExponent`](malachite_base::num::conversion::traits::IntegerMantissaAndExponent)
-/// and
-/// [`SciMantissaAndExponent`](malachite_base::num::conversion::traits::SciMantissaAndExponent).
+/// and [`SciMantissaAndExponent`](malachite_base::num::conversion::traits::SciMantissaAndExponent).
 ///
 /// Here are some examples of the macro-generated functions:
 ///

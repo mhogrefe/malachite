@@ -51,8 +51,8 @@ macro_rules! impl_next_power_of_2_primitive_float {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `self` has a negative sign (positive zero is allowed, but negative zero
-            /// is not), or if the next power of 2 is greater than the type's maximum value.
+            /// Panics if `self` has a negative sign (positive zero is allowed, but negative zero is
+            /// not), or if the next power of 2 is greater than the type's maximum value.
             ///
             /// # Examples
             /// See [here](super::next_power_of_2#next_power_of_2).

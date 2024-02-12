@@ -3,8 +3,8 @@ use malachite_base::num::arithmetic::traits::{DivExactAssign, Gcd};
 use malachite_nz::natural::Natural;
 
 impl Rational {
-    /// Mutates the numerator of a [`Rational`] using a provided closure, and then returns
-    /// whatever the closure returns.
+    /// Mutates the numerator of a [`Rational`] using a provided closure, and then returns whatever
+    /// the closure returns.
     ///
     /// After the closure executes, this function reduces the [`Rational`].
     ///

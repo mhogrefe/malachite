@@ -153,7 +153,7 @@ fn demo_float_from_raw_mantissa_and_exponent(gm: GenMode, config: &GenConfig, li
                 mantissa.clone(),
                 exponent,
             );
-        println!("Float::from_raw_mantissa_and_exponent({mantissa}, {exponent}) = {n}",);
+        println!("Float::from_raw_mantissa_and_exponent({mantissa}, {exponent}) = {n}");
     }
 }
 
@@ -186,7 +186,7 @@ fn demo_float_from_raw_mantissa_and_exponent_ref(gm: GenMode, config: &GenConfig
                 mantissa.clone(),
                 exponent,
             );
-        println!("Float::from_raw_mantissa_and_exponent({mantissa}, {exponent}) = {n}",);
+        println!("Float::from_raw_mantissa_and_exponent({mantissa}, {exponent}) = {n}");
     }
 }
 

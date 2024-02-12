@@ -43,9 +43,9 @@ pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only
-// the least-significant `pow` bits. If the upper limbs of the input slice are no longer needed,
-// they are set to zero.
+// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only the
+// least-significant `pow` bits. If the upper limbs of the input slice are no longer needed, they
+// are set to zero.
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -70,8 +70,8 @@ pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) 
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
-// the least-significant `pow` bits.
+// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only the
+// least-significant `pow` bits.
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -142,8 +142,8 @@ impl ModPowerOf2 for Natural {
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
     /// value.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
     /// $$
     /// f(x, k) = x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -176,8 +176,8 @@ impl<'a> ModPowerOf2 for &'a Natural {
     /// Divides a [`Natural`] by $2^k$, returning just the remainder. The [`Natural`] is taken by
     /// reference.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -209,8 +209,8 @@ impl<'a> ModPowerOf2 for &'a Natural {
 impl ModPowerOf2Assign for Natural {
     /// Divides a [`Natural`]by $2^k$, replacing the [`Natural`] by the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -319,8 +319,8 @@ impl<'a> RemPowerOf2 for &'a Natural {
 impl RemPowerOf2Assign for Natural {
     /// Divides a [`Natural`] by $2^k$, replacing the first [`Natural`] by the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = q2^k + r$ and $0 \leq r < 2^k$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and
+    /// $0 \leq r < 2^k$.
     ///
     /// $$
     /// x \gets x - 2^k\left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -356,8 +356,8 @@ impl RemPowerOf2Assign for Natural {
 impl NegModPowerOf2 for Natural {
     type Output = Natural;
 
-    /// Divides the negative of a [`Natural`] by a $2^k$, returning just
-    /// the remainder. The [`Natural`] is taken by value.
+    /// Divides the negative of a [`Natural`] by a $2^k$, returning just the remainder. The
+    /// [`Natural`] is taken by value.
     ///
     /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k - r$ and
     /// $0 \leq r < 2^k$.

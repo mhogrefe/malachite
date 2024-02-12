@@ -1,11 +1,11 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn float_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(x: &Float, y: &T) -> Option<Ordering>
 where

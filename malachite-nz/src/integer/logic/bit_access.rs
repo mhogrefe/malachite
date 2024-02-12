@@ -250,8 +250,8 @@ impl Natural {
 /// assert_eq!(x, -1);
 /// ```
 impl BitAccess for Integer {
-    /// Determines whether the $i$th bit of an [`Integer`], or the coefficient of $2^i$ in its
-    /// two's complement binary expansion, is 0 or 1.
+    /// Determines whether the $i$th bit of an [`Integer`], or the coefficient of $2^i$ in its two's
+    /// complement binary expansion, is 0 or 1.
     ///
     /// `false` means 0 and `true` means 1. Getting bits beyond the [`Integer`]'s width is allowed;
     /// those bits are `false` if the [`Integer`] is non-negative and `true` if it is negative.

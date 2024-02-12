@@ -30,55 +30,55 @@ fn test_limbs_kronecker_symbol() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // ys_len != 0
-        // xs_len != 0
-        // (x_lo | y_lo).odd()
-        // y_sign
-        // ys_len <= 1 || y_twos == 0 first time
-        // x_sign
-        // xs_len >= ys_len
-        // ys_len == 1
-        // y_lo == 1
+        // - ys_len != 0
+        // - xs_len != 0
+        // - (x_lo | y_lo).odd()
+        // - y_sign
+        // - ys_len <= 1 || y_twos == 0 first time
+        // - x_sign
+        // - xs_len >= ys_len
+        // - ys_len == 1
+        // - y_lo == 1
         test(true, &[1], true, &[1], 1);
-        // ys_len == 0
+        // - ys_len == 0
         test(false, &[], false, &[], 0);
-        // xs_len == 0
+        // - xs_len == 0
         test(false, &[], false, &[1], 1);
-        // !y_sign
-        // !x_sign
+        // - !y_sign
+        // - !x_sign
         test(false, &[1], false, &[1], -1);
-        // y_lo != 1
-        // xs_len <= 1
+        // - y_lo != 1
+        // - xs_len <= 1
         test(false, &[1], false, &[3], 1);
-        // (x_lo | y_lo).even()
+        // - (x_lo | y_lo).even()
         test(false, &[2], false, &[2], 0);
-        // xs_len < ys_len
-        // ys_len <= 1 || y_twos == 0 second time
+        // - xs_len < ys_len
+        // - ys_len <= 1 || y_twos == 0 second time
         test(false, &[1], false, &[1, 1], -1);
-        // xs_len > 1
-        // xs.len() < BMOD_1_TO_MOD_1_THRESHOLD
+        // - xs_len > 1
+        // - xs.len() < BMOD_1_TO_MOD_1_THRESHOLD
         test(false, &[3], false, &[1, 1], 1);
-        // ys_len != 1
-        // xs_len < ys_len << 1
-        // xs_len <= ys_len
-        // y_twos == 0
+        // - ys_len != 1
+        // - xs_len < ys_len << 1
+        // - xs_len <= ys_len
+        // - y_twos == 0
         test(false, &[1, 1], false, &[1, 1], 0);
-        // ys_len > 1 && y_twos != 0 first time
-        // ys_len == 2 && b1 >> y_twos == 0 first time
+        // - ys_len > 1 && y_twos != 0 first time
+        // - ys_len == 2 && b1 >> y_twos == 0 first time
         test(false, &[1], false, &[2, 1], -1);
-        // ys_len != 2 || b1 >> y_twos != 0 first time
+        // - ys_len != 2 || b1 >> y_twos != 0 first time
         test(false, &[1], false, &[2, 2], -1);
-        // xs_len > ys_len
+        // - xs_len > ys_len
         test(false, &[1, 1], false, &[1, 0, 1], -1);
-        // y_twos != 0
+        // - y_twos != 0
         test(false, &[1, 1], false, &[2, 2], 0);
-        // ys_len > 1 && y_twos != 0 second time
-        // ys_len == 2 && b1 >> y_twos == 0 second time
+        // - ys_len > 1 && y_twos != 0 second time
+        // - ys_len == 2 && b1 >> y_twos == 0 second time
         test(false, &[2, 1], false, &[1, 0, 1], -1);
     }
     #[cfg(feature = "32_bit_limbs")]
     {
-        // xs_len >= ys_len << 1
+        // - xs_len >= ys_len << 1
         test(
             true,
             &[
@@ -89,7 +89,7 @@ fn test_limbs_kronecker_symbol() {
             &[1909529931, 430037021],
             1,
         );
-        // ys_len != 2 || b1 >> y_twos != 0 second time
+        // - ys_len != 2 || b1 >> y_twos != 0 second time
         test(
             false,
             &[3810500016, 962414993, 1954977047],
@@ -100,7 +100,7 @@ fn test_limbs_kronecker_symbol() {
             ],
             1,
         );
-        // xs.len() >= BMOD_1_TO_MOD_1_THRESHOLD
+        // - xs.len() >= BMOD_1_TO_MOD_1_THRESHOLD
         test(
             true,
             &[95723951],

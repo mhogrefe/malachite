@@ -868,8 +868,8 @@ pub fn test_to_sci_with_options() {
     options = ToSciOptions::default();
     options.set_base(3);
     options.set_scale(1);
-    // RoundingMode::Nearest uses bankers' rounding: 1/2 is equidistant to 0.1 and 0.2 in base 3,
-    // so we choose the even option, 0.2.
+    // RoundingMode::Nearest uses bankers' rounding: 1/2 is equidistant to 0.1 and 0.2 in base 3, so
+    // we choose the even option, 0.2.
     test("1/2", options, "0.2");
 }
 

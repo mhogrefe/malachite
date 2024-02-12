@@ -17,9 +17,9 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
 
             /// Subtracts a number by the product of two other numbers.
             ///
-            /// Returns a tuple containing the result and a boolean indicating whether an
-            /// arithmetic overflow would occur. If an overflow would have occurred, then the
-            /// wrapped value is returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
+            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -93,9 +93,8 @@ macro_rules! impl_overflowing_sub_mul_signed {
 
             /// Subtracts a number by the product of two other numbers.
             ///
-            /// Returns a tuple containing the result and a boolean indicating whether an
-            /// arithmetic overflow occurred. If an overflow occurred, then the wrapped value is
-            /// returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
+            /// overflow occurred. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

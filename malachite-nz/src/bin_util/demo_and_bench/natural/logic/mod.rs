@@ -14,7 +14,6 @@ pub(crate) fn register(runner: &mut Runner) {
     hamming_distance::register(runner);
     index_of_next_false_bit::register(runner);
     index_of_next_true_bit::register(runner);
-    limb_count::register(runner);
     low_mask::register(runner);
     not::register(runner);
     or::register(runner);
@@ -38,7 +37,6 @@ mod get_bits;
 mod hamming_distance;
 mod index_of_next_false_bit;
 mod index_of_next_true_bit;
-mod limb_count;
 mod low_mask;
 mod not;
 mod or;

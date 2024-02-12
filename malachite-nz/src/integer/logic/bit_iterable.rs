@@ -1,8 +1,8 @@
 use crate::integer::Integer;
 use crate::natural::logic::bit_iterable::NaturalBitIterator;
 use crate::natural::Natural;
-use malachite_base::num::logic::traits::{BitAccess, BitIterable};
 use core::ops::Index;
+use malachite_base::num::logic::traits::{BitAccess, BitIterable};
 
 /// A double-ended iterator over the two's complement bits of the negative of an [`Integer`].
 ///
@@ -176,9 +176,9 @@ impl<'a> DoubleEndedIterator for IntegerBitIterator<'a> {
 impl<'a> Index<u64> for IntegerBitIterator<'a> {
     type Output = bool;
 
-    /// A function to retrieve an [`Integer`]'s two's complement bits by index. Indexing at or
-    /// above the significant bit count returns `false` or `true` bits, depending on the
-    /// [`Integer`]'s sign.
+    /// A function to retrieve an [`Integer`]'s two's complement bits by index. Indexing at or above
+    /// the significant bit count returns `false` or `true` bits, depending on the [`Integer`]'s
+    /// sign.
     ///
     /// This is equivalent to [`get_bit`](malachite_base::num::logic::traits::BitAccess::get_bit).
     ///

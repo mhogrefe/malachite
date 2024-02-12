@@ -166,8 +166,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedRange<T> {
 
 /// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by [`random_unsigned_inclusive_range`]; see its documentation for
-/// more.
+/// This `struct` is created by [`random_unsigned_inclusive_range`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
     NotAll(RandomUnsignedsLessThan<T>, T),
@@ -922,8 +921,8 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
 ///
 /// `NaN` is never generated.
 ///
-/// $a$ must be less than $b$. This function cannot create a range that includes
-/// `T::INFINITY`; for that, use [`random_primitive_float_inclusive_range`].
+/// $a$ must be less than $b$. This function cannot create a range that includes `T::INFINITY`; for
+/// that, use [`random_primitive_float_inclusive_range`].
 ///
 /// The output length is infinite.
 ///
@@ -1220,8 +1219,8 @@ pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
-/// $(-1/2, -1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges
-/// contain an equal number of floats.
+/// $(-1/2, -1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges contain
+/// an equal number of floats.
 ///
 /// Negative zero is generated; positive zero is not. `NaN` is not generated either.
 ///
@@ -1402,16 +1401,16 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 /// and denominators of their means.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
 /// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
 ///   but they may be as high as you like.
 ///
-/// Positive zero is generated; negative zero is not. `NaN` is not generated either.
-/// TODO: don't generate any zeros!
+/// Positive zero is generated; negative zero is not. `NaN` is not generated either. TODO: don't
+/// generate any zeros!
 ///
 /// The output length is infinite.
 ///
@@ -1487,8 +1486,8 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 /// and denominators of their means.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1564,8 +1563,8 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 /// and denominators of their means.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1625,8 +1624,8 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 /// numerators and denominators of their means of the nonzero floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1694,8 +1693,8 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 /// the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1763,8 +1762,8 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 /// the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1832,8 +1831,8 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 /// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -1896,13 +1895,13 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// Generates primitive floats.
 ///
 /// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
-/// chosen. You can specify the numerator and denominator of the probability that zero, infinity,
-/// or NaN will be generated. You can also specify the mean absolute sci-exponent and precision by
+/// chosen. You can specify the numerator and denominator of the probability that zero, infinity, or
+/// NaN will be generated. You can also specify the mean absolute sci-exponent and precision by
 /// passing the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -2228,10 +2227,10 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 /// Generates random primitive floats in the half-open interval $[a, b)$.
 ///
 /// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
-/// chosen. You can specify the numerator and denominator of the probability that any special
-/// values (positive or negative zero or infinity) are generated, provided that they are in the
-/// range. You can also specify the mean absolute sci-exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats.
+/// chosen. You can specify the numerator and denominator of the probability that any special values
+/// (positive or negative zero or infinity) are generated, provided that they are in the range. You
+/// can also specify the mean absolute sci-exponent and precision by passing the numerators and
+/// denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -2239,13 +2238,13 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
-/// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of
-///   a float in the range, and the precision mean greater than 2, but they may be as high as you
+/// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of a
+///   float in the range, and the precision mean greater than 2, but they may be as high as you
 /// like.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -2323,14 +2322,14 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 /// Generates random primitive floats in the closed interval $[a, b]$.
 ///
 /// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
-/// chosen. You can specify the numerator and denominator of the probability that any special
-/// values (positive or negative zero or infinity) are generated, provided that they are in the
-/// range. You can also specify the mean absolute sci-exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats.
+/// chosen. You can specify the numerator and denominator of the probability that any special values
+/// (positive or negative zero or infinity) are generated, provided that they are in the range. You
+/// can also specify the mean absolute sci-exponent and precision by passing the numerators and
+/// denominators of their means of the finite floats.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -2708,21 +2707,20 @@ pub mod geometric;
 /// * If $m=2$, the sequence is uniformly random. A sample sequence with $m=2$ is
 ///   $1100110001101010100101101001000001100001\ldots$.
 /// * If $m>2$, the sequence tends to have longer runs of 0s and 1s than a uniformly random
-///   sequence. A sample sequence with $m=32$ is
-///   $1111111111111111110000000011111111111111\ldots$.
+///   sequence. A sample sequence with $m=32$ is $1111111111111111110000000011111111111111\ldots$.
 ///
 /// An alternative way to generate a striped sequence is to start with 0 or 1 with equal probability
 /// and then determine the length of each block of equal bits using a geometric distribution with
 /// mean $m$. In practice, this isn't any more efficient than the naive algorithm.
 ///
 /// We can generate a random striped unsigned integer of type `T` by taking the first $W$ bits of a
-/// striped sequence. Fixing the parameter $m$ defines a distribution over `T`s. A few things can
-/// be said about the probability $P_m(n)$ of an unsigned integer $n$ of width $W$ being generated:
+/// striped sequence. Fixing the parameter $m$ defines a distribution over `T`s. A few things can be
+/// said about the probability $P_m(n)$ of an unsigned integer $n$ of width $W$ being generated:
 /// * $P_m(n) = P_m(\lnot n)$
 /// * $P_m(0) = P_m(2^W-1) = \frac{1}{2} \left ( 1-\frac{1}{m} \right )^{W-1}$. If $m>2$, this is
 ///   the maximum probability achieved; if $m<2$, the minimum.
-/// * $P_m(\lfloor 2^W/3 \rfloor) = P_m(\lfloor 2^{W+1}/3 \rfloor) = 1/(2m^{W-1})$. If $m>2$,
-///   this is the minimum probability achieved; if $m<2$, the maximum.
+/// * $P_m(\lfloor 2^W/3 \rfloor) = P_m(\lfloor 2^{W+1}/3 \rfloor) = 1/(2m^{W-1})$. If $m>2$, this
+///   is the minimum probability achieved; if $m<2$, the maximum.
 /// * Because of these distributions' symmetry, their mean is $(2^W-1)/2$ and their skewness is 0.
 ///   It's hard to say anything about their standard deviations or excess kurtoses, although these
 ///   can be computed quickly for specific values of $m$ when $W$ is 8 or 16.
@@ -2730,8 +2728,7 @@ pub mod geometric;
 /// We can similarly generate random striped signed integers of width $W$. The sign bit is chosen
 /// uniformly, and the remaining $W-1$ are taken from a striped sequence.
 ///
-/// To generate striped integers from a range, the integers are constructed one bit at a time.
-/// Some bits are forced; they must be 0 or 1 in order for the final integer to be within the
-/// specified range. If a bit is _not_ forced, it is different from the preceding bit with
-/// probability $1/m$.
+/// To generate striped integers from a range, the integers are constructed one bit at a time. Some
+/// bits are forced; they must be 0 or 1 in order for the final integer to be within the specified
+/// range. If a bit is _not_ forced, it is different from the preceding bit with probability $1/m$.
 pub mod striped;

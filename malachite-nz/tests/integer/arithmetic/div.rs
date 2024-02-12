@@ -1,14 +1,15 @@
-use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivRem};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_4;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
-    integer_gen, integer_gen_var_8, integer_pair_gen_var_1, integer_pair_gen_var_2,
-    natural_pair_gen_var_5,
+    integer_gen, integer_gen_var_8, integer_pair_gen, integer_pair_gen_var_1,
+    integer_pair_gen_var_2, natural_pair_gen_var_5,
 };
 use num::BigInt;
 use std::str::FromStr;
@@ -112,7 +113,7 @@ fn test_div() {
         "915607705283450388306561139234228660872677067256472842161753852459689688332903348325308112\
         7923093090598913",
         "11669177832462215441614364516705357863717491965951",
-        "784637716923245892498679555408392159158150581185689944063"
+        "784637716923245892498679555408392159158150581185689944063",
     );
 
     test("0", "-1", "0");
@@ -189,7 +190,7 @@ fn test_div() {
         "915607705283450388306561139234228660872677067256472842161753852459689688332903348325308112\
         7923093090598913",
         "-11669177832462215441614364516705357863717491965951",
-        "-784637716923245892498679555408392159158150581185689944063"
+        "-784637716923245892498679555408392159158150581185689944063",
     );
 
     test("-1", "1", "-1");
@@ -263,7 +264,7 @@ fn test_div() {
         "-91560770528345038830656113923422866087267706725647284216175385245968968833290334832530811\
         27923093090598913",
         "11669177832462215441614364516705357863717491965951",
-        "-784637716923245892498679555408392159158150581185689944063"
+        "-784637716923245892498679555408392159158150581185689944063",
     );
 
     test("-1", "-1", "1");
@@ -337,7 +338,7 @@ fn test_div() {
         "-91560770528345038830656113923422866087267706725647284216175385245968968833290334832530811\
         27923093090598913",
         "-11669177832462215441614364516705357863717491965951",
-        "784637716923245892498679555408392159158150581185689944063"
+        "784637716923245892498679555408392159158150581185689944063",
     );
 }
 
@@ -381,6 +382,94 @@ fn div_ref_val_fail() {
 #[allow(unused_must_use, clippy::unnecessary_operation)]
 fn div_ref_ref_fail() {
     &Integer::from(10) / &Integer::ZERO;
+}
+
+#[test]
+fn test_checked_div() {
+    let test = |s, t, quotient| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let q = u.clone().checked_div(v.clone());
+        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = u.clone().checked_div(&v);
+        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = (&u).checked_div(v.clone());
+        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = (&u).checked_div(&v);
+        assert!(q.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(q.to_debug_string(), quotient);
+
+        let q = BigInt::from_str(s)
+            .unwrap()
+            .checked_div(&BigInt::from_str(t).unwrap());
+        assert_eq!(q.to_debug_string(), quotient);
+    };
+    test("0", "1", "Some(0)");
+    test("0", "123", "Some(0)");
+    test("1", "1", "Some(1)");
+    test("123", "1", "Some(123)");
+    test("123", "123", "Some(1)");
+    test("123", "456", "Some(0)");
+    test("456", "123", "Some(3)");
+    test("4294967295", "1", "Some(4294967295)");
+    test("4294967295", "4294967295", "Some(1)");
+    test("1000000000000", "1", "Some(1000000000000)");
+    test("1000000000000", "3", "Some(333333333333)");
+    test("1000000000000", "123", "Some(8130081300)");
+    test("1000000000000", "4294967295", "Some(232)");
+
+    test("0", "-1", "Some(0)");
+    test("0", "-123", "Some(0)");
+    test("1", "-1", "Some(-1)");
+    test("123", "-1", "Some(-123)");
+    test("123", "-123", "Some(-1)");
+    test("123", "-456", "Some(0)");
+    test("456", "-123", "Some(-3)");
+    test("4294967295", "-1", "Some(-4294967295)");
+    test("4294967295", "-4294967295", "Some(-1)");
+    test("1000000000000", "-1", "Some(-1000000000000)");
+    test("1000000000000", "-3", "Some(-333333333333)");
+    test("1000000000000", "-123", "Some(-8130081300)");
+    test("1000000000000", "-4294967295", "Some(-232)");
+
+    test("-1", "1", "Some(-1)");
+    test("-123", "1", "Some(-123)");
+    test("-123", "123", "Some(-1)");
+    test("-123", "456", "Some(0)");
+    test("-456", "123", "Some(-3)");
+    test("-4294967295", "1", "Some(-4294967295)");
+    test("-4294967295", "4294967295", "Some(-1)");
+    test("-1000000000000", "1", "Some(-1000000000000)");
+    test("-1000000000000", "3", "Some(-333333333333)");
+    test("-1000000000000", "123", "Some(-8130081300)");
+    test("-1000000000000", "4294967295", "Some(-232)");
+
+    test("-1", "-1", "Some(1)");
+    test("-123", "-1", "Some(123)");
+    test("-123", "-123", "Some(1)");
+    test("-123", "-456", "Some(0)");
+    test("-456", "-123", "Some(3)");
+    test("-4294967295", "-1", "Some(4294967295)");
+    test("-4294967295", "-4294967295", "Some(1)");
+    test("-1000000000000", "-1", "Some(1000000000000)");
+    test("-1000000000000", "-3", "Some(333333333333)");
+    test("-1000000000000", "-123", "Some(8130081300)");
+    test("-1000000000000", "-4294967295", "Some(232)");
+
+    test("0", "0", "None");
+    test("1", "0", "None");
+    test("123", "0", "None");
+    test("1000000000000000000000000", "0", "None");
+    test("-1", "0", "None");
+    test("-123", "0", "None");
+    test("-1000000000000000000000000", "0", "None");
 }
 
 fn div_properties_helper(x: Integer, y: Integer) {
@@ -464,5 +553,46 @@ fn div_properties() {
 
     signed_pair_gen_var_4::<SignedLimb>().test_properties(|(x, y)| {
         assert_eq!(Integer::from(x) / Integer::from(y), x / y);
+    });
+}
+
+#[test]
+fn checked_div_properties() {
+    integer_pair_gen().test_properties(|(x, y)| {
+        let quotient_val_val = x.clone().checked_div(y.clone());
+        let quotient_val_ref = x.clone().checked_div(&y);
+        let quotient_ref_val = (&x).checked_div(y.clone());
+        let quotient = (&x).checked_div(&y);
+        assert!(quotient_val_val.as_ref().map_or(true, Integer::is_valid));
+        assert!(quotient_val_ref.as_ref().map_or(true, Integer::is_valid));
+        assert!(quotient_ref_val.as_ref().map_or(true, Integer::is_valid));
+        assert!(quotient.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(quotient_val_val, quotient);
+        assert_eq!(quotient_val_ref, quotient);
+        assert_eq!(quotient_ref_val, quotient);
+
+        if y != 0u32 {
+            assert_eq!(quotient, Some(&x / &y));
+        }
+
+        assert_eq!(
+            BigInt::from(&x)
+                .checked_div(&BigInt::from(&y))
+                .map(|n| Integer::from(&n)),
+            quotient
+        );
+    });
+
+    integer_gen().test_properties(|ref x| {
+        assert_eq!(x.checked_div(Integer::ZERO), None);
+        assert_eq!(x.checked_div(Integer::ONE), Some(x.clone()));
+    });
+
+    integer_gen_var_8().test_properties(|ref x| {
+        assert_eq!(Integer::ZERO.checked_div(x), Some(Integer::ZERO));
+        if *x > Integer::ONE {
+            assert_eq!(Integer::ONE.checked_div(x), Some(Integer::ZERO));
+        }
+        assert_eq!(x.checked_div(x), Some(Integer::ONE));
     });
 }

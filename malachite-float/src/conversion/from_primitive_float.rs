@@ -1,9 +1,9 @@
 use crate::Float;
+use core::cmp::Ordering;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 // This differs from the `precision` function provided by `PrimitiveFloat`. That function is the
 // smallest precision necessary to represent the float, whereas this function returns the maximum
@@ -95,8 +95,8 @@ impl Float {
 
     /// Converts a primitive float to a [`Float`]. If the [`Float`] is nonzero and finite, it has
     /// the specified precision. If rounding is needed, the specified rounding mode is used. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value. (Although a NaN is not comparable to anything,
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the original value. (Although a NaN is not comparable to anything,
     /// converting a NaN to a NaN will also return `Ordering::Equals`, indicating an exact
     /// conversion.)
     ///
@@ -108,8 +108,7 @@ impl Float {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(prec, x.sci_exponent().abs())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.sci_exponent().abs())`.
     ///
     /// # Examples
     /// See [here](super::from_primitive_float#from_primitive_float_prec_round).
@@ -128,16 +127,15 @@ impl Float {
     /// comparable to anything, converting a NaN to a NaN will also return `Ordering::Equals`,
     /// indicating an exact conversion.)
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_primitive_float_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_primitive_float_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(prec, x.sci_exponent().abs())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.sci_exponent().abs())`.
     ///
     /// # Examples
     /// See [here](super::from_primitive_float#from_primitive_float_prec).
@@ -153,8 +151,8 @@ macro_rules! impl_from_primitive_float {
             /// Converts a primitive float to a [`Float`].
             ///
             /// If the primitive float is finite and nonzero, the precision of the [`Float`] is
-            /// equal to the maximum precision of any primitive float in the same binade (for
-            /// normal `f32`s this is 24, and for normal `f64`s it is 53). If you want to specify a
+            /// equal to the maximum precision of any primitive float in the same binade (for normal
+            /// `f32`s this is 24, and for normal `f64`s it is 53). If you want to specify a
             /// different precision, try [`Float::from_primitive_float_prec`]. This may require
             /// rounding, which uses [`RoundingMode::Nearest`] by default. To specify a rounding
             /// mode as well as a precision, try [`Float::from_primitive_float_prec_round`].

@@ -81,7 +81,7 @@ fn next_power_of_2_properties() {
         assert!(result.is_power_of_2());
         assert!(result >= x);
         assert!(&result >> 1 < x);
-        //TODO assert_eq!(Rational::power_of_2(n.ceiling_log_base_2()), result);
+        // TODO assert_eq!(Rational::power_of_2(n.ceiling_log_base_2()), result);
     });
 
     natural_gen_var_2().test_properties(|x| {

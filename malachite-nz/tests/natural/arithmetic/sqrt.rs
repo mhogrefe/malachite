@@ -44,10 +44,10 @@ fn test_sqrt_rem_2_newton() {
             DoubleLimb::join_halves(n_hi, n_lo)
         );
     }
-    // no adjustment needed
+    // - no adjustment needed
     test(2000000000, 123, 2930859019, false, 2746357762);
     test(u32::MAX, 123, 4294967295, true, 122);
-    // adjustment needed
+    // - adjustment needed
     test(1073741825, 0, 2147483648, true, 0);
 }
 
@@ -82,11 +82,11 @@ fn test_limbs_sqrt_rem_helper() {
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
     }
-    // h2 == 1
-    // !q
-    // r_hi
-    // h1 == h2
-    // r_hi >= 0
+    // - h2 == 1
+    // - !q
+    // - r_hi
+    // - h1 == h2
+    // - r_hi >= 0
     test(
         &[123, 456, 789, 2000000000],
         2,
@@ -94,10 +94,10 @@ fn test_limbs_sqrt_rem_helper() {
         &[1917624951, 2990305571, 2377342468, 942810576],
         false,
     );
-    // !r_hi
+    // - !r_hi
     test(&[0, 0, 0, 1073741824], 2, &[0, 2147483648], &[0; 4], false);
-    // q
-    // r_hi < 0
+    // - q
+    // - r_hi < 0
     test(
         &[0, 0, 0, 1073741825],
         2,
@@ -105,8 +105,8 @@ fn test_limbs_sqrt_rem_helper() {
         &[4294967295, 1, 0, 0],
         false,
     );
-    // h2 > 1
-    // h1 != h2
+    // - h2 > 1
+    // - h1 != h2
     test(
         &[0, 0, 0, 0, 0, 1073741824],
         3,
@@ -118,7 +118,7 @@ fn test_limbs_sqrt_rem_helper() {
 
 #[test]
 fn limbs_sqrt_rem_helper_fail() {
-    // out too short
+    // - out too short
     assert_panic!({
         let out = &mut [];
         let xs = &mut [1, 2, 3];
@@ -126,7 +126,7 @@ fn limbs_sqrt_rem_helper_fail() {
         limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
     });
 
-    // xs too short
+    // - xs too short
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [1, 2, 3, 4, Limb::MAX];
@@ -134,7 +134,7 @@ fn limbs_sqrt_rem_helper_fail() {
         limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
     });
 
-    // (2 * n - 1)th element of xs too small
+    // - (2 * n - 1)th element of xs too small
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [1, 2, 3, 4, 5, 6];
@@ -162,44 +162,44 @@ fn test_limbs_sqrt_helper() {
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
     }
-    // shift != 0 first time
-    // !q
-    // qs_last != 0 <= 1
-    // (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) != 0
-    // odd == 1 || shift != 0
+    // - shift != 0 first time
+    // - !q
+    // - qs_last != 0 <= 1
+    // - (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) != 0
+    // - odd == 1 || shift != 0
     test(
         &[1, 2, 3, 4, 5, 6, 7, 8, 9],
         &[406519538, 874900746, 1431655766, 1, 3],
         true,
     );
-    // q
+    // - q
     test(
         &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         &[1984678003, 1990369149, 2938805076, 123516853, 207243],
         true,
     );
-    // (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) == 0
-    // cmp != Ordering::Less first time
-    // slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
-    // cmp == Ordering::Equal
-    // shift != 0 second time
-    // cmp != Ordering::Less second time
+    // - (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) == 0
+    // - cmp != Ordering::Less first time
+    // - slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
+    // - cmp == Ordering::Equal
+    // - shift != 0 second time
+    // - cmp != Ordering::Less second time
     test(&[0, 0, 0, 0, 0, 0, 0, 0, 1], &[0, 0, 0, 0, 1], false);
-    // !slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
+    // - !slice_test_zero(&scratch_hi[h1 + 1..h2 + 1])
     test(
         &[0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
         &[4294959104, 4294967295, 32767, 0, 65536],
         true,
     );
-    // cmp != Ordering::Equal
-    // cmp == Ordering::Less second time
+    // - cmp != Ordering::Equal
+    // - cmp == Ordering::Less second time
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
         &[4095, 0, 4294959104, 4294967295, 32767, 0, 65536],
         true,
     );
-    // shift == 0 first time
-    // odd == 0 && shift == 0
+    // - shift == 0 first time
+    // - odd == 0 && shift == 0
     test(
         &[
             2193991530, 2899278504, 3717617329, 1249076698, 879590153, 4210532297, 3303769392,
@@ -215,7 +215,7 @@ fn test_limbs_sqrt_helper() {
         ],
         true,
     );
-    // qs_last != 0 > 1
+    // - qs_last != 0 > 1
     test(
         &[
             4294967295, 4194303, 0, 0, 3758096384, 4294967295, 4294967295, 4294967295, 4294967295,
@@ -228,7 +228,7 @@ fn test_limbs_sqrt_helper() {
         ],
         true,
     );
-    // shift == 0 second time
+    // - shift == 0 second time
     test(
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 4294966784, 4294967295, 4294967295, 4294967295, 4294967295,
@@ -240,7 +240,7 @@ fn test_limbs_sqrt_helper() {
         ],
         true,
     );
-    // cmp == Ordering::Less first time
+    // - cmp == Ordering::Less first time
     test(
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4294967232, 4294967295, 4294967295,
@@ -258,19 +258,19 @@ fn test_limbs_sqrt_helper() {
 
 #[test]
 fn limbs_sqrt_helper_fail() {
-    // out too short
+    // - out too short
     assert_panic!({
         let out = &mut [1, 2, 3, 4];
         let xs = &mut [Limb::MAX; 8];
         limbs_sqrt_helper(out, xs, 0, false);
     });
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!({
         let out = &mut [1, 2, 3, 4, 5];
         let xs = &mut [10, 10, 10, 10, 10, 10, 10, 10, 10, 0];
         limbs_sqrt_helper(out, xs, 15, false);
     });
-    // shift too high
+    // - shift too high
     assert_panic!({
         let out = &mut [1, 2, 3, 4, 5];
         let xs = &mut [Limb::MAX; 10];
@@ -292,27 +292,27 @@ fn test_limbs_sqrt_to_out() {
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
     }
-    // shift != 0
-    // xs_len == 1
-    // xs_len == 1 && shift != 0
+    // - shift != 0
+    // - xs_len == 1
+    // - xs_len == 1 && shift != 0
     test(&[1], &[1]);
-    // shift == 0
-    // xs_len == 1 && shift == 0
+    // - shift == 0
+    // - xs_len == 1 && shift == 0
     test(&[4000000000], &[63245]);
-    // xs_len == 2
-    // xs_len == 2 && shift != 0
+    // - xs_len == 2
+    // - xs_len == 2 && shift != 0
     test(&[1, 2], &[92681]);
-    // xs_len == 2 && shift == 0
+    // - xs_len == 2 && shift == 0
     test(&[1, 4000000000], &[4144860574]);
-    // xs_len > 2
-    // 2 < xs_len <= 8
-    // xs_len.odd() || shift != 0
-    // xs_len > 2 && shift == 0
-    // tn > 1
+    // - xs_len > 2
+    // - 2 < xs_len <= 8
+    // - xs_len.odd() || shift != 0
+    // - xs_len > 2 && shift == 0
+    // - tn > 1
     test(&[1, 2, 3], &[3144134278, 1]);
-    // xs_len > 2 && shift != 0
+    // - xs_len > 2 && shift != 0
     test(&[1, 2, 4000000000], &[2375990371, 63245]);
-    // xs_len > 8
+    // - xs_len > 8
     test(
         &[
             2572912965, 1596092594, 2193991530, 2899278504, 3717617329, 1249076698, 879590153,
@@ -320,7 +320,7 @@ fn test_limbs_sqrt_to_out() {
         ],
         &[3491190173, 18317336, 2518787533, 3220458996, 3998374718, 60202],
     );
-    // xs_len.even() && shift == 0
+    // - xs_len.even() && shift == 0
     test(
         &[345016311, 2711392466, 1490697280, 1246394087],
         &[2306404477, 2313703058],
@@ -329,19 +329,19 @@ fn test_limbs_sqrt_to_out() {
 
 #[test]
 fn limbs_sqrt_to_out_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [];
         limbs_sqrt_to_out(out, xs);
     });
-    // out too short
+    // - out too short
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [Limb::MAX; 8];
         limbs_sqrt_to_out(out, xs);
     });
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [1, 2, 3, 4, 5, 0];
@@ -369,38 +369,38 @@ fn test_limbs_sqrt_rem_to_out() {
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
     }
-    // shift != 0
-    // xs_len == 1
-    // xs_len == 1 && shift != 0
+    // - shift != 0
+    // - xs_len == 1
+    // - xs_len == 1 && shift != 0
     test(&[1], &[1], &[]);
-    // shift == 0
-    // xs_len == 1 && shift == 0
+    // - shift == 0
+    // - xs_len == 1 && shift == 0
     test(&[4000000000], &[63245], &[69975]);
-    // xs_len == 2
-    // xs_len == 2 && shift != 0
+    // - xs_len == 2
+    // - xs_len == 2 && shift != 0
     test(&[1, 2], &[92681], &[166832]);
-    // xs_len == 2 && shift == 0
+    // - xs_len == 2 && shift == 0
     test(&[1, 4000000000], &[4144860574], &[1805423229, 1]);
-    // xs_len > 2
-    // xs_len.odd() || shift != 0
-    // xs_len > 2 && shift != 0 first time
-    // shift >= Limb::WIDTH
-    // xs_len > 2 && shift != 0 second time
+    // - xs_len > 2
+    // - xs_len.odd() || shift != 0
+    // - xs_len > 2 && shift != 0 first time
+    // - shift >= Limb::WIDTH
+    // - xs_len > 2 && shift != 0 second time
     test(&[1, 2, 3], &[3144134278, 1], &[1429311965, 0]);
-    // xs_len > 2 && shift == 0 first time
-    // xs_len > 2 && shift == 0 second time
+    // - xs_len > 2 && shift == 0 first time
+    // - xs_len > 2 && shift == 0 second time
     test(
         &[1, 2, 4000000000],
         &[2375990371, 63245],
         &[3710546360, 103937],
     );
-    // xs_len.even() && shift == 0
+    // - xs_len.even() && shift == 0
     test(
         &[2977742827, 3919053323, 1548431690, 1948915452],
         &[733991603, 2893186501],
         &[2063111874, 210353161, 1],
     );
-    // shift < Limb::WIDTH
+    // - shift < Limb::WIDTH
     test(
         &[
             1347797001, 1439220470, 2750411815, 3145460224, 3430380546, 2707019846, 2327263540,
@@ -413,28 +413,28 @@ fn test_limbs_sqrt_rem_to_out() {
 
 #[test]
 fn limbs_sqrt_rem_to_out_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!({
         let out_sqrt = &mut [1, 2, 3];
         let out_rem = &mut [0; 8];
         let xs = &mut [];
         limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
     });
-    // out too short
+    // - out too short
     assert_panic!({
         let out_sqrt = &mut [1, 2, 3];
         let out_rem = &mut [0; 8];
         let xs = &mut [Limb::MAX; 8];
         limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
     });
-    // rem too short
+    // - rem too short
     assert_panic!({
         let out_sqrt = &mut [1, 2, 3, 4];
         let out_rem = &mut [0; 7];
         let xs = &mut [Limb::MAX; 8];
         limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
     });
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!({
         let out_sqrt = &mut [1, 2, 3];
         let out_rem = &mut [0; 6];
@@ -454,9 +454,9 @@ fn test_limbs_floor_sqrt() {
 
 #[test]
 fn limbs_floor_sqrt_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!(limbs_floor_sqrt(&[]));
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!(limbs_floor_sqrt(&[1, 2, 0]));
 }
 
@@ -471,9 +471,9 @@ fn test_limbs_ceiling_sqrt() {
 
 #[test]
 fn limbs_ceiling_sqrt_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!(limbs_ceiling_sqrt(&[]));
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!(limbs_ceiling_sqrt(&[1, 2, 0]));
 }
 
@@ -489,9 +489,9 @@ fn test_limbs_checked_sqrt() {
 
 #[test]
 fn limbs_checked_sqrt_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!(limbs_checked_sqrt(&[]));
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!(limbs_checked_sqrt(&[1, 2, 0]));
 }
 
@@ -508,9 +508,9 @@ fn test_limbs_sqrt_rem() {
 
 #[test]
 fn limbs_sqrt_rem_fail() {
-    // xs empty
+    // - xs empty
     assert_panic!(limbs_sqrt_rem(&[]));
-    // last element of xs is 0
+    // - last element of xs is 0
     assert_panic!(limbs_sqrt_rem(&[1, 2, 0]));
 }
 

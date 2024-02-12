@@ -29,14 +29,13 @@ fn debug_starts_with_slash(c: char) -> bool {
 
 /// Determines whether a [`char`] is graphic.
 ///
-/// There is an
-/// [official Unicode definition](https://www.unicode.org/versions/Unicode14.0.0/ch03.pdf#G30602)
-/// of _graphic character_, but that definition is not followed here. In Malachite, a [`char`] is
-/// considered graphic if it is ASCII and not a
-/// [C0 control](https://unicode.org/charts/PDF/U0000.pdf), or non-ASCII and its debug string does
-/// not begin with a backslash. This function can be used as a guide to whether a [`char`] can be
-/// displayed on a screen without resorting to some sort of escape sequence. Of course, many
-/// typefaces will not be able to render many graphic [`char`]s.
+/// There is an [official Unicode
+/// definition](https://www.unicode.org/versions/Unicode14.0.0/ch03.pdf#G30602) of _graphic
+/// character_, but that definition is not followed here. In Malachite, a [`char`] is considered
+/// graphic if it is ASCII and not a [C0 control](https://unicode.org/charts/PDF/U0000.pdf), or
+/// non-ASCII and its debug string does not begin with a backslash. This function can be used as a
+/// guide to whether a [`char`] can be displayed on a screen without resorting to some sort of
+/// escape sequence. Of course, many typefaces will not be able to render many graphic [`char`]s.
 ///
 /// The ASCII space `' '` is the only graphic whitespace [`char`].
 ///

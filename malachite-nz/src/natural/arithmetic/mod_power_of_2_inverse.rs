@@ -12,10 +12,10 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
-// out should be just long enough for `pow` bits.
-// xs should have the same length as out.
-// scratch should be at least twice as long as out.
-// out should be filled with zeros.
+// - out should be just long enough for `pow` bits.
+// - xs should have the same length as out.
+// - scratch should be at least twice as long as out.
+// - out should be filled with zeros.
 fn limbs_mod_power_of_2_inverse(out: &mut [Limb], xs: &[Limb], pow: u64, scratch: &mut [Limb]) {
     let len = out.len();
     split_into_chunks_mut!(scratch, len, [scratch_0, scratch_1], _unused);
@@ -50,8 +50,8 @@ fn mod_power_of_2_inverse_helper(xs: &[Limb], pow: u64) -> Option<Natural> {
 impl ModPowerOf2Inverse for Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be
-    /// already reduced modulo $2^k$. The [`Natural`] is taken by value.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be already
+    /// reduced modulo $2^k$. The [`Natural`] is taken by value.
     ///
     /// Returns `None` if $x$ is even.
     ///
@@ -107,8 +107,8 @@ impl ModPowerOf2Inverse for Natural {
 impl<'a> ModPowerOf2Inverse for &'a Natural {
     type Output = Natural;
 
-    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be
-    /// already reduced modulo $2^k$. The [`Natural`] is taken by reference.
+    /// Computes the multiplicative inverse of a [`Natural`] modulo $2^k$. The input must be already
+    /// reduced modulo $2^k$. The [`Natural`] is taken by reference.
     ///
     /// Returns `None` if $x$ is even.
     ///

@@ -138,8 +138,8 @@ impl Natural {
 
     /// Converts a [`Vec`] of [limbs](crate#limbs) to a [`Natural`].
     ///
-    /// The limbs are in descending order, so that less-significant limbs have higher indices in
-    /// the input [`Vec`].
+    /// The limbs are in descending order, so that less-significant limbs have higher indices in the
+    /// input [`Vec`].
     ///
     /// This function takes ownership of the limbs. If it's necessary to borrow the limbs instead,
     /// use [`from_limbs_desc`](Self::from_limbs_desc).

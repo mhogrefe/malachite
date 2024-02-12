@@ -17,9 +17,8 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 
             /// Adds a number and the product of two other numbers.
             ///
-            /// Returns a tuple containing the result and a boolean indicating whether an
-            /// arithmetic overflow occured. If an overflow occurred, then the wrapped value is
-            /// returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
+            /// overflow occured. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -35,8 +34,8 @@ macro_rules! impl_overflowing_add_mul_unsigned {
         impl OverflowingAddMulAssign<$t> for $t {
             /// Adds a number and the product of two other numbers, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -96,9 +95,8 @@ macro_rules! impl_overflowing_add_mul_signed {
 
             /// Adds a number and the product of two other numbers.
             ///
-            /// Returns a tuple containing the result and a boolean indicating whether an
-            /// arithmetic overflow occurred. If an overflow occurred, then the wrapped value is
-            /// returned.
+            /// Returns a tuple containing the result and a boolean indicating whether an arithmetic
+            /// overflow occurred. If an overflow occurred, then the wrapped value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -114,8 +112,8 @@ macro_rules! impl_overflowing_add_mul_signed {
         impl OverflowingAddMulAssign<$t> for $t {
             /// Adds a number and the product of two other numbers, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

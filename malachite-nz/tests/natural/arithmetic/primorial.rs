@@ -32,10 +32,10 @@ fn test_primorial() {
     test(4, "6");
     test(5, "30");
     test(20, "9699690");
-    // sieve[index] & mask == 0
-    // prod <= max_prod
-    // sieve[index] & mask != 0
-    // prod > max_prod
+    // - sieve[index] & mask == 0
+    // - prod <= max_prod
+    // - sieve[index] & mask != 0
+    // - prod > max_prod
     test(53, "32589158477190044730");
     test(100, "2305567963945518424753102147331756070");
 }

@@ -174,6 +174,7 @@ pub mod nevers {
 pub mod num {
     pub mod arithmetic {
         pub mod abs;
+        pub mod abs_diff;
         pub mod add_mul;
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;

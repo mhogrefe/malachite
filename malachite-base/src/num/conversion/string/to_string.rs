@@ -56,9 +56,9 @@ impl<T> BaseFmtWrapper<T> {
 /// Converts a digit to a byte corresponding to a numeric or lowercase alphabetic [`char`] that
 /// represents the digit.
 ///
-/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to
-/// 35 become bytes representing the lowercase [`char`]s 'a' to 'z'. Passing a digit greater than
-/// 35 gives a `None`.
+/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to 35
+/// become bytes representing the lowercase [`char`]s 'a' to 'z'. Passing a digit greater than 35
+/// gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
@@ -84,9 +84,9 @@ pub const fn digit_to_display_byte_lower(b: u8) -> Option<u8> {
 /// Converts a digit to a byte corresponding to a numeric or uppercase alphabetic [`char`] that
 /// represents the digit.
 ///
-/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to
-/// 35 become bytes representing the lowercase [`char`]s 'A' to 'Z'. Passing a digit greater than
-/// 35 gives a `None`.
+/// Digits from 0 to 9 become bytes corresponding to [`char`]s from '0' to '9'. Digits from 10 to 35
+/// become bytes representing the lowercase [`char`]s 'A' to 'Z'. Passing a digit greater than 35
+/// gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.

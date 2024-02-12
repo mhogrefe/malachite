@@ -33,8 +33,8 @@ pub const fn char_to_contiguous_range(c: char) -> u32 {
     }
 }
 
-/// Converts a [`u32`] to a [`char`]; if all [`char`]s were arranged in ascending order, passing
-/// $u$ to this function would return the $u$th [`char`].
+/// Converts a [`u32`] to a [`char`]; if all [`char`]s were arranged in ascending order, passing $u$
+/// to this function would return the $u$th [`char`].
 ///
 /// This function is the inverse of [`char_to_contiguous_range`]. Every [`u32`] between $0$ and
 /// $\mathrm{NUMBER\\_OF\\_CHARS} - 1$, inclusive, is mapped to a distinct [`char`]. Passing a
@@ -64,8 +64,8 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     }
 }
 
-/// Increments this [`char`], skipping over the
-/// [surrogate code points](https://www.unicode.org/glossary/#surrogate_code_point).
+/// Increments this [`char`], skipping over the [surrogate code
+/// points](https://www.unicode.org/glossary/#surrogate_code_point).
 ///
 /// # Panics
 /// Panics if `self` is `char::MAX`.
@@ -88,8 +88,8 @@ pub fn increment_char(c: &mut char) {
         .expect("Cannot increment char::MAX")
 }
 
-/// Decrements this [`char`], skipping over the
-/// [surrogate code points](https://www.unicode.org/glossary/#surrogate_code_point).
+/// Decrements this [`char`], skipping over the [surrogate code
+/// points](https://www.unicode.org/glossary/#surrogate_code_point).
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.

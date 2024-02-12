@@ -51,29 +51,29 @@ pub_crate_test! {limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb
     *out_last = p;
 }}
 
-//TODO tune
+// TODO tune
 const SCALED_MUL_TOOM22_THRESHOLD: usize = MUL_TOOM22_THRESHOLD * 36 / (36 - 11);
-//TODO tune
+// TODO tune
 const SCALED_MUL_TOOM33_THRESHOLD: usize = MUL_TOOM33_THRESHOLD * 36 / (36 - 11);
-//TODO tune
+// TODO tune
 const SCALED_MUL_TOOM44_THRESHOLD: usize = MUL_TOOM44_THRESHOLD.saturating_mul(40) / (40 - 9);
-//TODO tune
+// TODO tune
 const SCALED_MUL_TOOM8H_THRESHOLD: usize = MUL_TOOM8H_THRESHOLD * 10 / 9;
 
-//TODO tune
+// TODO tune
 const MAYBE_RANGE_BASECASE_MUL_LOW: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (MULLO_DC_THRESHOLD == 0 && MULLO_BASECASE_THRESHOLD < SCALED_MUL_TOOM22_THRESHOLD
         || MULLO_DC_THRESHOLD != 0 && MULLO_DC_THRESHOLD < SCALED_MUL_TOOM22_THRESHOLD);
 
-//TODO tune
+// TODO tune
 const MAYBE_RANGE_TOOM22_MUL_LOW: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (MULLO_DC_THRESHOLD == 0 && MULLO_BASECASE_THRESHOLD < SCALED_MUL_TOOM33_THRESHOLD
         || MULLO_DC_THRESHOLD != 0 && MULLO_DC_THRESHOLD < SCALED_MUL_TOOM33_THRESHOLD);
 
-// We need fractional approximation of the value 0 < a <= 1/2
-// giving the minimum in the function k = (1 - a) ^ e / (1 - 2 * a ^ e).
+// We need fractional approximation of the value 0 < a <= 1/2 giving the minimum in the function k =
+// (1 - a) ^ e / (1 - 2 * a ^ e).
 const fn get_n_lo(n: usize) -> usize {
     if MAYBE_RANGE_BASECASE_MUL_LOW && n < SCALED_MUL_TOOM22_THRESHOLD {
         n >> 1
@@ -97,8 +97,7 @@ const fn get_n_lo(n: usize) -> usize {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where
-// `rp == tp`.
+// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp == tp`.
 pub_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
@@ -140,8 +139,8 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     limbs_slice_add_same_length_in_place_left(&mut out_lo[n_hi..], &out_hi[..n_lo]);
 }}
 
-// Compute the least significant half of the product {xs, n} * {ys, n}, or formally {rp, n} =
-// {xs, n} * {ys, n} mod (2 ^ `Limb::WIDTH * n`).
+// Compute the least significant half of the product {xs, n} * {ys, n}, or formally {rp, n} = {xs,
+// n} * {ys, n} mod (2 ^ `Limb::WIDTH * n`).
 //
 // Above the given threshold, the Divide and Conquer strategy is used. The operands are split in
 // two, and a full product plus two mul_low are used to obtain the final result. The more natural
@@ -151,39 +150,40 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 // Mulders suggests an unbalanced split in favour of the full product, split n = n_lo + n_hi, where
 // a * n = n_lo <= n_hi = (1 - a) * n; i.e. 0 < a <= 1/2.
 //
-// To compute the value of a, we assume that the cost of mul_lo for a given size ML(n) is a
-// fraction of the cost of a full product with same size M(n), and the cost M(n) = n ^ e for some
-// exponent 1 < e <= 2. Then we can write:
+// To compute the value of a, we assume that the cost of mul_lo for a given size ML(n) is a fraction
+// of the cost of a full product with same size M(n), and the cost M(n) = n ^ e for some exponent 1
+// < e <= 2. Then we can write:
 //
 // ML(n) = 2 * ML(a * n) + M((1 - a) * n) => k * M(n) = 2 * k * M(n) * a ^ e + M(n) * (1 - a) ^ e
 //
-// Given a value for e, want to minimise the value of k, i.e. the function
-// k = (1 - a) ^ e / (1 - 2 * a ^ e).
+// Given a value for e, want to minimise the value of k, i.e. the function k = (1 - a) ^ e / (1 - 2
+// * a ^ e).
 //
-// With e = 2, the exponent for schoolbook multiplication, the minimum is given by the values
-// a = 1 - a = 1/2.
+// With e = 2, the exponent for schoolbook multiplication, the minimum is given by the values a = 1
+// - a = 1/2.
 //
 // With e = log(3) / log(2), the exponent for Karatsuba (aka toom22), Mulders computes (1 - a) =
 // 0.694... and we approximate a with 11 / 36.
 //
 // Other possible approximations follow:
-// e = log(5) / log(3) [Toom-3] -> a ~= 9/40
-// e = log(7) / log(4) [Toom-4] -> a ~= 7/39
-// e = log(11) / log(6) [Toom-6] -> a ~= 1/8
-// e = log(15) / log(8) [Toom-8] -> a ~= 1/10
+// - e = log(5) / log(3) [Toom-3] -> a ~= 9/40
+// - e = log(7) / log(4) [Toom-4] -> a ~= 7/39
+// - e = log(11) / log(6) [Toom-6] -> a ~= 1/8
+// - e = log(15) / log(8) [Toom-8] -> a ~= 1/10
 //
 // The values above where obtained with the following trivial commands in the gp-pari shell:
 //
-// fun(e,a)=(1-a)^e/(1-2*a^e)
-// mul(a,b,c)={local(m,x,p);if(b-c<1/10000,(b+c)/2,m=1;x=b;
-// forstep(p=c,b,(b-c)/8,if(fun(a,p)<m,m=fun(a,p);x=p));mul(a,(b+x)/2,(c+x)/2))}
+// - fun(e,a)=(1-a)^e/(1-2*a^e)
+// - mul(a,b,c)={local(m,x,p);if(b-c<1/10000,(b+c)/2,m=1;x=b;
+// - forstep(p=c,b,(b-c)/8,if(fun(a,p)<m,m=fun(a,p);x=p));mul(a,(b+x)/2,(c+x)/2))}
 //
-// contfracpnqn(contfrac(mul(log(2*2-1)/log(2),1/2,0),5))
-// contfracpnqn(contfrac(mul(log(3*2-1)/log(3),1/2,0),5))
-// contfracpnqn(contfrac(mul(log(4*2-1)/log(4),1/2,0),5))
-// contfracpnqn(contfrac(mul(log(6*2-1)/log(6),1/2,0),3))
-// contfracpnqn(contfrac(mul(log(8*2-1)/log(8),1/2,0),3))
+// - contfracpnqn(contfrac(mul(log(2*2-1)/log(2),1/2,0),5))
+// - contfracpnqn(contfrac(mul(log(3*2-1)/log(3),1/2,0),5))
+// - contfracpnqn(contfrac(mul(log(4*2-1)/log(4),1/2,0),5))
+// - contfracpnqn(contfrac(mul(log(6*2-1)/log(6),1/2,0),3))
+// - contfracpnqn(contfrac(mul(log(8*2-1)/log(8),1/2,0),3))
 //
+// ```
 // ,
 // |\
 // | \
@@ -194,6 +194,7 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 // |    | \
 // +----+--`
 // ^n_hi^__^ <- n_low
+// ```
 //
 // For an actual implementation, the assumption that M(n) = n ^ e is incorrect, and, as a
 // consequence, the assumption that ML(n) = k * M(n) with a constant k is wrong.
@@ -201,9 +202,9 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 // But theory suggests us two things:
 // - the faster multiplication is (the lower e is), the more k approaches 1 and a approaches 0.
 //
-// - A smaller-than-optimal value for a is probably less bad than a bigger one: e.g. let e =
-//   log(3) / log(2), a = 0.3058... (the optimal value), and k(a) = 0.808...,  the mul / mul_low
-//   speed ratio. We get k * (a + 1 / 6) = 0.929..., but k(a - 1/6) = 0.865....
+// - A smaller-than-optimal value for a is probably less bad than a bigger one: e.g. let e = log(3)
+//   / log(2), a = 0.3058... (the optimal value), and k(a) = 0.808...,  the mul / mul_low speed
+//   ratio. We get k * (a + 1 / 6) = 0.929..., but k(a - 1/6) = 0.865....
 //
 // # Worst-case complexity
 // $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
@@ -212,8 +213,7 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where
-// `rp != tp`.
+// This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp != tp`.
 pub_test! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mul_low_same_length_divide_and_conquer(
@@ -266,7 +266,7 @@ pub_const_test! {limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usi
     n << 1
 }}
 
-//TODO tune
+// TODO tune
 const MULLO_BASECASE_THRESHOLD_LIMIT: usize = MULLO_BASECASE_THRESHOLD;
 
 pub_test! {limbs_mul_low_same_length_large(
@@ -276,8 +276,8 @@ pub_test! {limbs_mul_low_same_length_large(
     scratch: &mut [Limb],
 ) {
     let n = xs.len();
-    // For really large operands, use plain limbs_mul_same_length_to_out but throw away
-    // the upper n limbs of the result.
+    // For really large operands, use plain limbs_mul_same_length_to_out but throw away the upper n
+    // limbs of the result.
     let mut mul_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(n)];
     limbs_mul_same_length_to_out(scratch, xs, ys, &mut mul_scratch);
     out.copy_from_slice(&scratch[..n]);

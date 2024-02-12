@@ -120,8 +120,8 @@ impl Natural {
 impl CheckedSub<Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning `None`
-    /// if the result is negative.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking both by value and returning `None` if
+    /// the result is negative.
     ///
     /// $$
     /// f(x, y) = \\begin{cases}
@@ -220,8 +220,8 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
 impl<'a> CheckedSub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
-    /// second by value and returning `None` if the result is negative.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value and returning `None` if the result is negative.
     ///
     /// $$
     /// f(x, y) = \\begin{cases}

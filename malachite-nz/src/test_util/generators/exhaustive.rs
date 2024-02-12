@@ -1091,7 +1091,7 @@ pub fn exhaustive_natural_pair_gen_var_9() -> It<(Natural, Natural)> {
 }
 
 pub fn exhaustive_natural_pair_gen_var_10() -> It<(Natural, Natural)> {
-    //TODO
+    // TODO
     Box::new(exhaustive_pairs_from_single(exhaustive_naturals()).filter(|(x, y)| x >= y))
 }
 
@@ -2721,7 +2721,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_11() -> It<(Vec<Limb>, Vec<Limb>)> {
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator2,
@@ -2740,7 +2740,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_14() -> It<(Vec<Limb>, Vec<Limb>)> {
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -2810,7 +2810,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_22<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs(
                 primitive_int_increasing_inclusive_range(1, u64::MAX),
                 primitive_int_increasing_inclusive_range(
@@ -3045,7 +3045,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
                     BitDistributorOutputType::tiny(),
                     BitDistributorOutputType::normal(1),
                 ),
-                //TODO
+                // TODO
                 exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(1, u64::MAX))
                     .filter(|(x, y)| x >= y),
                 UnsignedVecPairLenGenerator1,
@@ -3164,7 +3164,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19(
                     BitDistributorOutputType::tiny(),
                     BitDistributorOutputType::normal(1),
                 ),
-                //TODO
+                // TODO
                 exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
                 UnsignedVecPairLenGenerator1,
             ),
@@ -4233,7 +4233,7 @@ pub fn exhaustive_large_type_gen_var_10() -> It<(Vec<Limb>, Vec<Limb>, Limb, Lim
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4322,7 +4322,7 @@ pub fn exhaustive_large_type_gen_var_13() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_triples_from_single(exhaustive_positive_primitive_ints())
                 .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
             UnsignedVecTripleLenGenerator1,
@@ -4409,7 +4409,7 @@ pub fn exhaustive_large_type_gen_var_16() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
             UnsignedVecTripleLenGenerator1,

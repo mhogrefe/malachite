@@ -69,9 +69,9 @@ macro_rules! impl_mod_shl_unsigned {
         impl ModShl<$t, Natural> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
-            /// [`Natural`]s are taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -98,9 +98,9 @@ macro_rules! impl_mod_shl_unsigned {
         impl<'a> ModShl<$t, &'a Natural> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
-            /// first [`Natural`] is taken by value and the second by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -127,9 +127,9 @@ macro_rules! impl_mod_shl_unsigned {
         impl<'a> ModShl<$t, Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
-            /// first [`Natural`] is taken by reference and the second by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -155,9 +155,9 @@ macro_rules! impl_mod_shl_unsigned {
         impl<'a, 'b> ModShl<$t, &'b Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
-            /// [`Natural`]s are taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -181,9 +181,9 @@ macro_rules! impl_mod_shl_unsigned {
         }
 
         impl ModShlAssign<$t, Natural> for Natural {
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
-            /// $m$. The [`Natural`] on the right-hand side is taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by value.
             ///
             /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -207,9 +207,9 @@ macro_rules! impl_mod_shl_unsigned {
         }
 
         impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
-            /// $m$. The [`Natural`] on the right-hand side is taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by reference.
             ///
             /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
             ///
@@ -320,9 +320,9 @@ macro_rules! impl_mod_shl_signed {
         impl ModShl<$t, Natural> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
-            /// [`Natural`]s are taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -349,9 +349,9 @@ macro_rules! impl_mod_shl_signed {
         impl<'a> ModShl<$t, &'a Natural> for Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
-            /// first [`Natural`] is taken by value and the second by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by value and the second by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -378,9 +378,9 @@ macro_rules! impl_mod_shl_signed {
         impl<'a> ModShl<$t, Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. The
-            /// first [`Natural`] is taken by reference and the second by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. The first [`Natural`]
+            /// is taken by reference and the second by value.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -406,9 +406,9 @@ macro_rules! impl_mod_shl_signed {
         impl<'a, 'b> ModShl<$t, &'b Natural> for &'a Natural {
             type Output = Natural;
 
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$. The first [`Natural`] must be already reduced modulo $m$. Both
-            /// [`Natural`]s are taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$. The first [`Natural`] must be already reduced modulo $m$. Both [`Natural`]s are
+            /// taken by reference.
             ///
             /// $f(x, n, m) = y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -432,9 +432,9 @@ macro_rules! impl_mod_shl_signed {
         }
 
         impl ModShlAssign<$t, Natural> for Natural {
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
-            /// $m$. The [`Natural`] on the right-hand side is taken by value.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by value.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///
@@ -458,9 +458,9 @@ macro_rules! impl_mod_shl_signed {
         }
 
         impl<'a> ModShlAssign<$t, &'a Natural> for Natural {
-            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another
-            /// [`Natural`] $m$, in place. The first [`Natural`] must be already reduced modulo
-            /// $m$. The [`Natural`] on the right-hand side is taken by reference.
+            /// Left-shifts a [`Natural`] (multiplies it by a power of 2) modulo another [`Natural`]
+            /// $m$, in place. The first [`Natural`] must be already reduced modulo $m$. The
+            /// [`Natural`] on the right-hand side is taken by reference.
             ///
             /// $x \gets y$, where $x, y < m$ and $\lfloor 2^nx \rfloor \equiv y \mod m$.
             ///

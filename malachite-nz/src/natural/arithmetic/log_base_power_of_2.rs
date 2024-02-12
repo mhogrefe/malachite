@@ -28,8 +28,8 @@ pub_test! {limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// $f((d_i)_ {i=0}^k, p) = \lceil\log_{2^p} x\rceil$, where $x = \sum_{i=0}^kB^id_i$ and $B$ is
-// one more than `Limb::MAX`.
+// $f((d_i)_ {i=0}^k, p) = \lceil\log_{2^p} x\rceil$, where $x = \sum_{i=0}^kB^id_i$ and $B$ is one
+// more than `Limb::MAX`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$

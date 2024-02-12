@@ -3,15 +3,14 @@ use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_powe
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use core::cmp::Ordering;
 
-// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
-// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
-// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb
-// are equal.
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns whether
+// the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`; that is,
+// whether the `pow` least-significant bits of the negative of the `Natural` and the limb are equal.
 //
 // This function assumes that `limbs` has length at least 2 and the last (most significant) limb is
 // nonzero.
@@ -98,9 +97,9 @@ fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -
 }
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// whether the first `Natural` and the negative of the second natural (equivalently, the negative
-// of the first `Natural` and the second `Natural`) are equivalent mod two to the power of `pow`;
-// that is, whether their `pow` least-significant bits are equal.
+// whether the first `Natural` and the negative of the second natural (equivalently, the negative of
+// the first `Natural` and the second `Natural`) are equivalent mod two to the power of `pow`; that
+// is, whether their `pow` least-significant bits are equal.
 //
 // This function assumes that neither slice is empty and their last elements are nonzero.
 //
@@ -143,8 +142,8 @@ impl Natural {
 }
 
 impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
-    /// Returns whether one [`Integer`] is equal to another modulo $2^k$; that is, whether their
-    /// $k$ least-significant bits (in two's complement) are equal.
+    /// Returns whether one [`Integer`] is equal to another modulo $2^k$; that is, whether their $k$
+    /// least-significant bits (in two's complement) are equal.
     ///
     /// $f(x, y, k) = (x \equiv y \mod 2^k)$.
     ///
@@ -155,8 +154,8 @@ impl<'a, 'b> EqModPowerOf2<&'b Integer> for &'a Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(pow, self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(pow, self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

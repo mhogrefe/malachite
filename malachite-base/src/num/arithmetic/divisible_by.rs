@@ -9,8 +9,8 @@ fn divisible_by_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> bool {
 macro_rules! impl_divisible_by_unsigned {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
-            /// Returns whether a number is divisible by another number; in other words, whether
-            /// the first number is a multiple of the second.
+            /// Returns whether a number is divisible by another number; in other words, whether the
+            /// first number is a multiple of the second.
             ///
             /// This means that zero is divisible by any number, including zero; but a nonzero
             /// number is never divisible by zero.
@@ -42,8 +42,8 @@ fn divisible_by_signed<T: PrimitiveSigned>(x: T, other: T) -> bool {
 macro_rules! impl_divisible_by_signed {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
-            /// Returns whether a number is divisible by another number; in other words, whether
-            /// the first number is a multiple of the second.
+            /// Returns whether a number is divisible by another number; in other words, whether the
+            /// first number is a multiple of the second.
             ///
             /// This means that zero is divisible by any number, including zero; but a nonzero
             /// number is never divisible by zero.

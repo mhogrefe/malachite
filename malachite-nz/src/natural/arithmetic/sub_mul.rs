@@ -11,8 +11,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::SplitInHalf;
 
-// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
-// y * z > x, `None` is returned.
+// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If y * z
+// > x, `None` is returned.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -44,8 +44,8 @@ pub_crate_test! {limbs_sub_mul_limb_greater(
 }}
 
 // Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
-// writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow
-// is returned.
+// writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is
+// returned.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -163,15 +163,13 @@ pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
-// `xs.len() - ys.len()`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `xs.len() - ys.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
-// positive, `sub` is negative, and the result is written to the second input rather than the
-// first.
+// positive, `sub` is negative, and the result is written to the second input rather than the first.
 pub_test! {limbs_sub_mul_limb_greater_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -192,11 +190,11 @@ pub_test! {limbs_sub_mul_limb_greater_in_place_right(
     }
 }}
 
-// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
-// x - y * z. If x < y * z, `None` is returned. `ys` and `zs` should have length at least 2, and
-// the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the latter condition is
-// false, the result would be `None` and there's no point in calling this function). None of the
-// slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of x - y
+// * z. If x < y * z, `None` is returned. `ys` and `zs` should have length at least 2, and the
+// length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the latter condition is false,
+// the result would be `None` and there's no point in calling this function). None of the slices
+// should have any trailing zeros. The result, if it exists, will have no trailing zeros.
 //
 // # Worst-case complexity
 // $T(n, m) = O(m + n \log n \log\log n)$
@@ -223,12 +221,12 @@ pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<
 }}
 
 // Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x - y * z. The
-// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if
-// x < y * z, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
+// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if x < y
+// * z, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
 // length at least 2, and the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the
 // latter condition is false, the result would be negative and there would be no point in calling
-// this function). None of the slices should have any trailing zeros. The result, if it exists,
-// will have no trailing zeros.
+// this function). None of the slices should have any trailing zeros. The result, if it exists, will
+// have no trailing zeros.
 //
 // # Worst-case complexity
 // $T(n, m) = O(m + n \log n \log\log n)$
@@ -239,8 +237,8 @@ pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<
 // `xs.len()`.
 //
 // # Panics
-// Panics if `ys` or `zs` have fewer than two elements each, or if
-// `xs.len() < ys.len() + zs.len() - 1`.
+// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len() < ys.len() + zs.len()
+// - 1`.
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is negative and negative results are discarded.
@@ -266,8 +264,7 @@ fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
 impl SubMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by
-    /// value.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking all three by value.
     ///
     /// $$
     /// f(x, y, z) = x - yz.
@@ -278,8 +275,8 @@ impl SubMul<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -317,8 +314,8 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -344,8 +341,8 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
 impl<'a> SubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and
-    /// third by value and the second by reference.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
+    /// by value and the second by reference.
     ///
     /// $$
     /// f(x, y, z) = x - yz.
@@ -356,8 +353,8 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -395,8 +392,8 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -434,8 +431,8 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// $M(n, m) = O(m + n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -472,8 +469,8 @@ impl SubMulAssign<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -511,8 +508,8 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -550,8 +547,8 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.
@@ -589,8 +586,8 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `x.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `y * z` is greater than `self`.

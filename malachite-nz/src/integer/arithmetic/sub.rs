@@ -1,10 +1,10 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::mem::swap;
+use core::ops::{Sub, SubAssign};
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
-use core::mem::swap;
-use core::ops::{Sub, SubAssign};
 
 impl Sub<Integer> for Integer {
     type Output = Integer;
@@ -20,8 +20,8 @@ impl Sub<Integer> for Integer {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -47,8 +47,8 @@ impl Sub<Integer> for Integer {
 impl<'a> Sub<&'a Integer> for Integer {
     type Output = Integer;
 
-    /// Subtracts an [`Integer`] by another [`Integer`], taking the first by value and the second
-    /// by reference.
+    /// Subtracts an [`Integer`] by another [`Integer`], taking the first by value and the second by
+    /// reference.
     ///
     /// $$
     /// f(x, y) = x - y.
@@ -59,8 +59,8 @@ impl<'a> Sub<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -98,8 +98,8 @@ impl<'a> Sub<Integer> for &'a Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -135,8 +135,8 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -273,8 +273,8 @@ impl<'a> SubAssign<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

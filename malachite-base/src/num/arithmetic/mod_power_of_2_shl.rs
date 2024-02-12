@@ -67,8 +67,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
-                    /// place. The number must be already reduced modulo $2^k$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place.
+                    /// The number must be already reduced modulo $2^k$.
                     ///
                     /// $x \gets y$, where $x, y < 2^k$ and $2^nx \equiv y \mod 2^k$.
                     ///
@@ -157,8 +157,8 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                     /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$. The
                     /// number must be already reduced modulo $2^k$.
                     ///
-                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
+                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod
+                    /// 2^k$.
                     ///
                     /// # Panics
                     /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than
@@ -176,11 +176,11 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in
-                    /// place. The number must be already reduced modulo $2^k$.
+                    /// Left-shifts a number (multiplies it by a power of 2) modulo $2^k$, in place.
+                    /// The number must be already reduced modulo $2^k$.
                     ///
-                    /// $x \gets y$, where $x, y < 2^k$ and
-                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^k$.
+                    /// $x \gets y$, where $x, y < 2^k$ and $\lfloor 2^nx \rfloor \equiv y \mod
+                    /// 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

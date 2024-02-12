@@ -151,8 +151,8 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// $M(n) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $m$ is
-/// `mean_length_numerator / mean_length_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being

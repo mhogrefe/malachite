@@ -63,6 +63,7 @@ use malachite_base::test_util::runner::Runner;
 
 // Examples:
 //
+// ```
 // cargo run --release --features bin_build -- -l 100000 -m special_random -d
 //     demo_natural_from_unsigned_u128 -c "mean_run_length_n 4 mean_run_length_d 1"
 //
@@ -70,6 +71,7 @@ use malachite_base::test_util::runner::Runner;
 //     benchmark_limbs_to_digits_small_base_algorithms
 //
 // cargo run --features bin_build -- -g digits_data
+// ```
 #[cfg(feature = "bin_build")]
 fn main() {
     let args = read_command_line_arguments("malachite-nz test utils");

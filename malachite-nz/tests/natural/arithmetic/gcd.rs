@@ -81,10 +81,10 @@ fn test_half_gcd_matrix_update_q() {
         m.update_q(qs, column, &mut scratch);
         assert_eq!(m, m_after);
     };
-    // qs_len > 1
-    // n + qs_len > self.n
-    // reached nonzero limb
-    // zero carry
+    // - qs_len > 1
+    // - n + qs_len > self.n
+    // - reached nonzero limb
+    // - zero carry
     test(
         half_gcd_matrix_create(
             16,
@@ -114,7 +114,7 @@ fn test_half_gcd_matrix_update_q() {
             ],
         ),
     );
-    // qs_len == 1
+    // - qs_len == 1
     test(
         half_gcd_matrix_create(
             3,
@@ -132,7 +132,7 @@ fn test_half_gcd_matrix_update_q() {
             ],
         ),
     );
-    // didn't reach nonzero limb
+    // - didn't reach nonzero limb
     test(
         half_gcd_matrix_create(
             11,
@@ -155,7 +155,7 @@ fn test_half_gcd_matrix_update_q() {
             ],
         ),
     );
-    // nonzero carry
+    // - nonzero carry
     test(
         half_gcd_matrix_create(
             26,
@@ -245,8 +245,8 @@ fn test_limbs_matrix_2_2_mul() {
         assert_eq!(z10, &x10 * y00 + &x11 * y10);
         assert_eq!(z11, x10 * y01 + x11 * y11);
     };
-    // small arguments
-    // small arguments, xs_len >= ys_len
+    // - small arguments
+    // - small arguments, xs_len >= ys_len
     test(
         6,
         &[
@@ -286,7 +286,7 @@ fn test_limbs_matrix_2_2_mul() {
             3410631721, 3956905026, 3154770531, 1888093339, 1763601187, 1,
         ],
     );
-    // small arguments, xs_len < ys_len
+    // - small arguments, xs_len < ys_len
     test(
         2,
         &[
@@ -342,16 +342,16 @@ fn test_limbs_matrix_2_2_mul() {
             1268262193, 931603943, 2447640352, 2661054782, 1778884540, 664908352, 827512809, 0,
         ],
     );
-    // large arguments
-    // !x11_sign first
-    // !x01_sign first && *xs01_lo_last == 0
-    // t0_sign first
-    // *t0_last == 0
-    // x01_sign == t0_sign
-    // !t0_sign second && *t0_last == 0
-    // !x01_sign second
-    // !x11_sign second
-    // !t0_sign third
+    // - large arguments
+    // - !x11_sign first
+    // - !x01_sign first && *xs01_lo_last == 0
+    // - t0_sign first
+    // - *t0_last == 0
+    // - x01_sign == t0_sign
+    // - !t0_sign second && *t0_last == 0
+    // - !x01_sign second
+    // - !x11_sign second
+    // - !t0_sign third
     test(
         13,
         &[
@@ -419,11 +419,11 @@ fn test_limbs_matrix_2_2_mul() {
             3289360053, 2808553404, 730378617, 671725420, 90513297, 0,
         ],
     );
-    // x11_sign first
-    // !t0_sign first
-    // *t0_last != 0
-    // *xs01_lo_last == 0
-    // !t0_sign second && *t0_last != 0
+    // - x11_sign first
+    // - !t0_sign first
+    // - *t0_last != 0
+    // - *xs01_lo_last == 0
+    // - !t0_sign second && *t0_last != 0
     test(
         15,
         &[
@@ -503,11 +503,11 @@ fn test_limbs_matrix_2_2_mul() {
             401053543, 1075392661, 1,
         ],
     );
-    // x01_sign first
-    // t0_sign second
-    // x01_sign second
-    // x11_sign second
-    // t0_sign third
+    // - x01_sign first
+    // - t0_sign second
+    // - x01_sign second
+    // - x11_sign second
+    // - t0_sign third
     test(
         13,
         &[
@@ -583,7 +583,7 @@ fn test_limbs_matrix_2_2_mul() {
             1117588071, 1313153141, 571072082, 2914006120, 3516294505, 1320473469, 1040189722, 0,
         ],
     );
-    // !x01_sign first && *xs01_lo_last != 0
+    // - !x01_sign first && *xs01_lo_last != 0
     test(
         10,
         &[
@@ -643,7 +643,7 @@ fn test_limbs_matrix_2_2_mul() {
             3485275615, 2079452863, 3685497725, 785093512, 267920582, 1623141509, 0,
         ],
     );
-    // x01_sign != t0_sign
+    // - x01_sign != t0_sign
     test(
         11,
         &[
@@ -711,7 +711,7 @@ fn test_limbs_matrix_2_2_mul() {
             280076983, 0,
         ],
     );
-    // *xs01_lo_last != 0
+    // - *xs01_lo_last != 0
     test(
         14,
         &[
@@ -798,100 +798,100 @@ fn test_limbs_gcd_reduced() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // n < GCD_DC_THRESHOLD
-        // xs__len > n
-        // !slice_test_zero(&xs[..n])
-        // !mask.get_highest_bit()
-        // x_high >= 2 && y_high >= 2 in limbs_half_gcd_2
-        // x_high <= y_high && (x_high != y_high || x_low <= y_low) in limbs_half_gcd_2
-        // y_high < 2 first time in limbs_half_gcd_2
-        // !limbs_half_gcd_2
-        // xs_len < ys_len first time in limbs_gcd_subdivide_step
-        // xs_len > s in limbs_gcd_subdivide_step
-        // ys_len > s first time in limbs_gcd_subdivide_step
-        // xs_len == ys_len second time in limbs_gcd_subdivide_step
-        // limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater second time
-        //      in limbs_gcd_subdivide_step
-        // xs_len != 1 first time in limbs_gcd_subdivide_step
-        // ys_len > s second time in limbs_gcd_subdivide_step
-        // n != 0
-        // xs[0].odd()
-        // n != 1
-        // y_0 == 0
-        // y_0.odd()
+        // - n < GCD_DC_THRESHOLD
+        // - xs__len > n
+        // - !slice_test_zero(&xs[..n])
+        // - !mask.get_highest_bit()
+        // - x_high >= 2 && y_high >= 2 in limbs_half_gcd_2
+        // - x_high <= y_high && (x_high != y_high || x_low <= y_low) in limbs_half_gcd_2
+        // - y_high < 2 first time in limbs_half_gcd_2
+        // - !limbs_half_gcd_2
+        // - xs_len < ys_len first time in limbs_gcd_subdivide_step
+        // - xs_len > s in limbs_gcd_subdivide_step
+        // - ys_len > s first time in limbs_gcd_subdivide_step
+        // - xs_len == ys_len second time in limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater second time in
+        //   limbs_gcd_subdivide_step
+        // - xs_len != 1 first time in limbs_gcd_subdivide_step
+        // - ys_len > s second time in limbs_gcd_subdivide_step
+        // - n != 0
+        // - xs[0].odd()
+        // - n != 1
+        // - y_0 == 0
+        // - y_0.odd()
         test(&[0, 0, 0, 1], &[1, 0, 1], &[1]);
-        // n >= GCD_DC_THRESHOLD
-        // n > s in limbs_half_gcd
-        // n >= HGCD_THRESHOLD in limbs_half_gcd
-        // n < HGCD_REDUCE_THRESHOLD in limbs_half_gcd_matrix_reduce
-        // n < HGCD_THRESHOLD in limbs_half_gcd_approx
-        // n != s + 1 && !mask.get_highest_bit() in limbs_half_gcd_step
-        // y_high >= 2 first time in limbs_half_gcd_2
-        // !subtract_a in limbs_half_gcd_2
-        // x_high != y_high first time in limbs_half_gcd_2
-        // x_high >= HALF_LIMIT_1 in limbs_half_gcd_2
-        // x_high >= 2 second time in limbs_half_gcd_2
-        // x_high > y_high first time in limbs_half_gcd_2
-        // x_high >= 2 third time in limbs_half_gcd_2
-        // x_high != y_high second time in limbs_half_gcd_2
-        // y_high >= HALF_LIMIT_1 in limbs_half_gcd_2
-        // y_high >= 2 second time in limbs_half_gcd_2
-        // x_high < y_high first time in limbs_half_gcd_2
-        // y_high >= 2 third time in limbs_half_gcd_2
-        // x_high <= y_high first time in limbs_half_gcd_2
-        // x_high < HALF_LIMIT_1 in limbs_half_gcd_2
-        // !done in limbs_half_gcd_2
-        // !subtract_a1 in limbs_half_gcd_2
-        // x_high >= HALF_LIMIT_2 first time in limbs_half_gcd_2
-        // x_high > y_high second time in limbs_half_gcd_2
-        // x_high >= HALF_LIMIT_2 second time in limbs_half_gcd_2
-        // y_high >= HALF_LIMIT_2 first time in limbs_half_gcd_2
-        // x_high < y_high in limbs_half_gcd_2 second time
-        // y_high >= HALF_LIMIT_2 second time in limbs_half_gcd_2
-        // x_high >= y_high in limbs_half_gcd_2 second time
-        // x_high <= y_high second time in limbs_half_gcd_2
-        // y_high < HALF_LIMIT_2 second time in limbs_half_gcd_2
-        // !skip && limbs_half_gcd_2 in limbs_half_gcd_step
-        // out[n - 1] | ys[n - 1] != 0 in limbs_half_gcd_matrix_1_mul_inverse_vector
-        // n != 0 fourth time in limbs_half_gcd
-        // x_high >= y_high in limbs_half_gcd_2 first time
-        // y_high < HALF_LIMIT_1 in limbs_half_gcd_2
-        // subtract_a1 in limbs_half_gcd_2
-        // y_high < HALF_LIMIT_2 first time in limbs_half_gcd_2
-        // out[n - 1] | ys[n - 1] == 0 in limbs_half_gcd_matrix_1_mul_inverse_vector
-        // x_high < HALF_LIMIT_2 second time in limbs_half_gcd_2
-        // x_high > y_high || x_high == y_high && a_low > b_low in limbs_half_gcd_2
-        // x_high >= 2 first time in limbs_half_gcd_2
-        // subtract_a in limbs_half_gcd_2
-        // x_high < HALF_LIMIT_2 first time in limbs_half_gcd_2
-        // n == s + 1 in limbs_half_gcd_step
-        // mask >= 4 in limbs_half_gcd_step
-        // x_high < 2 first time in limbs_half_gcd_2
-        // !limbs_half_gcd_2 in limbs_half_gcd_step
-        // xs_len == ys_len first time in limbs_gcd_subdivide_step
-        // limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater first time
-        //      in limbs_gcd_subdivide_step
-        // ys_len <= s first time in limbs_gcd_subdivide_step
-        // n == 0 fourth time in limbs_half_gcd
-        // new_n != 0 in limbs_half_gcd_matrix_reduce
-        // !x_high && !y_high in limbs_half_gcd_matrix_adjust
-        // new_n != 0 first time in limbs_half_gcd
-        // n != 0 second time in limbs_half_gcd
-        // n > s + 2 in limbs_half_gcd
-        // n != s + 1 && mask.get_highest_bit() in limbs_half_gcd_step
-        // limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less first time
-        //      in limbs_gcd_subdivide_step
-        // n != 0 third time in limbs_half_gcd
-        // first zero in limbs_half_gcd_matrix_mul_matrix
-        // second zero in limbs_half_gcd_matrix_mul_matrix
-        // ys_len <= s second time in limbs_gcd_subdivide_step
-        // s != 0 fourth time in limbs_gcd_subdivide_step
-        // ys_len != 0 second time in limbs_gcd_subdivide_step
-        // mask < 4 in limbs_half_gcd_step
-        // new_n != 0 first time
-        // limbs_half_gcd_2
-        // mask.get_highest_bit()
-        // y_0 != 0
+        // - n >= GCD_DC_THRESHOLD
+        // - n > s in limbs_half_gcd
+        // - n >= HGCD_THRESHOLD in limbs_half_gcd
+        // - n < HGCD_REDUCE_THRESHOLD in limbs_half_gcd_matrix_reduce
+        // - n < HGCD_THRESHOLD in limbs_half_gcd_approx
+        // - n != s + 1 && !mask.get_highest_bit() in limbs_half_gcd_step
+        // - y_high >= 2 first time in limbs_half_gcd_2
+        // - !subtract_a in limbs_half_gcd_2
+        // - x_high != y_high first time in limbs_half_gcd_2
+        // - x_high >= HALF_LIMIT_1 in limbs_half_gcd_2
+        // - x_high >= 2 second time in limbs_half_gcd_2
+        // - x_high > y_high first time in limbs_half_gcd_2
+        // - x_high >= 2 third time in limbs_half_gcd_2
+        // - x_high != y_high second time in limbs_half_gcd_2
+        // - y_high >= HALF_LIMIT_1 in limbs_half_gcd_2
+        // - y_high >= 2 second time in limbs_half_gcd_2
+        // - x_high < y_high first time in limbs_half_gcd_2
+        // - y_high >= 2 third time in limbs_half_gcd_2
+        // - x_high <= y_high first time in limbs_half_gcd_2
+        // - x_high < HALF_LIMIT_1 in limbs_half_gcd_2
+        // - !done in limbs_half_gcd_2
+        // - !subtract_a1 in limbs_half_gcd_2
+        // - x_high >= HALF_LIMIT_2 first time in limbs_half_gcd_2
+        // - x_high > y_high second time in limbs_half_gcd_2
+        // - x_high >= HALF_LIMIT_2 second time in limbs_half_gcd_2
+        // - y_high >= HALF_LIMIT_2 first time in limbs_half_gcd_2
+        // - x_high < y_high in limbs_half_gcd_2 second time
+        // - y_high >= HALF_LIMIT_2 second time in limbs_half_gcd_2
+        // - x_high >= y_high in limbs_half_gcd_2 second time
+        // - x_high <= y_high second time in limbs_half_gcd_2
+        // - y_high < HALF_LIMIT_2 second time in limbs_half_gcd_2
+        // - !skip && limbs_half_gcd_2 in limbs_half_gcd_step
+        // - out[n - 1] | ys[n - 1] != 0 in limbs_half_gcd_matrix_1_mul_inverse_vector
+        // - n != 0 fourth time in limbs_half_gcd
+        // - x_high >= y_high in limbs_half_gcd_2 first time
+        // - y_high < HALF_LIMIT_1 in limbs_half_gcd_2
+        // - subtract_a1 in limbs_half_gcd_2
+        // - y_high < HALF_LIMIT_2 first time in limbs_half_gcd_2
+        // - out[n - 1] | ys[n - 1] == 0 in limbs_half_gcd_matrix_1_mul_inverse_vector
+        // - x_high < HALF_LIMIT_2 second time in limbs_half_gcd_2
+        // - x_high > y_high || x_high == y_high && a_low > b_low in limbs_half_gcd_2
+        // - x_high >= 2 first time in limbs_half_gcd_2
+        // - subtract_a in limbs_half_gcd_2
+        // - x_high < HALF_LIMIT_2 first time in limbs_half_gcd_2
+        // - n == s + 1 in limbs_half_gcd_step
+        // - mask >= 4 in limbs_half_gcd_step
+        // - x_high < 2 first time in limbs_half_gcd_2
+        // - !limbs_half_gcd_2 in limbs_half_gcd_step
+        // - xs_len == ys_len first time in limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Greater first time in
+        //   limbs_gcd_subdivide_step
+        // - ys_len <= s first time in limbs_gcd_subdivide_step
+        // - n == 0 fourth time in limbs_half_gcd
+        // - new_n != 0 in limbs_half_gcd_matrix_reduce
+        // - !x_high && !y_high in limbs_half_gcd_matrix_adjust
+        // - new_n != 0 first time in limbs_half_gcd
+        // - n != 0 second time in limbs_half_gcd
+        // - n > s + 2 in limbs_half_gcd
+        // - n != s + 1 && mask.get_highest_bit() in limbs_half_gcd_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less first time in
+        //   limbs_gcd_subdivide_step
+        // - n != 0 third time in limbs_half_gcd
+        // - first zero in limbs_half_gcd_matrix_mul_matrix
+        // - second zero in limbs_half_gcd_matrix_mul_matrix
+        // - ys_len <= s second time in limbs_gcd_subdivide_step
+        // - s != 0 fourth time in limbs_gcd_subdivide_step
+        // - ys_len != 0 second time in limbs_gcd_subdivide_step
+        // - mask < 4 in limbs_half_gcd_step
+        // - new_n != 0 first time
+        // - limbs_half_gcd_2
+        // - mask.get_highest_bit()
+        // - y_0 != 0
         test(
             &[
                 4197577227, 3663616140, 2551363557, 471855676, 1132453243, 3890478103, 3255658039,
@@ -1036,7 +1036,7 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // xs_len <= n
+        // - xs_len <= n
         test(
             &[
                 1304645631, 3453605495, 2384770191, 4234662844, 193170837, 3507896589, 1570888072,
@@ -1048,7 +1048,7 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // x_high < 2 third time in limbs_half_gcd_2
+        // - x_high < 2 third time in limbs_half_gcd_2
         test(
             &[
                 2504682851, 2582732736, 385625941, 2382204212, 314045215, 2050447634, 503267526,
@@ -1058,35 +1058,35 @@ fn test_limbs_gcd_reduced() {
             &[2374767210, 3305948119, 2775088291, 3859016530, 6636685],
             &[5],
         );
-        // slice_test_zero(&up[..n])
+        // - slice_test_zero(&up[..n])
         test(&[0, 1, 1], &[1, 1], &[1, 1]);
-        // an == 1 in limbs_gcd_subdivide_step
-        // s == 0 fourth time in limbs_gcd_subdivide_step
-        // n == 0
+        // - an == 1 in limbs_gcd_subdivide_step
+        // - s == 0 fourth time in limbs_gcd_subdivide_step
+        // - n == 0
         test(&[0, 0, 0, 0, 1], &[1, 0, 1], &[1, 0, 0]);
-        // n == 1
+        // - n == 1
         test(&[0, 1, 1], &[1, 0, 1], &[1]);
-        // limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less second time
-        //      in limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Less second time in
+        //   limbs_gcd_subdivide_step
         test(&[0, 0, 0, 0, 0, 1], &[1, 0, 1], &[1]);
-        // limbs_cmp_same_length(xs_init, ys_init) == Ordering::Equal first time
-        //      in limbs_gcd_subdivide_step
-        // s == 0 first time in limbs_gcd_subdivide_step
+        // - limbs_cmp_same_length(xs_init, ys_init) == Ordering::Equal first time in
+        //   limbs_gcd_subdivide_step
+        // - s == 0 first time in limbs_gcd_subdivide_step
         test(&[1, 0, 1], &[1, 0, 1], &[1, 0, 1]);
-        // x_high == y_high first time in limbs_half_gcd_2
+        // - x_high == y_high first time in limbs_half_gcd_2
         test(&[0, 0, 2], &[1, 0, 1], &[1]);
-        // y_high < 2 second time in limbs_half_gcd_2
+        // - y_high < 2 second time in limbs_half_gcd_2
         test(&[0, 0, 2], &[1, 1, 1], &[1]);
-        // x_high == y_high second time in limbs_half_gcd_2
+        // - x_high == y_high second time in limbs_half_gcd_2
         test(&[0, 0, 0, 0, 1], &[1, 0, 3], &[1]);
-        // xs_len > ys_len first time in limbs_gcd_subdivide_step
+        // - xs_len > ys_len first time in limbs_gcd_subdivide_step
         test(&[0, 1, 1, 1], &[1, 0, 0, 1], &[1]);
-        // n == 0 second time in limbs_half_gcd
-        // s != 0 first time in limbs_gcd_subdivide_step
-        // new_n == 0 in limbs_half_gcd_matrix_reduce
-        // new_n == 0 first time in limbs_half_gcd
-        // nn == 0 first time
-        // nn == 0 second time
+        // - n == 0 second time in limbs_half_gcd
+        // - s != 0 first time in limbs_gcd_subdivide_step
+        // - new_n == 0 in limbs_half_gcd_matrix_reduce
+        // - new_n == 0 first time in limbs_half_gcd
+        // - nn == 0 first time
+        // - nn == 0 second time
         test(
             &[
                 104199695, 1437842355, 3026540896, 1036691142, 2895760091, 316986459, 3848493166,
@@ -1253,9 +1253,9 @@ fn test_limbs_gcd_reduced() {
                 3657891297, 554297412, 2239031137, 2012129,
             ],
         );
-        // new_n == 0 third time in limbs_half_gcd_approx
-        // new_n == 0 fourth time in limbs_half_gcd_approx
-        // !limbs_half_gcd_approx in limbs_half_gcd_matrix_reduce
+        // - new_n == 0 third time in limbs_half_gcd_approx
+        // - new_n == 0 fourth time in limbs_half_gcd_approx
+        // - !limbs_half_gcd_approx in limbs_half_gcd_matrix_reduce
         test(
             &[
                 3657711640, 998557705, 2673527526, 140583600, 3560526410, 3079349729, 1007803327,
@@ -1544,9 +1544,9 @@ fn test_limbs_gcd_reduced() {
                 3856657124, 3741113040, 3014123703, 739968874, 413,
             ],
         );
-        // xs_len <= s in limbs_gcd_subdivide_step
-        // s != 0 second time in limbs_gcd_subdivide_step
-        // new_n != 0 second time
+        // - xs_len <= s in limbs_gcd_subdivide_step
+        // - s != 0 second time in limbs_gcd_subdivide_step
+        // - new_n != 0 second time
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1642,7 +1642,7 @@ fn test_limbs_gcd_reduced() {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4128768, 0,
             ],
         );
-        // n <= s + 2 in limbs_half_gcd
+        // - n <= s + 2 in limbs_half_gcd
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1792,7 +1792,7 @@ fn test_limbs_gcd_reduced() {
                 4294967295, 4294967295, 4294967295, 4294967295, 16383,
             ],
         );
-        // ys_len == 0 second time in limbs_gcd_subdivide_step
+        // - ys_len == 0 second time in limbs_gcd_subdivide_step
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1932,7 +1932,7 @@ fn test_limbs_gcd_reduced() {
                 0, 0, 0, 0, 0, 0, 0, 0, 192,
             ],
         );
-        // n == 0 third time in limbs_half_gcd
+        // - n == 0 third time in limbs_half_gcd
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -2043,7 +2043,7 @@ fn test_limbs_gcd_reduced() {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64,
             ],
         );
-        // xs[new_n - 1] == 0 && ys[new_n - 1] == 0 in limbs_half_gcd_matrix_apply
+        // - xs[new_n - 1] == 0 && ys[new_n - 1] == 0 in limbs_half_gcd_matrix_apply
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -2322,9 +2322,9 @@ fn test_limbs_gcd_reduced() {
                 4294967295, 4294967295, 4294967295, 4294967295, 261631,
             ],
         );
-        // s + 1 == n || ... in limbs_half_gcd_approx
-        // extra_bits == 0 second time in limbs_half_gcd_approx
-        // n != 2 in limbs_half_gcd_approx
+        // - s + 1 == n || ... in limbs_half_gcd_approx
+        // - extra_bits == 0 second time in limbs_half_gcd_approx
+        // - n != 2 in limbs_half_gcd_approx
         test(
             &[
                 2004596728, 1848887139, 3588545405, 3004392306, 853879983, 1360524256, 1385705184,
@@ -2587,8 +2587,8 @@ fn test_limbs_gcd_reduced() {
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(&[0, 0, 0, 1], &[1, 0, 1], &[1]);
-        // xs[0].even()
-        // y_0.even()
+        // - xs[0].even()
+        // - y_0.even()
         test(
             &[
                 7642088996549441618,
@@ -5198,30 +5198,30 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // n >= HGCD_REDUCE_THRESHOLD in limbs_half_gcd_matrix_reduce
-        // n > 2 in limbs_half_gcd_approx
-        // n >= HGCD_APPR_THRESHOLD in limbs_half_gcd_approx
-        // new_n != 0 third time in limbs_half_gcd_approx
-        // new_n != 0 fourth time in limbs_half_gcd_approx
-        // n > s + 2 in limbs_half_gcd_approx
-        // n < HGCD_APPR_THRESHOLD in limbs_half_gcd_approx
-        // new_n != 0 first time in limbs_half_gcd_approx
-        // lhs <= rhs in limbs_half_gcd_approx
-        // extra_bits == 0 first time in limbs_half_gcd_approx
-        // s + 1 != n && !... in limbs_half_gcd_approx
-        // extra_bits != 0 first time in limbs_half_gcd_approx
-        // lhs > rhs in limbs_half_gcd_approx
-        // new_n == 0 first time in limbs_half_gcd_approx
-        // extra_bits != 0 second time in limbs_half_gcd_approx
-        // new_n != 0 second time in limbs_half_gcd_approx
-        // limbs_half_gcd_approx in limbs_half_gcd_approx
-        // limbs_half_gcd_approx in limbs_half_gcd_matrix_reduce
-        // m_lens[0][1] != 0 && m_lens[1][0] != 0 in limbs_half_gcd_matrix_apply
-        // n > mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[1][1] >= mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[0][1] >= mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[1][0] >= mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[0][0] >= mod_n in limbs_half_gcd_matrix_apply
+        // - n >= HGCD_REDUCE_THRESHOLD in limbs_half_gcd_matrix_reduce
+        // - n > 2 in limbs_half_gcd_approx
+        // - n >= HGCD_APPR_THRESHOLD in limbs_half_gcd_approx
+        // - new_n != 0 third time in limbs_half_gcd_approx
+        // - new_n != 0 fourth time in limbs_half_gcd_approx
+        // - n > s + 2 in limbs_half_gcd_approx
+        // - n < HGCD_APPR_THRESHOLD in limbs_half_gcd_approx
+        // - new_n != 0 first time in limbs_half_gcd_approx
+        // - lhs <= rhs in limbs_half_gcd_approx
+        // - extra_bits == 0 first time in limbs_half_gcd_approx
+        // - s + 1 != n && !... in limbs_half_gcd_approx
+        // - extra_bits != 0 first time in limbs_half_gcd_approx
+        // - lhs > rhs in limbs_half_gcd_approx
+        // - new_n == 0 first time in limbs_half_gcd_approx
+        // - extra_bits != 0 second time in limbs_half_gcd_approx
+        // - new_n != 0 second time in limbs_half_gcd_approx
+        // - limbs_half_gcd_approx in limbs_half_gcd_approx
+        // - limbs_half_gcd_approx in limbs_half_gcd_matrix_reduce
+        // - m_lens[0][1] != 0 && m_lens[1][0] != 0 in limbs_half_gcd_matrix_apply
+        // - n > mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[1][1] >= mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[0][1] >= mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[1][0] >= mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[0][0] >= mod_n in limbs_half_gcd_matrix_apply
         test(
             &[
                 575467399379548741,
@@ -7327,12 +7327,12 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // xs_len > ys_len second time in limbs_gcd_subdivide_step
-        // x_high < 2 || y_high < 2 in limbs_half_gcd_2
-        // xs_len < ys_len second time in limbs_gcd_subdivide_step
-        // y_high < 2 third time in limbs_half_gcd_2
-        // done in limbs_half_gcd_2
-        // x_high < 2 second time in limbs_half_gcd_2
+        // - xs_len > ys_len second time in limbs_gcd_subdivide_step
+        // - x_high < 2 || y_high < 2 in limbs_half_gcd_2
+        // - xs_len < ys_len second time in limbs_gcd_subdivide_step
+        // - y_high < 2 third time in limbs_half_gcd_2
+        // - done in limbs_half_gcd_2
+        // - x_high < 2 second time in limbs_half_gcd_2
         test(
             &[
                 18446744073701163008,
@@ -8312,8 +8312,8 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // !limbs_half_gcd_approx in limbs_half_gcd_approx
-        // n == 0 fifth time in limbs_half_gcd_approx
+        // - !limbs_half_gcd_approx in limbs_half_gcd_approx
+        // - n == 0 fifth time in limbs_half_gcd_approx
         test(
             &[
                 0,
@@ -9824,11 +9824,11 @@ fn test_limbs_gcd_reduced() {
             ],
             &[1],
         );
-        // n <= mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[1][1] < mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[0][1] < mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[1][0] < mod_n in limbs_half_gcd_matrix_apply
-        // n + m_lens[0][0] < mod_n in limbs_half_gcd_matrix_apply
+        // - n <= mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[1][1] < mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[0][1] < mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[1][0] < mod_n in limbs_half_gcd_matrix_apply
+        // - n + m_lens[0][0] < mod_n in limbs_half_gcd_matrix_apply
         test(
             &[
                 0,
@@ -11391,8 +11391,8 @@ fn test_limbs_gcd_reduced() {
             ],
             &[3],
         );
-        // n <= s + 2 in limbs_half_gcd_approx
-        // m_lens[0][1] == 0 in limbs_half_gcd_matrix_apply
+        // - n <= s + 2 in limbs_half_gcd_approx
+        // - m_lens[0][1] == 0 in limbs_half_gcd_matrix_apply
         test(
             &[
                 18446744073709551615,

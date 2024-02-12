@@ -4,7 +4,7 @@ pub(crate) const ORDERINGS: [Ordering; 3] = [Ordering::Equal, Ordering::Less, Or
 
 /// Converts a string to an [`Ordering`].
 ///
-/// If the string` does not represent a valid [`Ordering`], `None` is returned.
+/// If the string does not represent a valid [`Ordering`], `None` is returned.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.

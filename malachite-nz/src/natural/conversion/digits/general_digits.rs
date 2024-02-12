@@ -34,10 +34,10 @@ use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, Trailing
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 
-//TODO tune
+// TODO tune
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
 
-//TODO tune
+// TODO tune
 #[cfg(feature = "test_build")]
 pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
 
@@ -106,8 +106,8 @@ fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `MPN_SIZEINBASE` from `gmp-impl.h`, GMP 6.2.1, where result is returned
-// and base is not a power of 2.
+// This is equivalent to `MPN_SIZEINBASE` from `gmp-impl.h`, GMP 6.2.1, where result is returned and
+// base is not a power of 2.
 pub_crate_test! {limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
     assert!(base > 2);
     assert!(base < u64::wrapping_from(BASES.len()));
@@ -135,7 +135,7 @@ macro_rules! base_10_normalization_step {
     };
 }
 
-//TODO tune
+// TODO tune
 const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
     GET_STR_THRESHOLD_LIMIT
 } else {
@@ -147,9 +147,9 @@ const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
 // required. Return the number of significant digits. Complexity is quadratic; intended for small
 // conversions.
 //
-// `base` must not be a power of 2, and 2 < `base` < 256.
-// `xs.len()` < `GET_STR_PRECOMPUTE_THRESHOLD`.
-// `len` must be at least as large as the actual number of digits.
+// - `base` must not be a power of 2, and 2 < `base` < 256.
+// - `xs.len()` < `GET_STR_PRECOMPUTE_THRESHOLD`.
+// - `len` must be at least as large as the actual number of digits.
 //
 // # Worst-case complexity
 // $T(n) = O(n^2)$
@@ -283,13 +283,13 @@ struct PowerTableRow<'a> {
     digits_in_base: usize, // number of corresponding digits
 }
 
-//TODO tune
+// TODO tune
 const DIV_1_VS_MUL_1_PERCENT: usize = 150;
 
-//TODO tune
+// TODO tune
 const HAVE_MPN_COMPUTE_POWTAB_MUL: bool = DIV_1_VS_MUL_1_PERCENT > 120;
 
-//TODO tune
+// TODO tune
 const HAVE_MPN_COMPUTE_POWTAB_DIV: bool = DIV_1_VS_MUL_1_PERCENT < 275;
 
 #[cfg(feature = "test_build")]
@@ -660,12 +660,12 @@ pub_test! {limbs_compute_power_table(
     (power_len, powers)
 }}
 
-//TODO tune
+// TODO tune
 const GET_STR_DC_THRESHOLD: usize = 15;
 
 // Convert `xs` to a string with a base as represented in `powers`, and put the string in `out`.
-// Generate `len` characters, possibly padding with zeros to the left. If `len` is zero, generate
-// as many characters as required. Return a pointer immediately after the last digit of the result
+// Generate `len` characters, possibly padding with zeros to the left. If `len` is zero, generate as
+// many characters as required. Return a pointer immediately after the last digit of the result
 // string. This uses divide-and-conquer and is intended for large conversions.
 //
 // # Worst-case complexity
@@ -883,7 +883,7 @@ pub_test! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Na
     }
 }}
 
-//TODO tune
+// TODO tune
 const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
 
 const SQRT_MAX_LIMB: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
@@ -1352,7 +1352,8 @@ where
     Some(size)
 }}
 
-//TODO tune
+// TODO tune
+
 // must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
 const SET_STR_DC_THRESHOLD: usize = 7100;
 
@@ -1860,8 +1861,8 @@ impl Digits<u8> for Natural {
     ///
     /// If the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it ends with a nonzero digit.
     ///
-    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
-    /// $d_{k-1} \neq 0$, and
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or $d_{k-1} \neq
+    /// 0$, and
     ///
     /// $$
     /// \sum_{i=0}^{k-1}b^i d_i = x.
@@ -1905,8 +1906,8 @@ impl Digits<u8> for Natural {
     ///
     /// If the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it begins with a nonzero digit.
     ///
-    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
-    /// $d_{k-1} \neq 0$, and
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or $d_{k-1} \neq
+    /// 0$, and
     ///
     /// $$
     /// \sum_{i=0}^{k-1}b^i d_{k-i-1} = x.
@@ -2225,8 +2226,8 @@ impl Digits<Natural> for Natural {
     ///
     /// If the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it ends with a nonzero digit.
     ///
-    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
-    /// $d_{k-1} \neq 0$, and
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or $d_{k-1} \neq
+    /// 0$, and
     ///
     /// $$
     /// \sum_{i=0}^{k-1}b^i d_i = x.
@@ -2272,8 +2273,8 @@ impl Digits<Natural> for Natural {
     ///
     /// If the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it begins with a nonzero digit.
     ///
-    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
-    /// $d_{k-1} \neq 0$, and
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or $d_{k-1} \neq
+    /// 0$, and
     ///
     /// $$
     /// \sum_{i=0}^{k-1}b^i d_{k-i-1} = x.

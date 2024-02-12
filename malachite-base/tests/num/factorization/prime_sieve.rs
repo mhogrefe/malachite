@@ -29,31 +29,31 @@ fn test_limbs_prime_sieve_u32() {
         assert_eq!(limbs_prime_sieve_naive_2::<u32>(&mut sieve_alt, n), out);
         assert_eq!(sieve, sieve_alt);
     };
-    // size <= BLOCK_SIZE << 1
-    // limbs == 0 in first_block_primesieve
-    // (bits + 1) & Limb::WIDTH_MASK != 0 in first_block_primesieve
-    // (bits + 1) & Limb::WIDTH_MASK != 0
+    // - size <= BLOCK_SIZE << 1
+    // - limbs == 0 in first_block_primesieve
+    // - (bits + 1) & Limb::WIDTH_MASK != 0 in first_block_primesieve
+    // - (bits + 1) & Limb::WIDTH_MASK != 0
     test(5, 1, &[4294967294]);
-    // (bits + 1) & Limb::WIDTH_MASK == 0 in first_block_primesieve
-    // (bits + 1) & Limb::WIDTH_MASK == 0
+    // - (bits + 1) & Limb::WIDTH_MASK == 0 in first_block_primesieve
+    // - (bits + 1) & Limb::WIDTH_MASK == 0
     test(97, 23, &[1762821248]);
-    // limbs != 0 in first_block_primesieve
-    // offset == 0 first time in fill_bitpattern
+    // - limbs != 0 in first_block_primesieve
+    // - offset == 0 first time in fill_bitpattern
     test(101, 24, &[1762821248, 4294967294]);
-    // n_to_bit(SEED_LIMIT + 1) >= Limb::WIDTH in first_block_primesieve
-    // bit_array[index] & mask == 0 in first_block_primesieve
-    // lindex <= bits first time in first_block_primesieve
-    // lindex > bits second time in first_block_primesieve
-    // lindex > bits first time in first_block_primesieve
+    // - n_to_bit(SEED_LIMIT + 1) >= Limb::WIDTH in first_block_primesieve
+    // - bit_array[index] & mask == 0 in first_block_primesieve
+    // - lindex <= bits first time in first_block_primesieve
+    // - lindex > bits second time in first_block_primesieve
+    // - lindex > bits first time in first_block_primesieve
     test(121, 28, &[1762821248, 4294967264]);
-    // lindex <= bits second time in first_block_primesieve
+    // - lindex <= bits second time in first_block_primesieve
     test(187, 40, &[1762821248, 4069837280]);
-    // limbs != 0 first time in fill_bitpattern
-    // limbs == 0 second time in fill_bitpattern
+    // - limbs != 0 first time in fill_bitpattern
+    // - limbs == 0 second time in fill_bitpattern
     test(197, 43, &[1762821248, 848611808, 4294967294]);
-    // limbs != 0 second time in fill_bitpattern
+    // - limbs != 0 second time in fill_bitpattern
     test(293, 60, &[1762821248, 848611808, 3299549660, 4294967294]);
-    // bit_array[index] & mask != 0 in first_block_primesieve
+    // - bit_array[index] & mask != 0 in first_block_primesieve
     test(
         529,
         97,
@@ -80,37 +80,37 @@ fn test_limbs_prime_sieve_u32() {
             3953720370, 2080348909, 1828150423, 2537461567, 2647369563, 4126591959, 4294967295,
         ],
     );
-    // size > BLOCK_SIZE << 1
-    // offset != 0 first time in fill_bitpattern
-    // offset != 0 second time in fill_bitpattern
-    // offset <= Limb::WIDTH in fill_bitpattern
-    // offset != Limb::WIDTH in fill_bitpattern
-    // offset > 70 - 2 * Limb::WIDTH in fill_bitpattern
-    // sieve[index] & mask == 0 in block_resieve
-    // lindex <= bits + off in block_resieve
-    // lindex < off first time in block_resieve
-    // lindex < off second time in block_resieve
-    // sieve[index] & mask != 0 in block_resieve
-    // lindex >= off first time in block_resieve
-    // lindex >= off second time in block_resieve
-    // lindex > bits + off in block_resieve
-    // off >= size
+    // - size > BLOCK_SIZE << 1
+    // - offset != 0 first time in fill_bitpattern
+    // - offset != 0 second time in fill_bitpattern
+    // - offset <= Limb::WIDTH in fill_bitpattern
+    // - offset != Limb::WIDTH in fill_bitpattern
+    // - offset > 70 - 2 * Limb::WIDTH in fill_bitpattern
+    // - sieve[index] & mask == 0 in block_resieve
+    // - lindex <= bits + off in block_resieve
+    // - lindex < off first time in block_resieve
+    // - lindex < off second time in block_resieve
+    // - sieve[index] & mask != 0 in block_resieve
+    // - lindex >= off first time in block_resieve
+    // - lindex >= off second time in block_resieve
+    // - lindex > bits + off in block_resieve
+    // - off >= size
     test_large(400000, 33858);
-    // Limb::WIDTH < offset < 2 * Limb::WIDTH in fill_bitpattern
-    // offset > 70 - Limb::WIDTH in fill_bitpattern
+    // - Limb::WIDTH < offset < 2 * Limb::WIDTH in fill_bitpattern
+    // - offset > 70 - Limb::WIDTH in fill_bitpattern
     test_large(400037, 33861);
-    // offset <= 70 - 2 * Limb::WIDTH in fill_bitpattern
+    // - offset <= 70 - 2 * Limb::WIDTH in fill_bitpattern
     test_large(400325, 33885);
-    // offset <= 70 - Limb::WIDTH in fill_bitpattern
-    // offset != 70 - Limb::WIDTH in fill_bitpattern
+    // - offset <= 70 - Limb::WIDTH in fill_bitpattern
+    // - offset != 70 - Limb::WIDTH in fill_bitpattern
     test_large(400421, 33891);
-    // offset >= 2 * Limb::WIDTH in fill_bitpattern
+    // - offset >= 2 * Limb::WIDTH in fill_bitpattern
     test_large(400517, 33896);
-    // offset == 70 - Limb::WIDTH in fill_bitpattern
+    // - offset == 70 - Limb::WIDTH in fill_bitpattern
     test_large(401477, 33963);
-    // offset == 0 second time in fill_bitpattern
+    // - offset == 0 second time in fill_bitpattern
     test_large(401573, 33969);
-    // offset == Limb::WIDTH in fill_bitpattern
+    // - offset == Limb::WIDTH in fill_bitpattern
     test_large(401669, 33975);
 }
 
@@ -137,11 +137,11 @@ fn test_limbs_prime_sieve_u64() {
         assert_eq!(limbs_prime_sieve_naive_2(&mut sieve_alt, n), out);
         assert_eq!(sieve, sieve_alt);
     };
-    // offset == 0 first time in fill_bitpattern
-    // limbs == 0 first time in fill_bitpattern
-    // limbs != 0 first time in fill_bitpattern
-    // limbs == 0 second time in fill_bitpattern
-    // limbs != 0 second time in fill_bitpattern
+    // - offset == 0 first time in fill_bitpattern
+    // - limbs == 0 first time in fill_bitpattern
+    // - limbs != 0 first time in fill_bitpattern
+    // - limbs == 0 second time in fill_bitpattern
+    // - limbs != 0 second time in fill_bitpattern
     test(197, 43, &[3644759964122252416, 18446744073709551614]);
     test(
         10000,
@@ -202,35 +202,35 @@ fn test_limbs_prime_sieve_u64() {
             18446744073709551615,
         ],
     );
-    // offset != 0 first time in fill_bitpattern
-    // m21 != 0 in fill_bitpattern
-    // m21 < Limb::WIDTH in fill_bitpattern
-    // m21 <= 110 - Limb::WIDTH in fill_bitpattern
-    // offset != 0 second time in fill_bitpattern
-    // offset >= 2 * Limb::WIDTH in fill_bitpattern
+    // - offset != 0 first time in fill_bitpattern
+    // - m21 != 0 in fill_bitpattern
+    // - m21 < Limb::WIDTH in fill_bitpattern
+    // - m21 <= 110 - Limb::WIDTH in fill_bitpattern
+    // - offset != 0 second time in fill_bitpattern
+    // - offset >= 2 * Limb::WIDTH in fill_bitpattern
     test_large(800000, 63949);
-    // m21 >= Limb::WIDTH in fill_bitpattern
-    // offset <= Limb::WIDTH in fill_bitpattern
-    // offset != Limb::WIDTH in fill_bitpattern
-    // offset <= 182 - 2 * Limb::WIDTH in fill_bitpattern
+    // - m21 >= Limb::WIDTH in fill_bitpattern
+    // - offset <= Limb::WIDTH in fill_bitpattern
+    // - offset != Limb::WIDTH in fill_bitpattern
+    // - offset <= 182 - 2 * Limb::WIDTH in fill_bitpattern
     test_large(800069, 63953);
-    // m21 > 110 - Limb::WIDTH in fill_bitpattern
-    // Limb::WIDTH < offset < 2 * Limb::WIDTH in fill_bitpattern
-    // offset <= 182 - Limb::WIDTH in fill_bitpattern
-    // offset != 182 - Limb::WIDTH in fill_bitpattern
+    // - m21 > 110 - Limb::WIDTH in fill_bitpattern
+    // - Limb::WIDTH < offset < 2 * Limb::WIDTH in fill_bitpattern
+    // - offset <= 182 - Limb::WIDTH in fill_bitpattern
+    // - offset != 182 - Limb::WIDTH in fill_bitpattern
     test_large(800261, 63971);
-    // offset > 182 - 2 * Limb::WIDTH in fill_bitpattern
+    // - offset > 182 - 2 * Limb::WIDTH in fill_bitpattern
     test_large(801797, 64088);
-    // offset > 182 - Limb::WIDTH in fill_bitpattern
+    // - offset > 182 - Limb::WIDTH in fill_bitpattern
     test_large(801989, 64100);
-    // m21 == 0 in fill_bitpattern
+    // - m21 == 0 in fill_bitpattern
     test_large(805061, 64323);
-    // off < size
-    // offset == Limb::WIDTH in fill_bitpattern
+    // - off < size
+    // - offset == Limb::WIDTH in fill_bitpattern
     test_large(1800005, 135070);
-    // offset == 182 - Limb::WIDTH in fill_bitpattern
+    // - offset == 182 - Limb::WIDTH in fill_bitpattern
     test_large(1808261, 135646);
-    // offset == 0 second time in fill_bitpattern
+    // - offset == 0 second time in fill_bitpattern
     test_large(1808453, 135656);
 }
 

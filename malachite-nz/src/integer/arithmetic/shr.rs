@@ -62,8 +62,8 @@ macro_rules! impl_shr_unsigned {
         impl Shr<$t> for Integer {
             type Output = Integer;
 
-            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor),
-            /// taking it by value.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor), taking
+            /// it by value.
             ///
             /// $$
             /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -74,8 +74,8 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -89,8 +89,8 @@ macro_rules! impl_shr_unsigned {
         impl<'a> Shr<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor),
-            /// taking it by reference.
+            /// Right-shifts an [`Integer`] (divides it by a power of 2 and takes the floor), taking
+            /// it by reference.
             ///
             /// $$
             /// f(x, k) = \left \lfloor \frac{x}{2^k} \right \rfloor.
@@ -101,8 +101,8 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -125,8 +125,8 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr_assign).
@@ -181,8 +181,8 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -208,8 +208,8 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -232,8 +232,8 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr_assign).

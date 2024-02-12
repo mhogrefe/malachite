@@ -5,8 +5,7 @@ pub mod digits;
 pub mod from_digits;
 /// Functions for constructing a [`Rational`](crate::Rational) from base-$2^k$ digits.
 pub mod from_power_of_2_digits;
-/// Functions for producing iterators over the base-$2^k$ digits of a
-/// [`Rational`](crate::Rational).
+/// Functions for producing iterators over the base-$2^k$ digits of a [`Rational`](crate::Rational).
 pub mod power_of_2_digits;
 /// Functions for returning the digits of a [`Rational`](crate::Rational). The digits after the
 /// point are returned as a

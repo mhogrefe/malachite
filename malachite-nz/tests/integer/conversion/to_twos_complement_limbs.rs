@@ -5,12 +5,12 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
-    unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
+    signed_gen, unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
 };
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz::test_util::generators::{
     integer_bool_vec_pair_gen_var_1, integer_gen, integer_unsigned_pair_gen_var_2,
 };
@@ -110,6 +110,14 @@ fn test_twos_complement_limbs_asc() {
         "-1701411834921604967429270619762735448065",
         vec![u32::MAX, u32::MAX - 2, u32::MAX - 3, u32::MAX - 4, u32::MAX - 5],
     );
+    test("2147483647", vec![2147483647]);
+    test("-2147483647", vec![2147483649]);
+    test("2147483648", vec![2147483648, 0]);
+    test("-2147483648", vec![2147483648]);
+    test("2147483649", vec![2147483649, 0]);
+    test("-2147483649", vec![2147483647, 4294967295]);
+    test("4294967294", vec![u32::MAX - 1, 0]);
+    test("-4294967294", vec![2, u32::MAX]);
     test("4294967295", vec![u32::MAX, 0]);
     test("-4294967295", vec![1, u32::MAX]);
     test("4294967296", vec![0, 1]);
@@ -177,6 +185,40 @@ fn test_twos_complement_limbs_desc() {
     test("-18446744073709551615", vec![u32::MAX, 0, 1]);
     test("18446744073709551616", vec![1, 0, 0]);
     test("-18446744073709551616", vec![u32::MAX, 0, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_twos_complement_limb_count() {
+    let test = |n, out| {
+        assert_eq!(
+            Integer::from_str(n).unwrap().twos_complement_limb_count(),
+            out
+        );
+    };
+    test("0", 0);
+    test("123", 1);
+    test("-123", 1);
+    test("1000000000000", 2);
+    test("-1000000000000", 2);
+    test("1701411834921604967429270619762735448065", 5);
+    test("-1701411834921604967429270619762735448065", 5);
+    test("2147483647", 1);
+    test("-2147483647", 1);
+    test("2147483648", 2);
+    test("-2147483648", 1);
+    test("2147483649", 2);
+    test("-2147483649", 2);
+    test("4294967294", 2);
+    test("-4294967294", 2);
+    test("4294967295", 2);
+    test("-4294967295", 2);
+    test("4294967296", 2);
+    test("-4294967296", 2);
+    test("18446744073709551615", 3);
+    test("-18446744073709551615", 3);
+    test("18446744073709551616", 3);
+    test("-18446744073709551616", 3);
 }
 
 #[test]
@@ -248,6 +290,7 @@ fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_properties() {
 fn to_twos_complement_limbs_asc_properties() {
     integer_gen().test_properties(|x| {
         let xs = x.to_twos_complement_limbs_asc();
+        assert_eq!(xs.len(), usize::exact_from(x.twos_complement_limb_count()));
         assert_eq!(x.clone().into_twos_complement_limbs_asc(), xs);
         assert_eq!(x.twos_complement_limbs().collect_vec(), xs);
         assert_eq!(Integer::from_twos_complement_limbs_asc(&xs), x);
@@ -279,6 +322,7 @@ fn to_twos_complement_limbs_asc_properties() {
 fn to_twos_complement_limbs_desc_properties() {
     integer_gen().test_properties(|x| {
         let xs = x.to_twos_complement_limbs_desc();
+        assert_eq!(xs.len(), usize::exact_from(x.twos_complement_limb_count()));
         assert_eq!(x.clone().into_twos_complement_limbs_desc(), xs);
         assert_eq!(x.twos_complement_limbs().rev().collect_vec(), xs);
         assert_eq!(Integer::from_twos_complement_limbs_desc(&xs), x);
@@ -341,5 +385,22 @@ fn twos_complement_limbs_properties() {
 
     unsigned_gen_var_5().test_properties(|u| {
         assert_eq!(Integer::ZERO.twos_complement_limbs().get(u), 0);
+    });
+}
+
+const LIMB_HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+
+#[test]
+fn twos_complement_limb_count_properties() {
+    integer_gen().test_properties(|x| {
+        let n = x.twos_complement_limb_count();
+        assert_eq!(
+            (x >= 0 && x < LIMB_HIGH_BIT) || (x < 0 && x >= -Integer::from(LIMB_HIGH_BIT)),
+            n <= 1
+        );
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert!(Integer::from(i).twos_complement_limb_count() <= 1);
     });
 }

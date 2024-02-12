@@ -15,10 +15,10 @@ use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
-// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
-// there are no restrictions on the index values. If they index beyond the physical size of the
-// input limbs, the function interprets them as pointing to `false` bits.
+// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and ending
+// at index `end - 1`. `start` must be less than or equal to `end`, but apart from that there are no
+// restrictions on the index values. If they index beyond the physical size of the input limbs, the
+// function interprets them as pointing to `false` bits.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -52,10 +52,10 @@ pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
-// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
-// there are no restrictions on the index values. If they index beyond the physical size of the
-// input limbs, the function interprets them as pointing to `false` bits.
+// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and ending
+// at index `end - 1`. `start` must be less than or equal to `end`, but apart from that there are no
+// restrictions on the index values. If they index beyond the physical size of the input limbs, the
+// function interprets them as pointing to `false` bits.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -83,10 +83,10 @@ pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
 
 // Copy values from `ys` into `xs`.
 //
-// If `ys` has the same length as `xs`, the usual copy is performed.
-// If `ys` is longer than `xs`, the first `xs.len()` limbs of `ys` are copied.
-// If `ys` is shorter than `xs`, `ys` is copied and the remaining bits of `xs` are filled with
-// zeros.
+// - If `ys` has the same length as `xs`, the usual copy is performed.
+// - If `ys` is longer than `xs`, the first `xs.len()` limbs of `ys` are copied.
+// - If `ys` is shorter than `xs`, `ys` is copied and the remaining bits of `xs` are filled with
+//   zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -183,8 +183,8 @@ impl BitBlockAccess for Natural {
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
-    /// rest are 0. Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Then
     /// $$
     /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
     /// $$
@@ -228,8 +228,8 @@ impl BitBlockAccess for Natural {
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
-    /// are 0. Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Then
     /// $$
     /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
     /// $$
@@ -268,25 +268,23 @@ impl BitBlockAccess for Natural {
 
     /// Replaces a block of adjacent bits in a [`Natural`] with other bits.
     ///
-    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through
-    /// `end - 1`, inclusive, of `self`.
+    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through `end
+    /// - 1`, inclusive, of `self`.
     ///
     /// Let $n$ be `self` and let $m$ be `bits`, and let $p$ and $q$ be `start` and `end`,
     /// respectively.
     ///
-    /// If `bits` has fewer bits than `end - start`, the high bits are interpreted as 0.
-    /// Let
+    /// If `bits` has fewer bits than `end - start`, the high bits are interpreted as 0. Let
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
-    /// are 0.
-    /// Let
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Let
     /// $$
     /// m = \sum_{i=0}^k 2^{d_i},
     /// $$
-    /// where for all $i$, $d_i\in \\{0, 1\\}$.
-    /// Also, let $p, q \in \mathbb{N}$, and let $W$ be `max(self.significant_bits(), end + 1)`.
+    /// where for all $i$, $d_i\in \\{0, 1\\}$. Also, let $p, q \in \mathbb{N}$, and let $W$ be
+    /// `max(self.significant_bits(), end + 1)`.
     ///
     /// Then
     /// $$

@@ -15,8 +15,8 @@ use malachite_base::rounding_modes::RoundingMode;
 // zeros. An `Ordering` is also returned, indicating whether the returned value is less than, equal
 // to, or greater than the exact value.
 //
-// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the
-// division would be nonzero.
+// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the division
+// would be nonzero.
 //
 // Note that this function may only return `None`, `Some((0, Less))`, or `Some((1, Greater))`
 // because of the restrictions placed on the input slice.
@@ -75,9 +75,9 @@ fn div_round_assign_nearest(q: &mut Natural, r: &Natural, d: &Natural) -> Orderi
 impl DivRound<Natural> for Natural {
     type Output = Natural;
 
-    /// Divides a [`Natural`] by another [`Natural`], taking both by value and rounding according
-    /// to a specified rounding mode. An [`Ordering`] is also returned, indicating whether the
-    /// returned value is less than, equal to, or greater than the exact value.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and rounding according to
+    /// a specified rounding mode. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the exact value.
     ///
     /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
     /// the pair, without the [`Ordering`]:
@@ -105,8 +105,7 @@ impl DivRound<Natural> for Natural {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -203,8 +202,7 @@ impl<'a> DivRound<&'a Natural> for Natural {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -301,8 +299,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -377,8 +374,8 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and rounding
-    /// according to a specified rounding mode. An [`Ordering`] is also returned, indicating
-    /// whether the returned value is less than, equal to, or greater than the exact value.
+    /// according to a specified rounding mode. An [`Ordering`] is also returned, indicating whether
+    /// the returned value is less than, equal to, or greater than the exact value.
     ///
     /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
     /// the pair, without the [`Ordering`]:
@@ -406,8 +403,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$

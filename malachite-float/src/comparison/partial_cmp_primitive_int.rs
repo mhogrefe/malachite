@@ -1,10 +1,10 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn float_partial_cmp_unsigned<T: PrimitiveUnsigned>(x: &Float, y: &T) -> Option<Ordering>
 where
@@ -69,8 +69,8 @@ macro_rules! impl_from_unsigned {
             /// Compares an unsigned primitive integer to a [`Float`].
             ///
             /// No integer is comparable to NaN. Every integer is smaller than infinity and greater
-            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and
-            /// the [`Float`] negative zero.
+            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and the
+            /// [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -155,8 +155,8 @@ macro_rules! impl_from_signed {
             /// Compares a signed primitive integer to a [`Float`].
             ///
             /// No integer is comparable to NaN. Every integer is smaller than infinity and greater
-            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and
-            /// the [`Float`] negative zero.
+            /// than negative infinity. The integer zero is equal to both the [`Float`] zero and the
+            /// [`Float`] negative zero.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

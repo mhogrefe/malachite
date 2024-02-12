@@ -1,4 +1,6 @@
 use crate::Rational;
+use core::iter::{once, Chain, Once};
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::RoundingFrom;
@@ -10,8 +12,6 @@ use malachite_nz::integer::exhaustive::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::iter::{once, Chain, Once};
-use std::mem::swap;
 
 /// Generates all positive [`Rational`]s.
 ///
@@ -41,10 +41,10 @@ impl Iterator for ExhaustivePositiveRationals {
 
 /// Generates all positive [`Rational`]s.
 ///
-/// The [`Rational`]s are ordered as in the
-/// [Calkin-Wilf sequence](https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree#Breadth_first_traversal).
-/// Their numerators and denominators are given by the
-/// [Stern-Brocot sequence](https://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Relation_to_Farey_sequences).
+/// The [`Rational`]s are ordered as in the [Calkin-Wilf
+/// sequence](https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree#Breadth_first_traversal). Their
+/// numerators and denominators are given by the [Stern-Brocot
+/// sequence](https://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Relation_to_Farey_sequences).
 /// To generate the latter sequence, this iterator uses the formula
 /// $$
 /// a_{n+1} = \left ( 2 \left \lfloor \frac{a_{n-1}}{a_n} \right \rfloor +1 \right ) a_n - a_{n-1},
@@ -283,9 +283,8 @@ impl<'a, I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<'a, 
 ///
 /// When two [`Rational`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///
@@ -345,9 +344,8 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 ///
 /// When two [`Rational`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///
@@ -402,14 +400,13 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
     }
 }
 
-/// Generates all [`Rational`]s in the half-open range $[a, b)$ and with a specific denominator,
-/// in order of increasing absolute value.
+/// Generates all [`Rational`]s in the half-open range $[a, b)$ and with a specific denominator, in
+/// order of increasing absolute value.
 ///
 /// When two [`Rational`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///
@@ -481,9 +478,8 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///
 /// When two [`Rational`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///

@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct PrimitiveFloatFromIntegerError;
@@ -17,10 +17,10 @@ macro_rules! float_impls {
             ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite
             ///   float, then the maximum finite float is returned. If it is smaller than the
             ///   minimum finite float, then negative infinity is returned.
-            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to
-            ///   the [`Integer`] is returned. If the [`Integer`] is greater than the maximum
-            ///   finite float, then positive infinity is returned. If it is smaller than the
-            ///   minimum finite float, then the minimum finite float is returned.
+            /// - If the rounding mode is `Ceiling`, the smallest float greater than or equal to the
+            ///   [`Integer`] is returned. If the [`Integer`] is greater than the maximum finite
+            ///   float, then positive infinity is returned. If it is smaller than the minimum
+            ///   finite float, then the minimum finite float is returned.
             /// - If the rounding mode is `Down`, then the rounding proceeds as with `Floor` if the
             ///   [`Integer`] is non-negative and as with `Ceiling` if the [`Integer`] is negative.
             /// - If the rounding mode is `Up`, then the rounding proceeds as with `Ceiling` if the

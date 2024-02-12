@@ -1,25 +1,24 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 impl PartialOrdAbs<Natural> for Float {
-    /// Compares the absolute value of a [`Float`] to a
-    /// [`Natural`].
+    /// Compares the absolute value of a [`Float`] to a [`Natural`].
     ///
     /// NaN is not comparable to any [`Natural`]. Infinity and negative infinity are greater in
-    /// absolute value than any [`Natural`]. Both the [`Float`] zero and the [`Float`] negative
-    /// zero are equal to the [`Natural`] zero.
+    /// absolute value than any [`Natural`]. Both the [`Float`] zero and the [`Float`] negative zero
+    /// are equal to the [`Natural`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -65,16 +64,16 @@ impl PartialOrdAbs<Float> for Natural {
     /// Compares a [`Natural`] to the absolute value of a [`Float`].
     ///
     /// No [`Natural`] is comparable to NaN. Every [`Natural`] is smaller in absolute value than
-    /// infinity and negative infinity. The [`Natural`] zero is equal to both the [`Float`] zero
-    /// and the [`Float`] negative zero.
+    /// infinity and negative infinity. The [`Natural`] zero is equal to both the [`Float`] zero and
+    /// the [`Float`] negative zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

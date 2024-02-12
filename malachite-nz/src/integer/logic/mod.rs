@@ -30,8 +30,8 @@ pub mod low_mask;
 pub mod not;
 /// Bitwise or of [`Integer`](super::Integer)s.
 pub mod or;
-/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits),
-/// a trait for determining how many significant bits a number has.
+/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits), a
+/// trait for determining how many significant bits a number has.
 pub mod significant_bits;
 /// An implementation of [`TrailingZeros`](malachite_base::num::logic::traits::TrailingZeros), a
 /// trait for determining the number of zeros that a number ends with when written in binary.

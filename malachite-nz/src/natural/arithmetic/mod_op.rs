@@ -192,8 +192,8 @@ pub_test! {limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, 
 // Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, or the last limb of `ds`
 // does not have its highest bit set.
 //
-// This is equivalent to `mpn_sbpi1_div_qr` from `mpn/generic/sbpi1_div_qr.c`, GMP 6.2.1, where
-// only the remainder is calculated.
+// This is equivalent to `mpn_sbpi1_div_qr` from `mpn/generic/sbpi1_div_qr.c`, GMP 6.2.1, where only
+// the remainder is calculated.
 pub_test! {limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let d_len = ds.len();
     assert!(d_len > 2);
@@ -316,12 +316,11 @@ fn limbs_mod_divide_and_conquer_helper(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
 //
 // # Panics
-// Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has
-// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
-// set.
+// Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has length
+// less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
-// This is equivalent to `mpn_dcpi1_div_qr` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1, where
-// only the remainder is calculated.
+// This is equivalent to `mpn_dcpi1_div_qr` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1, where only
+// the remainder is calculated.
 pub_test! {limbs_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -346,8 +345,7 @@ pub_test! {limbs_mod_divide_and_conquer(
             }
             m
         };
-        // Perform the typically smaller block first.
-        // point at low limb of next quotient block
+        // Perform the typically smaller block first. point at low limb of next quotient block
         let qs_block = &mut qs[q_len - q_len_mod_d_len..q_len];
         if q_len_mod_d_len == 1 {
             // Handle highest_q up front, for simplicity.
@@ -356,8 +354,8 @@ pub_test! {limbs_mod_divide_and_conquer(
             if limbs_cmp_same_length(ns_tail, ds) >= Ordering::Equal {
                 assert!(!limbs_sub_same_length_in_place_left(ns_tail, ds));
             }
-            // A single iteration of schoolbook: One 3/2 division, followed by the bignum update
-            // and adjustment.
+            // A single iteration of schoolbook: One 3/2 division, followed by the bignum update and
+            // adjustment.
             let (last_n, ns) = ns.split_last_mut().unwrap();
             let n_2 = *last_n;
             let mut n_1 = ns[a];
@@ -579,8 +577,8 @@ fn limbs_mod_barrett_preinverted(
 //
 // where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
 //
-// This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where only
-// the remainder is calculated.
+// This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where only the
+// remainder is calculated.
 pub_test! {limbs_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -643,8 +641,8 @@ fn limbs_mod_barrett_large_helper(
     let (rs_lo, rs_hi) = rs.split_at_mut(n);
     let rs_hi = &mut rs_hi[..q_len_plus_one];
     let highest_q = limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
-    // Multiply the quotient by the divisor limbs ignored above.
-    // The product is d_len - 1 limbs long.
+    // Multiply the quotient by the divisor limbs ignored above. The product is d_len - 1 limbs
+    // long.
     let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ds_lo.len(), qs.len())];
     limbs_mul_to_out(scratch, ds_lo, qs, &mut mul_scratch);
     let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
@@ -820,8 +818,8 @@ fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_le
 // where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
 //
 // # Panics
-// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
-// of `ds` is zero.
+// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb of
+// `ds` is zero.
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `qp` is not
 // calculated and `rp` is returned.
@@ -991,9 +989,9 @@ pub_test! {limbs_mod_limb_normalized_shl(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the
-// quotient is not computed and the remainder is returned. Experiments show that this is always
-// slower than `limbs_mod_limb`.
+// This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the quotient
+// is not computed and the remainder is returned. Experiments show that this is always slower than
+// `limbs_mod_limb`.
 pub_test! {limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -1475,8 +1473,8 @@ impl Mod<Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning just the
     /// remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1522,8 +1520,8 @@ impl<'a> Mod<&'a Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1567,8 +1565,8 @@ impl<'a> Mod<Natural> for &'a Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
     /// by value and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1612,8 +1610,8 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning just
     /// the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1655,8 +1653,8 @@ impl ModAssign<Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by value and
     /// replacing the first by the remainder.
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq r < y$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1695,11 +1693,11 @@ impl ModAssign<Natural> for Natural {
 }
 
 impl<'a> ModAssign<&'a Natural> for Natural {
-    /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference
-    /// and replacing the first by the remainder.
+    /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference and
+    /// replacing the first by the remainder.
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq r < y$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1742,8 +1740,8 @@ impl Rem<Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning just the
     /// remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1789,8 +1787,8 @@ impl<'a> Rem<&'a Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
     /// reference and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1836,8 +1834,8 @@ impl<'a> Rem<Natural> for &'a Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
     /// by value and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1893,8 +1891,8 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning just
     /// the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1949,8 +1947,8 @@ impl RemAssign<Natural> for Natural {
     /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by value and
     /// replacing the first by the remainder.
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq r < y$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -1990,11 +1988,11 @@ impl RemAssign<Natural> for Natural {
 }
 
 impl<'a> RemAssign<&'a Natural> for Natural {
-    /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference
-    /// and replacing the first by the remainder.
+    /// Divides a [`Natural`] by another [`Natural`], taking the second [`Natural`] by reference and
+    /// replacing the first by the remainder.
     ///
-    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
-    /// and $0 \leq r < y$.
+    /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -2051,8 +2049,8 @@ impl NegMod<Natural> for Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking both by value and
     /// returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -2097,8 +2095,8 @@ impl<'a> NegMod<&'a Natural> for Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the first by value and
     /// the second by reference and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -2143,8 +2141,8 @@ impl<'a> NegMod<Natural> for &'a Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking the first by reference
     /// and the second by value and returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -2192,8 +2190,8 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     /// Divides the negative of a [`Natural`] by another [`Natural`], taking both by reference and
     /// returning just the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -2236,11 +2234,11 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
 }
 
 impl NegModAssign<Natural> for Natural {
-    /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second
-    /// [`Natural`]s by value and replacing the first by the remainder.
+    /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second [`Natural`]s
+    /// by value and replacing the first by the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -2281,11 +2279,11 @@ impl NegModAssign<Natural> for Natural {
 }
 
 impl<'a> NegModAssign<&'a Natural> for Natural {
-    /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second
-    /// [`Natural`]s by reference and replacing the first by the remainder.
+    /// Divides the negative of a [`Natural`] by another [`Natural`], taking the second [`Natural`]s
+    /// by reference and replacing the first by the remainder.
     ///
-    /// If the quotient were computed, the quotient and remainder would satisfy
-    /// $x = qy - r$ and $0 \leq r < y$.
+    /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and $0
+    /// \leq r < y$.
     ///
     /// $$
     /// x \gets y\left \lceil \frac{x}{y} \right \rceil - x.

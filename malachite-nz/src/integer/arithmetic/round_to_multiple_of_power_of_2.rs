@@ -1,9 +1,9 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
 
 impl RoundToMultipleOfPowerOf2<u64> for Integer {
     type Output = Integer;
@@ -50,8 +50,8 @@ impl RoundToMultipleOfPowerOf2<u64> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -150,8 +150,8 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -213,8 +213,8 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Integer {
 
 impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     /// Rounds an [`Integer`] to a multiple of $2^k$ in place, according to a specified rounding
-    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
-    /// equal to, or greater than the original value.
+    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
@@ -229,8 +229,8 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.

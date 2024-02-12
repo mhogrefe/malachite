@@ -12,8 +12,8 @@ use malachite_base::slices::slice_test_zero;
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
-// $f((d_i)_ {i=0}^k) = \lfloor\log_2 x\rfloor$, where $x = \sum_{i=0}^kB^id_i$ and $B$ is one
-// more than `Limb::MAX`.
+// $f((d_i)_ {i=0}^k) = \lfloor\log_2 x\rfloor$, where $x = \sum_{i=0}^kB^id_i$ and $B$ is one more
+// than `Limb::MAX`.
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -49,8 +49,8 @@ pub_test! {limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
     }
 }}
 
-// Given the limbs of a `Natural`, returns the its base-2 logarithm. If the `Natural` is not a
-// power of 2, returns `None`.
+// Given the limbs of a `Natural`, returns the its base-2 logarithm. If the `Natural` is not a power
+// of 2, returns `None`.
 //
 // This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 //
@@ -147,8 +147,8 @@ impl<'a> CeilingLogBase2 for &'a Natural {
 impl<'a> CheckedLogBase2 for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-2 logarithm of a positive [`Natural`]. If the [`Natural`] is not a power
-    /// of 2, then `None` is returned.
+    /// Returns the base-2 logarithm of a positive [`Natural`]. If the [`Natural`] is not a power of
+    /// 2, then `None` is returned.
     ///
     /// $$
     /// f(x) = \\begin{cases}

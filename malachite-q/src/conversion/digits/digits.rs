@@ -1,5 +1,6 @@
 use crate::conversion::digits::power_of_2_digits::RationalPowerOf2Digits;
 use crate::Rational;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{Abs, CheckedLogBase2, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::Digits;
 use malachite_nz::natural::Natural;
@@ -67,16 +68,16 @@ impl Rational {
     /// Both get the thousandth digit after the decimal point of `1/7`. The first way explicitly
     /// calculates each digit after the decimal point, whereas the second way determines that `1/7`
     /// is `0.(142857)`, with the `142857` repeating, and takes `1000 % 6 == 4` to determine that
-    /// the thousandth digit is 5. But when the [`Rational`] has a large denominator, the second
-    /// way is less efficient.
+    /// the thousandth digit is 5. But when the [`Rational`] has a large denominator, the second way
+    /// is less efficient.
     ///
     /// # Worst-case complexity per iteration
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), base.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.

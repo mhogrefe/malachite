@@ -1,10 +1,10 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::CheckedLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_q::Rational;
-use std::cmp::Ordering;
 
 impl PartialEq<Rational> for Float {
     /// Determines whether a [`Float`] is equal to a [`Rational`].
@@ -17,8 +17,8 @@ impl PartialEq<Rational> for Float {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -66,8 +66,8 @@ impl PartialEq<Float> for Rational {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

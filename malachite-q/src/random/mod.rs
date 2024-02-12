@@ -49,12 +49,12 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingle<I> {
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -112,12 +112,12 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -187,12 +187,12 @@ impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -250,12 +250,12 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomRationalsFromSingleAndSign<
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -282,8 +282,8 @@ pub fn random_nonzero_rationals(
     }
 }
 
-/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`]
-/// numerators, an iterator of random [`Natural`] denominators, and an iterator of [`bool`] signs.
+/// Generates random non-negative [`Rational`]s, given an iterator of random [`Natural`] numerators,
+/// an iterator of random [`Natural`] denominators, and an iterator of [`bool`] signs.
 #[derive(Clone, Debug)]
 pub struct RandomRationalsFromDoubleAndSign<
     I: Iterator<Item = Natural>,
@@ -317,12 +317,12 @@ impl<I: Iterator<Item = Natural>, J: Iterator<Item = Natural>> Iterator
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -373,21 +373,21 @@ pub fn random_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -427,21 +427,21 @@ pub fn striped_random_positive_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -490,21 +490,21 @@ pub fn striped_random_non_negative_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -546,21 +546,21 @@ pub fn striped_random_negative_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -600,21 +600,21 @@ pub fn striped_random_nonzero_rationals(
 ///
 /// The output length is infinite.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n (\log n)^2 \log\log n)$
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_bits_numerator / mean_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_bits_numerator /
+/// mean_bits_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -672,8 +672,8 @@ pub fn striped_random_rationals(
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
@@ -734,8 +734,8 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a < 0$ and their ratio
@@ -795,8 +795,8 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 /// $\lceil ad \right$ as $\log (b/a)$ approaches infinity. $m$ cannot be 0, and must be greater
 /// than the bit length of the numerator of the generated [`Rational`] with the smallest absolute
 /// value, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
-/// decrease as bit length increases. The larger it is, the more closely the distribution
-/// approaches a uniform distribution over the bit lengths.
+/// decrease as bit length increases. The larger it is, the more closely the distribution approaches
+/// a uniform distribution over the bit lengths.
 ///
 /// The output length is infinite.
 ///
@@ -805,8 +805,8 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -866,8 +866,7 @@ pub fn random_rationals_with_denominator_range(
     }
 }
 
-/// Generates random [`Rational`]s in the closed interval $[a, b]$ and with a specific
-/// denominator.
+/// Generates random [`Rational`]s in the closed interval $[a, b]$ and with a specific denominator.
 ///
 /// In general, the [`Rational`]s are not generated uniformly. Instead, [`Rational`]s whose
 /// numerators have smaller bit lengths are generated more frequently.
@@ -878,8 +877,8 @@ pub fn random_rationals_with_denominator_range(
 /// $\lceil ad \right$ as $\log (b/a)$ approaches infinity. $m$ cannot be 0, and must be greater
 /// than the bit length of the numerator of the generated [`Rational`] with the smallest absolute
 /// value, but it may be arbitrarily large. The smaller it is, the more quickly the probabilities
-/// decrease as bit length increases. The larger it is, the more closely the distribution
-/// approaches a uniform distribution over the bit lengths.
+/// decrease as bit length increases. The larger it is, the more closely the distribution approaches
+/// a uniform distribution over the bit lengths.
 ///
 /// The output length is infinite.
 ///
@@ -888,8 +887,8 @@ pub fn random_rationals_with_denominator_range(
 ///
 /// $M(n) = O(n \log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_numerator_bits_numerator / mean_numerator_bits_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_numerator_bits_numerator /
+/// mean_numerator_bits_denominator`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio

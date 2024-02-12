@@ -85,8 +85,8 @@ pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
-// positive and have the same lengths, `sub` is positive, the lowest limbs of the result are
-// written to the second input rather than the first, and the highest limb is returned.
+// positive and have the same lengths, `sub` is positive, the lowest limbs of the result are written
+// to the second input rather than the first, and the highest limb is returned.
 pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -105,16 +105,16 @@ pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
 }}
 
 // Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
-// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
-// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
+// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have no
+// trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive and sub is positive.
@@ -159,8 +159,8 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())` and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is positive, and the result is written to the second input rather than the first.
@@ -222,9 +222,9 @@ pub_test! {limbs_vec_add_mul_limb_in_place_either(
     }
 }}
 
-// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
-// x + y * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
-// slices should have any trailing zeros. The result will have no trailing zeros.
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of x + y
+// * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the slices
+// should have any trailing zeros. The result will have no trailing zeros.
 //
 // # Worst-case complexity
 // $T(n, m) = O(m + n \log n \log\log n)$
@@ -347,8 +347,8 @@ impl AddMul<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -382,8 +382,8 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -417,8 +417,8 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -452,8 +452,8 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -477,8 +477,7 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
-    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by
-    /// reference.
+    /// Adds a [`Natural`] and the product of two other [`Natural`]s, taking all three by reference.
     ///
     /// $f(x, y, z) = x + yz$.
     ///
@@ -487,8 +486,8 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     ///
     /// $M(n, m) = O(m + n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -525,8 +524,8 @@ impl AddMulAssign<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -564,8 +563,8 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -603,8 +602,8 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -642,8 +641,8 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```

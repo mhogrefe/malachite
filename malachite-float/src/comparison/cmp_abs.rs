@@ -1,7 +1,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
+use core::cmp::Ordering;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use std::cmp::Ordering;
 
 impl PartialOrdAbs for Float {
     /// Compares the absolute values of two [`Float`]s.
@@ -18,8 +18,8 @@ impl PartialOrdAbs for Float {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -80,8 +80,8 @@ impl<'a> OrdAbs for ComparableFloatRef<'a> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -156,8 +156,8 @@ impl<'a> PartialOrdAbs for ComparableFloatRef<'a> {
 impl OrdAbs for ComparableFloat {
     /// Compares the absolute values of two [`ComparableFloat`]s.
     ///
-    /// This implementation does not follow the IEEE 754 standard. This is how
-    /// [`ComparableFloat`]s are ordered by absolute value, from least to greatest:
+    /// This implementation does not follow the IEEE 754 standard. This is how [`ComparableFloat`]s
+    /// are ordered by absolute value, from least to greatest:
     ///   - NaN
     ///   - Positive and negative zero
     ///   - Nonzero finite floats
@@ -171,8 +171,8 @@ impl OrdAbs for ComparableFloat {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

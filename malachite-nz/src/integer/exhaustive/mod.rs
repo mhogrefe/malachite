@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::iter::{once, Chain, Once, Rev};
 use itertools::{Interleave, Itertools};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use core::iter::{once, Chain, Once, Rev};
 
 /// Generates all [`Integer`]s in a finite interval, in ascending order.
 ///
@@ -260,8 +260,8 @@ pub const fn exhaustive_negative_integers() -> IntegerDecreasingRangeToNegativeI
     integer_decreasing_range_to_negative_infinity(Integer::NEGATIVE_ONE)
 }
 
-/// Generates all nonzero [`Integer`]s, in order of increasing absolute value. When two
-/// [`Integer`]s have the same absolute value, the positive one comes first.
+/// Generates all nonzero [`Integer`]s, in order of increasing absolute value. When two [`Integer`]s
+/// have the same absolute value, the positive one comes first.
 ///
 /// The output length is infinite.
 ///
@@ -289,8 +289,8 @@ pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
 
 /// Generates all [`Integer`]s in the half-open interval $[a, b)$, in ascending order.
 ///
-/// $a$ must be less than or equal to $b$. If $a$ and $b$ are equal, the range is empty. To
-/// generate all [`Integer`]s in an infinite interval in ascending or descending order, use
+/// $a$ must be less than or equal to $b$. If $a$ and $b$ are equal, the range is empty. To generate
+/// all [`Integer`]s in an infinite interval in ascending or descending order, use
 /// [`integer_increasing_range_to_infinity`] or [`integer_decreasing_range_to_negative_infinity`].
 ///
 /// The output is $(k)_{k=a}^{b-1}$.
@@ -456,9 +456,8 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 /// When two [`Integer`]s have the same absolute value, the positive one comes first. $a$ must be
 /// less than or equal to $b$. If $a$ and $b$ are equal, the range is empty.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a)$ and $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [0, b - a)$ and $i < j$.
 ///
 /// The output length is $b - a$.
 ///
@@ -514,9 +513,8 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 /// When two [`Integer`]s have the same absolute value, the positive one comes first. $a$ must be
 /// less than or equal to $b$. If $a$ and $b$ are equal, the range contains a single element.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a]$ and $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i, j \\in [0, b - a]$ and $i < j$.
 ///
 /// The output length is $b - a + 1$.
 ///
@@ -571,9 +569,8 @@ pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveI
 ///
 /// When two [`Integer`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///
@@ -618,9 +615,8 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 ///
 /// When two [`Integer`]s have the same absolute value, the positive one comes first.
 ///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i < j$.
+/// The output satisfies $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|,
+/// \operatorname{sgn}(-x_j))$ whenever $i < j$.
 ///
 /// The output length is infinite.
 ///

@@ -63,8 +63,8 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 //
-// This is equivalent to `mpn_toom_eval_dgr3_pm2` from `mpn/generic/toom_eval_dg3_pm2.c`,
-// GMP 6.2.1, where `s` is omitted from the inputs because it can be determined from `ap` and `n`.
+// This is equivalent to `mpn_toom_eval_dgr3_pm2` from `mpn/generic/toom_eval_dg3_pm2.c`, GMP 6.2.1,
+// where `s` is omitted from the inputs because it can be determined from `ap` and `n`.
 pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
@@ -187,8 +187,8 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
-// This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with
-// `d == out`, `a == xs`, and `b == ys`.
+// This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with `d ==
+// out`, `a == xs`, and `b == ys`.
 fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], carry: &mut Limb) {
     *carry <<= 2;
     *carry += limbs_shl_to_out(out, xs, 2);
@@ -209,8 +209,8 @@ fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], c
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
-// This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with
-// `d == b == ys` and `a == xs`.
+// This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with `d == b ==
+// ys` and `a == xs`.
 fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &mut Limb) {
     *carry <<= 2;
     *carry += limbs_slice_shl_in_place(xs, 2);
@@ -397,8 +397,8 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_neg_2_pow_neg
 }
 
-// Given a `Natural` whose limbs are `ys`, multiplies the `Natural` by 2<sup>`shift`</sup> and adds
-// the `Natural` whose limbs are the lowest `ys.len()` limbs of `xs`, writing the lowest `ys.len()`
+// Given a `Natural` whose limbs are `ys`, multiplies the `Natural` by `2 ^ shift` and adds the
+// `Natural` whose limbs are the lowest `ys.len()` limbs of `xs`, writing the lowest `ys.len()`
 // limbs of the result to those limbs, and returning the highest limb as a carry.
 //
 // # Worst-case complexity

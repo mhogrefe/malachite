@@ -14,9 +14,9 @@ use malachite_base::slices::slice_trailing_zeros;
 /// A natural (non-negative) integer.
 ///
 /// Any `Natural` small enough to fit into a [`Limb`](crate#limbs) is represented inline. Only
-/// `Natural`s outside this range incur the costs of heap-allocation. Here's a diagram of a slice
-/// of `Natural`s (using 32-bit limbs) containing the first 8 values of
-/// [Sylvester's sequence](https://oeis.org/A000058):
+/// `Natural`s outside this range incur the costs of heap-allocation. Here's a diagram of a slice of
+/// `Natural`s (using 32-bit limbs) containing the first 8 values of [Sylvester's
+/// sequence](https://oeis.org/A000058):
 ///
 /// ![Natural memory layout][natural-mem-layout]
 #[cfg_attr(
@@ -80,8 +80,8 @@ impl Natural {
 
     // Returns true iff `self` is valid. To be valid,
     //
-    // `self` can only be `Large` when it is at least $2^W$, and cannot have leading zero limbs.
-    // All `Natural`s must be valid.
+    // `self` can only be `Large` when it is at least $2^W$, and cannot have leading zero limbs. All
+    // `Natural`s must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         match *self {

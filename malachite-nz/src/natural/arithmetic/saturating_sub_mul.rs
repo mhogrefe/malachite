@@ -19,8 +19,8 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -62,8 +62,8 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -93,8 +93,8 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
 impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and
-    /// third by value and the second by reference and returning 0 if the result is negative.
+    /// Subtracts a [`Natural`] by the product of two other [`Natural`]s, taking the first and third
+    /// by value and the second by reference and returning 0 if the result is negative.
     ///
     /// $$
     /// f(x, y, z) = \max(x - yz, 0).
@@ -105,8 +105,8 @@ impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -148,8 +148,8 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -191,8 +191,8 @@ impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -233,8 +233,8 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -275,8 +275,8 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -317,8 +317,8 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -359,8 +359,8 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```

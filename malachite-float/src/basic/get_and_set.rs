@@ -1,5 +1,6 @@
 use crate::InnerFloat::Finite;
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
@@ -7,7 +8,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
 
 impl Float {
     /// Gets the significand of a [`Float`], taking the [`Float`] by value.
@@ -30,11 +30,14 @@ impl Float {
     /// assert_eq!(Float::INFINITY.to_significand(), None);
     /// assert_eq!(Float::ZERO.to_significand(), None);
     ///
-    /// assert_eq!(Float::ONE.to_significand(), Some(Natural::power_of_2(63)));
-    /// assert_eq!(
-    ///     Float::from(std::f64::consts::PI).to_significand().unwrap(),
-    ///     14488038916154245120u64
-    /// );
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// {
+    ///     assert_eq!(Float::ONE.to_significand(), Some(Natural::power_of_2(63)));
+    ///     assert_eq!(
+    ///         Float::from(std::f64::consts::PI).to_significand().unwrap(),
+    ///         14488038916154245120u64
+    ///     );
+    /// }
     /// ```
     #[inline]
     pub fn to_significand(&self) -> Option<Natural> {
@@ -64,11 +67,14 @@ impl Float {
     /// assert_eq!(Float::INFINITY.into_significand(), None);
     /// assert_eq!(Float::ZERO.into_significand(), None);
     ///
-    /// assert_eq!(Float::ONE.into_significand(), Some(Natural::power_of_2(63)));
-    /// assert_eq!(
-    ///     Float::from(std::f64::consts::PI).into_significand().unwrap(),
-    ///     14488038916154245120u64
-    /// );
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// {
+    ///     assert_eq!(Float::ONE.into_significand(), Some(Natural::power_of_2(63)));
+    ///     assert_eq!(
+    ///         Float::from(std::f64::consts::PI).into_significand().unwrap(),
+    ///         14488038916154245120u64
+    ///     );
+    /// }
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
     #[inline]
@@ -99,11 +105,14 @@ impl Float {
     /// assert_eq!(Float::INFINITY.significand_ref(), None);
     /// assert_eq!(Float::ZERO.significand_ref(), None);
     ///
-    /// assert_eq!(*Float::ONE.significand_ref().unwrap(), Natural::power_of_2(63));
-    /// assert_eq!(
-    ///     *Float::from(std::f64::consts::PI).significand_ref().unwrap(),
-    ///     14488038916154245120u64
-    /// );
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// {
+    ///     assert_eq!(*Float::ONE.significand_ref().unwrap(), Natural::power_of_2(63));
+    ///     assert_eq!(
+    ///         *Float::from(std::f64::consts::PI).significand_ref().unwrap(),
+    ///         14488038916154245120u64
+    ///     );
+    /// }
     /// ```
     #[inline]
     pub const fn significand_ref(&self) -> Option<&Natural> {
@@ -179,6 +188,42 @@ impl Float {
     pub const fn get_prec(&self) -> Option<u64> {
         match self {
             Float(Finite { precision, .. }) => Some(*precision),
+            _ => None,
+        }
+    }
+
+    /// Returns the minimum precision necessary to represent the given [`Float`]'s value.
+    ///
+    /// For example, `Float:one_prec(100)` has a precision of 100, but its minimum precision is 1,
+    /// because that's all that's necessary to represent the value 1.
+    ///
+    /// The minimum precision is always less than or equal to the actual precision.
+    ///
+    /// Only [`Float`]s that are finite and nonzero have a minimum precision. For other [`Float`]s,
+    /// `None` is returned.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::NAN.get_min_prec(), None);
+    /// assert_eq!(Float::INFINITY.get_min_prec(), None);
+    /// assert_eq!(Float::ZERO.get_min_prec(), None);
+    ///
+    /// assert_eq!(Float::ONE.get_min_prec(), Some(1));
+    /// assert_eq!(Float::one_prec(100).get_min_prec(), Some(1));
+    /// assert_eq!(Float::from(std::f64::consts::PI).get_min_prec(), Some(50));
+    /// ```
+    pub fn get_min_prec(&self) -> Option<u64> {
+        match self {
+            Float(Finite { significand, .. }) => {
+                Some(significand_bits(significand) - significand.trailing_zeros().unwrap())
+            }
             _ => None,
         }
     }

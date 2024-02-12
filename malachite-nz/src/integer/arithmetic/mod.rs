@@ -14,8 +14,8 @@ pub mod binomial_coefficient;
 /// Division of [`Integer`](super::Integer)s.
 pub mod div;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
-/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for
-/// dividing two numbers when it's known that the division is exact.
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
+/// two numbers when it's known that the division is exact.
 pub mod div_exact;
 /// Implementations of raits for simultaneously finding the quotient and remainder of two numbers,
 /// subject to various rounding rules.
@@ -29,8 +29,8 @@ pub mod div_exact;
 /// | towards $\infty$  | [`CeilingDivMod`](malachite_base::num::arithmetic::traits::CeilingDivMod) | [`CeilingDivAssignMod`](malachite_base::num::arithmetic::traits::CeilingDivAssignMod) |
 pub mod div_mod;
 /// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
-/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for
-/// dividing two numbers according to a specified
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
+/// two numbers according to a specified
 /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
 pub mod div_round;
 /// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), a
@@ -38,14 +38,13 @@ pub mod div_round;
 pub mod divisible_by;
 /// Implementations of
 /// [`DivisibleByPowerOf2`](malachite_base::num::arithmetic::traits::DivisibleByPowerOf2), a trait
-/// for determining whether a number
-/// is divisible by $2^k$.
+/// for determining whether a number is divisible by $2^k$.
 pub mod divisible_by_power_of_2;
 /// Implementations of [`EqMod`](malachite_base::num::arithmetic::traits::EqMod), a trait for
 /// determining whether one number is equal by another modulo a third.
 pub mod eq_mod;
-/// Implementations of [`EqModPowerOf2`](malachite_base::num::arithmetic::traits::EqModPowerOf2),
-/// a trait for determining whether one number is equal to another modulo $2^k$.
+/// Implementations of [`EqModPowerOf2`](malachite_base::num::arithmetic::traits::EqModPowerOf2), a
+/// trait for determining whether one number is equal to another modulo $2^k$.
 pub mod eq_mod_power_of_2;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
@@ -100,9 +99,8 @@ pub mod power_of_2;
 /// [`CeilingRootAssign`](malachite_base::num::arithmetic::traits::CeilingRootAssign), and
 /// [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot).
 pub mod root;
-/// Implementations of
-/// [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple) and
-/// [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
+/// Implementations of [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
+/// and [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
 /// traits for rounding a number to a multiple of another number.
 pub mod round_to_multiple;
 /// Implementations of
@@ -410,8 +408,8 @@ pub mod shl_round;
 /// ```
 pub mod shr;
 /// Implementations of [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound) and
-/// [`ShrRoundAssign`](malachite_base::num::arithmetic::traits::ShrRoundAssign), traits for
-/// dividing a number by a power of 2 and rounding according to a specified
+/// [`ShrRoundAssign`](malachite_base::num::arithmetic::traits::ShrRoundAssign), traits for dividing
+/// a number by a power of 2 and rounding according to a specified
 /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
 ///
 /// # shr_round

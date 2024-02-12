@@ -28,7 +28,7 @@ use crate::num::exhaustive::{
     exhaustive_primitive_float_range, exhaustive_primitive_floats,
     exhaustive_signed_inclusive_range, exhaustive_signed_range, exhaustive_signeds,
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
-    PrimitiveIntIncreasingRange, PrimitiveIntUpDown,
+    ExhaustiveSigneds, PrimitiveIntIncreasingRange,
 };
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
@@ -79,7 +79,7 @@ use crate::vecs::exhaustive::{
 };
 use itertools::{repeat_n, Itertools};
 use std::cmp::{max, min};
-use std::iter::{once, Chain, Once};
+use std::iter::once;
 use std::marker::PhantomData;
 use std::vec::IntoIter;
 
@@ -858,8 +858,8 @@ impl<T: PrimitiveSigned> ExhaustiveDependentPairsYsGenerator<T, T, It<T>>
 {
     #[inline]
     fn get_ys(&self, y: &T) -> It<T> {
-        // A simple take_while doesn't work. For example, if T is i8 and y is 64, trying to checked-
-        // multiply y by the exhaustive signeds gives [Some(0), Some(64), Some(-64), None,
+        // A simple take_while doesn't work. For example, if T is i8 and y is 64, trying to
+        // checked-multiply y by the exhaustive signeds gives [Some(0), Some(64), Some(-64), None,
         // Some(-128), None, None, ...], where the first None corresponds to 128, which is not
         // representable as an i8. Doing a take_while would lose the Some(-128). Instead, we use
         // take_while_extra, which is like a take_while, but it waits until it sees a second None to
@@ -2024,19 +2024,13 @@ struct ModPowerOfTwoPairWithExtraSignedGenerator<T: PrimitiveUnsigned, U: Primit
     phantom_u: PhantomData<*const U>,
 }
 
-type LongType<T, U> =
-    ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, Chain<Once<U>, PrimitiveIntUpDown<U>>>;
+type LongType<T, U> = ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, ExhaustiveSigneds<U>>;
 
 impl<T: PrimitiveUnsigned, U: PrimitiveSigned>
     ExhaustiveDependentPairsYsGenerator<
         u64,
         (T, U),
-        ExhaustivePairs<
-            T,
-            PrimitiveIntIncreasingRange<T>,
-            U,
-            Chain<Once<U>, PrimitiveIntUpDown<U>>,
-        >,
+        ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, ExhaustiveSigneds<U>>,
     > for ModPowerOfTwoPairWithExtraSignedGenerator<T, U>
 {
     #[inline]
@@ -2188,7 +2182,7 @@ pub fn exhaustive_unsigned_pair_gen_var_5<
     ))
 }
 
-//TODO make better
+// TODO make better
 pub fn exhaustive_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(T, T)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x <= y))
 }
@@ -4034,7 +4028,7 @@ impl<T: PrimitiveUnsigned>
     }
 }
 
-//TODO generate (usize, usize) pairs better
+// TODO generate (usize, usize) pairs better
 pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> T1<Vec<T>, usize>
 {
     Box::new(
@@ -4567,7 +4561,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> It<(Vec
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
         )
@@ -4582,7 +4576,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_2<T: PrimitiveUnsigned>() -> It<(Vec
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4778,7 +4772,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_10<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator2,
@@ -4793,7 +4787,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_12<T: PrimitiveUnsigned>() -> It<(Ve
     Box::new(
         exhaustive_dependent_pairs(
             ruler_sequence(),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4815,7 +4809,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_13<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4835,7 +4829,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_16<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4861,7 +4855,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_17<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4910,7 +4904,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_21<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -4928,7 +4922,7 @@ pub fn exhaustive_unsigned_vec_pair_gen_var_32<T: PrimitiveUnsigned>() -> It<(Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
         )
@@ -4978,7 +4972,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: Primiti
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
         )
@@ -4997,7 +4991,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4<T: Primiti
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -5050,7 +5044,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5<T: Primiti
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator3,
@@ -5127,7 +5121,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_11<T: Primit
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, i)| {
                 let y = y.checked_add(i)?;
                 let x = x.checked_add(y)?;
@@ -5155,7 +5149,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_13<T: Primit
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -5175,7 +5169,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22<
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
         )
@@ -5194,7 +5188,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23<
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
                 .filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
@@ -5212,7 +5206,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24<T: Primit
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, i)| {
                 let x = x.checked_add(i)?;
                 Some((x, x, i))
@@ -5938,7 +5932,7 @@ pub fn exhaustive_large_type_gen_var_1<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
                 BitDistributorOutputType::tiny(),
                 BitDistributorOutputType::normal(1),
             ),
-            //TODO
+            // TODO
             exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
             UnsignedVecPairLenGenerator1,
         )

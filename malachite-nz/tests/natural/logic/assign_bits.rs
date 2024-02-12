@@ -36,20 +36,20 @@ fn test_limbs_assign_bits() {
         assert_eq!(xs, out);
         verify_limbs_assign_bits(xs_old, start, end, bits, out);
     };
-    // bits_limb_width >= bits.len()
-    // end_limb <= limbs.len()
-    // xs_len <= ys_len in copy_from_diff_len_slice
-    // start_remainder == 0
-    // end_remainder != 0
+    // - bits_limb_width >= bits.len()
+    // - end_limb <= limbs.len()
+    // - xs_len <= ys_len in copy_from_diff_len_slice
+    // - start_remainder == 0
+    // - end_remainder != 0
     test(&[1], 0, 1, &[1], &[1]);
-    // start_remainder != 0
+    // - start_remainder != 0
     test(&[1], 1, 2, &[1], &[3]);
-    // bits_limb_width < bits.len()
+    // - bits_limb_width < bits.len()
     test(&[1], 0, 1, &[0, 1], &[0]);
     test(&[123], 64, 128, &[456], &[123, 0, 456, 0]);
     test(&[123], 80, 100, &[456], &[123, 0, 29884416, 0]);
     test(&[123, 456], 80, 100, &[789, 321], &[123, 456, 51707904, 0]);
-    // end_limb > limbs.len()
+    // - end_limb > limbs.len()
     test(
         &[1619367413, 294928230],
         73,
@@ -57,7 +57,7 @@ fn test_limbs_assign_bits() {
         &[4211621339, 3627566573, 1208090001, 4045783696, 2932656682, 177881999, 898588654],
         &[1619367413, 294928230, 8107520],
     );
-    // end_remainder == 0
+    // - end_remainder == 0
     test(
         &[1404969050, 495263765, 2378891263, 1299524786, 1654909014, 2724647948],
         21,
@@ -68,7 +68,7 @@ fn test_limbs_assign_bits() {
         ],
         &[1790845018, 495263765, 2378891263, 1299524786, 1654909014, 2724647948],
     );
-    // xs_len > ys_len in copy_from_diff_len_slice
+    // - xs_len > ys_len in copy_from_diff_len_slice
     test(
         &[
             4126931041, 1467617913, 1718397261, 904474857, 312429577, 2397873671, 3967827549,

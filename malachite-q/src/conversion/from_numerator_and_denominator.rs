@@ -17,9 +17,8 @@ macro_rules! const_gcd_step {
     };
 }
 
-// Worst case when Limb = u64 is
-// const_gcd(Fib_92, Fib_93)
-// = const_gcd(7540113804746346429, 12200160415121876738)
+// Worst case when Limb = u64 is const_gcd(Fib_92, Fib_93) = const_gcd(7540113804746346429,
+// 12200160415121876738)
 const fn const_gcd(mut x: Limb, mut y: Limb) -> Limb {
     if y == 0 {
         x
@@ -126,40 +125,34 @@ impl Rational {
     ///
     /// If `denominator` is zero, `None` is returned.
     ///
-    /// This function is const, so it may be used to define constants. When called at runtime,
-    /// it is slower than [`Rational::from_unsigneds`].
+    /// This function is const, so it may be used to define constants. When called at runtime, it is
+    /// slower than [`Rational::from_unsigneds`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// use malachite_q::Rational;
     ///
-    /// const TWO_THIRDS: Option<Rational> = Rational::const_from_unsigneds(2, 3);
-    /// assert_eq!(TWO_THIRDS, Some(Rational::from_unsigneds(2u32, 3)));
+    /// const TWO_THIRDS: Rational = Rational::const_from_unsigneds(2, 3);
+    /// assert_eq!(TWO_THIRDS, Rational::from_unsigneds(2u32, 3));
     ///
-    /// const TWO_THIRDS_ALT: Option<Rational> = Rational::const_from_unsigneds(22, 33);
-    /// assert_eq!(TWO_THIRDS, Some(Rational::from_unsigneds(2u32, 3)));
-    ///
-    /// const ZERO_DENOMINATOR: Option<Rational> = Rational::const_from_unsigneds(22, 0);
-    /// assert_eq!(ZERO_DENOMINATOR, None);
+    /// const TWO_THIRDS_ALT: Rational = Rational::const_from_unsigneds(22, 33);
+    /// assert_eq!(TWO_THIRDS, Rational::from_unsigneds(2u32, 3));
     /// ```
-    pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Option<Rational> {
-        if denominator == 0 {
-            None
-        } else {
-            let gcd = const_gcd(numerator, denominator);
-            Some(Rational {
-                sign: true,
-                numerator: Natural::const_from(numerator / gcd),
-                denominator: Natural::const_from(denominator / gcd),
-            })
+    pub const fn const_from_unsigneds(numerator: Limb, denominator: Limb) -> Rational {
+        assert!(denominator != 0);
+        let gcd = const_gcd(numerator, denominator);
+        Rational {
+            sign: true,
+            numerator: Natural::const_from(numerator / gcd),
+            denominator: Natural::const_from(denominator / gcd),
         }
     }
 
@@ -168,46 +161,37 @@ impl Rational {
     ///
     /// If `denominator` is zero, `None` is returned.
     ///
-    /// This function is const, so it may be used to define constants. When called at runtime,
-    /// it is slower than [`Rational::from_signeds`].
+    /// This function is const, so it may be used to define constants. When called at runtime, it is
+    /// slower than [`Rational::from_signeds`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Examples
     /// ```
     /// use malachite_q::Rational;
     ///
-    /// const NEGATIVE_TWO_THIRDS: Option<Rational> = Rational::const_from_signeds(-2, 3);
-    /// assert_eq!(NEGATIVE_TWO_THIRDS, Some(Rational::from_signeds(-2, 3)));
+    /// const NEGATIVE_TWO_THIRDS: Rational = Rational::const_from_signeds(-2, 3);
+    /// assert_eq!(NEGATIVE_TWO_THIRDS, Rational::from_signeds(-2, 3));
     ///
-    /// const NEGATIVE_TWO_THIRDS_ALT: Option<Rational> = Rational::const_from_signeds(-22, 33);
-    /// assert_eq!(NEGATIVE_TWO_THIRDS, Some(Rational::from_signeds(-2, 3)));
-    ///
-    /// const ZERO_DENOMINATOR: Option<Rational> = Rational::const_from_signeds(-22, 0);
-    /// assert_eq!(ZERO_DENOMINATOR, None);
+    /// const NEGATIVE_TWO_THIRDS_ALT: Rational = Rational::const_from_signeds(-22, 33);
+    /// assert_eq!(NEGATIVE_TWO_THIRDS, Rational::from_signeds(-2, 3));
     /// ```
-    pub const fn const_from_signeds(
-        numerator: SignedLimb,
-        denominator: SignedLimb,
-    ) -> Option<Rational> {
-        if denominator == 0 {
-            None
-        } else {
-            let sign = numerator == 0 || (numerator > 0) == (denominator > 0);
-            let numerator = numerator.unsigned_abs();
-            let denominator = denominator.unsigned_abs();
-            let gcd = const_gcd(numerator, denominator);
-            Some(Rational {
-                sign,
-                numerator: Natural::const_from(numerator / gcd),
-                denominator: Natural::const_from(denominator / gcd),
-            })
+    pub const fn const_from_signeds(numerator: SignedLimb, denominator: SignedLimb) -> Rational {
+        assert!(denominator != 0);
+        let sign = numerator == 0 || (numerator > 0) == (denominator > 0);
+        let numerator = numerator.unsigned_abs();
+        let denominator = denominator.unsigned_abs();
+        let gcd = const_gcd(numerator, denominator);
+        Rational {
+            sign,
+            numerator: Natural::const_from(numerator / gcd),
+            denominator: Natural::const_from(denominator / gcd),
         }
     }
 
@@ -225,8 +209,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -267,8 +251,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -309,8 +293,8 @@ impl Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -333,8 +317,8 @@ impl Rational {
 
     /// Converts two [`Integer`]s to a [`Rational`], taking the [`Integer`]s by value.
     ///
-    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and
-    /// denominator. The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
+    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and denominator.
+    /// The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
     ///
     /// The denominator may not be zero.
     ///
@@ -345,8 +329,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -378,8 +362,8 @@ impl Rational {
 
     /// Converts two [`Integer`]s to a [`Rational`], taking the [`Integer`]s by reference.
     ///
-    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and
-    /// denominator. The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
+    /// The absolute values of the [`Integer`]s become the [`Rational`]'s numerator and denominator.
+    /// The sign of the [`Rational`] is the sign of the [`Integer`]s' quotient.
     ///
     /// The denominator may not be zero.
     ///
@@ -390,8 +374,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -425,8 +409,8 @@ impl Rational {
 
     /// Converts two signed primitive integers to a [`Rational]`.
     ///
-    /// The absolute values of the integers become the [`Rational`]'s numerator and denominator.
-    /// The sign of the [`Rational`] is the sign of the integers' quotient.
+    /// The absolute values of the integers become the [`Rational`]'s numerator and denominator. The
+    /// sign of the [`Rational`] is the sign of the integers' quotient.
     ///
     /// The denominator may not be zero.
     ///
@@ -437,8 +421,8 @@ impl Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -463,9 +447,9 @@ impl Rational {
 
     /// Converts a sign and two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by value.
     ///
-    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign
-    /// indicates whether the [`Rational`] should be non-negative. If the numerator is zero, then
-    /// the [`Rational`] will be non-negative regardless of the sign.
+    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign indicates
+    /// whether the [`Rational`] should be non-negative. If the numerator is zero, then the
+    /// [`Rational`] will be non-negative regardless of the sign.
     ///
     /// The denominator may not be zero.
     ///
@@ -476,8 +460,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -522,9 +506,9 @@ impl Rational {
     /// Converts a sign and two [`Natural`]s to a [`Rational`], taking the [`Natural`]s by
     /// reference.
     ///
-    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign
-    /// indicates whether the [`Rational`] should be non-negative. If the numerator is zero, then
-    /// the [`Rational`] will be non-negative regardless of the sign.
+    /// The [`Natural`]s become the [`Rational`]'s numerator and denominator, and the sign indicates
+    /// whether the [`Rational`] should be non-negative. If the numerator is zero, then the
+    /// [`Rational`] will be non-negative regardless of the sign.
     ///
     /// The denominator may not be zero.
     ///
@@ -535,8 +519,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -593,8 +577,8 @@ impl Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(numerator.significant_bits(), denominator.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
+    /// denominator.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.

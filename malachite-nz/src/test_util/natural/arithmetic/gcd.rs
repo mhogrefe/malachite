@@ -151,8 +151,8 @@ pub fn half_gcd_matrix_all_elements_nonzero(m: &HalfGcdMatrix) -> bool {
     true
 }
 
-/// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where
-/// `HGCD2_DIV2_METHOD == 2`.
+/// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where `HGCD2_DIV2_METHOD ==
+/// 2`.
 pub fn limbs_gcd_div_alt(
     mut n1: Limb,
     mut n0: Limb,

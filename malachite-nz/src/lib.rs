@@ -141,7 +141,7 @@
     clippy::uninlined_format_args,
     clippy::unused_self
 )]
-#![cfg_attr(not(feature = "test_build"), no_std)]
+#![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
 
 #[macro_use]
 extern crate alloc;

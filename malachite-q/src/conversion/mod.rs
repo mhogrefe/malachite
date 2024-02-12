@@ -15,13 +15,13 @@ pub mod from_integer;
 /// Implementations of the [`From`] trait for converting a
 /// [`Integer`](malachite_nz::natural::Natural) to a [`Rational`](crate::Rational).
 pub mod from_natural;
-/// Functions for constructing a [`Rational`](crate::Rational) from a numerator and denominator,
-/// or from a sign, numerator, and denominator.
+/// Functions for constructing a [`Rational`](crate::Rational) from a numerator and denominator, or
+/// from a sign, numerator, and denominator.
 pub mod from_numerator_and_denominator;
 /// Implementations of traits for converting a primitive float to a [`Rational`](crate::Rational).
 ///
-/// The traits are [`TryFrom`]
-/// and [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
 ///
 /// # try_from
 /// ```
@@ -274,8 +274,7 @@ pub mod natural_from_rational;
 /// assert_eq!(f32::convertible_from(&-Rational::power_of_2(-200i64)), false);
 /// ```
 pub mod primitive_float_from_rational;
-/// Implementations of traits for converting a [`Rational`](crate::Rational) to a primitive
-/// integer.
+/// Implementations of traits for converting a [`Rational`](crate::Rational) to a primitive integer.
 ///
 /// The traits are [`TryFrom`],
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
@@ -462,8 +461,7 @@ pub mod primitive_float_from_rational;
 /// );
 /// ```
 pub mod primitive_int_from_rational;
-/// Implementations of traits for converting [`Rational`](crate::Rational)s to and from
-/// [`String`]s.
+/// Implementations of traits for converting [`Rational`](crate::Rational)s to and from [`String`]s.
 pub mod string;
 /// Functions for extracting or referencing the numerator and/or denominator of a
 /// [`Rational`](crate::Rational).

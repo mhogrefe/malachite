@@ -19,8 +19,7 @@ use core::cmp::Ordering;
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
-// `rp != ap`.
+// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where `rp != ap`.
 fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -38,9 +37,8 @@ fn limbs_sub_abs_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
-// `rp == ap`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`. This is equivalent to
+// `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where `rp == ap`.
 fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -60,8 +58,7 @@ fn limbs_sub_abs_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
-// `rp == bp`.
+// This is equivalent to `abs_sub_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where `rp == bp`.
 fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let n = xs.len();
     assert_eq!(ys.len(), n);
@@ -81,8 +78,8 @@ fn limbs_sub_abs_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
-// `rp != ap`.
+// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where `rp !=
+// ap`.
 fn limbs_add_signed_same_length_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -105,8 +102,8 @@ fn limbs_add_signed_same_length_to_out(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where
-// `rp == ap`.
+// This is equivalent to `add_signed_n` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1, where `rp ==
+// ap`.
 fn limbs_add_signed_same_length_in_place_left(
     xs: &mut [Limb],
     x_sign: bool,
@@ -186,6 +183,7 @@ pub_test! {limbs_matrix_2_2_mul_small(
 
 // Algorithm:
 //
+// ```
 // / s0 \   /  1  0   0  0 \ / xs00 \
 // | s1 |   |  0  1   0  1 | | xs01 |
 // | s2 |   |  0  0  -1  1 | | xs10 |
@@ -201,11 +199,13 @@ pub_test! {limbs_matrix_2_2_mul_small(
 // | t4 |   | -1  1  -1  1 |
 // | t5 |   |  0  1   0  0 |
 // \ t6 /   \  0  0   1  0 /
+// ```
 //
-// Note: the two matrices above are the same, but s_i and t_i are used in the same product, only
-// for i < 4, see "A Strassen-like Matrix Multiplication suited for squaring and higher power
+// Note: the two matrices above are the same, but s_i and t_i are used in the same product, only for
+// i < 4, see "A Strassen-like Matrix Multiplication suited for squaring and higher power
 // computation" by M. Bodrato, in Proceedings of ISSAC 2010.
 //
+// ```
 // / xs00 \   / 1 0   0   0   0   1   0 \ / s0 * t0 \
 // | xs01 | = | 0 0  -1   1  -1   1   0 | | s1 * t1 |
 // | xs10 |   | 0 1   0  -1   0  -1  -1 | | s2 * t2 |
@@ -213,6 +213,7 @@ pub_test! {limbs_matrix_2_2_mul_small(
 //		                                  | s4 * t5 |
 //		                                  | s5 * t6 |
 //		                                  \ s6 * t4 /
+// ```
 //
 // The scheduling uses two temporaries U0 and U1 to store products, and two, S0 and T0, to store
 // combinations of entries of the two operands.

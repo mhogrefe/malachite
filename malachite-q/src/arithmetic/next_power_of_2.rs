@@ -1,8 +1,8 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{NextPowerOf2, NextPowerOf2Assign, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::cmp::Ordering;
 
 impl NextPowerOf2 for Rational {
     type Output = Rational;

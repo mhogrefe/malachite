@@ -165,10 +165,10 @@ pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Ve
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural` n, writes the
-// limbs of `bits` into the limbs of -n, starting at bit `start` of -n (inclusive) and ending at
-// bit `end` of -n (exclusive). The bit indices do not need to be aligned with any limb boundaries.
-// If `bits` has more than `end` - `start` bits, only the first `end` - `start` bits are written.
-// If `bits` has fewer than `end` - `start` bits, the remaining written bits are one. `xs` may be
+// limbs of `bits` into the limbs of -n, starting at bit `start` of -n (inclusive) and ending at bit
+// `end` of -n (exclusive). The bit indices do not need to be aligned with any limb boundaries. If
+// `bits` has more than `end` - `start` bits, only the first `end` - `start` bits are written. If
+// `bits` has fewer than `end` - `start` bits, the remaining written bits are one. `xs` may be
 // extended to accommodate the new bits. `start` must be smaller than `end`, and `xs` cannot only
 // contain zeros.
 //
@@ -252,8 +252,7 @@ impl BitBlockAccess for Integer {
     /// $$
     /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$.
-    /// Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$. Then
     /// $$
     /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
     /// $$
@@ -313,8 +312,7 @@ impl BitBlockAccess for Integer {
     /// $$
     /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$.
-    /// Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$. Then
     /// $$
     /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
     /// $$
@@ -361,8 +359,8 @@ impl BitBlockAccess for Integer {
 
     /// Replaces a block of adjacent two's complement bits in an [`Integer`] with other bits.
     ///
-    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through
-    /// `end - 1`, inclusive, of `self`.
+    /// The least-significant `end - start` bits of `bits` are assigned to bits `start` through `end
+    /// - 1`, inclusive, of `self`.
     ///
     /// Let $n$ be `self` and let $m$ be `bits`, and let $p$ and $q$ be `start` and `end`,
     /// respectively.
@@ -381,8 +379,7 @@ impl BitBlockAccess for Integer {
     /// $$
     /// -n - 1 = \sum_{i=0}^\infty 2^{1 - b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$.
-    /// Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$. Then
     /// $$
     /// n \gets \sum_{i=0}^\infty 2^{c_i},
     /// $$
@@ -397,8 +394,8 @@ impl BitBlockAccess for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), end)`,
-    /// and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), end)`, and
+    /// $m$ is `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `start > end`.

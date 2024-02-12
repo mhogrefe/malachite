@@ -26,12 +26,12 @@ fn test_limbs_binomial_coefficient_limb_limb_bdiv() {
             Natural::binomial_coefficient(Natural::from(n), Natural::from(k))
         );
     }
-    // k_max == 0
-    // ones == 0
+    // - k_max == 0
+    // - ones == 0
     test(26, 26, &[1]);
-    // ones != 0
+    // - ones != 0
     test(69, 32, &[10356137869959167254, 2]);
-    // k_max != 0
+    // - k_max != 0
     test(
         364,
         227,
@@ -80,15 +80,15 @@ fn test_limbs_binomial_coefficient_limb_limb_small_k() {
             Natural::binomial_coefficient(Natural::from(n), Natural::from(k))
         );
     }
-    // nmax >= k
+    // - nmax >= k
     test(2, 2, &[1]);
-    // nmax < k
-    // numfac == 0
-    // shift != 0 in limbs_hensel_div_limb
+    // - nmax < k
+    // - numfac == 0
+    // - shift != 0 in limbs_hensel_div_limb
     test(9, 9, &[1]);
-    // numfac != 0
+    // - numfac != 0
     test(17, 17, &[1]);
-    // shift == 0 in limbs_hensel_div_limb
+    // - shift == 0 in limbs_hensel_div_limb
     test(836, 7, &[55217369185858880]);
     test(
         1000,
@@ -123,19 +123,19 @@ fn test_limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer() {
             Natural::binomial_coefficient(Natural::from(n), Natural::from(k))
         );
     }
-    // !BIN_UIUI_RECURSIVE_SMALLDC || hk <= ODD_FACTORIAL_TABLE_LIMIT as Limb
-    // n <= ODD_FACTORIAL_EXTTABLE_LIMIT as Limb
+    // - !BIN_UIUI_RECURSIVE_SMALLDC || hk <= ODD_FACTORIAL_TABLE_LIMIT as Limb
+    // - n <= ODD_FACTORIAL_EXTTABLE_LIMIT as Limb
     test(27, 25, &[351]);
-    // n > ODD_FACTORIAL_EXTTABLE_LIMIT as Limb
-    // !BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT as Limb
+    // - n > ODD_FACTORIAL_EXTTABLE_LIMIT as Limb
+    // - !BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT as Limb
     test(
         10000,
         25,
         &[12769553919776416000, 9951314237341865820, 6910797670090152703, 99667982199316897],
     );
-    // BIN_UIUI_RECURSIVE_SMALLDC && hk > ODD_FACTORIAL_TABLE_LIMIT as Limb
+    // - BIN_UIUI_RECURSIVE_SMALLDC && hk > ODD_FACTORIAL_TABLE_LIMIT as Limb
     test(54, 52, &[1431]);
-    // BIN_UIUI_RECURSIVE_SMALLDC && k > ODD_FACTORIAL_TABLE_LIMIT as Limb
+    // - BIN_UIUI_RECURSIVE_SMALLDC && k > ODD_FACTORIAL_TABLE_LIMIT as Limb
     test(93, 51, &[10325892988062052036, 28774313]);
 }
 
@@ -151,35 +151,35 @@ fn test_limbs_binomial_coefficient_limb_limb_goetgheluck() {
             Natural::binomial_coefficient(Natural::from(n), Natural::from(k))
         );
     }
-    // prod <= max_prod first time
-    // ma < mb first time
-    // a >= prime first time
-    // ma >= mb first time
-    // a < prime first time
-    // sieve[index] & mask == 0 first time
-    // prod <= max_prod second time
-    // ma >= mb second time
-    // a >= prime second time
-    // ma < mb second time
-    // a < prime second time
-    // i <= max_i first time
-    // sieve[index] & mask != 0 first time
-    // i > max_i first time
-    // sieve[index] & mask != 0 second time
-    // i <= max_i second time
-    // sieve[index] & mask == 0 second time
-    // n % prime < k % prime
-    // prod <= max_prod third time
-    // n % prime >= k % prime
-    // prod > max_prod third time
-    // i > max_i second time
-    // sieve[index] & mask != 0 third time
-    // i <= max_i third time
-    // sieve[index] & mask == 0 third time
-    // prod <= max_prod fourth time
-    // prod > max_prod fourth time
-    // i > max_i third time
-    // j != 0
+    // - prod <= max_prod first time
+    // - ma < mb first time
+    // - a >= prime first time
+    // - ma >= mb first time
+    // - a < prime first time
+    // - sieve[index] & mask == 0 first time
+    // - prod <= max_prod second time
+    // - ma >= mb second time
+    // - a >= prime second time
+    // - ma < mb second time
+    // - a < prime second time
+    // - i <= max_i first time
+    // - sieve[index] & mask != 0 first time
+    // - i > max_i first time
+    // - sieve[index] & mask != 0 second time
+    // - i <= max_i second time
+    // - sieve[index] & mask == 0 second time
+    // - n % prime < k % prime
+    // - prod <= max_prod third time
+    // - n % prime >= k % prime
+    // - prod > max_prod third time
+    // - i > max_i second time
+    // - sieve[index] & mask != 0 third time
+    // - i <= max_i third time
+    // - sieve[index] & mask == 0 third time
+    // - prod <= max_prod fourth time
+    // - prod > max_prod fourth time
+    // - i > max_i third time
+    // - j != 0
     test(
         1024,
         512,
@@ -202,7 +202,7 @@ fn test_limbs_binomial_coefficient_limb_limb_goetgheluck() {
             459836855626902435,
         ],
     );
-    // prod > max_prod second time
+    // - prod > max_prod second time
     test(
         1045,
         519,
@@ -239,13 +239,13 @@ fn test_binomial_coefficient_limb_limb() {
             Natural::binomial_coefficient(Natural::from(n), Natural::from(k))
         );
     }
-    // n >= k
-    // k == 0
+    // - n >= k
+    // - k == 0
     test(0, 0, "1");
     test(1, 0, "1");
     test(1, 1, "1");
     test(2, 0, "1");
-    // k == 1
+    // - k == 1
     test(2, 1, "2");
     test(2, 2, "1");
     test(3, 0, "1");
@@ -254,25 +254,25 @@ fn test_binomial_coefficient_limb_limb() {
     test(3, 3, "1");
     test(4, 0, "1");
     test(4, 1, "4");
-    // using limbs_binomial_coefficient_limb_limb_basecase
+    // - using limbs_binomial_coefficient_limb_limb_basecase
     test(4, 2, "6");
     test(4, 3, "4");
     test(4, 4, "1");
-    // n < k
+    // - n < k
     test(1, 2, "0");
     test(10, 5, "252");
-    // using limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer
+    // - using limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer
     test(100, 50, "100891344545564193334812497256");
-    // using limbs_binomial_coefficient_limb_limb_small_k
+    // - using limbs_binomial_coefficient_limb_limb_small_k
     test(68, 2, "2278");
-    // using limbs_binomial_coefficient_limb_limb_bdiv
+    // - using limbs_binomial_coefficient_limb_limb_bdiv
     test(
         557,
         270,
         "12303897123684661862136414153519313173927533052423815769743887086897271613639625388778793\
         435582088957595545453390198975003546712921290727359277922023155427564241544480",
     );
-    // using limbs_binomial_coefficient_limb_limb_goetgheluck
+    // - using limbs_binomial_coefficient_limb_limb_goetgheluck
     test(
         1520,
         604,
@@ -303,42 +303,42 @@ fn test_binomial_coefficient() {
             assert_eq!(rug::Integer::from(&n).binomial(k).to_string(), out);
         }
     }
-    // k <= n
-    // k == 0 || n == k
+    // - k <= n
+    // - k == 0 || n == k
     test("0", "0", "1");
     test("1", "0", "1");
     test("1", "1", "1");
     test("2", "0", "1");
-    // k != 0 && n != k
-    // double_cmp(&k, &n) != Ordering::Greater
-    // k < 2 in binomial_coefficient_helper
+    // - k != 0 && n != k
+    // - double_cmp(&k, &n) != Ordering::Greater
+    // - k < 2 in binomial_coefficient_helper
     test("2", "1", "2");
     test("2", "2", "1");
     test("3", "0", "1");
     test("3", "1", "3");
-    // double_cmp(&k, &n) == Ordering::Greater
+    // - double_cmp(&k, &n) == Ordering::Greater
     test("3", "2", "3");
     test("3", "3", "1");
     test("4", "0", "1");
     test("4", "1", "4");
-    // k >= 2 && Limb::convertible_from(&n) in binomial_coefficient_helper
+    // - k >= 2 && Limb::convertible_from(&n) in binomial_coefficient_helper
     test("4", "2", "6");
     test("4", "3", "4");
     test("4", "4", "1");
-    // k > n
+    // - k > n
     test("1", "2", "0");
     test("10", "5", "252");
     test("100", "50", "100891344545564193334812497256");
-    // k >= 2 && !Limb::convertible_from(&n) in binomial_coefficient_helper
-    // k.even() first time in binomial_coefficient_raising_factorial_4
-    // k <= Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
-    // k.odd() second time in binomial_coefficient_raising_factorial_4
-    // r == 0 first time in binomial_coefficient_raising_factorial_4
-    // k != 0 in binomial_coefficient_raising_factorial_4
-    // r != 0 second time in binomial_coefficient_raising_factorial_4
-    // k > 1 in binomial_coefficient_raising_factorial_4
-    // k - lk < 5 in binomial_coefficient_raising_factorial_4_rec
-    // k <= lk in binomial_coefficient_raising_factorial_4_rec
+    // - k >= 2 && !Limb::convertible_from(&n) in binomial_coefficient_helper
+    // - k.even() first time in binomial_coefficient_raising_factorial_4
+    // - k <= Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
+    // - k.odd() second time in binomial_coefficient_raising_factorial_4
+    // - r == 0 first time in binomial_coefficient_raising_factorial_4
+    // - k != 0 in binomial_coefficient_raising_factorial_4
+    // - r != 0 second time in binomial_coefficient_raising_factorial_4
+    // - k > 1 in binomial_coefficient_raising_factorial_4
+    // - k - lk < 5 in binomial_coefficient_raising_factorial_4_rec
+    // - k <= lk in binomial_coefficient_raising_factorial_4_rec
     test(
         "1000000000000000000000000",
         "10",
@@ -353,10 +353,10 @@ fn test_binomial_coefficient() {
         347422646604938271604938264183063271604938271604958214285714285714285714253397817460317460\
         3174603457499999999999999999999900000000000000000000000",
     );
-    // k.odd() first time in binomial_coefficient_raising_factorial_4
-    // k.even() second time in binomial_coefficient_raising_factorial_4
-    // k - lk >= 5 in binomial_coefficient_raising_factorial_4_rec
-    // k > lk in binomial_coefficient_raising_factorial_4_rec
+    // - k.odd() first time in binomial_coefficient_raising_factorial_4
+    // - k.even() second time in binomial_coefficient_raising_factorial_4
+    // - k - lk >= 5 in binomial_coefficient_raising_factorial_4_rec
+    // - k > lk in binomial_coefficient_raising_factorial_4_rec
     test(
         "25694718637547264792682404365646",
         "77",
@@ -440,7 +440,7 @@ fn test_binomial_coefficient() {
         875803132012584698568224321090559637699882304716272182566747176011138741513605154927341734\
         8337767036988850446297726975",
     );
-    // r == 0 second time in binomial_coefficient_raising_factorial_4
+    // - r == 0 second time in binomial_coefficient_raising_factorial_4
     test(
         "64794141400349148426125344064038245668210",
         "256",
@@ -556,7 +556,7 @@ fn test_binomial_coefficient() {
         160706943287071568418614565943721712313708341206571425251067669284456587123688846181674686\
         565863767558687263852890202721039246395025",
     );
-    // r != 0 first time in binomial_coefficient_raising_factorial_4
+    // - r != 0 first time in binomial_coefficient_raising_factorial_4
     test(
         "525899105584115331831822389398654378975439821235847075538334479459976804361",
         "39",
@@ -593,7 +593,7 @@ fn test_binomial_coefficient() {
         791101502903444068723989625533851827638409364499043290472310636212447688058605971032119472\
         5991269626624579699378058679358476375414026678029422929039835277325354971910400",
     );
-    // k == 0 in binomial_coefficient_raising_factorial_4
+    // - k == 0 in binomial_coefficient_raising_factorial_4
     test(
         "55186653679569007523486527767687421937059940360080261894526453",
         "3",
@@ -601,7 +601,7 @@ fn test_binomial_coefficient() {
         244616713573401635136679393282116959418116580481496576838954049642935186063159197881085428\
         921826",
     );
-    // k <= 1 in binomial_coefficient_raising_factorial_4
+    // - k <= 1 in binomial_coefficient_raising_factorial_4
     test(
         "821407847938765300653812701638851178",
         "5",
@@ -626,7 +626,7 @@ fn test_binomial_coefficient() {
                 assert_eq!(Natural::exact_from(&rug::Integer::from(&n).binomial(k)), b);
             }
         }
-        // k > Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
+        // - k > Limb::power_of_2(Limb::WIDTH >> 1) in binomial_coefficient_hmul_nbnpk
         test_large("4294967296", "131076");
     }
 }

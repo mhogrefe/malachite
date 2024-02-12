@@ -100,8 +100,8 @@ pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
     y != T::ZERO
 }}
 
-// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-// writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+// the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -124,6 +124,7 @@ pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 
 // # Worst-case complexity
 // Constant time and additional memory.
+#[inline]
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let c = *carry;
     let mut sum;
@@ -134,9 +135,9 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     sum
 }
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
-// the `Natural`s.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
+// first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of the
+// `Natural`s.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -175,8 +176,8 @@ pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     out
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// a `Vec` of the limbs of the sum of the `Natural`s.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the sum of the `Natural`s.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -221,9 +222,9 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
     carry
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-// the first slice is at least as long as the second, writes the `xs.len()` least-significant limbs
-// of the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
+// first slice is at least as long as the second, writes the `xs.len()` least-significant limbs of
+// the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
 // Returns whether there is a carry.
 //
 // # Worst-case complexity
@@ -282,11 +283,9 @@ pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) ->
 // and `xs_len` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
 // `xs[..xs_len]` and `ys` to `xs`. Returns whether there is a carry.
 //
-// For example,
-// `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
-// would be equivalent to
-// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
-// although the latter expression is not allowed because `xs` cannot be borrowed in that way.
+// For example, `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[..10])` would be equivalent to
+// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[..10])` although the latter expression is not
+// allowed because `xs` cannot be borrowed in that way.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -298,8 +297,8 @@ pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) ->
 // # Panics
 // Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
 //
-// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the second argument is at least
-// as long as the first and the output pointer is the same as the first input pointer.
+// This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the second argument is at least as
+// long as the first and the output pointer is the same as the first input pointer.
 pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
@@ -307,6 +306,20 @@ pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[
     let (ys_lo, ys_hi) = ys.split_at(xs_len);
     xs[xs_len..ys_len].copy_from_slice(ys_hi);
     limbs_slice_add_greater_in_place_left(&mut xs[..ys_len], ys_lo)
+}}
+
+// For example, `limbs_add_to_out_aliased_2(&mut xs[..15], 5, &ys[..10])` would be equivalent to
+// `limbs_add_to_out(&mut xs[..10], &xs[5..15], &ys[..10])` although the latter expression is not
+// allowed because `xs` cannot be borrowed in that way.
+pub_crate_test! {
+    limbs_add_to_out_aliased_2(xs: &mut [Limb], xs_offset: usize, ys: &[Limb]) -> bool {
+    let len = ys.len();
+    assert_eq!(xs.len(), len + xs_offset);
+    let mut carry = false;
+    for i in 0..len {
+        xs[i] = add_and_carry(xs[i + xs_offset], ys[i], &mut carry);
+    }
+    carry
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -335,8 +348,8 @@ pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: 
     carry
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-// the length of the first slice is greater than or equal to the length of the second, writes the
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
+// length of the first slice is greater than or equal to the length of the second, writes the
 // `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
 // Returns whether there is a carry.
 //
@@ -374,8 +387,8 @@ pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Li
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the first input.
@@ -428,9 +441,9 @@ pub_test! {limbs_slice_add_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> 
 }}
 
 // Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are
-// equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
-// `true` when it's to the second `Vec`.
+// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are equally
+// long). Returns a `bool` which is `false` when the output is to the first `Vec` and `true` when
+// it's to the second `Vec`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -578,8 +591,8 @@ impl Add<Natural> for Natural {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -615,8 +628,8 @@ impl<'a> Add<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -653,8 +666,8 @@ impl<'a> Add<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -691,8 +704,8 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -730,8 +743,8 @@ impl AddAssign<Natural> for Natural {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -772,8 +785,8 @@ impl<'a> AddAssign<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

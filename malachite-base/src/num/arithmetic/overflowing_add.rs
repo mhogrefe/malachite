@@ -16,8 +16,8 @@ macro_rules! impl_overflowing_add {
         impl OverflowingAddAssign<$t> for $t {
             /// Adds a number to another number, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

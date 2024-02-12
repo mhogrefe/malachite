@@ -28,15 +28,15 @@ pub fn test_assign_bits_unsigned() {
         assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
     }
-    // assign partially
+    // - assign partially
     test(0xab5du16, 4, 8, 0xc, 0xabcd);
     test(0x5bcdu16, 12, 100, 0xa, 0xabcd);
     test(0xabcdu16, 5, 9, 10, 43853);
     test(0xabcdu16, 5, 5, 123, 0xabcd);
-    // assign zeros above width
+    // - assign zeros above width
     test(0xabcdu16, 100, 200, 0, 0xabcd);
     test(0xabcdu16, 8, 24, 0, 0xcd);
-    // assign everything
+    // - assign everything
     test(0xabcdu16, 0, 100, 0x1234, 0x1234);
 
     test(0xab5du64, 4, 8, 0xc, 0xabcd);
@@ -64,16 +64,16 @@ pub fn test_assign_bits_signed() {
         assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
     }
-    // *self >= 0
+    // - *self >= 0
     test(0x2b5di16, 4, 8, 0xc, 0x2bcd);
-    // *self < 0
-    // assign within width
+    // - *self < 0
+    // - assign within width
     test(-0x5413i16, 4, 8, 0xc, -0x5433);
     test(-0x54a3i16, 5, 9, 14, -21539);
     test(-0x5433i16, 5, 5, 0, -0x5433);
-    // assign ones above width
+    // - assign ones above width
     test(-0x5433i16, 100, 104, 0xf, -0x5433);
-    // assign everything
+    // - assign everything
     test(-57i8, 0, 8, 0xff, -1);
 
     test(0x2b5di64, 4, 8, 0xc, 0x2bcd);

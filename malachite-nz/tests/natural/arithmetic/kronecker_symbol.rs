@@ -39,129 +39,129 @@ fn test_limbs_jacobi_symbol_same_length() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // n < JACOBI_DC_THRESHOLD
-        // bits < 16
-        // n == 1
-        // y_lo == 1
+        // - n < JACOBI_DC_THRESHOLD
+        // - bits < 16
+        // - n == 1
+        // - y_lo == 1
         test(&[0], &[1], 1);
-        // y_lo != 1
-        // bits.even() first time
+        // - y_lo != 1
+        // - bits.even() first time
         test(&[0], &[3], 0);
-        // n != 1
-        // bits.even() second time
+        // - n != 1
+        // - bits.even() second time
         test(&[0, 0], &[1, 1], 0);
-        // !mask.get_highest_bit()
-        // x_1 < 2 || y_1 < 2 in limbs_half_gcd_2_jacobi
-        // !limbs_half_gcd_2_jacobi
-        // let Some(gs) = gs in JacobiContext::gcd_subdiv_step_hook
-        // gs_len != 1 || gs[0] != 1 in JacobiContext::gcd_subdiv_step_hook
-        // n == 0 second time
-        // bits == BITS_FAIL second time
+        // - !mask.get_highest_bit()
+        // - x_1 < 2 || y_1 < 2 in limbs_half_gcd_2_jacobi
+        // - !limbs_half_gcd_2_jacobi
+        // - let Some(gs) = gs in JacobiContext::gcd_subdiv_step_hook
+        // - gs_len != 1 || gs[0] != 1 in JacobiContext::gcd_subdiv_step_hook
+        // - n == 0 second time
+        // - bits == BITS_FAIL second time
         test(&[0, 0, 0], &[1, 0, 1], 0);
-        // gs == None in JacobiContext::gcd_subdiv_step_hook
-        // let Some(qs) = qs in JacobiContext::gcd_subdiv_step_hook
-        // gs.len() == 1 && gp[0] == 1 in JacobiContext::gcd_subdiv_step_hook
-        // bits != BITS_FAIL second time
+        // - gs == None in JacobiContext::gcd_subdiv_step_hook
+        // - let Some(qs) = qs in JacobiContext::gcd_subdiv_step_hook
+        // - gs.len() == 1 && gp[0] == 1 in JacobiContext::gcd_subdiv_step_hook
+        // - bits != BITS_FAIL second time
         test(&[0, 0, 1], &[1, 0, 0], 1);
-        // x_1 >= 2 && y_1 >= 2 in limbs_half_gcd_2_jacobi
-        // x_1 <= y_1 && (x_1 != y_1 || x_0 <= y_0) in limbs_half_gcd_2_jacobi
-        // y_1 < 2 first time in limbs_half_gcd_2_jacobi
+        // - x_1 >= 2 && y_1 >= 2 in limbs_half_gcd_2_jacobi
+        // - x_1 <= y_1 && (x_1 != y_1 || x_0 <= y_0) in limbs_half_gcd_2_jacobi
+        // - y_1 < 2 first time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 1], &[1, 0, 1], 1);
-        // n != 0 second time
+        // - n != 0 second time
         test(&[0, 0, 1], &[1, 1, 0], 1);
-        // x_1 > y_1 || (x_1 == y_1 && x_0 > y_0) in limbs_half_gcd_2_jacobi
-        // x_1 < 2 first time in limbs_half_gcd_2_jacobi
-        // bits >= 16
+        // - x_1 > y_1 || (x_1 == y_1 && x_0 > y_0) in limbs_half_gcd_2_jacobi
+        // - x_1 < 2 first time in limbs_half_gcd_2_jacobi
+        // - bits >= 16
         test(&[0, 1, 1], &[1, 0, 1], 1);
-        // y_1 >= 2 first time in limbs_half_gcd_2_jacobi
-        // !subtract_a in limbs_half_gcd_2_jacobi
-        // x_1 == y_1 first time in limbs_half_gcd_2_jacobi
-        // limbs_half_gcd_2_jacobi
+        // - y_1 >= 2 first time in limbs_half_gcd_2_jacobi
+        // - !subtract_a in limbs_half_gcd_2_jacobi
+        // - x_1 == y_1 first time in limbs_half_gcd_2_jacobi
+        // - limbs_half_gcd_2_jacobi
         test(&[0, 0, 1], &[1, 0, 2], 1);
-        // subtract_a in limbs_half_gcd_2_jacobi
-        // x_1 != y_1 second time in limbs_half_gcd_2_jacobi
-        // y_1 >= Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
-        // y_1 >= 2 second time in limbs_half_gcd_2_jacobi
-        // y_1 <= x_1 first time in limbs_half_gcd_2_jacobi
+        // - subtract_a in limbs_half_gcd_2_jacobi
+        // - x_1 != y_1 second time in limbs_half_gcd_2_jacobi
+        // - y_1 >= Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
+        // - y_1 >= 2 second time in limbs_half_gcd_2_jacobi
+        // - y_1 <= x_1 first time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 1], &[1, 0, 3], 1);
-        // x_1 != y_1 first time in limbs_half_gcd_2_jacobi
-        // x_1 >= Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
-        // x_1 < 2 second time in limbs_half_gcd_2_jacobi
+        // - x_1 != y_1 first time in limbs_half_gcd_2_jacobi
+        // - x_1 >= Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
+        // - x_1 < 2 second time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 1], &[1, 0, 2], -1);
-        // bits.odd() first time
+        // - bits.odd() first time
         test(&[1, 0, 1], &[1, 1, 3], -1);
-        // x_1 >= 2 first time in limbs_half_gcd_2_jacobi
+        // - x_1 >= 2 first time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 2], &[1, 0, 1], 1);
-        // x_1 >= 2 second time in limbs_half_gcd_2_jacobi
-        // x_1 <= y_1 second time in limbs_half_gcd_2_jacobi
-        // x_1 == y_1 second time in limbs_half_gcd_2_jacobi
+        // - x_1 >= 2 second time in limbs_half_gcd_2_jacobi
+        // - x_1 <= y_1 second time in limbs_half_gcd_2_jacobi
+        // - x_1 == y_1 second time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 3], &[1, 0, 1], -1);
-        // y_1 < 2 second time in limbs_half_gcd_2_jacobi
+        // - y_1 < 2 second time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 2], &[1, 1, 1], 1);
-        // bits.odd() second time
+        // - bits.odd() second time
         test(&[0, 1, 2], &[1, 1, 1], 0);
-        // y_1 > x_1 first time in limbs_half_gcd_2_jacobi
-        // y_1 < 2 third time in limbs_half_gcd_2_jacobi
+        // - y_1 > x_1 first time in limbs_half_gcd_2_jacobi
+        // - y_1 < 2 third time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 3], &[1, 1, 2], 1);
-        // x_1 > y_1 second time in limbs_half_gcd_2_jacobi
-        // x_1 < 2 third time in limbs_half_gcd_2_jacobi
+        // - x_1 > y_1 second time in limbs_half_gcd_2_jacobi
+        // - x_1 < 2 third time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 2], &[1, 0, 3], -1);
-        // mask.get_highest_bit()
+        // - mask.get_highest_bit()
         test(&[0, 0, 0, 1, 1], &[1, 0, 0, 0, 1], 1);
-        // y_1 >= 2 third time in limbs_half_gcd_2_jacobi
+        // - y_1 >= 2 third time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 1, 1], &[1, 1, 0, 2], 1);
-        // x_1 >= 2 third time in limbs_half_gcd_2_jacobi
-        // y_1 < Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
-        // subtract_a_1 in limbs_half_gcd_2_jacobi
-        // x_1 != y_1 fourth time in limbs_half_gcd_2_jacobi
-        // y_1 < TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
+        // - x_1 >= 2 third time in limbs_half_gcd_2_jacobi
+        // - y_1 < Limb::power_of_2(Limb::WIDTH >> 1) in limbs_half_gcd_2_jacobi
+        // - subtract_a_1 in limbs_half_gcd_2_jacobi
+        // - x_1 != y_1 fourth time in limbs_half_gcd_2_jacobi
+        // - y_1 < TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 0, 1, 1], &[1, 1, 1, 0, 1], 1);
-        // x_1 < TWO_POW_HALF_WIDTH in limbs_half_gcd_2_jacobi
-        // !subtract_a_1 in limbs_half_gcd_2_jacobi
-        // x_1 != y_1 third time in limbs_half_gcd_2_jacobi
-        // x_1 < TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
+        // - x_1 < TWO_POW_HALF_WIDTH in limbs_half_gcd_2_jacobi
+        // - !subtract_a_1 in limbs_half_gcd_2_jacobi
+        // - x_1 != y_1 third time in limbs_half_gcd_2_jacobi
+        // - x_1 < TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 1, 0, 1], &[1, 0, 0, 1, 1], 0);
-        // y_1 >= TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
-        // y_1 <= x_1 second time in limbs_half_gcd_2_jacobi
-        // x_1 >= TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
-        // x_1 > y_1 in limbs_half_gcd_2_jacobi
-        // x_1 < TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
+        // - y_1 >= TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
+        // - y_1 <= x_1 second time in limbs_half_gcd_2_jacobi
+        // - x_1 >= TWICE_TWO_POW_HALF_WIDTH first time in limbs_half_gcd_2_jacobi
+        // - x_1 > y_1 in limbs_half_gcd_2_jacobi
+        // - x_1 < TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 1, 3], &[1, 1, 0, 2], 1);
-        // y_1 > x_1 second time in limbs_half_gcd_2_jacobi
-        // y_1 < TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
+        // - y_1 > x_1 second time in limbs_half_gcd_2_jacobi
+        // - y_1 < TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
         test(&[0, 0, 0, 1, 1], &[1, 1, 1, 0, 3], 1);
-        // x_1 <= y_1 in limbs_half_gcd_2_jacobi
+        // - x_1 <= y_1 in limbs_half_gcd_2_jacobi
         test(&[0, 0, 1, 0, 1], &[1, 1, 0, 1, 3], 1);
-        // x_1 == y_1 fourth time in limbs_half_gcd_2_jacobi
+        // - x_1 == y_1 fourth time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 0, 1, 1], &[1, 0, 1, 0, 3], -1);
-        // y_1 >= TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
+        // - y_1 >= TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 1, 1, 1], &[1, 0, 0, 1, 3], 1);
-        // x_1 >= TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
+        // - x_1 >= TWICE_TWO_POW_HALF_WIDTH second time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 1, 1, 1], &[1, 1, 0, 0, 3], 1);
-        // x_1 == y_1 third time in limbs_half_gcd_2_jacobi
+        // - x_1 == y_1 third time in limbs_half_gcd_2_jacobi
         test(&[0, 1, 0, 1, 2], &[1, 0, 1, 0, 1], 0);
     }
     #[cfg(feature = "32_bit_limbs")]
     {
-        // n >= JACOBI_DC_THRESHOLD
-        // dc_scratch_len > scratch_len
-        // n >= HGCD_THRESHOLD in limbs_half_gcd_jacobi
-        // n < HGCD_THRESHOLD in limbs_half_gcd_jacobi
-        // n != s + 1 && !mask.get_highest_bit() in limbs_half_gcd_jacobi_step
-        // limbs_half_gcd_2_jacobi in limbs_half_gcd_jacobi_step
-        // nn != 0 fourth time in limbs_half_gcd_jacobi
-        // n == s + 1 in limbs_half_gcd_jacobi_step
-        // mask >= 4 in limbs_half_gcd_jacobi_step
-        // mask < 4 in limbs_half_gcd_jacobi_step
-        // nn == 0 fourth time in limbs_half_gcd_jacobi
-        // nn != 0 first time in limbs_half_gcd_jacobi
-        // nn != 0 second time in limbs_half_gcd_jacobi
-        // n > s + 2 in limbs_half_gcd_jacobi
-        // n != s + 1 && mask.get_highest_bit() in limbs_half_gcd_jacobi_step
-        // !limbs_half_gcd_2_jacobi in limbs_half_gcd_jacobi_step
-        // nn != 0 third time in limbs_half_gcd_jacobi
-        // qs_len != 0 in HalfGcdJacobiContext::gcd_subdiv_step_hook
-        // nn != 0
+        // - n >= JACOBI_DC_THRESHOLD
+        // - dc_scratch_len > scratch_len
+        // - n >= HGCD_THRESHOLD in limbs_half_gcd_jacobi
+        // - n < HGCD_THRESHOLD in limbs_half_gcd_jacobi
+        // - n != s + 1 && !mask.get_highest_bit() in limbs_half_gcd_jacobi_step
+        // - limbs_half_gcd_2_jacobi in limbs_half_gcd_jacobi_step
+        // - nn != 0 fourth time in limbs_half_gcd_jacobi
+        // - n == s + 1 in limbs_half_gcd_jacobi_step
+        // - mask >= 4 in limbs_half_gcd_jacobi_step
+        // - mask < 4 in limbs_half_gcd_jacobi_step
+        // - nn == 0 fourth time in limbs_half_gcd_jacobi
+        // - nn != 0 first time in limbs_half_gcd_jacobi
+        // - nn != 0 second time in limbs_half_gcd_jacobi
+        // - n > s + 2 in limbs_half_gcd_jacobi
+        // - n != s + 1 && mask.get_highest_bit() in limbs_half_gcd_jacobi_step
+        // - !limbs_half_gcd_2_jacobi in limbs_half_gcd_jacobi_step
+        // - nn != 0 third time in limbs_half_gcd_jacobi
+        // - qs_len != 0 in HalfGcdJacobiContext::gcd_subdiv_step_hook
+        // - nn != 0
         test(
             &[
                 1873633918, 123030658, 719377342, 1504696614, 2362755734, 3961478485, 781485753,
@@ -285,7 +285,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             -1,
         );
-        // qs_len == 0 in HalfGcdJacobiContext::gcd_subdiv_step_hook
+        // - qs_len == 0 in HalfGcdJacobiContext::gcd_subdiv_step_hook
         test(
             &[
                 3557994669, 445289342, 1108435216, 1656651402, 3854541936, 2345816964, 2732613883,
@@ -429,7 +429,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             -1,
         );
-        // nn == 0 first time in limbs_half_gcd_jacobi
+        // - nn == 0 first time in limbs_half_gcd_jacobi
         test(
             &[
                 0,
@@ -1207,7 +1207,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             -1,
         );
-        // n <= s + 2 in limbs_half_gcd_jacobi
+        // - n <= s + 2 in limbs_half_gcd_jacobi
         test(
             &[
                 u32::MAX,
@@ -1891,10 +1891,10 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             1,
         );
-        // nn == 0 second time in limbs_half_gcd_jacobi
-        // nn == 0
-        // n == 0 first time
-        // bits == BITS_FAIL first time
+        // - nn == 0 second time in limbs_half_gcd_jacobi
+        // - nn == 0
+        // - n == 0 first time
+        // - bits == BITS_FAIL first time
         test(
             &[
                 1077171533, 3384534038, 3509377481, 3012981171, 2169372009, 3568066367, 510541737,
@@ -2018,7 +2018,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             0,
         );
-        // n != 0 first time
+        // - n != 0 first time
         test(
             &[
                 2527776570, 1096068921, 3262306218, 1320735475, 3585033863, 837181718, 1434028202,
@@ -2096,7 +2096,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             1,
         );
-        // nn == 0 third time in limbs_half_gcd_jacobi
+        // - nn == 0 third time in limbs_half_gcd_jacobi
         test(
             &[
                 u32::MAX,
@@ -2906,7 +2906,7 @@ fn test_limbs_jacobi_symbol_same_length() {
             ],
             0,
         );
-        // bits != BITS_FAIL first time
+        // - bits != BITS_FAIL first time
         test(
             &[
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

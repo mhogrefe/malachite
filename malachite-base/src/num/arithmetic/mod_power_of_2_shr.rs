@@ -70,8 +70,8 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                     /// Right-shifts a number (divides it by a power of 2) modulo $2^k$. The number
                     /// must be already reduced modulo $2^k$.
                     ///
-                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
+                    /// $f(x, n, k) = y$, where $x, y < 2^k$ and $\lfloor 2^{-n}x \rfloor \equiv y
+                    /// \mod 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -92,8 +92,8 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                     /// Right-shifts a number (divides it by a power of 2) modulo $2^k$, in place.
                     /// The number must be already reduced modulo $2^k$.
                     ///
-                    /// $x \gets y$, where $x, y < 2^k$ and
-                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod 2^k$.
+                    /// $x \gets y$, where $x, y < 2^k$ and $\lfloor 2^{-n}x \rfloor \equiv y \mod
+                    /// 2^k$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

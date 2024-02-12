@@ -1,9 +1,9 @@
 use crate::Rational;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::mem::swap;
 
 impl Rational {
     /// Converts a finite continued fraction to a [`Rational`], taking the inputs by value.
@@ -24,9 +24,8 @@ impl Rational {
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(floor.significant_bits(), xs.map(Natural::significant_bits).max())`, and $m$ is
-    /// `xs.count()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(floor.significant_bits(),
+    /// xs.map(Natural::significant_bits).max())`, and $m$ is `xs.count()`.
     ///
     /// # Panics
     /// Panics if any [`Natural`] in `xs` is zero.
@@ -81,9 +80,8 @@ impl Rational {
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(floor.significant_bits(), xs.map(Natural::significant_bits).max())`, and $m$ is
-    /// `xs.count()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(floor.significant_bits(),
+    /// xs.map(Natural::significant_bits).max())`, and $m$ is `xs.count()`.
     ///
     /// # Panics
     /// Panics if any [`Natural`] in `xs` is zero.

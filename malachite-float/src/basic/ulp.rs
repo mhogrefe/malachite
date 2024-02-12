@@ -10,9 +10,9 @@ use malachite_nz::platform::Limb;
 impl Float {
     /// Gets a [`Float`]'s ulp (unit in last place, or unit of least precision).
     ///
-    /// If the [`Float`] is positive, its ulp is the distance to the next-largest [`Float`] with
-    /// the same precision; if it is negative, the next-smallest. (This definition works even if
-    /// the [`Float`] is the largest in its binade.)
+    /// If the [`Float`] is positive, its ulp is the distance to the next-largest [`Float`] with the
+    /// same precision; if it is negative, the next-smallest. (This definition works even if the
+    /// [`Float`] is the largest in its binade.)
     ///
     /// If the [`Float`] is NaN, infinite, or zero, then `None` is returned.
     ///

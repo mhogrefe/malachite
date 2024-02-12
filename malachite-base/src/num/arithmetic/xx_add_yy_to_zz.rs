@@ -27,11 +27,11 @@ explicit_xx_add_yy_to_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -
 macro_rules! implicit_xx_add_yy_to_zz {
     ($t:ident, $dt:ident) => {
         impl XXAddYYToZZ for $t {
-            /// Adds two numbers, each composed of two `Self` values, returning the sum as a pair
-            /// of `Self` values.
+            /// Adds two numbers, each composed of two `Self` values, returning the sum as a pair of
+            /// `Self` values.
             ///
-            /// The more significant value always comes first. Addition is wrapping, and overflow
-            /// is not indicated.
+            /// The more significant value always comes first. Addition is wrapping, and overflow is
+            /// not indicated.
             ///
             /// $$
             /// f(x_1, x_0, y_1, y_0) = (z_1, z_0),
@@ -49,8 +49,8 @@ macro_rules! implicit_xx_add_yy_to_zz {
             /// # Examples
             /// See [here](super::xx_add_yy_to_zz#xx_add_yy_to_zz).
             ///
-            /// This is equivalent to `add_ssaaaa` from `longlong.h`, GMP 6.2.1, where `(sh, sl)`
-            /// is returned.
+            /// This is equivalent to `add_ssaaaa` from `longlong.h`, GMP 6.2.1, where `(sh, sl)` is
+            /// returned.
             #[inline]
             fn xx_add_yy_to_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
                 implicit_xx_add_yy_to_zz::<$dt>(x_1, x_0, y_1, y_0)

@@ -185,88 +185,88 @@ fn test_jacobi_symbol_unsigned_double() {
         assert_eq!(jacobi_symbol_unsigned_double_fast_1(x_1, x_0, y_1, y_0), s);
         assert_eq!(jacobi_symbol_unsigned_double_fast_2(x_1, x_0, y_1, y_0), s);
     }
-    // fast_1: y_1 == T::ZERO || y_0 == T::ZERO first time
-    // fast_2: y_1 == T::ZERO && y_0 == T::ONE
+    // - fast_1: y_1 == T::ZERO || y_0 == T::ZERO first time
+    // - fast_2: y_1 == T::ZERO && y_0 == T::ONE
     test::<u64, u128>(0, 0, 0, 1, 1);
-    // fast_1: y_1 != T::ZERO && y_0 != T::ZERO first time
-    // fast_1: x_1 != T::ZERO && x_0 != T::ZERO
-    // fast_1: x_0 != T::ZERO first time
-    // fast_1: c != T::WIDTH first time
-    // fast_1: diff_0 != T::ZERO && diff_1 != T::ZERO
-    // fast_1: diff_1.get_highest_bit()
-    // fast_1: y_1 != T::ZERO && y_0 != T::ZERO second time
-    // fast_1: x_0 == T::ZERO second time
-    // fast_1: c != T::WIDTH second time
-    // fast_1: bit.even()
-    // fast_2: y_1 != T::ZERO || y_0 != T::ONE
-    // fast_2: x_0 != T::ZERO first time
-    // fast_2: x_0.odd()
-    // fast_2: x_1 == T::ZERO second time
-    // fast_2: y_1 != T::ZERO
-    // fast_2: skip_loop
-    // fast_2: y_0 != T::ONE second time
-    // fast_2: x_0 == T::ZERO fourth time
-    // fast_2: x_1 != T::ZERO fourth time
-    // fast_2: !bit.get_bit(1)
+    // - fast_1: y_1 != T::ZERO && y_0 != T::ZERO first time
+    // - fast_1: x_1 != T::ZERO && x_0 != T::ZERO
+    // - fast_1: x_0 != T::ZERO first time
+    // - fast_1: c != T::WIDTH first time
+    // - fast_1: diff_0 != T::ZERO && diff_1 != T::ZERO
+    // - fast_1: diff_1.get_highest_bit()
+    // - fast_1: y_1 != T::ZERO && y_0 != T::ZERO second time
+    // - fast_1: x_0 == T::ZERO second time
+    // - fast_1: c != T::WIDTH second time
+    // - fast_1: bit.even()
+    // - fast_2: y_1 != T::ZERO || y_0 != T::ONE
+    // - fast_2: x_0 != T::ZERO first time
+    // - fast_2: x_0.odd()
+    // - fast_2: x_1 == T::ZERO second time
+    // - fast_2: y_1 != T::ZERO
+    // - fast_2: skip_loop
+    // - fast_2: y_0 != T::ONE second time
+    // - fast_2: x_0 == T::ZERO fourth time
+    // - fast_2: x_1 != T::ZERO fourth time
+    // - fast_2: !bit.get_bit(1)
     test::<u64, u128>(0, 3, 2, 3, 1);
-    // fast_1: x_1 == T::ZERO || x_0 == T::ZERO
-    // fast_2: x_0 == T::ZERO first time
-    // fast_2: x_1 == T::ZERO first time
+    // - fast_1: x_1 == T::ZERO || x_0 == T::ZERO
+    // - fast_2: x_0 == T::ZERO first time
+    // - fast_2: x_1 == T::ZERO first time
     test::<u64, u128>(0, 0, 0, 3, 0);
-    // fast_1: t != T::ZERO
-    // fast_1: c == T::WIDTH third time
-    // fast_2: y_0 == T::ONE second time
+    // - fast_1: t != T::ZERO
+    // - fast_1: c == T::WIDTH third time
+    // - fast_2: y_0 == T::ONE second time
     test::<u64, u128>(0, 1, 1, 1, 1);
-    // fast_1: c != T::WIDTH third time
+    // - fast_1: c != T::WIDTH third time
     test::<u64, u128>(0, 1, 1, 3, 1);
-    // fast_1: x_0 == T::ZERO first time
-    // fast_2: x_1 != T::ZERO first time
-    // fast_2: y_0 == T::ONE first time
+    // - fast_1: x_0 == T::ZERO first time
+    // - fast_2: x_1 != T::ZERO first time
+    // - fast_2: y_0 == T::ONE first time
     test::<u64, u128>(1, 0, 0, 3, 1);
-    // fast_1: bit.odd()
-    // fast_2: x_1 != T::ZERO second time
-    // fast_2: !skip_loop
-    // fast_2: x_0 != T::ZERO fourth time
-    // fast_2: bit.get_bit(1)
+    // - fast_1: bit.odd()
+    // - fast_2: x_1 != T::ZERO second time
+    // - fast_2: !skip_loop
+    // - fast_2: x_0 != T::ZERO fourth time
+    // - fast_2: bit.get_bit(1)
     test::<u64, u128>(1, 1, 0, 3, -1);
-    // fast_1: t == T::ZERO
-    // fast_2: x_1 == y_1 first time
-    // fast_2: x_1 == y_1 second time
-    // fast_2: x_0 >= y_0
-    // fast_2: x_0 == T::ZERO third time
+    // - fast_1: t == T::ZERO
+    // - fast_2: x_1 == y_1 first time
+    // - fast_2: x_1 == y_1 second time
+    // - fast_2: x_0 >= y_0
+    // - fast_2: x_0 == T::ZERO third time
     test::<u64, u128>(1, 1, 1, 1, 0);
-    // fast_1: y_1 == T::ZERO || y_0 == T::ZERO second time
+    // - fast_1: y_1 == T::ZERO || y_0 == T::ZERO second time
     test::<u64, u128>(0, 1, 2, 1, 1);
-    // fast_1: x_0 != T::ZERO second time
-    // fast_1: c == T::WIDTH second time
-    // fast_2: x_1 != y_1 first time
-    // fast_2: x_1 != T::ZERO third time
-    // fast_2: y_0 == T::ZERO
+    // - fast_1: x_0 != T::ZERO second time
+    // - fast_1: c == T::WIDTH second time
+    // - fast_2: x_1 != y_1 first time
+    // - fast_2: x_1 != T::ZERO third time
+    // - fast_2: y_0 == T::ZERO
     test::<u64, u128>(1, 1, 2, 1, 1);
-    // fast_1: !diff_1.get_highest_bit()
+    // - fast_1: !diff_1.get_highest_bit()
     test::<u64, u128>(2, 1, 0, 3, 0);
-    // fast_1: diff_0 == T::ZERO || diff_1 == T::ZERO
+    // - fast_1: diff_0 == T::ZERO || diff_1 == T::ZERO
     test::<u64, u128>(2, 1, 2, 1, 0);
-    // fast_1: c == T::WIDTH first time
-    // fast_2: x_0.even()
-    // fast_2: y_0 != T::ZERO
+    // - fast_1: c == T::WIDTH first time
+    // - fast_2: x_0.even()
+    // - fast_2: y_0 != T::ZERO
     test::<u8, u16>(242, 128, 173, 173, -1);
-    // fast_2: y_1 == T::ZERO
+    // - fast_2: y_1 == T::ZERO
     test::<u8, u16>(0, 1, 0, 3, 1);
-    // fast_2: x_0 < y_0
-    // fast_2: x_0 != T::ZERO third time
-    // fast_2: x_0 == T::ONE
+    // - fast_2: x_0 < y_0
+    // - fast_2: x_0 != T::ZERO third time
+    // - fast_2: x_0 == T::ONE
     test::<u8, u16>(1, 1, 1, 3, 1);
-    // fast_2: x_0 != T::ONE
+    // - fast_2: x_0 != T::ONE
     test::<u8, u16>(1, 1, 1, 7, -1);
-    // fast_2: x_1 != y_1 second time
+    // - fast_2: x_1 != y_1 second time
     test::<u8, u16>(1, 1, 2, 3, 1);
-    // fast_2: x_0 == T::ZERO second time
+    // - fast_2: x_0 == T::ZERO second time
     test::<u8, u16>(2, 1, 1, 1, 1);
-    // fast_2: x_0 != T::ZERO second time
-    // fast_2: x_1 == T::ZERO third time
+    // - fast_2: x_0 != T::ZERO second time
+    // - fast_2: x_1 == T::ZERO third time
     test::<u8, u16>(2, 1, 1, 3, -1);
-    // fast_2: y_0 != T::ONE first time
+    // - fast_2: y_0 != T::ONE first time
     test::<u8, u16>(3, 0, 0, 3, 0);
 }
 

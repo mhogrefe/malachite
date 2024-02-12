@@ -41,14 +41,14 @@ fn test_limbs_square_low_basecase() {
         assert_eq!(square, expected_square);
         assert_eq!(&out_before[len..], &out_after[len..]);
     };
-    // n == 1
+    // - n == 1
     test(&[10; 3], &[1], &[1, 10, 10]);
-    // n == 2
+    // - n == 2
     test(&[10; 3], &[123, 456], &[15129, 112176, 10]);
-    // n > 2
-    // n.odd() in limbs_square_low_diagonal
+    // - n > 2
+    // - n.odd() in limbs_square_low_diagonal
     test(&[10; 4], &[123, 456, 789], &[15129, 112176, 402030, 10]);
-    // n.even() in limbs_square_low_diagonal
+    // - n.even() in limbs_square_low_diagonal
     test(
         &[10; 5],
         &[123, 456, 789, 987],

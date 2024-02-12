@@ -83,8 +83,8 @@ pub_crate_test! {limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the product of the `Natural` and a `Limb`, plus a carry, to the input slice. Returns
-// the carry.
+// limbs of the product of the `Natural` and a `Limb`, plus a carry, to the input slice. Returns the
+// carry.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -134,8 +134,8 @@ pub_crate_test! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the `rp == up`
-// and instead of returning the carry, it is appended to `rp`.
+// This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the `rp == up` and
+// instead of returning the carry, it is appended to `rp`.
 pub_test! {limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     let carry = limbs_slice_mul_limb_in_place(xs, y);
     if carry != 0 {

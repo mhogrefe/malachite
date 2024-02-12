@@ -1,10 +1,10 @@
 use crate::Float;
+use core::str::FromStr;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_q::Rational;
-use std::str::FromStr;
 
 fn from_hex_string(s: &str) -> Float {
     match s {

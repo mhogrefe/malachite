@@ -42,8 +42,8 @@ pub_test! {rational_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &
         == 0
 }}
 
-/// A `RationalSequence` is a sequence that is either finite or eventually repeating, just like
-/// the digits of a rational number.
+/// A `RationalSequence` is a sequence that is either finite or eventually repeating, just like the
+/// digits of a rational number.
 ///
 /// In testing, the set of rational sequences may be used as a proxy for the set of all sequences,
 /// which is too large to work with.
@@ -174,10 +174,10 @@ impl<T: Eq> RationalSequence<T> {
 impl<T: Clone + Eq> RationalSequence<T> {
     // Returns true iff `self` is valid.
     //
-    // To be valid, the non-repeating and repeating parts must be reduced. For example, `[1, 2]`
-    // and `[3, 4]` is a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` is a
-    // non-reduced pair representing the same sequence, as is `[1, 2, 3]` and `[4, 3]`. All
-    // `RationalSequence`s must be valid.
+    // To be valid, the non-repeating and repeating parts must be reduced. For example, `[1, 2]` and
+    // `[3, 4]` is a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` is a non-reduced
+    // pair representing the same sequence, as is `[1, 2, 3]` and `[4, 3]`. All `RationalSequence`s
+    // must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         rational_sequence_is_reduced(&self.non_repeating, &self.repeating)

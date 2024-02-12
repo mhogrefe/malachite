@@ -128,8 +128,8 @@ pub fn random_natural_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -186,8 +186,8 @@ pub fn random_positive_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -221,10 +221,10 @@ pub fn random_negative_integers(
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// [`geometric_random_nonzero_signeds`]); $m$ must be greater than 1. Then an [`Integer`] is
-/// chosen uniformly among all positive [`Integer`]s with that bit length, and its sign is set to
-/// the sign of the signed bit length. The resulting distribution has no mean or higher-order
-/// statistics (unless $m < 2$, which is not typical).
+/// [`geometric_random_nonzero_signeds`]); $m$ must be greater than 1. Then an [`Integer`] is chosen
+/// uniformly among all positive [`Integer`]s with that bit length, and its sign is set to the sign
+/// of the signed bit length. The resulting distribution has no mean or higher-order statistics
+/// (unless $m < 2$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
@@ -245,8 +245,8 @@ pub fn random_negative_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if
-/// `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero or if `mean_bits_numerator
+/// <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -282,8 +282,8 @@ pub fn random_nonzero_integers(
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
 /// [`geometric_random_signeds`]); $m$ must be greater than 0. Then an [`Integer`] is chosen
 /// uniformly among all [`Integer`]s with that bit length, and its sign is set to the sign of the
-/// signed bit length. The resulting distribution has no mean or higher-order statistics (unless
-/// $m < 1$, which is not typical).
+/// signed bit length. The resulting distribution has no mean or higher-order statistics (unless $m
+/// < 1$, which is not typical).
 ///
 /// $$
 /// P(n) = \\begin{cases}
@@ -376,10 +376,9 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if
+/// after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -435,9 +434,9 @@ pub fn striped_random_natural_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -494,9 +493,9 @@ pub fn striped_random_positive_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -556,9 +555,9 @@ pub fn striped_random_negative_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or if `mean_bits_numerator <= mean_bits_denominator`.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// `mean_bits_numerator <= mean_bits_denominator`.
 ///
 /// # Examples
 /// ```
@@ -598,11 +597,11 @@ pub fn striped_random_nonzero_integers(
 ///
 /// The actual signed bit length is chosen from a distribution that produces values whose mean
 /// absolute values are $m$, where $m$ is `mean_bits_numerator / mean_bits_denominator` (see
-/// [`geometric_random_signeds`]); $m$ must be greater than 0. A striped bit sequence with the
-/// given stripe parameter is generated and truncated at the bit length. The highest bit is forced
-/// to be 1, an [`Integer`] is generated from the sequence, and its sign is set to the sign of the
-/// signed bit length. The resulting distribution has no mean or higher-order statistics (unless
-/// $m < 1$, which is not typical).
+/// [`geometric_random_signeds`]); $m$ must be greater than 0. A striped bit sequence with the given
+/// stripe parameter is generated and truncated at the bit length. The highest bit is forced to be
+/// 1, an [`Integer`] is generated from the sequence, and its sign is set to the sign of the signed
+/// bit length. The resulting distribution has no mean or higher-order statistics (unless $m < 1$,
+/// which is not typical).
 ///
 /// The output length is infinite.
 ///
@@ -617,10 +616,9 @@ pub fn striped_random_nonzero_integers(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or, if
+/// after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -1005,12 +1003,12 @@ impl Iterator for RandomIntegerRange {
 /// more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
-/// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
-/// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
-/// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
-/// as bit length increases. The larger it is, the more closely the distribution approaches a
-/// uniform distribution over the bit lengths.
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though it
+/// approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity. $m$
+/// cannot be 0, and must be greater than the bit length of the smallest integer in the range, but
+/// it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease as
+/// bit length increases. The larger it is, the more closely the distribution approaches a uniform
+/// distribution over the bit lengths.
 ///
 /// Once a bit length is selected, the [`Integer`] is chosen uniformly from all [`Integer`]s with
 /// that bit length that are in $[a, b)$.
@@ -1022,8 +1020,8 @@ impl Iterator for RandomIntegerRange {
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
+/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -1076,12 +1074,12 @@ pub fn random_integer_range(
 /// generated more frequently.
 ///
 /// The distribution of generated values is parametrized by a number $m$, given by
-/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though
-/// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
-/// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
-/// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
-/// as bit length increases. The larger it is, the more closely the distribution approaches a
-/// uniform distribution over the bit lengths.
+/// `mean_bits_numerator / mean_bits_denominator`. It is not actually the mean bit length, though it
+/// approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity. $m$
+/// cannot be 0, and must be greater than the bit length of the smallest integer in the range, but
+/// it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease as
+/// bit length increases. The larger it is, the more closely the distribution approaches a uniform
+/// distribution over the bit lengths.
 ///
 /// Once a bit length is selected, the [`Integer`] is chosen uniformly from all [`Integer`]s with
 /// that bit length that are in $[a, b]$.
@@ -1093,8 +1091,8 @@ pub fn random_integer_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is
-/// `mean_bits_numerator + mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
+/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -1199,12 +1197,12 @@ impl Iterator for StripedRandomIntegerInclusiveRange {
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1261,12 +1259,12 @@ pub fn striped_random_integer_range(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1416,12 +1414,12 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 
 /// Generates striped random [`Integer`]s greater than or equal to a lower bound $a$.
 ///
-/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit
-/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
-/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
-/// which is not typical).
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$, which
+/// is not typical).
 ///
 /// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
 /// length will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher
@@ -1440,10 +1438,10 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, if $a > 0$ and their ratio is less than or equal to the bit
-/// length of $a$, or if they are too large and manipulating them leads to arithmetic overflow.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a >
+/// 0$ and their ratio is less than or equal to the bit length of $a$, or if they are too large and
+/// manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
@@ -1502,12 +1500,12 @@ pub fn striped_random_integer_range_to_infinity(
 
 /// Generates striped random [`Integer`]s less than or equal to an upper bound $a$.
 ///
-/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit
-/// length of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+/// The mean bit length $m$ of the [`Integer`]s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
-/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
-/// which is not typical).
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$, which
+/// is not typical).
 ///
 /// Because the [`Integer`]s are constrained to be within a certain range, the actual mean run
 /// length will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher
@@ -1526,10 +1524,10 @@ pub fn striped_random_integer_range_to_infinity(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
-/// `mean_bits_denominator` are zero, if $b < 0$ and their ratio is less than or equal to the bit
-/// length of $b$, or if they are too large and manipulating them leads to arithmetic overflow.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $b <
+/// 0$ and their ratio is less than or equal to the bit length of $b$, or if they are too large and
+/// manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```

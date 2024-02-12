@@ -1,20 +1,21 @@
 use crate::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
-    CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial, CheckedLcm, CheckedLogBase,
-    CheckedLogBase2, CheckedLogBasePowerOf2, CheckedMultifactorial, CheckedNextPowerOf2,
-    CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial,
-    FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign,
-    ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed,
-    ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed,
-    ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse,
-    ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
-    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
-    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
-    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
-    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod,
-    NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
-    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ,
-    XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
+    AbsDiff, AbsDiffAssign, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase,
+    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial, CheckedLcm,
+    CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2, CheckedMultifactorial,
+    CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
+    ExtendedGcd, Factorial, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign,
+    IsPowerOf2, Lcm, LcmAssign, ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul,
+    ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
+    ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add,
+    ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
+    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
+    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
+    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
+    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod, NegModAssign,
+    NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, Primorial,
+    RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ, XXAddYYToZZ,
+    XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::traits::{
@@ -27,7 +28,9 @@ use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
 
 /// Defines functions on primitive unsigned integer types: uxx and usize.
 pub trait PrimitiveUnsigned:
-    BitBlockAccess<Bits = Self>
+    AbsDiff<Self, Output = Self>
+    + AbsDiffAssign<Self>
+    + BitBlockAccess<Bits = Self>
     + CeilingLogBase<Output = u64>
     + CeilingLogBase2<Output = u64>
     + CeilingLogBasePowerOf2<u64, Output = u64>

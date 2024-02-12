@@ -38,8 +38,7 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
 }
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-// 2<sup>`pow`</sup>.
+// `Natural` from a `Limb`, mod `2 ^ pow`. Assumes the input is already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -57,8 +56,8 @@ pub_test! {limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>, and writes the limbs of the difference to the
-// input slice. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+// `Natural` from a `Limb`, mod `2 ^ pow`, and writes the limbs of the difference to the input
+// slice. Assumes the input is already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -74,9 +73,9 @@ pub_test! {limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Li
     limbs_vec_mod_power_of_2_add_limb_in_place(ys, x, pow);
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and returns a `Vec` of the
-// limbs of the difference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second `Natural` from the first, mod `2 ^ pow`, and returns a `Vec` of the limbs of the
+// difference. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -97,10 +96,9 @@ pub_test! {limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<L
     out_limbs
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-// the difference to the first (left) slice. Assumes the inputs are already reduced mod
-// 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second `Natural` from the first, mod `2 ^ pow`, and writes the limbs of the difference to the
+// first (left) slice. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -119,10 +117,9 @@ pub_test! {limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb
     }
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-// the difference to the second (right) slice. Assumes the inputs are already reduced mod
-// 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second `Natural` from the first, mod `2 ^ pow`, and writes the limbs of the difference to the
+// second (right) slice. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // Neither input slice may have trailing zeros.
 //
@@ -151,11 +148,11 @@ pub_test! {limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Lim
     }
 }}
 
-// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-// the difference to to the longer slice (or the first one, if they are equally long). Returns a
-// `bool` which is `false` when the output is to the first `Vec` and `true` when it's to the second
-// `Vec`. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second `Natural` from the first, mod `2 ^ pow`, and writes the limbs of the difference to to
+// the longer slice (or the first one, if they are equally long). Returns a `bool` which is `false`
+// when the output is to the first `Vec` and `true` when it's to the second `Vec`. Assumes the
+// inputs are already reduced mod `2 ^ pow`.
 //
 // Neither input slice may have trailing zeros.
 //

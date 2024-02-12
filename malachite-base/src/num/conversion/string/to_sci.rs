@@ -218,8 +218,8 @@ macro_rules! impl_to_sci_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that
-            /// the input must be rounded.
+            /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the
+            /// input must be rounded.
             ///
             /// # Examples
             /// See [here](super::to_sci).
@@ -249,8 +249,8 @@ macro_rules! impl_to_sci_signed {
                 fmt_sci_valid_signed(*self, options)
             }
 
-            /// Converts a signed number to a string using a specified base, possibly formatting
-            /// the number using scientific notation.
+            /// Converts a signed number to a string using a specified base, possibly formatting the
+            /// number using scientific notation.
             ///
             /// See [`ToSciOptions`] for details on the available options. Note that setting
             /// `neg_exp_threshold` has no effect, since there is never a need to use negative
@@ -264,8 +264,8 @@ macro_rules! impl_to_sci_signed {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that
-            /// the input must be rounded.
+            /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the
+            /// input must be rounded.
             ///
             /// # Examples
             /// See [here](super::to_sci).

@@ -61,9 +61,9 @@ impl<'a> DivExact<&'a Integer> for Integer {
     /// f(x, y) = \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `self / &other` instead. If
-    /// you're unsure and you want to know, use `self.div_mod(&other)` and check whether the
-    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// If you are unsure whether the division will be exact, use `self / &other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(&other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round(&other, RoundingMode::Exact)`.
     ///
     /// # Worst-case complexity
@@ -110,9 +110,9 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// f(x, y) = \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `&self / other` instead. If
-    /// you're unsure and you want to know, use `self.div_mod(other)` and check whether the
-    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// If you are unsure whether the division will be exact, use `&self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
     /// `(&self).div_round(other, RoundingMode::Exact)`.
     ///
     /// # Worst-case complexity
@@ -154,8 +154,8 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference. The first
-    /// [`Integer`] must be exactly divisible by the second. If it isn't, this function may panic
-    /// or return a meaningless result.
+    /// [`Integer`] must be exactly divisible by the second. If it isn't, this function may panic or
+    /// return a meaningless result.
     ///
     /// $$
     /// f(x, y) = \frac{x}{y}.
@@ -203,8 +203,8 @@ impl DivExactAssign<Integer> for Integer {
     /// x \gets \frac{x}{y}.
     /// $$
     ///
-    /// If you are unsure whether the division will be exact, use `self /= other` instead. If
-    /// you're unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// If you are unsure whether the division will be exact, use `self /= other` instead. If you're
+    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
     /// remainder is zero. If you want a function that panics if the division is not exact, use
     /// `self.div_round_assign(other, RoundingMode::Exact)`.
     ///
@@ -242,8 +242,8 @@ impl DivExactAssign<Integer> for Integer {
 
 impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// Divides an [`Integer`] by another [`Integer`] in place, taking the [`Integer`] on the
-    /// right-hand side by reference. The first [`Integer`] must be exactly divisible by the
-    /// second. If it isn't, this function may panic or return a meaningless result.
+    /// right-hand side by reference. The first [`Integer`] must be exactly divisible by the second.
+    /// If it isn't, this function may panic or return a meaningless result.
     ///
     /// $$
     /// x \gets \frac{x}{y}.

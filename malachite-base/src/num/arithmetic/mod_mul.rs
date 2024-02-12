@@ -273,8 +273,8 @@ macro_rules! impl_mod_mul_precomputed_fast {
                 $invert_limb(m << LeadingZeros::leading_zeros(m))
             }
 
-            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
-            /// reduced modulo $m$.
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced
+            /// modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular multiplications with the same modulus. The precomputed data should be
@@ -317,8 +317,8 @@ macro_rules! impl_mod_mul_precomputed_promoted {
                 u32::precompute_mod_mul_data(&u32::from(m))
             }
 
-            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
-            /// reduced modulo $m$.
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced
+            /// modulo $m$.
             ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular multiplications with the same modulus. The precomputed data should be
@@ -466,8 +466,8 @@ macro_rules! impl_mod_mul {
         impl ModMul<$t> for $t {
             type Output = $t;
 
-            /// Multiplies two numbers modulo a third number $m$. The inputs must be already
-            /// reduced modulo $m$.
+            /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced
+            /// modulo $m$.
             ///
             /// $f(x, y, m) = z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
             ///
@@ -502,8 +502,8 @@ macro_rules! impl_mod_mul {
             /// # Panics
             /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
-            /// This is equivalent to `nmod_mul` from `nmod_vec.h`, FLINT 2.7.1, where the result
-            /// is assigned to `a`.
+            /// This is equivalent to `nmod_mul` from `nmod_vec.h`, FLINT 2.7.1, where the result is
+            /// assigned to `a`.
             #[inline]
             fn mod_mul_assign(&mut self, other: $t, m: $t) {
                 *self = naive_mod_mul(*self, other, m);

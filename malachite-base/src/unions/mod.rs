@@ -15,8 +15,8 @@ pub enum UnionFromStrError<E> {
 /// Defines unions.
 ///
 /// Malachite provides [`Union2`], but you can also define `Union3`, `Union4`, and so on, in your
-/// program using the code below. The documentation for [`Union2`] and describes these other
-/// `enum`s as well.
+/// program using the code below. The documentation for [`Union2`] and describes these other `enum`s
+/// as well.
 ///
 /// ```
 /// # #[macro_use]

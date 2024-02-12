@@ -4,12 +4,12 @@ use crate::exhaustive::{
     exhaustive_rationals_with_denominator_range,
 };
 use crate::Rational;
+use alloc::collections::BTreeSet;
 use malachite_base::num::arithmetic::traits::{Ceiling, Reciprocal, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::factorization::traits::Primes;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::collections::BTreeSet;
 
 // Returns a k such that for all n >= k, any closed interval with the given diameter is guaranteed
 // to contain rationals with (reduced) denominator n.
@@ -34,8 +34,8 @@ fn smallest_likely_denominator(interval_diameter: &Rational) -> Natural {
     interval_diameter.reciprocal().ceiling().unsigned_abs()
 }
 
-/// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a
-/// closed interval.
+/// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a closed
+/// interval.
 ///
 /// This `struct` is created by [`DenominatorsInClosedInterval::denominators_in_closed_interval`];
 /// see its documentation for more.
@@ -144,11 +144,11 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     ///
     /// For example, consider the interval $[1/3, 1/2]$. It contains no integers, so no
     /// [`Rational`]s with denominator 1. It does contain [`Rational`]s with denominators 2 and 3
-    /// (the endpoints). It contains none with denominator 4, but it does contain $2/5$. It
-    /// contains none with denominator 6 (though $1/3$ and $1/2$ are $2/6$ and $3/6$, those
-    /// representations are not reduced). It contains $3/7$, $3/8$, and $4/9$ but none with
-    /// denominator 10 ($0.4$ does not count because it is $2/5$). It contains all denominators
-    /// greater than 10, so the complete list is $2, 3, 5, 7, 8, 9, 11, 12, 13, \ldots$.
+    /// (the endpoints). It contains none with denominator 4, but it does contain $2/5$. It contains
+    /// none with denominator 6 (though $1/3$ and $1/2$ are $2/6$ and $3/6$, those representations
+    /// are not reduced). It contains $3/7$, $3/8$, and $4/9$ but none with denominator 10 ($0.4$
+    /// does not count because it is $2/5$). It contains all denominators greater than 10, so the
+    /// complete list is $2, 3, 5, 7, 8, 9, 11, 12, 13, \ldots$.
     ///
     /// # Worst-case complexity per iteration
     /// $T(n, i) = O(n + \log i)$

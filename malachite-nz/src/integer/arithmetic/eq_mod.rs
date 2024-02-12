@@ -63,9 +63,9 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 // positive, `c` is negative, `a` and `d` are one limb long, and `c` is longer than one limb.
 pub_const_test! {limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
     // We are checking whether x ≡ -y mod m; that is, whether x + y = k * m for some k in Z. But
-    // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
-    // while the highest possible value of x + y is 2<sup>Limb::WIDTH + 1</sup> - 2, so we have
-    // x + y < 2 * m. This means that k can only be 1, so we're actually checking whether x + y = m.
+    // because of the preconditions on m, the lowest possible value of m is `2 ^ Limb::WIDTH`, while
+    // the highest possible value of x + y is `2 ^ (Limb::WIDTH + 1) - 2`, so we have x + y < 2 * m.
+    // This means that k can only be 1, so we're actually checking whether x + y = m.
     ms.len() == 2 && ms[1] == 1 && {
         let (sum, overflow) = x.overflowing_add(y);
         overflow && sum == ms[0]
@@ -167,8 +167,8 @@ pub_test! {limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> b
     scratch.len() >= ms.len() && limbs_divisible_by(&mut scratch, ms)
 }}
 
-// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and
-// m, determines whether x ≡ -y mod m.
+// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
+// determines whether x ≡ -y mod m.
 //
 // This function assumes that each of the two input slices have at least two elements, their last
 // elements are nonzero, and `m` is nonzero.
@@ -382,8 +382,8 @@ impl EqMod<Integer, Natural> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -436,8 +436,8 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -490,8 +490,8 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -544,8 +544,8 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -598,8 +598,8 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -652,8 +652,8 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -706,8 +706,8 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -760,8 +760,8 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

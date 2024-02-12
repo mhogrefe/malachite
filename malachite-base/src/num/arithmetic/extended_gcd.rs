@@ -183,9 +183,9 @@ macro_rules! impl_extended_gcd {
             /// - $f(0, 0) = (0, 0, 0)$.
             /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
             /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
-            /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-            ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-            ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+            /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(a,
+            ///   b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$,
+            ///   and $y \leq \lfloor a/g \rfloor$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$
@@ -218,9 +218,9 @@ macro_rules! impl_extended_gcd {
             /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
             /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
             /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-            /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-            ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-            ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+            /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|,
+            ///   |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$,
+            ///   and $y \leq \lfloor a/g \rfloor$.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$

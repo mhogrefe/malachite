@@ -73,9 +73,9 @@ pub_test! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x | y).collect()
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the result is the length
-// of the longer input slice.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the result is the length of
+// the longer input slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -200,8 +200,8 @@ pub_test! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 
 // Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the limbs of the bitwise or of the `Natural`s to the longer slice (or the first one, if they are
-// equally long). Returns a `bool` which is `false` when the output is to the first slice and
-// `true` when it's to the second slice.
+// equally long). Returns a `bool` which is `false` when the output is to the first slice and `true`
+// when it's to the second slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -260,8 +260,8 @@ impl BitOr<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -368,8 +368,8 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -401,8 +401,8 @@ impl BitOrAssign<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

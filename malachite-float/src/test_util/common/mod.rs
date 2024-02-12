@@ -1,16 +1,20 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, ComparableFloatRef, Float};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
-use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase};
+use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase, SciMantissaAndExponent};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use rug::float::{Round, Special};
 
 // Can't have From impl due to orphan rule. We could define an impl in malachite-base where
 // RoundingMode is defined, but pulling in rug::float just for that purpose seems overkill.
-pub fn rounding_mode_from_rug_round(rm: Round) -> RoundingMode {
+pub const fn rounding_mode_from_rug_round(rm: Round) -> RoundingMode {
     match rm {
         Round::Nearest => RoundingMode::Nearest,
         Round::Zero => RoundingMode::Down,
@@ -55,12 +59,20 @@ impl From<&rug::Float> for Float {
                 Float::NEGATIVE_ZERO
             }
         } else {
-            Float(Finite {
+            let mut significand = Natural::exact_from(&*x.get_significand().unwrap());
+            let precision = u64::from(x.prec());
+            if significand.significant_bits() - precision >= Limb::WIDTH {
+                // can only happen when 32_bit_limbs is set
+                significand >>= Limb::WIDTH;
+            }
+            let result = Float(Finite {
                 sign: x.is_sign_positive(),
                 exponent: i64::from(x.get_exp().unwrap()),
-                precision: u64::from(x.prec()),
-                significand: Natural::exact_from(&*x.get_significand().unwrap()),
-            })
+                precision,
+                significand,
+            });
+            assert!(result.is_valid());
+            result
         }
     }
 }
@@ -73,6 +85,14 @@ fn special_float(prec: u32, value: Special) -> Result<rug::Float, ()> {
     Ok(rug::Float::with_val_round(prec, value, Round::Zero).0)
 }
 
+pub fn rug_float_significant_bits(x: &rug::Float) -> u64 {
+    if x.is_normal() {
+        u64::from(x.prec())
+    } else {
+        1
+    }
+}
+
 impl TryFrom<&Float> for rug::Float {
     type Error = ();
 
@@ -82,7 +102,7 @@ impl TryFrom<&Float> for rug::Float {
             float_infinity!() => special_float(1, Special::Infinity),
             float_negative_infinity!() => special_float(1, Special::NegInfinity),
             float_zero!() => special_float(1, Special::Zero),
-            float_negative_zero!() => special_float(2, Special::NegZero),
+            float_negative_zero!() => special_float(1, Special::NegZero),
             Float(Finite {
                 sign,
                 exponent,
@@ -114,6 +134,35 @@ pub fn parse_hex_string(s_hex: &str) -> Float {
 
 pub fn to_hex_string(x: &Float) -> String {
     format!("{:#x}", ComparableFloatRef(x))
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn emulate_primitive_float_fn_2<T: PrimitiveFloat, F: Fn(Float, Float, u64) -> Float>(
+    f: F,
+    x: T,
+    y: T,
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let y = Float::from(y);
+    let mut result = f(x.clone(), y.clone(), T::MANTISSA_WIDTH + 1);
+    if !result.is_normal() {
+        return T::exact_from(&result);
+    }
+    let e = <&Float as SciMantissaAndExponent<Float, i64, _>>::sci_exponent(&result);
+    if e < T::MIN_NORMAL_EXPONENT {
+        result = f(x, y, T::max_precision_for_sci_exponent(e));
+    }
+    if result > T::MAX_FINITE {
+        T::INFINITY
+    } else if result < -T::MAX_FINITE {
+        T::NEGATIVE_INFINITY
+    } else {
+        T::exact_from(&result)
+    }
 }
 
 pub const ORDERED_FLOAT_STRINGS: [&str; 21] = [

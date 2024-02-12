@@ -1,4 +1,5 @@
 use crate::Rational;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, Pow};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
@@ -20,9 +21,8 @@ impl Rational {
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(before_point.len(), after_point.component_len())`, and $m$ is
-    /// `base.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(before_point.len(),
+    /// after_point.component_len())`, and $m$ is `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.
@@ -93,9 +93,8 @@ impl Rational {
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(before_point.len(), after_point.component_len())`, and $m$ is
-    /// `base.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(before_point.len(),
+    /// after_point.component_len())`, and $m$ is `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than 2.

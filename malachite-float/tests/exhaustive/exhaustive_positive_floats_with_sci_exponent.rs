@@ -1,18 +1,22 @@
-use malachite_float::exhaustive::exhaustive_floats_with_sci_exponent;
+use malachite_float::exhaustive::exhaustive_positive_floats_with_sci_exponent;
 use malachite_float::test_util::exhaustive::exhaustive_floats_helper_helper_with_limit;
 
-fn exhaustive_floats_with_sci_exponent_helper(sci_exponent: i64, out: &[&str], out_hex: &[&str]) {
+fn exhaustive_positive_floats_with_sci_exponent_helper(
+    sci_exponent: i64,
+    out: &[&str],
+    out_hex: &[&str],
+) {
     exhaustive_floats_helper_helper_with_limit(
         20,
-        exhaustive_floats_with_sci_exponent(sci_exponent),
+        exhaustive_positive_floats_with_sci_exponent(sci_exponent),
         out,
         out_hex,
     );
 }
 
 #[test]
-fn test_exhaustive_floats_with_sci_exponent() {
-    exhaustive_floats_with_sci_exponent_helper(
+fn test_exhaustive_positive_floats_with_sci_exponent() {
+    exhaustive_positive_floats_with_sci_exponent_helper(
         0,
         &[
             "1.0", "1.0", "1.5", "1.0", "1.2", "1.5", "1.8", "1.0", "1.1", "1.2", "1.4", "1.5",
@@ -24,7 +28,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x1.1#5", "0x1.2#5", "0x1.3#5", "0x1.4#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         1,
         &[
             "2.0", "2.0", "3.0", "2.0", "2.5", "3.0", "3.5", "2.0", "2.2", "2.5", "2.8", "3.0",
@@ -36,7 +40,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x2.2#5", "0x2.4#5", "0x2.6#5", "0x2.8#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         2,
         &[
             "4.0", "4.0", "6.0", "4.0", "5.0", "6.0", "7.0", "4.0", "4.5", "5.0", "5.5", "6.0",
@@ -48,7 +52,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x4.4#5", "0x4.8#5", "0x4.c#5", "0x5.0#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         10,
         &[
             "1.0e3", "1.0e3", "1.5e3", "1.0e3", "1.3e3", "1.5e3", "1.8e3", "1.0e3", "1.2e3",
@@ -78,7 +82,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x5.0E+2#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         -1,
         &[
             "0.5", "0.5", "0.8", "0.5", "0.6", "0.8", "0.9", "0.5", "0.56", "0.62", "0.7", "0.75",
@@ -90,7 +94,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x0.80#5", "0x0.88#5", "0x0.90#5", "0x0.98#5", "0x0.a0#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         -2,
         &[
             "0.2", "0.2", "0.4", "0.25", "0.3", "0.38", "0.44", "0.25", "0.28", "0.31", "0.34",
@@ -102,7 +106,7 @@ fn test_exhaustive_floats_with_sci_exponent() {
             "0x0.78#4", "0x0.40#5", "0x0.44#5", "0x0.48#5", "0x0.4c#5", "0x0.50#5",
         ],
     );
-    exhaustive_floats_with_sci_exponent_helper(
+    exhaustive_positive_floats_with_sci_exponent_helper(
         -10,
         &[
             "0.001", "0.00098", "0.0015", "0.00098", "0.0012", "0.0015", "0.0017", "0.00098",

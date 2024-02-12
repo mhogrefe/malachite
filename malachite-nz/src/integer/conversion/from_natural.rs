@@ -4,8 +4,8 @@ use crate::natural::Natural;
 impl Integer {
     /// Converts a sign and a [`Natural`] to an [`Integer`], taking the [`Natural`] by value. The
     /// [`Natural`] becomes the [`Integer`]'s absolute value, and the sign indicates whether the
-    /// [`Integer`] should be non-negative. If the [`Natural`] is zero, then the [`Integer`] will
-    /// be non-negative regardless of the sign.
+    /// [`Integer`] should be non-negative. If the [`Natural`] is zero, then the [`Integer`] will be
+    /// non-negative regardless of the sign.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -26,9 +26,9 @@ impl Integer {
     }
 
     /// Converts a sign and an [`Natural`] to an [`Integer`], taking the [`Natural`] by reference.
-    /// The [`Natural`] becomes the [`Integer`]'s absolute value, and the sign indicates whether
-    /// the [`Integer`] should be non-negative. If the [`Natural`] is zero, then the [`Integer`]
-    /// will be non-negative regardless of the sign.
+    /// The [`Natural`] becomes the [`Integer`]'s absolute value, and the sign indicates whether the
+    /// [`Integer`] should be non-negative. If the [`Natural`] is zero, then the [`Integer`] will be
+    /// non-negative regardless of the sign.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

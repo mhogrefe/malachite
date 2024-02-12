@@ -9,8 +9,8 @@ pub enum SciSizeOptions {
     /// Indicates how many significant figures should be shown. The precision cannot be zero.
     Precision(u64),
     /// Indicates how many digits after the decimal (or other-base) point should be shown. For
-    /// example, if the base is 10 and the scale is 2, then up to two digits after the decimal
-    /// point should be shown.
+    /// example, if the base is 10 and the scale is 2, then up to two digits after the decimal point
+    /// should be shown.
     Scale(u64),
 }
 
@@ -33,9 +33,9 @@ impl SciSizeOptions {
 
 /// A `struct` determining how a number should be formatted as a "scientific" string.
 ///
-/// - The base must be between 2 and 36, inclusive. The characters representing the digits are
-///   `'0'` through `'9'` and either `'a'` through `'z'` or `'A'` through `'Z'`, depending on
-///   whether the `lowercase` field is set. The default base is 10.
+/// - The base must be between 2 and 36, inclusive. The characters representing the digits are `'0'`
+///   through `'9'` and either `'a'` through `'z'` or `'A'` through `'Z'`, depending on whether the
+///   `lowercase` field is set. The default base is 10.
 ///
 /// - The rounding mode determines how the output should be rounded, in case the `size_options`
 ///   field is such that the number can't be fully represented. The default rounding mode is
@@ -57,9 +57,9 @@ impl SciSizeOptions {
 ///   or uppercase (`'E'`). The default is `true`.
 ///
 /// - The "force exponent plus sign" setting determines whether positive exponents should be
-///   rendered with an explicit plus sign. If the base is 15 or greater, then the explicit plus
-///   sign is used regardless, in order to distinguish the exponent indicator from the digit `'e'`.
-///   The default is `false`.
+///   rendered with an explicit plus sign. If the base is 15 or greater, then the explicit plus sign
+///   is used regardless, in order to distinguish the exponent indicator from the digit `'e'`. The
+///   default is `false`.
 ///
 /// - The "include trailing zeros" setting determines whether trailing zeros after the decimal (or
 ///   other-base) point should be included. The default is `false`.
@@ -156,8 +156,8 @@ impl ToSciOptions {
         self.rounding_mode = rm;
     }
 
-    /// Sets the size options to the "Complete" mode, indicating that the number should be
-    /// converted using its full precision.
+    /// Sets the size options to the "Complete" mode, indicating that the number should be converted
+    /// using its full precision.
     #[inline]
     pub fn set_size_complete(&mut self) {
         self.size_options = SciSizeOptions::Complete;
@@ -236,8 +236,8 @@ impl ToSciOptions {
 /// A `struct` determining how a number should be parsed from a "scientific" string.
 ///
 /// - The base must be between 2 and 36, inclusive. The characters representing the digits may be
-///   `'0'` through `'9'` and either `'a'` through `'z'` or `'A'` through `'Z'`. The default base
-///   is 10.
+///   `'0'` through `'9'` and either `'a'` through `'z'` or `'A'` through `'Z'`. The default base is
+///   10.
 ///
 /// - The rounding mode determines how the output should be rounded, in case the output type can't
 ///   represent all possible input strings. The default rounding mode is `Nearest`.

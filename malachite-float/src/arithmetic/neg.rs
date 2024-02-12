@@ -1,9 +1,9 @@
 use crate::float_nan;
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::logic::traits::NotAssign;
-use std::ops::Neg;
 
 impl Neg for Float {
     type Output = Float;

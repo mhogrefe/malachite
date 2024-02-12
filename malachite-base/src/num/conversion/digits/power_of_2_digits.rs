@@ -107,8 +107,8 @@ macro_rules! impl_power_of_2_digits {
                     /// than the width of the digit type. If `self` is 0, the [`Vec`] is empty;
                     /// otherwise, it ends with a nonzero digit.
                     ///
-                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$,
-                    /// $n=0$ or $d_{n-1} \neq 0$, and
+                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$
+                    /// or $d_{n-1} \neq 0$, and
                     ///
                     /// $$
                     /// \sum_{i=0}^{n-1}2^{ki}d_i = x.
@@ -133,15 +133,15 @@ macro_rules! impl_power_of_2_digits {
                         to_power_of_2_digits_asc(self, log_base)
                     }
 
-                    /// Returns a [`Vec`] containing the base-$2^k$ digits of a number in
-                    /// descending order (most- to least-significant).
+                    /// Returns a [`Vec`] containing the base-$2^k$ digits of a number in descending
+                    /// order (most- to least-significant).
                     ///
                     /// The base-2 logarithm of the base is specified. `log_base` must be no larger
                     /// than the width of the digit type. If `self` is 0, the [`Vec`] is empty;
                     /// otherwise, it begins with a nonzero digit.
                     ///
-                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$,
-                    /// $n=0$ or $d_0 \neq 0$, and
+                    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$
+                    /// or $d_0 \neq 0$, and
                     ///
                     /// $$
                     /// \sum_{i=0}^{n-1}2^{k (n-i-1)}d_i = x.

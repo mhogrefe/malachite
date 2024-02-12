@@ -1,9 +1,9 @@
 use crate::conversion::traits::ContinuedFraction;
 use crate::Rational;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{DivMod, Floor};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::mem::swap;
 
 /// An iterator that produces the continued fraction of a [`Rational`].
 ///
@@ -40,17 +40,17 @@ impl ContinuedFraction for Rational {
 
     /// Returns the continued fraction of a [`Rational`], taking the [`Rational`] by value.
     ///
-    /// The output has two components. The first is the first value of the continued fraction,
-    /// which may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is
-    /// an iterator that produces the remaining values, which are all positive. Using the standard
+    /// The output has two components. The first is the first value of the continued fraction, which
+    /// may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is an
+    /// iterator that produces the remaining values, which are all positive. Using the standard
     /// notation for continued fractions, the first value is the number before the semicolon, and
     /// the second value produces the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. The shorter of the two
     /// representations (the one that does not end in 1) is returned.
     ///
-    /// $f(x) = (a_0, (a_1, a_2, \ldots, a_3)),$ where $x = [a_0; a_1, a_2, \ldots, a_3]$ and
-    /// $a_3 \neq 1$.
+    /// $f(x) = (a_0, (a_1, a_2, \ldots, a_3)),$ where $x = [a_0; a_1, a_2, \ldots, a_3]$ and $a_3
+    /// \neq 1$.
     ///
     /// The output length is $O(n)$, where $n$ is `self.significant_bits()`.
     ///
@@ -97,17 +97,17 @@ impl<'a> ContinuedFraction for &'a Rational {
 
     /// Returns the continued fraction of a [`Rational`], taking the [`Rational`] by reference.
     ///
-    /// The output has two components. The first is the first value of the continued fraction,
-    /// which may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is
-    /// an iterator that produces the remaining values, which are all positive. Using the standard
+    /// The output has two components. The first is the first value of the continued fraction, which
+    /// may be any [`Integer`] and is equal to the floor of the [`Rational`]. The second is an
+    /// iterator that produces the remaining values, which are all positive. Using the standard
     /// notation for continued fractions, the first value is the number before the semicolon, and
     /// the second value produces the remaining numbers.
     ///
     /// Each rational number has two continued fraction representations. The shorter of the two
     /// representations (the one that does not end in 1) is returned.
     ///
-    /// $f(x) = (a_0, (a_1, a_2, \ldots, a_3)),$ where $x = [a_0; a_1, a_2, \ldots, a_3]$ and
-    /// $a_3 \neq 1$.
+    /// $f(x) = (a_0, (a_1, a_2, \ldots, a_3)),$ where $x = [a_0; a_1, a_2, \ldots, a_3]$ and $a_3
+    /// \neq 1$.
     ///
     /// The output length is $O(n)$, where $n$ is `self.significant_bits()`.
     ///

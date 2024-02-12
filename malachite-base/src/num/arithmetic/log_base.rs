@@ -67,8 +67,8 @@ macro_rules! impl_log_base_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits() / base.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
+            /// base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -93,8 +93,8 @@ macro_rules! impl_log_base_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits() / base.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
+            /// base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -110,8 +110,8 @@ macro_rules! impl_log_base_unsigned {
         impl CheckedLogBase for $t {
             type Output = u64;
 
-            /// Returns the base-$b$ logarithm of a positive integer. If the integer is not a
-            /// power of $b$, `None` is returned.
+            /// Returns the base-$b$ logarithm of a positive integer. If the integer is not a power
+            /// of $b$, `None` is returned.
             ///
             /// $$
             /// f(x, b) = \\begin{cases}
@@ -125,8 +125,8 @@ macro_rules! impl_log_base_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits() / base.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
+            /// base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.

@@ -62,14 +62,14 @@ pub_test! {limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb],
     limbs_slice_add_same_length_in_place_left(&mut out[1..], scratch);
 }}
 
-//TODO tune
+// TODO tune
 #[cfg(feature = "test_build")]
 pub const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
 
 #[cfg(not(feature = "test_build"))]
 const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
 
-//TODO tune
+// TODO tune
 const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
     1
 } else {
@@ -118,10 +118,10 @@ pub_test! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     }
 }}
 
-//TODO tune
+// TODO tune
 const SQRLO_BASECASE_THRESHOLD: usize = 8;
 
-//TODO tune
+// TODO tune
 /// This is equivalent to `MAYBE_range_basecase` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
 /// changes from 6.1.2?
 const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
@@ -132,7 +132,7 @@ const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
         SQRLO_DC_THRESHOLD
     }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
 
-//TODO tune
+// TODO tune
 /// This is equivalent to `MAYBE_range_toom22` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
 /// changes from 6.1.2?
 const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
@@ -146,8 +146,8 @@ const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_sqrlo_itch` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate
-// changes from 6.1.2?
+// This is equivalent to `mpn_sqrlo_itch` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
+// from 6.1.2?
 pub_const_test! {limbs_square_low_scratch_len(len: usize) -> usize {
     len << 1
 }}
@@ -208,14 +208,15 @@ limbs_square_low_divide_and_conquer(
     limbs_slice_add_same_length_in_place_left(out_hi, &scratch_lo[len_big..]);
 }}
 
-//TODO tune
+// TODO tune
+
 // must be at least SQRLO_BASECASE_THRESHOLD
 const SQRLO_BASECASE_THRESHOLD_LIMIT: usize = 8;
 
-//TODO tune
+// TODO tune
 const SQRLO_SQR_THRESHOLD: usize = 6440;
 
-//TODO tune
+// TODO tune
 const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
     1
 } else {
@@ -231,8 +232,8 @@ const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
-// from 6.1.2?
+// This is equivalent to `mpn_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes from
+// 6.1.2?
 pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     assert!(SQRLO_BASECASE_THRESHOLD_LIMIT >= SQRLO_BASECASE_THRESHOLD);
     let len = xs.len();
@@ -260,9 +261,8 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 }}
 
 // Interpreting a `Vec<Limb>` as the limbs (in ascending order) of a `Natural`, returns a `Vec` of
-// the limbs of the square of the `Natural` mod 2<sup>`pow`</sup>. Assumes the input is already
-// reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated. The input may not be empty or
-// have trailing zeros.
+// the limbs of the square of the `Natural` mod `2 ^ pow`. Assumes the input is already reduced mod
+// `2 ^ pow`. The input `Vec` may be mutated. The input may not be empty or have trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -297,8 +297,8 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 }}
 
 // Interpreting a slice of `Limb` as the limbs (in ascending order) of a `Natural`, returns a `Vec`
-// of the limbs of the square of the `Natural` mod 2<sup>`pow`</sup>. Assumes the input is already
-// reduced mod 2<sup>`pow`</sup>. The input may not be empty or have trailing zeros.
+// of the limbs of the square of the `Natural` mod `2 ^ pow`. Assumes the input is already reduced
+// mod `2 ^ pow`. The input may not be empty or have trailing zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$

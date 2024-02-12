@@ -211,8 +211,8 @@ fn from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 /// returned, indicating whether the mantissa and exponent correspond to a value less than, equal
 /// to, or greater than the original value.
 ///
-/// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
-/// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
+/// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a
+/// rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
 /// conversion might not be exact, so we round to the nearest float using the provided rounding
 /// mode. If the rounding mode is `Exact` but the conversion is not exact, `None` is returned.
 /// $$
@@ -294,16 +294,16 @@ pub fn sci_mantissa_and_exponent_round<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 }
 
 /// Constructs a primitive integer from its scientific mantissa and exponent. An [`Ordering`] is
-/// also returned, indicating whether the returned value is less than, equal to, or greater than
-/// the exact value implied by the input.
+/// also returned, indicating whether the returned value is less than, equal to, or greater than the
+/// exact value implied by the input.
 ///
 /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a
 /// rational number with $1 \leq m_s < 2$. Here, the rational mantissa is provided as a float. If
 /// the mantissa is outside the range $[1, 2)$, `None` is returned.
 ///
 /// Some combinations of mantissas and exponents do not specify an integer, in which case the
-/// resulting value is rounded to an integer using the specified rounding mode. If the rounding
-/// mode is `Exact` but the input does not exactly specify an integer, `None` is returned.
+/// resulting value is rounded to an integer using the specified rounding mode. If the rounding mode
+/// is `Exact` but the input does not exactly specify an integer, `None` is returned.
 ///
 /// $$
 /// f(x, r) \approx 2^{e_s}m_s.
@@ -467,8 +467,8 @@ macro_rules! impl_mantissa_and_exponent_unsigned {
             /// or `None` if the result cannot be exactly represented as an integer of the desired
             /// type (this happens if the exponent is too large).
             ///
-            /// The input does not have to be reduced; that is to say, the mantissa does not have
-            /// to be odd.
+            /// The input does not have to be reduced; that is to say, the mantissa does not have to
+            /// be odd.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -573,8 +573,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             ///
             /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
             /// components of `self`. When `self` is nonzero and finite, the raw exponent $e_r$ is
-            /// an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an integer in
-            /// $[0, 2^M-1]$.
+            /// an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an integer in $[0, 2^M-1]$.
             ///
             /// When `self` is nonzero and finite, $f(x) = (m_r, e_r)$, where
             /// $$
@@ -593,9 +592,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// and $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to
-            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
-            /// below.
+            /// For zeros, infinities, or `NaN`, refer to [IEEE
+            /// 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples below.
             ///
             /// The inverse operation is [`Self::from_raw_mantissa_and_exponent`].
             ///
@@ -611,8 +609,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
 
             /// Returns the raw mantissa.
             ///
-            /// The raw mantissa is the actual bit pattern used to represent the mantissa of
-            /// `self`. When `self` is nonzero and finite, it is an integer in $[0, 2^M-1]$.
+            /// The raw mantissa is the actual bit pattern used to represent the mantissa of `self`.
+            /// When `self` is nonzero and finite, it is an integer in $[0, 2^M-1]$.
             ///
             /// When `self` is nonzero and finite,
             /// $$
@@ -624,9 +622,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to
-            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
-            /// below.
+            /// For zeros, infinities, or `NaN`, refer to [IEEE
+            /// 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples below.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -640,8 +637,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
 
             /// Returns the raw exponent.
             ///
-            /// The raw exponent is the actual bit pattern used to represent the exponent of
-            /// `self`. When `self` is nonzero and finite, it is an integer in $[0, 2^E-2]$.
+            /// The raw exponent is the actual bit pattern used to represent the exponent of `self`.
+            /// When `self` is nonzero and finite, it is an integer in $[0, 2^E-2]$.
             ///
             /// When `self` is nonzero and finite,
             /// $$
@@ -652,9 +649,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to
-            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
-            /// below.
+            /// For zeros, infinities, or `NaN`, refer to [IEEE
+            /// 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples below.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -670,8 +666,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             ///
             /// The raw exponent and raw mantissa are the actual bit patterns used to represent the
             /// components of a float. When the float is nonzero and finite, the raw exponent $e_r$
-            /// is an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an integer in
-            /// $[0, 2^M-1]$.
+            /// is an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an integer in $[0,
+            /// 2^M-1]$.
             ///
             /// When the exponent is not `2^E-1`,
             /// $$
@@ -682,9 +678,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// where $M$ and $E$ are the mantissa width and exponent width, respectively.
             ///
-            /// For zeros, infinities, or `NaN`, refer to
-            /// [IEEE 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples
-            /// below.
+            /// For zeros, infinities, or `NaN`, refer to [IEEE
+            /// 754](https://standards.ieee.org/ieee/754/6210/) or look at the examples below.
             ///
             /// This function only outputs a single, canonical, `NaN`.
             ///
@@ -776,8 +771,8 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// f(x) = 2^{e_i}m_i,
             /// $$
-            /// or `None` if the result cannot be exactly represented as a float of the desired
-            /// type (this happens if the exponent is too large or too small, or if the mantissa's
+            /// or `None` if the result cannot be exactly represented as a float of the desired type
+            /// (this happens if the exponent is too large or too small, or if the mantissa's
             /// precision is too high for the exponent).
             ///
             /// The input does not have to be reduced; that is to say, the mantissa does not have to
@@ -829,9 +824,9 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// Returns the scientific mantissa.
             ///
             /// When $x$ is positive, nonzero, and finite, we can write $x = 2^{e_s}m_s$, where
-            /// $e_s$ is an integer and $m_s$ is a rational number with $1 \leq m_s < 2$. If $x$
-            /// is a valid float, the scientific mantissa $m_s$ is always exactly representable as
-            /// a float of the same type. We have
+            /// $e_s$ is an integer and $m_s$ is a rational number with $1 \leq m_s < 2$. If $x$ is
+            /// a valid float, the scientific mantissa $m_s$ is always exactly representable as a
+            /// float of the same type. We have
             /// $$
             /// f(x) = \frac{x}{2^{\lfloor \log_2 x \rfloor}}.
             /// $$
@@ -878,10 +873,9 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// $$
             /// f(x) = 2^{e_s}m_s,
             /// $$
-            /// or `None` if the result cannot be exactly represented as a float of the desired
-            /// type (this happens if the exponent is too large or too small, if the mantissa is
-            /// not in the range $[1, 2)$, or if the mantissa's precision is too high for the
-            /// exponent).
+            /// or `None` if the result cannot be exactly represented as a float of the desired type
+            /// (this happens if the exponent is too large or too small, if the mantissa is not in
+            /// the range $[1, 2)$, or if the mantissa's precision is too high for the exponent).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

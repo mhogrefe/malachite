@@ -1947,7 +1947,7 @@ pub fn random_natural_pair_gen_var_9(config: &GenConfig) -> It<(Natural, Natural
 }
 
 pub fn random_natural_pair_gen_var_10(config: &GenConfig) -> It<(Natural, Natural)> {
-    //TODO
+    // TODO
     Box::new(
         random_pairs_from_single(random_naturals(
             EXAMPLE_SEED,

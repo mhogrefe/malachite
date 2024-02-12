@@ -1,5 +1,6 @@
 use crate::InnerFloat::Finite;
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, IsPowerOf2, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
@@ -12,7 +13,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_q::conversion::primitive_float_from_rational::FloatFromRationalError;
 use malachite_q::Rational;
-use std::cmp::Ordering;
 
 impl Float {
     #[doc(hidden)]
@@ -161,8 +161,8 @@ impl Float {
     /// a [`Float`] using `try_from` instead. The precision of the resulting [`Float`] will be the
     /// number of significant bits of the [`Rational`]'s numerator.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_rational_prec_round`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_rational_prec_round`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -358,8 +358,8 @@ impl Float {
     /// a [`Float`] using `try_from` instead. The precision of the resulting [`Float`] will be the
     /// number of significant bits of the [`Rational`]'s numerator.
     ///
-    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify
-    /// a rounding mode as well as a precision, try [`Float::from_rational_prec_round_ref`].
+    /// Rounding may occur, in which case [`RoundingMode::Nearest`] is used by default. To specify a
+    /// rounding mode as well as a precision, try [`Float::from_rational_prec_round_ref`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

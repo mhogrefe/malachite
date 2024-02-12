@@ -2267,7 +2267,7 @@ pub fn special_random_natural_pair_gen_var_8(config: &GenConfig) -> It<(Natural,
 }
 
 pub fn special_random_natural_pair_gen_var_9(config: &GenConfig) -> It<(Natural, Natural)> {
-    //TODO
+    // TODO
     Box::new(
         random_pairs_from_single(striped_random_naturals(
             EXAMPLE_SEED,

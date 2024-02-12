@@ -107,8 +107,8 @@ pub fn slice_trailing_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
 /// Given a slice and an starting index, copies the subslice starting from that index to the
 /// beginning of the slice.
 ///
-/// In other words, this function copies the contents of `&xs[starting_index..]` to
-/// `&xs[..xs.len() - starting_index]`.
+/// In other words, this function copies the contents of `&xs[starting_index..]` to `&xs[..xs.len()
+/// - starting_index]`.
 ///
 /// In other other words, if $k$ is `starting_index`, the sequence $[x_0, x_1, \ldots, x_{n-1}]$
 /// becomes $[x_k, x_{k+1}, \ldots, x_{n-1}, x_{n-k}, x_{n-k+1}, \ldots, x_{n-1}]$.
@@ -140,9 +140,9 @@ pub fn slice_move_left<T: Copy>(xs: &mut [T], starting_index: usize) {
 
 /// Splits an immutable slice into adjacent immutable chunks.
 ///
-/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
-/// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
-/// $\mathbf{x}_k$, is specified via a separate argument called `xs_last`.
+/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names $\\mathbf{x}_0,
+/// \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name, $\mathbf{x}_k$, is
+/// specified via a separate argument called `xs_last`.
 ///
 /// The first $k$ output slice names are assigned adjacent length-$n$ chunks from $\mathbf{x}$. If
 /// $|\mathbf{x}| < kn$, the generated code panics.
@@ -185,9 +185,9 @@ macro_rules! split_into_chunks {
 
 /// Splits a mutable slice into adjacent mutable chunks.
 ///
-/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
-/// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
-/// $\mathbf{x}_k$, is specified via a separate argument called `xs_last`.
+/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names $\\mathbf{x}_0,
+/// \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name, $\mathbf{x}_k$, is
+/// specified via a separate argument called `xs_last`.
 ///
 /// The first $k$ output slice names are assigned adjacent length-$n$ chunks from $\mathbf{x}$. If
 /// $|\mathbf{x}| < kn$, the generated code panics.
@@ -357,8 +357,7 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 /// iterator to own the data, in which case you may use
 /// [`exhaustive_vec_permutations`](crate::vecs::exhaustive_vec_permutations) instead.
 ///
-/// The permutations are generated in lexicographic order with respect to the ordering in the
-/// slice.
+/// The permutations are generated in lexicographic order with respect to the ordering in the slice.
 ///
 /// The output length is $n!$, where $n$ is `xs.len()`.
 ///

@@ -25,8 +25,7 @@ pub fn option_from_str<T: FromStr>(src: &str) -> Option<Option<T>> {
 ///
 /// If the string does not represent a valid `Option<T>`, `None` is returned.
 ///
-/// If `f` just uses the [`FromStr`] implementation on `T`, you can use [`option_from_str`]
-/// instead.
+/// If `f` just uses the [`FromStr`] implementation on `T`, you can use [`option_from_str`] instead.
 ///
 /// # Examples
 /// ```

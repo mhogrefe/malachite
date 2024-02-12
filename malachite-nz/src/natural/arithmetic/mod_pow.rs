@@ -100,8 +100,8 @@ fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Li
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 //
-// This is equivalent to `MPN_REDC_1` from `mpn/generic/powm.c`, GMP 6.2.1. Investigate changes
-// from 6.1.2?
+// This is equivalent to `MPN_REDC_1` from `mpn/generic/powm.c`, GMP 6.2.1. Investigate changes from
+// 6.1.2?
 fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) {
     if limbs_redc_limb_raw(out, xs, ms, m_inv) {
         limbs_sub_same_length_in_place_left(&mut out[..ms.len()], ms);
@@ -165,8 +165,7 @@ fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ms.len()`.
 //
-// This is equivalent to `redcify` from `mpn/generic/powm.c`, 6.2.1. Investigate changes from
-// 6.1.2?
+// This is equivalent to `redcify` from `mpn/generic/powm.c`, 6.2.1. Investigate changes from 6.1.2?
 fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
     let xs_len = xs.len();
     let ms_len = ms.len();
@@ -182,7 +181,7 @@ fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
     }
 }
 
-//TODO tune
+// TODO tune
 const REDC_1_TO_REDC_N_THRESHOLD: usize = 100;
 
 // # Worst-case complexity
@@ -416,10 +415,9 @@ pub_test! {limbs_mod_pow_odd(
 }}
 
 // Interpreting a `Vec<Limb>` and two `&[Limb]` as the limbs (in ascending order) of three
-// `Natural`s, `x`, `exp`, and `m`, writes the limbs of `x`<sup>`exp`</sup> mod 2<sup>`m`</sup> to
-// an output slice. Assumes the input is already reduced mod `m`. No input may be empty or have
-// trailing zeros, the exponent must be greater than 1, and the output slice must be at least as
-// long as `ms`.
+// `Natural`s, `x`, `exp`, and `m`, writes the limbs of `x ^ exp` mod `2 ^ m` to an output slice.
+// Assumes the input is already reduced mod `m`. No input may be empty or have trailing zeros, the
+// exponent must be greater than 1, and the output slice must be at least as long as `ms`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(mn \log n \log\log n)$
@@ -530,8 +528,8 @@ pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]
 impl ModPow<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. All three [`Natural`]s are taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. All three [`Natural`]s are taken by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -564,9 +562,9 @@ impl ModPow<Natural, Natural> for Natural {
 impl<'a> ModPow<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. The first two [`Natural`]s are taken by value and the third
-    /// by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
+    /// reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -599,8 +597,8 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
 impl<'a> ModPow<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. The first and third [`Natural`]s are taken by value and the
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first and third [`Natural`]s are taken by value and the
     /// second by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
@@ -634,9 +632,9 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
 impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. The first [`Natural`] is taken by value and the second and
-    /// third by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first [`Natural`] is taken by value and the second and third
+    /// by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -730,9 +728,9 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
 impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. The first and third [`Natural`]s are taken by reference and
-    /// the second by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the
+    /// second by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -788,9 +786,9 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
 impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. The first two [`Natural`]s are taken by reference and the
-    /// third by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third
+    /// by value.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///
@@ -846,8 +844,8 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
 impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must
-    /// be already reduced modulo $m$. All three [`Natural`]s are taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. All three [`Natural`]s are taken by reference.
     ///
     /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
     ///

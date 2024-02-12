@@ -11,9 +11,9 @@ use malachite_base::rounding_modes::RoundingMode;
 macro_rules! float_impls {
     ($f: ident) => {
         impl RoundingFrom<$f> for Natural {
-            /// Converts a floating-point value to a [`Natural`], using the specified rounding
-            /// mode. An [`Ordering`] is also returned, indicating whether the returned value is
-            /// less than, equal to, or greater than the original value.
+            /// Converts a floating-point value to a [`Natural`], using the specified rounding mode.
+            /// An [`Ordering`] is also returned, indicating whether the returned value is less
+            /// than, equal to, or greater than the original value.
             ///
             /// The floating-point value cannot be NaN or infinite, and it cannot round to a
             /// negative integer.
@@ -87,8 +87,7 @@ macro_rules! float_impls {
         }
 
         impl ConvertibleFrom<$f> for Natural {
-            /// Determines whether a floating-point value can be exactly converted to a
-            /// [`Natural`].
+            /// Determines whether a floating-point value can be exactly converted to a [`Natural`].
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

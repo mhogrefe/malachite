@@ -1,9 +1,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, UnsignedAbs,
 };
-use core::ops::Neg;
 
 impl FloorRoot<u64> for Integer {
     type Output = Integer;

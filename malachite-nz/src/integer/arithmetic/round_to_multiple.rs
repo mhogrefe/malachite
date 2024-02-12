@@ -1,7 +1,7 @@
 use crate::integer::Integer;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
 
 impl RoundToMultiple<Integer> for Integer {
     type Output = Integer;
@@ -153,8 +153,8 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
     /// rounding mode. The first [`Integer`] is taken by value and the second by reference. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the original value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///
@@ -298,8 +298,8 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
 
     /// Rounds an [`Integer`] to a multiple of another [`Integer`], according to a specified
     /// rounding mode. The first [`Integer`] is taken by reference and the second by value. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the original value.
     ///
     /// Let $q = \frac{x}{|y|}$:
     ///

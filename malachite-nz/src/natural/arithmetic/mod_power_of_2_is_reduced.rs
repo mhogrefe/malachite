@@ -3,8 +3,8 @@ use malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced;
 use malachite_base::num::logic::traits::SignificantBits;
 
 impl ModPowerOf2IsReduced for Natural {
-    /// Returns whether a [`Natural`] is reduced modulo 2^k$; in other words, whether it has no
-    /// more than $k$ significant bits.
+    /// Returns whether a [`Natural`] is reduced modulo 2^k$; in other words, whether it has no more
+    /// than $k$ significant bits.
     ///
     /// $f(x, k) = (x < 2^k)$.
     ///

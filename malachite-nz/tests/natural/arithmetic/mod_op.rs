@@ -47,37 +47,36 @@ fn test_limbs_mod_limb() {
         assert_eq!(limbs_mod_limb_alt_3(ns, d), r);
     };
     test(&[0, 0], 2, 0);
-    // shift != 0 in limbs_mod_limb_any_leading_zeros_1
-    // r_hi < b in limbs_mod_limb_any_leading_zeros_1
-    // n == 2 in limbs_mod_limb_any_leading_zeros_1
-    // !divisor.get_highest_bit() in limbs_mod_limb_alt_2
-    // !divisor.get_highest_bit() && len < MOD_1U_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
+    // - shift != 0 in limbs_mod_limb_any_leading_zeros_1
+    // - r_hi < b in limbs_mod_limb_any_leading_zeros_1
+    // - n == 2 in limbs_mod_limb_any_leading_zeros_1
+    // - !divisor.get_highest_bit() in limbs_mod_limb_alt_2
+    // - !divisor.get_highest_bit() && len < MOD_1U_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // n > 2 in limbs_mod_limb_any_leading_zeros_1
-    // !divisor.get_highest_bit() &&
-    //      MOD_1U_TO_MOD_1_1_THRESHOLD <= len < MOD_11_TO_MOD_1_2_THRESHOLD
-    //      in limbs_mod_limb_alt_2
+    // - n > 2 in limbs_mod_limb_any_leading_zeros_1
+    // - !divisor.get_highest_bit() && MOD_1U_TO_MOD_1_1_THRESHOLD <= len <
+    //   MOD_11_TO_MOD_1_2_THRESHOLD in limbs_mod_limb_alt_2
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
     test(&[0, 0], 0xa0000000, 0);
-    // shift == 0 in limbs_mod_limb_any_leading_zeros_1
-    // divisor.get_highest_bit() in limbs_mod_limb_alt_2
-    // divisor.get_highest_bit() && len < MOD_1N_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
+    // - shift == 0 in limbs_mod_limb_any_leading_zeros_1
+    // - divisor.get_highest_bit() in limbs_mod_limb_alt_2
+    // - divisor.get_highest_bit() && len < MOD_1N_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
     test(&[6, 7], 0x80000000, 6);
     test(&[6, 7], 0xa0000000, 0x20000006);
-    // divisor.get_highest_bit() && len >= MOD_1N_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
+    // - divisor.get_highest_bit() && len >= MOD_1N_TO_MOD_1_1_THRESHOLD in limbs_mod_limb_alt_2
     test(&[100, 101, 102], 0xabcddcba, 2152689614);
-    // r_hi >= b in limbs_mod_limb_any_leading_zeros_1
+    // - r_hi >= b in limbs_mod_limb_any_leading_zeros_1
     test(&[u32::MAX, u32::MAX], 2, 1);
     test(&[u32::MAX, u32::MAX], 3, 0);
     test(&[u32::MAX, u32::MAX], u32::MAX, 0);
     test(&[u32::MAX, u32::MAX], 0xa0000000, 1610612735);
     test(&[100, 101, 102], u32::MAX, 303);
     test(&[1, 2, 3, 4], 6, 1);
-    // !divisor.get_highest_bit() && len >= MOD_11_TO_MOD_1_2_THRESHOLD &&
-    //      (len < MOD_12_TO_MOD_1_4_THRESHOLD || divisor & HIGHEST_TWO_BITS_MASK != 0)
-    //      in limbs_mod_limb_alt_2
+    // - !divisor.get_highest_bit() && len >= MOD_11_TO_MOD_1_2_THRESHOLD && (len <
+    //   MOD_12_TO_MOD_1_4_THRESHOLD || divisor & HIGHEST_TWO_BITS_MASK != 0) in
+    //   limbs_mod_limb_alt_2
     test(
         &[
             3713432036, 2475243626, 3960734766, 244755020, 3760002601, 301563516, 2499010086,
@@ -86,9 +85,8 @@ fn test_limbs_mod_limb() {
         565832495,
         295492150,
     );
-    // !divisor.get_highest_bit() && len >= MOD_12_TO_MOD_1_4_THRESHOLD &&
-    //      divisor & HIGHEST_TWO_BITS_MASK == 0
-    //      in limbs_mod_limb_alt_2
+    // - !divisor.get_highest_bit() && len >= MOD_12_TO_MOD_1_4_THRESHOLD && divisor &
+    //   HIGHEST_TWO_BITS_MASK == 0 in limbs_mod_limb_alt_2
     test(
         &[
             540286473, 1475101238, 1863380542, 2517905739, 81646271, 3172818884, 2759300635,
@@ -182,22 +180,22 @@ fn test_limbs_mod_limb_small_unnormalized() {
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
-    // remainder >= divisor in limbs_mod_limb_small_unnormalized
-    // len.odd() in limbs_mod_limb_at_least_1_leading_zero
-    // len == 1 in limbs_mod_limb_at_least_1_leading_zero
+    // - remainder >= divisor in limbs_mod_limb_small_unnormalized
+    // - len.odd() in limbs_mod_limb_at_least_1_leading_zero
+    // - len == 1 in limbs_mod_limb_at_least_1_leading_zero
     test(&[6], 2, 0);
     test(&[6], 4, 2);
-    // len.even() in limbs_mod_limb_at_least_1_leading_zero
-    // len < 4 in limbs_mod_limb_at_least_1_leading_zero
+    // - len.even() in limbs_mod_limb_at_least_1_leading_zero
+    // - len < 4 in limbs_mod_limb_at_least_1_leading_zero
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // len.odd() && len != 1 in limbs_mod_limb_at_least_1_leading_zero
+    // - len.odd() && len != 1 in limbs_mod_limb_at_least_1_leading_zero
     test(&[100, 101, 102], 10, 8);
-    // remainder < divisor in limbs_mod_limb_small_unnormalized
+    // - remainder < divisor in limbs_mod_limb_small_unnormalized
     test(&[123, 456], 789, 636);
     test(&[u32::MAX, u32::MAX], 2, 1);
     test(&[u32::MAX, u32::MAX], 3, 0);
-    // len >= 4 in limbs_mod_limb_at_least_1_leading_zero
+    // - len >= 4 in limbs_mod_limb_at_least_1_leading_zero
     test(&[1, 2, 3, 4, 5], 6, 3);
     test(&[1, 2, 3, 4], 6, 1);
 }
@@ -238,21 +236,21 @@ fn test_limbs_mod_limb_at_least_2_leading_zeros() {
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
-    // len ≡ 1 mod 4
-    // len < 4
+    // - len ≡ 1 mod 4
+    // - len < 4
     test(&[6], 2, 0);
     test(&[6], 4, 2);
-    // len ≡ 2 mod 4
+    // - len ≡ 2 mod 4
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // len ≡ 3 mod 4
+    // - len ≡ 3 mod 4
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
     test(&[u32::MAX, u32::MAX], 2, 1);
     test(&[u32::MAX, u32::MAX], 3, 0);
-    // len ≡ 0 mod 4
+    // - len ≡ 0 mod 4
     test(&[1, 2, 3, 4], 6, 1);
-    // len >= 4
+    // - len >= 4
     test(&[1, 2, 3, 4, 5], 6, 3);
 }
 

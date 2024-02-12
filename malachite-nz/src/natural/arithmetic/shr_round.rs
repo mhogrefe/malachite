@@ -100,17 +100,17 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, O
 }
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the
-// actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is exactly between
-// two integers, it is rounded to the even one.
+// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the actual
+// value of `self` divided by `2 ^ bits`. If the actual value is exactly between two integers, it is
+// rounded to the even one.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
-// `max(1, xs.len() - bits / Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
+// bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     if bits == 0 {
         (xs.to_vec(), Ordering::Equal)
@@ -138,8 +138,8 @@ pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Orderi
 //
 // $M(n) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
-// `max(1, xs.len() - bits / Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
+// bits / Limb::WIDTH)`.
 pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
@@ -157,8 +157,8 @@ pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
-// `max(1, xs.len() - bits / Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
+// bits / Limb::WIDTH)`.
 pub_test! {
     limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<(Vec<Limb>, Ordering)> {
     match rm {
@@ -249,8 +249,8 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounding to the `Natural`
-// nearest to the actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is
-// exactly between two integers, it is rounded to the even one.
+// nearest to the actual value of `self` divided by `2 ^ bits`. If the actual value is exactly
+// between two integers, it is rounded to the even one.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -451,10 +451,10 @@ macro_rules! impl_natural_shr_round_unsigned {
         impl<'a> ShrRound<$t> for &'a Natural {
             type Output = Natural;
 
-            /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by reference,
-            /// and rounds according to the specified rounding mode. An [`Ordering`] is also
-            /// returned, indicating whether the returned value is less than, equal to, or greater
-            /// than the exact value.
+            /// Shifts a [`Natural`] right (divides it by a power of 2), taking it by reference, and
+            /// rounds according to the specified rounding mode. An [`Ordering`] is also returned,
+            /// indicating whether the returned value is less than, equal to, or greater than the
+            /// exact value.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
@@ -513,9 +513,9 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// specified rounding mode, in place. An [`Ordering`] is returned, indicating whether
             /// the assigned value is less than, equal to, or greater than the exact value.
             ///
-            /// Passing `RoundingMode::Floor` or
-            /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>=`.
+            /// To test whether `RoundingMode::Exact` can be passed, use
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
             /// See the [`ShrRound`] documentation for details.
             ///

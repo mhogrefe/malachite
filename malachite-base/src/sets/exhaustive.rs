@@ -136,8 +136,8 @@ where
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
-/// The iterator should be finite; if it is infinite, [`HashSet`]s of length `\max(2, \ell + 1)`
-/// and above will never be generated.
+/// The iterator should be finite; if it is infinite, [`HashSet`]s of length `\max(2, \ell + 1)` and
+/// above will never be generated.
 ///
 /// If the input iterator is infinite, the output length is also infinite.
 ///

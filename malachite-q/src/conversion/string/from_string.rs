@@ -1,7 +1,7 @@
 use crate::Rational;
+use core::str::FromStr;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
-use std::str::FromStr;
 
 impl FromStr for Rational {
     type Err = ();

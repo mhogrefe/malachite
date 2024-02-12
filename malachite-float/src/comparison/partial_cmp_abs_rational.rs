@@ -1,10 +1,10 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::Rational;
-use std::cmp::Ordering;
 
 impl PartialOrdAbs<Rational> for Float {
     /// Compares the absolute values of a [`Float`] and a [`Rational`].
@@ -18,8 +18,8 @@ impl PartialOrdAbs<Rational> for Float {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -95,8 +95,8 @@ impl PartialOrdAbs<Float> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

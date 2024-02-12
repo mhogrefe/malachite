@@ -280,8 +280,8 @@ impl<'a, 'b> ModPowerOf2Pow<&'b Natural> for &'a Natural {
 }
 
 impl ModPowerOf2PowAssign<Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be
-    /// already reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be already
+    /// reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by value.
     ///
     /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///
@@ -316,8 +316,8 @@ impl ModPowerOf2PowAssign<Natural> for Natural {
 }
 
 impl<'a> ModPowerOf2PowAssign<&'a Natural> for Natural {
-    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be
-    /// already reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
+    /// Raises a [`Natural`] to a [`Natural`] power modulo $2^k$, in place. The base must be already
+    /// reduced modulo $2^k$. The [`Natural`] on the right-hand side is taken by reference.
     ///
     /// $x \gets y$, where $x, y < 2^k$ and $x^n \equiv y \mod 2^k$.
     ///

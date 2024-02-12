@@ -1,5 +1,6 @@
 use crate::InnerFloat::{Finite, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::from::SignedFromFloatError;
@@ -7,7 +8,6 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 impl RoundingFrom<Float> for Integer {
     /// Converts a [`Float`] to an [`Integer`], using a specified [`RoundingMode`] and taking the
@@ -25,8 +25,8 @@ impl RoundingFrom<Float> for Integer {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `f.complexity()`.
     ///
     /// # Panics
-    /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is NaN
-    /// or infinite.
+    /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is NaN or
+    /// infinite.
     ///
     /// # Examples
     /// ```
@@ -121,8 +121,8 @@ impl<'a> RoundingFrom<&'a Float> for Integer {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `f.complexity()`.
     ///
     /// # Panics
-    /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is NaN
-    /// or infinite.
+    /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`] is NaN or
+    /// infinite.
     ///
     /// # Examples
     /// ```

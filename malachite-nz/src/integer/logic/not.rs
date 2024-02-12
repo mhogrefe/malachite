@@ -1,8 +1,8 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::ops::Not;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
-use core::ops::Not;
 
 impl Not for Integer {
     type Output = Integer;

@@ -9,16 +9,16 @@ pub mod eq;
 /// Hashing of [`Float`](crate::Float)s.
 pub mod hash;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
-/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s
-/// and [`Integer`](malachite_nz::integer::Integer)s.
+/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
+/// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_cmp_abs_integer;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
-/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s
-/// and [`Natural`](malachite_nz::natural::Natural)s.
+/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
+/// [`Natural`](malachite_nz::natural::Natural)s.
 pub mod partial_cmp_abs_natural;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
-/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s
-/// and primitive floats.
+/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
+/// primitive floats.
 ///
 /// # partial_cmp_abs
 /// ```
@@ -36,8 +36,8 @@ pub mod partial_cmp_abs_natural;
 /// ```
 pub mod partial_cmp_abs_primitive_float;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
-/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s
-/// and primitive integers.
+/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
+/// primitive integers.
 ///
 /// # partial_cmp_abs
 /// ```
@@ -65,8 +65,8 @@ pub mod partial_cmp_abs_primitive_float;
 /// ```
 pub mod partial_cmp_abs_primitive_int;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
-/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s
-/// and [`Rational`](malachite_q::Rational)s.
+/// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
+/// [`Rational`](malachite_q::Rational)s.
 pub mod partial_cmp_abs_rational;
 /// Comparison of [`Float`](crate::Float)s and [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_cmp_integer;

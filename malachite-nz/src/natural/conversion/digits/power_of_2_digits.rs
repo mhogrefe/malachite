@@ -194,8 +194,8 @@ macro_rules! power_of_2_digits_unsigned {
             /// type, and `log_base` must be no larger than the width of that type. If the
             /// [`Natural`] is 0, the [`Vec`] is empty; otherwise, it begins with a nonzero digit.
             ///
-            /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or
-            /// $d_0 \neq 0$, and
+            /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or $d_0
+            /// \neq 0$, and
             ///
             /// $$
             /// \sum_{i=0}^{n-1}2^{k (n-i-1)}d_i = x.
@@ -291,11 +291,11 @@ impl PowerOf2Digits<Natural> for Natural {
     /// Returns a [`Vec`] containing the base-$2^k$ digits of a [`Natural`] in ascending order:
     /// least- to most-significant.
     ///
-    /// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. If
-    /// the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it ends with a nonzero digit.
+    /// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. If the
+    /// [`Natural`] is 0, the [`Vec`] is empty; otherwise, it ends with a nonzero digit.
     ///
-    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or
-    /// $d_{n-1} \neq 0$, and
+    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or $d_{n-1} \neq
+    /// 0$, and
     ///
     /// $$
     /// \sum_{i=0}^{n-1}2^{ki}d_i = x.
@@ -400,11 +400,11 @@ impl PowerOf2Digits<Natural> for Natural {
     /// Returns a [`Vec`] containing the base-$2^k$ digits of a [`Natural`] in descending order:
     /// most- to least-significant.
     ///
-    /// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. If
-    /// the [`Natural`] is 0, the [`Vec`] is empty; otherwise, it begins with a nonzero digit.
+    /// The base-2 logarithm of the base is specified. The type of each digit is [`Natural`]. If the
+    /// [`Natural`] is 0, the [`Vec`] is empty; otherwise, it begins with a nonzero digit.
     ///
-    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or
-    /// $d_0 \neq 0$, and
+    /// $f(x, k) = (d_i)_ {i=0}^{n-1}$, where $0 \leq d_i < 2^k$ for all $i$, $n=0$ or $d_0 \neq 0$,
+    /// and
     ///
     /// $$
     /// \sum_{i=0}^{n-1}2^{k (n-i-1)}d_i = x.
@@ -467,8 +467,7 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `digits.count()`, and $m$ is
-    /// `log_base`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `digits.count()`, and $m$ is `log_base`.
     ///
     /// # Panics
     /// Panics if `log_base` is zero.
@@ -579,8 +578,7 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `digits.count()`, and $m$ is
-    /// `log_base`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `digits.count()`, and $m$ is `log_base`.
     ///
     /// # Panics
     /// Panics if `log_base` is zero.

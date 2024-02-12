@@ -263,8 +263,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
 
 /// Generates random negative signed integers from a random striped distribution.
 ///
-/// This `struct` is created by [`striped_random_negative_signeds`]; see its documentation for
-/// more.
+/// This `struct` is created by [`striped_random_negative_signeds`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
     phantom: PhantomData<*const T>,
@@ -317,8 +316,8 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedsLessThan<T> {
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -360,8 +359,8 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -404,8 +403,8 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -451,8 +450,8 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -496,8 +495,8 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -543,8 +542,8 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -590,8 +589,8 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -634,8 +633,8 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `m_numerator / m_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `m_numerator /
+/// m_denominator`.
 ///
 /// The output length is infinite.
 ///
@@ -732,12 +731,12 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomBoolVecs<I> {
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero or if
-/// `mean_stripe_numerator <= mean_stripe_denominator`.
+/// Panics if `mean_stripe_denominator` is zero or if `mean_stripe_numerator <=
+/// mean_stripe_denominator`.
 ///
 /// # Examples
 /// ```
@@ -782,8 +781,8 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
@@ -831,25 +830,24 @@ pub fn striped_random_fixed_length_bool_vecs(
 ///
 /// See [here](self) for more information.
 ///
-/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
-/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator / mean_length_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
-/// `mean_length_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, or,
+/// if after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -892,26 +890,26 @@ pub fn striped_random_bool_vecs(
 ///
 /// See [here](self) for more information.
 ///
-/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
-/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
 /// `min_length`.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator / mean_length_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
-/// `mean_length_denominator` are zero, if their ratio is less than or equal to `min_length`, or if
-/// they are too large and manipulating them leads to arithmetic overflow.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, if
+/// their ratio is less than or equal to `min_length`, or if they are too large and manipulating
+/// them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
@@ -964,8 +962,8 @@ pub fn striped_random_bool_vecs_min_length(
 /// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b)$. $a$ must be
 /// less than $b$.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -982,8 +980,8 @@ pub fn striped_random_bool_vecs_min_length(
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1028,8 +1026,8 @@ pub fn striped_random_bool_vecs_length_range(
 /// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b]$. $a$ must be
 /// less than $b$.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -1046,8 +1044,8 @@ pub fn striped_random_bool_vecs_length_range(
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1155,12 +1153,12 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = u64>> Iterator for StripedRandomUn
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero or if
-/// `mean_stripe_numerator <= mean_stripe_denominator`.
+/// Panics if `mean_stripe_denominator` is zero or if `mean_stripe_numerator <=
+/// mean_stripe_denominator`.
 ///
 /// # Examples
 /// ```
@@ -1210,8 +1208,8 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 ///
 /// See [here](self) for more information.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
@@ -1264,11 +1262,11 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
-/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \frac{m^n}{(m+1)^{n+1}}\prod_{i=0}^{n-1}P(x_i).
@@ -1279,14 +1277,13 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator / mean_length_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
-/// `mean_length_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, or,
+/// if after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -1335,12 +1332,12 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean
-/// $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
 /// `min_length`.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -1355,14 +1352,14 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `mean_length_numerator / mean_length_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, if `mean_length_numerator` or
-/// `mean_length_denominator` are zero, if their ratio is less than or equal to `min_length`, or if
-/// they are too large and manipulating them leads to arithmetic overflow.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, if
+/// their ratio is less than or equal to `min_length`, or if they are too large and manipulating
+/// them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
@@ -1420,8 +1417,8 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b)$. $a$ must be
 /// less than $b$.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -1438,8 +1435,8 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1487,8 +1484,8 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b]$. $a$ must be
 /// less than $b$.
 ///
-/// The mean run length (before the bit sequences are truncated) is
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
+/// mean_stripe_denominator`.
 ///
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
@@ -1505,8 +1502,8 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// where $T$ is time and $M$ is additional memory.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1621,8 +1618,8 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedInclusiveRange<T> {
 ///
 /// See [here](self) for more information.
 ///
-/// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The unsigneds are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the unsigneds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1636,8 +1633,8 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedInclusiveRange<T> {
 /// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```
@@ -1677,8 +1674,8 @@ pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// See [here](self) for more information.
 ///
-/// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The unsigneds are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the unsigneds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1692,8 +1689,8 @@ pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
 /// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1778,8 +1775,8 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 ///
 /// See [here](self) for more information.
 ///
-/// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The unsigneds are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the signeds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1790,12 +1787,12 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a > b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a > b$.
 ///
 /// # Examples
 /// ```
@@ -1838,8 +1835,8 @@ pub fn striped_random_signed_range<
 ///
 /// See [here](self) for more information.
 ///
-/// The unsigneds are generated using a striped bit sequence with mean run length
-/// $m$ = `mean_stripe_numerator / mean_stripe_denominator`.
+/// The unsigneds are generated using a striped bit sequence with mean run length $m$ =
+/// `mean_stripe_numerator / mean_stripe_denominator`.
 ///
 /// Because the signeds are constrained to be within a certain range, the actual mean run length
 /// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
@@ -1850,12 +1847,12 @@ pub fn striped_random_signed_range<
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is
-/// `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(a.significant_bits(),
+/// b.significant_bits())`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator <= mean_stripe_denominator`, or if $a \geq b$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
+/// mean_stripe_denominator`, or if $a \geq b$.
 ///
 /// # Examples
 /// ```

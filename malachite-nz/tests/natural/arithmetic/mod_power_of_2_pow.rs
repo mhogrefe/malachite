@@ -45,17 +45,17 @@ fn test_limbs_pow_low() {
         assert_eq!(xs, out);
         verify_limbs_pow_low(xs_old, es, out);
     };
-    // bit_index != 0 && !limbs_get_bit(es, bit_index - 1)
-    // bit_index != 0 first time
-    // bit_index >= window_size
-    // this_windowsize == 1
-    // bit_index != 0 second time
-    // bit_index == 0 first time
+    // - bit_index != 0 && !limbs_get_bit(es, bit_index - 1)
+    // - bit_index != 0 first time
+    // - bit_index >= window_size
+    // - this_windowsize == 1
+    // - bit_index != 0 second time
+    // - bit_index == 0 first time
     test(&[3], &[20], &[3486784401]);
-    // bit_index < window_size
-    // bit_index == 0 second time
+    // - bit_index < window_size
+    // - bit_index == 0 second time
     test(&[123, 456], &[789], &[426102667, 1687864191]);
-    // this_windowsize > 1
+    // - this_windowsize > 1
     test(
         &[55455610, 1786865634],
         &[

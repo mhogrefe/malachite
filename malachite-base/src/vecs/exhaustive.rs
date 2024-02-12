@@ -402,8 +402,8 @@ where
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
 ///
-/// This `struct` is created by the [`lex_vecs_fixed_length_from_single`]; see its documentation
-/// for more.
+/// This `struct` is created by the [`lex_vecs_fixed_length_from_single`]; see its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub enum LexFixedLengthVecsFromSingle<I: Iterator>
 where
@@ -704,13 +704,12 @@ macro_rules! exhaustive_vecs_fixed_length {
             }
         }
 
-        /// This documentation applies not only to `exhaustive_vecs_fixed_length_2_inputs`, but
-        /// also to `exhaustive_vecs_fixed_length_3_inputs`,
-        /// `exhaustive_vecs_fixed_length_4_inputs`, and so on. See
-        /// [`exhaustive_vecs_fixed_length`] for more information.
+        /// This documentation applies not only to `exhaustive_vecs_fixed_length_2_inputs`, but also
+        /// to `exhaustive_vecs_fixed_length_3_inputs`, `exhaustive_vecs_fixed_length_4_inputs`, and
+        /// so on. See [`exhaustive_vecs_fixed_length`] for more information.
         ///
-        /// Generates all [`Vec`]s of a given length with elements from $m$ iterators, where
-        /// $m \leq n$.
+        /// Generates all [`Vec`]s of a given length with elements from $m$ iterators, where $m \leq
+        /// n$.
         ///
         /// The `output_types` parameter defines which iterators are mapped to which slot in the
         /// output [`Vec`]s, and how quickly each output slot advances through its iterator. The
@@ -720,9 +719,8 @@ macro_rules! exhaustive_vecs_fixed_length {
         /// `usize`. The [`BitDistributorOutputType`] determines how quickly the $i$th output slot
         /// advances through its iterator; see the [`BitDistributor`] documentation for a
         /// description of the different types. The `usize` is an index from 0 to $m-1$ which
-        /// specifies which iterator the $i$th output slot is populated with. Together, the
-        /// `usize`s must include all indices from 0 to $m-1$, inclusive, possibly with
-        /// repetitions.
+        /// specifies which iterator the $i$th output slot is populated with. Together, the `usize`s
+        /// must include all indices from 0 to $m-1$, inclusive, possibly with repetitions.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, the output length is the product of their
         /// lengths. If any of `xs`, `ys`, `zs`, ... are infinite, the output is also infinite.
@@ -918,8 +916,8 @@ where
 /// documentation for a description of the different types. The length of the output [`Vec`]s, $n$,
 /// is specified by the length of `output_types`.
 ///
-/// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$ is `len`.
-/// If `xs` is infinite, the output is also infinite.
+/// If `xs` is finite, the output length is $k^n$, where $k$ is `xs.count()` and $n$ is `len`. If
+/// `xs` is infinite, the output is also infinite.
 ///
 /// If `len` is 0, the output consists of one empty [`Vec`].
 ///
@@ -1339,8 +1337,8 @@ where
 /// same length are output in lexicographic order with respect to the ordering of the [`Vec`]
 /// elements specified by the input iterator.
 ///
-/// `xs` must be finite; if it's infinite, only [`Vec`]s of length `a` (or 0 and 1, if `a` is 0)
-/// are ever produced.
+/// `xs` must be finite; if it's infinite, only [`Vec`]s of length `a` (or 0 and 1, if `a` is 0) are
+/// ever produced.
 ///
 /// The output length is
 /// $$
@@ -1799,8 +1797,8 @@ pub fn fixed_length_ordered_unique_indices_helper(
 ) -> bool {
     let mut expected_j = n - 1;
     let mut i = k - 1;
-    // Find longest suffix of the form [..., n - 3, n - 2, n - 1].
-    // After this loop, i is index right before this longest suffix.
+    // Find longest suffix of the form [..., n - 3, n - 2, n - 1]. After this loop, i is the index
+    // right before this longest suffix.
     loop {
         if expected_j != indices[i] {
             break;
@@ -2097,9 +2095,9 @@ where
     shortlex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
@@ -2160,9 +2158,9 @@ where
     shortlex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
@@ -2282,12 +2280,12 @@ where
             let last_i = *self.indices.last().unwrap();
             let next_i = last_i + 1;
             if k < self.max_len && self.xs.get(next_i).is_some() {
-                // For example, if xs is [0, 1, 2, 3] and max_len is 4, then the next set of
-                // indices after [0, 1] is [0, 1, 2].
+                // For example, if xs is [0, 1, 2, 3] and max_len is 4, then the next set of indices
+                // after [0, 1] is [0, 1, 2].
                 self.indices.push(next_i);
             } else if k == self.min_len {
-                // For example, if xs is [0, 1, 2, 3] and min_len is 2, then the next set of
-                // indices after [1, 3] is [2, 3].
+                // For example, if xs is [0, 1, 2, 3] and min_len is 2, then the next set of indices
+                // after [1, 3] is [2, 3].
                 if let Some(n) = self.xs.known_len() {
                     if fixed_length_ordered_unique_indices_helper(n, k, &mut self.indices) {
                         self.done = true;
@@ -2297,8 +2295,8 @@ where
                     *self.indices.last_mut().unwrap() += 1;
                 }
             } else if self.xs.get(next_i).is_some() {
-                // For example, if xs is [0, 1, 2, 3] and max_len is 3, then the next set of
-                // indices after [1, 2, 3] is [1, 2, 4].
+                // For example, if xs is [0, 1, 2, 3] and max_len is 3, then the next set of indices
+                // after [1, 2, 3] is [1, 2, 4].
                 *self.indices.last_mut().unwrap() = next_i;
             } else {
                 let x = self.indices.pop();
@@ -2314,8 +2312,8 @@ where
                         self.done = true;
                         return None;
                     } else {
-                        // For example, if xs is [0, 1, 2, 3] and max_len is 1, then the next set
-                        // of indices after [0] is [1].
+                        // For example, if xs is [0, 1, 2, 3] and max_len is 1, then the next set of
+                        // indices after [0] is [1].
                         self.indices.push(next_x);
                     }
                 }
@@ -2441,9 +2439,9 @@ where
     lex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
@@ -2503,9 +2501,9 @@ where
     lex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
@@ -2950,9 +2948,9 @@ where
     exhaustive_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -3008,9 +3006,9 @@ where
     }
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered
-/// the same way as they are in the source iterator.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements, and the elements in each [`Vec`] are ordered the
+/// same way as they are in the source iterator.
 ///
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
@@ -3431,8 +3429,8 @@ where
     shortlex_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements.
 ///
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
@@ -3503,8 +3501,8 @@ where
     shortlex_unique_vecs_length_inclusive_range(a, b - 1, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements.
 ///
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
@@ -3795,8 +3793,8 @@ where
     lex_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such  that each [`Vec`] has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements.
 ///
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
@@ -4281,8 +4279,8 @@ where
     }
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4347,8 +4345,8 @@ where
     }
 }
 
-/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator,
-/// such that each [`Vec`] has no repeated elements.
+/// Generates [`Vec`]s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each [`Vec`] has no repeated elements.
 ///
 /// The source iterator should not repeat any elements, but this is not enforced.
 ///
@@ -4413,8 +4411,8 @@ where
     }
 }
 
-/// Generates all $k$-compositions of a number: all length-$k$ [`Vec`]s of positive [`usize`]s
-/// whose sum is a given number.
+/// Generates all $k$-compositions of a number: all length-$k$ [`Vec`]s of positive [`usize`]s whose
+/// sum is a given number.
 #[derive(Clone, Debug)]
 pub struct LexKCompositions {
     done: bool,
@@ -4449,8 +4447,8 @@ impl Iterator for LexKCompositions {
     }
 }
 
-/// Generates all $k$-compositions of a number: given $n$ and $k$, generates all length-$k$
-/// [`Vec`]s of positive [`usize`]s whose sum is $n$.
+/// Generates all $k$-compositions of a number: given $n$ and $k$, generates all length-$k$ [`Vec`]s
+/// of positive [`usize`]s whose sum is $n$.
 ///
 /// The [`Vec`]s are output in lexicographic order.
 ///

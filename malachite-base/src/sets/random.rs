@@ -47,8 +47,8 @@ where
 
 /// Randomly generates [`HashSet`]s of a given length.
 ///
-/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator
-/// will hang.
+/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator will
+/// hang.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
@@ -205,9 +205,9 @@ pub fn random_hash_sets_from_length_iterator<
 ///
 /// Strictly speaking, the input iterator must generate infinitely many distinct elements. In
 /// practice it only needs to generate $k$ distinct elements, where $k$ is the largest length
-/// actually sampled from the geometric distribution. For example, if
-/// `mean_length_numerator / mean_length_denominator` is significantly lower than 256, then it's
-/// ok to use `random_unsigneds::<u8>`.
+/// actually sampled from the geometric distribution. For example, if `mean_length_numerator /
+/// mean_length_denominator` is significantly lower than 256, then it's ok to use
+/// `random_unsigneds::<u8>`.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
@@ -283,9 +283,9 @@ where
 ///
 /// Strictly speaking, the input iterator must generate infinitely many distinct elements. In
 /// practice it only needs to generate $k$ distinct elements, where $k$ is the largest length
-/// actually sampled from the geometric distribution. For example, if
-/// `mean_length_numerator / mean_length_denominator` is significantly lower than 256, then it's
-/// ok to use `random_unsigneds::<u8>`.
+/// actually sampled from the geometric distribution. For example, if `mean_length_numerator /
+/// mean_length_denominator` is significantly lower than 256, then it's ok to use
+/// `random_unsigneds::<u8>`.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
@@ -562,8 +562,8 @@ where
 
 /// Randomly generates [`BTreeSet`]s of a given length.
 ///
-/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator
-/// will hang.
+/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator will
+/// hang.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
@@ -721,9 +721,9 @@ pub fn random_b_tree_sets_from_length_iterator<
 ///
 /// Strictly speaking, the input iterator must generate infinitely many distinct elements. In
 /// practice it only needs to generate $k$ distinct elements, where $k$ is the largest length
-/// actually sampled from the geometric distribution. For example, if
-/// `mean_length_numerator / mean_length_denominator` is significantly lower than 256, then it's
-/// ok to use `random_unsigneds::<u8>`.
+/// actually sampled from the geometric distribution. For example, if `mean_length_numerator /
+/// mean_length_denominator` is significantly lower than 256, then it's ok to use
+/// `random_unsigneds::<u8>`.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),
@@ -799,9 +799,9 @@ where
 ///
 /// Strictly speaking, the input iterator must generate infinitely many distinct elements. In
 /// practice it only needs to generate $k$ distinct elements, where $k$ is the largest length
-/// actually sampled from the geometric distribution. For example, if
-/// `mean_length_numerator / mean_length_denominator` is significantly lower than 256, then it's
-/// ok to use `random_unsigneds::<u8>`.
+/// actually sampled from the geometric distribution. For example, if `mean_length_numerator /
+/// mean_length_denominator` is significantly lower than 256, then it's ok to use
+/// `random_unsigneds::<u8>`.
 ///
 /// $$
 /// P((x\_i)\_{i=0}^{n-1}) = n!P_g(n)\prod\_{i=0}^{n-1}P(x\_i),

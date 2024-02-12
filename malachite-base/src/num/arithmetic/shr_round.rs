@@ -184,8 +184,8 @@ macro_rules! impl_shr_round_unsigned_unsigned {
 
                     /// Shifts a number right (divides it by a power of 2) and rounds according to
                     /// the specified rounding mode. An [`Ordering`] is also returned, indicating
-                    /// whether the returned value is less than, equal to, or greater than the
-                    /// exact value.
+                    /// whether the returned value is less than, equal to, or greater than the exact
+                    /// value.
                     ///
                     /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
                     /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
@@ -240,8 +240,8 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// indicating whether the assigned value is less than, equal to, or greater
                     /// than the exact value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// See the [`ShrRound`] documentation for details.
@@ -304,11 +304,11 @@ macro_rules! impl_shr_round_signed_unsigned {
 
                     /// Shifts a number right (divides it by a power of 2) and rounds according to
                     /// the specified rounding mode. An [`Ordering`] is also returned, indicating
-                    /// whether the returned value is less than, equal to, or greater than the
-                    /// exact value.
+                    /// whether the returned value is less than, equal to, or greater than the exact
+                    /// value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Let $q = \frac{x}{2^k}$, and let $g$ be the function that just returns the
@@ -360,8 +360,8 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// indicating whether the assigned value is less than, equal to, or greater
                     /// than the exact value.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// # Worst-case complexity
@@ -442,12 +442,12 @@ macro_rules! impl_shr_round_primitive_signed {
 
                     /// Shifts a number right (divides it by a power of 2) and rounds according to
                     /// the specified rounding mode. An [`Ordering`] is also returned, indicating
-                    /// whether the returned value is less than, equal to, or greater than the
-                    /// exact value. If `bits` is negative, then the returned [`Ordering`] is
-                    /// always `Equal`, even if the higher bits of the result are lost.
+                    /// whether the returned value is less than, equal to, or greater than the exact
+                    /// value. If `bits` is negative, then the returned [`Ordering`] is always
+                    /// `Equal`, even if the higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
                     ///
@@ -505,8 +505,8 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// than the exact value. If `bits` is negative, then the returned [`Ordering`]
                     /// is always `Equal`, even if the higher bits of the result are lost.
                     ///
-                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
+                    /// `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
                     ///

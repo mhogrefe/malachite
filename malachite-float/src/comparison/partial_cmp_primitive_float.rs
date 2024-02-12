@@ -1,9 +1,9 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn float_partial_cmp_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> Option<Ordering> {
     match (x, y) {

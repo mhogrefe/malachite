@@ -61,8 +61,10 @@ use malachite_base::test_util::runner::Runner;
 
 // Examples: TODO
 //
+// ```
 // cargo run --release --features bin_build -- -l 10000 -m special_random -d demo_from_naturals
 //      -c "mean_bits_n 128 mean_bits_d 1"
+// ```
 #[cfg(feature = "bin_build")]
 fn main() {
     let args = read_command_line_arguments("malachite-float test utils");

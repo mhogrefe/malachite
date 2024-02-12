@@ -16,10 +16,10 @@ macro_rules! impl_overflowing_div {
         impl OverflowingDivAssign<$t> for $t {
             /// Divides a number by another number, in place.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned. Overflow only occurs when
-            /// `Self` is signed, `self` is `Self::MIN`, and `other` is -1. The "actual" result,
-            /// `-Self::MIN`, can't be represented and is wrapped back to `Self::MIN`.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned. Overflow only occurs when `Self` is
+            /// signed, `self` is `Self::MIN`, and `other` is -1. The "actual" result, `-Self::MIN`,
+            /// can't be represented and is wrapped back to `Self::MIN`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

@@ -303,7 +303,7 @@ fn test_limbs_modular_invert() {
         assert_eq!(&is[..n], is_out);
         verify_limbs_modular_invert(ds, is_out);
     };
-    // rn < DC_BDIV_Q_THRESHOLD
+    // - rn < DC_BDIV_Q_THRESHOLD
     test(&[10; 3], &[1], &[1]);
     test(&[10; 3], &[3], &[2863311531]);
     test(&[10; 3], &[5], &[3435973837]);
@@ -312,7 +312,7 @@ fn test_limbs_modular_invert() {
     test(&[10; 4], &[1, 2, 3, 4], &[1, u32::MAX - 1, 0, 0]);
     test(&[10; 4], &[1, 0, 0, 0], &[1, 0, 0, 0]);
     test(&[10; 4], &[u32::MAX; 4], &[u32::MAX; 4]);
-    // rn >= DC_BDIV_Q_THRESHOLD
+    // - rn >= DC_BDIV_Q_THRESHOLD
     test(
         &[10; 162],
         &[
@@ -368,8 +368,8 @@ fn test_limbs_modular_invert() {
             31373948,
         ],
     );
-    // rn >= BINV_NEWTON_THRESHOLD
-    // rn < d_len
+    // - rn >= BINV_NEWTON_THRESHOLD
+    // - rn < d_len
     test(
         &[10; 1539],
         &[
@@ -878,9 +878,9 @@ fn test_limbs_modular_div_mod_schoolbook() {
             assert_eq!(&ns[q_len..], ns_out);
             verify_limbs_modular_div_mod(ns_in, ds, borrow, qs_out, ns_out);
         };
-    // lowest_q && limbs_slice_add_limb_in_place(&mut qs[q_diff..], 1)
+    // - lowest_q && limbs_slice_add_limb_in_place(&mut qs[q_diff..], 1)
     test(&[10; 3], &[0, 0, 0], &[1, 2], false, &[0], &[0, 0]);
-    // !(lowest_q && limbs_slice_add_limb_in_place(&mut qs[q_diff..], 1))
+    // - !(lowest_q && limbs_slice_add_limb_in_place(&mut qs[q_diff..], 1))
     test(&[10; 3], &[1, 2, 3], &[1, 2], false, &[1], &[0, 3]);
     test(
         &[10; 3],
@@ -953,9 +953,9 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
             assert_eq!(&ns[q_len..], ns_out);
             verify_limbs_modular_div_mod(ns_in, ds, borrow, qs_out, ns_out);
         };
-    // q_len <= d_len
-    // q_len < DC_BDIV_QR_THRESHOLD
-    // q_len != d_len
+    // - q_len <= d_len
+    // - q_len < DC_BDIV_QR_THRESHOLD
+    // - q_len != d_len
     test(&[10; 3], &[0, 0, 0], &[1, 2], false, &[0], &[0, 0]);
     test(&[10; 3], &[1, 2, 3], &[1, 2], false, &[1], &[0, 3]);
     test(
@@ -975,13 +975,13 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[1],
         &[3, u32::MAX, 3],
     );
-    // q_len == d_len
+    // - q_len == d_len
     test(&[10; 4], &[0; 4], &[1, 0], false, &[0, 0], &[0, 0]);
-    // q_len > d_len
-    // q_len_mod_d_len < DC_BDIV_QR_THRESHOLD
-    // q_len_mod_d_len != d_len
-    // lo < DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
-    // hi < DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
+    // - q_len > d_len
+    // - q_len_mod_d_len < DC_BDIV_QR_THRESHOLD
+    // - q_len_mod_d_len != d_len
+    // - lo < DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
+    // - hi < DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
     test(&[10; 5], &[0; 5], &[1, 0], false, &[0, 0, 0], &[0, 0]);
     test(
         &[10; 4],
@@ -999,7 +999,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[3067833783, 175304787],
         &[1051828726, 2717224210, 4],
     );
-    // q_len_mod_d_len == d_len
+    // - q_len_mod_d_len == d_len
     test(
         &[10; 6],
         &[1, 2, 3, 4, 5, 6],
@@ -1008,7 +1008,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[3067833783, 175304787, 3481052211, 2770888938],
         &[3602692266, 0],
     );
-    // q_len >= DC_BDIV_QR_THRESHOLD
+    // - q_len >= DC_BDIV_QR_THRESHOLD
     test(
         &[10; 111],
         &[
@@ -1059,7 +1059,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
             3130583770,
         ],
     );
-    // q_len_mod_d_len >= DC_BDIV_QR_THRESHOLD
+    // - q_len_mod_d_len >= DC_BDIV_QR_THRESHOLD
     test(
         &[10; 172],
         &[
@@ -1121,8 +1121,8 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
             3466863337, 682644819, 4092006006, 1963236296, 154386710, 1982810036, 3147006703,
         ],
     );
-    // lo >= DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
-    // hi >= DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
+    // - lo >= DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
+    // - hi >= DC_BDIV_QR_THRESHOLD in limbs_modular_div_mod_divide_and_conquer_helper
     test(
         &[10; 704],
         &[
@@ -1308,10 +1308,10 @@ fn test_limbs_modular_div_mod_barrett() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // in limbs_modular_div_mod_barrett_balanced
-        // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
-        // q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
-        // carry in limbs_modular_div_mod_barrett_balanced
+        // - in limbs_modular_div_mod_barrett_balanced
+        // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
+        // - q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
+        // - carry in limbs_modular_div_mod_barrett_balanced
         test(
             &[10; 3],
             &[10; 3],
@@ -1357,15 +1357,15 @@ fn test_limbs_modular_div_mod_barrett() {
             &[1, 3],
             &[2, 0xfffffff8, 4],
         );
-        // in limbs_modular_div_mod_barrett_unbalanced
-        // q_len_s > i_len in limbs_modular_div_mod_barrett_unbalanced
-        // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD
-        //      in limbs_modular_div_mod_barrett_unbalanced
-        // d_len == i_len in limbs_modular_div_mod_barrett_unbalanced
-        // q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD
-        //      in limbs_modular_div_mod_barrett_unbalanced
-        // d_len != q_len_s in limbs_modular_div_mod_barrett_unbalanced
-        // !carry second time in limbs_modular_div_mod_barrett_unbalanced
+        // - in limbs_modular_div_mod_barrett_unbalanced
+        // - q_len_s > i_len in limbs_modular_div_mod_barrett_unbalanced
+        // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_unbalanced
+        // - d_len == i_len in limbs_modular_div_mod_barrett_unbalanced
+        // - q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_unbalanced
+        // - d_len != q_len_s in limbs_modular_div_mod_barrett_unbalanced
+        // - !carry second time in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 3],
             &[10; 3],
@@ -1375,7 +1375,7 @@ fn test_limbs_modular_div_mod_barrett() {
             &[3067833783, 175304787, 3481052211],
             &[2216353382, u32::MAX - 1],
         );
-        // d_len == q_len_s in limbs_modular_div_mod_barrett_unbalanced
+        // - d_len == q_len_s in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 4],
             &[10; 3],
@@ -1385,8 +1385,8 @@ fn test_limbs_modular_div_mod_barrett() {
             &[3067833783, 175304787, 3481052211, 2770888938],
             &[3602692266, 0],
         );
-        // d_len != i_len in limbs_modular_div_mod_barrett_unbalanced
-        // !carry first time in limbs_modular_div_mod_barrett_unbalanced
+        // - d_len != i_len in limbs_modular_div_mod_barrett_unbalanced
+        // - !carry first time in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 25],
             &[10; 19],
@@ -1417,7 +1417,7 @@ fn test_limbs_modular_div_mod_barrett() {
                 1242425483, 2864810952, 1157382204, 2754439417, 1927770818,
             ],
         );
-        // carry second time in limbs_modular_div_mod_barrett_unbalanced
+        // - carry second time in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 113],
             &[10; 7],
@@ -1464,7 +1464,7 @@ fn test_limbs_modular_div_mod_barrett() {
             ],
             &[2336930396, 3906180555, 3405422945, 1687575114, 2055613801, 3816276157, 1899020713],
         );
-        // carry first time in limbs_modular_div_mod_barrett_unbalanced
+        // - carry first time in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 210],
             &[10; 19],
@@ -1547,7 +1547,7 @@ fn test_limbs_modular_div_mod_barrett() {
                 221121460, 921437873, 2477571204, 1545760534, 127126010,
             ],
         );
-        // carry in limbs_modular_div_mod_barrett_balanced
+        // - carry in limbs_modular_div_mod_barrett_balanced
         test(
             &[10; 6],
             &[10; 8],
@@ -1566,12 +1566,12 @@ fn test_limbs_modular_div_mod_barrett() {
                 4272553129,
             ],
         );
-        // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD
-        //      in limbs_modular_div_mod_barrett_unbalanced
-        // d_len + i_len > mul_size in limbs_modular_div_mod_barrett_unbalanced
-        // q_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
-        //      limbs_modular_div_mod_barrett_unbalanced
-        // d_len + q_len_s > mul_size in limbs_modular_div_mod_barrett_unbalanced
+        // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_unbalanced
+        // - d_len + i_len > mul_size in limbs_modular_div_mod_barrett_unbalanced
+        // - q_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_unbalanced
+        // - d_len + q_len_s > mul_size in limbs_modular_div_mod_barrett_unbalanced
         test(
             &[10; 139],
             &[10; 84],
@@ -1661,10 +1661,12 @@ fn test_limbs_modular_div_mod_barrett() {
                 864196777, 1789864771, 1239143610, 84264026, 1385174506, 806629248, 4117925861,
             ],
         );
-        // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
-        // d_len + i_len > mul_size in limbs_modular_div_mod_barrett_balanced
-        // q_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_mod_barrett_balanced
-        // d_len + q_len_s > mul_size in limbs_modular_div_mod_barrett_balanced
+        // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_balanced
+        // - d_len + i_len > mul_size in limbs_modular_div_mod_barrett_balanced
+        // - q_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in
+        //   limbs_modular_div_mod_barrett_balanced
+        // - d_len + q_len_s > mul_size in limbs_modular_div_mod_barrett_balanced
         test(
             &[10; 101],
             &[10; 102],
@@ -1752,8 +1754,8 @@ fn test_limbs_modular_div_mod_barrett() {
                 2945427566, 210394923, 1847865361, 255836050,
             ],
         );
-        // d_len + i_len <= mul_size in limbs_modular_div_mod_barrett_balanced
-        // d_len + q_len_s <= mul_size in limbs_modular_div_mod_barrett_balanced
+        // - d_len + i_len <= mul_size in limbs_modular_div_mod_barrett_balanced
+        // - d_len + q_len_s <= mul_size in limbs_modular_div_mod_barrett_balanced
         test(
             &[10; 90],
             &[10; 1294],
@@ -2281,9 +2283,9 @@ fn test_limbs_modular_div_divide_and_conquer() {
         assert_eq!(&qs[..ns.len()], qs_out);
         verify_limbs_modular_div(ns_in, ds, qs_out);
     };
-    // q_len > d_len first time
-    // q_len < DC_BDIV_QR_THRESHOLD first time
-    // q_len != d_len
+    // - q_len > d_len first time
+    // - q_len < DC_BDIV_QR_THRESHOLD first time
+    // - q_len != d_len
     test(&[10; 3], &[0, 0, 0], &[1, 2], &[0, 0, 0]);
     test(&[10; 3], &[1, 2, 3], &[1, 2], &[1, 0, 3]);
     test(
@@ -2292,25 +2294,25 @@ fn test_limbs_modular_div_divide_and_conquer() {
         &[5, 6],
         &[3435973837, 3607772528, 3401614098],
     );
-    // q_len <= d_len
-    // q_len < DC_BDIV_QR_THRESHOLD second time
+    // - q_len <= d_len
+    // - q_len < DC_BDIV_QR_THRESHOLD second time
     test(&[10; 3], &[1, 2, 3], &[1, 2, 3], &[1, 0, 0]);
     test(&[10; 3], &[1, 2, 3], &[1, u32::MAX, 3], &[1, 3, 2]);
-    // q_len == d_len
+    // - q_len == d_len
     test(
         &[10; 4],
         &[1, 2, 3, 4],
         &[5, 6],
         &[3435973837, 3607772528, 3401614098, 2790010755],
     );
-    // q_len > d_len second time
+    // - q_len > d_len second time
     test(
         &[10; 5],
         &[1, 2, 3, 4, 5],
         &[7, 8],
         &[3067833783, 175304787, 3481052211, 2770888938, 2968937350],
     );
-    // q_len >= DC_BDIV_QR_THRESHOLD first time
+    // - q_len >= DC_BDIV_QR_THRESHOLD first time
     test(
         &[10; 101],
         &[
@@ -2358,8 +2360,8 @@ fn test_limbs_modular_div_divide_and_conquer() {
             3310189672, 2767979128, 3491264110,
         ],
     );
-    // n >= DC_BDIV_Q_THRESHOLD in limbs_modular_div_divide_and_conquer_helper
-    // lo < hi in limbs_modular_div_divide_and_conquer_helper
+    // - n >= DC_BDIV_Q_THRESHOLD in limbs_modular_div_divide_and_conquer_helper
+    // - lo < hi in limbs_modular_div_divide_and_conquer_helper
     test(
         &[10; 369],
         &[
@@ -2497,7 +2499,7 @@ fn test_limbs_modular_div_divide_and_conquer() {
             728659538, 896138123, 62660027, 2953563063, 2225405012,
         ],
     );
-    // lo == hi in limbs_modular_div_divide_and_conquer_helper
+    // - lo == hi in limbs_modular_div_divide_and_conquer_helper
     test(
         &[10; 130],
         &[
@@ -2563,7 +2565,7 @@ fn test_limbs_modular_div_divide_and_conquer() {
             3022974738, 3499817070, 70324044, 1955894168,
         ],
     );
-    // q_len >= DC_BDIV_QR_THRESHOLD second time
+    // - q_len >= DC_BDIV_QR_THRESHOLD second time
     test(
         &[10; 136],
         &[
@@ -2683,14 +2685,14 @@ fn test_limbs_modular_div_barrett() {
         assert_eq!(&qs[n..], &qs_in[n..]);
         verify_limbs_modular_div(ns, ds, qs_out);
     };
-    // in limbs_modular_div_barrett_same_length
-    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_same_length
+    // - in limbs_modular_div_barrett_same_length
+    // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_same_length
     test(&[10; 3], &[0, 0], &[1, 2], &[0, 0]);
     test(&[10; 3], &[1, 2], &[1, 1], &[1, 1]);
     test(&[10; 3], &[1, 2], &[1, 2], &[1, 0]);
     test(&[10; 3], &[1, 2], &[5, 6], &[3435973837, 3607772528]);
-    // in limbs_modular_div_barrett_greater
-    // !carry second time in limbs_modular_div_barrett_greater
+    // - in limbs_modular_div_barrett_greater
+    // - !carry second time in limbs_modular_div_barrett_greater
     test(&[10; 4], &[1, 2, 3, 4], &[1, 2, 3], &[1, 0, 0, 4]);
     test(
         &[10; 4],
@@ -2698,17 +2700,17 @@ fn test_limbs_modular_div_barrett() {
         &[1, u32::MAX, 3],
         &[1, 3, 2, 0xfffffffa],
     );
-    // q_len > i_len in limbs_modular_div_barrett_greater
-    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_greater
-    // d_len == i_len in limbs_modular_div_barrett_greater
+    // - q_len > i_len in limbs_modular_div_barrett_greater
+    // - i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_greater
+    // - d_len == i_len in limbs_modular_div_barrett_greater
     test(
         &[10; 5],
         &[1, 2, 3, 4, 5],
         &[7, 8],
         &[3067833783, 175304787, 3481052211, 2770888938, 2968937350],
     );
-    // d_len != i_len in limbs_modular_div_barrett_greater
-    // !carry first time in limbs_modular_div_barrett_greater
+    // - d_len != i_len in limbs_modular_div_barrett_greater
+    // - !carry first time in limbs_modular_div_barrett_greater
     test(
         &[10; 17],
         &[
@@ -2737,7 +2739,7 @@ fn test_limbs_modular_div_barrett() {
             901277614,
         ],
     );
-    // carry first time in limbs_modular_div_barrett_greater
+    // - carry first time in limbs_modular_div_barrett_greater
     test(
         &[10; 98],
         &[
@@ -2778,7 +2780,7 @@ fn test_limbs_modular_div_barrett() {
             2450050482, 2554796526, 3366193628, 4244612028, 1102253197, 3744549054, 521836615,
         ],
     );
-    // carry second time in limbs_modular_div_barrett_greater
+    // - carry second time in limbs_modular_div_barrett_greater
     test(
         &[10; 37],
         &[
@@ -2803,8 +2805,8 @@ fn test_limbs_modular_div_barrett() {
             1415086525, 3673678347,
         ],
     );
-    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_same_length
-    // n_len + i_len > mul_size in limbs_modular_div_barrett_same_length
+    // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_same_length
+    // - n_len + i_len > mul_size in limbs_modular_div_barrett_same_length
     test(
         &[10; 69],
         &[
@@ -2844,8 +2846,8 @@ fn test_limbs_modular_div_barrett() {
             83156101, 1563034919, 1982884392, 689027156, 3848414016, 2735835897,
         ],
     );
-    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_greater
-    // d_len + i_len > mul_size in limbs_modular_div_barrett_greater
+    // - i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_modular_div_barrett_greater
+    // - d_len + i_len > mul_size in limbs_modular_div_barrett_greater
     test(
         &[10; 369],
         &[
@@ -3054,7 +3056,7 @@ fn test_limbs_modular_div() {
 
         verify_limbs_modular_div(ns, ds, qs_out);
     };
-    // schoolbook branch
+    // - schoolbook branch
     test(&[10; 3], &[0, 0], &[1, 2], &[0, 0]);
     test(&[10; 3], &[1, 2, 3], &[3], &[2863311531, 0, 1]);
     test(
@@ -3073,7 +3075,7 @@ fn test_limbs_modular_div() {
         &[1, u32::MAX, 3],
         &[1, 3, 2, 0xfffffffa],
     );
-    // divide-and-conquer branch
+    // - divide-and-conquer branch
     test(
         &[10; 940],
         &[
@@ -3402,7 +3404,7 @@ fn test_limbs_modular_div() {
             2716506129,
         ],
     );
-    // Barrett branch
+    // - Barrett branch
     test(
         &[10; 1659],
         &[
@@ -4249,16 +4251,16 @@ fn test_limbs_div_exact() {
 
         verify_limbs_div_exact(ns, ds, qs_out);
     };
-    // d_len == 1
+    // - d_len == 1
     test(&[10; 3], &[6], &[2], &[3]);
-    // leading_zero_limbs == 0
-    // d_len != 1
-    // shift == 0
-    // d_len <= q_len
+    // - leading_zero_limbs == 0
+    // - d_len != 1
+    // - shift == 0
+    // - d_len <= q_len
     test(&[5; 8], &[1, 3, 6, 5, 3], &[1; 3], &[1, 2, 3]);
-    // d_len > q_len
+    // - d_len > q_len
     test(&[0; 5], &[6, 19, 32, 21], &[1, 2, 3], &[6, 7]);
-    // shift != 0
+    // - shift != 0
     test(&[0; 5], &[6, 19, 32, 21], &[6, 7], &[1, 2, 3]);
     test(
         &[10; 7],
@@ -4274,7 +4276,7 @@ fn test_limbs_div_exact() {
         &[u32::MAX; 3],
         &[u32::MAX, u32::MAX, u32::MAX, 0],
     );
-    // leading_zero_limbs != 0
+    // - leading_zero_limbs != 0
     test(
         &[0; 5],
         &[0, 0, 0, 6, 19, 32, 21],
@@ -4498,7 +4500,7 @@ fn test_div_exact() {
         9106139481288193067515284601342023565222679498917484131095648263181800618990427694244342686\
         4412105186059052689237237088193855584354278755933606296018800151986520872701706693002473648\
         4330061421236425747083307907706860804054565348593527605104495080560663025897787060638154303\
-        7631781316565710346299551930891169154491973589315700505458672804104869879731391323700304"
+        7631781316565710346299551930891169154491973589315700505458672804104869879731391323700304",
     );
 }
 

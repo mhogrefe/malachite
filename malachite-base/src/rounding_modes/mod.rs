@@ -8,8 +8,8 @@ use crate::named::Named;
 /// [`div_round`](crate::num::arithmetic::traits::DivRound::div_round).
 ///
 /// # Examples
-/// Here are some examples of how floating-point values would be rounded to integer values using
-/// the different `RoundingMode`s.
+/// Here are some examples of how floating-point values would be rounded to integer values using the
+/// different `RoundingMode`s.
 ///
 /// | x    | `Floor` | `Ceiling` | `Down` | `Up` | `Nearest` | `Exact`    |
 /// |------|---------|-----------|--------|------|-----------|------------|

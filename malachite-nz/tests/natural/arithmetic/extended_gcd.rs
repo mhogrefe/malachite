@@ -44,58 +44,58 @@ fn test_limbs_extended_gcd() {
     };
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // s == 0 second time in limbs_gcd_subdivide_step
-        // scratch <= scratch_2 first time
-        // n < GCDEXT_DC_THRESHOLD first time
-        // ys_len <= n
-        // n < GCDEXT_DC_THRESHOLD second time
-        // !mask.get_highest_bit() && n == 2 in mpn_gcdext_lehmer_n
-        // !limbs_half_gcd_2 in mpn_gcdext_lehmer_n
-        // let Some(gs) = gs in gcd_subdiv_step_hook
-        // d != -1 in gcd_subdiv_step_hook
-        // n == 0 in mpn_gcdext_lehmer_n
+        // - s == 0 second time in limbs_gcd_subdivide_step
+        // - scratch <= scratch_2 first time
+        // - n < GCDEXT_DC_THRESHOLD first time
+        // - ys_len <= n
+        // - n < GCDEXT_DC_THRESHOLD second time
+        // - !mask.get_highest_bit() && n == 2 in mpn_gcdext_lehmer_n
+        // - !limbs_half_gcd_2 in mpn_gcdext_lehmer_n
+        // - let Some(gs) = gs in gcd_subdiv_step_hook
+        // - d != -1 in gcd_subdiv_step_hook
+        // - n == 0 in mpn_gcdext_lehmer_n
         test(&[0, 0], &[0, 1], &[0, 1], &[0; 3], false);
-        // gs == None in gcd_subdiv_step_hook
-        // d == 0 in gcd_subdiv_step_hook
-        // qs[qs_len - 1] != 0
-        // qs_len == 1 in gcd_subdiv_step_hook
-        // q == 1 in gcd_subdiv_step_hook
-        // d != 0 in gcd_subdiv_step_hook
+        // - gs == None in gcd_subdiv_step_hook
+        // - d == 0 in gcd_subdiv_step_hook
+        // - qs[qs_len - 1] != 0
+        // - qs_len == 1 in gcd_subdiv_step_hook
+        // - q == 1 in gcd_subdiv_step_hook
+        // - d != 0 in gcd_subdiv_step_hook
         test(&[0, 1], &[1, 1], &[1], &[1, 0, 0], false);
         test(&[1, 1], &[0, 1], &[1], &[1, 0, 0], true);
-        // ys_len > n
-        // slice_test_zero
-        // n != 1
+        // - ys_len > n
+        // - slice_test_zero
+        // - n != 1
         test(&[0, 0, 0], &[0, 1], &[0, 1], &[0; 3], true);
-        // d == -1 in gcd_subdiv_step_hook
+        // - d == -1 in gcd_subdiv_step_hook
         test(&[0, 1], &[0, 1], &[0, 1], &[0; 3], false);
-        // !mask.get_highest_bit() && n != 2 in mpn_gcdext_lehmer_n
+        // - !mask.get_highest_bit() && n != 2 in mpn_gcdext_lehmer_n
         test(&[0, 0, 0], &[0, 0, 1], &[0, 0, 1], &[0; 4], false);
-        // !slice_test_zero
+        // - !slice_test_zero
         test(&[0, 0, 1], &[1, 1], &[1], &[1, 0, 0], true);
-        // limbs_half_gcd_2 in mpn_gcdext_lehmer_n
+        // - limbs_half_gcd_2 in mpn_gcdext_lehmer_n
         test(&[0, 1], &[0, 2], &[0, 1], &[1, 0, 0], true);
-        // q != 1 in gcd_subdiv_step_hook
-        // n != 0 in mpn_gcdext_lehmer_n
-        // ys[0] != ys[0] in mpn_gcdext_lehmer_n
-        // u == 0 in mpn_gcdext_lehmer_n
+        // - q != 1 in gcd_subdiv_step_hook
+        // - n != 0 in mpn_gcdext_lehmer_n
+        // - ys[0] != ys[0] in mpn_gcdext_lehmer_n
+        // - u == 0 in mpn_gcdext_lehmer_n
         test(&[1, 1], &[0, 2], &[1], &[u64::MAX, 0, 0], false);
-        // v != 0 && u > 0 in mpn_gcdext_lehmer_n
-        // u_high != 0 ||  v_high != 0 in mpn_gcdext_lehmer_n
-        // !overflow in mpn_gcdext_lehmer_n
+        // - v != 0 && u > 0 in mpn_gcdext_lehmer_n
+        // - u_high != 0 ||  v_high != 0 in mpn_gcdext_lehmer_n
+        // - !overflow in mpn_gcdext_lehmer_n
         test(&[1, 1], &[0, 3], &[1], &[1, 1, 0], true);
-        // u != 0 && v == 0 in mpn_gcdext_lehmer_n
+        // - u != 0 && v == 0 in mpn_gcdext_lehmer_n
         test(&[0, 2], &[1, 1], &[1], &[0x8000000000000000, 0, 0], true);
-        // v == 0 && u < 0 in mpn_gcdext_lehmer_n
-        // u_high == 0 && v_high == 0 in mpn_gcdext_lehmer_n
+        // - v == 0 && u < 0 in mpn_gcdext_lehmer_n
+        // - u_high == 0 && v_high == 0 in mpn_gcdext_lehmer_n
         test(&[0, 3], &[1, 1], &[1], &[6148914691236517206, 0, 0], false);
-        // qs[qs_len - 1] == 0 in gcd_subdiv_step_hook
+        // - qs[qs_len - 1] == 0 in gcd_subdiv_step_hook
         test(&[0, 1], &[3, 1], &[1], &[6148914691236517206, 0, 0], true);
-        // ys[0] == ys[0] in mpn_gcdext_lehmer_n
-        // c == Ordering::Less in mpn_gcdext_lehmer_n
+        // - ys[0] == ys[0] in mpn_gcdext_lehmer_n
+        // - c == Ordering::Less in mpn_gcdext_lehmer_n
         test(&[0, 3], &[2, 1], &[6], &[1, 0, 0], false);
-        // qs_len != 1 in gcd_subdiv_step_hook
-        // us1_len >= un in gcd_subdiv_step_hook
+        // - qs_len != 1 in gcd_subdiv_step_hook
+        // - us1_len >= un in gcd_subdiv_step_hook
         test(
             &[0, 1, 1],
             &[1, 0, 1],
@@ -103,11 +103,11 @@ fn test_limbs_extended_gcd() {
             &[9223372036854775808, 9223372036854775807, 0, 0],
             true,
         );
-        // c != Ordering::Less in mpn_gcdext_lehmer_n
+        // - c != Ordering::Less in mpn_gcdext_lehmer_n
         test(&[2, 1], &[0, 3], &[6], &[3, 0, 0], true);
-        // mask.get_highest_bit() in mpn_gcdext_lehmer_n
+        // - mask.get_highest_bit() in mpn_gcdext_lehmer_n
         test(&[0, 0, 0, 1], &[0, 1, 2], &[0, 1], &[4, 0, 0, 0], true);
-        // n == 1
+        // - n == 1
         test(
             &[6848271667560079512, 13861374652666379954, 600542],
             &[15542],
@@ -115,7 +115,7 @@ fn test_limbs_extended_gcd() {
             &[1371, 0],
             true,
         );
-        // lehmer_un_mag == 0
+        // - lehmer_un_mag == 0
         test(
             &[
                 u64::MAX,
@@ -1278,7 +1278,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // a_high != 0 || b_high != 0 in hgcd_mul_matrix_vector
+        // - a_high != 0 || b_high != 0 in hgcd_mul_matrix_vector
         test(
             &[
                 0,
@@ -2787,7 +2787,7 @@ fn test_limbs_extended_gcd() {
             ],
             true,
         );
-        // limbs_half_gcd_approx, n != 0 fifth time
+        // - limbs_half_gcd_approx, n != 0 fifth time
         test(
             &[
                 u64::MAX,
@@ -18940,7 +18940,7 @@ fn test_limbs_extended_gcd() {
             ],
             true,
         );
-        // x_high || y_high in limbs_half_gcd_matrix_adjust
+        // - x_high || y_high in limbs_half_gcd_matrix_adjust
         test(
             &[
                 u64::MAX,
@@ -25745,7 +25745,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // size == 0 in limbs_extended_gcd_cofactor
+        // - size == 0 in limbs_extended_gcd_cofactor
         test(
             &[
                 u64::MAX,
@@ -26702,7 +26702,7 @@ fn test_limbs_extended_gcd() {
     }
     #[cfg(feature = "32_bit_limbs")]
     {
-        // scratch > scratch_2 first time
+        // - scratch > scratch_2 first time
         test(
             &[
                 3897754892, 1591443736, 3731539623, 2201049795, 667019954, 338792079, 2659170876,
@@ -26714,20 +26714,20 @@ fn test_limbs_extended_gcd() {
             &[1373166577, 18362570, 0],
             true,
         );
-        // n >= GCDEXT_DC_THRESHOLD first time
-        // scratch > scratch_2 second time
-        // scratch <= scratch_2 third time
-        // n >= GCDEXT_DC_THRESHOLD second time
-        // nn != 0 first time
-        // nn != 0 second time
-        // a_high == 0 && b_high == 0 in hgcd_mul_matrix_vector
-        // limbs_cmp_same_length(..) != Ordering::Equal && (us0[0] != 0 || us_len != 1)
-        // lehmer_us_len != 0
-        // ss_len != 0 && ss_sign in limbs_extended_gcd_cofactor
-        // size != 0 in limbs_extended_gcd_cofactor
-        // lehmer_us_len == 0 || lehmer_us_sign
-        // lehmer_vs_len != 0
-        // us1_len <= us_len
+        // - n >= GCDEXT_DC_THRESHOLD first time
+        // - scratch > scratch_2 second time
+        // - scratch <= scratch_2 third time
+        // - n >= GCDEXT_DC_THRESHOLD second time
+        // - nn != 0 first time
+        // - nn != 0 second time
+        // - a_high == 0 && b_high == 0 in hgcd_mul_matrix_vector
+        // - limbs_cmp_same_length(..) != Ordering::Equal && (us0[0] != 0 || us_len != 1)
+        // - lehmer_us_len != 0
+        // - ss_len != 0 && ss_sign in limbs_extended_gcd_cofactor
+        // - size != 0 in limbs_extended_gcd_cofactor
+        // - lehmer_us_len == 0 || lehmer_us_sign
+        // - lehmer_vs_len != 0
+        // - us1_len <= us_len
         test(
             &[
                 3762839616, 2967303351, 4062879665, 4165640742, 2234446345, 1620638488, 448679871,
@@ -26888,8 +26888,8 @@ fn test_limbs_extended_gcd() {
             ],
             true,
         );
-        // scratch > scratch_2 third time
-        // ss_len == 0 || !ss_sign in limbs_extended_gcd_cofactor
+        // - scratch > scratch_2 third time
+        // - ss_len == 0 || !ss_sign in limbs_extended_gcd_cofactor
         test(
             &[
                 74310550, 3684857215, 4195563540, 1932463403, 2701977359, 4052089791, 2826747541,
@@ -27018,7 +27018,7 @@ fn test_limbs_extended_gcd() {
             ],
             true,
         );
-        // lehmer_us_len != 0 && !lehmer_us_sign
+        // - lehmer_us_len != 0 && !lehmer_us_sign
         test(
             &[
                 3714073558, 375193035, 1620772021, 2308204402, 626547013, 3688150199, 1448538382,
@@ -27143,7 +27143,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // us1_len > us_len
+        // - us1_len > us_len
         test(
             &[
                 u32::MAX,
@@ -27782,8 +27782,8 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // nn == 0 first time
-        // n != 0 first time
+        // - nn == 0 first time
+        // - n != 0 first time
         test(
             &[
                 0,
@@ -28431,8 +28431,8 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // nn == 0 second time
-        // n != 0 second time
+        // - nn == 0 second time
+        // - n != 0 second time
         test(
             &[
                 u32::MAX,
@@ -29169,8 +29169,8 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // limbs_cmp_same_length(..) == Ordering::Equal
-        // c != Ordering::Less
+        // - limbs_cmp_same_length(..) == Ordering::Equal
+        // - c != Ordering::Less
         test(
             &[
                 1582207393, 3257769320, 312002593, 3788671422, 2562360222, 2018485950, 1642000633,
@@ -29297,7 +29297,7 @@ fn test_limbs_extended_gcd() {
             ],
             true,
         );
-        // n == 0 second time
+        // - n == 0 second time
         test(
             &[
                 104199695, 1437842355, 3026540896, 1036691142, 2895760091, 316986459, 3848493166,
@@ -29483,7 +29483,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // c == Ordering::Less
+        // - c == Ordering::Less
         test(
             &[
                 187934912, 3963930250, 231958896, 4245982773, 1934140206, 440616703, 3262112836,
@@ -29611,7 +29611,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // n == 0 first time
+        // - n == 0 first time
         test(
             &[
                 1,
@@ -30451,7 +30451,7 @@ fn test_limbs_extended_gcd() {
             ],
             false,
         );
-        // scratch <= scratch_2 second time
+        // - scratch <= scratch_2 second time
         test(
             &[
                 2207864798, 267946504, 372323977, 838488163, 989944659, 2604803451, 4238223922,

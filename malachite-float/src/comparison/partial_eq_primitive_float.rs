@@ -1,8 +1,8 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 fn float_partial_eq_primitive_float<T: PrimitiveFloat>(x: &Float, y: &T) -> bool {
     match x {
@@ -33,8 +33,8 @@ macro_rules! impl_partial_eq_primitive_float {
             ///
             /// The [`Float`] infinity is equal to the primitive float infinity, and the [`Float`]
             /// negative infinity is equal to the primitive float negative infinity. The [`Float`]
-            /// NaN is not equal to anything, not even the primitive float NaN. Every [`Float`]
-            /// zero is equal to every primitive float zero, regardless of sign.
+            /// NaN is not equal to anything, not even the primitive float NaN. Every [`Float`] zero
+            /// is equal to every primitive float zero, regardless of sign.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

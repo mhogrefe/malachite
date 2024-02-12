@@ -1,6 +1,7 @@
 use crate::arithmetic::is_power_of_2::float_is_signed_min;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -9,7 +10,6 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom, Wra
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 #[allow(clippy::type_repetition_in_bounds)]
 fn unsigned_rounding_from_float<T: PrimitiveUnsigned>(f: Float, rm: RoundingMode) -> (T, Ordering)
@@ -280,8 +280,8 @@ macro_rules! impl_unsigned_from {
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
             /// is less than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`, if the [`Float`]
-            /// is greater than the maximum representable value of the unsigned type and `rm` is
-            /// not `Down`, `Floor`, or `Nearest`, or if the [`Float`] is NaN.
+            /// is greater than the maximum representable value of the unsigned type and `rm` is not
+            /// `Down`, `Floor`, or `Nearest`, or if the [`Float`] is NaN.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#rounding_from).
@@ -314,8 +314,8 @@ macro_rules! impl_unsigned_from {
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
             /// is less than zero and `rm` is not `Down`, `Ceiling`, or `Nearest`, if the [`Float`]
-            /// is greater than the maximum representable value of the unsigned type and `rm` is
-            /// not `Down`, `Floor`, or `Nearest`, or if the [`Float`] is NaN.
+            /// is greater than the maximum representable value of the unsigned type and `rm` is not
+            /// `Down`, `Floor`, or `Nearest`, or if the [`Float`] is NaN.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#rounding_from).
@@ -328,9 +328,9 @@ macro_rules! impl_unsigned_from {
         impl TryFrom<Float> for $t {
             type Error = UnsignedFromFloatError;
 
-            /// Converts a [`Float`] to a primitive unsigned integer, taking the [`Float`] by
-            /// value. If the [`Float`] is not equal to an unsigned primitive integer of the given
-            /// type, an error is returned.
+            /// Converts a [`Float`] to a primitive unsigned integer, taking the [`Float`] by value.
+            /// If the [`Float`] is not equal to an unsigned primitive integer of the given type, an
+            /// error is returned.
             ///
             /// Both positive and negative zero convert to a primitive unsigned integer zero.
             ///
@@ -466,8 +466,8 @@ where
                     }
                 }
             } else if exponent > i64::wrapping_from(T::WIDTH) {
-                // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok
-                // because the next else block handles it.
+                // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok because the
+                // next else block handles it.
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
                         (T::MIN, Ordering::Greater)
@@ -583,8 +583,8 @@ where
                     }
                 }
             } else if *exponent > i64::wrapping_from(T::WIDTH) {
-                // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok
-                // because the next else block handles it.
+                // This doesn't catch the case where -2^(W+1) < x < -2^W, but that's ok because the
+                // next else block handles it.
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Down | RoundingMode::Nearest => {
                         (T::MIN, Ordering::Greater)

@@ -1525,39 +1525,44 @@ fn test_limbs_mul_greater_to_out_toom_22() {
         limbs_mul_greater_to_out_toom_22(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // s != n
-    // !(xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less)
-    // t != n
-    // slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) != Ordering::Less
-    // s <= t
-    // !v_neg_1_neg
-    // carry <= 2
+    // - s != n
+    // - !(xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less)
+    // - t != n
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) != Ordering::Less
+    // - s <= t
+    // - !v_neg_1_neg
+    // - carry <= 2
     test(
         &series(2, 3),
         &series(3, 3),
         &[10; 6],
         &[6, 17, 34, 31, 20, 0],
     );
-    // xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less
-    // v_neg_1_neg
-    //test(&[2, 0, 4], &[3, 4, 5], &[10, 10, 10, 10, 10, 10], vec![6, 8, 22, 16, 20, 0]);
+    // - xs0[s] == 0 && limbs_cmp_same_length(&xs0[..s], xs1) == Ordering::Less
+    // - v_neg_1_neg
+    test(
+        &[2, 0, 4],
+        &[3, 4, 5],
+        &[10, 10, 10, 10, 10, 10],
+        &[6, 8, 22, 16, 20, 0],
+    );
     test(&[1; 3], &series(1, 3), &[5; 8], &[1, 3, 6, 5, 3, 0, 5, 5]);
-    // s == n
-    // limbs_cmp_same_length(ys0, ys1) != Ordering::Less
-    // t == n
-    // limbs_cmp_same_length(ys0, ys1) == Ordering::Less
+    // - s == n
+    // - limbs_cmp_same_length(ys0, ys1) != Ordering::Less
+    // - t == n
+    // - limbs_cmp_same_length(ys0, ys1) == Ordering::Less
     test(&[1; 4], &series(1, 4), &[5; 8], &[1, 3, 6, 10, 9, 7, 4, 0]);
-    // limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
-    // limbs_cmp_same_length(&b0[..n], &b1[..n]) != Ordering::Less
+    // - limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
+    // - limbs_cmp_same_length(&b0[..n], &b1[..n]) != Ordering::Less
     test(&series(1, 4), &[1; 4], &[5; 8], &[1, 3, 6, 10, 9, 7, 4, 0]);
-    // slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
     test(
         &series(1, 5),
         &[1, 0, 0, 4],
         &[5; 9],
         &[1, 2, 3, 8, 13, 12, 16, 20, 0],
     );
-    // s > t
+    // - s > t
     test(&[1; 4], &series(1, 3), &[5; 8], &[1, 3, 6, 6, 5, 3, 0, 5]);
     test(
         &[100, 101, 102],
@@ -1568,7 +1573,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
     let xs = rle_decode(&[(u32::MAX, 8), (4294950911, 1), (u32::MAX, 21), (536870911, 1), (0, 25)]);
     let ys = rle_decode(&[(u32::MAX, 2), (4294963199, 1), (u32::MAX, 18), (268435455, 1), (0, 34)]);
     let out_len = xs.len() + ys.len();
-    // carry > 2
+    // - carry > 2
     test(
         &xs,
         &ys,
@@ -1773,63 +1778,63 @@ fn test_limbs_mul_greater_to_out_toom_32() {
         limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // !(ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less)
-    // t == n
-    // limbs_cmp_same_length(ys0, ys1) == Ordering::Less
-    // ap1hi != 1 and ap1hi != 2
-    // !bp1hi
-    // hi == 0 first time
-    // v_neg_1_neg
-    // s <= t
-    // s + t > n
-    // hi >= 0 second time
+    // - !(ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less)
+    // - t == n
+    // - limbs_cmp_same_length(ys0, ys1) == Ordering::Less
+    // - ap1hi != 1 and ap1hi != 2
+    // - !bp1hi
+    // - hi == 0 first time
+    // - v_neg_1_neg
+    // - s <= t
+    // - s + t > n
+    // - hi >= 0 second time
     test(
         series(2, 6),
         series(3, 4),
         vec![10; 10],
         vec![6, 17, 34, 58, 76, 94, 88, 71, 42, 0],
     );
-    // limbs_cmp_same_length(ys0, ys1) != Ordering::Less
-    // ap1hi == 2
-    // bp1hi
-    // !v_neg_1_neg
+    // - limbs_cmp_same_length(ys0, ys1) != Ordering::Less
+    // - ap1hi == 2
+    // - bp1hi
+    // - !v_neg_1_neg
     test(
         vec![u32::MAX; 6],
         vec![u32::MAX; 4],
         vec![10; 10],
         vec![1, 0, 0, 0, u32::MAX, u32::MAX, u32::MAX - 1, u32::MAX, u32::MAX, u32::MAX],
     );
-    // ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less
+    // - ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less
     test(
         vec![0, 0, 1, 1, 0, 1],
         vec![0, 0, 0, 1],
         vec![10; 10],
         vec![0, 0, 0, 0, 0, 1, 1, 0, 1, 0],
     );
-    // t != n
-    // slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
-    // s + t <= n
+    // - t != n
+    // - slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less
+    // - s + t <= n
     test(
         vec![0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 0, 0, 1],
         vec![10; 12],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // !(slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less)
+    // - !(slice_test_zero(&ys0[t..]) && limbs_cmp_same_length(&ys0[..t], ys1) == Ordering::Less)
     test(
         vec![0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 1, 0, 1],
         vec![10; 12],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
     );
-    // s > t
+    // - s > t
     test(
         series(1, 9),
         vec![9, 8, 7, 6, 5],
         vec![10; 14],
         vec![9, 26, 50, 80, 115, 150, 185, 220, 255, 200, 146, 94, 45, 0],
     );
-    // ap1hi == 1
+    // - ap1hi == 1
     test(
         vec![2543705880, 1859419010, 3343322808, 1165039137, 1872701663, 1957510151, 1589243046],
         vec![1919189400, 1295801997, 354566481, 1212146910, 1886225431],
@@ -1839,7 +1844,7 @@ fn test_limbs_mul_greater_to_out_toom_32() {
             3338154324, 3806846000, 1880963052, 291601955, 697949587, 10, 10,
         ],
     );
-    // hi != 0 first time
+    // - hi != 0 first time
     test(
         vec![706760835, 4153647095, 3843998199, 2077172825, 1158686949, 3157624247],
         vec![2847735618, 2779635711, 2471732382, 2655639495],
@@ -1926,28 +1931,28 @@ fn test_limbs_mul_greater_to_out_toom_33() {
         limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less
-    // s != n
-    // carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less
-    // t != n
-    // s <= t
-    // !v_neg_1
-    // two_r <= k + 1
+    // - carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less
+    // - s != n
+    // - carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less
+    // - t != n
+    // - s <= t
+    // - !v_neg_1
+    // - two_r <= k + 1
     test(
         series(2, 5),
         series(3, 5),
         vec![10; 10],
         vec![6, 17, 34, 58, 90, 94, 88, 71, 42, 0],
     );
-    // s > t
+    // - s > t
     test(
         series(2, 6),
         series(3, 5),
         vec![10; 11],
         vec![6, 17, 34, 58, 90, 115, 116, 106, 84, 49, 0],
     );
-    // v_neg_1
-    // two_r > k + 1
+    // - v_neg_1
+    // - two_r > k + 1
     test(
         series(2, 9),
         series(3, 8),
@@ -1960,8 +1965,8 @@ fn test_limbs_mul_greater_to_out_toom_33() {
         vec![10; 10],
         vec![6, 17, 34, 58, 90, 94, 88, 71, 42, 0],
     );
-    // !(carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less)
-    // !(carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less)
+    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less)
+    // - !(carry == 0 && limbs_cmp_same_length(&gp[..n], ys_1) == Ordering::Less)
     test(
         vec![u32::MAX; 5],
         vec![u32::MAX; 5],
@@ -2034,42 +2039,42 @@ fn test_limbs_mul_greater_to_out_toom_42() {
         limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // v_neg_1_neg
-    // t == n
-    // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
-    // s <= t
-    // as1[n] not 1, 2, or 3
+    // - v_neg_1_neg
+    // - t == n
+    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - s <= t
+    // - as1[n] not 1, 2, or 3
     test(
         series(2, 4),
         vec![3, 4],
         vec![10; 7],
         vec![6, 17, 24, 31, 20, 0, 10],
     );
-    // !v_neg_1_neg
-    // s != n
-    // t != n
-    // !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - !v_neg_1_neg
+    // - s != n
+    // - t != n
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
     test(
         series(2, 7),
         series(3, 3),
         vec![10; 10],
         vec![6, 17, 34, 46, 58, 70, 82, 67, 40, 0],
     );
-    // s > t
+    // - s > t
     test(
         series(2, 8),
         series(3, 3),
         vec![10; 11],
         vec![6, 17, 34, 46, 58, 70, 82, 94, 76, 45, 0],
     );
-    // limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
     test(
         vec![0, 0, 0, 1],
         vec![1, 1],
         vec![10; 6],
         vec![0, 0, 0, 1, 1, 0],
     );
-    // as1[n] == 1
+    // - as1[n] == 1
     test(
         vec![
             2363703565, 2011430902, 405935879, 3293866119, 79230945, 4067912411, 54522599,
@@ -2088,7 +2093,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             31889895, 4291170933, 743974460, 931456782, 3403938046, 2227799389,
         ],
     );
-    // bs1[n] != 0
+    // - bs1[n] != 0
     test(
         vec![
             1023706198, 1055957821, 62637438, 3129002448, 1343635842, 1979891039, 2332614953,
@@ -2107,7 +2112,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             2499732116, 168215214, 1611459466, 1659741921, 3303732250, 173154690,
         ],
     );
-    // as1[n] == 2
+    // - as1[n] == 2
     test(
         vec![
             0xfffff,
@@ -2162,21 +2167,21 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             u32::MAX,
         ],
     );
-    // asm1[n] != 0
+    // - asm1[n] != 0
     test(
         vec![3338024033, 1570788701, 4067509056, 680440343],
         vec![599772085, 925834366],
         vec![10; 6],
         vec![1056633749, 686831275, 2758938475, 3727232403, 1859912609, 146677497],
     );
-    // as1[n] == 3
+    // - as1[n] == 3
     test(
         vec![4030415682, 3643742328, 2586387240, 3719633661],
         vec![708497006, 797041707],
         vec![10; 6],
         vec![4203348572, 3202027474, 4170951291, 2012723103, 3609216593, 690273745],
     );
-    // slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
     test(
         vec![
             0,
@@ -2275,14 +2280,14 @@ fn test_limbs_mul_greater_to_out_toom_43() {
         limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // n_high < n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // !v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // limbs_cmp_same_length(small_scratch, bsm1) != Ordering::Less
-    // s <= t
-    // !v_neg_2neg in limbs_mul_toom_interpolate_6points
-    // !v_neg_1_neg in limbs_mul_toom_interpolate_6points
-    // n_high > n in limbs_mul_toom_interpolate_6points
-    // special_carry_1 <= special_carry_2
+    // - n_high < n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // - !v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // - limbs_cmp_same_length(small_scratch, bsm1) != Ordering::Less
+    // - s <= t
+    // - !v_neg_2neg in limbs_mul_toom_interpolate_6points
+    // - !v_neg_1_neg in limbs_mul_toom_interpolate_6points
+    // - n_high > n in limbs_mul_toom_interpolate_6points
+    // - special_carry_1 <= special_carry_2
     test(
         series(2, 11),
         series(3, 9),
@@ -2292,12 +2297,12 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             132, 0,
         ],
     );
-    // n_high >= n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // t != n
-    // limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less
-    // *bsm1last == 0 && limbs_cmp_same_length(bsm1init, ys_1) == Ordering::Less
-    // s > t
+    // - n_high >= n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // - v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // - t != n
+    // - limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less
+    // - *bsm1last == 0 && limbs_cmp_same_length(bsm1init, ys_1) == Ordering::Less
+    // - s > t
     test(
         series(2, 12),
         series(3, 8),
@@ -2307,9 +2312,9 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             130, 0,
         ],
     );
-    // v_neg_2neg in limbs_mul_toom_interpolate_6points
-    // v_neg_1_neg in limbs_mul_toom_interpolate_6points
-    // n_high <= n in limbs_mul_toom_interpolate_6points
+    // - v_neg_2neg in limbs_mul_toom_interpolate_6points
+    // - v_neg_1_neg in limbs_mul_toom_interpolate_6points
+    // - n_high <= n in limbs_mul_toom_interpolate_6points
     test(
         series(2, 19),
         series(3, 11),
@@ -2319,7 +2324,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             1210, 1235, 1236, 1212, 1162, 1085, 980, 846, 682, 487, 260, 0,
         ],
     );
-    // special_carry_1 > special_carry_2
+    // - special_carry_1 > special_carry_2
     test(
         vec![
             3785023459, 4249117725, 1551102690, 4239134101, 2264608302, 1455009194, 3261002629,
@@ -2586,27 +2591,27 @@ fn test_limbs_mul_greater_to_out_toom_44() {
         limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
-    // limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
-    // s <= t
-    // !w1_neg
-    // !w3neg
-    // w6n <= n + 1
-    // limbs_mul_greater_to_out_basecase in limbs_mul_same_length_to_out_toom_44recursive
+    // - limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
+    // - limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut scratch[..n + 1])
+    // - s <= t
+    // - !w1_neg
+    // - !w3neg
+    // - w6n <= n + 1
+    // - limbs_mul_greater_to_out_basecase in limbs_mul_same_length_to_out_toom_44recursive
     test(
         series(2, 4),
         series(3, 4),
         vec![10; 8],
         vec![6, 17, 34, 58, 58, 49, 30, 0],
     );
-    // w3neg
+    // - w3neg
     test(
         vec![0, 0, 0, 1],
         vec![0, 0, 1, 1],
         vec![10; 8],
         vec![0, 0, 0, 0, 0, 1, 1, 0],
     );
-    // w6n > n + 1
+    // - w6n > n + 1
     test(
         vec![
             1528859315, 4288784328, 3677151116, 445199233, 3304488688, 3566979465, 3541025426,
@@ -2624,7 +2629,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
             2274199643, 3000367783, 688838692,
         ],
     );
-    // s > t
+    // - s > t
     test(
         vec![
             1588217107, 79108222, 2883552792, 2390312777, 1587172303, 2070384343, 2265280181,
@@ -2638,7 +2643,7 @@ fn test_limbs_mul_greater_to_out_toom_44() {
             1401222667,
         ],
     );
-    // w1_neg
+    // - w1_neg
     test(
         vec![
             1047248630, 339306853, 1100911694, 3907715577, 4281628442, 1447091409, 3425204321,
@@ -2751,14 +2756,14 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         limbs_mul_greater_to_out_toom_52(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.even() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // !v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // t != n
-    // !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
-    // !v_neg_1_neg
-    // !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
-    // degree.even() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // !v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - degree.even() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - !v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - t != n
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - !v_neg_1_neg
+    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
+    // - degree.even() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - !v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
     test(
         &series(2, 15),
         &series(3, 5),
@@ -2774,34 +2779,34 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
     );
-    // n_high != n in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // t == n
-    // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
-    // v_neg_1_neg
+    // - n_high != n in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - t == n
+    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - v_neg_1_neg
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 0, 0, 0, 1],
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 0, 0, 1],
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
-    // limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less
     test(
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         &[0, 0, 1, 0, 0, 1],
         &[10; 20],
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
     );
-    // v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // limbs_mul_toom_evaluate_poly_in_1and_neg_1(as1, asm1, 4, xs, n, s, &mut v_neg_1[..m])
+    // - v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - limbs_mul_toom_evaluate_poly_in_1and_neg_1(as1, asm1, 4, xs, n, s, &mut v_neg_1[..m])
     test(
         &[
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -2815,7 +2820,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3650814344, 1121996596, 3441179979, 3561879910, 1574546788, 1514489709,
         ],
     );
-    // limbs_cmp_same_length(bsm1, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(bsm1, ys_1) != Ordering::Less
     test(
         &[
             2331447040, 1003213663, 1873981685, 3371337621, 3796896013, 4144448610, 2569252563,
@@ -2829,7 +2834,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             3374007062, 3091178442, 1888125000, 2974781424, 307612679, 174629431,
         ],
     );
-    // slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
     test(
         &rle_decode(&[
             (32767, 1),
@@ -2971,19 +2976,19 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // !(*bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less)
-    // limbs_cmp_same_length(bs2, &out[..n + 1]) != Ordering::Less
-    // *asm1last != 1 && *asm1last != 2
-    // *as1last == 0
+    // - !(*bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less)
+    // - limbs_cmp_same_length(bs2, &out[..n + 1]) != Ordering::Less
+    // - *asm1last != 1 && *asm1last != 2
+    // - *as1last == 0
     test(
         series(2, 5),
         series(3, 3),
         vec![10; 8],
         vec![6, 17, 34, 46, 58, 49, 30, 0],
     );
-    // *bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less
-    // *as1last == 2
-    // *bs1last == 1
+    // - *bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less
+    // - *as1last == 2
+    // - *bs1last == 1
     test(
         vec![611094747, 2426195984, 3948451542, 3575143460, 2163084716],
         vec![1043494367, 2432724646, 1148376235],
@@ -2993,7 +2998,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             578359487,
         ],
     );
-    // *as1last == 1
+    // - *as1last == 1
     test(
         vec![83336617, 52963853, 1461131367, 615175494, 2376138249],
         vec![1085015601, 823246134, 3222784883],
@@ -3003,8 +3008,8 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             1782966412,
         ],
     );
-    // limbs_cmp_same_length(bs2, &out[..n + 1]) == Ordering::Less
-    // *as1last > 2
+    // - limbs_cmp_same_length(bs2, &out[..n + 1]) == Ordering::Less
+    // - *as1last > 2
     test(
         vec![
             3853679659, 4236745288, 2469732913, 4265854402, 4207372271, 1754370134, 137881047,
@@ -3018,7 +3023,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             380101898, 225439482,
         ],
     );
-    // *asm1last == 1
+    // - *asm1last == 1
     test(
         vec![4171807709, 1363035595, 2692148345, 3728232161, 2672522097],
         vec![178202067, 736149219, 623937260],
@@ -3028,7 +3033,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             388241865,
         ],
     );
-    // *bs1last == 2
+    // - *bs1last == 2
     test(
         vec![361692441, 3665267779, 1770324312, 1221560416, 2810295690],
         vec![1887715703, 4035171395, 2815003797],
@@ -3038,7 +3043,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             1841921601,
         ],
     );
-    // *bsm1last != 0
+    // - *bsm1last != 0
     test(
         vec![1542637461, 595638956, 1883922642, 2681579369, 2641006916],
         vec![3723002977, 116606811, 2193352864],
@@ -3048,7 +3053,7 @@ fn test_limbs_mul_greater_to_out_toom_53() {
             1348708775,
         ],
     );
-    // *asm1last == 2
+    // - *asm1last == 2
     test(
         vec![4043423637, 312331403, 3088235367, 41162462, 2934893364],
         vec![2702987034, 4184574368, 2455116868],
@@ -3160,16 +3165,16 @@ fn test_limbs_mul_greater_to_out_toom_54() {
         limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // !v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // !y_sign in limbs_toom_couple_handling
-    // y_shift != 0 in limbs_toom_couple_handling
-    // x_shift != 0 in limbs_toom_couple_handling
-    // s > t
-    // carry_1 && !carry_2, first time, in limbs_mul_toom_interpolate_8points
-    // carry_1 && !carry_2, second time, in limbs_mul_toom_interpolate_8points
-    // s_plus_t != n in limbs_mul_toom_interpolate_8points
+    // - degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // - !v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // - degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // - !y_sign in limbs_toom_couple_handling
+    // - y_shift != 0 in limbs_toom_couple_handling
+    // - x_shift != 0 in limbs_toom_couple_handling
+    // - s > t
+    // - carry_1 && !carry_2, first time, in limbs_mul_toom_interpolate_8points
+    // - carry_1 && !carry_2, second time, in limbs_mul_toom_interpolate_8points
+    // - s_plus_t != n in limbs_mul_toom_interpolate_8points
     test(
         series(2, 15),
         series(3, 11),
@@ -3179,16 +3184,16 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             882, 833, 760, 662, 538, 387, 208, 0,
         ],
     );
-    // v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // y_sign in limbs_toom_couple_handling
-    // s <= t
+    // - v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // - y_sign in limbs_toom_couple_handling
+    // - s <= t
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         vec![10; 26],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // !carry_1 && carry_2, first time, in limbs_mul_toom_interpolate_8points
+    // - !carry_1 && carry_2, first time, in limbs_mul_toom_interpolate_8points
     test(
         vec![
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -3206,7 +3211,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             3773463966, 3902311612, 4169089467, 614631841, 1314987876,
         ],
     );
-    // s_plus_t == n in limbs_mul_toom_interpolate_8points
+    // - s_plus_t == n in limbs_mul_toom_interpolate_8points
     test(
         vec![
             1372428912, 2999825770, 3824933735, 1252466299, 1644332514, 577056155, 267504800,
@@ -3229,7 +3234,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             774831877, 3808631269, 3720895601, 1034939105, 474724830,
         ],
     );
-    // !carry_1 && carry_2, second time, in limbs_mul_toom_interpolate_8points
+    // - !carry_1 && carry_2, second time, in limbs_mul_toom_interpolate_8points
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xfffffff0, u32::MAX, u32::MAX, u32::MAX],
         vec![
@@ -3353,42 +3358,42 @@ fn test_limbs_mul_greater_to_out_toom_62() {
         limbs_mul_greater_to_out_toom_62(&mut out, xs, ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.odd() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // degree > 4 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // degree_u >= 5 in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // t == n
-    // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
-    // v_neg_1_neg_b
-    // *as1last == 0
+    // - degree.odd() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - degree > 4 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - degree_u >= 5 in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - degree.odd() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // - t == n
+    // - limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
+    // - v_neg_1_neg_b
+    // - *as1last == 0
     test(
         &series(2, 6),
         &[3, 4],
         &[10; 8],
         &[6, 17, 24, 31, 38, 45, 28, 0],
     );
-    // limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
-    // !v_neg_1_neg_b
-    // t >= n
-    // limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less
+    // - limbs_cmp_same_length(ys_0, ys_1) != Ordering::Less
+    // - !v_neg_1_neg_b
+    // - t >= n
+    // - limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less
     test(
         &[0, 0, 0, 0, 0, 1],
         &[1, 1],
         &[10; 8],
         &[0, 0, 0, 0, 0, 1, 1, 0],
     );
-    // limbs_cmp_same_length(&bsm1, ys_1) != Ordering::Less
+    // - limbs_cmp_same_length(&bsm1, ys_1) != Ordering::Less
     test(
         &[0, 0, 0, 0, 0, 1],
         &[2, 1],
         &[10; 8],
         &[0, 0, 0, 0, 0, 2, 1, 0],
     );
-    // t != n
-    // !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
-    // t < n
-    // !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
-    // *as1last == 2
+    // - t != n
+    // - !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
+    // - t < n
+    // - !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
+    // - *as1last == 2
     test(
         &[
             2291585918, 1380546066, 1861205162, 1395600128, 1509813785, 1715266614, 3251195596,
@@ -3401,7 +3406,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             3973435471, 3570040059, 138616924, 3845622124, 4243476600, 2488800838, 2175946157,
         ],
     );
-    // *as1last > 2
+    // - *as1last > 2
     test(
         &[706760835, 4153647095, 3843998199, 2077172825, 1158686949, 3157624247],
         &[708497006, 797041707],
@@ -3411,7 +3416,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             585978436,
         ],
     );
-    // *as1last == 1
+    // - *as1last == 1
     test(
         &[
             1817453168, 96871997, 3927306877, 3090061646, 3474317652, 437148773, 439538568,
@@ -3424,7 +3429,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             1709306376, 2647162930, 2288715437, 510829208, 3519993529, 1581992297, 88668250,
         ],
     );
-    // *bs1last != 0
+    // - *bs1last != 0
     test(
         &[478149678, 4026802122, 1384639138, 368837837, 183900171, 785221208],
         &[1458158767, 4167624669],
@@ -3434,7 +3439,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             761939975,
         ],
     );
-    // *asm1last == 1
+    // - *asm1last == 1
     test(
         &[760464004, 3698115579, 1282981837, 2124133062, 1943175022, 3815903204],
         &[2302225798, 423133196],
@@ -3444,7 +3449,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             375936580,
         ],
     );
-    // *asm1last == 2
+    // - *asm1last == 2
     test(
         &[
             486320673, 3488920730, 3556919186, 380261964, 1609664786, 3382076763, 3478178414,
@@ -3458,7 +3463,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             1307127829,
         ],
     );
-    // slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
     test(
         &rle_decode(&[(u32::MAX, 17), (31, 1), (0, 5), (4294967232, 1), (u32::MAX, 12)]),
         &[u32::MAX, 63, 0, 0, 0, 0, 4227858432, u32::MAX, u32::MAX, u32::MAX, u32::MAX],
@@ -3513,7 +3518,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             u32::MAX,
         ],
     );
-    // slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+    // - slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
     test(
         &rle_decode(&[(1073741823, 1), (0, 7), (4290772992, 1), (u32::MAX, 8)]),
         &[0xfff00000, u32::MAX, 0, 0xffffff8, 4294443008],
@@ -3617,9 +3622,9 @@ fn test_limbs_mul_greater_to_out_toom_63() {
         limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // n == t
-    // !(!carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less)
-    // s <= t
+    // - n == t
+    // - !(!carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less)
+    // - s <= t
     test(
         series(2, 17),
         series(3, 9),
@@ -3629,7 +3634,7 @@ fn test_limbs_mul_greater_to_out_toom_63() {
             812, 773, 710, 622, 508, 367, 198, 0,
         ],
     );
-    // n != t
+    // - n != t
     test(
         vec![
             3047748962, 2284186344, 3132866461, 2331447040, 1003213663, 1873981685, 3371337621,
@@ -3680,8 +3685,8 @@ fn test_limbs_mul_greater_to_out_toom_63() {
             2805842653, 2980411632, 2879849003, 22987084, 2408312078, 212023482, 336282883,
         ],
     );
-    // !carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less
-    // s > t
+    // - !carry && limbs_cmp_same_length(scratch2lo, ys_1) == Ordering::Less
+    // - s > t
     test(
         vec![
             275320572, 2678313698, 1997150503, 1718206458, 3389415001, 1347098060, 423205500,
@@ -3856,12 +3861,12 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // xs_len * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * ys_len
-    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // degree > 3 in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // !neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // q != 3
-    // !half in limbs_mul_toom_interpolate_12points
+    // - xs_len * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * ys_len
+    // - degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // - degree > 3 in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // - !neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // - q != 3
+    // - !half in limbs_mul_toom_interpolate_12points
     test(series(2, 42), series(3, 42), vec![10; 84]);
     test(vec![0; 43], vec![0; 42], vec![10; 85]);
     let xs = vec![
@@ -3873,7 +3878,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     ];
     let out_len = xs.len() + ys.len();
-    // v_2pow_neg_neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // - v_2pow_neg_neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2176876728, 2496909862, 111654638, 4071443844, 1244732003, 1399710541, 3492272815,
@@ -3892,7 +3897,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         4000265982, 1287753121, 874311717, 2200865401, 21122981, 1507911002,
     ];
     let out_len = xs.len() + ys.len();
-    // r4last.leading_zeros() < 3 in limbs_mul_toom_interpolate_12points
+    // - r4last.leading_zeros() < 3 in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2327202328, 3179332026, 2188958336, 2717879675, 130062885, 140536268, 2499125438,
@@ -3913,13 +3918,13 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         3772482523,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * LIMIT_DENOMINATOR >= LIMIT_NUMERATOR * ys_len
-    // xs_len * 5 * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 7 * ys_len
-    // half
-    // degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // degree > 5 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // s <= t
-    // half in limbs_mul_toom_interpolate_12points
+    // - xs_len * LIMIT_DENOMINATOR >= LIMIT_NUMERATOR * ys_len
+    // - xs_len * 5 * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 7 * ys_len
+    // - half
+    // - degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // - degree > 5 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // - s <= t
+    // - half in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1940830933, 3780770129, 1587254032, 832573251, 1504418072, 4247592896, 317874907,
@@ -3942,7 +3947,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         2718480927, 2872538422,
     ];
     let out_len = xs.len() + ys.len();
-    // t < 1
+    // - t < 1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         3796896013, 4144448610, 2569252563, 2859304641, 1027973602, 3158196152, 4058699545,
@@ -3962,7 +3967,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         2445511584, 2092009263, 3412361485, 2354390078, 3106038172, 3481973486,
     ];
     let out_len = xs.len() + ys.len();
-    // s < 1
+    // - s < 1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2187046946, 3600373521, 4275090943, 2120016813, 4177241875, 3185774231, 2397692077,
@@ -3982,7 +3987,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         208671986, 2395250976, 1549715018, 2746690542, 1219103496, 256305249,
     ];
     let out_len = xs.len() + ys.len();
-    // s_plus_t > n in limbs_mul_toom_interpolate_12points
+    // - s_plus_t > n in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1976230069, 2821313230, 4002048052, 2248747478, 1208640865, 1469538686, 2438066233,
@@ -4003,7 +4008,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         3117394831, 4409774, 2422780755, 3367234488, 1080583495, 29356841, 3627216363,
     ];
     let out_len = xs.len() + ys.len();
-    // s > t
+    // - s > t
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2764481948, 3824853452, 3714446166, 1652416239, 2448871004, 3349954116, 2715554665,
@@ -4025,7 +4030,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         4216404337, 2988297132, 1171366979, 752568358, 3832355781, 3002295862,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * 5 * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 7 * ys_len
+    // - xs_len * 5 * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 7 * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1537074800, 903591185, 3505885895, 1600301704, 2247503777, 2456507858, 354178772,
@@ -4048,7 +4053,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         601137572, 2476346948, 1057124592, 2232232546, 2939285402, 2703166574, 2566511508,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 2 * ys_len
+    // - xs_len * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 2 * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2480817744, 2385986715, 908796583, 3725142486, 4259996640, 2324291843, 2514777689,
@@ -4075,8 +4080,8 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         3359666682, 2960119991, 3759575408,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 2 * ys_len
-    // q == 3
+    // - xs_len * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * 2 * ys_len
+    // - q == 3
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2182584668, 370736031, 944597706, 368333101, 3076089385, 4269551750, 455799119, 1640998687,
@@ -4103,7 +4108,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         238468207, 84087963, 2802633771, 2722772179, 1905704311, 791349630, 4036308669, 1333503772,
     ];
     let out_len = xs.len() + ys.len();
-    // p == 9, q == 4
+    // - p == 9, q == 4
     test(xs, ys, vec![10; out_len]);
 }
 
@@ -4197,11 +4202,11 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // xs_len == ys_len
-    //        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
-    // !(Limb::WIDTH > 36 && q == 3)
-    // r6last.leading_zeros() < 3 in limbs_mul_toom_interpolate_16points
-    // !half in limbs_mul_toom_interpolate_16points
+    // - xs_len == ys_len || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR *
+    //   (ys_len >> 1)
+    // - !(Limb::WIDTH > 36 && q == 3)
+    // - r6last.leading_zeros() < 3 in limbs_mul_toom_interpolate_16points
+    // - !half in limbs_mul_toom_interpolate_16points
     test(series(2, 86), series(3, 86), vec![10; 172]);
     let xs = vec![
         3581553119, 2147449432, 208926434, 2037430803, 4143975728, 2356343321, 937192435,
@@ -4233,7 +4238,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         3607511108, 2863853568, 1611642161, 1312857772, 1839433327, 567060478, 3139863681,
     ];
     let out_len = xs.len() + ys.len();
-    // r5last.leading_zeros() < 7 in limbs_mul_toom_interpolate_16points
+    // - r5last.leading_zeros() < 7 in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         3998843185, 3237409891, 364765898, 887299373, 875693912, 790653310, 1949338310, 309040598,
@@ -4267,12 +4272,12 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         4190065677,
     ];
     let out_len = xs.len() + ys.len();
-    // !(an == bn || an * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (bn >> 1))
-    // xs_len * 13 < 16 * ys_len
-    // half
-    // s <= t
-    // half in limbs_mul_toom_interpolate_16points
-    // s_plus_t > n in limbs_mul_toom_interpolate_16points
+    // - !(an == bn || an * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (bn >> 1))
+    // - xs_len * 13 < 16 * ys_len
+    // - half
+    // - s <= t
+    // - half in limbs_mul_toom_interpolate_16points
+    // - s_plus_t > n in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2456061149, 2562918666, 2903450513, 1994190773, 99234624, 3722083920, 4262323306,
@@ -4307,8 +4312,8 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         2721518545, 2493587613, 3444837338,
     ];
     let out_len = xs.len() + ys.len();
-    // s > t
-    // s_plus_t <= n in limbs_mul_toom_interpolate_16points
+    // - s > t
+    // - s_plus_t <= n in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2166912886, 3021127478, 1088026295, 863338925, 1902617744, 2706401163, 3211745137,
@@ -4341,7 +4346,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         1417957671, 2007397536, 3845476521,
     ];
     let out_len = xs.len() + ys.len();
-    // s < 1
+    // - s < 1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1012246656, 3781649075, 2144318856, 2608903399, 688555306, 1040133166, 3831584367,
@@ -4376,9 +4381,8 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         2165764832,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 9 * 3
-    //            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
-    //                < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
+    // - Limb::WIDTH <= 9 * 3 || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) <
+    //   (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         4119986492, 3769784140, 1016845783, 1462133596, 4070906664, 3720888633, 4162266585,
@@ -4414,7 +4418,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         3735654948, 1766940801, 3723445548, 3203977826, 1788553316,
     ];
     let out_len = xs.len() + ys.len();
-    // t < 1
+    // - t < 1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         562392731, 220608607, 3016011233, 1988425644, 1753293069, 202000452, 2988281129,
@@ -4452,7 +4456,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         1296900550,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * 10 < 33 * (ys_len >> 1)
+    // - xs_len * 10 < 33 * (ys_len >> 1)
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2699110155, 1597521691, 470373633, 1547603733, 1114505968, 121868046, 1203637014,
@@ -4493,9 +4497,8 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         2726878536, 4276109446,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 10 * 3
-    //            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) <
-    //      (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
+    // - Limb::WIDTH <= 10 * 3 || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) <
+    //   (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         561532292, 1489901668, 253691236, 2318497628, 4251899866, 2953100123, 2461942387,
@@ -4538,7 +4541,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         660499678, 4213349264, 915065087, 44382277, 1138965336, 3728412916,
     ];
     let out_len = xs.len() + ys.len();
-    // xs_len * 6 < 13 * ys_len
+    // - xs_len * 6 < 13 * ys_len
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2628750713, 2361938253, 4208887130, 2080756349, 672997060, 2130716095, 4212789307,
@@ -4586,7 +4589,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         1088854315,
     ];
     let out_len = xs.len() + ys.len();
-    // Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len
+    // - Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len
     test(xs, ys, vec![10; out_len]);
 }
 
@@ -8885,8 +8888,8 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
 
         verify_mul_low_2(&xs, &ys, out_after);
     };
-    // MAYBE_RANGE_BASECASE && n < MUL_TOOM22THRESHOLD * 36 / (36 - 11)
-    // n1 < MULLO_BASECASE_THRESHOLD
+    // - MAYBE_RANGE_BASECASE && n < MUL_TOOM22THRESHOLD * 36 / (36 - 11)
+    // - n1 < MULLO_BASECASE_THRESHOLD
     test(vec![1; 3], series(1, 3), vec![5; 8], &[1, 3, 6]);
     test(
         vec![100, 101, 102],
@@ -8900,8 +8903,8 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
         vec![10; 6],
         &[1, 0, 0],
     );
-    // n < MUL_TOOM44THRESHOLD * 40 / (40 - 9)
-    // n1 >= MULLO_BASECASE_THRESHOLD
+    // - n < MUL_TOOM44THRESHOLD * 40 / (40 - 9)
+    // - n1 >= MULLO_BASECASE_THRESHOLD
     test(
         vec![
             461989387, 2665399848, 3579300374, 878189998, 4019917942, 1906890030, 3540714906,
@@ -9031,7 +9034,7 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
             3918796486, 2658009039, 1875612194, 2278918363, 4156398458,
         ],
     );
-    // n < MUL_TOOM8H_THRESHOLD * 10 / 9
+    // - n < MUL_TOOM8H_THRESHOLD * 10 / 9
     test(
         vec![
             1131150821, 2762649368, 1291624341, 1701704353, 4014105561, 3682713698, 514896869,
@@ -9437,7 +9440,7 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
             3290579922, 171379862, 3550817154,
         ],
     );
-    // n >= MUL_TOOM8H_THRESHOLD * 10 / 9
+    // - n >= MUL_TOOM8H_THRESHOLD * 10 / 9
     test(
         vec![
             3325828688, 2222275271, 2251341024, 536425450, 4031282462, 1974932579, 2802802687,
@@ -10062,7 +10065,7 @@ fn test_limbs_mul_low_same_length() {
         assert_eq!(&out[..len], out_after);
         verify_mul_low_1(&out_before, &xs, &ys, &out);
     };
-    // MULLO_BASECASE_THRESHOLD <= n < MULLO_DC_THRESHOLD
+    // - MULLO_BASECASE_THRESHOLD <= n < MULLO_DC_THRESHOLD
     test(vec![1; 3], series(1, 3), vec![5; 8], &[1, 3, 6]);
     test(
         vec![100, 101, 102],
@@ -10076,8 +10079,8 @@ fn test_limbs_mul_low_same_length() {
         vec![10; 6],
         &[1, 0, 0],
     );
-    // n >= MULLO_DC_THRESHOLD
-    // n < MULLO_MUL_N_THRESHOLD
+    // - n >= MULLO_DC_THRESHOLD
+    // - n < MULLO_MUL_N_THRESHOLD
     test(
         vec![
             667555911, 2348733364, 1961106649, 1440628769, 1419633260, 3052369574, 1108620071,
@@ -10129,8 +10132,8 @@ fn test_limbs_mul_low_same_length() {
             1288915975, 2839044440, 1348673262, 916617232, 3060106377,
         ],
     );
-    // n >= MULLO_MUL_N_THRESHOLD
-    // !TUNE_PROGRAM_BUILD && MULLO_MUL_N_THRESHOLD > MUL_FFT_THRESHOLD
+    // - n >= MULLO_MUL_N_THRESHOLD
+    // - !TUNE_PROGRAM_BUILD && MULLO_MUL_N_THRESHOLD > MUL_FFT_THRESHOLD
     test(
         series(1, 9000),
         series(2, 9000),
@@ -11409,12 +11412,12 @@ fn test_limbs_product() {
         test(&[1, 1], &[1]);
         test(&[1, 2, 3, 0], &[0]);
         test(&[1, 1, 1, 6], &[6]);
-        // factor_len < RECURSIVE_PROD_THRESHOLD
-        // factor_len < RECURSIVE_PROD_THRESHOLD && carry == 0
+        // - factor_len < RECURSIVE_PROD_THRESHOLD
+        // - factor_len < RECURSIVE_PROD_THRESHOLD && carry == 0
         test(&[2, 2], &[4]);
-        // 1 < factor_len < RECURSIVE_PROD_THRESHOLD
+        // - 1 < factor_len < RECURSIVE_PROD_THRESHOLD
         test(&[2, 2, 2], &[8]);
-        // factor_len < RECURSIVE_PROD_THRESHOLD && carry != 0
+        // - factor_len < RECURSIVE_PROD_THRESHOLD && carry != 0
         test(
             &[
                 3364358997, 3754657515, 2983848742, 3936755874, 1784338974, 2546784265, 1325228501,
@@ -11429,8 +11432,8 @@ fn test_limbs_product() {
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test(&[0, 0], &[0]);
-        // factor_len >= RECURSIVE_PROD_THRESHOLD
-        // factor_len >= RECURSIVE_PROD_THRESHOLD && carry != 0
+        // - factor_len >= RECURSIVE_PROD_THRESHOLD
+        // - factor_len >= RECURSIVE_PROD_THRESHOLD && carry != 0
         test(
             &[
                 10008125746032292648,
@@ -11483,7 +11486,7 @@ fn test_limbs_product() {
                 707009434669,
             ],
         );
-        // factor_len >= RECURSIVE_PROD_THRESHOLD && carry == 0
+        // - factor_len >= RECURSIVE_PROD_THRESHOLD && carry == 0
         test(
             &rle_decode(&[
                 (0, 2),
@@ -11654,53 +11657,53 @@ fn test_limbs_mul_greater_to_out_fft() {
     };
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // depth < 11
-        // depth < 6
-        // j1 + j2 - 1 <= 4 * n || w <= wadj
-        // j1 + j2 - 1 > 4 * n || w <= wadj
-        // trunc > n << 1 in limbs_mul_truncate_sqrt2
-        // top_bits != 0 in limbs_fft_split_bits
-        // i < length - 1 in limbs_split_bits_worker
-        // shift_bits == 0 in limbs_split_bits_worker
-        // shift_bits != 0 in limbs_split_bits_worker
-        // shift_bits >= Limb::WIDTH in limbs_split_bits_worker
-        // i >= length - 1 in limbs_split_bits_worker
-        // shift_bits != 0 in limbs_fft_split_bits
-        // w.even() in limbs_fft_truncate_sqrt2
-        // trunc == n << 1 in limbs_fft_truncate
-        // n != 1 in limbs_fft_radix2
-        // x == 0 in limbs_butterfly_lsh_b
-        // x == 0 && y == 0 in limbs_butterfly_lsh_b
-        // !xs.is_empty() in limbs_fft_sumdiff
-        // d == 0 in limbs_fft_mul_2expmod_2expp1_in_place
-        // x == 0 && y == 0 in limbs_butterfly_lsh_b
-        // !(sum ^ *x_lo).get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // n == 1 in limbs_fft_radix2
-        // (sum ^ *x_lo).get_highest_bit() && c.get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // h == 0 in limbs_fft_normmod_2expp1
-        // cy == 0 in limbs_fft_mulmod_2expp1_basecase_same
-        // cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same
-        // h != 0 in limbs_fft_normmod_2expp1
-        // hi == 0 in limbs_fft_normmod_2expp1
-        // !(sum ^ *x_lo).get_highest_bit() && !c.get_highest_bit() in limbs_fft_addmod_2expp1_1
-        // w.even() in limbs_ifft_truncate_sqrt2
-        // trunc == n << 1 in limbs_ifft_truncate
-        // n != 1 in limbs_ifft_radix2
-        // n == 1 in limbs_ifft_radix2
-        // d == 0 in limbs_fft_div_2expmod_2expp1_in_place
-        // x == 0 in limbs_butterfly_rsh_b
-        // x == 0 && y == 0 in limbs_butterfly_rsh_b
-        // x == 0 && y != 0 in limbs_butterfly_rsh_b
-        // d != 0 in limbs_fft_div_2expmod_2expp1_in_place
-        // hi != 0 in limbs_fft_normmod_2expp1
-        // t[limbs] != Limb::MAX in limbs_fft_normmod_2expp1
-        // top_bits != 0 in limbs_fft_combine_bits
-        // shift_bits == 0 first time in limbs_fft_combine_bits
-        // shift_bits < Limb::WIDTH first time in limbs_fft_combine_bits
-        // shift_bits != 0 first time in limbs_fft_combine_bits
-        // shift_bits >= Limb::WIDTH first time in limbs_fft_combine_bits
-        // shift_bits != 0 second time in limbs_fft_combine_bits
-        // shift_bits >= Limb::WIDTH second time in limbs_fft_combine_bits
+        // - depth < 11
+        // - depth < 6
+        // - j1 + j2 - 1 <= 4 * n || w <= wadj
+        // - j1 + j2 - 1 > 4 * n || w <= wadj
+        // - trunc > n << 1 in limbs_mul_truncate_sqrt2
+        // - top_bits != 0 in limbs_fft_split_bits
+        // - i < length - 1 in limbs_split_bits_worker
+        // - shift_bits == 0 in limbs_split_bits_worker
+        // - shift_bits != 0 in limbs_split_bits_worker
+        // - shift_bits >= Limb::WIDTH in limbs_split_bits_worker
+        // - i >= length - 1 in limbs_split_bits_worker
+        // - shift_bits != 0 in limbs_fft_split_bits
+        // - w.even() in limbs_fft_truncate_sqrt2
+        // - trunc == n << 1 in limbs_fft_truncate
+        // - n != 1 in limbs_fft_radix2
+        // - x == 0 in limbs_butterfly_lsh_b
+        // - x == 0 && y == 0 in limbs_butterfly_lsh_b
+        // - !xs.is_empty() in limbs_fft_sumdiff
+        // - d == 0 in limbs_fft_mul_2expmod_2expp1_in_place
+        // - x == 0 && y == 0 in limbs_butterfly_lsh_b
+        // - !(sum ^ *x_lo).get_highest_bit() in limbs_fft_addmod_2expp1_1
+        // - n == 1 in limbs_fft_radix2
+        // - (sum ^ *x_lo).get_highest_bit() && c.get_highest_bit() in limbs_fft_addmod_2expp1_1
+        // - h == 0 in limbs_fft_normmod_2expp1
+        // - cy == 0 in limbs_fft_mulmod_2expp1_basecase_same
+        // - cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same
+        // - h != 0 in limbs_fft_normmod_2expp1
+        // - hi == 0 in limbs_fft_normmod_2expp1
+        // - !(sum ^ *x_lo).get_highest_bit() && !c.get_highest_bit() in limbs_fft_addmod_2expp1_1
+        // - w.even() in limbs_ifft_truncate_sqrt2
+        // - trunc == n << 1 in limbs_ifft_truncate
+        // - n != 1 in limbs_ifft_radix2
+        // - n == 1 in limbs_ifft_radix2
+        // - d == 0 in limbs_fft_div_2expmod_2expp1_in_place
+        // - x == 0 in limbs_butterfly_rsh_b
+        // - x == 0 && y == 0 in limbs_butterfly_rsh_b
+        // - x == 0 && y != 0 in limbs_butterfly_rsh_b
+        // - d != 0 in limbs_fft_div_2expmod_2expp1_in_place
+        // - hi != 0 in limbs_fft_normmod_2expp1
+        // - t[limbs] != Limb::MAX in limbs_fft_normmod_2expp1
+        // - top_bits != 0 in limbs_fft_combine_bits
+        // - shift_bits == 0 first time in limbs_fft_combine_bits
+        // - shift_bits < Limb::WIDTH first time in limbs_fft_combine_bits
+        // - shift_bits != 0 first time in limbs_fft_combine_bits
+        // - shift_bits >= Limb::WIDTH first time in limbs_fft_combine_bits
+        // - shift_bits != 0 second time in limbs_fft_combine_bits
+        // - shift_bits >= Limb::WIDTH second time in limbs_fft_combine_bits
         test(
             &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             &[
@@ -11737,150 +11740,150 @@ fn test_limbs_mul_greater_to_out_fft() {
                 (u64::MAX, 24),
             ]),
         );
-        // trunc != n << 1 && trunc > n in limbs_fft_truncate
-        // d != 0 in limbs_fft_mul_2expmod_2expp1_in_place
-        // x != 0 in limbs_fft_adjust
-        // offset != n in limbs_fft_neg
-        // zeros != n in limbs_fft_neg
-        // zeros == n in limbs_fft_neg
-        // trunc != n << 1 && trunc > n in limbs_fft_truncate1
-        // trunc != n << 1 && trunc <= n in limbs_fft_truncate1
-        // trunc == n << 1 in limbs_fft_truncate1
-        // trunc != n << 1 && trunc > n in limbs_ifft_truncate
-        // trunc != n << 1 && trunc > n in limbs_ifft_truncate1
-        // trunc != n << 1 && trunc <= n in limbs_ifft_truncate1
-        // trunc == n << 1 in limbs_ifft_truncate1
+        // - trunc != n << 1 && trunc > n in limbs_fft_truncate
+        // - d != 0 in limbs_fft_mul_2expmod_2expp1_in_place
+        // - x != 0 in limbs_fft_adjust
+        // - offset != n in limbs_fft_neg
+        // - zeros != n in limbs_fft_neg
+        // - zeros == n in limbs_fft_neg
+        // - trunc != n << 1 && trunc > n in limbs_fft_truncate1
+        // - trunc != n << 1 && trunc <= n in limbs_fft_truncate1
+        // - trunc == n << 1 in limbs_fft_truncate1
+        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate
+        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate1
+        // - trunc != n << 1 && trunc <= n in limbs_ifft_truncate1
+        // - trunc == n << 1 in limbs_ifft_truncate1
         test_big(&[10; 1000], &[10; 1000]);
         test_big(&[Limb::MAX; 1000], &[u64::MAX; 1000]);
-        // trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2
-        // shift_bits < Limb::WIDTH in limbs_split_bits_worker
-        // i < n1 in limbs_fft_outer1_worker
-        // w.odd() in limbs_fft_outer1_worker
-        // j.even() in limbs_fft_outer1_worker
-        // i.even() in limbs_fft_outer1_worker
-        // n != 1 in limbs_fft_radix2_twiddle
-        // n == 1 in limbs_fft_radix2_twiddle
-        // b1 < nw in limbs_fft_butterfly_twiddle
-        // b2 < nw in limbs_fft_butterfly_twiddle
-        // j >= s in limbs_fft_outer1_worker;
-        // j < s in limbs_fft_outer1_worker
-        // j.odd() in limbs_fft_outer1_worker
-        // b1 < wn in limbs_fft_butterfly_sqrt2
-        // y != 0 in limbs_fft_butterfly_sqrt2
-        // limbs.even() in limbs_fft_butterfly_sqrt2
-        // !negate in limbs_fft_butterfly_sqrt2
-        // i.odd() in limbs_fft_outer1_worker
-        // b1 < wn in limbs_fft_adjust_sqrt2
-        // y != 0 first time in limbs_fft_adjust_sqrt2
-        // d != 0 in limbs_fft_mul_2expmod_2expp1
-        // y != 0 second time in limbs_fft_adjust_sqrt2
-        // limbs.even() in limbs_fft_adjust_sqrt2
-        // !negate in limbs_fft_adjust_sqrt2
-        // b1 >= wn in limbs_fft_adjust_sqrt2
-        // y == 0 first time in limbs_fft_adjust_sqrt2
-        // negate in limbs_fft_adjust_sqrt2
-        // x != 0 && y != 0 && x < y in limbs_butterfly_lsh_b
-        // offset == n in limbs_fft_neg_in_place
-        // offset != n in limbs_fft_neg_in_place
-        // zeros == n in limbs_fft_neg_in_place
-        // zeros != n in limbs_fft_neg_in_place
-        // d == 0 in limbs_fft_mul_2expmod_2expp1
-        // b2 >= nw in limbs_fft_butterfly_twiddle
-        // x != 0 && y != 0 && x > y in limbs_butterfly_lsh_b
-        // x != 0 && y == 0 in limbs_butterfly_lsh_b
-        // i >= n1 in limbs_fft_outer1_worker
-        // i < n1 in limbs_fft_outer2_worker
-        // trunc != n << 1 && trunc <= n in limbs_fft_truncate1_twiddle
-        // trunc == n << 1 in limbs_fft_truncate1_twiddle
-        // j >= s in limbs_fft_outer2_worker
-        // j < s in limbs_fft_outer2_worker
-        // i >= n1 in limbs_fft_outer2_worker
-        // s < trunc in limbs_fft_inner1_worker
-        // c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1
-        // limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1
-        // s >= trunc in limbs_fft_inner1_worker
-        // i < n2 in limbs_fft_inner2_worker
-        // i >= n2 in limbs_fft_inner2_worker
-        // i < n1 in limbs_ifft_outer1_worker
-        // j >= s in limbs_ifft_outer1_worker
-        // j < s in limbs_ifft_outer1_worker
-        // n != 1 in limbs_ifft_radix2_twiddle
-        // n == 1 in limbs_ifft_radix2_twiddle
-        // b1 < nw in limbs_ifft_butterfly_twiddle
-        // b2 < nw in limbs_ifft_butterfly_twiddle
-        // !negate1 in limbs_ifft_butterfly_twiddle
-        // !negate2 in limbs_ifft_butterfly_twiddle
-        // x != 0 && y != 0 && x < y in limbs_butterfly_rsh_b
-        // b2 >= nw in limbs_ifft_butterfly_twiddle
-        // negate2 in limbs_ifft_butterfly_twiddle
-        // x != 0 && y != 0 && x > y in limbs_butterfly_rsh_b
-        // x != 0 && y == 0 in limbs_butterfly_rsh_b
-        // i >= n1 in limbs_ifft_outer1_worker
-        // i < n1 in limbs_ifft_outer2_worker
-        // j >= s in limbs_ifft_outer2_worker
-        // j < s in limbs_ifft_outer2_worker
-        // w.odd() first time in limbs_ifft_outer2_worker
-        // i.even() in limbs_ifft_outer2_worker
-        // trunc != n << 1 && trunc <= n in limbs_ifft_truncate1_twiddle
-        // trunc == n << 1 in limbs_ifft_truncate1_twiddle
-        // w.odd() second time in limbs_ifft_outer2_worker
-        // j.even() in limbs_ifft_outer2_worker
-        // i.odd() in limbs_ifft_outer2_worker
-        // offset == n in limbs_fft_neg
-        // j.odd() in limbs_ifft_outer2_worker
-        // b1 >= wn in limbs_ifft_butterfly_sqrt2
-        // b1 != 0 in limbs_ifft_butterfly_sqrt2
-        // y != 0 in limbs_ifft_butterfly_sqrt2
-        // limbs.even() in limbs_ifft_butterfly_sqrt2
-        // !negate in limbs_ifft_butterfly_sqrt2
-        // xs.is_empty() in limbs_fft_sumdiff
-        // b1 < wn in limbs_ifft_butterfly_sqrt2
-        // negate in limbs_ifft_butterfly_sqrt2
-        // b1 == 0 in limbs_ifft_butterfly_sqrt2
-        // i >= n1 in limbs_ifft_outer2_worker
-        // shift_bits < Limb::WIDTH second time in limbs_fft_combine_bits
-        // j1 + j2 - 1 <= 3 * n
+        // - trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2
+        // - shift_bits < Limb::WIDTH in limbs_split_bits_worker
+        // - i < n1 in limbs_fft_outer1_worker
+        // - w.odd() in limbs_fft_outer1_worker
+        // - j.even() in limbs_fft_outer1_worker
+        // - i.even() in limbs_fft_outer1_worker
+        // - n != 1 in limbs_fft_radix2_twiddle
+        // - n == 1 in limbs_fft_radix2_twiddle
+        // - b1 < nw in limbs_fft_butterfly_twiddle
+        // - b2 < nw in limbs_fft_butterfly_twiddle
+        // - j >= s in limbs_fft_outer1_worker;
+        // - j < s in limbs_fft_outer1_worker
+        // - j.odd() in limbs_fft_outer1_worker
+        // - b1 < wn in limbs_fft_butterfly_sqrt2
+        // - y != 0 in limbs_fft_butterfly_sqrt2
+        // - limbs.even() in limbs_fft_butterfly_sqrt2
+        // - !negate in limbs_fft_butterfly_sqrt2
+        // - i.odd() in limbs_fft_outer1_worker
+        // - b1 < wn in limbs_fft_adjust_sqrt2
+        // - y != 0 first time in limbs_fft_adjust_sqrt2
+        // - d != 0 in limbs_fft_mul_2expmod_2expp1
+        // - y != 0 second time in limbs_fft_adjust_sqrt2
+        // - limbs.even() in limbs_fft_adjust_sqrt2
+        // - !negate in limbs_fft_adjust_sqrt2
+        // - b1 >= wn in limbs_fft_adjust_sqrt2
+        // - y == 0 first time in limbs_fft_adjust_sqrt2
+        // - negate in limbs_fft_adjust_sqrt2
+        // - x != 0 && y != 0 && x < y in limbs_butterfly_lsh_b
+        // - offset == n in limbs_fft_neg_in_place
+        // - offset != n in limbs_fft_neg_in_place
+        // - zeros == n in limbs_fft_neg_in_place
+        // - zeros != n in limbs_fft_neg_in_place
+        // - d == 0 in limbs_fft_mul_2expmod_2expp1
+        // - b2 >= nw in limbs_fft_butterfly_twiddle
+        // - x != 0 && y != 0 && x > y in limbs_butterfly_lsh_b
+        // - x != 0 && y == 0 in limbs_butterfly_lsh_b
+        // - i >= n1 in limbs_fft_outer1_worker
+        // - i < n1 in limbs_fft_outer2_worker
+        // - trunc != n << 1 && trunc <= n in limbs_fft_truncate1_twiddle
+        // - trunc == n << 1 in limbs_fft_truncate1_twiddle
+        // - j >= s in limbs_fft_outer2_worker
+        // - j < s in limbs_fft_outer2_worker
+        // - i >= n1 in limbs_fft_outer2_worker
+        // - s < trunc in limbs_fft_inner1_worker
+        // - c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1
+        // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1
+        // - s >= trunc in limbs_fft_inner1_worker
+        // - i < n2 in limbs_fft_inner2_worker
+        // - i >= n2 in limbs_fft_inner2_worker
+        // - i < n1 in limbs_ifft_outer1_worker
+        // - j >= s in limbs_ifft_outer1_worker
+        // - j < s in limbs_ifft_outer1_worker
+        // - n != 1 in limbs_ifft_radix2_twiddle
+        // - n == 1 in limbs_ifft_radix2_twiddle
+        // - b1 < nw in limbs_ifft_butterfly_twiddle
+        // - b2 < nw in limbs_ifft_butterfly_twiddle
+        // - !negate1 in limbs_ifft_butterfly_twiddle
+        // - !negate2 in limbs_ifft_butterfly_twiddle
+        // - x != 0 && y != 0 && x < y in limbs_butterfly_rsh_b
+        // - b2 >= nw in limbs_ifft_butterfly_twiddle
+        // - negate2 in limbs_ifft_butterfly_twiddle
+        // - x != 0 && y != 0 && x > y in limbs_butterfly_rsh_b
+        // - x != 0 && y == 0 in limbs_butterfly_rsh_b
+        // - i >= n1 in limbs_ifft_outer1_worker
+        // - i < n1 in limbs_ifft_outer2_worker
+        // - j >= s in limbs_ifft_outer2_worker
+        // - j < s in limbs_ifft_outer2_worker
+        // - w.odd() first time in limbs_ifft_outer2_worker
+        // - i.even() in limbs_ifft_outer2_worker
+        // - trunc != n << 1 && trunc <= n in limbs_ifft_truncate1_twiddle
+        // - trunc == n << 1 in limbs_ifft_truncate1_twiddle
+        // - w.odd() second time in limbs_ifft_outer2_worker
+        // - j.even() in limbs_ifft_outer2_worker
+        // - i.odd() in limbs_ifft_outer2_worker
+        // - offset == n in limbs_fft_neg
+        // - j.odd() in limbs_ifft_outer2_worker
+        // - b1 >= wn in limbs_ifft_butterfly_sqrt2
+        // - b1 != 0 in limbs_ifft_butterfly_sqrt2
+        // - y != 0 in limbs_ifft_butterfly_sqrt2
+        // - limbs.even() in limbs_ifft_butterfly_sqrt2
+        // - !negate in limbs_ifft_butterfly_sqrt2
+        // - xs.is_empty() in limbs_fft_sumdiff
+        // - b1 < wn in limbs_ifft_butterfly_sqrt2
+        // - negate in limbs_ifft_butterfly_sqrt2
+        // - b1 == 0 in limbs_ifft_butterfly_sqrt2
+        // - i >= n1 in limbs_ifft_outer2_worker
+        // - shift_bits < Limb::WIDTH second time in limbs_fft_combine_bits
+        // - j1 + j2 - 1 <= 3 * n
         test_big(&[10; 69569], &[10; 2591]);
-        // trunc != n << 1 && trunc > n in limbs_fft_truncate1_twiddle
-        // trunc != n << 1 && trunc > n in limbs_ifft_truncate1_twiddle
+        // - trunc != n << 1 && trunc > n in limbs_fft_truncate1_twiddle
+        // - trunc != n << 1 && trunc > n in limbs_ifft_truncate1_twiddle
         test_big(&[10; 44636], &[10; 25927]);
-        // w.even() in limbs_fft_outer1_worker
-        // w.even() first time in limbs_ifft_outer2_worker
-        // w.even() second time in limbs_ifft_outer2_worker
-        // 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1
-        // 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1
-        // 50 cutoff: top_bits == 0 in limbs_fft_split_bits
-        // 50 cutoff: i < num in limbs_split_limbs_worke
-        // 50 cutoff: i >= num in limbs_split_limbs_worker
-        // 50 cutoff: i >= length in limbs_fft_split_limbs
-        // 50 cutoff: total_limbs <= skip in limbs_fft_split_limbs
-        // 50 cutoff: w.even() in limbs_fft_negacyclic
-        // 50 cutoff: top_bits == 0 in limbs_fft_combine_bits
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time
-        //      in limbs_fft_mulmod_2expp1_helper
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0
-        //      in limbs_fft_mulmod_2expp1_helper
-        // 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0
-        //      in limbs_fft_mulmod_2expp1_helper
-        // 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time
-        //      in limbs_fft_mulmod_2expp1_helper
+        // - w.even() in limbs_fft_outer1_worker
+        // - w.even() first time in limbs_ifft_outer2_worker
+        // - w.even() second time in limbs_ifft_outer2_worker
+        // - 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1
+        // - 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1
+        // - 50 cutoff: top_bits == 0 in limbs_fft_split_bits
+        // - 50 cutoff: i < num in limbs_split_limbs_worke
+        // - 50 cutoff: i >= num in limbs_split_limbs_worker
+        // - 50 cutoff: i >= length in limbs_fft_split_limbs
+        // - 50 cutoff: total_limbs <= skip in limbs_fft_split_limbs
+        // - 50 cutoff: w.even() in limbs_fft_negacyclic
+        // - 50 cutoff: top_bits == 0 in limbs_fft_combine_bits
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time in
+        //   limbs_fft_mulmod_2expp1_helper
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
+        //   limbs_fft_mulmod_2expp1_helper
+        // - 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
+        //   limbs_fft_mulmod_2expp1_helper
+        // - 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time in
+        //   limbs_fft_mulmod_2expp1_helper
         test_big(&[10; 178940], &[10; 21015]);
-        // w.odd() in limbs_fft_truncate_sqrt2
-        // b1 >= wn in limbs_fft_butterfly_sqrt2
-        // negate in limbs_fft_butterfly_sqrt2
-        // w.odd() in limbs_ifft_truncate_sqrt2
+        // - w.odd() in limbs_fft_truncate_sqrt2
+        // - b1 >= wn in limbs_fft_butterfly_sqrt2
+        // - negate in limbs_fft_butterfly_sqrt2
+        // - w.odd() in limbs_ifft_truncate_sqrt2
         test_big(&[10; 10758], &[10; 14125]);
-        // depth >= 6
+        // - depth >= 6
         test_big(&[10; 10000], &[10; 10000]);
-        // w == 1
-        // w != 1
-        // depth >= 11
-        // j1 + j2 - 1 > 3 * n
+        // - w == 1
+        // - w != 1
+        // - depth >= 11
+        // - j1 + j2 - 1 > 3 * n
         test_big(&[10; 100000], &[10; 100000]);
-        // limbs.odd() in limbs_fft_butterfly_sqrt2
-        // limbs.odd() in limbs_fft_adjust_sqrt2
-        // limbs.odd() in limbs_ifft_butterfly_sqrt2
+        // - limbs.odd() in limbs_fft_butterfly_sqrt2
+        // - limbs.odd() in limbs_fft_adjust_sqrt2
+        // - limbs.odd() in limbs_ifft_butterfly_sqrt2
         test_big(&[10; 188], &[10; 3231]);
         test_big(&[Limb::MAX; 27300], &[Limb::MAX; 49384]);
         let xs = &[
@@ -11917,10 +11920,10 @@ fn test_limbs_mul_greater_to_out_fft() {
     }
     #[cfg(feature = "32_bit_limbs")]
     {
-        // shift_bits == 0 in limbs_fft_split_bits
+        // - shift_bits == 0 in limbs_fft_split_bits
         test(&[0; 49], &[0; 64], &[10; 113], &[0; 113]);
-        // t[limbs] == Limb::MAX in limbs_fft_normmod_2expp1
-        // cy == 0 && cz != 0 in limbs_fft_mulmod_2expp1_basecase_same
+        // - t[limbs] == Limb::MAX in limbs_fft_normmod_2expp1
+        // - cy == 0 && cz != 0 in limbs_fft_mulmod_2expp1_basecase_same
         test(
             &[0; 49],
             &[
@@ -11931,13 +11934,13 @@ fn test_limbs_mul_greater_to_out_fft() {
             &[10; 113],
             &[0; 113],
         );
-        // shift_bits == 0 second time in limbs_fft_combine_bits
+        // - shift_bits == 0 second time in limbs_fft_combine_bits
         test_big(&[10; 8284], &[10; 23341]);
-        // x == 0 in limbs_fft_adjust
+        // - x == 0 in limbs_fft_adjust
         test_big(&[10; 17027], &[10; 15816]);
-        // trunc <= n << 1 in limbs_mul_truncate_sqrt2
+        // - trunc <= n << 1 in limbs_mul_truncate_sqrt2
         test_big(&[10; 32127], &[10; 32870]);
-        // 50 cutoff: depth < 12 in limbs_fft_mulmod_2expp1
+        // - 50 cutoff: depth < 12 in limbs_fft_mulmod_2expp1
         test_big(&[10; 178940], &[10; 21015]);
     }
 }
@@ -11981,15 +11984,15 @@ fn test_limbs_square_to_out_fft() {
     };
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // depth < 11
-        // depth < 6
-        // w > wadj
-        // (j1 << 1) - 1 <= n << 2 || w <= wadj
-        // (j1 << 1) - 1 > n << 2 && w > wadj
-        // trunc > n << 1 in limbs_mul_truncate_sqrt2_same
-        // cy == 0 in limbs_fft_mulmod_2expp1_basecase_same2
-        // cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same2
-        // k == 0 in limbs_fft_mulmod_2expp1_internal_same2
+        // - depth < 11
+        // - depth < 6
+        // - w > wadj
+        // - (j1 << 1) - 1 <= n << 2 || w <= wadj
+        // - (j1 << 1) - 1 > n << 2 && w > wadj
+        // - trunc > n << 1 in limbs_mul_truncate_sqrt2_same
+        // - cy == 0 in limbs_fft_mulmod_2expp1_basecase_same2
+        // - cy == 0 && cz == 0 in limbs_fft_mulmod_2expp1_basecase_same2
+        // - k == 0 in limbs_fft_mulmod_2expp1_internal_same2
         test(
             &[
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -12002,33 +12005,33 @@ fn test_limbs_square_to_out_fft() {
                 1, 0,
             ],
         );
-        // w == 1
+        // - w == 1
         test_big(&[10; 100]);
-        // w != 1
-        // depth >= 6
+        // - w != 1
+        // - depth >= 6
         test_big(&[10; 1000]);
-        // depth >= 11
-        // (j1 << 1) - 1 > 3 * n
-        // trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2_same
-        // s < trunc in limbs_fft_inner1_worker_same
-        // c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1_same
-        // limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1_same
-        // s >= trunc in limbs_fft_inner1_worker_same
-        // i < n2 in limbs_fft_inner2_worker_same
-        // i >= n2 in limbs_fft_inner2_worker_same
-        // 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1_same
-        // 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1_same
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time
-        //      in limbs_fft_mulmod_2expp1_helper_same
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0
-        //      in limbs_fft_mulmod_2expp1_helper_same
-        // 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0
-        //      in limbs_fft_mulmod_2expp1_helper_same
-        // 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper_same
-        // 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time
-        //      in limbs_fft_mulmod_2expp1_helper_same
+        // - depth >= 11
+        // - (j1 << 1) - 1 > 3 * n
+        // - trunc > n << 1 in limbs_mul_mfa_truncate_sqrt2_same
+        // - s < trunc in limbs_fft_inner1_worker_same
+        // - c.even() && c & 2 == 0 in limbs_fft_mulmod_2expp1_same
+        // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF in limbs_fft_mulmod_2expp1_same
+        // - s >= trunc in limbs_fft_inner1_worker_same
+        // - i < n2 in limbs_fft_inner2_worker_same
+        // - i >= n2 in limbs_fft_inner2_worker_same
+        // - 50 cutoff: limbs > cutoff in limbs_fft_mulmod_2expp1_same
+        // - 50 cutoff: depth >= 12 in limbs_fft_mulmod_2expp1_same
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 first time in
+        //   limbs_fft_mulmod_2expp1_helper_same
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
+        //   limbs_fft_mulmod_2expp1_helper_same
+        // - 50 cutoff: r[j] != 0 && SignedLimb::wrapping_from(xss[j][limbs]) >= 0 in
+        //   limbs_fft_mulmod_2expp1_helper_same
+        // - 50 cutoff: limb_add != 0 in limbs_fft_mulmod_2expp1_helper_same
+        // - 50 cutoff: r[j] == 0 && SignedLimb::wrapping_from(xss[j][limbs]) < 0 second time in
+        //   limbs_fft_mulmod_2expp1_helper_same
         test_big(&[10; 100000]);
-        // (j1 << 1) - 1 <= 3 * n
+        // - (j1 << 1) - 1 <= 3 * n
         test_big(&[10; 38424]);
         test_big(&[10; 5354]);
         let xs = rle_decode(&[
@@ -12070,11 +12073,11 @@ fn test_limbs_square_to_out_fft() {
     }
     #[cfg(feature = "32_bit_limbs")]
     {
-        // w <= wadj
+        // - w <= wadj
         test_big(&[10; 25186]);
-        // trunc <= n << 1 in limbs_mul_truncate_sqrt2_same
+        // - trunc <= n << 1 in limbs_mul_truncate_sqrt2_same
         test_big(&[10; 32562]);
-        // depth < 12 in limbs_fft_mulmod_2expp1_same
+        // - depth < 12 in limbs_fft_mulmod_2expp1_same
         test_big(&[10; 103030]);
     }
 }

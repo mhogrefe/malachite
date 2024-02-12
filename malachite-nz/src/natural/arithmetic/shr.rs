@@ -37,9 +37,9 @@ pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     }
 }}
 
-// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
-// writes the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice
-// must be at least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1,
+// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+// the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice must be
+// at least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1,
 // inclusive. The carry, or the bits that are shifted past the width of the input slice, is
 // returned. The input slice should not only contain zeros.
 //
@@ -74,9 +74,9 @@ pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
     remaining_bits
 }}
 
-// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
-// writes the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must
-// be between 1 and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the
+// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+// the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must be
+// between 1 and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the
 // width of the input slice, is returned.
 //
 // # Worst-case complexity
@@ -187,8 +187,8 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -214,8 +214,8 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -238,8 +238,8 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr_assign).
@@ -294,8 +294,8 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -321,8 +321,8 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr).
@@ -345,8 +345,8 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is
-            /// `max(1, self.significant_bits() - bits)`.
+            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// self.significant_bits() - bits)`.
             ///
             /// # Examples
             /// See [here](super::shr#shr_assign).

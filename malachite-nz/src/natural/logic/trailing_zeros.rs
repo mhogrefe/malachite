@@ -27,9 +27,8 @@ pub_crate_test! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
 }}
 
 impl Natural {
-    /// Returns the number of trailing zeros in the binary expansion of a [`Natural`]
-    /// (equivalently, the multiplicity of 2 in its prime factorization), or `None` is the
-    /// [`Natural`] is 0.
+    /// Returns the number of trailing zeros in the binary expansion of a [`Natural`] (equivalently,
+    /// the multiplicity of 2 in its prime factorization), or `None` is the [`Natural`] is 0.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

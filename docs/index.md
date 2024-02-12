@@ -48,17 +48,19 @@ specify different rounding behavior via the options parameter.
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
 
+Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` features are enabled.
+
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.4.4"
+version = "0.4.5"
 ```
 
 By default, all of Malachite's features are included, but you can opt out of some of them. For
 example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
 ```yaml
 [dependencies.malachite]
-version = "0.4.4"
+version = "0.4.5"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```

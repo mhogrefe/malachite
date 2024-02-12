@@ -25,6 +25,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_get_exponent_debug);
     register_demo!(runner, demo_float_get_prec);
     register_demo!(runner, demo_float_get_prec_debug);
+    register_demo!(runner, demo_float_get_min_prec);
+    register_demo!(runner, demo_float_get_min_prec_debug);
     register_demo!(runner, demo_float_set_prec_round);
     register_demo!(runner, demo_float_set_prec_round_debug);
     register_demo!(runner, demo_float_set_prec);
@@ -34,6 +36,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_significand_ref_library_comparison);
     register_bench!(runner, benchmark_float_get_exponent_library_comparison);
     register_bench!(runner, benchmark_float_get_prec_library_comparison);
+    register_bench!(runner, benchmark_float_get_min_prec);
     register_bench!(runner, benchmark_float_set_prec_round_library_comparison);
     register_bench!(runner, benchmark_float_set_prec_library_comparison);
 }
@@ -122,6 +125,22 @@ fn demo_float_get_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_get_min_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!("get_min_prec({}) = {:?}", x, x.get_min_prec());
+    }
+}
+
+fn demo_float_get_min_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!(
+            "get_min_prec({:#x}) = {:?}",
+            ComparableFloatRef(&x),
+            x.get_min_prec()
+        );
+    }
+}
+
 fn demo_float_set_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, p, rm) in float_unsigned_rounding_mode_triple_gen_var_1()
         .get(gm, config)
@@ -129,7 +148,7 @@ fn demo_float_set_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let old_x = x.clone();
         let o = x.set_prec_round(p, rm);
-        println!("x := {old_x}; x.set_prec_round({p}, {rm}) = {o:?}; x = {x}",);
+        println!("x := {old_x}; x.set_prec_round({p}, {rm}) = {o:?}; x = {x}");
     }
 }
 
@@ -261,6 +280,19 @@ fn benchmark_float_get_prec_library_comparison(
             ("Malachite", &mut |(_, x)| no_out!(x.get_prec())),
             ("rug", &mut |(x, _)| no_out!(x.prec())),
         ],
+    );
+}
+
+fn benchmark_float_get_min_prec(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Float.get_min_prec()",
+        BenchmarkType::Single,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [("Malachite", &mut |x| no_out!(x.get_min_prec()))],
     );
 }
 

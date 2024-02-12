@@ -1,11 +1,11 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
 };
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering;
 
 impl RoundToMultipleOfPowerOf2<i64> for Rational {
     type Output = Rational;
@@ -46,8 +46,8 @@ impl RoundToMultipleOfPowerOf2<i64> for Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -132,8 +132,8 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -176,8 +176,8 @@ impl<'a> RoundToMultipleOfPowerOf2<i64> for &'a Rational {
 
 impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     /// Rounds a [`Rational`] to a multiple of $2^k$ in place, according to a specified rounding
-    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
-    /// equal to, or greater than the original value.
+    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
@@ -188,8 +188,8 @@ impl RoundToMultipleOfPowerOf2Assign<i64> for Rational {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.

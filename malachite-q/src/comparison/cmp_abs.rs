@@ -1,7 +1,7 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use std::cmp::Ordering;
 
 impl PartialOrdAbs for Rational {
     /// Compares the absolute values of two [`Rational`]s.
@@ -21,8 +21,8 @@ impl OrdAbs for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -42,7 +42,7 @@ impl OrdAbs for Rational {
     /// );
     /// ```
     fn cmp_abs(&self, other: &Rational) -> Ordering {
-        if std::ptr::eq(self, other) {
+        if core::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         // First check if either value is zero

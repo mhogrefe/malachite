@@ -99,19 +99,19 @@ fn test_limbs_pos_eq_neg_limb_mod() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // !xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
+    // - !xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
     test(&[1, 2], 2, &[2, 1], false);
-    // xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
-    // m_len == 2 && m_0 != 0
-    // m_1 < 1 << twos
-    // x_len < BMOD_1_TO_MOD_1_THRESHOLD
+    // - xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
+    // - m_len == 2 && m_0 != 0
+    // - m_1 < 1 << twos
+    // - x_len < BMOD_1_TO_MOD_1_THRESHOLD
     test(&[2, 2], 2, &[2, 1], true);
-    // m_1 >= 1 << twos
+    // - m_1 >= 1 << twos
     test(&[0, 1], 1, &[1, 1], true);
-    // m_len > 2 || m_0 == 0
+    // - m_len > 2 || m_0 == 0
     test(&[0, 1], 1, &[1, 0, 1], false);
-    // x_len >= BMOD_1_TO_MOD_1_THRESHOLD
-    // y < m_0
+    // - x_len >= BMOD_1_TO_MOD_1_THRESHOLD
+    // - y < m_0
     test(
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -209,13 +209,13 @@ fn test_limbs_pos_eq_neg_mod_limb() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros()))
-    //      in limbs_pos_eq_mod_neg_limb_greater
+    // - xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros())) in
+    //   limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[0, 1], 1, true);
     test(&[0, 1], &[0, 1], 2, true);
     test(&[0, 1], &[6, 1], 2, true);
-    // !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros()))
-    //      in limbs_pos_eq_mod_neg_limb_greater
+    // - !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros())) in
+    //   limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[7, 1], 2, false);
 }
 
@@ -272,12 +272,12 @@ fn test_limbs_pos_eq_neg_mod() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros()))
-    //      in limbs_pos_eq_neg_mod_greater
+    // - !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros())) in
+    //   limbs_pos_eq_neg_mod_greater
     test(&[1, 2], &[3, 4], &[0, 1], false);
     test(&[0, 0, 1], &[0, 1], &[1, 1], true);
-    // xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros()))
-    //      in limbs_pos_eq_neg_mod_greater
+    // - xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros())) in
+    //   limbs_pos_eq_neg_mod_greater
     test(
         &[
             936369948, 322455623, 3632895046, 978349680, 17000327, 2833388987, 2719643819,
@@ -736,8 +736,10 @@ fn eq_mod_properties() {
     integer_integer_natural_triple_gen_var_2().test_properties(|(ref x, ref y, ref m)| {
         assert!(!x.eq_mod(y, m));
         assert!(!y.eq_mod(x, m));
-        assert!(!rug::Integer::from(x)
-            .is_congruent(&rug::Integer::from(y), &rug::Integer::from(m)));
+        assert!(
+            !rug::Integer::from(x).is_congruent(&rug::Integer::from(y),
+            &rug::Integer::from(m))
+        );
     });
 
     integer_pair_gen().test_properties(|(x, y)| {

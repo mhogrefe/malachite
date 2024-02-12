@@ -44,18 +44,18 @@ fn test_limbs_mod_pow_odd() {
         assert_eq!(out, out_out);
         verify_limbs_mod_pow(out_old, xs, es, ms, &out);
     };
-    // ms_len < REDC_1_TO_REDC_N_THRESHOLD
-    // ms_len == 1 in to_redc
-    // end >= len in get_bits
-    // width >= windowsize
-    // bit_index != 0
-    // !limbs_get_bit(es, bit_index - 1)
-    // bit_index >= windowsize
-    // limbs_cmp_same_length(out, ms) == Ordering::Less
+    // - ms_len < REDC_1_TO_REDC_N_THRESHOLD
+    // - ms_len == 1 in to_redc
+    // - end >= len in get_bits
+    // - width >= windowsize
+    // - bit_index != 0
+    // - !limbs_get_bit(es, bit_index - 1)
+    // - bit_index >= windowsize
+    // - limbs_cmp_same_length(out, ms) == Ordering::Less
     test(&[10; 3], &[3], &[20], &[105], &[51, 10, 10]);
-    // ms_len != 1 in to_redc
-    // end < len in get_bits
-    // bit_index < windowsize
+    // - ms_len != 1 in to_redc
+    // - end < len in get_bits
+    // - bit_index < windowsize
     test(
         &[10; 3],
         &[123, 456],
@@ -63,10 +63,10 @@ fn test_limbs_mod_pow_odd() {
         &[135, 797],
         &[2939877551, 399, 10],
     );
-    // limbs_cmp_same_length(out, ms) != Ordering::Less
+    // - limbs_cmp_same_length(out, ms) != Ordering::Less
     test(&[10; 3], &[3], &[2], &[9], &[0, 10, 10]);
-    // ms_len >= REDC_1_TO_REDC_N_THRESHOLD
-    // REDC_1_TO_REDC_N_THRESHOLD <= ms_len < MUL_TOOM22_THRESHOLD in select_fns
+    // - ms_len >= REDC_1_TO_REDC_N_THRESHOLD
+    // - REDC_1_TO_REDC_N_THRESHOLD <= ms_len < MUL_TOOM22_THRESHOLD in select_fns
     test(
         &[10; 102],
         &[
@@ -111,7 +111,7 @@ fn test_limbs_mod_pow_odd() {
             3829991598, 71670781, 10, 10,
         ],
     );
-    // ms_len >= MUL_TOOM22_THRESHOLD in select_fns
+    // - ms_len >= MUL_TOOM22_THRESHOLD in select_fns
     test(
         &[10; 132],
         &[
@@ -171,7 +171,7 @@ fn test_limbs_mod_pow_odd() {
             1152465509, 3085485694, 2286582782, 1487765908, 10, 10,
         ],
     );
-    // xs longer than ms
+    // - xs longer than ms
     test(&[10; 3], &[123, 456], &[20], &[105], &[36, 10, 10]);
 }
 
@@ -248,33 +248,33 @@ fn test_limbs_mod_pow() {
         assert_eq!(out, out_out);
         verify_limbs_mod_pow(out_old, xs, es, ms, &out);
     };
-    // ms[0].odd()
-    // ms_zero_len == 0
+    // - ms[0].odd()
+    // - ms_zero_len == 0
     test(&[10; 3], &[3], &[20], &[105], &[51, 10, 10]);
     test(&[10; 3], &[4], &[20], &[105], &[16, 10, 10]);
     test(&[10; 3], &[4], &[1000000], &[3], &[1, 10, 10]);
-    // ms[0].even()
-    // ms_zero_len != 0
-    // xs_len >= ms_zero_len
-    // xs[0].odd()
-    // do_pow_low
-    // ms_nonzero_len >= ms_zero_len
-    // ms_twos != 0
+    // - ms[0].even()
+    // - ms_zero_len != 0
+    // - xs_len >= ms_zero_len
+    // - xs[0].odd()
+    // - do_pow_low
+    // - ms_nonzero_len >= ms_zero_len
+    // - ms_twos != 0
     test(&[10; 3], &[3], &[1000000], &[4], &[1, 10, 10]);
-    // xs[0].even()
-    // es_len == 1
-    // es[0].wrapping_mul(bits) >= t
-    // !do_pow_low
+    // - xs[0].even()
+    // - es_len == 1
+    // - es[0].wrapping_mul(bits) >= t
+    // - !do_pow_low
     test(&[10; 3], &[4], &[1000000], &[6], &[4, 10, 10]);
-    // ms[ms_zero_len] == 0
-    // xs_len < ms_zero_len
-    // ms_nonzero_len < ms_zero_len
+    // - ms[ms_zero_len] == 0
+    // - xs_len < ms_zero_len
+    // - ms_nonzero_len < ms_zero_len
     test(&[10; 3], &[4], &[1000000], &[0, 6], &[0, 4, 10]);
-    // es_len > 1
+    // - es_len > 1
     test(&[10; 3], &[4], &[1, 1], &[0, 6], &[0, 4, 10]);
-    // ms_twos == 0
+    // - ms_twos == 0
     test(&[10; 4], &[1], &[2], &[0, 1], &[1, 0, 10, 10]);
-    // es[0].wrapping_mul(bits) < t
+    // - es[0].wrapping_mul(bits) < t
     test(&[10; 4], &[2], &[2], &[0, 1], &[4, 0, 10, 10]);
 }
 

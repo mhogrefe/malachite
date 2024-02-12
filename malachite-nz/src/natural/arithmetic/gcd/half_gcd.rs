@@ -200,8 +200,8 @@ impl<'a> HalfGcdMatrix<'a> {
     }
 }
 
-// Multiply M by M1 from the right. Needs 3*(M->n + M1->n) + 5 limbs
-// of temporary storage (see mpn_matrix22_mul_itch).
+// Multiply M by M1 from the right. Needs 3*(M->n + M1->n) + 5 limbs of temporary storage (see
+// mpn_matrix22_mul_itch).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -216,17 +216,14 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
     b: &HalfGcdMatrix,
     scratch: &mut [Limb]
 ) {
-    // About the new size of M:s elements. Since M1's diagonal elements
-    // are > 0, no element can decrease. The new elements are of size
-    // M->n + M1->n, one limb more or less. The computation of the
-    // matrix product produces elements of size M->n + M1->n + 1. But
-    // the true size, after normalization, may be three limbs smaller.
+    // About the new size of M:s elements. Since M1's diagonal elements are > 0, no element can
+    // decrease. The new elements are of size M->n + M1->n, one limb more or less. The computation
+    // of the matrix product produces elements of size M->n + M1->n + 1. But the true size, after
+    // normalization, may be three limbs smaller.
     //
-    // The reason that the product has normalized size >= M->n + M1->n -
-    // 2 is subtle. It depends on the fact that M and M1 can be factored
-    // as products of (1,1; 0,1) and (1,0; 1,1), and that we can't have
-    // M ending with a large power and M1 starting with a large power of
-    // the same matrix.
+    // The reason that the product has normalized size >= M->n + M1->n - 2 is subtle. It depends on
+    // the fact that M and M1 can be factored as products of (1,1; 0,1) and (1,0; 1,1), and that we
+    // can't have M ending with a large power and M1 starting with a large power of the same matrix.
     assert!(a.n + b.n < a.s);
     assert!(!a.all_elements_zero_at_index(a.n - 1));
     let b_n = b.n;
@@ -256,9 +253,8 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
     a.n = n + 1;
 }}
 
-// Multiply M by M1 from the right. Since the M1 elements fit in
-// GMP_NUMB_BITS - 1 bits, M grows by at most one limb. Needs
-// temporary space M->n
+// Multiply M by M1 from the right. Since the M1 elements fit in GMP_NUMB_BITS - 1 bits, M grows by
+// at most one limb. Needs temporary space M->n
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -285,8 +281,8 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix_1(
     assert!(a.n <= a.s);
 }}
 
-// Update column `column`, adding in Q * column (1-`col`). Temporary storage:
-// qn + n <= `self.s`, where n is the size of the largest element in column 1 - `column`.
+// Update column `column`, adding in Q * column (1-`col`). Temporary storage: qn + n <= `self.s`,
+// where n is the size of the largest element in column 1 - `column`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -320,11 +316,11 @@ pub_crate_test! {limbs_half_gcd_matrix_update_q(
             m.n += 1;
         }
     } else {
-        // Carries for the unlikely case that we get both high words from the multiplication
-        // and carries from the addition.
+        // Carries for the unlikely case that we get both high words from the multiplication and
+        // carries from the addition.
         let mut carries = [0; 2];
-        // The matrix will not necessarily grow in size by qn, so we need normalization in
-        // order not to overflow m.
+        // The matrix will not necessarily grow in size by qn, so we need normalization in order not
+        // to overflow m.
         let mut n = m.n;
         while n + qs_len > m.n {
             assert_ne!(n, 0);
@@ -363,8 +359,8 @@ pub_crate_test! {limbs_half_gcd_matrix_update_q(
     assert!(m.n <= m.s);
 }}
 
-// Multiplies the least significant p limbs of (X;Y) by M^-1.
-// Temporary space needed: 2 * (p + m.n)
+// - Multiplies the least significant p limbs of (X;Y) by M^-1.
+// - Temporary space needed: 2 * (p + m.n)
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -470,8 +466,8 @@ fn limbs_half_gcd_matrix_apply(m: &HalfGcdMatrix, xs: &mut [Limb], ys: &mut [Lim
         // Put X <- X - q * Y
         limbs_gcd_sub_mul(xs_lo, ys_lo, &m.get(0, 1)[..m_lens[0][1]])
     } else {
-        // X = m00 x + m01 y => x <= X / m00, y <= X / m01.
-        // Y = m10 x + m11 y => x <= Y / m10, y <= Y / m11.
+        // - X = m00 x + m01 y => x <= X / m00, y <= X / m01.
+        // - Y = m10 x + m11 y => x <= Y / m10, y <= Y / m11.
         let mut new_n = max(
             min(xs_len - m_lens[0][0], ys_len - m_lens[1][0]),
             min(xs_len - m_lens[0][1], ys_len - m_lens[1][1]),
@@ -636,8 +632,8 @@ pub(crate) struct HalfGcdMatrix1 {
     pub(crate) data: [[Limb; 2]; 2],
 }
 
-// Sets (r;b) = (a;b) M, with M = (u00, u01; u10, u11). Vector must
-// have space for n + 1 limbs. Uses three buffers to avoid a copy
+// Sets (r;b) = (a;b) M, with M = (u00, u01; u10, u11). Vector must have space for n + 1 limbs. Uses
+// three buffers to avoid a copy
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -676,10 +672,12 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
 }}
 
 // Compute (r;y) <- (u11 x - u01 y; -u10 x + u00 y) xs
+// ```
 // r  = u11 * x
 // r -= u01 * y
 // y *= u00
 // y -= u10 * x
+// ```
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -890,8 +888,8 @@ pub(crate) const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where
-// `HGCD2_DIV2_METHOD == 1`.
+// This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where `HGCD2_DIV2_METHOD ==
+// 1`.
 pub_crate_test! {limbs_gcd_div(
     mut n1: Limb,
     mut n0: Limb,
@@ -1179,7 +1177,7 @@ pub(crate) const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
     (((n + 1) >> 1) + 1) << 2
 }
 
-//TODO tune
+// TODO tune
 pub(crate) const HGCD_THRESHOLD: usize = 101;
 
 // # Worst-case complexity
@@ -1196,7 +1194,7 @@ pub(crate) fn limbs_half_gcd_scratch_len(n: usize) -> usize {
     }
 }
 
-//TODO tune
+// TODO tune
 const HGCD_REDUCE_THRESHOLD: usize = 1679;
 
 // # Worst-case complexity
@@ -1208,8 +1206,8 @@ pub_test! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
     let diff = n - p;
     if n < HGCD_REDUCE_THRESHOLD {
         let scratch_len = limbs_half_gcd_scratch_len(diff);
-        // For arbitrary p, the storage for adjust is
-        // 2 * (p + M.n) = 2 * (p + ceil((n - p) / 2) - 1 <= n + p - 1
+        // - For arbitrary p, the storage for adjust is
+        // - 2 * (p + M.n) = 2 * (p + ceil((n - p) / 2) - 1 <= n + p - 1
         let sum = n + p - 1;
         if scratch_len < sum {
             sum
@@ -1221,7 +1219,7 @@ pub_test! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
     }
 }}
 
-//TODO tune
+// TODO tune
 const HGCD_APPR_THRESHOLD: usize = 104;
 
 /// Destroys inputs.
@@ -1243,9 +1241,9 @@ fn limbs_half_gcd_approx(
         return false;
     }
     assert!(((n + 1) >> 1) - 1 < a.s);
-    // We aim for reduction of to W * s bits. But each time we discard some of the least
-    // significant limbs, we must keep one additional bit to account for the truncation error. We
-    // maintain the W * s - extra_bits as the current target size.
+    // We aim for reduction of to W * s bits. But each time we discard some of the least significant
+    // limbs, we must keep one additional bit to account for the truncation error. We maintain the W
+    // * s - extra_bits as the current target size.
     let mut s = (n >> 1) + 1;
     let mut offset = 0;
     let mut success = false;
@@ -1265,9 +1263,8 @@ fn limbs_half_gcd_approx(
             ys_chunk = &mut ys_chunk[..n];
             success = true;
             // We can truncate and discard the lower p bits whenever n <= 2 * s - p. To account for
-            // the truncation error, we must adjust s <- s + 1 - p, rather than just
-            // sbits <- sbits - p. This adjustment makes the produced matrix slightly smaller than
-            // it could be.
+            // the truncation error, we must adjust s <- s + 1 - p, rather than just sbits <- sbits
+            // - p. This adjustment makes the produced matrix slightly smaller than it could be.
             let lhs = ((n + 1) << Limb::LOG_WIDTH) + (usize::exact_from(extra_bits) << 1);
             let rhs = s << (Limb::LOG_WIDTH + 1);
             if lhs <= rhs {
@@ -1362,14 +1359,14 @@ fn limbs_half_gcd_approx(
                 // We always have max(A) > 2 ^ (-(W + 1)) * max(B).
                 assert!(a.n + 2 >= b.n);
                 // Furthermore, assume A ends with a quotient (1, q; 0, 1); then either q or q + 1
-                // is a correct quotient, and B will start with either (1, 0; 1, 1) or
-                // (2, 1; 1, 1). This rules out the case that the size of A * B is much smaller
-                // than the expected A.n + B.n.
+                // is a correct quotient, and B will start with either (1, 0; 1, 1) or (2, 1; 1, 1).
+                // This rules out the case that the size of A * B is much smaller than the expected
+                // A.n + B.n.
                 assert!(a.n + b.n < a.s);
-                // We need a bound for of A.n + B.n. Let n be the original input size. Then
-                // ceil(n / 2) - 1 >= size of product >= A.n + B.n - 2, and it follows that
-                // A.n + B.n <= ceil(n / 2) + 1. Then 3 * (A.n + B.n) + 5 <= 3 * ceil(n / 2) + 8
-                // is the amount of needed scratch space.
+                // We need a bound for of A.n + B.n. Let n be the original input size. Then ceil(n /
+                // 2) - 1 >= size of product >= A.n + B.n - 2, and it follows that A.n + B.n <=
+                // ceil(n / 2) + 1. Then 3 * (A.n + B.n) + 5 <= 3 * ceil(n / 2) + 8 is the amount of
+                // needed scratch space.
                 limbs_half_gcd_matrix_mul_matrix(a, &b, scratch_hi);
                 return true;
             }
@@ -1389,8 +1386,8 @@ fn limbs_half_gcd_approx(
     }
 }
 
-// Reduces x, y until |x - y| fits in n / 2 + 1 limbs. Constructs matrix A with elements of size
-// at most (n + 1) / 2 - 1. Returns new size of a, b, or zero if no reduction is possible.
+// Reduces x, y until |x - y| fits in n / 2 + 1 limbs. Constructs matrix A with elements of size at
+// most (n + 1) / 2 - 1. Returns new size of a, b, or zero if no reduction is possible.
 //
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log\log n)$
@@ -1443,17 +1440,17 @@ pub(crate) fn limbs_half_gcd(
                 // We always have max(A) > 2 ^ (-(W + 1)) * max(B).
                 assert!(a.n + 2 >= b.n);
                 // Furthermore, assume A ends with a quotient (1, q; 0, 1); then either q or q + 1
-                // is a correct quotient, and B will start with either (1, 0; 1, 1) or
-                // (2, 1; 1, 1).This rules out the case that the size of A * B is much smaller than
-                // the expected A.n + B.n.
+                // is a correct quotient, and B will start with either (1, 0; 1, 1) or (2, 1; 1,
+                // 1).This rules out the case that the size of A * B is much smaller than the
+                // expected A.n + B.n.
                 assert!(a.n + b.n < a.s);
-                // Needs 2 * (p + A.n) <= 2 * (2 * s - limit + 1 + limit - s - 1) = 2 * s <=
-                // 2 * (floor(n / 2) + 1) <= n + 2.
+                // Needs 2 * (p + A.n) <= 2 * (2 * s - limit + 1 + limit - s - 1) = 2 * s <= 2 *
+                // (floor(n / 2) + 1) <= n + 2.
                 n = limbs_half_gcd_matrix_adjust(&b, p + new_n, xs, ys, p, scratch_hi);
-                // We need a bound for of A.n + B.n. Let n be the original input size. Then
-                // ceil(n / 2) - 1 >= size of product >= A.n + B.n - 2 and it follows that
-                // A.n + B.n <= ceil(n / 2) + 1. Then 3 * (A.n + B.n) + 5 <= 3 * ceil(n / 2) + 8 is
-                // the amount of needed scratch space.
+                // We need a bound for of A.n + B.n. Let n be the original input size. Then ceil(n /
+                // 2) - 1 >= size of product >= A.n + B.n - 2 and it follows that A.n + B.n <=
+                // ceil(n / 2) + 1. Then 3 * (A.n + B.n) + 5 <= 3 * ceil(n / 2) + 8 is the amount of
+                // needed scratch space.
                 limbs_half_gcd_matrix_mul_matrix(a, &b, scratch_hi);
                 success = true;
             }
@@ -1470,7 +1467,7 @@ pub(crate) fn limbs_half_gcd(
     }
 }
 
-//TODO tune
+// TODO tune
 pub(crate) const GCD_DC_THRESHOLD: usize = 330;
 
 // X >= Y, X and Y not both even.
@@ -1597,7 +1594,7 @@ pub_crate_test! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [
         y_1 >>= zeros;
     }
     let x_1 = xs[1];
-    //TODO try mpn_gcd_22
+    // TODO try mpn_gcd_22
     (out[1], out[0]) = DoubleLimb::join_halves(x_1, x_0)
         .gcd(DoubleLimb::join_halves(y_1, y_0))
         .split_in_half();

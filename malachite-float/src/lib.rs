@@ -62,6 +62,9 @@
     clippy::uninlined_format_args,
     clippy::unused_self
 )]
+#![cfg_attr(not(any(feature = "test_build", feature = "random")), no_std)]
+
+extern crate alloc;
 
 #[macro_use]
 extern crate malachite_base;
@@ -71,6 +74,7 @@ extern crate itertools;
 
 #[cfg(feature = "test_build")]
 use crate::InnerFloat::Finite;
+use core::ops::Deref;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -78,18 +82,17 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::ops::Deref;
 
 /// A floating-point number.
 ///
 /// `Float`s are currently experimental. They are missing many important functions. However, the
 /// functions that are currently implemented are thoroughly tested and documented, with the
-/// exception of string conversion functions. The current string conversions are incomplete and
-/// will be changed in the future to match MPFR's behavior.
+/// exception of string conversion functions. The current string conversions are incomplete and will
+/// be changed in the future to match MPFR's behavior.
 ///
-/// `Float`s are similar to the primitive floats defined by the IEEE 754 standard. They include
-/// NaN, positive and negative infinity, and positive and negative zero. There is only one NaN;
-/// there is no concept of a NaN payload.
+/// `Float`s are similar to the primitive floats defined by the IEEE 754 standard. They include NaN,
+/// positive and negative infinity, and positive and negative zero. There is only one NaN; there is
+/// no concept of a NaN payload.
 ///
 /// All the finite `Float`s are dyadic rationals (rational numbers whose denominator is a power of
 /// 2). A finite `Float` consists of several fields:
@@ -103,9 +106,9 @@ use std::ops::Deref;
 ///   precision indicates how good the approximation is intended to be.
 ///
 /// `Float`s inherit some odd behavior from the IEEE 754 standard regarding comparison. A `NaN` is
-/// not equal to any `Float`, including itself. Positive and negative zero compare as equal,
-/// despite being two distinct values. Additionally, (and this is not IEEE 754's fault), `Float`s
-/// with different precisions compare as equal if they represent the same numeric value.
+/// not equal to any `Float`, including itself. Positive and negative zero compare as equal, despite
+/// being two distinct values. Additionally, (and this is not IEEE 754's fault), `Float`s with
+/// different precisions compare as equal if they represent the same numeric value.
 ///
 /// In many cases, the above behavior is unsatisfactory, so the [`ComparableFloat`] and
 /// [`ComparableFloat`] wrappers are provided. See their documentation for a description of their
@@ -120,9 +123,9 @@ use std::ops::Deref;
 ///
 /// Here are the structural difference between `Float` and `mpfr_t`:
 /// - `Float` can only represent a single `NaN` value, with no sign or payload.
-/// - Only finite, nonzero `Float`s have a significand, precision, and exponent. For other
-///   `Float`s, these concepts are undefined. In particular, unlike `mpfr_t` zeros, `Float`
-///   zeros do not have a precision.
+/// - Only finite, nonzero `Float`s have a significand, precision, and exponent. For other `Float`s,
+///   these concepts are undefined. In particular, unlike `mpfr_t` zeros, `Float` zeros do not have
+///   a precision.
 /// - The types of `mpfr_t` components are configuration- and platform-dependent. The types of
 ///   `Float` components are platform-independent, although the `Limb` type is
 ///   configuration-dependent: it is `u64` by default, but may be changed to `u32` using the
@@ -136,8 +139,7 @@ use std::ops::Deref;
 pub struct Float(pub(crate) InnerFloat);
 
 // We want to limit the visibility of the `NaN`, `Zero`, `Infinity`, and `Finite` constructors to
-// within this crate. To do this, we wrap the `InnerFloat` enum in a struct that gets compiled
-// away.
+// within this crate. To do this, we wrap the `InnerFloat` enum in a struct that gets compiled away.
 #[derive(Clone)]
 pub(crate) enum InnerFloat {
     NaN,
@@ -172,6 +174,9 @@ impl Float {
                 if *precision == 0 {
                     return false;
                 }
+                if !significand.is_valid() {
+                    return false;
+                }
                 let bits = significand.significant_bits();
                 bits != 0
                     && bits.divisible_by_power_of_2(Limb::LOG_WIDTH)
@@ -203,8 +208,8 @@ impl Float {
 ///
 /// The analogous wrapper for primitive floats is
 /// [`NiceFloat`](malachite_base::num::float::NiceFloat). However,
-/// [`NiceFloat`](malachite_base::num::float::NiceFloat) also facilitates better string
-/// conversion, something that isn't necessary for [`Float`]s
+/// [`NiceFloat`](malachite_base::num::float::NiceFloat) also facilitates better string conversion,
+/// something that isn't necessary for [`Float`]s
 ///
 /// `ComparableFloat` owns its float. This is useful in many cases, for example if you want to use
 /// [`Float`]s as keys in a hash map. In other situations, it is better to use

@@ -190,8 +190,8 @@ impl AddMul<Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -215,8 +215,8 @@ impl AddMul<Integer, Integer> for Integer {
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
-    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first two by
-    /// value and the third by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first two by value
+    /// and the third by reference.
     ///
     /// $f(x, y, z) = x + yz$.
     ///
@@ -225,8 +225,8 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -250,8 +250,8 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first and third
-    /// by value and the second by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first and third by
+    /// value and the second by reference.
     ///
     /// $f(x, y, z) = x + yz$.
     ///
@@ -260,8 +260,8 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -285,8 +285,8 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
-    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first by value
-    /// and the second and third by reference.
+    /// Adds an [`Integer`] and the product of two other [`Integer`]s, taking the first by value and
+    /// the second and third by reference.
     ///
     /// $f(x, y, z) = x + yz$.
     ///
@@ -295,8 +295,8 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -330,8 +330,8 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     ///
     /// $M(n, m) = O(m + n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -375,8 +375,8 @@ impl AddMulAssign<Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -412,8 +412,8 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -449,8 +449,8 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -486,8 +486,8 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(y.significant_bits(), z.significant_bits())`, and $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(y.significant_bits(),
+    /// z.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```

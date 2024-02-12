@@ -290,11 +290,10 @@ pub fn jacobi_symbol_unsigned_double_simple<
     D::join_halves(x_1, x_0).jacobi_symbol(D::join_halves(y_1, y_0))
 }
 
-// Computes (a / b) where b is odd, and a and b are otherwise arbitrary
-// two-limb numbers.
+// Computes (a / b) where b is odd, and a and b are otherwise arbitrary two-limb numbers.
 //
-// This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where
-// `JACOBI_2_METHOD == 1` and `bit` is 0.
+// This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where `JACOBI_2_METHOD ==
+// 1` and `bit` is 0.
 pub fn jacobi_symbol_unsigned_double_fast_1<T: PrimitiveUnsigned>(
     mut x_1: T,
     mut x_0: T,

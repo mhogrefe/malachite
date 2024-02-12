@@ -73,8 +73,8 @@ macro_rules! impl_log_base_2_unsigned {
         impl CheckedLogBase2 for $t {
             type Output = u64;
 
-            /// Returns the base-2 logarithm of a positive integer. If the integer is not a power
-            /// of 2, `None` is returned.
+            /// Returns the base-2 logarithm of a positive integer. If the integer is not a power of
+            /// 2, `None` is returned.
             ///
             /// $$
             /// f(x) = \\begin{cases}

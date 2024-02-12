@@ -34,40 +34,40 @@ fn test_limbs_floor_root() {
         assert!((r + Natural::ONE).pow(exp) > n);
         assert_eq!(pow == n, !inexact);
     };
-    // (xs_len + 2) / 3 <= u_exp
-    // bit_count < exp in limbs_root_to_out_internal
-    // !out_rem_is_some in limbs_root_to_out_internal
+    // - (xs_len + 2) / 3 <= u_exp
+    // - bit_count < exp in limbs_root_to_out_internal
+    // - !out_rem_is_some in limbs_root_to_out_internal
     test(&[1], 3, &[1], false);
-    // bit_count >= exp in limbs_root_to_out_internal
-    // leading_zeros != Limb::WIDTH in limbs_root_to_out_internal
-    // bit_count.significant_bits() > LOGROOT_USED_BITS_COMP in log_based_root
-    // !approx || ss[0] <= 1 in limbs_root_to_out_internal
-    // need_adjust || qs_len != xs_len in limbs_root_to_out_internal
-    // rs_len == 0 || !out_rem_is_some in limbs_root_to_out_internal
+    // - bit_count >= exp in limbs_root_to_out_internal
+    // - leading_zeros != Limb::WIDTH in limbs_root_to_out_internal
+    // - bit_count.significant_bits() > LOGROOT_USED_BITS_COMP in log_based_root
+    // - !approx || ss[0] <= 1 in limbs_root_to_out_internal
+    // - need_adjust || qs_len != xs_len in limbs_root_to_out_internal
+    // - rs_len == 0 || !out_rem_is_some in limbs_root_to_out_internal
     test(&[1000], 3, &[10], false);
-    // root_bits > log_exp in limbs_root_to_out_internal
-    // need_adjust || qs_len != rs_len in limbs_root_to_out_internal
-    // pow_cmp != Ordering::Equal in limbs_root_to_out_internal
-    // carry == 0 first time in limbs_root_to_out_internal
-    // n_len - 1 <= next_len in limbs_root_to_out_internal
-    // carry == 0 second time in limbs_root_to_out_internal
-    // rs_len >= ws_len in limbs_root_to_out_internal
-    // qs_len <= b_rem in limbs_root_to_out_internal
-    // qs_len <= b_rem && ... in limbs_root_to_out_internal
-    // carry != 0 first time in limbs_root_to_out_internal
-    // n_len - 1 > next_len in limbs_root_to_out_internal
+    // - root_bits > log_exp in limbs_root_to_out_internal
+    // - need_adjust || qs_len != rs_len in limbs_root_to_out_internal
+    // - pow_cmp != Ordering::Equal in limbs_root_to_out_internal
+    // - carry == 0 first time in limbs_root_to_out_internal
+    // - n_len - 1 <= next_len in limbs_root_to_out_internal
+    // - carry == 0 second time in limbs_root_to_out_internal
+    // - rs_len >= ws_len in limbs_root_to_out_internal
+    // - qs_len <= b_rem in limbs_root_to_out_internal
+    // - qs_len <= b_rem && ... in limbs_root_to_out_internal
+    // - carry != 0 first time in limbs_root_to_out_internal
+    // - n_len - 1 > next_len in limbs_root_to_out_internal
     test(&[123, 456, 789], 3, &[24415497], true);
-    // leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
+    // - leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
     test(&[0, 1], 3, &[1625], true);
-    // pow_cmp == Ordering::Equal in limbs_root_to_out_internal
-    // rs_len < ws_len in limbs_root_to_out_internal
+    // - pow_cmp == Ordering::Equal in limbs_root_to_out_internal
+    // - rs_len < ws_len in limbs_root_to_out_internal
     test(&[0, 0, 1], 4, &[65536], false);
-    // !need_adjust && qs_len == rs_len in limbs_root_to_out_internal
-    // !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
-    // carry != 0 second time in limbs_root_to_out_internal
+    // - !need_adjust && qs_len == rs_len in limbs_root_to_out_internal
+    // - !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
+    // - carry != 0 second time in limbs_root_to_out_internal
     test(&[0, 0, 1], 5, &[7131], true);
-    // (xs_len + 2) / 3 > u_exp
-    // approx && ss[0] > 1 in limbs_root_to_out_internal
+    // - (xs_len + 2) / 3 > u_exp
+    // - approx && ss[0] > 1 in limbs_root_to_out_internal
     test(
         &[
             10045114, 111940252, 2181719322, 1883679021, 2601294413, 1872079876, 578360935,
@@ -78,7 +78,7 @@ fn test_limbs_floor_root() {
         &[2416867165, 2555201003, 3891828300, 7026],
         true,
     );
-    // qs_len > b_rem || ... in limbs_root_to_out_internal
+    // - qs_len > b_rem || ... in limbs_root_to_out_internal
     test(
         &[
             2055929154, 2630529572, 271121346, 1501542260, 1183697298, 2075827756, 4275724366,
@@ -89,7 +89,7 @@ fn test_limbs_floor_root() {
         &[2524001878, 2377965049, 719885555, 160379071, 3624665804, 1231],
         true,
     );
-    // limbs_root_to_out_internal, root_bits <= log_exp
+    // - limbs_root_to_out_internal, root_bits <= log_exp
     test(
         &[
             1321882439, 1623785800, 3134073276, 2565564486, 2821610380, 2583585204, 3897897848,
@@ -119,15 +119,15 @@ fn test_limbs_floor_root() {
 
 #[test]
 fn limbs_floor_root_fail() {
-    // xs too short
+    // - xs too short
     assert_panic!(limbs_floor_root(&[], 3));
-    // last element of xs zero
+    // - last element of xs zero
     assert_panic!(limbs_floor_root(&[1, 0], 3));
-    // exp is 0
+    // - exp is 0
     assert_panic!(limbs_floor_root(&[1, 1], 0));
-    // exp is 1
+    // - exp is 1
     assert_panic!(limbs_floor_root(&[1, 1], 1));
-    // exp is 2
+    // - exp is 2
     assert_panic!(limbs_floor_root(&[1, 1], 2));
 }
 
@@ -144,37 +144,37 @@ fn test_limbs_root_rem() {
         assert_eq!((&r_1).pow(exp) + r_2, n);
         assert!((r_1 + Natural::ONE).pow(exp) > n);
     };
-    // bit_count < exp in limbs_root_to_out_internal
-    // out_rem_is_some in limbs_root_to_out_internal
+    // - bit_count < exp in limbs_root_to_out_internal
+    // - out_rem_is_some in limbs_root_to_out_internal
     test(&[1], 3, &[1], &[]);
-    // bit_count >= exp in limbs_root_to_out_internal
-    // leading_zeros != Limb::WIDTH in limbs_root_to_out_internal
-    // bit_count.significant_bits() <= LOGROOT_USED_BITS_COMP in log_based_root
-    // !approx || ss[0] <= 1 in limbs_root_to_out_internal
-    // !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
-    // rs_len == 0 || !out_rem_is_some in limbs_root_to_out_internal
+    // - bit_count >= exp in limbs_root_to_out_internal
+    // - leading_zeros != Limb::WIDTH in limbs_root_to_out_internal
+    // - bit_count.significant_bits() <= LOGROOT_USED_BITS_COMP in log_based_root
+    // - !approx || ss[0] <= 1 in limbs_root_to_out_internal
+    // - !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
+    // - rs_len == 0 || !out_rem_is_some in limbs_root_to_out_internal
     test(&[1000], 3, &[10], &[]);
-    // root_bits > log_exp in limbs_root_to_out_internal
-    // need_adjust || qs_len != rs_len in limbs_root_to_out_internal
-    // pow_cmp != Ordering::Equal in limbs_root_to_out_internal
-    // carry == 0 first time in limbs_root_to_out_internal
-    // n_len - 1 <= next_len in limbs_root_to_out_internal
-    // carry == 0 second time in limbs_root_to_out_internal
-    // rs_len >= ws_len in limbs_root_to_out_internal
-    // qs_len <= b_rem in limbs_root_to_out_internal
-    // qs_len <= b_rem && ... in limbs_root_to_out_internal
-    // carry != 0 first time in limbs_root_to_out_internal
-    // n_len - 1 > next_len in limbs_root_to_out_internal
-    // rs_len != 0 && out_rem_is_some in limbs_root_to_out_internal
+    // - root_bits > log_exp in limbs_root_to_out_internal
+    // - need_adjust || qs_len != rs_len in limbs_root_to_out_internal
+    // - pow_cmp != Ordering::Equal in limbs_root_to_out_internal
+    // - carry == 0 first time in limbs_root_to_out_internal
+    // - n_len - 1 <= next_len in limbs_root_to_out_internal
+    // - carry == 0 second time in limbs_root_to_out_internal
+    // - rs_len >= ws_len in limbs_root_to_out_internal
+    // - qs_len <= b_rem in limbs_root_to_out_internal
+    // - qs_len <= b_rem && ... in limbs_root_to_out_internal
+    // - carry != 0 first time in limbs_root_to_out_internal
+    // - n_len - 1 > next_len in limbs_root_to_out_internal
+    // - rs_len != 0 && out_rem_is_some in limbs_root_to_out_internal
     test(&[123, 456, 789], 3, &[24415497], &[1082861218, 142292]);
-    // leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
+    // - leading_zeros == Limb::WIDTH in limbs_root_to_out_internal
     test(&[0, 1], 3, &[1625], &[3951671]);
-    // pow_cmp == Ordering::Equal in limbs_root_to_out_internal
-    // rs_len < ws_len in limbs_root_to_out_internal
+    // - pow_cmp == Ordering::Equal in limbs_root_to_out_internal
+    // - rs_len < ws_len in limbs_root_to_out_internal
     test(&[0, 0, 1], 4, &[65536], &[]);
-    // !need_adjust && qs_len == rs_len in limbs_root_to_out_internal
+    // - !need_adjust && qs_len == rs_len in limbs_root_to_out_internal
     test(&[0, 0, 1], 5, &[7131], &[1889423061, 1656574]);
-    // carry != 0 second time in limbs_root_to_out_internal
+    // - carry != 0 second time in limbs_root_to_out_internal
     test(
         &[
             10045114, 111940252, 2181719322, 1883679021, 2601294413, 1872079876, 578360935,
@@ -201,23 +201,23 @@ fn test_limbs_root_rem() {
             1641457454, 3086626670, 2101663143, 3655678,
         ],
     );
-    // !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
+    // - !need_adjust && qs_len == xs_len in limbs_root_to_out_internal
     test(&[0, 2], 4, &[304], &[49217536]);
-    // qs_len > b_rem || ... in limbs_root_to_out_internal
+    // - qs_len > b_rem || ... in limbs_root_to_out_internal
     test(&[1002403925, 303302627], 4, &[33783], &[188673716, 30155]);
 }
 
 #[test]
 fn limbs_root_rem_fail() {
-    // xs too short
+    // - xs too short
     assert_panic!(limbs_root_rem(&[], 3));
-    // last element of xs zero
+    // - last element of xs zero
     assert_panic!(limbs_root_rem(&[1, 0], 3));
-    // exp is 0
+    // - exp is 0
     assert_panic!(limbs_root_rem(&[1, 1], 0));
-    // exp is 1
+    // - exp is 1
     assert_panic!(limbs_root_rem(&[1, 1], 1));
-    // exp is 2
+    // - exp is 2
     assert_panic!(limbs_root_rem(&[1, 1], 2));
 }
 

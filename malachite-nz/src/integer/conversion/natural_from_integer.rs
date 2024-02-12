@@ -147,8 +147,8 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
 }
 
 impl ConvertibleFrom<Integer> for Natural {
-    /// Determines whether an [`Integer`] can be converted to a [`Natural`] (when the [`Integer`]
-    /// is non-negative). Takes the [`Integer`] by value.
+    /// Determines whether an [`Integer`] can be converted to a [`Natural`] (when the [`Integer`] is
+    /// non-negative). Takes the [`Integer`] by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -172,8 +172,8 @@ impl ConvertibleFrom<Integer> for Natural {
 }
 
 impl<'a> ConvertibleFrom<&'a Integer> for Natural {
-    /// Determines whether an [`Integer`] can be converted to a [`Natural`] (when the [`Integer`]
-    /// is non-negative). Takes the [`Integer`] by reference.
+    /// Determines whether an [`Integer`] can be converted to a [`Natural`] (when the [`Integer`] is
+    /// non-negative). Takes the [`Integer`] by reference.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

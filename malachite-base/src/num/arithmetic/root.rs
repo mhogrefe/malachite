@@ -500,15 +500,14 @@ pub_test! {floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G
     }
 }}
 
-// Coefficients of Chebyshev's approximation polynomial (deg 2) {c0, c1, c2}
-// splitting 0.5 to 1 into 8 equal intervals
+// Coefficients of Chebyshev's approximation polynomial (deg 2) {c0, c1, c2} splitting 0.5 to 1 into
+// 8 equal intervals
 //
-// Values of these coefficients of Chebyshev's approximation polynomial have been
-// calculated from the python module, "mpmath" - http://mpmath.org/
-// function call:
-// mpmath.chebyfit(lambda x: mpmath.root(x,3), [i, j], 3, error=True)
-// where (i, j) is the  range.
+// Values of these coefficients of Chebyshev's approximation polynomial have been calculated from
+// the python module, "mpmath" - http://mpmath.org/ function call: mpmath.chebyfit(lambda x:
+// mpmath.root(x,3), [i, j], 3, error=True) where (i, j) is the  range.
 //
+// ```
 //          c0          c1           c2        range
 // 0.445434042 0.864136635 -0.335205926 [0.50000, 0.53125]
 // 0.454263239 0.830878907 -0.303884962 [0.53125, 0.56250]
@@ -526,7 +525,8 @@ pub_test! {floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G
 // 0.540672371 0.586548233 -0.127254189 [0.90625, 0.93750]
 // 0.546715310 0.573654340 -0.120376066 [0.93750, 0.96875]
 // 0.552627494 0.561446514 -0.114074068 [0.96875, 1.00000]
-
+// ```
+//
 // 1^(1/3), 2^(1/3), 4^(1/3)
 const FACTOR_TABLE: [f32; 3] = [1.000000, 1.259921, 1.587401];
 
@@ -566,6 +566,7 @@ pub_test! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
     let (exponent_over_3, exponent_rem) = (u32::wrapping_from(exponent) - BIAS).div_mod(3);
 
     // Calculating cube root of dec using Chebyshev approximation polynomial
+    //
     // Evaluating approx polynomial at (dec) by Estrin's scheme
     let x = f32::from_bits(mantissa);
     let row = COEFF[table_index];
@@ -606,6 +607,7 @@ pub_test! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     let (exponent_over_3, exponent_rem) = (exponent - BIAS).div_mod(3);
 
     // Calculating cube root of dec using Chebyshev approximation polynomial
+    //
     // Evaluating approx polynomial at x by Estrin's scheme
     let x = f64::from_bits(mantissa);
     let row = COEFF[table_index];
@@ -631,8 +633,8 @@ pub_test! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     cbrt
 }}
 
-// This is equivalent to `n_cbrt_estimate` from `ulong_extras/n_cbrt_estimate.c`, FLINT 2.7.1,
-// where `FLINT64` is `true`.
+// This is equivalent to `n_cbrt_estimate` from `ulong_extras/n_cbrt_estimate.c`, FLINT 2.7.1, where
+// `FLINT64` is `true`.
 #[cfg(feature = "test_build")]
 fn cbrt_estimate_f64(a: f64) -> f64 {
     const S: u64 = 4607182418800017408; // ((1 << 10) - 1) << 52
@@ -716,7 +718,7 @@ pub fn fast_floor_cbrt_u32(n: u32) -> u32 {
     ret
 }
 
-//TODO tune
+// TODO tune
 #[cfg(feature = "test_build")]
 const CBRT_CHEBYSHEV_THRESHOLD: u64 = 10;
 
@@ -1032,8 +1034,8 @@ pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     root
 }}
 
-// This is equivalent to `n_root` from `ulong_extras/root.c`, FLINT 2.7.1, where `FLINT64` is
-// `true` and `root` is nonzero.
+// This is equivalent to `n_root` from `ulong_extras/root.c`, FLINT 2.7.1, where `FLINT64` is `true`
+// and `root` is nonzero.
 pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
@@ -1958,8 +1960,8 @@ impl CeilingRoot<u64> for usize {
 impl CheckedRoot<u64> for usize {
     type Output = usize;
 
-    /// Returns the the $n$th root of a [`usize`], or `None` if the [`usize`] is not a perfect
-    /// $n$th power.
+    /// Returns the the $n$th root of a [`usize`], or `None` if the [`usize`] is not a perfect $n$th
+    /// power.
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
@@ -2130,8 +2132,8 @@ impl RootRem<u64> for u128 {
     type RootOutput = u128;
     type RemOutput = u128;
 
-    /// Returns the floor of the $n$th root of a [`u128`], and the remainder (the difference
-    /// between the [`u128`] and the $n$th power of the floor).
+    /// Returns the floor of the $n$th root of a [`u128`], and the remainder (the difference between
+    /// the [`u128`] and the $n$th power of the floor).
     ///
     /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
     ///
@@ -2161,8 +2163,8 @@ macro_rules! impl_root_assign_rem {
         impl RootAssignRem<u64> for $t {
             type RemOutput = $t;
 
-            /// Replaces an integer with the floor of its $n$th root, and returns the remainder
-            /// (the difference between the original integer and the $n$th power of the floor).
+            /// Replaces an integer with the floor of its $n$th root, and returns the remainder (the
+            /// difference between the original integer and the $n$th power of the floor).
             ///
             /// $f(x, n) = x - \lfloor\sqrt\[n\]{x}\rfloor^n$,
             ///

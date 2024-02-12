@@ -1,5 +1,34 @@
 /// Comparison of [`Natural`](crate::natural::Natural)s.
 pub mod cmp;
+/// Equality of the absolute values of a [`Natural`](crate::natural::Natural)s and a primitive float
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(Natural::from(123u32).eq_abs(&123.0), true);
+/// assert_eq!(Natural::from(123u32).eq_abs(&5.0), false);
+/// assert_eq!(Natural::from(123u32).eq_abs(&-123.0), true);
+/// assert_eq!(Natural::from(123u32).eq_abs(&-5.0), false);
+/// assert_eq!(Natural::ZERO.eq_abs(&0.0), true);
+/// assert_eq!(Natural::ZERO.eq_abs(&-0.0), true);
+/// assert_eq!(Natural::ZERO.eq_abs(&f64::NAN), false);
+/// assert_eq!(Natural::ZERO.eq_abs(&f64::INFINITY), false);
+/// assert_eq!(Natural::ZERO.eq_abs(&f64::NEGATIVE_INFINITY), false);
+///
+/// assert_eq!(123.0.eq_abs(&Natural::from(123u32)), true);
+/// assert_eq!(5.0.eq_abs(&Natural::from(123u32)), false);
+/// assert_eq!((-123.0).eq_abs(&Natural::from(123u32)), true);
+/// assert_eq!((-5.0).eq_abs(&Natural::from(123u32)), false);
+/// assert_eq!(0.0.eq_abs(&Natural::ZERO), true);
+/// assert_eq!((-0.0).eq_abs(&Natural::ZERO), true);
+/// assert_eq!(f64::NAN.eq_abs(&Natural::ZERO), false);
+/// assert_eq!(f64::INFINITY.eq_abs(&Natural::ZERO), false);
+/// assert_eq!(f64::NEGATIVE_INFINITY.eq_abs(&Natural::ZERO), false);
+/// ```
+pub mod eq_abs_primitive_float;
 /// Equality of the absolute values of a [`Natural`](crate::natural::Natural)s and a primitive
 /// integer.
 ///

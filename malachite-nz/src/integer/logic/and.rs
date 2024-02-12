@@ -12,8 +12,8 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
-// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
+// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by `y`
+// and whose other limbs are full of `true` bits. `xs` may not be empty.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -31,9 +31,9 @@ pub_test! {limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
-// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-// `y` and whose other limbs are full of `true` bits, to an output slice. `xs` may not be empty.
-// The output slice must be at least as long as the input slice.
+// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by `y`
+// and whose other limbs are full of `true` bits, to an output slice. `xs` may not be empty. The
+// output slice must be at least as long as the input slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -54,8 +54,8 @@ pub_test! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
-// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-// `y` and whose other limbs are full of `true` bits, to the input slice. `xs` may not be empty.
+// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by `y`
+// and whose other limbs are full of `true` bits, to the input slice. `xs` may not be empty.
 //
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -223,8 +223,8 @@ pub_test! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 // negative of another, writes the limbs of the bitwise and of the `Integer`s to an output slice.
 // `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
-// as the first input slice. `xs.len()` limbs will be written; if the number of significant limbs
-// of the result is lower, some of the written limbs will be zero.
+// as the first input slice. `xs.len()` limbs will be written; if the number of significant limbs of
+// the result is lower, some of the written limbs will be zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -315,9 +315,9 @@ pub_test! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 // negative of another, writes the lowest min(`xs.len()`, `ys.len()`) limbs of the bitwise and of
-// the `Integer`s to the second (right) slice. `xs` and `ys` may not be empty or only contain
-// zeros. If `ys` is shorter than `xs`, the result may be too long to fit in `ys`. The extra limbs
-// in this case are just `xs[ys.len()..]`.
+// the `Integer`s to the second (right) slice. `xs` and `ys` may not be empty or only contain zeros.
+// If `ys` is shorter than `xs`, the result may be too long to fit in `ys`. The extra limbs in this
+// case are just `xs[ys.len()..]`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -487,8 +487,8 @@ pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-// longer of `xs` and `ys`.
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the longer of
+// `xs` and `ys`.
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
@@ -569,8 +569,8 @@ pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros, or if `xs` is shorter than `ys`.
 //
-// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, both inputs
-// are negative, and the length of `op1` is not changed; instead, a carry is returned.
+// This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, both inputs are
+// negative, and the length of `op1` is not changed; instead, a carry is returned.
 pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -854,8 +854,8 @@ impl BitAnd<Integer> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -891,9 +891,8 @@ impl<'a> BitAnd<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -929,9 +928,8 @@ impl<'a> BitAnd<Integer> for &'a Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -967,8 +965,8 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1006,8 +1004,8 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 }
 
 impl BitAndAssign<Integer> for Integer {
-    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
-    /// the right-hand side by value.
+    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by value.
     ///
     /// $$
     /// x \gets x \wedge y.
@@ -1018,8 +1016,8 @@ impl BitAndAssign<Integer> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1047,8 +1045,8 @@ impl BitAndAssign<Integer> for Integer {
 }
 
 impl<'a> BitAndAssign<&'a Integer> for Integer {
-    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on
-    /// the right-hand side by reference.
+    /// Bitwise-ands an [`Integer`] with another [`Integer`] in place, taking the [`Integer`] on the
+    /// right-hand side by reference.
     ///
     /// $$
     /// x \gets x \wedge y.
@@ -1059,9 +1057,8 @@ impl<'a> BitAndAssign<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```

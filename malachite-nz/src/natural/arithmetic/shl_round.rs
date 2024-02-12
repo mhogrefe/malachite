@@ -1,11 +1,11 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
+use core::ops::{Shl, ShlAssign};
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
-use core::ops::{Shl, ShlAssign};
 
 fn shl_round_ref<'a, U, S: PrimitiveSigned + UnsignedAbs<Output = U>>(
     x: &'a Natural,
@@ -50,9 +50,9 @@ macro_rules! impl_natural_shl_round_signed {
             /// always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
-            /// if `bits` is negative.
+            /// To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -113,9 +113,9 @@ macro_rules! impl_natural_shl_round_signed {
             /// [`Ordering`] is always `Equal`, even if the higher bits of the result are lost.
             ///
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
-            /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be necessary
-            /// if `bits` is negative.
+            /// To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// Let $q = x2^k$, and let $g$ be the function that just returns the first element of
             /// the pair, without the [`Ordering`]:
@@ -171,10 +171,10 @@ macro_rules! impl_natural_shl_round_signed {
             /// indicating whether the assigned value is less than, equal to, or greater than the
             /// exact value.
             ///
-            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
-            /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
-            /// necessary if `bits` is negative.
+            /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
+            /// To test whether `RoundingMode::Exact` can be passed, use `bits > 0 ||
+            /// self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if `bits` is
+            /// negative.
             ///
             /// See the [`ShlRound`] documentation for details.
             ///

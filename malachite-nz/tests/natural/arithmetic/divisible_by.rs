@@ -74,23 +74,23 @@ fn test_limbs_divisible_by() {
 
         verify_limbs_divisible_by(ns, ds, divisible);
     };
-    // n_low & d_mask == 0
-    // d_len == 1
-    // d_len == 1 && n_len < BMOD_1_TO_MOD_1_THRESHOLD
+    // - n_low & d_mask == 0
+    // - d_len == 1
+    // - d_len == 1 && n_len < BMOD_1_TO_MOD_1_THRESHOLD
     test(&[6], &[2], true);
-    // n_low & d_mask != 0
+    // - n_low & d_mask != 0
     test(&[6], &[4], false);
-    // d_len != 1
-    // d_len != 2
-    // trailing_zeros == 0
-    // rs[n_len - 1] >= ds[d_len - 1]
-    // schoolbook
+    // - d_len != 1
+    // - d_len != 2
+    // - trailing_zeros == 0
+    // - rs[n_len - 1] >= ds[d_len - 1]
+    // - schoolbook
     test(&[1, 3, 6, 5, 3], &[1; 3], true);
     test(&[1, 3, 7, 5, 3], &[1; 3], false);
     test(&[6, 19, 32, 21], &[1, 2, 3], true);
-    // d_len == 2
-    // d_1 > d_mask
-    // trailing_zeros != 0
+    // - d_len == 2
+    // - d_1 > d_mask
+    // - trailing_zeros != 0
     test(&[6, 19, 32, 21], &[6, 7], true);
     test(&[10200, 20402, 30605, 20402, 10200], &[100, 101, 102], true);
     test(
@@ -111,14 +111,14 @@ fn test_limbs_divisible_by() {
         false,
     );
     test(&[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3], true);
-    // rs[n_len - 1] < ds[d_len - 1] && n_len == d_len
+    // - rs[n_len - 1] < ds[d_len - 1] && n_len == d_len
     test(&[0, 1], &[1, 2], false);
-    // rs[n_len - 1] < ds[d_len - 1] && n_len != d_len
+    // - rs[n_len - 1] < ds[d_len - 1] && n_len != d_len
     test(&[0, 0, 1], &[1, 2], false);
-    // d_1 <= d_mask
-    // d_len == 2 && n_len < BMOD_1_TO_MOD_1_THRESHOLD
+    // - d_1 <= d_mask
+    // - d_len == 2 && n_len < BMOD_1_TO_MOD_1_THRESHOLD
     test(&[0, 1], &[2, 1], false);
-    // d_len == 1 && n_len >= BMOD_1_TO_MOD_1_THRESHOLD
+    // - d_len == 1 && n_len >= BMOD_1_TO_MOD_1_THRESHOLD
     test(
         &[
             4217434641, 2983831158, 957997048, 1656831590, 3000005030, 3397493916, 1524177764,
@@ -136,7 +136,7 @@ fn test_limbs_divisible_by() {
         &[2987492981],
         false,
     );
-    // d_len == 2 && n_len >= BMOD_1_TO_MOD_1_THRESHOLD
+    // - d_len == 2 && n_len >= BMOD_1_TO_MOD_1_THRESHOLD
     test(
         &[
             256, 2983831158, 957997048, 1656831590, 3000005030, 3397493916, 1524177764, 1158142389,
@@ -154,7 +154,7 @@ fn test_limbs_divisible_by() {
         &[128, 10],
         false,
     );
-    // divide-and-conquer
+    // - divide-and-conquer
     test(
         &[
             2169104186, 2266546494, 587315734, 3739269241, 3114885960, 3686571368, 1230083221,
@@ -665,7 +665,7 @@ fn test_limbs_divisible_by() {
         ],
         false,
     );
-    // Barrett
+    // - Barrett
     test(&[8; 70000], &[3; 60000], false);
     test(&[9; 120000], &[3; 60000], true);
 }
@@ -860,7 +860,7 @@ fn test_divisible_by() {
         2133518716987668865936529827437388042190084309005369564717390726257594902619365180097509576\
         6240189037770619308206906414128686856349950952623970023039440323701643457411485666776354448\
         186307133288106956593939073729500658176632828099789",
-        true
+        true,
     );
     test(
         "851673906388325341550957943071111911557800036845129556099360938813259608650267079456739978\
@@ -888,7 +888,7 @@ fn test_divisible_by() {
         2133518716987668865936529827437388042190084309005369564717390726257594902619365180097509576\
         6240189037770619308206906414128686856349950952623970023039440323701643457411485666776354448\
         186307133288106956593939073729500658176632828099788",
-        false
+        false,
     );
     test("1", "94815577610368829905234938913859", false)
 }

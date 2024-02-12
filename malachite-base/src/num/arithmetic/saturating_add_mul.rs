@@ -16,8 +16,8 @@ macro_rules! impl_saturating_add_mul_unsigned {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Adds a number and the product of two other numbers, saturating at the numeric
-            /// bounds instead of overflowing.
+            /// Adds a number and the product of two other numbers, saturating at the numeric bounds
+            /// instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}
@@ -107,8 +107,8 @@ macro_rules! impl_saturating_add_mul_signed {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Adds a number and the product of two other numbers, saturating at the numeric
-            /// bounds instead of overflowing.
+            /// Adds a number and the product of two other numbers, saturating at the numeric bounds
+            /// instead of overflowing.
             ///
             /// $$
             /// f(x, y, z) = \\begin{cases}

@@ -10,8 +10,8 @@ impl DivRound<Integer> for Integer {
     /// to a specified rounding mode. An [`Ordering`] is also returned, indicating whether the
     /// returned value is less than, equal to, or greater than the exact value.
     ///
-    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
-    /// element of the pair, without the [`Ordering`]:
+    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
+    /// the pair, without the [`Ordering`]:
     ///
     /// $$
     /// g(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
@@ -44,8 +44,7 @@ impl DivRound<Integer> for Integer {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -153,8 +152,8 @@ impl<'a> DivRound<&'a Integer> for Integer {
     /// returned, indicating whether the returned value is less than, equal to, or greater than the
     /// exact value.
     ///
-    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
-    /// element of the pair, without the [`Ordering`]:
+    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
+    /// the pair, without the [`Ordering`]:
     ///
     /// $$
     /// g(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
@@ -187,8 +186,7 @@ impl<'a> DivRound<&'a Integer> for Integer {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -280,6 +278,7 @@ impl<'a> DivRound<&'a Integer> for Integer {
     ///     Integer::from(-14).div_round(&Integer::from(-4), RoundingMode::Nearest),
     ///     (Integer::from(4), Ordering::Greater)
     /// );
+    /// ```
     #[inline]
     fn div_round(mut self, other: &'a Integer, rm: RoundingMode) -> (Integer, Ordering) {
         let o = self.div_round_assign(other, rm);
@@ -295,8 +294,8 @@ impl<'a> DivRound<Integer> for &'a Integer {
     /// returned, indicating whether the returned value is less than, equal to, or greater than the
     /// exact value.
     ///
-    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
-    /// element of the pair, without the [`Ordering`]:
+    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
+    /// the pair, without the [`Ordering`]:
     ///
     /// $$
     /// g(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
@@ -329,8 +328,7 @@ impl<'a> DivRound<Integer> for &'a Integer {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$
@@ -437,11 +435,11 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     type Output = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and rounding
-    /// according to a specified rounding mode. An [`Ordering`] is also returned, indicating
-    /// whether the returned value is less than, equal to, or greater than the exact value.
+    /// according to a specified rounding mode. An [`Ordering`] is also returned, indicating whether
+    /// the returned value is less than, equal to, or greater than the exact value.
     ///
-    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first
-    /// element of the pair, without the [`Ordering`]:
+    /// Let $q = \frac{x}{y}$, and let $g$ be the function that just returns the first element of
+    /// the pair, without the [`Ordering`]:
     ///
     /// $$
     /// g(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.
@@ -474,8 +472,7 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     ///
     /// $g(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
     ///
-    /// Then
-    /// $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
+    /// Then $f(x, y, r) = (g(x, y, r), \operatorname{cmp}(g(x, y, r), q))$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log \log n)$

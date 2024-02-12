@@ -8,114 +8,114 @@ pub type FloatWithLimbWidth = f32;
 
 pub const MAX_DIGITS_PER_LIMB: usize = 10;
 
-//TODO tune
+// TODO tune
 pub const AORSMUL_FASTER_2AORSLSH: bool = true;
-//TODO tune
+// TODO tune
 pub const AORSMUL_FASTER_3AORSLSH: bool = true;
-//TODO tune
+// TODO tune
 pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
-//TODO tune
+// TODO tune
 pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
-//TODO tune
+// TODO tune
 pub const MUL_TOOM22_THRESHOLD: usize = 118;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM33_THRESHOLD: usize = 101;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM44_THRESHOLD: usize = 530;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM6H_THRESHOLD: usize = 738;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM8H_THRESHOLD: usize = 984;
 
-//TODO tune
+// TODO tune
 pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 315;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 307;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 328;
-//TODO tune
+// TODO tune
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 295;
 
-//TODO tune
+// TODO tune
 pub const MUL_FFT_THRESHOLD: usize = 5608;
 
-//TODO tune
+// TODO tune
 pub const DC_DIV_QR_THRESHOLD: usize = 7;
-//TODO tune
+// TODO tune
 pub const DC_DIVAPPR_Q_THRESHOLD: usize = 151;
-//TODO tune
+// TODO tune
 pub const MAYBE_DCP1_DIVAPPR: bool = true;
-//TODO tune
+// TODO tune
 pub const INV_NEWTON_THRESHOLD: usize = 618;
-//TODO tune
+// TODO tune
 pub const MU_DIV_QR_THRESHOLD: usize = 2243;
-//TODO tune
+// TODO tune
 pub const INV_MULMOD_BNM1_THRESHOLD: usize = 68;
-//TODO tune
+// TODO tune
 pub const MU_DIV_QR_SKEW_THRESHOLD: usize = 233;
 
-//TODO tune
+// TODO tune
 pub const MU_DIVAPPR_Q_THRESHOLD: usize = 2297;
-//TODO tune
+// TODO tune
 pub const FUDGE: usize = 261;
 
-//TODO tune
+// TODO tune
 pub const MULLO_BASECASE_THRESHOLD: usize = 0;
-//TODO tune
+// TODO tune
 pub const MULLO_DC_THRESHOLD: usize = 216;
-//TODO tune
+// TODO tune
 pub const MULLO_MUL_N_THRESHOLD: usize = 100000;
 
-//TODO tune
+// TODO tune
 pub const BINV_NEWTON_THRESHOLD: usize = 3264;
-//TODO tune
+// TODO tune
 pub const DC_BDIV_QR_THRESHOLD: usize = 329;
-//TODO tune
+// TODO tune
 pub const MU_BDIV_QR_THRESHOLD: usize = 50000;
-//TODO tune
+// TODO tune
 pub const DC_BDIV_Q_THRESHOLD: usize = 373;
-//TODO tune
+// TODO tune
 pub const MU_BDIV_Q_THRESHOLD: usize = 2390;
 
-//TODO tune
+// TODO tune
 pub const MOD_1_NORM_THRESHOLD: usize = 0;
-//TODO tune
+// TODO tune
 pub const MOD_1_UNNORM_THRESHOLD: usize = 0;
-//TODO tune
+// TODO tune
 pub const MOD_1_1P_METHOD: bool = true;
-//TODO tune
+// TODO tune
 pub const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
-//TODO tune
+// TODO tune
 pub const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 3;
-//TODO tune
+// TODO tune
 pub const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 15;
-//TODO tune
+// TODO tune
 pub const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 43;
 
-//TODO tune
+// TODO tune
 pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = 31;
 
-//TODO tune
+// TODO tune
 pub const SQR_BASECASE_THRESHOLD: usize = 0;
-//TODO tune
+// TODO tune
 pub const SQR_TOOM2_THRESHOLD: usize = 222;
-//TODO tune
+// TODO tune
 pub const SQR_TOOM3_THRESHOLD: usize = 205;
-//TODO tune
+// TODO tune
 pub const SQR_TOOM4_THRESHOLD: usize = 1170;
-//TODO tune
+// TODO tune
 pub const SQR_TOOM6_THRESHOLD: usize = 512;
-//TODO tune
+// TODO tune
 pub const SQR_TOOM8_THRESHOLD: usize = 644;
 
-//TODO tune
+// TODO tune
 pub const SQRLO_DC_THRESHOLD: usize = 460;
 
-//TODO tune
+// TODO tune
 pub const FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 12000;
 
-//TODO tune
+// TODO tune
 pub const MATRIX22_STRASSEN_THRESHOLD: usize = 50;
 
 // This section is created by digits_data.rs.
@@ -453,8 +453,8 @@ pub const ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE: [Limb; 11] = [
 
 // This table contains the values t in the formula binomial(2k, k) / 2 ^ t.
 //
-// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and
-// `CENTRAL_BINOMIAL_2FAC_TABLE` from `fac_table.h`, GMP 6.2.1.
+// This is equivalent to `fac2bin` in `mpz/bin_uiui.c`, GMP 6.2.1, and `CENTRAL_BINOMIAL_2FAC_TABLE`
+// from `fac_table.h`, GMP 6.2.1.
 pub const CENTRAL_BINOMIAL_2FAC_TABLE: [u64; 11] = [1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2];
 
 // https://oeis.org/A005187, skipping the initial 0

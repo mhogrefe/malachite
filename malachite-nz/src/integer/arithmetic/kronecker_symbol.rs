@@ -104,15 +104,14 @@ pub_crate_test! {
     xs = &xs[slice_leading_zeros(xs)..];
     xs_len = xs.len();
     let mut x_lo = xs[0];
-    // Ensure xs_len >= ys_len. Take advantage of the generalized reciprocity law:
-    // (x / y * 2 ^ n) = (y * 2 ^ n / x) * recip(x, y)
+    // Ensure xs_len >= ys_len. Take advantage of the generalized reciprocity law: (x / y * 2 ^ n) =
+    // (y * 2 ^ n / x) * recip(x, y)
     if xs_len < ys_len {
         swap(&mut xs, &mut ys);
         swap(&mut xs_len, &mut ys_len);
         swap(&mut x_lo, &mut y_lo);
-        // The value of x_lo (old y_lo) is a bit subtle. For this code path, we get x_lo as the
-        // low, always odd, limb of shifted x. Which is what we need for the reciprocity update
-        // below.
+        // The value of x_lo (old y_lo) is a bit subtle. For this code path, we get x_lo as the low,
+        // always odd, limb of shifted x. Which is what we need for the reciprocity update below.
         //
         // However, all other uses of x_lo assumes that it is *not* shifted. Luckily, x_lo matters
         // only when either
@@ -164,8 +163,8 @@ pub_crate_test! {
         }
     ];
     let (mut xs_alt, mut ys_alt) = scratch.split_at_mut(ys_len);
-    // In the case of even y, we conceptually shift out the powers of two first, and then divide
-    // x % y. Hence, when taking those powers of two into account, we must use alow *before* the
+    // In the case of even y, we conceptually shift out the powers of two first, and then divide x %
+    // y. Hence, when taking those powers of two into account, we must use alow *before* the
     // division. Doing the actual division first is ok, because the point is to remove multiples of
     // y from x, and multiples of 2 ^ k y are good enough.
     if xs_len > ys_len {
@@ -206,8 +205,8 @@ impl LegendreSymbol<Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -247,8 +246,8 @@ impl<'a> LegendreSymbol<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -288,8 +287,8 @@ impl<'a> LegendreSymbol<Integer> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -328,8 +327,8 @@ impl<'a, 'b> LegendreSymbol<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -365,8 +364,8 @@ impl JacobiSymbol<Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -405,8 +404,8 @@ impl<'a> JacobiSymbol<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -433,8 +432,8 @@ impl<'a> JacobiSymbol<&'a Integer> for Integer {
 }
 
 impl<'a> JacobiSymbol<Integer> for &'a Integer {
-    /// Computes the Jacobi symbol of two [`Integer`]s, taking the first by reference and the
-    /// second by value.
+    /// Computes the Jacobi symbol of two [`Integer`]s, taking the first by reference and the second
+    /// by value.
     ///
     /// $$
     /// f(x, y) = \left ( \frac{x}{y} \right ).
@@ -445,8 +444,8 @@ impl<'a> JacobiSymbol<Integer> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -484,8 +483,8 @@ impl<'a, 'b> JacobiSymbol<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is negative or if `other` is even.
@@ -523,8 +522,8 @@ impl KroneckerSymbol<Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -561,8 +560,8 @@ impl<'a> KroneckerSymbol<&'a Integer> for Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -599,8 +598,8 @@ impl<'a> KroneckerSymbol<Integer> for &'a Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -636,8 +635,8 @@ impl<'a, 'b> KroneckerSymbol<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

@@ -37,7 +37,24 @@
 /// assert_eq!(NiceFloat(x), NiceFloat(100.0));
 /// ```
 pub mod abs;
-
+/// [`AbsDiff`](traits::AbsDiff) and [`AbsDiffAssign`](traits::AbsDiffAssign), traits for getting
+/// the absolute value of the difference between two numbers.
+///
+/// # abs_diff
+/// ```
+/// assert_eq!(10u8.abs_diff(20u8), 10u8);
+/// assert_eq!(10i8.abs_diff(-10i8), 20u8);
+/// ```
+///
+/// # abs_diff_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AbsDiffAssign;
+///
+/// let mut x = 10u8;
+/// x.abs_diff_assign(20u8);
+/// assert_eq!(x, 10);
+/// ```
+pub mod abs_diff;
 /// [`AddMul`](traits::AddMul) and [`AddMulAssign`](traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 ///
@@ -136,9 +153,8 @@ pub mod arithmetic_checked_shl;
 pub mod arithmetic_checked_shr;
 /// Traits for computing the binomial coefficient of two numbers. There is a trait whose
 /// implementations panic if the result cannot be represented, and a checked trait whose
-/// implementations return `None` in that case:
-/// [`BinomialCoefficient`](traits::BinomialCoefficient) and
-/// [`CheckedBinomialCoefficient`](traits::CheckedBinomialCoefficient).
+/// implementations return `None` in that case: [`BinomialCoefficient`](traits::BinomialCoefficient)
+/// and [`CheckedBinomialCoefficient`](traits::CheckedBinomialCoefficient).
 ///
 /// # binomial_coefficient
 /// ```
@@ -214,20 +230,20 @@ pub mod checked_add_mul;
 /// [`CheckedDiv`](traits::CheckedDiv), a trait for dividing two numbers and checking whether the
 /// result is representable.
 pub mod checked_div;
-/// [`CheckedMul`](traits::CheckedMul), a trait for multiplying two numbers and checking whether
-/// the result is representable.
+/// [`CheckedMul`](traits::CheckedMul), a trait for multiplying two numbers and checking whether the
+/// result is representable.
 pub mod checked_mul;
 /// [`CheckedNeg`](traits::CheckedNeg), a trait for negating a number and checking whether the
 /// result is representable.
 pub mod checked_neg;
-/// [`CheckedNextPowerOf2`](traits::CheckedNextPowerOf2), a trait for getting the next-highest
-/// power of 2, if it's representable.
+/// [`CheckedNextPowerOf2`](traits::CheckedNextPowerOf2), a trait for getting the next-highest power
+/// of 2, if it's representable.
 pub mod checked_next_power_of_2;
 /// [`CheckedPow`](traits::CheckedPow), a trait for raising a number to the power of a [`u64`] and
 /// checking whether the result is representable.
 pub mod checked_pow;
-/// [`CheckedSquare`](traits::CheckedSquare), a trait for squaring a number and checking whether
-/// the result is representable.
+/// [`CheckedSquare`](traits::CheckedSquare), a trait for squaring a number and checking whether the
+/// result is representable.
 ///
 /// # checked_square
 /// ```
@@ -238,8 +254,8 @@ pub mod checked_pow;
 /// assert_eq!((1000u16).checked_square(), None);
 /// ```
 pub mod checked_square;
-/// [`CheckedSub`](traits::CheckedSub), a trait for subtracting two numbers and checking whether
-/// the result is representable.
+/// [`CheckedSub`](traits::CheckedSub), a trait for subtracting two numbers and checking whether the
+/// result is representable.
 pub mod checked_sub;
 /// [`CheckedSubMul`](traits::CheckedSubMul), a trait for subtracting the product of two numbers
 /// from another number, and checking whether the result is representable.
@@ -310,12 +326,12 @@ pub mod div_exact;
 /// | towards $\infty$  | [`CeilingDivMod`](traits::CeilingDivMod) | [`CeilingDivAssignMod`](traits::CeilingDivAssignMod) |
 /// | towards $\infty$  | [`CeilingDivNegMod`](traits::CeilingDivNegMod) | [`CeilingDivAssignNegMod`](traits::CeilingDivAssignNegMod) |
 ///
-/// [`CeilingDivMod`](traits::CeilingDivMod) and [`CeilingDivNegMod`](traits::CeilingDivNegMod)
-/// are similar. The difference is that [`CeilingDivMod`](traits::CeilingDivMod) returns a
-/// remainder less than or equal to 0, so that the usual relation $x = qy + r$ is satisfied, while
+/// [`CeilingDivMod`](traits::CeilingDivMod) and [`CeilingDivNegMod`](traits::CeilingDivNegMod) are
+/// similar. The difference is that [`CeilingDivMod`](traits::CeilingDivMod) returns a remainder
+/// less than or equal to 0, so that the usual relation $x = qy + r$ is satisfied, while
 /// [`CeilingDivNegMod`](traits::CeilingDivNegMod) returns a remainder greater than or equal to
-/// zero. This allows the remainder to have an unsigned type, but modifies the relation to
-/// $x = qy - r$.
+/// zero. This allows the remainder to have an unsigned type, but modifies the relation to $x = qy
+/// - r$.
 ///
 /// # div_mod
 /// ```
@@ -628,8 +644,8 @@ pub mod div_mod;
 /// assert_eq!(x, 4);
 /// ```
 pub mod div_round;
-/// [`DivisibleBy`](traits::DivisibleBy), a trait for determining whether one number is divisible
-/// by another.
+/// [`DivisibleBy`](traits::DivisibleBy), a trait for determining whether one number is divisible by
+/// another.
 ///
 /// # divisible_by
 /// ```
@@ -660,8 +676,8 @@ pub mod divisible_by;
 /// assert_eq!(96i32.divisible_by_power_of_2(6), false);
 /// ```
 pub mod divisible_by_power_of_2;
-/// [`EqMod`](traits::EqMod), a trait for determining whether one number is equal by another
-/// modulo a third.
+/// [`EqMod`](traits::EqMod), a trait for determining whether one number is equal by another modulo
+/// a third.
 ///
 /// # eq_mod
 /// ```
@@ -672,8 +688,8 @@ pub mod divisible_by_power_of_2;
 /// assert_eq!((-123i64).eq_mod(278, 100), false);
 /// ```
 pub mod eq_mod;
-/// [`EqModPowerOf2`](traits::EqModPowerOf2), a trait for determining whether one number is equal
-/// to another modulo $2^k$.
+/// [`EqModPowerOf2`](traits::EqModPowerOf2), a trait for determining whether one number is equal to
+/// another modulo $2^k$.
 ///
 /// # eq_mod_power_of_2
 /// ```
@@ -684,8 +700,8 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
-/// [`ExtendedGcd`](traits::ExtendedGcd), a trait for computing the GCD (greatest common divisor)
-/// of two numbers as well as the coefficients of Bézout's identity $ax+by=\gcd(a,b)$.
+/// [`ExtendedGcd`](traits::ExtendedGcd), a trait for computing the GCD (greatest common divisor) of
+/// two numbers as well as the coefficients of Bézout's identity $ax+by=\gcd(a,b)$.
 ///
 /// # extended_gcd
 /// ```
@@ -914,8 +930,8 @@ pub mod floor;
 /// assert_eq!(x, 6);
 /// ```
 pub mod gcd;
-/// [`IsPowerOf2`](traits::IsPowerOf2), a trait for determining whether a number is an integer
-/// power of 2.
+/// [`IsPowerOf2`](traits::IsPowerOf2), a trait for determining whether a number is an integer power
+/// of 2.
 ///
 /// # is_power_of_2
 /// ```
@@ -1312,11 +1328,11 @@ pub mod mod_neg;
 /// | towards $\infty$  | [`CeilingMod`](traits::CeilingMod) | [`CeilingModAssign`](traits::CeilingModAssign) |
 /// | towards $\infty$  | [`NegMod`](traits::NegMod) | [`NegModAssign`](traits::NegModAssign) |
 ///
-/// [`CeilingMod`](traits::CeilingMod) and [`NegMod`](traits::NegMod) are similar. The difference
-/// is that [`CeilingMod`](traits::CeilingMod) returns a remainder less than or equal to 0, so that
-/// the usual relation $x = qy + r$ is satisfied, while [`NegMod`](traits::NegMod) returns a
-/// remainder greater than or equal to zero. This allows the remainder to have an unsigned type,
-/// but modifies the relation to $x = qy - r$.
+/// [`CeilingMod`](traits::CeilingMod) and [`NegMod`](traits::NegMod) are similar. The difference is
+/// that [`CeilingMod`](traits::CeilingMod) returns a remainder less than or equal to 0, so that the
+/// usual relation $x = qy + r$ is satisfied, while [`NegMod`](traits::NegMod) returns a remainder
+/// greater than or equal to zero. This allows the remainder to have an unsigned type, but modifies
+/// the relation to $x = qy - r$.
 ///
 /// The [`Rem`](std::ops::Rem) trait in the standard library rounds towards 0.
 ///
@@ -1559,8 +1575,7 @@ pub mod mod_pow;
 /// [`CeilingModPowerOf2`](traits::CeilingModPowerOf2) returns a remainder less than or equal to 0,
 /// so that the usual relation $x = q2^k + r$ is satisfied, while
 /// [`NegModPowerOf2`](traits::NegModPowerOf2) returns a remainder greater than or equal to zero.
-/// This allows the remainder to have an unsigned type, but modifies the relation to
-/// $x = q2^k - r$.
+/// This allows the remainder to have an unsigned type, but modifies the relation to $x = q2^k - r$.
 ///
 /// # mod_power_of_2
 /// ```
@@ -1735,8 +1750,8 @@ pub mod mod_power_of_2_add;
 /// assert_eq!(123u32.mod_power_of_2_inverse(7), Some(51));
 /// ```
 pub mod mod_power_of_2_inverse;
-/// [`ModPowerOf2IsReduced`](traits::ModPowerOf2IsReduced), a trait for checking whether a number
-/// is reduced modulo $2^k$.
+/// [`ModPowerOf2IsReduced`](traits::ModPowerOf2IsReduced), a trait for checking whether a number is
+/// reduced modulo $2^k$.
 ///
 /// # mod_power_of_2_is_reduced
 /// ```
@@ -1828,8 +1843,8 @@ pub mod mod_power_of_2_neg;
 /// ```
 pub mod mod_power_of_2_pow;
 /// [`ModPowerOf2Shl`](traits::ModPowerOf2Shl) and
-/// [`ModPowerOf2ShlAssign`](traits::ModPowerOf2ShlAssign), traits for left-shifting a number
-/// modulo $2^k$.
+/// [`ModPowerOf2ShlAssign`](traits::ModPowerOf2ShlAssign), traits for left-shifting a number modulo
+/// $2^k$.
 ///
 /// # mod_power_of_2_shl
 /// ```
@@ -1973,8 +1988,8 @@ pub mod mod_power_of_2_sub;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shl;
-/// [`ModShr`](traits::ModShr) and [`ModShrAssign`](traits::ModShrAssign), traits for
-/// right-shifting a number modulo another number.
+/// [`ModShr`](traits::ModShr) and [`ModShrAssign`](traits::ModShrAssign), traits for right-shifting
+/// a number modulo another number.
 ///
 /// # mod_shr
 /// ```
@@ -2142,8 +2157,8 @@ pub mod neg;
 /// ```
 pub mod next_power_of_2;
 /// [`OverflowingAbs`](traits::OverflowingAbs) and
-/// [`OverflowingAbsAssign`](traits::OverflowingAbsAssign), traits for taking the absolute value
-/// of a number and returning a boolean indicating whether an overflow occurred.
+/// [`OverflowingAbsAssign`](traits::OverflowingAbsAssign), traits for taking the absolute value of
+/// a number and returning a boolean indicating whether an overflow occurred.
 ///
 /// # overflowing_abs_assign
 /// ```
@@ -2347,9 +2362,9 @@ pub mod overflowing_square;
 /// ```
 pub mod overflowing_sub;
 /// [`OverflowingSubMul`](traits::OverflowingSubMul) and
-/// [`OverflowingSubMulAssign`](traits::OverflowingSubMulAssign), traits for subtracting the
-/// product of two other numbers from a number and returning a boolean indicating whether an
-/// overflow occurred.
+/// [`OverflowingSubMulAssign`](traits::OverflowingSubMulAssign), traits for subtracting the product
+/// of two other numbers from a number and returning a boolean indicating whether an overflow
+/// occurred.
 ///
 /// # overflowing_sub_mul
 /// ```
@@ -2965,8 +2980,8 @@ pub mod saturating_abs;
 /// ```
 pub mod saturating_add;
 /// [`SaturatingAddMul`](traits::SaturatingAddMul) and
-/// [`SaturatingAddMulAssign`](traits::SaturatingAddMulAssign), traits for adding the product of
-/// two numbers to a number and saturating at numeric bounds instead of overflowing.
+/// [`SaturatingAddMulAssign`](traits::SaturatingAddMulAssign), traits for adding the product of two
+/// numbers to a number and saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_add_mul
 /// ```
@@ -3043,8 +3058,8 @@ pub mod saturating_mul;
 /// ```
 pub mod saturating_neg;
 /// [`SaturatingPow`](traits::SaturatingPow) and
-/// [`SaturatingPowAssign`](traits::SaturatingPowAssign), traits for raising a number to a power
-/// and saturating at numeric bounds instead of overflowing.
+/// [`SaturatingPowAssign`](traits::SaturatingPowAssign), traits for raising a number to a power and
+/// saturating at numeric bounds instead of overflowing.
 ///
 /// # saturating_pow_assign
 /// ```
@@ -3854,8 +3869,8 @@ pub mod xx_sub_yy_to_zz;
 /// );
 /// ```
 pub mod xxx_add_yyy_to_zzz;
-/// [`XXXSubYYYToZZZ`](traits::XXXSubYYYToZZZ), a trait for subtracting two triple-width numbers
-/// and returning the result as a triple-width number.
+/// [`XXXSubYYYToZZZ`](traits::XXXSubYYYToZZZ), a trait for subtracting two triple-width numbers and
+/// returning the result as a triple-width number.
 ///
 /// # xxx_sub_yyy_to_zzz
 /// ```
@@ -3871,8 +3886,8 @@ pub mod xxx_add_yyy_to_zzz;
 /// );
 /// ```
 pub mod xxx_sub_yyy_to_zzz;
-/// [`XXXXAddYYYYToZZZZ`](traits::XXXXAddYYYYToZZZZ), a trait for adding two quadruple-width
-/// numbers and returning the result as a quadruple-width number.
+/// [`XXXXAddYYYYToZZZZ`](traits::XXXXAddYYYYToZZZZ), a trait for adding two quadruple-width numbers
+/// and returning the result as a quadruple-width number.
 ///
 /// # xxxx_add_yyyy_to_zzzz
 /// ```

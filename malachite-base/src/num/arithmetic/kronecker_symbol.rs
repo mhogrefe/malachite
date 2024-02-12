@@ -34,11 +34,10 @@ pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: 
     }
 }}
 
-// Computes (a / b) where b is odd, and a and b are otherwise arbitrary
-// two-limb numbers.
+// Computes (a / b) where b is odd, and a and b are otherwise arbitrary two-limb numbers.
 //
-// This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where
-// `JACOBI_2_METHOD == 2` and `bit` is 0.
+// This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where `JACOBI_2_METHOD ==
+// 2` and `bit` is 0.
 pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
     mut x_1: T,
     mut x_0: T,
@@ -434,8 +433,8 @@ macro_rules! impl_jacobi_symbol_unsigned {
         ///
         /// $M(n) = O(n)$
         ///
-        /// where $T$ is time, $M$ is additional memory, and $n$ is
-        /// `max(self.significant_bits(), other.significant_bits())`.
+        /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+        /// other.significant_bits())`.
         ///
         /// # Panics
         /// Panics if `n` is even or negative.
@@ -468,8 +467,8 @@ impl JacobiSymbol<u128> for u128 {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// See [here](super::kronecker_symbol#jacobi_symbol).

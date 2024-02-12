@@ -11,8 +11,8 @@ impl Float {
     /// Raises 2 to an integer power, returning a [`Float`] with the specified precision.
     ///
     /// If you need a [`Float`] with precision 1, then the
-    /// [`PowerOfTwo`](malachite_base::num::arithmetic::traits::PowerOf2) implementation may be
-    /// used instead.
+    /// [`PowerOfTwo`](malachite_base::num::arithmetic::traits::PowerOf2) implementation may be used
+    /// instead.
     ///
     /// $f(k) = 2^k$,
     ///

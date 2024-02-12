@@ -165,15 +165,14 @@ fn from_string_base_helper(base: u8, s: &str) {
     let with_zero = "0".to_string() + s;
     assert_eq!(Natural::from_string_base(base, &with_zero).unwrap(), n);
 
-    if let Ok(base) = u32::try_from(base) {
-        assert_eq!(BigUint::from_str_radix(s, base).unwrap(), BigUint::from(&n));
-    }
-    if let Ok(base) = i32::try_from(base) {
-        assert_eq!(
-            rug::Integer::from_str_radix(s, base).unwrap(),
-            rug::Integer::from(&n)
-        );
-    }
+    assert_eq!(
+        BigUint::from_str_radix(s, u32::from(base)).unwrap(),
+        BigUint::from(&n)
+    );
+    assert_eq!(
+        rug::Integer::from_str_radix(s, i32::from(base)).unwrap(),
+        rug::Integer::from(&n)
+    );
 }
 
 #[test]

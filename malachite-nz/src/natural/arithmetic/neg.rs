@@ -2,9 +2,9 @@ use crate::integer::Integer;
 use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-use core::ops::Neg;
 
 // This is equivalent to `mpn_neg` from `gmp.h`, GMP 6.2.1.
 pub(crate) fn limbs_neg(out: &mut [Limb], xs: &[Limb]) -> bool {

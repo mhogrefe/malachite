@@ -1,9 +1,9 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::Rational;
-use std::cmp::Ordering;
 
 pub fn float_partial_cmp_rational_alt(x: &Float, other: &Rational) -> Option<Ordering> {
     match (x, other) {
@@ -47,16 +47,16 @@ impl PartialOrd<Rational> for Float {
     /// Compares a [`Float`] to a [`Rational`].
     ///
     /// NaN is not comparable to any [`Rational`]. Infinity is greater than any [`Rational`], and
-    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are
-    /// equal to the [`Rational`] zero.
+    /// negative infinity is less. Both the [`Float`] zero and the [`Float`] negative zero are equal
+    /// to the [`Rational`] zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -146,8 +146,8 @@ impl PartialOrd<Float> for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

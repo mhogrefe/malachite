@@ -231,16 +231,16 @@ impl<T, U: OverflowingFrom<T>> OverflowingInto<U> for T {
     }
 }
 
-/// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
-/// value is less than, equal to, or greater than the original value.
+/// Converts a value from one type to another, where the conversion is made according to a specified
+/// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned value is
+/// less than, equal to, or greater than the original value.
 pub trait RoundingFrom<T>: Sized {
     fn rounding_from(value: T, rm: RoundingMode) -> (Self, Ordering);
 }
 
-/// Converts a value from one type to another, where the conversion is made according to a
-/// specified [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned
-/// value is less than, equal to, or greater than the original value.
+/// Converts a value from one type to another, where the conversion is made according to a specified
+/// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the returned value is
+/// less than, equal to, or greater than the original value.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when [`RoundingFrom`] is implemented.
@@ -269,8 +269,8 @@ pub trait HasHalf {
     type Half;
 }
 
-/// Provides a function to join two pieces into a number. For example, two [`u32`]s may be joined
-/// to form a [`u64`].
+/// Provides a function to join two pieces into a number. For example, two [`u32`]s may be joined to
+/// form a [`u64`].
 pub trait JoinHalves: HasHalf {
     /// Joins two values into a single value; the upper, or most-significant, half comes first.
     fn join_halves(upper: Self::Half, lower: Self::Half) -> Self;

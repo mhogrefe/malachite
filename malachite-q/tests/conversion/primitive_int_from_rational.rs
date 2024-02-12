@@ -315,7 +315,7 @@ where
         }
     });
 
-    //TODO use range
+    // TODO use range
     rational_gen_var_3().test_properties(|x| {
         if x < T::MIN || x > T::MAX {
             return;

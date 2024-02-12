@@ -1,7 +1,7 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
+use core::cmp::max;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::cmp::max;
 
 impl Float {
     /// Determines a [`Float`]'s complexity. The complexity is defined as follows:

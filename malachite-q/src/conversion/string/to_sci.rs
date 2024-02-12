@@ -1,5 +1,8 @@
 use crate::arithmetic::log_base::log_base_helper;
 use crate::Rational;
+use alloc::string::String;
+use core::cmp::{max, Ordering};
+use core::fmt::{Formatter, Write};
 use malachite_base::num::arithmetic::traits::{
     Abs, CheckedLogBase2, DivExact, DivExactAssign, DivRound, DivisibleBy, Pow, Sign,
 };
@@ -11,8 +14,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::{max, Ordering};
-use std::fmt::{Formatter, Write};
 
 const BASE_PRIME_FACTORS: [[(u8, u8); 3]; 37] = [
     [(0, 0), (0, 0), (0, 0)],
@@ -154,7 +155,7 @@ pub_test! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
     }
 }}
 
-fn fmt_zero(f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
+fn fmt_zero(f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
     f.write_char('0')?;
     let scale = if options.get_include_trailing_zeros() {
         match options.get_size_options() {
@@ -196,14 +197,13 @@ impl ToSci for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), s)`, where `s` depends on the size type specified in
-    /// `options`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), s)`,
+    /// where `s` depends on the size type specified in `options`.
     /// - If `options` has `scale` specified, then `s` is `options.scale`.
     /// - If `options` has `precision` specified, then `s` is `options.precision`.
-    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log
-    ///   of the denominator!). This reflects the fact that setting `size_complete` might result in
-    ///   a very long string.
+    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log of
+    ///   the denominator!). This reflects the fact that setting `size_complete` might result in a
+    ///   very long string.
     ///
     /// # Examples
     /// ```
@@ -265,14 +265,13 @@ impl ToSci for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), s)`, where `s` depends on the size type specified in
-    /// `options`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), s)`,
+    /// where `s` depends on the size type specified in `options`.
     /// - If `options` has `scale` specified, then `s` is `options.scale`.
     /// - If `options` has `precision` specified, then `s` is `options.precision`.
-    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log
-    ///   of the denominator!). This reflects the fact that setting `size_complete` might result in
-    ///   a very long string.
+    /// - If `options` has `size_complete` specified, then `s` is `self.denominator` (not the log of
+    ///   the denominator!). This reflects the fact that setting `size_complete` might result in a
+    ///   very long string.
     ///
     /// # Panics
     /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the input
@@ -336,7 +335,7 @@ impl ToSci for Rational {
     /// options.set_size_complete();
     /// assert_eq!(q.to_sci_with_options(options).to_string(), "9.31322574615478515625e-10");
     /// ```
-    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
+    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
         if *self == 0u32 {
             return fmt_zero(f, options);
         }

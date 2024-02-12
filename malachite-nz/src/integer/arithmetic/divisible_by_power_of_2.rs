@@ -16,8 +16,7 @@ impl<'a> DivisibleByPowerOf2 for &'a Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(pow, self.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(pow, self.significant_bits())`.
     ///
     /// # Examples
     /// ```

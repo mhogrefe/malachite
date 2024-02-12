@@ -701,8 +701,8 @@ impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
 }
 
 impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
-    /// Iterate through the base-$2^k$ digits of a [`Natural`] in descending order
-    /// (most-significant first).
+    /// Iterate through the base-$2^k$ digits of a [`Natural`] in descending order (most-significant
+    /// first).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

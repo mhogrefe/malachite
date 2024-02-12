@@ -54,14 +54,14 @@ impl BitDistributorOutputType {
 /// it's repeatedly incremented, it eventually takes on every 64-bit value.
 ///
 /// `output_types` is a list of $n$ configuration structs that, together, specify how to generate an
-/// n-element tuple of unsigned integers. Calling `get_output` repeatedly, passing in 0 through
-/// $n - 1$ as `index`, distributes the bits of `counter` into a tuple.
+/// n-element tuple of unsigned integers. Calling `get_output` repeatedly, passing in 0 through $n -
+/// 1$ as `index`, distributes the bits of `counter` into a tuple.
 ///
 /// This is best shown with an example. If `output_types` is set to
 /// `[BitDistributorOutputType::normal(1); 2]`, the distributor will generate all pairs of unsigned
 /// integers. A pair may be extracted by calling `get_output(0)` and `get_output(1)`; then `counter`
-/// may be incremented to create the next pair. In this case, the pairs will be
-/// $(0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 0), (2, 1), \ldots$.
+/// may be incremented to create the next pair. In this case, the pairs will be $(0, 0), (0, 1), (1,
+/// 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 0), (2, 1), \ldots$.
 ///
 /// If you think of these pairs as coordinates in the $xy$-plane, they are traversed along a
 /// [Z-order curve](https://en.wikipedia.org/wiki/Z-order_curve). Every pair of unsigned integers
@@ -71,11 +71,11 @@ impl BitDistributorOutputType {
 /// $n$-tuples. The elements of the tuples will be very roughly the same size, in the sense that
 /// each element will grow as $O(\sqrt\[n\]{i})$, where $i$ is the counter. Sometimes we want the
 /// elements to grow at different rates. To accomplish this, we can change the weights of the output
-/// types. For example, if we set `output_types` to
-/// `[BitDistributorOutputType::normal(1), BitDistributorOutputType::normal(2)]`, the first element
-/// of the generated pairs will grow as $O(\sqrt\[3\]{i})$ and the second as $O(i^{2/3})$. In
-/// general, if the weights are $w_0, w_1, \\ldots, w_{n-1}$, then the $k$th element of the output
-/// tuples will grow as $O(i^{w_i/\sum_{j=0}^{n-1}w_j})$.
+/// types. For example, if we set `output_types` to `[BitDistributorOutputType::normal(1),
+/// BitDistributorOutputType::normal(2)]`, the first element of the generated pairs will grow as
+/// $O(\sqrt\[3\]{i})$ and the second as $O(i^{2/3})$. In general, if the weights are $w_0, w_1,
+/// \\ldots, w_{n-1}$, then the $k$th element of the output tuples will grow as
+/// $O(i^{w_i/\sum_{j=0}^{n-1}w_j})$.
 ///
 /// Apart from creating _normal_ output types with different weights, we can create _tiny_ output
 /// types, which indicate that the corresponding tuple element should grow especially slowly. If
@@ -138,8 +138,8 @@ impl BitDistributor {
     ///
     /// The bit map determines which output gets each bit of the counter. For example, if the bit
     /// map is $[0, 1, 0, 1, 0, 1, \ldots]$, then the first element of the output pair gets the bits
-    /// with indices $0, 2, 4, \ldots$ and the second element gets the bits with indices
-    /// $1, 3, 5, \ldots$.
+    /// with indices $0, 2, 4, \ldots$ and the second element gets the bits with indices $1, 3, 5,
+    /// \ldots$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

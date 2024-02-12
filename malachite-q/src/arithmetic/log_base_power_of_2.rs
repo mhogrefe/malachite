@@ -1,10 +1,10 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, DivMod,
     DivRound, FloorLogBase2, FloorLogBasePowerOf2, Sign,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 impl<'a> FloorLogBasePowerOf2<i64> for &'a Rational {
     type Output = i64;

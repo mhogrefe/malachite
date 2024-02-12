@@ -1048,7 +1048,7 @@ pub fn random_primitive_int_pair_gen_var_1<T: PrimitiveInt>(_config: &GenConfig)
     )))
 }
 
-//TODO make better
+// TODO make better
 pub fn random_primitive_int_pair_gen_var_2<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
     Box::new(
         random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED)).map(|(x, y)| {

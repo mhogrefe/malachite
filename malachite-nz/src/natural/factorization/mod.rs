@@ -1,5 +1,5 @@
-/// An implementation of [`Primes`](malachite_base::num::factorization::traits::Primes), a trait
-/// for generating prime numbers.
+/// An implementation of [`Primes`](malachite_base::num::factorization::traits::Primes), a trait for
+/// generating prime numbers.
 ///
 /// # primes_less_than
 /// ```

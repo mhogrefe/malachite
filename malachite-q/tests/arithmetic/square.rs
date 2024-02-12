@@ -49,7 +49,7 @@ fn square_properties() {
             assert_eq!(square.cmp_abs(&x), x.partial_cmp_abs(&1).unwrap());
         }
 
-        //TODO assert_eq!(square.checked_sqrt(), Some(x.abs()));
+        // TODO assert_eq!(square.checked_sqrt(), Some(x.abs()));
     });
 
     rational_pair_gen().test_properties(|(x, y)| {

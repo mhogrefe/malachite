@@ -1,10 +1,10 @@
 use crate::Rational;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct NaturalFromRationalError;
@@ -185,8 +185,8 @@ impl RoundingFrom<Rational> for Natural {
 
 impl<'a> RoundingFrom<&'a Rational> for Natural {
     /// Converts a [`Rational`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
-    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
-    /// returned value is less than, equal to, or greater than the original value.
+    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the returned
+    /// value is less than, equal to, or greater than the original value.
     ///
     /// If the [`Rational`] is negative, then it will be rounded to zero when the [`RoundingMode`]
     /// is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will panic.

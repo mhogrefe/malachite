@@ -1,14 +1,14 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
-use std::cmp::Ordering;
 
 impl Sign for Float {
     /// Returns the sign of a [`Float`].
     ///
     /// Returns `Greater` if the sign is positive and `Less` if the sign is negative. Never returns
-    /// `Equal`. Positive infinity and positive zero have a positive sign, and negative infinity
-    /// and negative zero have a negative sign.
+    /// `Equal`. Positive infinity and positive zero have a positive sign, and negative infinity and
+    /// negative zero have a negative sign.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

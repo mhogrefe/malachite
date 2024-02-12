@@ -194,8 +194,8 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
         impl CheckedLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
-            /// Returns the base-$2^k$ logarithm of a positive float. If the float is not a power
-            /// of $2^k$, `None` is returned.
+            /// Returns the base-$2^k$ logarithm of a positive float. If the float is not a power of
+            /// $2^k$, `None` is returned.
             ///
             /// $$
             /// f(x, k) = \\begin{cases}

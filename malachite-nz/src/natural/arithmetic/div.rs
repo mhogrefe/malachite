@@ -90,8 +90,8 @@ pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
-// This is equivalent to `mpn_bdiv_dbm1c` from `mpn/generic/bdiv_dbm1c.c`, GMP 6.2.1, where
-// `qp == ap`.
+// This is equivalent to `mpn_bdiv_dbm1c` from `mpn/generic/bdiv_dbm1c.c`, GMP 6.2.1, where `qp ==
+// ap`.
 pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_in_place(
     ns: &mut [Limb],
     d: Limb,
@@ -132,8 +132,8 @@ pub_test! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-// limb slice must have at least two elements.
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the limb
+// slice must have at least two elements.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -145,8 +145,8 @@ pub_test! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 // # Panics
 // Panics if the length of `ns` is less than 2 or if `d` is zero.
 //
-// This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the
-// quotient is returned, but not computing the remainder.
+// This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the quotient
+// is returned, but not computing the remainder.
 pub_test! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut qs = vec![0; ns.len()];
     limbs_div_limb_to_out(&mut qs, ns, d);
@@ -283,10 +283,10 @@ pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
 // Schoolbook division using the Möller-Granlund 3/2 division algorithm.
 //
 // Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
-// significant bit of `ds` must be set. `d_inv` should be the result of
-// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. `ds`
+// must have length greater than 2, `ns` must be at least as long as `ds`, and the most significant
+// bit of `ds` must be set. `d_inv` should be the result of `limbs_two_limb_inverse_helper` applied
+// to the two highest limbs of the denominator.
 //
 // # Worst-case complexity
 // $T(n) = O(n^2)$
@@ -522,10 +522,10 @@ pub_test! {limbs_div_schoolbook(
 // Recursive divide-and-conquer division.
 //
 // Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
-// significant bit of `ds` must be set. `d_inv` should be the result of
-// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. `ds`
+// must have length greater than 2, `ns` must be at least as long as `ds`, and the most significant
+// bit of `ds` must be set. `d_inv` should be the result of `limbs_two_limb_inverse_helper` applied
+// to the two highest limbs of the denominator.
 //
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log \log n)$
@@ -580,14 +580,14 @@ pub_test! {limbs_div_divide_and_conquer(
 }}
 
 // Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-// `ds` must have length greater than 2, `ns` must be longer than `ds`, and the most significant
-// bit of `ds` must be set.
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. `ds`
+// must have length greater than 2, `ns` must be longer than `ds`, and the most significant bit of
+// `ds` must be set.
 //
 // The idea of the algorithm used herein is to compute a smaller inverted value than used in the
 // standard Barrett algorithm, and thus save time in the Newton iterations, and pay just a small
-// price when using the inverted value for developing quotient bits. This algorithm was presented
-// at ICMS 2006.
+// price when using the inverted value for developing quotient bits. This algorithm was presented at
+// ICMS 2006.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log \log n)$
@@ -612,8 +612,10 @@ pub_test! {limbs_div_barrett(
     let mut scratch_2 = vec![0; q_len_plus_1];
     let highest_q;
     if q_len >= d_len {
+        // ```
         // |_______________________|   dividend
         // |________|   divisor
+        // ```
         let mut rs = Vec::with_capacity(n_len + 1);
         rs.push(0);
         rs.extend_from_slice(ns);
@@ -630,8 +632,8 @@ pub_test! {limbs_div_barrett(
                 *s = Limb::MAX;
             }
         }
-        // The max error of limbs_div_barrett_approx is +4. If the low quotient limb is smaller
-        // than the max error, we cannot trust the quotient.
+        // The max error of limbs_div_barrett_approx is +4. If the low quotient limb is smaller than
+        // the max error, we cannot trust the quotient.
         let (scratch_2_head, scratch_2_tail) = scratch_2.split_first().unwrap();
         if *scratch_2_head > 4 {
             qs.copy_from_slice(scratch_2_tail);
@@ -654,8 +656,10 @@ pub_test! {limbs_div_barrett(
             }
         }
     } else {
-        //  |_______________________|   dividend
-        //  |________________|   divisor
+        // ```
+        // |_______________________|   dividend
+        // |________________|   divisor
+        // ```
         let ghost_n = n_len == (d_len << 1) - 1;
         highest_q = limbs_div_barrett_approx_helper(
             &mut scratch_2,
@@ -699,8 +703,8 @@ pub_test! {limbs_div_barrett(
 //
 // The result is $O(n)$, where $n$ is `n_len`.
 //
-// This is equivalent to `mpn_mu_div_q_itch` from `mpn/generic/mu_div_q.c`, GMP 6.2.1, where
-// `mua_k == 0`.
+// This is equivalent to `mpn_mu_div_q_itch` from `mpn/generic/mu_div_q.c`, GMP 6.2.1, where `mua_k
+// == 0`.
 pub_test! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let q_len = n_len - d_len;
     if q_len >= d_len {
@@ -717,9 +721,8 @@ pub_test! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
 // Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
 // `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
 // quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
-// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
-// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
-// denominator.
+// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be the
+// result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
 //
 // # Worst-case complexity
 // $T(n) = O(n^2)$
@@ -927,9 +930,8 @@ fn limbs_div_divide_and_conquer_approx_helper(
 // Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
 // `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
 // quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
-// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
-// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
-// denominator.
+// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be the
+// result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
 //
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log \log n)$
@@ -981,8 +983,8 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
             if highest_q {
                 assert!(!limbs_sub_same_length_in_place_left(ns_2, ds));
             }
-            // A single iteration of schoolbook: One 3/2 division, followed by the bignum update
-            // and adjustment.
+            // A single iteration of schoolbook: One 3/2 division, followed by the bignum update and
+            // adjustment.
             let n_2 = ns_hi[d_len];
             let mut n_1 = ns_hi[a];
             let mut n_0 = ns_hi[b];
@@ -1313,9 +1315,9 @@ fn limbs_div_barrett_approx_preinverted(
 
 // We distinguish 3 cases:
 //
-// (a) d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
-// (b) d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
-// (c) q_len < d_len / 3:          i_len = q_len
+// - d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
+// - d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
+// - q_len < d_len / 3:          i_len = q_len
 //
 // In all cases we have i_len <= d_len.
 //
@@ -1344,8 +1346,8 @@ fn limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
 //
 // The result is $O(n)$, where $n$ is `n_len`.
 //
-// This is equivalent to `mpn_mu_divappr_q_itch` from `mpn/generic/mu_divappr_q.c`, GMP 6.2.1,
-// where `mua_k == 0`.
+// This is equivalent to `mpn_mu_divappr_q_itch` from `mpn/generic/mu_divappr_q.c`, GMP 6.2.1, where
+// `mua_k == 0`.
 pub_crate_test! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
     let qn = n_len - d_len;
     if qn + 1 < d_len {
@@ -1360,13 +1362,13 @@ pub_crate_test! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: u
     is_len + d_len + local_len + out_len
 }}
 
-//TODO tune
+// TODO tune
 const DC_DIV_Q_THRESHOLD: usize = DC_DIVAPPR_Q_THRESHOLD;
-//TODO tune
+// TODO tune
 const MU_DIV_Q_THRESHOLD: usize = MU_DIVAPPR_Q_THRESHOLD;
-//TODO tune
+// TODO tune
 const MUPI_DIV_Q_THRESHOLD: usize = MUPI_DIVAPPR_Q_THRESHOLD;
-//TODO tune
+// TODO tune
 const MUPI_DIVAPPR_Q_THRESHOLD: usize = MUPI_DIV_QR_THRESHOLD;
 
 fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
@@ -1390,8 +1392,10 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+    // ```
     // |________________________|
     //                  |_______|
+    // ```
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1462,8 +1466,10 @@ pub_test! {limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) 
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+    // ```
     // |________________________|
     //                  |_______|
+    // ```
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1512,8 +1518,10 @@ fn limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[L
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+    // ```
     // |________________________|
     //                  |_______|
+    // ```
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1570,8 +1578,10 @@ fn limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [L
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    // ```
     // |________________________|
     //                  |_______|
+    // ```
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1629,8 +1639,10 @@ fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    // ```
     // |________________________|
     //        |_________________|
+    // ```
     let n_len = ns.len();
     let d_len = ds.len();
     let q_len = n_len - d_len + 1;
@@ -1721,8 +1733,8 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
-// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
-// of `ds` is zero.
+// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb of
+// `ds` is zero.
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `qp` is returned.
@@ -1884,8 +1896,8 @@ fn limbs_div_in_place_naive(ns: &mut [Limb], d: Limb) {
     }
 }
 
-// This is equivalent to `mpn_pi1_bdiv_q_1` from `mpn/generic/bdiv_q_1.c`, GMP 6.2.1, where
-// rp == up.
+// This is equivalent to `mpn_pi1_bdiv_q_1` from `mpn/generic/bdiv_q_1.c`, GMP 6.2.1, where rp ==
+// up.
 pub(crate) fn limbs_hensel_div_limb_in_place(
     ns: &mut [Limb],
     d: Limb,
@@ -1980,8 +1992,8 @@ impl Div<Natural> for Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value. The quotient is rounded
-    /// towards negative infinity. The quotient and remainder (which is not computed) satisfy
-    /// $x = qy + r$ and $0 \leq r < y$.
+    /// towards negative infinity. The quotient and remainder (which is not computed) satisfy $x =
+    /// qy + r$ and $0 \leq r < y$.
     ///
     /// $$
     /// f(x, y) = \left \lfloor \frac{x}{y} \right \rfloor.
@@ -2278,9 +2290,9 @@ impl CheckedDiv<Natural> for Natural {
     type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by value. The quotient is rounded
-    /// towards negative infinity. The quotient and remainder (which is not computed) satisfy
-    /// $x = qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is zero,
-    /// `Some` otherwise.
+    /// towards negative infinity. The quotient and remainder (which is not computed) satisfy $x =
+    /// qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is zero, `Some`
+    /// otherwise.
     ///
     /// $$
     /// f(x, y) = \begin{cases}
@@ -2473,8 +2485,8 @@ impl<'a, 'b> CheckedDiv<&'b Natural> for &'a Natural {
 
     /// Divides a [`Natural`] by another [`Natural`], taking both by reference. The quotient is
     /// rounded towards negative infinity. The quotient and remainder (which is not computed)
-    /// satisfy $x = qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is
-    /// zero, `Some` otherwise.
+    /// satisfy $x = qy + r$ and $0 \leq r < y$. Returns `None` when the second [`Natural`] is zero,
+    /// `Some` otherwise.
     ///
     /// $$
     /// f(x, y) = \begin{cases}

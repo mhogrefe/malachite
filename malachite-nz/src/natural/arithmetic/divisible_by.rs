@@ -548,8 +548,8 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
 
 impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// Returns whether a [`Natural`] is divisible by another [`Natural`]; in other words, whether
-    /// the first is a multiple of the second. The first [`Natural`]s are taken by reference and
-    /// the second by value.
+    /// the first is a multiple of the second. The first [`Natural`]s are taken by reference and the
+    /// second by value.
     ///
     /// This means that zero is divisible by any [`Natural`], including zero; but a nonzero
     /// [`Natural`] is never divisible by zero.

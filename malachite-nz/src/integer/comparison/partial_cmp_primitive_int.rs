@@ -1,8 +1,8 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use core::cmp::Ordering;
 
 fn partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>
 where

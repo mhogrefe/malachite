@@ -4,8 +4,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 impl From<bool> for Rational {
     /// Converts a [`bool`] to 0 or 1.
     ///
-    /// This function is known as the
-    /// [Iverson bracket](https://en.wikipedia.org/wiki/Iverson_bracket).
+    /// This function is known as the [Iverson
+    /// bracket](https://en.wikipedia.org/wiki/Iverson_bracket).
     ///
     /// $$
     /// f(P) = \[P\] = \\begin{cases}

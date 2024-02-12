@@ -1,6 +1,6 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 impl PartialOrd for Float {
     /// Compares two [`Float`]s.
@@ -17,8 +17,8 @@ impl PartialOrd for Float {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -101,8 +101,8 @@ impl<'a> Ord for ComparableFloatRef<'a> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -191,8 +191,8 @@ impl<'a> PartialOrd for ComparableFloatRef<'a> {
 impl Ord for ComparableFloat {
     /// Compares two [`ComparableFloat`]s.
     ///
-    /// This implementation does not follow the IEEE 754 standard. This is how
-    /// [`ComparableFloat`]s are ordered, least to greatest:
+    /// This implementation does not follow the IEEE 754 standard. This is how [`ComparableFloat`]s
+    /// are ordered, least to greatest:
     ///   - Negative infinity
     ///   - Negative nonzero finite floats
     ///   - Negative zero
@@ -209,8 +209,8 @@ impl Ord for ComparableFloat {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

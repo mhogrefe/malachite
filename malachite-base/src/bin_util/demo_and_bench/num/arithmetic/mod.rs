@@ -2,6 +2,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
+    abs_diff::register(runner);
     add_mul::register(runner);
     arithmetic_checked_shl::register(runner);
     arithmetic_checked_shr::register(runner);
@@ -105,6 +106,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod abs;
+mod abs_diff;
 mod add_mul;
 mod arithmetic_checked_shl;
 mod arithmetic_checked_shr;

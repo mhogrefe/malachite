@@ -1,8 +1,8 @@
 use crate::Rational;
+use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shl_unsigned_assign<T>(x: &mut Rational, bits: T)
 where

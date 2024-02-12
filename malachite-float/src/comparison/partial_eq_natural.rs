@@ -1,8 +1,8 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Zero};
+use core::cmp::Ordering;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 impl PartialEq<Natural> for Float {
     /// Determines whether a [`Float`] is equal to a [`Natural`].
@@ -15,8 +15,8 @@ impl PartialEq<Natural> for Float {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -58,8 +58,8 @@ impl PartialEq<Float> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

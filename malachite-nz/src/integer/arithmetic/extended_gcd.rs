@@ -10,25 +10,25 @@ impl ExtendedGcd for Integer {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. Both [`Integer`]s are
     /// taken by value.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
     /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
+    ///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq
+    ///   \lfloor a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -71,25 +71,25 @@ impl<'a> ExtendedGcd<&'a Integer> for Integer {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. The first [`Integer`] is
     /// taken by value and the second by reference.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
     /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
+    ///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq
+    ///   \lfloor a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -131,25 +131,25 @@ impl<'a> ExtendedGcd<Integer> for &'a Integer {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. The first [`Integer`] is
     /// taken by reference and the second by value.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
     /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
+    ///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq
+    ///   \lfloor a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -191,25 +191,25 @@ impl<'a, 'b> ExtendedGcd<&'a Integer> for &'b Integer {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. Both [`Integer`]s are
     /// taken by reference.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(a, ak) = (-a, -1, 0)$ if $a < 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
     /// - $f(bk, b) = (-b, 0, -1)$ if $b < 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(|a|, |b|)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(|a|, |b|)$,
+    ///   where $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq
+    ///   \lfloor a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

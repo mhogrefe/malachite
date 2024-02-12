@@ -1,3 +1,4 @@
+#![cfg_attr(not(feature = "random"), no_std)]
 pub use malachite_base::*;
 
 #[cfg(feature = "naturals_and_integers")]

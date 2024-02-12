@@ -35,9 +35,9 @@ pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-// `Limb` from the `Natural`, writing the `xs.len()` limbs of the result to an output slice.
-// Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
-// `Natural`. The output slice must be at least as long as the input slice.
+// `Limb` from the `Natural`, writing the `xs.len()` limbs of the result to an output slice. Returns
+// whether there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
+// The output slice must be at least as long as the input slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -94,7 +94,7 @@ pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
 
 // # Worst-case complexity
 // Constant time and additional memory.
-fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
+pub(crate) fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let b = *borrow;
     let mut diff;
     (diff, *borrow) = x.overflowing_sub(y);
@@ -139,10 +139,10 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 }}
 
 // Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-// an output slice. Returns whether there was a borrow left over; that is, whether the second
-// `Natural` was greater than the first `Natural`. The output slice must be at least as long as
-// either input slice.
+// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to an
+// output slice. Returns whether there was a borrow left over; that is, whether the second `Natural`
+// was greater than the first `Natural`. The output slice must be at least as long as either input
+// slice.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -201,8 +201,8 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-// the first (left) slice. Returns whether there was a borrow left over; that is, whether the
-// second `Natural` was greater than the first `Natural`.
+// the first (left) slice. Returns whether there was a borrow left over; that is, whether the second
+// `Natural` was greater than the first `Natural`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -225,11 +225,10 @@ pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
     borrow
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second from the first, writing the `xs.len()` limbs of the result to the first
-// (left) slice. Returns whether there was a borrow left over; that is, whether the second
-// `Natural` was greater than the first `Natural`. The first slice must be at least as long as the
-// second.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second from the first, writing the `xs.len()` limbs of the result to the first (left) slice.
+// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
+// than the first `Natural`. The first slice must be at least as long as the second.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -241,8 +240,8 @@ pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
 // # Panics
 // Panics if `xs` is shorter than `ys`.
 //
-// This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is written to the
-// first input.
+// This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is written to the first
+// input.
 pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -283,10 +282,10 @@ pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Lim
     borrow
 }}
 
-// Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s
-// whose limbs are `xs` and `&ys[..len]`, and writes the limbs of the result to `ys`. Returns
-// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
-// first `Natural`.
+// Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s whose
+// limbs are `xs` and `&ys[..len]`, and writes the limbs of the result to `ys`. Returns whether
+// there was a borrow left over; that is, whether the second `Natural` was greater than the first
+// `Natural`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -328,8 +327,8 @@ pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], le
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
-// `xs.len()` - `ys.len()`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `xs.len()` -
+// `ys.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
@@ -595,8 +594,8 @@ impl<'a> Sub<&'a Natural> for Natural {
 impl<'a> Sub<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the
-    /// second by value.
+    /// Subtracts a [`Natural`] by another [`Natural`], taking the first by reference and the second
+    /// by value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

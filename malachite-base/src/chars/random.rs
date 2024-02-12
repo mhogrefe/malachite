@@ -8,8 +8,8 @@ use crate::vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Uniformly generates random [`char`]s in a closed interval.
 ///
-/// This `struct` is created by [`random_char_range`] and [`random_char_inclusive_range`]; see
-/// their documentation for more.
+/// This `struct` is created by [`random_char_range`] and [`random_char_inclusive_range`]; see their
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomCharRange {
     chunks: RandomUnsignedInclusiveRange<u32>,
@@ -313,8 +313,8 @@ pub fn graphic_weighted_random_ascii_chars(
     )
 }
 
-/// Generates random [`char`]s in the half-open interval $[a, b)$, weighting graphic and
-/// non-graphic [`char`]s separately.
+/// Generates random [`char`]s in the half-open interval $[a, b)$, weighting graphic and non-graphic
+/// [`char`]s separately.
 ///
 /// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///
@@ -346,8 +346,8 @@ pub fn graphic_weighted_random_ascii_chars(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`, if $a \geq b$, if
-/// $[a, b)$ contains no graphic [`char`]s, or if $[a, b)$ contains only graphic [`char`]s.
+/// Panics if `p_denominator` is zero or `p_denominator > p_denominator`, if $a \geq b$, if $[a, b)$
+/// contains no graphic [`char`]s, or if $[a, b)$ contains only graphic [`char`]s.
 ///
 /// # Examples
 /// ```
@@ -377,8 +377,8 @@ pub fn graphic_weighted_random_char_range(
     graphic_weighted_random_char_inclusive_range(seed, a, b, p_numerator, p_denominator)
 }
 
-/// Generates random [`char`]s in the closed interval $[a, b]$, weighting graphic and
-/// non-graphic [`char`]s separately.
+/// Generates random [`char`]s in the closed interval $[a, b]$, weighting graphic and non-graphic
+/// [`char`]s separately.
 ///
 /// See [`char_is_graphic`] for the definition of a graphic [`char`].
 ///

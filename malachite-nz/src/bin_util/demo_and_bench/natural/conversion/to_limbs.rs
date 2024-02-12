@@ -16,11 +16,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_limbs_rev);
     register_demo!(runner, demo_natural_limbs_size_hint);
     register_demo!(runner, demo_natural_limbs_index);
+    register_demo!(runner, demo_natural_limb_count);
 
     register_bench!(runner, benchmark_natural_limbs_evaluation_strategy);
     register_bench!(runner, benchmark_natural_limbs_rev_evaluation_strategy);
     register_bench!(runner, benchmark_natural_limbs_size_hint);
     register_bench!(runner, benchmark_natural_limbs_index_algorithms);
+    register_bench!(runner, benchmark_natural_limb_count);
 }
 
 fn demo_natural_to_limbs_asc(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -71,6 +73,12 @@ fn demo_natural_limbs_index(gm: GenMode, config: &GenConfig, limit: usize) {
         .take(limit)
     {
         println!("limbs({})[{}] = {:?}", n, i, n.limbs()[i]);
+    }
+}
+
+fn demo_natural_limb_count(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in natural_gen().get(gm, config).take(limit) {
+        println!("limb_count({}) = {}", n, n.limb_count());
     }
 }
 
@@ -174,5 +182,18 @@ fn benchmark_natural_limbs_index_algorithms(
                 };
             }),
         ],
+    );
+}
+
+fn benchmark_natural_limb_count(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Natural.limb_count()",
+        BenchmarkType::Single,
+        natural_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &natural_bit_bucketer("n"),
+        &mut [("Malachite", &mut |n| no_out!(n.limb_count()))],
     );
 }

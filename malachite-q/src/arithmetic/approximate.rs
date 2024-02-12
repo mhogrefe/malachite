@@ -1,5 +1,6 @@
 use crate::arithmetic::traits::{Approximate, ApproximateAssign};
 use crate::Rational;
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivMod, Floor, Parity, Reciprocal, ShrRound, UnsignedAbs,
 };
@@ -9,7 +10,6 @@ use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::mem::swap;
 
 fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
     let floor = q.floor();
@@ -74,10 +74,9 @@ fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
         }
     };
     // Suppose the input is (1/4, 2). The approximations 0 and 1/2 both satisfy the denominator
-    // limit and are equidistant from 1/4, but we prefer 0 because it has the smaller
-    // denominator. Unfortunately, the code above makes the wrong choice, so we need the
-    // following code to check whether the approximation on the opposite side of `self` is
-    // better.
+    // limit and are equidistant from 1/4, but we prefer 0 because it has the smaller denominator.
+    // Unfortunately, the code above makes the wrong choice, so we need the following code to check
+    // whether the approximation on the opposite side of `self` is better.
     let opposite: Rational = (q << 1) - &result;
     if result.denominator_ref() <= opposite.denominator_ref() {
         result
@@ -101,8 +100,8 @@ impl Approximate for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// - If `max_denominator` is zero.
@@ -127,10 +126,9 @@ impl Approximate for Rational {
     ///
     /// # Implementation notes
     /// This algorithm follows the description in
-    /// <https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations>. One part
-    /// of the algorithm not mentioned in that article is that if the last term $n$ in the
-    /// continued fraction needs to be reduced, the optimal replacement term $m$ may be found using
-    /// division.
+    /// <https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations>. One part of
+    /// the algorithm not mentioned in that article is that if the last term $n$ in the continued
+    /// fraction needs to be reduced, the optimal replacement term $m$ may be found using division.
     fn approximate(self, max_denominator: &Natural) -> Rational {
         assert_ne!(*max_denominator, 0);
         if self.denominator_ref() <= max_denominator {
@@ -158,8 +156,8 @@ impl<'a> Approximate for &'a Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// - If `max_denominator` is zero.
@@ -185,10 +183,9 @@ impl<'a> Approximate for &'a Rational {
     ///
     /// # Implementation notes
     /// This algorithm follows the description in
-    /// <https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations>. One part
-    /// of the algorithm not mentioned in that article is that if the last term $n$ in the
-    /// continued fraction needs to be reduced, the optimal replacement term $m$ may be found using
-    /// division.
+    /// <https://en.wikipedia.org/wiki/Continued_fraction#Best_rational_approximations>. One part of
+    /// the algorithm not mentioned in that article is that if the last term $n$ in the continued
+    /// fraction needs to be reduced, the optimal replacement term $m$ may be found using division.
     fn approximate(self, max_denominator: &Natural) -> Rational {
         assert_ne!(*max_denominator, 0);
         if self.denominator_ref() <= max_denominator {
@@ -212,8 +209,8 @@ impl ApproximateAssign for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// - If `max_denominator` is zero.

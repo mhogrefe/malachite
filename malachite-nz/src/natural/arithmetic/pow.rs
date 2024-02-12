@@ -315,8 +315,8 @@ fn limb_pow_alt_estimated_scratch_len(x: Limb, exp: u64) -> usize {
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `exp`.
 //
-// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1` and
-// `bn == 1`.
+// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1` and `bn
+// == 1`.
 #[cfg(feature = "test_build")]
 fn limb_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
@@ -415,8 +415,8 @@ fn limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
 //
-// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1`,
-// `bn > 1`, and the last element of `xs` is nonzero.
+// This is equivalent to `mpn_pow_1` from `mpn/generic/pow_1.c`, GMP 6.2.1, where `exp > 1`, `bn >
+// 1`, and the last element of `xs` is nonzero.
 #[cfg(feature = "test_build")]
 fn limbs_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],

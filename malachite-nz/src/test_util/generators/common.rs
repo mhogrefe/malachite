@@ -141,6 +141,10 @@ pub fn integer_pair_nrm(
     }))
 }
 
+pub fn integer_pair_nm(ps: It<(Integer, Integer)>) -> It<((BigInt, BigInt), (Integer, Integer))> {
+    Box::new(ps.map(|(x, y)| ((BigInt::from(&x), BigInt::from(&y)), (x, y))))
+}
+
 pub fn integer_pair_1_rm<T: 'static + Clone>(
     ps: It<(Integer, T)>,
 ) -> It<((rug::Integer, T), (Integer, T))> {

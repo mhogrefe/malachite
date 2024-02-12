@@ -1,6 +1,6 @@
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::Sign;
 use core::cmp::Ordering;
+use malachite_base::num::arithmetic::traits::Sign;
 
 impl Sign for Integer {
     /// Compares an [`Integer`] to zero.

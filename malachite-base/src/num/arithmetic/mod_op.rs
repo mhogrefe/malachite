@@ -28,8 +28,8 @@ macro_rules! impl_mod_unsigned {
 
             /// Divides a number by another number, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy + r$ and $0 \leq r < y$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq r < y$.
             ///
             /// $$
             /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -80,8 +80,8 @@ macro_rules! impl_mod_unsigned {
 
             /// Divides the negative of a number by another number, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy - r$ and $0 \leq r < y$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$
+            /// and $0 \leq r < y$.
             ///
             /// $$
             /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -104,8 +104,8 @@ macro_rules! impl_mod_unsigned {
         impl NegModAssign<$t> for $t {
             /// Divides the negative of a number by another number, returning just the remainder.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy - r$ and $0 \leq r < y$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$
+            /// and $0 \leq r < y$.
             ///
             /// $$
             /// x \gets y\left \lceil \frac{x}{y} \right \rceil - x.
@@ -174,8 +174,8 @@ macro_rules! impl_mod_signed {
             /// Divides a number by another number, returning just the remainder. The remainder has
             /// the same sign as the second number.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy + r$ and $0 \leq |r| < |y|$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq |r| < |y|$.
             ///
             /// $$
             /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
@@ -198,8 +198,8 @@ macro_rules! impl_mod_signed {
         }
 
         impl ModAssign<$t> for $t {
-            /// Divides a number by another number, replacing the first number by the remainder.
-            /// The remainder has the same sign as the second number.
+            /// Divides a number by another number, replacing the first number by the remainder. The
+            /// remainder has the same sign as the second number.
             ///
             /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
             /// and $0 \leq |r| < |y|$.
@@ -228,8 +228,8 @@ macro_rules! impl_mod_signed {
             /// Divides a number by another number, returning just the remainder. The remainder has
             /// the opposite sign as the second number.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy + r$ and $0 \leq |r| < |y|$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq |r| < |y|$.
             ///
             /// $$
             /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
@@ -250,11 +250,11 @@ macro_rules! impl_mod_signed {
         }
 
         impl CeilingModAssign<$t> for $t {
-            /// Divides a number by another number, replacing the first number by the remainder.
-            /// The remainder has the opposite sign as the second number.
+            /// Divides a number by another number, replacing the first number by the remainder. The
+            /// remainder has the opposite sign as the second number.
             ///
-            /// If the quotient were computed, the quotient and remainder would satisfy
-            /// $x = qy + r$ and $0 \leq |r| < |y|$.
+            /// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq |r| < |y|$.
             ///
             /// $$
             /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.

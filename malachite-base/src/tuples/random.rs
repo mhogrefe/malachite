@@ -374,8 +374,8 @@ macro_rules! random_custom_tuples {
         //
         // The mapping from iterators to tuple slots is indicated by the struct name; for example,
         // in `RandomTriplesXYX` there are two iterators, `X`, and `Y`; `X` generates the elements
-        // in the first and third slots of the output triples, and `Y` generates the elements in
-        // the second slots.
+        // in the first and third slots of the output triples, and `Y` generates the elements in the
+        // second slots.
         #[derive(Clone, Debug)]
         $($vis)* struct $random_struct<$($t: Clone, $it: Iterator<Item = $t>,)*> {
             $($xs: $it,)*
@@ -397,10 +397,10 @@ macro_rules! random_custom_tuples {
 
         // Generates random $n$-tuples with elements from $m$ iterators, where $m \leq n$.
         //
-        // The mapping from iterators to tuple slots is indicated by the function name; for
-        // example, `random_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the
-        // elements in the first and third slots of the output triples, and `ys` generates the
-        // elements in the second slots.
+        // The mapping from iterators to tuple slots is indicated by the function name; for example,
+        // `random_triples_xyx` takes two iterators, `xs`, and `ys`; `xs` generates the elements in
+        // the first and third slots of the output triples, and `ys` generates the elements in the
+        // second slots.
         //
         // The probability of a particular $n$-tuple being generated is the product of the
         // probabilities of each of its elements.
@@ -473,8 +473,8 @@ where
 /// P((x\_0, x\_1)) = 2P(x\_0)P(x\_1).
 /// $$
 ///
-/// The above formula assumes that the pair is valid, \emph{i.e.} its first element is less than
-/// its second. The probability of an invalid pair is zero.
+/// The above formula assumes that the pair is valid, \emph{i.e.} its first element is less than its
+/// second. The probability of an invalid pair is zero.
 ///
 /// `xs` must be infinite.
 #[inline]
@@ -579,8 +579,8 @@ macro_rules! random_ordered_unique_tuples {
         $fn: ident,
         [$($i: expr),*]
     ) => {
-        // Generates random $n$-tuples using elements from a single iterator, where the tuples
-        // have no repeated elements, and the elements are in ascending order.
+        // Generates random $n$-tuples using elements from a single iterator, where the tuples have
+        // no repeated elements, and the elements are in ascending order.
         #[derive(Clone, Debug)]
         $($vis)* struct $struct<I: Iterator> where I::Item: Ord {
             xs: RandomBTreeSetsFixedLength<I>,
@@ -596,8 +596,8 @@ macro_rules! random_ordered_unique_tuples {
             }
         }
 
-        // Generates random $n$-tuples using elements from a single iterator, where the tuples
-        // have no repeated elements, and the elements are in ascending order.
+        // Generates random $n$-tuples using elements from a single iterator, where the tuples have
+        // no repeated elements, and the elements are in ascending order.
         //
         // The input iterator must generate at least `len` distinct elements; otherwise, this
         // iterator will hang.
@@ -606,8 +606,8 @@ macro_rules! random_ordered_unique_tuples {
         // P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
         // $$
         //
-        // The above formula assumes that the tuple is valid, \emph{i.e.} its elements are
-        // strictly increasing. The probability of an invalid tuple is zero.
+        // The above formula assumes that the tuple is valid, \emph{i.e.} its elements are strictly
+        // increasing. The probability of an invalid tuple is zero.
         //
         // `xs` must be infinite.
         //

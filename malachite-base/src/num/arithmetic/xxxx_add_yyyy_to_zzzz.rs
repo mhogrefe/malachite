@@ -36,8 +36,8 @@ macro_rules! impl_xxxx_add_yyyy_to_zzzz {
             /// Adds two numbers, each composed of four `Self` values, returning the sum as a
             /// quadruple of `Self` values.
             ///
-            /// The more significant value always comes first. Addition is wrapping, and overflow
-            /// is not indicated.
+            /// The more significant value always comes first. Addition is wrapping, and overflow is
+            /// not indicated.
             ///
             /// $$
             /// f(x_3, x_2, x_1, x_0, y_2, y_2, y_1, y_0) = (z_3, z_2, z_1, z_0),
@@ -56,8 +56,8 @@ macro_rules! impl_xxxx_add_yyyy_to_zzzz {
             /// # Examples
             /// See [here](super::xxxx_add_yyyy_to_zzzz#xxxx_add_yyyy_to_zzzz).
             ///
-            /// This is equivalent to `add_ssssaaaaaaaa` from `longlong.h`, FLINT 2.7.1, where
-            /// `(s3, s2, s1, s0)` is returned.
+            /// This is equivalent to `add_ssssaaaaaaaa` from `longlong.h`, FLINT 2.7.1, where `(s3,
+            /// s2, s1, s0)` is returned.
             #[inline]
             fn xxxx_add_yyyy_to_zzzz(
                 x_3: $t,
@@ -105,8 +105,8 @@ impl XXXXAddYYYYToZZZZ for usize {
     /// # Examples
     /// See [here](super::xxxx_add_yyyy_to_zzzz#xxxx_add_yyyy_to_zzzz).
     ///
-    /// This is equivalent to `add_ssssaaaaaaaa` from `longlong.h`, FLINT 2.7.1, where
-    /// `(s3, s2, s1, s0)` is returned.
+    /// This is equivalent to `add_ssssaaaaaaaa` from `longlong.h`, FLINT 2.7.1, where `(s3, s2, s1,
+    /// s0)` is returned.
     fn xxxx_add_yyyy_to_zzzz(
         x_3: usize,
         x_2: usize,

@@ -7,9 +7,9 @@ use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
-// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
-// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
-// the `pow` least-significant bits of the `Natural` and the limb are equal.
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns whether
+// the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether the `pow`
+// least-significant bits of the `Natural` and the limb are equal.
 //
 // This function assumes that `xs` has length at least 2 and the last (most significant) limb is
 // nonzero.
@@ -97,8 +97,8 @@ impl Natural {
 }
 
 impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
-    /// Returns whether one [`Natural`] is equal to another modulo $2^k$; that is, whether their
-    /// $k$ least-significant bits are equal.
+    /// Returns whether one [`Natural`] is equal to another modulo $2^k$; that is, whether their $k$
+    /// least-significant bits are equal.
     ///
     /// $f(x, y, k) = (x \equiv y \mod 2^k)$.
     ///
@@ -109,8 +109,8 @@ impl<'a, 'b> EqModPowerOf2<&'b Natural> for &'a Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(pow, self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(pow, self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

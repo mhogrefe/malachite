@@ -100,8 +100,8 @@ pub_crate_test! {limbs_clear_bit(xs: &mut [Limb], index: u64) {
 /// assert_eq!(x, 0);
 /// ```
 impl BitAccess for Natural {
-    /// Determines whether the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its
-    /// binary expansion, is 0 or 1.
+    /// Determines whether the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its binary
+    /// expansion, is 0 or 1.
     ///
     /// `false` means 0 and `true` means 1. Getting bits beyond the [`Natural`]'s width is allowed;
     /// those bits are `false`.
@@ -110,8 +110,8 @@ impl BitAccess for Natural {
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
-    /// rest are 0. Then $f(n, j) = (b_j = 1)$.
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Then $f(n, j) = (b_j = 1)$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -135,15 +135,15 @@ impl BitAccess for Natural {
         }
     }
 
-    /// Sets the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its binary expansion,
-    /// to 1.
+    /// Sets the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its binary expansion, to
+    /// 1.
     ///
     /// Let
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
-    /// are 0. Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Then
     /// $$
     /// n \gets \\begin{cases}
     ///     n + 2^j & \text{if} \\quad b_j = 0, \\\\
@@ -189,8 +189,8 @@ impl BitAccess for Natural {
         }
     }
 
-    /// Sets the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its binary expansion,
-    /// to 0.
+    /// Sets the $i$th bit of a [`Natural`], or the coefficient of $2^i$ in its binary expansion, to
+    /// 0.
     ///
     /// Clearing bits beyond the [`Natural`]'s width is allowed; since those bits are already
     /// `false`, clearing them does nothing.
@@ -199,8 +199,8 @@ impl BitAccess for Natural {
     /// $$
     /// n = \sum_{i=0}^\infty 2^{b_i},
     /// $$
-    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest
-    /// are 0. Then
+    /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the rest are
+    /// 0. Then
     /// $$
     /// n \gets \\begin{cases}
     ///     n - 2^j & \text{if} \\quad b_j = 1, \\\\

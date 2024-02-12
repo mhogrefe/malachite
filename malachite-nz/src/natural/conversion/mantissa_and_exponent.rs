@@ -108,8 +108,8 @@ impl Natural {
         rm: RoundingMode,
     ) -> Option<(T, u64, Ordering)> {
         assert_ne!(*self, 0);
-        // Worst case: 32-bit limbs, 64-bit float output, most-significant limb is 1. In this
-        // case, the 3 most-significant limbs are needed.
+        // Worst case: 32-bit limbs, 64-bit float output, most-significant limb is 1. In this case,
+        // the 3 most-significant limbs are needed.
         let mut most_significant_limbs = [0; 3];
         let mut exponent = T::MANTISSA_WIDTH;
         let significant_bits;
@@ -234,11 +234,11 @@ impl Natural {
     /// mantissa and exponent.
     ///
     /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
-    /// a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is provided as a
-    /// float. If the mantissa is outside the range $[1, 2)$, `None` is returned.
+    /// a rational number with $1 \leq m_s < 2$. Here, the rational mantissa is provided as a float.
+    /// If the mantissa is outside the range $[1, 2)$, `None` is returned.
     ///
-    /// Some combinations of mantissas and exponents do not specify a [`Natural`], in which case
-    /// the resulting value is rounded to a [`Natural`] using the specified rounding mode. If the
+    /// Some combinations of mantissas and exponents do not specify a [`Natural`], in which case the
+    /// resulting value is rounded to a [`Natural`] using the specified rounding mode. If the
     /// rounding mode is `Exact` but the input does not exactly specify a [`Natural`], `None` is
     /// returned.
     ///
@@ -342,8 +342,8 @@ impl Natural {
 impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     /// Returns a [`Natural`]'s integer mantissa and exponent.
     ///
-    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
-    /// $m_i$ is an odd integer.
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
+    /// an odd integer.
     /// $$
     /// f(x) = (\frac{|x|}{2^{e_i}}, e_i),
     /// $$
@@ -384,8 +384,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
 
     /// Returns a [`Natural`]'s integer mantissa.
     ///
-    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
-    /// $m_i$ is an odd integer.
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
+    /// an odd integer.
     /// $$
     /// f(x) = \frac{|x|}{2^{e_i}},
     /// $$
@@ -416,8 +416,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
 
     /// Returns a [`Natural`]'s integer exponent.
     ///
-    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
-    /// $m_i$ is an odd integer.
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
+    /// an odd integer.
     /// $$
     /// f(x) = e_i,
     /// $$
@@ -464,8 +464,8 @@ impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `integer_mantissa.significant_bits() + integer_exponent`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `integer_mantissa.significant_bits()
+    /// + integer_exponent`.
     ///
     /// # Examples
     /// ```
@@ -494,9 +494,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// Returns a [`Natural`]'s scientific mantissa and exponent.
             ///
             /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and
-            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
-            /// mantissa as a float. The conversion might not be exact, so we round to the nearest
-            /// float using the `Nearest` rounding mode. To use other rounding modes, use
+            /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational mantissa
+            /// as a float. The conversion might not be exact, so we round to the nearest float
+            /// using the `Nearest` rounding mode. To use other rounding modes, use
             /// [`sci_mantissa_and_exponent_round`](Natural::sci_mantissa_and_exponent_round).
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).

@@ -17,8 +17,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is
-// already reduced mod 2<sup>`pow`</sup>.
+// limbs of the sum of the `Natural` and a `Limb`, mod `2 ^ pow`. Assumes the input is already
+// reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -39,8 +39,8 @@ pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input slice.
-// Returns whether there is a carry. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+// limbs of the sum of the `Natural` and a `Limb`, mod `2 ^ pow`, to the input slice. Returns
+// whether there is a carry. Assumes the input is already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -63,9 +63,9 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
     }
 }}
 
-// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-// writes the limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input
-// `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes
+// the limbs of the sum of the `Natural` and a `Limb`, mod `2 ^ pow`, to the input `Vec`. Assumes
+// the input is already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -83,10 +83,9 @@ pub_crate_test! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, 
     }
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
-// the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
-// 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
+// first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of the
+// `Natural`s mod `2 ^ pow`. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -105,9 +104,9 @@ pub_test! {limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) 
     out
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
-// already reduced mod 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the sum of the `Natural`s mod `2 ^ pow`. Assumes the inputs are already
+// reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -123,11 +122,11 @@ pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<L
     }
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-// the length of the first slice is greater than or equal to the length of the second, writes the
-// `xs.len()` least-significant limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the
-// first (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod
-// 2<sup>`pow`</sup>.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where the
+// length of the first slice is greater than or equal to the length of the second, writes the
+// `xs.len()` least-significant limbs of the sum of the `Natural`s, mod `2 ^ pow`, to the first
+// (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod `2 ^
+// pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -154,16 +153,16 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 }}
 
 // Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
-// `Natural`s, writes the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the first
-// (left) slice. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+// `Natural`s, writes the limbs of the sum of the `Natural`s, mod `2 ^ pow`, to the first (left)
+// slice. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -189,10 +188,9 @@ pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[
 }}
 
 // Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-// the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the longer slice (or the first
-// one, if they are equally long). Returns a `bool` which is `false` when the output is to the
-// first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod
-// 2<sup>`pow`</sup>.
+// the limbs of the sum of the `Natural`s, mod `2 ^ pow`, to the longer slice (or the first one, if
+// they are equally long). Returns a `bool` which is `false` when the output is to the first `Vec`
+// and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -276,8 +274,8 @@ impl ModPowerOf2Add<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` or `other` are greater than or equal to $2^k$.
@@ -378,8 +376,8 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` or `other` are greater than or equal to $2^k$.
@@ -424,8 +422,8 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` or `other` are greater than or equal to $2^k$.

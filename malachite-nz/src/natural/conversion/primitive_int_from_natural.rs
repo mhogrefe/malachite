@@ -107,8 +107,8 @@ macro_rules! impl_from_limb {
         impl<'a> TryFrom<&'a Natural> for $s {
             type Error = SignedFromNaturalError;
 
-            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same
-            /// as a [limb](crate#limbs)'s), returning an error if the [`Natural`] is too large.
+            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same as
+            /// a [limb](crate#limbs)'s), returning an error if the [`Natural`] is too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -126,9 +126,8 @@ macro_rules! impl_from_limb {
         }
 
         impl<'a> WrappingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same
-            /// as a [limb](crate#limbs)'s), wrapping modulo $2^W$, where $W$ is the width of a
-            /// limb.
+            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same as
+            /// a [limb](crate#limbs)'s), wrapping modulo $2^W$, where $W$ is the width of a limb.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -142,8 +141,8 @@ macro_rules! impl_from_limb {
         }
 
         impl<'a> SaturatingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same
-            /// as a [limb](crate#limbs)'s).
+            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same as
+            /// a [limb](crate#limbs)'s).
             ///
             /// If the [`Natural`] is too large to fit in a `SignedLimb`, the largest representable
             /// value is returned.
@@ -160,9 +159,8 @@ macro_rules! impl_from_limb {
         }
 
         impl<'a> OverflowingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same
-            /// as a [limb](crate#limbs)'s), wrapping modulo $2^W$, where $W$ is the width of a
-            /// limb.
+            /// Converts a [`Natural`] to a `SignedLimb` (the signed type whose width is the same as
+            /// a [limb](crate#limbs)'s), wrapping modulo $2^W$, where $W$ is the width of a limb.
             ///
             /// The returned boolean value indicates whether wrapping occurred.
             ///
@@ -179,8 +177,8 @@ macro_rules! impl_from_limb {
         }
 
         impl<'a> ConvertibleFrom<&'a Natural> for $s {
-            /// Determines whether a [`Natural`] can be converted to a `SignedLimb` (the signed
-            /// type whose width is the same as a [limb](crate#limbs)'s).
+            /// Determines whether a [`Natural`] can be converted to a `SignedLimb` (the signed type
+            /// whose width is the same as a [limb](crate#limbs)'s).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -272,8 +270,8 @@ macro_rules! impl_from_smaller_than_limb {
         }
 
         impl<'a> ConvertibleFrom<&'a Natural> for $u {
-            /// Determines whether a [`Natural`] can be converted to a value of a primitive
-            /// unsigned integer type that's smaller than a [`Limb`](crate#limbs).
+            /// Determines whether a [`Natural`] can be converted to a value of a primitive unsigned
+            /// integer type that's smaller than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -382,8 +380,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
     ($u: ident, $s: ident) => {
         impl<'a> WrappingFrom<&'a Natural> for $u {
             /// Converts a [`Natural`] to a [`usize`] or a value of an unsigned primitive integer
-            /// type that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$
-            /// is the width of a limb.
+            /// type that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$ is
+            /// the width of a limb.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -402,8 +400,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             type Error = SignedFromNaturalError;
 
             /// Converts a [`Natural`] to an [`isize`] or value of a signed primitive integer type
-            /// that's larger than a [`Limb`](crate#limbs), returning an error if the [`Natural`]
-            /// is too large.
+            /// that's larger than a [`Limb`](crate#limbs), returning an error if the [`Natural`] is
+            /// too large.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -419,9 +417,9 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
         }
 
         impl<'a> WrappingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer
-            /// type that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$
-            /// is the width of a limb.
+            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer type
+            /// that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$ is the
+            /// width of a limb.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -435,9 +433,9 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
         }
 
         impl<'a> SaturatingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer
-            /// type that's larger than a [`Limb`](crate#limbs), If the [`Natural`] is too large to
-            /// fit in the output type, the largest representable value is returned.
+            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer type
+            /// that's larger than a [`Limb`](crate#limbs), If the [`Natural`] is too large to fit
+            /// in the output type, the largest representable value is returned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -451,9 +449,9 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
         }
 
         impl<'a> OverflowingFrom<&'a Natural> for $s {
-            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer
-            /// type that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$
-            /// is the width of a limb.
+            /// Converts a [`Natural`] to an [`isize`] or a value of a signed primitive integer type
+            /// that's larger than a [`Limb`](crate#limbs), wrapping modulo $2^W$, where $W$ is the
+            /// width of a limb.
             ///
             /// The returned boolean value indicates whether wrapping occurred.
             ///
@@ -545,8 +543,8 @@ macro_rules! impl_from_larger_than_limb {
         }
 
         impl<'a> ConvertibleFrom<&'a Natural> for $u {
-            /// Determines whether a [`Natural`] can be converted to a value of a primitive
-            /// unsigned integer type that's larger than a [`Limb`](crate#limbs).
+            /// Determines whether a [`Natural`] can be converted to a value of a primitive unsigned
+            /// integer type that's larger than a [`Limb`](crate#limbs).
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

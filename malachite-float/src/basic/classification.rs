@@ -1,7 +1,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{float_either_infinity, float_finite, float_nan, float_negative_zero, float_zero};
 use crate::{float_either_zero, Float};
-use std::num::FpCategory;
+use core::num::FpCategory;
 
 impl Float {
     /// Determines whether a [`Float`] is NaN.
@@ -295,8 +295,8 @@ impl Float {
         }
     }
 
-    /// Turns any [`Float`] that's NaN or infinite into a `None` and wraps any finite [`Float`]
-    /// with a `Some`. The [`Float`] is taken by value.
+    /// Turns any [`Float`] that's NaN or infinite into a `None` and wraps any finite [`Float`] with
+    /// a `Some`. The [`Float`] is taken by value.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -320,8 +320,8 @@ impl Float {
         }
     }
 
-    /// Turns any [`Float`] that's NaN or infinite into a `None` and wraps any finite [`Float`]
-    /// with a `Some`. The [`Float`] is taken by reference.
+    /// Turns any [`Float`] that's NaN or infinite into a `None` and wraps any finite [`Float`] with
+    /// a `Some`. The [`Float`] is taken by reference.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

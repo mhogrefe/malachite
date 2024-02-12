@@ -1,11 +1,12 @@
+use crate::alloc::string::ToString;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
+use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
 use malachite_base::num::arithmetic::traits::{Abs, ModPowerOf2, ShrRound};
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_q::Rational;
-use std::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
 
 impl Display for Float {
     fn fmt(&self, f: &mut Formatter) -> Result {

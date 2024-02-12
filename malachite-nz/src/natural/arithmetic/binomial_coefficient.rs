@@ -242,8 +242,8 @@ pub_test! {limbs_binomial_coefficient_limb_limb_basecase(n: Limb, k: Limb) -> Li
 
 pub const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
 
-// Recursively exploit the relation
-// bin(n, k) = bin(n, k >> 1) * bin(n - k >> 1, k - k >> 1) / bin(k, k >> 1).
+// Recursively exploit the relation bin(n, k) = bin(n, k >> 1) * bin(n - k >> 1, k - k >> 1) /
+// bin(k, k >> 1).
 //
 // Values for binomial(k, k >> 1) that fit in a limb are precomputed (with inverses).
 //
@@ -301,11 +301,14 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     out
 }}
 
-// Returns an approximation of the sqare root of x.
-// It gives:
+// Returns an approximation of the sqare root of x. It gives:
+// ```
 //   limb_apprsqrt (x) ^ 2 <= x < (limb_apprsqrt (x)+1) ^ 2
+// ```
 // or
-//   x <= limb_apprsqrt (x) ^ 2 <= x * 9/8
+// ```
+// x <= limb_apprsqrt (x) ^ 2 <= x * 9/8
+// ```
 fn limbs_approx_sqrt(x: Limb) -> Limb {
     assert!(x > 2);
     let s = (Limb::WIDTH - LeadingZeros::leading_zeros(x)) >> 1;
@@ -490,8 +493,8 @@ pub_test! {binomial_coefficient_limb_limb(n: Limb, mut k: Limb) -> Natural {
 
 // Computes r = n * (n + (2 * k - 1)) / 2.
 //
-// It uses a square instead of a product, computing r = ((n + k - 1) ^ 2 + n - (k - 1) ^ 2) / 2
-// As a side effect, sets t = n + k - 1.
+// It uses a square instead of a product, computing r = ((n + k - 1) ^ 2 + n - (k - 1) ^ 2) / 2 As a
+// side effect, sets t = n + k - 1.
 //
 // This is equivalent to `mpz_hmul_nbnpk` from `mpz/bin_ui.c`, GMP 6.2.1.
 fn binomial_coefficient_hmul_nbnpk(n: &Natural, mut k: Limb) -> Natural {
@@ -568,8 +571,8 @@ fn binomial_coefficient_raising_factorial_4(mut n: Natural, mut k: Limb) -> Natu
     r
 }
 
-// This is equivalent to `mpz_bin_ui` from `mpz/bin_ui.c`, GMP 6.2.1, where n is non-negative,
-// n >= k, k <= n - k, and r is returned.
+// This is equivalent to `mpz_bin_ui` from `mpz/bin_ui.c`, GMP 6.2.1, where n is non-negative, n >=
+// k, k <= n - k, and r is returned.
 fn binomial_coefficient_helper(n: Natural, k: Limb) -> Natural {
     assert_ne!(k, 0);
     if k < 2 {

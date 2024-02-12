@@ -169,10 +169,10 @@ macro_rules! impl_primes {
 
             /// Returns an iterator that generates all primes less than or equal to a given value.
             ///
-            /// The iterator produced by `primes_less_than_or_equal_to(n)` generates the same
-            /// primes as the iterator produced by `primes().take_while(|&p| p <= n)`, but the
-            /// latter would be slower because it doesn't know in advance how large its prime sieve
-            /// should be, and might have to create larger and larger prime sieves.
+            /// The iterator produced by `primes_less_than_or_equal_to(n)` generates the same primes
+            /// as the iterator produced by `primes().take_while(|&p| p <= n)`, but the latter would
+            /// be slower because it doesn't know in advance how large its prime sieve should be,
+            /// and might have to create larger and larger prime sieves.
             ///
             /// # Worst-case complexity (amortized)
             /// $T(i) = O(\log \log i)$
@@ -194,8 +194,8 @@ macro_rules! impl_primes {
             /// produced by `primes_less_than_or_equal_to(T::MAX)`. If you really need to generate
             /// _every_ prime, and `T` is `u32` or smaller, then you should use the latter, as it
             /// will allocate all the needed memory at once. If `T` is `u64` or larger, or if you
-            /// probably don't need every prime, then `primes()` will be faster as it won't
-            /// allocate too much memory right away.
+            /// probably don't need every prime, then `primes()` will be faster as it won't allocate
+            /// too much memory right away.
             ///
             /// # Worst-case complexity (amortized)
             /// $T(i) = O(\log \log i)$

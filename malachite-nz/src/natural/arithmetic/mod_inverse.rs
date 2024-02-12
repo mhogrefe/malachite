@@ -39,8 +39,8 @@ impl ModInverse for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), m.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// m.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
@@ -83,8 +83,8 @@ impl<'a> ModInverse<&'a Natural> for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), m.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// m.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
@@ -127,8 +127,8 @@ impl<'a> ModInverse<Natural> for &'a Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), m.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// m.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.
@@ -170,8 +170,8 @@ impl<'a, 'b> ModInverse<&'a Natural> for &'b Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), m.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// m.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `self` is 0 or if `self` is greater than or equal to `m`.

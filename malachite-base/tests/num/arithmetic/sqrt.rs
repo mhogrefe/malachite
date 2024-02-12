@@ -24,10 +24,10 @@ fn test_sqrt_rem_newton() {
         assert_eq!(actual_rem, rem);
         assert_eq!(n.sqrt_rem(), (sqrt, rem));
     }
-    // no initial underestimate
+    // - no initial underestimate
     test::<u32, i32>(2000000000, 44721, 32159);
     test::<u32, i32>(u32::MAX, 65535, 131070);
-    // initial underestimate
+    // - initial underestimate
     test::<u32, i32>(1073741824, 32768, 0);
 
     test::<u64, i64>(10000000000000000000, 3162277660, 1064924400);

@@ -1,6 +1,6 @@
 [package]
 name = "malachite"
-version = "0.4.4"
+version = "0.4.5"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -13,15 +13,18 @@ keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
 [dependencies]
-malachite-base = { version = "0.4.4" }
-malachite-nz = { version = "0.4.4", optional = true }
-malachite-q = { version = "0.4.4", optional = true }
-malachite-float = { version = "0.4.4", optional = true }
+malachite-base = { version = "0.4.5", default_features = false }
+malachite-nz = { version = "0.4.5", default_features = false, optional = true }
+malachite-q = { version = "0.4.5", default_features = false, optional = true }
+malachite-float = { version = "0.4.5", default_features = false, optional = true }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 [features]
 default = [ "naturals_and_integers", "rationals" ]
-enable_serde = [ "malachite-q/enable_serde", "malachite-nz/enable_serde" ]
+enable_serde = [ "malachite-nz/enable_serde", "malachite-q/enable_serde", "malachite-float/enable_serde" ]
+random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random", "malachite-float/random"]
+32_bit_limbs = ["malachite-nz/32_bit_limbs", "malachite-q/32_bit_limbs", "malachite-float/32_bit_limbs"]
+
 naturals_and_integers = [ "malachite-nz" ]
 rationals = [ "malachite-q" ]
 floats = [ "malachite-float" ]

@@ -83,8 +83,8 @@ pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb
     }
 }}
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`s, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural`s to an output slice. The
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`s, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural`s to an output slice. The
 // output must be at least twice as long as `xs.len()`, `xs.len()` must be less than
 // `SQR_TOOM2_THRESHOLD`, and `xs` cannot be empty.
 //
@@ -129,7 +129,8 @@ pub_const_test! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize 
     (xs_len + Limb::WIDTH as usize) << 1
 }}
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
 const TOOM2_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= 2 * SQR_TOOM2_THRESHOLD;
@@ -150,18 +151,18 @@ fn limbs_square_to_out_toom_2_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-// limbs needed is provided by `limbs_square_to_out_toom_2_scratch_len`. The following
-// restrictions on the input slices must be met:
-// 1. `out`.len() >= 2 * `xs`.len()
-// 2. `xs`.len() > 1
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A scratch
+// slice is provided for the algorithm to use. An upper bound for the number of scratch limbs needed
+// is provided by `limbs_square_to_out_toom_2_scratch_len`. The following restrictions on the input
+// slices must be met:
+// - `out`.len() >= 2 * `xs`.len()
+// - `xs`.len() > 1
 //
 // The smallest allowable `xs` length is 2.
 //
 // Evaluate in: -1, 0, infinity.
-//
+// ```
 // <-s--><--n-->
 //  ____ ______
 // |xs1_|__xs0_|
@@ -169,6 +170,7 @@ fn limbs_square_to_out_toom_2_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // v_0     = xs_0 ^ 2          # X(0) ^ 2
 // v_neg_1 = (xs_0 - xs_1) ^ 2 # X(-1) ^ 2
 // v_inf   = xs_1 ^ 2          # X(inf) ^ 2
+// ```
 //
 // # Worst-case complexity
 // $T(n) = O(n^{\log_2 3}) \approx O(n^{1.585})$
@@ -254,10 +256,12 @@ pub_const_test! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize 
     3 * xs_len + Limb::WIDTH as usize
 }}
 
-//TODO tune
+// TODO tune
+
 const SMALLER_RECURSION_TOOM_3: bool = true;
 
-//TODO tune
+// TODO tune
+
 // This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 #[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_TOOM3: bool =
@@ -266,7 +270,8 @@ pub const TOOM3_MAYBE_SQR_TOOM3: bool =
 const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
 #[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_BASECASE: bool =
@@ -294,18 +299,18 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-// limbs needed is provided by `limbs_square_to_out_toom_3_scratch_len`. The following
-// restrictions on the input slices must be met:
-// 1. `out`.len() >= 2 * `xs`.len()
-// 2. `xs`.len() == 3 or `xs`.len() > 4
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A scratch
+// slice is provided for the algorithm to use. An upper bound for the number of scratch limbs needed
+// is provided by `limbs_square_to_out_toom_3_scratch_len`. The following restrictions on the input
+// slices must be met:
+// - `out`.len() >= 2 * `xs`.len()
+// - `xs`.len() == 3 or `xs`.len() > 4
 //
 // The smallest allowable `xs` length is 3.
 //
 // Evaluate in: -1, 0, +1, +2, +inf
-//
+// ```
 // <-s--><--n--><--n-->
 //  ____ ______ ______
 // |xs_2|_xs_1_|_xs_0_|
@@ -315,6 +320,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // v_neg_1 = (xs_0 - xs_1 + xs_2) ^ 2         # X(-1)^2  |xh| <= 1
 // v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2) ^ 2 # X(2)^2    xh  <= 6
 // v_inf   = xs_2 ^ 2                         # X(inf)^2
+// ```
 //
 // # Worst-case complexity
 // $T(n) = O(n^{\log_3 5}) \approx O(n^{1.465})$
@@ -436,12 +442,14 @@ pub_const_test! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize 
     3 * xs_len + Limb::WIDTH as usize
 }}
 
-//TODO tune
+// TODO tune
+
 // This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 // This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= 4 * SQR_TOOM4_THRESHOLD;
@@ -469,18 +477,18 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-// limbs needed is provided by `limbs_square_to_out_toom_4_scratch_len`. The following
-// restrictions on the input slices must be met:
-// 1. `out`.len() >= 2 * `xs`.len()
-// 2. `xs`.len() is 4, 7, or 8, or `xs`.len() > 9.
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A scratch
+// slice is provided for the algorithm to use. An upper bound for the number of scratch limbs needed
+// is provided by `limbs_square_to_out_toom_4_scratch_len`. The following restrictions on the input
+// slices must be met:
+// - `out`.len() >= 2 * `xs`.len()
+// - `xs`.len() is 4, 7, or 8, or `xs`.len() > 9.
 //
 // The smallest allowable `xs` length is 4.
 //
-//  Evaluate in: -1, -1/2, 0, +1/2, +1, +2, +inf
-//
+// Evaluate in: -1, -1/2, 0, +1/2, +1, +2, +inf
+// ```
 // <-s--><--n--><--n--><--n-->
 //  ____ ______ ______ ______
 // |xs_3|_xs_2_|_xs_1_|_xs_0_|
@@ -492,6 +500,7 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // vh      = (8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3) ^ 2 # X(1/2) ^ 2   xh <= 14
 // vmh     = (8 * xs_0 - 4 * xs_1 + 2 * xs_2 - xs_3) ^ 2 # X(-1/2) ^ 2  -4 <= xh <= 9
 // v_inf   = xs_3 ^ 2                                    # X(inf) ^ 2
+// ```
 //
 // # Worst-case complexity
 // $T(n) = O(n^{\log_4 7}) \approx O(n^{1.404})$
@@ -513,10 +522,9 @@ pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &m
     let m = n + 1;
     let k = m + n;
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
-    // Total scratch need: 8 * n + 5 + scratch for recursive calls. This gives roughly
-    // 32 * n / 3 + log term.
-    // Compute apx = xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3
-    // and amx = xs_0 - 2 * xs_1 + 4 * xs_2 - 8 * xs_3.
+    // Total scratch need: 8 * n + 5 + scratch for recursive calls. This gives roughly 32 * n / 3 +
+    // log term. Compute apx = xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3 and amx = xs_0 - 2 * xs_1 + 4
+    // * xs_2 - 8 * xs_3.
     let (apx, remainder) = out.split_at_mut(n << 1);
     let apx = &mut apx[..m];
     let (v1, amx) = remainder.split_at_mut(m << 1);
@@ -581,36 +589,43 @@ pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
         - (SQR_TOOM6_THRESHOLD << 1)
 }}
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `SQR_TOOM6_MAX` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM2_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom2` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM4_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom3` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM4_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom4` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
 const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM6_THRESHOLD;
@@ -638,13 +653,13 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-// limbs needed is provided by `limbs_square_to_out_toom_6_scratch_len`. The following
-// restrictions on the input slices must be met:
-// 1. `out`.len() >= 2 * `xs`.len()
-// 2. `xs`.len() is 18, or `xs.len()` > 21 but `xs`.len() is not 25, 26, or 31.
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A scratch
+// slice is provided for the algorithm to use. An upper bound for the number of scratch limbs needed
+// is provided by `limbs_square_to_out_toom_6_scratch_len`. The following restrictions on the input
+// slices must be met:
+// - `out`.len() >= 2 * `xs`.len()
+// - `xs`.len() is 18, or `xs.len()` > 21 but `xs`.len() is not 25, 26, or 31.
 //
 // The smallest allowable `xs` length is 18.
 //
@@ -721,7 +736,7 @@ pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &m
     limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
 }}
 
-//TODO tune
+// TODO tune
 pub(crate) const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 
 // This function can be used to determine whether the size of the input slice to
@@ -746,7 +761,8 @@ pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
         - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
 }}
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `SQR_TOOM8_MAX` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
     (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
@@ -754,47 +770,56 @@ const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7
     usize::MAX
 };
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_basecase` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM2_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom2` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM3_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom3` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM4_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom4` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM6_THRESHOLD;
 
-//TODO tune
+// TODO tune
+
 /// This is equivalent to `MAYBE_sqr_above_toom6` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
@@ -825,13 +850,13 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-// limbs needed is provided by `limbs_square_to_out_toom_8_scratch_len`. The following
-// restrictions on the input slices must be met:
-// 1. `out`.len() >= 2 * `xs`.len()
-// 2. `xs`.len() is 40, or `xs.len()` > 43 but `xs`.len() is not 49, 50, or 57.
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the `2
+// * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A scratch
+// slice is provided for the algorithm to use. An upper bound for the number of scratch limbs needed
+// is provided by `limbs_square_to_out_toom_8_scratch_len`. The following restrictions on the input
+// slices must be met:
+// - `out`.len() >= 2 * `xs`.len()
+// - `xs`.len() is 40, or `xs.len()` > 43 but `xs`.len() is not 49, 50, or 57.
 //
 // The smallest allowable `xs` length is 40.
 //

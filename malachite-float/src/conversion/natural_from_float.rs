@@ -1,12 +1,12 @@
 use crate::InnerFloat::{Finite, Infinity, Zero};
 use crate::{significand_bits, Float};
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
 
 impl RoundingFrom<Float> for Natural {
     /// Converts a [`Float`] to a [`Natural`], using a specified [`RoundingMode`] and taking the
@@ -355,8 +355,8 @@ impl<'a> ConvertibleFrom<&'a Float> for Natural {
     /// Determines whether a [`Float`] can be converted to a [`Natural`] (when the [`Float`] is
     /// non-negative and an integer), taking the [`Float`] by reference.
     ///
-    /// Both positive and negative zero are convertible to a [`Natural`]. (Although negative zero
-    /// is nominally negative, the real number it represents is zero, which is not negative.)
+    /// Both positive and negative zero are convertible to a [`Natural`]. (Although negative zero is
+    /// nominally negative, the real number it represents is zero, which is not negative.)
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

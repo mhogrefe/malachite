@@ -9,8 +9,8 @@ impl DivMod<Integer> for Integer {
     type ModOutput = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by value and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity, and the
-    /// remainder has the same sign as the second [`Integer`].
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// has the same sign as the second [`Integer`].
     ///
     /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
@@ -59,8 +59,8 @@ impl<'a> DivMod<&'a Integer> for Integer {
     type ModOutput = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
-    /// reference and returning the quotient and remainder. The quotient is rounded towards
-    /// negative infinity, and the remainder has the same sign as the second [`Integer`].
+    /// reference and returning the quotient and remainder. The quotient is rounded towards negative
+    /// infinity, and the remainder has the same sign as the second [`Integer`].
     ///
     /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
@@ -166,8 +166,8 @@ impl<'a, 'b> DivMod<&'b Integer> for &'a Integer {
     type ModOutput = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking both by reference and returning the
-    /// quotient and remainder. The quotient is rounded towards negative infinity, and the
-    /// remainder has the same sign as the second [`Integer`].
+    /// quotient and remainder. The quotient is rounded towards negative infinity, and the remainder
+    /// has the same sign as the second [`Integer`].
     ///
     /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
@@ -413,8 +413,8 @@ impl<'a> DivRem<&'a Integer> for Integer {
     type RemOutput = Integer;
 
     /// Divides an [`Integer`] by another [`Integer`], taking the first by value and the second by
-    /// reference and returning the quotient and remainder. The quotient is rounded towards zero
-    /// and the remainder has the same sign as the first [`Integer`].
+    /// reference and returning the quotient and remainder. The quotient is rounded towards zero and
+    /// the remainder has the same sign as the first [`Integer`].
     ///
     /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///
@@ -765,9 +765,9 @@ impl<'a> CeilingDivMod<&'a Integer> for Integer {
     type DivOutput = Integer;
     type ModOutput = Integer;
 
-    /// Divides an [`Integer`] by another [`Integer`], taking both the first by value and the
-    /// second by reference and returning the quotient and remainder. The quotient is rounded
-    /// towards positive infinity and the remainder has the opposite sign as the second [`Integer`].
+    /// Divides an [`Integer`] by another [`Integer`], taking both the first by value and the second
+    /// by reference and returning the quotient and remainder. The quotient is rounded towards
+    /// positive infinity and the remainder has the opposite sign as the second [`Integer`].
     ///
     /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
     ///

@@ -1,5 +1,5 @@
 use crate::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign,
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, Ln,
     RoundToMultipleOfPowerOf2, ShrRound, Sqrt, SqrtAssign, SqrtAssignRem, SqrtRem,
 };
 use crate::num::basic::integers::PrimitiveInt;
@@ -208,9 +208,8 @@ pub fn sqrt_rem_newton<
         _ => panic!(),
     };
     assert!(n.leading_zeros() < 2);
-    // Use Newton iterations for approximating 1/sqrt(a) instead of sqrt(a),
-    // since we can do the former without division.  As part of the last
-    // iteration convert from 1/sqrt(a) to sqrt(a).
+    // Use Newton iterations for approximating 1/sqrt(a) instead of sqrt(a), since we can do the
+    // former without division. As part of the last iteration convert from 1/sqrt(a) to sqrt(a).
     let i: usize = (n >> (U::WIDTH - 9)).wrapping_into(); // extract bits for table lookup
     let mut inv_sqrt = U::wrapping_from(INV_SQRT_TAB[i - 0x80]);
     inv_sqrt.set_bit(8); // initial 1/sqrt(a)
@@ -533,8 +532,8 @@ macro_rules! impl_sqrt_newton {
         impl CheckedSqrt for $u {
             type Output = $u;
 
-            /// Returns the the square root of an integer, or `None` if the integer is not a
-            /// perfect square.
+            /// Returns the the square root of an integer, or `None` if the integer is not a perfect
+            /// square.
             ///
             /// $$
             /// f(x) = \\begin{cases}
@@ -656,8 +655,8 @@ impl SqrtRem for u16 {
     type SqrtOutput = u16;
     type RemOutput = u16;
 
-    /// Returns the floor of the square root of a [`u16`], and the remainder (the difference
-    /// between the [`u16`] and the square of the floor).
+    /// Returns the floor of the square root of a [`u16`], and the remainder (the difference between
+    /// the [`u16`] and the square of the floor).
     ///
     /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
     ///
@@ -794,7 +793,7 @@ impl SqrtRem for usize {
     }
 }
 
-//TODO tune
+// TODO tune
 const U128_SQRT_THRESHOLD: u64 = 125;
 const U128_MAX_SQUARE: u128 = 0xfffffffffffffffe0000000000000001;
 
@@ -837,8 +836,8 @@ impl FloorSqrt for u128 {
     ///
     /// $2^{\lceil b/2 \rceil-1} \leq \lfloor\sqrt{x}\rfloor \leq 2^{\lceil b/2 \rceil}$.
     ///
-    /// For example, since $10^9$ has 30 significant bits, we know that
-    /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
+    /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
+    /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn floor_sqrt(self) -> u128 {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
             floor_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
@@ -887,8 +886,8 @@ impl CeilingSqrt for u128 {
     ///
     /// $2^{\lceil b/2 \rceil-1} \leq \lfloor\sqrt{x}\rfloor \leq 2^{\lceil b/2 \rceil}$.
     ///
-    /// For example, since $10^9$ has 30 significant bits, we know that
-    /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
+    /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
+    /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn ceiling_sqrt(self) -> u128 {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
             ceiling_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
@@ -943,8 +942,8 @@ impl CheckedSqrt for u128 {
     ///
     /// $2^{\lceil b/2 \rceil-1} \leq \lfloor\sqrt{x}\rfloor \leq 2^{\lceil b/2 \rceil}$.
     ///
-    /// For example, since $10^9$ has 30 significant bits, we know that
-    /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
+    /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
+    /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn checked_sqrt(self) -> Option<u128> {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
             checked_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
@@ -995,8 +994,8 @@ impl SqrtRem for u128 {
     ///
     /// $2^{\lceil b/2 \rceil-1} \leq \lfloor\sqrt{x}\rfloor \leq 2^{\lceil b/2 \rceil}$.
     ///
-    /// For example, since $10^9$ has 30 significant bits, we know that
-    /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
+    /// For example, since $10^9$ has 30 significant bits, we know that $2^{14} \leq
+    /// \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn sqrt_rem(self) -> (u128, u128) {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
             sqrt_rem_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
@@ -1061,8 +1060,8 @@ macro_rules! impl_sqrt_signed {
         impl CheckedSqrt for $s {
             type Output = $s;
 
-            /// Returns the the square root of an integer, or `None` if the integer is not a
-            /// perfect square.
+            /// Returns the the square root of an integer, or `None` if the integer is not a perfect
+            /// square.
             ///
             /// $$
             /// f(x) = \\begin{cases}
@@ -1171,6 +1170,16 @@ macro_rules! impl_sqrt_primitive_float {
             #[inline]
             fn sqrt(self) -> $f {
                 libm::Libm::<$f>::sqrt(self)
+            }
+        }
+
+        // TODO move to better location
+        impl Ln for $f {
+            type Output = Self;
+
+            #[inline]
+            fn ln(self) -> $f {
+                libm::Libm::<$f>::log(self)
             }
         }
 

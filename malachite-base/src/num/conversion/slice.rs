@@ -198,8 +198,8 @@ macro_rules! impl_slice_traits_large_to_small {
             ///
             /// The input value will be broken up into several values in the output [`Vec`].
             ///
-            /// $f(x) = (y_k)_{k=0}^{m-1}$, where $x = \sum_{j=0}^{m-1}2^{jW}y_j$ and
-            /// $m = 2^{V-W}n$.
+            /// $f(x) = (y_k)_{k=0}^{m-1}$, where $x = \sum_{j=0}^{m-1}2^{jW}y_j$ and $m =
+            /// 2^{V-W}n$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -316,8 +316,8 @@ macro_rules! impl_slice_traits_small_to_large {
             /// Converts a value of one type of unsigned integer to a [`Vec`] of a larger unsigned
             /// type.
             ///
-            /// The output [`Vec`] only contains one value. The least-significant bits of the
-            /// output value contain the input value, and the most-significant bits are set to 0.
+            /// The output [`Vec`] only contains one value. The least-significant bits of the output
+            /// value contain the input value, and the most-significant bits are set to 0.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

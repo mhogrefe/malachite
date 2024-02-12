@@ -1,8 +1,8 @@
 use crate::Rational;
+use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
-use std::ops::Neg;
 
 impl Neg for Rational {
     type Output = Rational;

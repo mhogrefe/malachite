@@ -136,8 +136,8 @@ pub_const_test! {limbs_neg_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
-// negative of another, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may
-// not be empty or only contain zeros.
+// negative of another, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not
+// be empty or only contain zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -268,8 +268,7 @@ pub_test! {limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
 // negative of another, writes the limbs of the bitwise or of the `Integer`s to the first (left)
 // slice. `xs` and `ys` may not be empty or only contain zeros. Returns whether the result is too
-// large to be contained in the first slice; if it is, only the lowest `xs.len()` limbs are
-// written.
+// large to be contained in the first slice; if it is, only the lowest `xs.len()` limbs are written.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -339,8 +338,8 @@ pub_test! {limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) ->
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is
-// `max(1, ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
+// ys.len() - xs.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
@@ -450,8 +449,8 @@ pub_test! {limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 }}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
-// `Integer`s, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not be
-// empty or only contain zeros.
+// `Integer`s, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not be empty
+// or only contain zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -515,8 +514,8 @@ pub_test! {limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-// shorter of `xs` and `ys`.
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the shorter
+// of `xs` and `ys`.
 //
 // This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are negative.
 pub_test! {limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -863,9 +862,9 @@ impl BitOr<Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -901,9 +900,8 @@ impl<'a> BitOr<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -939,9 +937,8 @@ impl<'a> BitOr<Integer> for &'a Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -976,8 +973,8 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1022,9 +1019,9 @@ impl BitOrAssign<Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1060,9 +1057,8 @@ impl<'a> BitOrAssign<&'a Integer> for Integer {
     ///
     /// $M(m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`, and $m$ is
-    /// `other.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`, and $m$ is `other.significant_bits()`.
     ///
     /// # Examples
     /// ```

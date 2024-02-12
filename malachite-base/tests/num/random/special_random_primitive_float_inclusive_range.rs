@@ -493,8 +493,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = 100.0, b = 101.0, mean abs of exponent = 10, mean precision = 10,
-    // mean zero P = 1/100
+    // f32, a = 100.0, b = 101.0, mean abs of exponent = 10, mean precision = 10, mean zero P =
+    // 1/100
     let values = &[
         100.82031, 100.5625, 100.0, 100.71875, 100.75, 100.5, 100.9375, 100.88427, 100.9375, 100.5,
         100.0, 101.0, 100.0, 100.125, 101.0, 100.46094, 100.51196, 100.46338, 100.80127, 101.0,
@@ -547,8 +547,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = 1.0e38, b = Infinity, mean abs of exponent = 129, mean precision = 2,
-    // mean zero P = 1/10
+    // f32, a = 1.0e38, b = Infinity, mean abs of exponent = 129, mean precision = 2, mean zero P =
+    // 1/10
     let values = &[
         2.5521178e38,
         1.0633824e38,
@@ -645,8 +645,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = -f32::MIN_POSITIVE_SUBNORMAL, b = f32::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 150, mean precision = 2, mean zero P = 1/10
+    // f32, a = -f32::MIN_POSITIVE_SUBNORMAL, b = f32::MIN_POSITIVE_SUBNORMAL, mean abs of exponent
+    // = 150, mean precision = 2, mean zero P = 1/10
     let values = &[
         1.0e-45, 1.0e-45, 1.0e-45, -0.0, -1.0e-45, -1.0e-45, -1.0e-45, -1.0e-45, 1.0e-45, 1.0e-45,
         -1.0e-45, -1.0e-45, -1.0e-45, 0.0, -1.0e-45, -1.0e-45, -1.0e-45, -0.0, 1.0e-45, -1.0e-45,
@@ -678,8 +678,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = -0.0, b = f32::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 150, mean precision = 2, mean zero P = 1/10
+    // f32, a = -0.0, b = f32::MIN_POSITIVE_SUBNORMAL, mean abs of exponent = 150, mean precision =
+    // 2, mean zero P = 1/10
     let values = &[
         1.0e-45, 1.0e-45, 1.0e-45, -0.0, 1.0e-45, 1.0e-45, 1.0e-45, 1.0e-45, 1.0e-45, 1.0e-45,
         1.0e-45, 1.0e-45, 1.0e-45, 0.0, 1.0e-45, 1.0e-45, 1.0e-45, -0.0, 1.0e-45, 1.0e-45, 1.0e-45,
@@ -735,8 +735,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // -f32::MIN_POSITIVE_SUBNORMAL, b = -f32::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 150, mean precision = 2, mean zero P = 1/10
+    // -f32::MIN_POSITIVE_SUBNORMAL, b = -f32::MIN_POSITIVE_SUBNORMAL, mean abs of exponent = 150,
+    // mean precision = 2, mean zero P = 1/10
     let values = &[-1.0e-45; 50];
     let common_values = &[(-1.0e-45, 1000000)];
     let sample_median = (-1.0e-45, None);
@@ -761,8 +761,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = -f32::MIN_POSITIVE_SUBNORMAL, b = 0.0,
-    // mean abs of exponent = 150, mean precision = 2, mean zero P = 1/10
+    // f32, a = -f32::MIN_POSITIVE_SUBNORMAL, b = 0.0, mean abs of exponent = 150, mean precision =
+    // 2, mean zero P = 1/10
     let values = &[
         -1.0e-45, -1.0e-45, -1.0e-45, -0.0, -1.0e-45, -1.0e-45, -1.0e-45, -1.0e-45, -1.0e-45,
         -1.0e-45, -1.0e-45, -1.0e-45, -1.0e-45, 0.0, -1.0e-45, -1.0e-45, -1.0e-45, -0.0, -1.0e-45,
@@ -794,8 +794,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = -Infinity, b = Infinity, mean abs of exponent = 1, mean precision = 2,
-    // mean zero P = 1/10
+    // f32, a = -Infinity, b = Infinity, mean abs of exponent = 1, mean precision = 2, mean zero P =
+    // 1/10
     let values = &[
         12.0,
         1.5,
@@ -892,8 +892,7 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f32, a = -0.0, b = -0.0, mean abs of exponent = 1, mean precision = 2,
-    // mean zero P = 1/10
+    // f32, a = -0.0, b = -0.0, mean abs of exponent = 1, mean precision = 2, mean zero P = 1/10
     let values = &[-0.0; 50];
     let common_values = &[(-0.0, 1000000)];
     let sample_median = (-0.0, None);
@@ -1460,8 +1459,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = 100.0, b = 101.0, mean abs of exponent = 10, mean precision = 10,
-    // mean zero P = 1/100
+    // f64, a = 100.0, b = 101.0, mean abs of exponent = 10, mean precision = 10, mean zero P =
+    // 1/100
     let values = &[
         100.8203125,
         100.5625,
@@ -1558,8 +1557,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = 1.0e38, b = Infinity, mean abs of exponent = 129, mean precision = 2,
-    // mean zero P = 1/10
+    // f64, a = 1.0e38, b = Infinity, mean abs of exponent = 129, mean precision = 2, mean zero P =
+    // 1/10
     let values = &[
         4.0833884030512616e39,
         1.0633823966279327e38,
@@ -1656,8 +1655,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = -f64::MIN_POSITIVE_SUBNORMAL, b = f64::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 1075, mean precision = 2, mean zero P = 1/10
+    // f64, a = -f64::MIN_POSITIVE_SUBNORMAL, b = f64::MIN_POSITIVE_SUBNORMAL, mean abs of exponent
+    // = 1075, mean precision = 2, mean zero P = 1/10
     let values = &[
         5.0e-324, 5.0e-324, 5.0e-324, -0.0, -5.0e-324, -5.0e-324, -5.0e-324, -5.0e-324, 5.0e-324,
         5.0e-324, -5.0e-324, -5.0e-324, -5.0e-324, 0.0, -5.0e-324, -5.0e-324, -5.0e-324, -0.0,
@@ -1689,8 +1688,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = -0.0, b = f64::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 1075, mean precision = 2, mean zero P = 1/10
+    // f64, a = -0.0, b = f64::MIN_POSITIVE_SUBNORMAL, mean abs of exponent = 1075, mean precision =
+    // 2, mean zero P = 1/10
     let values = &[
         5.0e-324, 5.0e-324, 5.0e-324, -0.0, 5.0e-324, 5.0e-324, 5.0e-324, 5.0e-324, 5.0e-324,
         5.0e-324, 5.0e-324, 5.0e-324, 5.0e-324, 0.0, 5.0e-324, 5.0e-324, 5.0e-324, -0.0, 5.0e-324,
@@ -1747,8 +1746,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // -f64::MIN_POSITIVE_SUBNORMAL, b = -f64::MIN_POSITIVE_SUBNORMAL,
-    // mean abs of exponent = 1075, mean precision = 2, mean zero P = 1/10
+    // -f64::MIN_POSITIVE_SUBNORMAL, b = -f64::MIN_POSITIVE_SUBNORMAL, mean abs of exponent = 1075,
+    // mean precision = 2, mean zero P = 1/10
     let values = &[-5.0e-324; 50];
     let common_values = &[(-5.0e-324, 1000000)];
     let sample_median = (-5.0e-324, None);
@@ -1773,8 +1772,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = -f64::MIN_POSITIVE_SUBNORMAL, b = 0.0,
-    // mean abs of exponent = 1075, mean precision = 2, mean zero P = 1/10
+    // f64, a = -f64::MIN_POSITIVE_SUBNORMAL, b = 0.0, mean abs of exponent = 1075, mean precision =
+    // 2, mean zero P = 1/10
     let values = &[
         -5.0e-324, -5.0e-324, -5.0e-324, -0.0, -5.0e-324, -5.0e-324, -5.0e-324, -5.0e-324,
         -5.0e-324, -5.0e-324, -5.0e-324, -5.0e-324, -5.0e-324, 0.0, -5.0e-324, -5.0e-324,
@@ -1807,8 +1806,8 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = -Infinity, b = Infinity, mean abs of exponent = 1, mean precision = 2,
-    // mean zero P = 1/10
+    // f64, a = -Infinity, b = Infinity, mean abs of exponent = 1, mean precision = 2, mean zero P =
+    // 1/10
     let values = &[
         12.0,
         1.5,
@@ -1905,8 +1904,7 @@ fn test_special_random_primitive_float_inclusive_range() {
         sample_moment_stats,
     );
 
-    // f64, a = -0.0, b = -0.0, mean abs of exponent = 1, mean precision = 2,
-    // mean zero P = 1/10
+    // f64, a = -0.0, b = -0.0, mean abs of exponent = 1, mean precision = 2, mean zero P = 1/10
     let values = &[-0.0; 50];
     let common_values = &[(-0.0, 1000000)];
     let sample_median = (-0.0, None);

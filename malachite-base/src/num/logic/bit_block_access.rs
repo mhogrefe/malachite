@@ -69,21 +69,20 @@ macro_rules! impl_bit_block_access_unsigned {
             /// The least-significant `end - start` bits of `bits` are assigned to bits `start`
             /// through `end - 1`, inclusive, of `self`.
             ///
-            /// The block of bits has the same type as the input. If `bits` has fewer bits than
-            /// `end - start`, the high bits are interpreted as 0. If `end` is greater than the
-            /// type's width, the high bits of `bits` must be 0.
+            /// The block of bits has the same type as the input. If `bits` has fewer bits than `end
+            /// - start`, the high bits are interpreted as 0. If `end` is greater than the type's
+            /// width, the high bits of `bits` must be 0.
             ///
             /// Let
             /// $$
             /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
-            /// Let
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Let
             /// $$
             /// m = \sum_{i=0}^k 2^{d_i},
             /// $$
-            /// where for all $i$, $d_i\in \\{0, 1\\}$.
-            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 0$ for all $i \geq W + p$.
+            /// where for all $i$, $d_i\in \\{0, 1\\}$. Also, let $p, q \in \mathbb{N}$, where $d_i
+            /// = 0$ for all $i \geq W + p$.
             ///
             /// Then
             /// $$
@@ -100,8 +99,8 @@ macro_rules! impl_bit_block_access_unsigned {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Let `W` be the type's width. Panics if `start < end`, or if `end > W` and bits
-            /// `W - start` through `end - start` of `bits` are nonzero.
+            /// Let `W` be the type's width. Panics if `start < end`, or if `end > W` and bits `W -
+            /// start` through `end - start` of `bits` are nonzero.
             ///
             /// # Examples
             /// See [here](super::bit_block_access#assign_bits).
@@ -209,8 +208,8 @@ macro_rules! impl_bit_block_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Let `W` be the type's width. Panics if `start < end` or (`self < 0` and
-            /// `end - start > W`).
+            /// Let `W` be the type's width. Panics if `start < end` or (`self < 0` and `end - start
+            /// > W`).
             ///
             /// # Examples
             /// See [here](super::bit_block_access#get_bits).
@@ -236,13 +235,12 @@ macro_rules! impl_bit_block_access_signed {
             /// $$
             /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
-            /// Let
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Let
             /// $$
             /// m = \sum_{i=0}^k 2^{d_i},
             /// $$
-            /// where for all $i$, $d_i\in \\{0, 1\\}$.
-            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 0$ for all $i \geq W + p - 1$. Then
+            /// where for all $i$, $d_i\in \\{0, 1\\}$. Also, let $p, q \in \mathbb{N}$, where $d_i
+            /// = 0$ for all $i \geq W + p - 1$. Then
             /// $$
             /// n \gets \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
@@ -257,13 +255,12 @@ macro_rules! impl_bit_block_access_signed {
             /// $$
             /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
-            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
-            /// Let
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Let
             /// $$
             /// m = \sum_{i=0}^k 2^{d_i},
             /// $$
-            /// where for all $i$, $d_i\in \\{0, 1\\}$.
-            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 1$ for all $i \geq W + p - 1$. Then
+            /// where for all $i$, $d_i\in \\{0, 1\\}$. Also, let $p, q \in \mathbb{N}$, where $d_i
+            /// = 1$ for all $i \geq W + p - 1$. Then
             /// $$
             /// f(n, p, q, m) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
             /// $$
@@ -278,9 +275,9 @@ macro_rules! impl_bit_block_access_signed {
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Let `W` be the type's width Panics if `start < end`, or if `end >= W` and bits
-            /// `W - start` through `end - start` of `bits` are not equal to the original sign bit
-            /// of `self`.
+            /// Let `W` be the type's width Panics if `start < end`, or if `end >= W` and bits `W -
+            /// start` through `end - start` of `bits` are not equal to the original sign bit of
+            /// `self`.
             ///
             /// # Examples
             /// See [here](super::bit_block_access#assign_bits).

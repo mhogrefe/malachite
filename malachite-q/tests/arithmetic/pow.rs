@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    Parity, Pow, PowAssign, PowerOf2, Reciprocal, Square,
+    CheckedRoot, Parity, Pow, PowAssign, PowerOf2, Reciprocal, Square,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -217,10 +217,9 @@ fn pow_properties() {
         } else {
             assert_eq!(power_of_neg, -&power);
         }
-        // TODO
-        // if exp > 0 && (x >= 0 || exp.odd()) {
-        //     assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
-        // }
+        if exp > 0 && (x >= 0 || exp.odd()) {
+            assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
+        }
 
         assert_eq!((&x).pow(i64::exact_from(exp)), power);
 
@@ -287,10 +286,9 @@ fn pow_properties() {
             assert_eq!((&x).pow(-exp), (&power).reciprocal());
         }
 
-        // TODO
-        // if exp > 0 && (x >= 0 || exp.odd()) {
-        //     assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
-        // }
+        if exp > 0 && (x >= 0 || exp.odd()) {
+            assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
+        }
 
         assert_eq!(Rational::from(&BigRational::from(&x).pow(exp)), power);
         assert_eq!(

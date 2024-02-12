@@ -68,8 +68,8 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// mode. An [`Ordering`] is also returned, indicating whether the returned value is
             /// less than, equal to, or greater than the original value.
             ///
-            /// The only rounding modes that are guaranteed to return without a panic are `Down`
-            /// and `Floor`.
+            /// The only rounding modes that are guaranteed to return without a panic are `Down` and
+            /// `Floor`.
             ///
             /// Let $q = \frac{x}{y}$:
             ///
@@ -118,11 +118,11 @@ macro_rules! impl_round_to_multiple_unsigned {
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds a number to a multiple of another number in place, according to a specified
-            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value
-            /// is less than, equal to, or greater than the original value.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value is
+            /// less than, equal to, or greater than the original value.
             ///
-            /// The only rounding modes that are guaranteed to return without a panic are `Down`
-            /// and `Floor`.
+            /// The only rounding modes that are guaranteed to return without a panic are `Down` and
+            /// `Floor`.
             ///
             /// See the [`RoundToMultiple`] documentation for details.
             ///
@@ -241,8 +241,8 @@ macro_rules! impl_round_to_multiple_signed {
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds a number to a multiple of another number in place, according to a specified
-            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value
-            /// is less than, equal to, or greater than the original value.
+            /// rounding mode. An [`Ordering`] is returned, indicating whether the returned value is
+            /// less than, equal to, or greater than the original value.
             ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
             ///

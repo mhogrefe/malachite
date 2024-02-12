@@ -1,16 +1,15 @@
 use crate::natural::Natural;
+use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-use core::cmp::Ordering;
 
 impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;
 
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. Both [`Natural`]s are taken by value. An [`Ordering`] is also returned,
-    /// indicating whether the returned value is less than, equal to, or greater than the original
-    /// value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
+    /// mode. Both [`Natural`]s are taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -110,10 +109,10 @@ impl RoundToMultiple<Natural> for Natural {
 impl<'a> RoundToMultiple<&'a Natural> for Natural {
     type Output = Natural;
 
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. The first [`Natural`] is taken by value and the second by reference. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
+    /// mode. The first [`Natural`] is taken by value and the second by reference. An [`Ordering`]
+    /// is also returned, indicating whether the returned value is less than, equal to, or greater
+    /// than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -213,10 +212,10 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
 impl<'a> RoundToMultiple<Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. The first [`Natural`] is taken by reference and the second by value. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
+    /// mode. The first [`Natural`] is taken by reference and the second by value. An [`Ordering`]
+    /// is also returned, indicating whether the returned value is less than, equal to, or greater
+    /// than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -356,10 +355,9 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
 impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     type Output = Natural;
 
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified
-    /// rounding mode. Both [`Natural`]s are taken by reference. An [`Ordering`] is also returned,
-    /// indicating whether the returned value is less than, equal to, or greater than the original
-    /// value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`], according to a specified rounding
+    /// mode. Both [`Natural`]s are taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the returned value is less than, equal to, or greater than the original value.
     ///
     /// Let $q = \frac{x}{y}$:
     ///
@@ -497,10 +495,10 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
 }
 
 impl RoundToMultipleAssign<Natural> for Natural {
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
-    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by value. An
-    /// [`Ordering`] is returned, indicating whether the returned value is less than, equal to, or
-    /// greater than the original value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a specified
+    /// rounding mode. The [`Natural`] on the right-hand side is taken by value. An [`Ordering`] is
+    /// returned, indicating whether the returned value is less than, equal to, or greater than the
+    /// original value.
     ///
     /// See the [`RoundToMultiple`] documentation for details.
     ///
@@ -638,10 +636,10 @@ impl RoundToMultipleAssign<Natural> for Natural {
 }
 
 impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
-    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a
-    /// specified rounding mode. The [`Natural`] on the right-hand side is taken by reference. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the original value.
+    /// Rounds a [`Natural`] to a multiple of another [`Natural`] in place, according to a specified
+    /// rounding mode. The [`Natural`] on the right-hand side is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the returned value is less than, equal to, or greater
+    /// than the original value.
     ///
     /// See the [`RoundToMultiple`] documentation for details.
     ///

@@ -18,7 +18,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the `Natural` rounded down to a multiple of 2<sup>`pow`</sup>.
+// limbs of the `Natural` rounded down to a multiple of `2 ^ pow`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -49,8 +49,7 @@ pub_test! {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the `Natural` rounded up to a multiple of 2<sup>`pow`</sup>. The limbs should not all
-// be zero.
+// limbs of the `Natural` rounded up to a multiple of `2 ^ pow`. The limbs should not all be zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -140,8 +139,8 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
 }
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup>. If the original
-// value is exactly between two multiples, it is rounded to the one whose `pow`th bit is zero.
+// limbs of the `Natural` rounded to the nearest multiple of `2 ^ pow`. If the original value is
+// exactly between two multiples, it is rounded to the one whose `pow`th bit is zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -163,9 +162,9 @@ pub_test! {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-// limbs of the `Natural` rounded to a multiple of 2<sup>`pow`</sup>, using a specified rounding
-// format. If the original value is not already a multiple of the power of 2, and the
-// `RoundingMode` is `Exact`, `None` is returned. The limbs should not all be zero.
+// limbs of the `Natural` rounded to a multiple of `2 ^ pow`, using a specified rounding format. If
+// the original value is not already a multiple of the power of 2, and the `RoundingMode` is
+// `Exact`, `None` is returned. The limbs should not all be zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -197,7 +196,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2(
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural`, rounded down to a multiple of 2<sup>`pow`</sup>, to the input `Vec`.
+// limbs of the `Natural`, rounded down to a multiple of `2 ^ pow`, to the input `Vec`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -229,8 +228,8 @@ pub_test! {
 }}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural`, rounded up to a multiple of 2<sup>`pow`</sup>, to the input `Vec`. The
-// limbs should not all be zero.
+// limbs of the `Natural`, rounded up to a multiple of `2 ^ pow`, to the input `Vec`. The limbs
+// should not all be zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -313,9 +312,9 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
 }
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural`, rounded to the nearest multiple of 2<sup>`pow`</sup>, to the input
-// `Vec`. If the original value is exactly between two multiples, it is rounded to the one whose
-// `pow`th bit is zero.
+// limbs of the `Natural`, rounded to the nearest multiple of `2 ^ pow`, to the input `Vec`. If the
+// original value is exactly between two multiples, it is rounded to the one whose `pow`th bit is
+// zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -339,10 +338,10 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup> to the input `Vec`,
-// using a specified rounding format. If the original value is not already a multiple of the power
-// of two, and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `None` is
-// returned. Otherwise, an `Ordering` is returned. The limbs should not all be zero.
+// limbs of the `Natural` rounded to the nearest multiple of `2 ^ pow` to the input `Vec`, using a
+// specified rounding format. If the original value is not already a multiple of the power of two,
+// and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `None` is returned.
+// Otherwise, an `Ordering` is returned. The limbs should not all be zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -416,8 +415,8 @@ impl RoundToMultipleOfPowerOf2<u64> for Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -512,8 +511,8 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -578,8 +577,8 @@ impl<'a> RoundToMultipleOfPowerOf2<u64> for &'a Natural {
 
 impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     /// Rounds a [`Natural`] to a multiple of $2^k$ in place, according to a specified rounding
-    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than,
-    /// equal to, or greater than the original value.
+    /// mode. An [`Ordering`] is returned, indicating whether the returned value is less than, equal
+    /// to, or greater than the original value.
     ///
     /// See the [`RoundToMultipleOfPowerOf2`] documentation for details.
     ///
@@ -594,8 +593,8 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Natural {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), pow / Limb::WIDTH)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), pow /
+    /// Limb::WIDTH)`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of 2.

@@ -1,4 +1,5 @@
 use crate::Rational;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_nz::natural::Natural;
@@ -57,8 +58,8 @@ impl Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), base)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// base)`.
     ///
     /// # Panics
     /// Panics if `log_base` is zero.

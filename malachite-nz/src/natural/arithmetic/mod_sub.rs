@@ -77,8 +77,8 @@ impl<'a> ModSub<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value and `m` is taken by reference.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value and `m` is taken by reference.
     #[inline]
     fn mod_sub(mut self, other: Natural, m: &'a Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -253,8 +253,8 @@ impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by reference and `c` is taken by value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by reference and `c` is taken by value.
     fn mod_sub(self, other: Natural, m: &'b Natural) -> Natural {
         assert!(self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -303,8 +303,8 @@ impl<'a, 'b> ModSub<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by reference and `m` is taken by value.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by reference and `m` is taken by value.
     fn mod_sub(self, other: &'b Natural, m: Natural) -> Natural {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -439,8 +439,8 @@ impl<'a> ModSubAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
-    /// `c` are taken by value, `m` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `c`
+    /// are taken by value, `m` is taken by reference, and `a == b`.
     fn mod_sub_assign(&mut self, other: Natural, m: &'a Natural) {
         assert!(&*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -486,8 +486,8 @@ impl<'a> ModSubAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and
-    /// `m` are taken by value, `c` is taken by reference, and `a == b`.
+    /// This is equivalent to `_fmpz_mod_subN` from `fmpz_mod/sub.c`, FLINT 2.7.1, where `b` and `m`
+    /// are taken by value, `c` is taken by reference, and `a == b`.
     fn mod_sub_assign(&mut self, other: &'a Natural, m: Natural) {
         assert!(*self < m, "self must be reduced mod m, but {self} >= {m}");
         assert!(
@@ -504,8 +504,7 @@ impl<'a> ModSubAssign<&'a Natural, Natural> for Natural {
 
 impl<'a, 'b> ModSubAssign<&'a Natural, &'b Natural> for Natural {
     /// Subtracts two [`Natural`]s modulo a third [`Natural`] $m$, in place. The inputs must be
-    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by
-    /// reference.
+    /// already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken by reference.
     ///
     /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
     ///

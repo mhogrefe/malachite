@@ -18,8 +18,8 @@ const SMALL_PRIMORIAL_LIMIT: u64 = 29;
 #[cfg(not(feature = "32_bit_limbs"))]
 const SMALL_PRIMORIAL_LIMIT: u64 = 53;
 
-// This is equivalent to `mpz_primorial_ui` from `mpz/primorial_ui.c`, GMP 6.2.1,
-// where n is too large for the primorial of n to fit in a single limb.
+// This is equivalent to `mpz_primorial_ui` from `mpz/primorial_ui.c`, GMP 6.2.1, where n is too
+// large for the primorial of n to fit in a single limb.
 #[allow(clippy::useless_conversion)]
 fn limbs_primorial(n: Limb) -> Vec<Limb> {
     let n_u64 = u64::from(n);
@@ -89,8 +89,7 @@ fn limbs_product_of_first_n_primes(n: usize) -> Vec<Limb> {
 }
 
 impl Primorial for Natural {
-    /// Computes the primorial of a [`Natural`]: the product of all primes less than or equal to
-    /// it.
+    /// Computes the primorial of a [`Natural`]: the product of all primes less than or equal to it.
     ///
     /// The [`product_of_first_n_primes`](Natural::product_of_first_n_primes) function is similar;
     /// it computes the primorial of the $n$th prime.
@@ -137,15 +136,15 @@ impl Primorial for Natural {
     /// primes less than or equal to $n$.
     ///
     /// $$
-    /// f(n) = p_n\\# =prod_{k=1}^n p_n,
+    /// f(n) = p_n\\# = \prod_{k=1}^n p_n,
     /// $$
     /// where $p_n$ is the $n$th prime number.
     ///
-    /// $p_n\\# = O\left (left (frac{1}{e}k\log k\left (frac{\log k}{e^2}k
-    ///right )^{1/\log k}right )^komega(1)\right )$.
+    /// $p_n\\# = O\left (\left (\frac{1}{e}k\log k\left (\frac{\log k}{e^2}k \right )^{1/\log
+    /// k}\right )^k\omega(1)\right )$.
     ///
-    /// This asymptotic approximation is due to
-    /// [Bart Michels](https://math.stackexchange.com/a/1594930).
+    /// This asymptotic approximation is due to [Bart
+    /// Michels](https://math.stackexchange.com/a/1594930).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

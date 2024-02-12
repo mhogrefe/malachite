@@ -21,6 +21,8 @@ use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::platform::Limb;
+use core::cmp::{max, Ordering};
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign,
@@ -29,8 +31,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use core::cmp::{max, Ordering};
-use core::mem::swap;
 
 // This is equivalent to `gcdext_ctx` from `gmp-impl.h`, GMP 6.2.1.
 struct ExtendedGcdContext<'a> {
@@ -174,16 +174,18 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
 ) -> (usize, usize, bool) {
     // Keeps track of the second row of the reduction matrix
     //
-    //   M = (v0, v1 ; us0, us1)
+    // M = (v0, v1 ; us0, us1)
     //
     // which correspond to the first column of the inverse
     //
-    //   M^{-1} = (us1, -v1; -us0, v0)
+    // M^{-1} = (us1, -v1; -us0, v0)
     //
     // This implies that
     //
+    // ```
     //   a =  us1 A (mod B)
     //   b = -us0 A (mod B)
+    // ```
     //
     // where A, B denotes the input values.
     let mut n = xs.len();
@@ -246,9 +248,9 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
     assert_ne!(ys[0], 0);
     let negate;
     if xs[0] == ys[0] {
-        // Which cofactor to return now? Candidates are +us1 and -us0, depending on which of a and
-        // b was most recently reduced, which we don't keep track of. So compare and get the
-        // smallest one.
+        // Which cofactor to return now? Candidates are +us1 and -us0, depending on which of a and b
+        // was most recently reduced, which we don't keep track of. So compare and get the smallest
+        // one.
         gs[0] = xs[0];
         let c = limbs_cmp_same_length(&us0[..us_len], &us1[..us_len]);
         assert!(c != Ordering::Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
@@ -302,9 +304,8 @@ fn limbs_extended_gcd_same_length_lehmer<'a>(
     }
 }
 
-// Computes (r;b) = (a; b) M. Result is of size n + M->n +/- 1, and
-// the size is returned (if inputs are non-normalized, result may be
-// non-normalized too). Temporary space needed is M->n + n.
+// Computes (r;b) = (a; b) M. Result is of size n + M->n +/- 1, and the size is returned (if inputs
+// are non-normalized, result may be non-normalized too). Temporary space needed is M->n + n.
 //
 // This is equivalent to `hgcd_mul_matrix_vector` from `mpn/generic/gcdext.c`, GMP 6.2.1.
 fn limbs_half_gcd_matrix_mul_vector(
@@ -316,6 +317,7 @@ fn limbs_half_gcd_matrix_mul_vector(
 ) -> usize {
     // Compute (r,b) <-- (u00 a + u10 b, u01 a + u11 b) as
     //
+    // ```
     // t  = u00 * a
     // r  = u10 * b
     // r += t;
@@ -323,6 +325,7 @@ fn limbs_half_gcd_matrix_mul_vector(
     // t  = u11 * b
     // b  = u01 * a
     // b += t;
+    // ```
     let n = xs.len();
     let ys_lo = &ys[..n];
     let m_n = m.n;
@@ -349,9 +352,8 @@ fn limbs_half_gcd_matrix_mul_vector(
     big_n
 }
 
-// Computes |v| = |(g - u a)| / b, where u may be positive or
-// negative, and v is of the opposite sign. max(a, b) is of size n, u and
-// v at most size n, and v must have space for n+1 limbs.
+// Computes |v| = |(g - u a)| / b, where u may be positive or negative, and v is of the opposite
+// sign. max(a, b) is of size n, u and v at most size n, and v must have space for n+1 limbs.
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -447,9 +449,9 @@ const GCDEXT_DC_THRESHOLD: usize = 242;
 //
 // When hgcd fails: 2n + 1 for mpn_gcdext_subdiv_step, which is less.
 //
-// For the lehmer call after the loop, Let T denote GCDEXT_DC_THRESHOLD. For the gcdext_lehmer
-// call, we need T each for u, a and b, and 4T+3 scratch space. Next, for compute_v, we need T for
-// u, T+1 for v and 2T scratch space. In all, 7T + 3 is sufficient for both operations.
+// For the lehmer call after the loop, Let T denote GCDEXT_DC_THRESHOLD. For the gcdext_lehmer call,
+// we need T each for u, a and b, and 4T+3 scratch space. Next, for compute_v, we need T for u, T+1
+// for v and 2T scratch space. In all, 7T + 3 is sufficient for both operations.
 //
 // Optimal choice of p seems difficult. In each iteration the division of work between hgcd and the
 // updates of us0 and us1 depends on the current size of the u. It may be desirable to use a
@@ -486,9 +488,8 @@ pub fn limbs_extended_gcd(
     );
     let mut matrix_scratch = 0;
     if n >= GCDEXT_DC_THRESHOLD {
-        // For hgcd loop.
-        // If the definitions of choose_p_1 and choose_p_2 change, the min and max might change
-        // too.
+        // For hgcd loop. If the definitions of choose_p_1 and choose_p_2 change, the min and max
+        // might change too.
         let max_p = choose_p_1(n);
         let min_p = choose_p_2(n);
         matrix_scratch = limbs_half_gcd_matrix_init_scratch_len(n - min_p);
@@ -524,8 +525,8 @@ pub fn limbs_extended_gcd(
     }
     slice_set_zero(&mut scratch[..scratch_len << 1]);
     split_into_chunks_mut!(scratch, scratch_len, [us0, us1], scratch);
-    // For the first hgcd call, there are no u updates, and it makes
-    //  some sense to use a different choice for p.
+    // For the first hgcd call, there are no u updates, and it makes some sense to use a different
+    // choice for p.
     let p = choose_p_1(n);
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(matrix_scratch);
     let mut m = HalfGcdMatrix::init(n - p, scratch_lo);
@@ -544,9 +545,8 @@ pub fn limbs_extended_gcd(
             us_len -= 1;
         }
     } else {
-        // mpn_hgcd has failed. Then either one of a or b is very
-        // small, or the difference is very small. Perform one
-        // subtraction followed by one division.
+        // mpn_hgcd has failed. Then either one of a or b is very small, or the difference is very
+        // small. Perform one subtraction followed by one division.
         us1[0] = 1;
         let (scratch, scratch_hi) = scratch.split_at_mut(n);
         let mut context = ExtendedGcdContext::new(gs, ss, 1, us0, us1, &mut scratch_hi[n..]);
@@ -579,9 +579,8 @@ pub fn limbs_extended_gcd(
             assert!(us_len < scratch_len);
             assert!(us0[us_len - 1] != 0 || us1[us_len - 1] != 0);
         } else {
-            // mpn_hgcd has failed. Then either one of a or b is very
-            // small, or the difference is very small. Perform one
-            // subtraction followed by one division.
+            // mpn_hgcd has failed. Then either one of a or b is very small, or the difference is
+            // very small. Perform one subtraction followed by one division.
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
             let mut context = ExtendedGcdContext::new(gs, ss, us_len, us0, us1, scratch_hi);
             // Temporary storage n
@@ -597,29 +596,33 @@ pub fn limbs_extended_gcd(
     let n = n;
     let xs = &mut xs[..n];
     let ys = &mut ys[..n];
-    // We have A = ... a + ... b
-    //     B =  us0 a +  us1 b
+    // We have
+    // ```
+    // A = ... a + ... b
+    // B =  us0 a +  us1 b
     //
-    //     a = us1  A + ... B
-    //     b = -us0 A + ... B
+    // a = us1  A + ... B
+    // b = -us0 A + ... B
+    // ```
     //
     // with bounds |us0|, |us1| <= B / min(a, b)
     //
     // We always have us1 > 0, and us0 == 0 is possible only if us1 == 1, in which case the only
     // reduction done so far is a = A - k B for some k.
     //
-    // Compute g = u a + v b = (u us1 - v us0) A + (...) B
-    // Here, u, v are bounded by
+    // Compute g = u a + v b = (u us1 - v us0) A + (...) B. Here, u, v are bounded by
+    // ```
     // |u| <= b,
     // |v| <= a
+    // ```
     assert!(*xs.last().unwrap() != 0 || *ys.last().unwrap() != 0);
     if limbs_cmp_same_length(xs, ys) == Ordering::Equal {
         // Must return the smallest cofactor, +us1 or -us0
         gs[..n].copy_from_slice(xs);
         let c = limbs_cmp_same_length(&us0[..us_len], &us1[..us_len]);
         // c == 0 can happen only when A = (2k+1) G, B = 2 G. And in this case we choose the
-        // cofactor + 1, corresponding to G = A - k B, rather than -1, corresponding to
-        // G = - A + (k+1) B.
+        // cofactor + 1, corresponding to G = A - k B, rather than -1, corresponding to G = - A +
+        // (k+1) B.
         assert!(c != Ordering::Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
         if c == Ordering::Less {
             us_len -= slice_trailing_zeros(&us0[..us_len]);
@@ -673,8 +676,8 @@ pub fn limbs_extended_gcd(
         let mut us1_len = us_len - slice_trailing_zeros(&us1[..us_len]);
         assert_ne!(us1_len, 0);
         assert!(lehmer_vs_len + us0_len <= scratch_len);
-        // We may still have v == 0
-        // Compute u us0
+        // - We may still have v == 0
+        // - Compute u us0
         let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(us1_len, lehmer_ss.len())];
         limbs_mul_to_out(ss, &us1[..us1_len], lehmer_ss, &mut mul_scratch);
         us_len = us1_len + lehmer_us_len;
@@ -740,23 +743,23 @@ impl ExtendedGcd for Natural {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. Both [`Natural`]s are
     /// taken by value.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(a, b)$, where
+    ///   $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor
+    ///   a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -796,23 +799,23 @@ impl<'a> ExtendedGcd<&'a Natural> for Natural {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. The first [`Natural`] is
     /// taken by value and the second by reference.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(a, b)$, where
+    ///   $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor
+    ///   a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -852,23 +855,23 @@ impl<'a> ExtendedGcd<Natural> for &'a Natural {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. The first [`Natural`] is
     /// taken by reference and the second by value.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(a, b)$, where
+    ///   $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor
+    ///   a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -908,23 +911,23 @@ impl<'a, 'b> ExtendedGcd<&'a Natural> for &'b Natural {
     /// coefficients $x$ and $y$ in Bézout's identity $ax+by=\gcd(a,b)$. Both [`Natural`]s are
     /// taken by reference.
     ///
-    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the
-    /// full specification is more detailed:
+    /// The are infinitely many $x$, $y$ that satisfy the identity for any $a$, $b$, so the full
+    /// specification is more detailed:
     ///
     /// - $f(0, 0) = (0, 0, 0)$.
     /// - $f(a, ak) = (a, 1, 0)$ if $a > 0$ and $k \neq 1$.
     /// - $f(bk, b) = (b, 0, 1)$ if $b > 0$.
-    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and
-    ///   $\gcd(a, b) \neq \min(a, b)$, where $g = \gcd(a, b) \geq 0$, $ax + by = g$,
-    ///   $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor a/g \rfloor$.
+    /// - $f(a, b) = (g, x, y)$ if $a \neq 0$ and $b \neq 0$ and $\gcd(a, b) \neq \min(a, b)$, where
+    ///   $g = \gcd(a, b) \geq 0$, $ax + by = g$, $x \leq \lfloor b/g \rfloor$, and $y \leq \lfloor
+    ///   a/g \rfloor$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

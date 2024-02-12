@@ -5,6 +5,7 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_leading_zeros;
@@ -46,8 +47,8 @@ pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 }}
 
 // Given the limbs of the absolute value of an `Integer`, in ascending order, converts the limbs to
-// two's complement. Returns whether there is a carry left over from the two's complement
-// conversion process.
+// two's complement. Returns whether there is a carry left over from the two's complement conversion
+// process.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -248,9 +249,9 @@ impl<'a> SignExtendedLimbIterator for NLIterator<'a> {
 /// A double-ended iterator over the twos-complement [limbs](crate#limbs) of an [`Integer`].
 ///
 /// The forward order is ascending (least-significant first). The most significant bit of the most
-/// significant limb corresponds to the sign of the [`Integer`]; `false` for non-negative and
-/// `true` for negative. This means that there may be a single most-significant sign-extension limb
-/// that is 0 or `Limb::MAX`.
+/// significant limb corresponds to the sign of the [`Integer`]; `false` for non-negative and `true`
+/// for negative. This means that there may be a single most-significant sign-extension limb that is
+/// 0 or `Limb::MAX`.
 ///
 /// This struct also supports retrieving limbs by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading limbs is allowed.
@@ -407,10 +408,10 @@ impl Integer {
     /// significant limbs have lower indices in the output vector.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
-    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
-    /// negative. There are no trailing zero limbs if the [`Integer`] is positive or trailing
-    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
-    /// correct sign bit. Zero is a special case: it contains no limbs.
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is negative.
+    /// There are no trailing zero limbs if the [`Integer`] is positive or trailing `Limb::MAX`
+    /// limbs if the [`Integer`] is negative, except as necessary to include the correct sign bit.
+    /// Zero is a special case: it contains no limbs.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible,
     /// [`into_twos_complement_limbs_asc`](`Self::into_twos_complement_limbs_asc`) is more
@@ -463,10 +464,10 @@ impl Integer {
     /// significant limbs have higher indices in the output vector.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
-    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
-    /// negative. There are no leading zero limbs if the [`Integer`] is non-negative or leading
-    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
-    /// correct sign bit. Zero is a special case: it contains no limbs.
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is negative.
+    /// There are no leading zero limbs if the [`Integer`] is non-negative or leading `Limb::MAX`
+    /// limbs if the [`Integer`] is negative, except as necessary to include the correct sign bit.
+    /// Zero is a special case: it contains no limbs.
     ///
     /// This is similar to how `BigInteger`s in Java are represented.
     ///
@@ -517,10 +518,10 @@ impl Integer {
     /// significant limbs have lower indices in the output vector.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
-    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
-    /// negative. There are no trailing zero limbs if the [`Integer`] is positive or trailing
-    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
-    /// correct sign bit. Zero is a special case: it contains no limbs.
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is negative.
+    /// There are no trailing zero limbs if the [`Integer`] is positive or trailing `Limb::MAX`
+    /// limbs if the [`Integer`] is negative, except as necessary to include the correct sign bit.
+    /// Zero is a special case: it contains no limbs.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// [`to_twos_complement_limbs_asc`](`Self::to_twos_complement_limbs_asc`).
@@ -572,10 +573,10 @@ impl Integer {
     /// significant limbs have higher indices in the output vector.
     ///
     /// The limbs are in two's complement, and the most significant bit of the limbs indicates the
-    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is
-    /// negative. There are no leading zero limbs if the [`Integer`] is non-negative or leading
-    /// `Limb::MAX` limbs if the [`Integer`] is negative, except as necessary to include the
-    /// correct sign bit. Zero is a special case: it contains no limbs.
+    /// sign; if the bit is zero, the [`Integer`] is positive, and if the bit is one it is negative.
+    /// There are no leading zero limbs if the [`Integer`] is non-negative or leading `Limb::MAX`
+    /// limbs if the [`Integer`] is negative, except as necessary to include the correct sign bit.
+    /// Zero is a special case: it contains no limbs.
     ///
     /// This is similar to how `BigInteger`s in Java are represented.
     ///
@@ -703,6 +704,56 @@ impl Integer {
             TwosComplementLimbIterator::Positive(self.abs.limbs(), false)
         } else {
             TwosComplementLimbIterator::Negative(self.abs.negative_limbs(), false)
+        }
+    }
+
+    /// Returns the number of twos-complement limbs of an [`Integer`]. There may be a
+    /// most-significant sign-extension limb, which is included in the count.
+    ///
+    /// Zero has 0 limbs.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(Integer::ZERO.twos_complement_limb_count(), 0);
+    ///     assert_eq!(Integer::from(123u32).twos_complement_limb_count(), 1);
+    ///     assert_eq!(Integer::from(10u32).pow(12).twos_complement_limb_count(), 2);
+    ///
+    ///     let n = Integer::power_of_2(Limb::WIDTH - 1);
+    ///     assert_eq!((&n - Integer::ONE).twos_complement_limb_count(), 1);
+    ///     assert_eq!(n.twos_complement_limb_count(), 2);
+    ///     assert_eq!((&n + Integer::ONE).twos_complement_limb_count(), 2);
+    ///     assert_eq!((-(&n - Integer::ONE)).twos_complement_limb_count(), 1);
+    ///     assert_eq!((-&n).twos_complement_limb_count(), 1);
+    ///     assert_eq!((-(&n + Integer::ONE)).twos_complement_limb_count(), 2);
+    /// }
+    /// ```
+    pub fn twos_complement_limb_count(&self) -> u64 {
+        if *self == 0 {
+            return 0;
+        }
+        let abs_limbs_count = self.unsigned_abs_ref().limb_count();
+        let highest_bit_of_highest_limb =
+            self.unsigned_abs().limbs()[usize::exact_from(abs_limbs_count - 1)].get_highest_bit();
+        if highest_bit_of_highest_limb
+            && (*self > 0 || (*self < 0 && !self.unsigned_abs_ref().is_power_of_2()))
+        {
+            abs_limbs_count + 1
+        } else {
+            abs_limbs_count
         }
     }
 }

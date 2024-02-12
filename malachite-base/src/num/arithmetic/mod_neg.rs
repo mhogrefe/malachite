@@ -41,8 +41,8 @@ macro_rules! impl_mod_neg {
         }
 
         impl ModNegAssign for $t {
-            /// Negates a number modulo another number $m$. The input must be already reduced
-            /// modulo $m$.
+            /// Negates a number modulo another number $m$. The input must be already reduced modulo
+            /// $m$.
             ///
             /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.
             ///
@@ -52,8 +52,8 @@ macro_rules! impl_mod_neg {
             /// # Examples
             /// See [here](super::mod_neg#mod_neg_assign).
             ///
-            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1, where the output
-            /// is assigned to `a`.
+            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1, where the output is
+            /// assigned to `a`.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
                 mod_neg_assign(self, m)

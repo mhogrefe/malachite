@@ -16,8 +16,8 @@ macro_rules! impl_overflowing_abs {
         impl OverflowingAbsAssign for $t {
             /// Replaces a number with its absolute value.
             ///
-            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an
-            /// overflow occurred, then the wrapped value is assigned.
+            /// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow
+            /// occurred, then the wrapped value is assigned.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.

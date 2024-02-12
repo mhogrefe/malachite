@@ -2,103 +2,48 @@ import os
 
 MAX_LINE_LENGTH = 100
 
-#def process_block(block):
-#    words = []
-#    (padding, block) = block
-#    for (line_number, line) in block:
-#        words.extend(line[4:].split(' '))
-#    fixed_lines = []
-#    current_line = ''
-#    for i in range(0, padding):
-#        current_line += ' '
-#    current_line += '///'
-#    for word in words:
-#        if len(current_line) + len(word) + 1 > MAX_LINE_LENGTH:
-#            fixed_lines.append(current_line)
-#            current_line = ''
-#            for i in range(0, padding):
-#                current_line += ' '
-#            current_line += '/// '
-#            current_line += word
-#        else:
-#            current_line += ' '
-#            current_line += word
-#    fixed_lines.append(current_line)
-#    print fixed_lines
-#
-#def lint(filename):
-#    i = 1
-#    blocks = []
-#    current_block = []
-#    in_doctest = False
-#    previously_in_comment = False
-#    with open(filename) as f:
-#        for line in f.readlines():
-#            line = line.rstrip()
-#            line_length = len(line)
-#            line = line.lstrip()
-#            padding = len(line) - line_length
-#            in_comment = line.startswith('///')
-#            if in_comment:
-#                if line == '/// ```':
-#                    in_doctest = not in_doctest
-#                elif not in_doctest and line == '///':
-#                    if current_block:
-#                        blocks.append((padding, current_block))
-#                        current_block = []
-#                elif not in_doctest:
-#                    current_block.append((i, line))
-#            if not in_comment and previously_in_comment and current_block:
-#                blocks.append((padding, current_block))
-#                current_block = []
-#            previously_in_comment = in_comment
-#            i += 1
-#    for block in blocks:
-#        process_block(block)
-#    return i - 1
-
 line_length_exceptions = set((
     # long Markdown table rows and/or links
     ('./malachite-base/src/lib.rs', 57),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 310),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 311),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1312),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1552),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1553),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1554),
-    ('./malachite-base/src/num/arithmetic/mod.rs', 1555),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 326),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 327),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1328),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1568),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1569),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1570),
+    ('./malachite-base/src/num/arithmetic/mod.rs', 1571),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 77),
     ('./malachite-base/src/num/arithmetic/primorial.rs', 236),
     ('./malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs', 110),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 148),
     ('./malachite-base/src/num/conversion/digits/power_of_2_digit_iterable.rs', 150),
-    ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 428),
-    ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 604),
+    ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 434),
+    ('./malachite-float/src/conversion/mantissa_and_exponent.rs', 610),
     ('./malachite-float/src/conversion/mod.rs', 224),
     ('./malachite-float/src/lib.rs', 16),
     ('./malachite-base/src/num/exhaustive/mod.rs', 1023),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 27),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 28),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 29),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 64),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 65),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 66),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 76),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 77),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 78),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 79),
+    ('./malachite-nz/src/integer/arithmetic/mod.rs', 107),
     ('./malachite-nz/src/integer/arithmetic/mod.rs', 109),
-    ('./malachite-nz/src/integer/arithmetic/mod.rs', 111),
     ('./malachite-nz/src/lib.rs', 28),
     ('./malachite-nz/src/lib.rs', 94),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 34),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 35),
     ('./malachite-nz/src/natural/arithmetic/mod.rs', 36),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 135),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 136),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 159),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 160),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 161),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 530),
-    ('./malachite-nz/src/natural/arithmetic/mod.rs', 532),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 132),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 133),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 156),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 157),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 158),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 526),
+    ('./malachite-nz/src/natural/arithmetic/mod.rs', 528),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 523),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 525),
     ('./malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs', 825),
@@ -106,12 +51,10 @@ line_length_exceptions = set((
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 353),
     ('./malachite-nz/src/natural/conversion/mantissa_and_exponent.rs', 532),
     ('./malachite-nz/src/natural/conversion/mod.rs', 212),
+    ('./malachite-q/src/arithmetic/mod.rs', 71),
     ('./malachite-q/src/arithmetic/mod.rs', 73),
-    ('./malachite-q/src/arithmetic/mod.rs', 75),
     ('./malachite-q/src/conversion/string/from_sci_string.rs', 118),
     ('./malachite-q/src/conversion/string/from_sci_string.rs', 201),
-    ('./malachite-q/src/exhaustive/mod.rs', 45),
-    ('./malachite-q/src/exhaustive/mod.rs', 47),
     ('./malachite-q/src/lib.rs', 46),
 ))
 

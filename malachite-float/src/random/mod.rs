@@ -4,17 +4,18 @@ use malachite_base::bools::random::{
     random_bools, weighted_random_bools, RandomBools, WeightedRandomBools,
 };
 use malachite_base::iterators::{with_special_values, WithSpecialValues};
-use malachite_base::num::arithmetic::traits::NegModPowerOf2;
+use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
     geometric_random_signeds, GeometricRandomNaturalValues, GeometricRandomSigneds,
 };
 use malachite_base::random::Seed;
 use malachite_nz::natural::random::{
-    random_positive_naturals, striped_random_positive_naturals, RandomNaturals,
-    StripedRandomNaturals,
+    random_positive_naturals, striped_random_natural_inclusive_range,
+    striped_random_positive_naturals, uniform_random_natural_inclusive_range, RandomNaturals,
+    StripedRandomNaturalInclusiveRange, StripedRandomNaturals, UniformRandomNaturalRange,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -37,7 +38,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomPositiveFiniteFloats<I> {
         assert_ne!(precision, 0);
         Some(Float(Finite {
             sign: true,
-            exponent: self.exponents.next().unwrap(),
+            exponent: self.exponents.next().unwrap() + 1,
             precision,
             significand: x << precision.neg_mod_power_of_2(Limb::LOG_WIDTH),
         }))
@@ -46,95 +47,13 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomPositiveFiniteFloats<I> {
 
 /// Generates random positive finite [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the mean absolute sci-exponent and precision by passing the
-/// numerators and denominators of their means.
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
-/// - The actual means are slightly lower than the specified means.
-/// - However, increasing the specified means increases the actual means, so this still works as a
-///   mechanism for controlling the sci-exponent and precision.
-/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
-///   but they may be as high as you like.
-///
-/// Neither positive nor negative zero is generated. `NaN` is not generated either.
-///
-/// The output length is infinite.
-///
-/// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
-///
-/// $M(n, m) = O(n / m)$
-///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
-/// `mean_precision_denominator`.
-///
-/// # Examples
-/// ```
-/// use itertools::Itertools;
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::ComparableFloat;
-/// use malachite_float::random::random_negative_finite_floats;
-///
-/// // The number after the '#' is the precision.
-/// assert_eq!(
-///     random_negative_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
-///     &[
-///         "-0.44#3", "-6.6e-7#6", "-0.004#1", "-0.2#1", "-4.107e4#13", "-0.00779413723#29",
-///         "-0.008#1", "-1.7#7", "-2.2990855826#33", "-0.000016716029#23", "-0.169649838688#37",
-///         "-1.33e4#7", "-2.0e4#1", "-0.699#8", "-18.7#9", "-0.1#1", "-0.0005554#13", "-533.0#10",
-///         "-0.092#7", "-0.000666152806#28"
-///     ]
-/// );
-/// ```
-pub fn random_positive_finite_floats(
-    seed: Seed,
-    mean_sci_exponent_abs_numerator: u64,
-    mean_sci_exponent_abs_denominator: u64,
-    mean_precision_numerator: u64,
-    mean_precision_denominator: u64,
-) -> RandomPositiveFiniteFloats<RandomNaturals<GeometricRandomNaturalValues<u64>>> {
-    RandomPositiveFiniteFloats {
-        exponents: geometric_random_signeds(
-            seed.fork("exponents"),
-            mean_sci_exponent_abs_numerator,
-            mean_sci_exponent_abs_denominator,
-        ),
-        xs: random_positive_naturals(
-            seed.fork("significands"),
-            mean_precision_numerator,
-            mean_precision_denominator,
-        ),
-    }
-}
-
-/// Generates random negative finite [`Float`]s.
-///
-/// This `struct` is created by [`random_negative_finite_floats`]; see its documentation for more.
-#[derive(Clone, Debug)]
-pub struct RandomNegativeFiniteFloats<I: Iterator<Item = Natural>>(RandomPositiveFiniteFloats<I>);
-
-impl<I: Iterator<Item = Natural>> Iterator for RandomNegativeFiniteFloats<I> {
-    type Item = Float;
-
-    #[inline]
-    fn next(&mut self) -> Option<Float> {
-        self.0.next().map(|f| -f)
-    }
-}
-
-/// Generates random negative finite [`Float`]s.
-///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the mean absolute sci-exponent and precision by passing the
-/// numerators and denominators of their means.
-///
-/// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -165,10 +84,160 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNegativeFiniteFloats<I> {
 ///     random_positive_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "0.44#3", "6.6e-7#6", "0.004#1", "0.2#1", "4.107e4#13", "0.00779413723#29", "0.008#1",
-///         "1.7#7", "2.2990855826#33", "0.000016716029#23", "0.169649838688#37", "1.33e4#7",
-///         "2.0e4#1", "0.699#8", "18.7#9", "0.1#1", "0.0005554#13", "533.0#10", "0.092#7",
-///         "0.000666152806#28"
+///         "0.9#3", "1.31e-6#6", "0.008#1", "0.5#1", "8.214e4#13", "0.01558827446#29", "0.02#1",
+///         "3.41#7", "4.598171165#33", "0.000033432058#23", "0.339299677376#37", "2.66e4#7",
+///         "3.0e4#1", "1.4#8", "37.4#9", "0.2#1", "0.0011108#13", "1066.0#10", "0.184#7",
+///         "0.00133230561#28"
+///     ]
+/// );
+/// ```
+pub fn random_positive_finite_floats(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> RandomPositiveFiniteFloats<RandomNaturals<GeometricRandomNaturalValues<u64>>> {
+    RandomPositiveFiniteFloats {
+        exponents: geometric_random_signeds(
+            seed.fork("exponents"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+        ),
+        xs: random_positive_naturals(
+            seed.fork("significands"),
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+/// Generates random positive finite [`Float`]s with a specified precision.
+///
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent) are more likely to be chosen. You
+/// can specify the mean absolute sci-exponent by passing the numerators and denominators of its
+/// means.
+///
+/// But note that the specified mean is only approximate, since the distribution we are sampling is
+/// truncated geometric, and its exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is slightly lower than the specified mean.
+/// - However, increasing the specified mean increases the actual mean, so this still works as a
+///   mechanism for controlling the sci-exponent.
+/// - The specified sci-exponent mean must be greater than 0, but it may be as high as you like.
+///
+/// Neither positive nor negative zero is generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n,) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+///
+/// # Panics
+/// Panics if `prec` is zero.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_float::ComparableFloat;
+/// use malachite_float::random::random_positive_floats_with_precision;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     random_positive_floats_with_precision(EXAMPLE_SEED, 10, 1, 10)
+///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///     &[
+///         "0.959#10", "1.889e-6#10", "0.01291#10", "0.71#10", "1.02e5#10", "0.01181#10",
+///         "0.01953#10", "3.082#10", "7.24#10", "0.00005597#10", "0.3877#10", "2.144e4#10",
+///         "5.856e4#10", "1.43#10", "62.19#10", "0.4658#10", "0.001659#10", "1914.0#10",
+///         "0.136#10", "0.001144#10"
+///     ]
+/// );
+/// ```
+pub fn random_positive_floats_with_precision(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    prec: u64,
+) -> RandomPositiveFiniteFloats<UniformRandomNaturalRange> {
+    assert_ne!(prec, 0);
+    RandomPositiveFiniteFloats {
+        exponents: geometric_random_signeds(
+            seed.fork("exponents"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+        ),
+        xs: uniform_random_natural_inclusive_range(
+            seed.fork("significands"),
+            Natural::power_of_2(prec - 1),
+            Natural::low_mask(prec),
+        ),
+    }
+}
+
+/// Generates random negative finite [`Float`]s.
+///
+/// This `struct` is created by [`random_negative_finite_floats`]; see its documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomNegativeFiniteFloats<I: Iterator<Item = Natural>>(RandomPositiveFiniteFloats<I>);
+
+impl<I: Iterator<Item = Natural>> Iterator for RandomNegativeFiniteFloats<I> {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.0.next().map(|f| -f)
+    }
+}
+
+/// Generates random negative finite [`Float`]s.
+///
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
+///
+/// But note that the specified means are only approximate, since the distributions we are sampling
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual means are slightly lower than the specified means.
+/// - However, increasing the specified means increases the actual means, so this still works as a
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
+///
+/// Neither positive nor negative zero is generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n, m) = O(n + m)$
+///
+/// $M(n, m) = O(n / m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_precision_numerator`, and $m$ is
+/// `mean_precision_denominator`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_float::ComparableFloat;
+/// use malachite_float::random::random_positive_finite_floats;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     random_positive_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1)
+///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///     &[
+///         "0.9#3", "1.31e-6#6", "0.008#1", "0.5#1", "8.214e4#13", "0.01558827446#29", "0.02#1",
+///         "3.41#7", "4.598171165#33", "0.000033432058#23", "0.339299677376#37", "2.66e4#7",
+///         "3.0e4#1", "1.4#8", "37.4#9", "0.2#1", "0.0011108#13", "1066.0#10", "0.184#7",
+///         "0.00133230561#28"
 ///     ]
 /// );
 /// ```
@@ -214,14 +283,14 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonNegativeFiniteFloats<I> 
 
 /// Generates random non-negative finite [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the numerator and denominator of the probability that a zero will be
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that a zero will be
 /// generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the nonzero [`Float`]s.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -252,10 +321,10 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonNegativeFiniteFloats<I> 
 ///     random_non_negative_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "5.5e4#5", "0.0155402#17", "4.7969e6#14", "0.0", "0.0063#5", "0.009216#11", "1.0#5",
-///         "1.541#10", "0.437477#16", "5144.14763838#38", "4.61#10", "0.015024275#23",
-///         "155.7261#19", "0.0", "536.0#7", "0.000483#9", "29579.761#27", "0.0", "0.0000176#6",
-///         "8.0#1"
+///         "1.11e5#5", "0.0310805#17", "9.594e6#14", "0.0", "0.0127#5", "0.01843#11", "2.0#5",
+///         "3.082#10", "0.87495#16", "10288.29527676#38", "9.22#10", "0.030048549#23",
+///         "311.452#19", "0.0", "1.07e3#7", "0.000965#9", "59159.522#27", "0.0", "0.000035#6",
+///         "2.0e1#1"
 ///     ]
 /// );
 /// ```
@@ -306,14 +375,14 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonPositiveFiniteFloats<I> 
 
 /// Generates random non-positive finite [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the numerator and denominator of the probability that a zero will be
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that a zero will be
 /// generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the nonzero [`Float`]s.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -344,10 +413,10 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonPositiveFiniteFloats<I> 
 ///     random_non_positive_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-5.5e4#5", "-0.0155402#17", "-4.7969e6#14", "-0.0", "-0.0063#5", "-0.009216#11",
-///         "-1.0#5", "-1.541#10", "-0.437477#16", "-5144.14763838#38", "-4.61#10",
-///         "-0.015024275#23", "-155.7261#19", "-0.0", "-536.0#7", "-0.000483#9", "-29579.761#27",
-///         "-0.0", "-0.0000176#6", "-8.0#1"
+///         "-1.11e5#5", "-0.0310805#17", "-9.594e6#14", "-0.0", "-0.0127#5", "-0.01843#11",
+///         "-2.0#5", "-3.082#10", "-0.87495#16", "-10288.29527676#38", "-9.22#10",
+///         "-0.030048549#23", "-311.452#19", "-0.0", "-1.07e3#7", "-0.000965#9", "-59159.522#27",
+///         "-0.0", "-0.000035#6", "-2.0e1#1"
 ///     ]
 /// );
 /// ```
@@ -375,8 +444,7 @@ pub fn random_non_positive_finite_floats(
 
 /// Generates random nonzero finite [`Float`]s.
 ///
-/// This `struct` is created by [`random_nonzero_finite_floats`]; see its documentation for
-/// more.
+/// This `struct` is created by [`random_nonzero_finite_floats`]; see its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomNonzeroFiniteFloats<I: Iterator<Item = Natural>> {
     bs: RandomBools,
@@ -395,13 +463,13 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonzeroFiniteFloats<I> {
 
 /// Generates random nonzero finite [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the mean absolute sci-exponent and precision by passing the
-/// numerators and denominators of their means.
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -432,10 +500,10 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonzeroFiniteFloats<I> {
 ///     random_nonzero_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-5.5e4#5", "-0.0155402#17", "-4.7969e6#14", "0.0063#5", "-0.009216#11", "1.0#5",
-///         "-1.541#10", "-0.437477#16", "-5144.14763838#38", "4.61#10", "0.015024275#23",
-///         "155.7261#19", "-536.0#7", "-0.000483#9", "29579.761#27", "-0.0000176#6", "-8.0#1",
-///         "-60.0#5", "-4.8e2#5", "-179.1201#20"
+///         "-1.11e5#5", "-0.0310805#17", "-9.594e6#14", "0.0127#5", "-0.01843#11", "2.0#5",
+///         "-3.082#10", "-0.87495#16", "-10288.29527676#38", "9.22#10", "0.030048549#23",
+///         "311.452#19", "-1.07e3#7", "-0.000965#9", "59159.522#27", "-0.000035#6", "-2.0e1#1",
+///         "-120.0#5", "-9.6e2#5", "-358.2402#20"
 ///     ]
 /// );
 /// ```
@@ -480,14 +548,14 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomFiniteFloats<I> {
 
 /// Generates random finite [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the numerator and denominator of the probability that a zero will be
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that a zero will be
 /// generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the nonzero [`Float`]s.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -518,9 +586,9 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomFiniteFloats<I> {
 ///     random_finite_floats(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-1.22#7", "-1.161697943e-8#30", "-0.043#6", "504.6885#20", "-0.00041#6", "0.99#10",
-///         "-9.5e-7#3", "-1.341e5#14", "-0.0001693#10", "3.0#2", "0.0", "0.051#5", "-0.6832#13",
-///         "-1.6e9#2", "0.059#4", "-0.09#2", "-0.015#7", "-2.0e-6#2", "-57.0#6", "-2001.0#13"
+///         "-2.44#7", "-2.323395887e-8#30", "-0.086#6", "1009.377#20", "-0.00082#6", "1.98#10",
+///         "-1.9e-6#3", "-2.6819e5#14", "-0.0003386#10", "6.0#2", "0.0", "0.1#5", "-1.3665#13",
+///         "-3.0e9#2", "0.117#4", "-0.19#2", "-0.03#7", "-4.0e-6#2", "-114.0#6", "-4002.0#13"
 ///     ]
 /// );
 /// ```
@@ -550,14 +618,14 @@ pub fn random_finite_floats(
 
 /// Generates random [`Float`]s.
 ///
-/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to
-/// be chosen. You can specify the numerator and denominator of the probability that a zero, an
+/// Simpler [`Float`]s (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that a zero, an
 /// infinity, or a NaN will be generated. You can also specify the mean absolute sci-exponent and
 /// precision by passing the numerators and denominators of their means of the nonzero [`Float`]s.
 ///
 /// But note that the specified means are only approximate, since the distributions we are sampling
-/// are truncated geometric, and their exact means are somewhat annoying to deal with. The
-/// practical implications are that
+/// are truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
 /// - The actual means are slightly lower than the specified means.
 /// - However, increasing the specified means increases the actual means, so this still works as a
 ///   mechanism for controlling the sci-exponent and precision.
@@ -586,14 +654,14 @@ pub fn random_finite_floats(
 ///     random_floats(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .take(50).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "3.602#10", "19.6#8", "0.0", "NaN", "-0.000015#2", "-3.0e2#1", "-0.0439#8",
-///         "-47.5601#17", "0.19038#14", "0.000069018#15", "-0.0547#7", "-5.156#12",
-///         "-6.841984502561296#51", "Infinity", "-0.17#4", "-3.6e-12#5", "-197292.0#16", "NaN",
-///         "6.8#5", "-0.0", "-0.0032#5", "0.03#1", "0.09467#12", "0.00002#6", "-2.4094e-8#13",
-///         "5.8e2#6", "-9.6e6#7", "237.867#17", "5.5e-7#7", "Infinity", "-12.0#3", "-2.0e-15#1",
-///         "-Infinity", "0.252#11", "-5.0e2#3", "-0.0000141#6", "-9.8e4#2", "3.21589e-6#20",
-///         "-0.000095#5", "-0.0", "-15.0#4", "0.1#1", "-0.00314969#18", "2.29139385931e-6#38",
-///         "-0.0001353542#19", "6.564e-6#10", "NaN", "-0.0", "3.0e7#1", "10131.8#16"
+///         "7.203#10", "39.2#8", "0.0", "NaN", "-0.00003#2", "-5.0e2#1", "-0.0879#8", "-95.12#17",
+///         "0.38077#14", "0.000138037#15", "-0.109#7", "-10.312#12", "-13.68396900512259#51",
+///         "Infinity", "-0.34#4", "-7.3e-12#5", "-394584.0#16", "NaN", "13.5#5", "-0.0",
+///         "-0.0063#5", "0.06#1", "0.18933#12", "0.00004#6", "-4.819e-8#13", "1.15e3#6",
+///         "-1.91e7#7", "475.734#17", "1.1e-6#7", "Infinity", "-24.0#3", "-4.0e-15#1",
+///         "-Infinity", "0.5039#11", "-1.0e3#3", "-0.0000281#6", "-2.0e5#2", "6.43178e-6#20",
+///         "-0.00019#5", "-0.0", "-30.0#4", "0.2#1", "-0.00629938#18", "4.58278771862e-6#38",
+///         "-0.0002707085#19", "0.00001313#10", "NaN", "-0.0", "7.0e7#1", "20263.5#16"
 ///     ]
 /// );
 /// ```
@@ -629,13 +697,13 @@ pub fn random_floats(
 /// Generates striped random positive finite [`Float`]s.
 ///
 /// The actual precision is chosen from a geometric distribution with mean $m$, where $m$ is
-/// `mean_stripe_numerator / mean_stripe_denominator`; $m$ must be greater than 0. A striped bit
-/// sequence with the given stripe parameter is generated and truncated at the bit length. The
-/// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
-/// sci-exponent.
+/// `mean_sci_exponent_abs_numerator / mean_sci_exponent_abs_denominator`; $m$ must be greater than
+/// 0. A striped bit sequence with the given stripe parameter is generated and truncated at the bit
+/// length. The highest bit is forced to be 1, and the [`Float`] is generated from the sequence and
+/// a random sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Neither positive nor negative zero is generated. `NaN` is not generated either.
 ///
@@ -650,10 +718,10 @@ pub fn random_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -666,11 +734,10 @@ pub fn random_floats(
 ///     striped_random_positive_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "0.47#4", "9.532e-7#11", "0.004#2", "0.25#3", "49166.0#21",
-///         "0.007080316550854948256#60", "0.01#2", "1.055#8", "2.00001514144221892#57",
-///         "0.000028610638416637#43", "0.12500002991873621069#63", "12288.0#12", "2.0e4#1",
-///         "0.99216#16", "16.75#12", "0.1#1", "0.0004884003#23", "639.75#25", "0.0625#7",
-///         "0.0007324367693311#42"
+///         "0.94#4", "1.906e-6#11", "0.008#2", "0.5#3", "98332.0#21", "0.01416063310170989651#60",
+///         "0.023#2", "2.11#8", "4.00003028288443785#57", "0.000057221276833275#43",
+///         "0.25000005983747242139#63", "24576.0#12", "3.0e4#1", "1.98431#16", "33.5#12", "0.2#1",
+///         "0.0009768007#23", "1279.5#25", "0.125#7", "0.0014648735386622#42"
 ///     ]
 /// );
 /// ```
@@ -699,6 +766,73 @@ pub fn striped_random_positive_finite_floats(
     }
 }
 
+/// Generates striped random positive finite [`Float`]s with a specified precision.
+///
+/// A striped bit sequence with the given stripe parameter is generated and truncated at the bit
+/// length. The highest bit is forced to be 1, and the [`Float`] is generated from the sequence and
+/// a random sci-exponent.
+///
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
+///
+/// Neither positive nor negative zero is generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, or if `prec` is zero.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_float::ComparableFloat;
+/// use malachite_float::random::striped_random_positive_finite_floats;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     striped_random_positive_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1)
+///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
+///     &[
+///         "0.94#4", "1.906e-6#11", "0.008#2", "0.5#3", "98332.0#21", "0.01416063310170989651#60",
+///         "0.023#2", "2.11#8", "4.00003028288443785#57", "0.000057221276833275#43",
+///         "0.25000005983747242139#63", "24576.0#12", "3.0e4#1", "1.98431#16", "33.5#12", "0.2#1",
+///         "0.0009768007#23", "1279.5#25", "0.125#7", "0.0014648735386622#42"
+///     ]
+/// );
+/// ```
+pub fn striped_random_positive_floats_with_precision(
+    seed: Seed,
+    mean_sci_exponent_abs_numerator: u64,
+    mean_sci_exponent_abs_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    prec: u64,
+) -> RandomPositiveFiniteFloats<StripedRandomNaturalInclusiveRange> {
+    assert_ne!(prec, 0);
+    RandomPositiveFiniteFloats {
+        exponents: geometric_random_signeds(
+            seed.fork("exponents"),
+            mean_sci_exponent_abs_numerator,
+            mean_sci_exponent_abs_denominator,
+        ),
+        xs: striped_random_natural_inclusive_range(
+            seed.fork("significands"),
+            Natural::power_of_2(prec - 1),
+            Natural::low_mask(prec),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+    }
+}
+
 /// Generates striped random negative finite [`Float`]s.
 ///
 /// The actual precision is chosen from a geometric distribution with mean $m$, where $m$ is
@@ -707,8 +841,8 @@ pub fn striped_random_positive_finite_floats(
 /// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
 /// sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Neither positive nor negative zero is generated. `NaN` is not generated either.
 ///
@@ -723,10 +857,10 @@ pub fn striped_random_positive_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -739,11 +873,11 @@ pub fn striped_random_positive_finite_floats(
 ///     striped_random_negative_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-0.47#4", "-9.532e-7#11", "-0.004#2", "-0.25#3", "-49166.0#21",
-///         "-0.007080316550854948256#60", "-0.01#2", "-1.055#8", "-2.00001514144221892#57",
-///         "-0.000028610638416637#43", "-0.12500002991873621069#63", "-12288.0#12", "-2.0e4#1",
-///         "-0.99216#16", "-16.75#12", "-0.1#1", "-0.0004884003#23", "-639.75#25", "-0.0625#7",
-///         "-0.0007324367693311#42"
+///         "-0.94#4", "-1.906e-6#11", "-0.008#2", "-0.5#3", "-98332.0#21",
+///         "-0.01416063310170989651#60", "-0.023#2", "-2.11#8", "-4.00003028288443785#57",
+///         "-0.000057221276833275#43", "-0.25000005983747242139#63", "-24576.0#12", "-3.0e4#1",
+///         "-1.98431#16", "-33.5#12", "-0.2#1", "-0.0009768007#23", "-1279.5#25", "-0.125#7",
+///         "-0.0014648735386622#42"
 ///     ]
 /// );
 /// ```
@@ -776,8 +910,8 @@ pub fn striped_random_negative_finite_floats(
 /// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
 /// sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Positive zero is generated, but negative zero is not. `NaN` is not generated either.
 ///
@@ -792,10 +926,10 @@ pub fn striped_random_negative_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -808,10 +942,10 @@ pub fn striped_random_negative_finite_floats(
 ///     striped_random_non_negative_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "3.28e4#7", "0.0107421875#26", "4.20248e6#19", "0.0", "0.0077533#16", "0.01560976#20",
-///         "1.97#6", "1.0019#15", "0.3085632#21", "8191.989257573615703#61", "6.0#14",
-///         "0.0097655062#31", "190.000114#25", "0.0", "755.8#12", "0.00045779#14",
-///         "16399.9998760223#46", "0.0", "0.0000153#6", "1.0e1#2"
+///         "6.6e4#7", "0.021484375#26", "8.40496e6#19", "0.0", "0.0155065#16", "0.03121951#20",
+///         "3.94#6", "2.0038#15", "0.6171265#21", "16383.978515147231406#61", "12.0#14",
+///         "0.0195310124#31", "380.00023#25", "0.0", "1511.5#12", "0.00091559#14",
+///         "32799.999752045#46", "0.0", "0.0000305#6", "24.0#2"
 ///     ]
 /// );
 /// ```
@@ -850,8 +984,8 @@ pub fn striped_random_non_negative_finite_floats(
 /// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
 /// sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Negative zero is generated, but positive zero is not. `NaN` is not generated either.
 ///
@@ -866,10 +1000,10 @@ pub fn striped_random_non_negative_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -882,10 +1016,11 @@ pub fn striped_random_non_negative_finite_floats(
 ///     striped_random_non_positive_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-3.28e4#7", "-0.0107421875#26", "-4.20248e6#19", "-0.0", "-0.0077533#16",
-///         "-0.01560976#20", "-1.97#6", "-1.0019#15", "-0.3085632#21", "-8191.989257573615703#61",
-///         "-6.0#14", "-0.0097655062#31", "-190.000114#25", "-0.0", "-755.8#12", "-0.00045779#14",
-///         "-16399.9998760223#46", "-0.0", "-0.0000153#6", "-1.0e1#2"
+///         "-6.6e4#7", "-0.021484375#26", "-8.40496e6#19", "-0.0", "-0.0155065#16",
+///         "-0.03121951#20", "-3.94#6", "-2.0038#15", "-0.6171265#21",
+///         "-16383.978515147231406#61", "-12.0#14", "-0.0195310124#31", "-380.00023#25", "-0.0",
+///         "-1511.5#12", "-0.00091559#14", "-32799.999752045#46", "-0.0", "-0.0000305#6",
+///         "-24.0#2"
 ///     ]
 /// );
 /// ```
@@ -923,8 +1058,8 @@ pub fn striped_random_non_positive_finite_floats(
 /// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
 /// sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Neither positive nor negative zero is generated. `NaN` is not generated either.
 ///
@@ -939,10 +1074,10 @@ pub fn striped_random_non_positive_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -955,11 +1090,11 @@ pub fn striped_random_non_positive_finite_floats(
 ///     striped_random_nonzero_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-3.28e4#7", "-0.0107421875#26", "-4.20248e6#19", "0.0077533#16", "-0.01560976#20",
-///         "1.97#6", "-1.0019#15", "-0.3085632#21", "-8191.989257573615703#61", "6.0#14",
-///         "0.0097655062#31", "190.000114#25", "-755.8#12", "-0.00045779#14",
-///         "16399.9998760223#46", "-0.0000153#6", "-1.0e1#2", "-32.0#9", "-380.0#7",
-///         "-143.88281249#34"
+///         "-6.6e4#7", "-0.021484375#26", "-8.40496e6#19", "0.0155065#16", "-0.03121951#20",
+///         "3.94#6", "-2.0038#15", "-0.6171265#21", "-16383.978515147231406#61", "12.0#14",
+///         "0.0195310124#31", "380.00023#25", "-1511.5#12", "-0.00091559#14",
+///         "32799.999752045#46", "-0.0000305#6", "-24.0#2", "-64.0#9", "-7.6e2#7",
+///         "-287.76562497#34"
 ///     ]
 /// );
 /// ```
@@ -996,8 +1131,8 @@ pub fn striped_random_nonzero_finite_floats(
 /// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
 /// sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// Both positive and negative zero are generated. `NaN` is not.
 ///
@@ -1012,10 +1147,10 @@ pub fn striped_random_nonzero_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -1028,10 +1163,10 @@ pub fn striped_random_nonzero_finite_floats(
 ///     striped_random_finite_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1, 1, 10)
 ///         .take(20).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "-1.946#14", "-1.30385160461398e-8#47", "-0.04688#11", "263.999999877#38",
-///         "-0.000256#7", "0.50192#17", "-9.5e-7#3", "-262136.0#16", "-0.000220354#18", "3.9#5",
-///         "0.0", "0.06226#12", "-0.9960933#21", "-1.6e9#2", "0.0312#8", "-0.11#3", "-0.00781#11",
-///         "-1.9e-6#4", "-32.0#13", "-2032.0#19"
+///         "-3.8921#14", "-2.60770320922795e-8#47", "-0.09375#11", "527.999999754#38",
+///         "-0.00051#7", "1.00385#17", "-1.9e-6#3", "-5.2427e5#16", "-0.000440707#18", "7.8#5",
+///         "0.0", "0.12451#12", "-1.992187#21", "-3.0e9#2", "0.0625#8", "-0.22#3", "-0.01562#11",
+///         "-3.8e-6#4", "-64.0#13", "-4064.0#19"
 ///     ]
 /// );
 /// ```
@@ -1065,16 +1200,15 @@ pub fn striped_random_finite_floats(
 
 /// Generates striped random finite [`Float`]s.
 ///
-/// Special values (NaN, infinities, and zeros) are generated with the specified probability. If
-/// the [`Float`] to be generated is finite and nonzero, then the actual precision is chosen from a
-/// geometric distribution with mean $m$, where $m$ is
-/// `mean_stripe_numerator / mean_stripe_denominator`; $m$ must be greater than 0. A striped bit
-/// sequence with the given stripe parameter is generated and truncated at the bit length. The
-/// highest bit is forced to be 1, and the [`Float`] is generated from the sequence and a random
-/// sci-exponent.
+/// Special values (NaN, infinities, and zeros) are generated with the specified probability. If the
+/// [`Float`] to be generated is finite and nonzero, then the actual precision is chosen from a
+/// geometric distribution with mean $m$, where $m$ is `mean_stripe_numerator /
+/// mean_stripe_denominator`; $m$ must be greater than 0. A striped bit sequence with the given
+/// stripe parameter is generated and truncated at the bit length. The highest bit is forced to be
+/// 1, and the [`Float`] is generated from the sequence and a random sci-exponent.
 ///
-/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for
-/// information about generating striped random numbers.
+/// See [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource) for information
+/// about generating striped random numbers.
 ///
 /// The output length is infinite.
 ///
@@ -1087,10 +1221,10 @@ pub fn striped_random_finite_floats(
 /// `mean_precision_denominator`.
 ///
 /// # Panics
-/// Panics if `mean_stripe_denominator` is zero, if
-/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_precision_numerator` or
-/// `mean_precision_denominator` are zero, or, if after being reduced to lowest terms, their sum is
-/// greater than or equal to $2^{64}$.
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_precision_numerator` or `mean_precision_denominator` are
+/// zero, or, if after being reduced to lowest terms, their sum is greater than or equal to
+/// $2^{64}$.
 ///
 /// ```
 /// use itertools::Itertools;
@@ -1103,15 +1237,15 @@ pub fn striped_random_finite_floats(
 ///     striped_random_floats(EXAMPLE_SEED, 10, 1, 8, 1, 16, 1, 1, 10)
 ///         .take(50).map(|f| ComparableFloat(f).to_string()).collect_vec().as_slice(),
 ///     &[
-///         "3.9999#15", "16.38#9", "0.0", "NaN", "-0.000023#2", "-3.0e2#1", "-0.06244#10",
-///         "-63.7499926#28", "0.24999994#22", "0.0001219511046#28", "-0.05859#11", "-4.984375#23",
-///         "-7.9922331646080293499066#75", "Infinity", "-0.24#5", "-7.0e-12#5", "-131072.0#21",
-///         "NaN", "4.438#12", "-0.0", "-0.00293#7", "0.03#1", "0.06347653#22", "0.00003049#10",
-///         "-1.5366815e-8#22", "512.0#9", "-1.5759e7#13", "241.9692382#31", "4.9162e-7#17",
-///         "Infinity", "-12.0#6", "-2.0e-15#1", "-Infinity", "0.3041992222#31", "-5.0e2#4",
-///         "-7.6e-6#7", "-7.0e4#2", "1.9148572e-6#24", "-0.0000618#10", "-0.0", "-11.97#9",
-///         "0.1#1", "-0.003663062946#31", "1.909211266861208422e-6#61", "-0.00024414061863#34",
-///         "7.5769e-6#16", "NaN", "-0.0", "3.0e7#1", "10211.992188#33"
+///         "7.9998#15", "32.8#9", "0.0", "NaN", "-0.00005#2", "-5.0e2#1", "-0.1249#10",
+///         "-127.4999852#28", "0.4999999#22", "0.000243902209#28", "-0.11719#11", "-9.96875#23",
+///         "-15.9844663292160586998132#75", "Infinity", "-0.48#5", "-1.41e-11#5", "-262144.0#21",
+///         "NaN", "8.875#12", "-0.0", "-0.00586#7", "0.06#1", "0.12695307#22", "0.00006098#10",
+///         "-3.073363e-8#22", "1024.0#9", "-3.1519e7#13", "483.9384763#31", "9.8324e-7#17",
+///         "Infinity", "-24.0#6", "-4.0e-15#1", "-Infinity", "0.6083984445#31", "-1.0e3#4",
+///         "-0.0000153#7", "-1.0e5#2", "3.8297144e-6#24", "-0.0001235#10", "-0.0", "-23.94#9",
+///         "0.2#1", "-0.007326125891#31", "3.818422533722416844e-6#61", "-0.00048828123727#34",
+///         "0.0000151538#16", "NaN", "-0.0", "7.0e7#1", "20423.984375#33"
 ///     ]
 /// );
 /// ```

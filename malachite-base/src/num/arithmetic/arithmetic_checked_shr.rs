@@ -33,8 +33,8 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
                     /// Shifts a number right (divides it by a power of 2). If the result is too
                     /// large to be represented, `None` is returned.
                     ///
-                    /// Zero may be shifted by any amount, and any number may be shifted by any non-
-                    /// negative amount; shifting by a large amount returns `Some(0)`.
+                    /// Zero may be shifted by any amount, and any number may be shifted by any
+                    /// non-negative amount; shifting by a large amount returns `Some(0)`.
                     ///
                     /// $$
                     /// f(x, b) = \\begin{cases}
@@ -96,9 +96,9 @@ macro_rules! impl_arithmetic_checked_shr_signed_signed {
                     /// Shifts a number right (divides it by a power of 2). If the result is too
                     /// large to be represented, `None` is returned.
                     ///
-                    /// Zero may be shifted by any amount, and any number may be shifted by any non-
-                    /// negative amount; shifting by a large amount returns `Some(0)` if `self` is
-                    /// positive, and `Some(-1)` if `self` is negative.
+                    /// Zero may be shifted by any amount, and any number may be shifted by any
+                    /// non-negative amount; shifting by a large amount returns `Some(0)` if `self`
+                    /// is positive, and `Some(-1)` if `self` is negative.
                     ///
                     /// $$
                     /// f(x, b) = \\begin{cases}

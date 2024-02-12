@@ -43,8 +43,8 @@ pub fn coprime_with_check_2_3_5<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
 macro_rules! impl_coprime_with {
     ($t:ident) => {
         impl CoprimeWith<$t> for $t {
-            /// Returns whether two numbers are coprime; that is, whether they have no common
-            /// factor other than 1.
+            /// Returns whether two numbers are coprime; that is, whether they have no common factor
+            /// other than 1.
             ///
             /// Every number is coprime with 1. No number is coprime with 0, except 1.
             ///

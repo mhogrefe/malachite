@@ -2,12 +2,12 @@ use crate::arithmetic::traits::SimplestRationalInInterval;
 use crate::conversion::continued_fraction::to_continued_fraction::RationalContinuedFraction;
 use crate::conversion::traits::ContinuedFraction;
 use crate::Rational;
+use core::cmp::{max, min, Ordering};
+use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMul, Ceiling, Floor, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_nz::natural::Natural;
-use std::cmp::{max, min, Ordering};
-use std::mem::swap;
 
 fn min_helper_oo<'a>(ox: &'a Option<Natural>, oy: &'a Option<Natural>) -> &'a Natural {
     if let Some(x) = ox.as_ref() {
@@ -84,10 +84,10 @@ fn update_best(best: &mut Option<Rational>, x: &Rational, y: &Rational, candidat
 impl Rational {
     /// Compares two [`Rational`]s according to their complexity.
     ///
-    /// Complexity is defined as follows: If two [`Rational`]s have different denominators, then
-    /// the one with the larger denominator is more complex. If they have the same denominator,
-    /// then the one whose numerator is further from zero is more complex. Finally, if $q > 0$,
-    /// then $q$ is simpler than $-q$.
+    /// Complexity is defined as follows: If two [`Rational`]s have different denominators, then the
+    /// one with the larger denominator is more complex. If they have the same denominator, then the
+    /// one whose numerator is further from zero is more complex. Finally, if $q > 0$, then $q$ is
+    /// simpler than $-q$.
     ///
     /// The [`Rational`]s ordered by complexity look like this:
     /// $$
@@ -142,8 +142,8 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(x.significant_bits(), y.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if $x \geq y$.
@@ -200,9 +200,8 @@ impl SimplestRationalInInterval for Rational {
                 Rational::from(floor_x + Natural::ONE)
             } else {
                 let floor = floor_x;
-                // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need
-                // [f; x_1, x_2, x_3...] and [f; 1].
-                // If x_1 does not exist, the result is [f; 2].
+                // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f;
+                // x_1, x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
                 let (n, d) = if cf_x.is_done() {
                     ((floor << 1) | Natural::ONE, Natural::TWO)
                 } else {
@@ -221,8 +220,8 @@ impl SimplestRationalInInterval for Rational {
                     } else {
                         // x_2 exists since x_1 was 1
                         let x_2 = cf_x.next().unwrap();
-                        // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate.
-                        // [f; 1, x_2 - 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
+                        // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 -
+                        // 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
                         let k = &x_2 + Natural::ONE;
                         (&floor * &k + floor + k, x_2 + Natural::TWO)
                     }
@@ -348,8 +347,8 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(x.significant_bits(), y.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if $x > y$.

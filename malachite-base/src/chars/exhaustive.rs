@@ -58,14 +58,14 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
 /// Generates all [`char`]s, in a friendly order, so that more familiar [`char`] come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters,
-/// 2. Uppercase ASCII letters,
-/// 3. ASCII digits,
-/// 4. Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
-///    whitespace,
-/// 5. (only if `ascii_only` is false) Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose
-///    [`Debug`](std::fmt::Debug) representations don't start with `'\'`,
-/// 6. All remaining [`char`]s.
+/// - Lowercase ASCII letters,
+/// - Uppercase ASCII letters,
+/// - ASCII digits,
+/// - Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
+///   whitespace,
+/// - (only if `ascii_only` is false) Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose
+///   [`Debug`](std::fmt::Debug) representations don't start with `'\'`,
+/// - All remaining [`char`]s.
 ///
 /// This `struct` is created by [`exhaustive_chars`] and [`exhaustive_ascii_chars`]; see their
 /// documentation for more.
@@ -159,12 +159,12 @@ impl Iterator for ExhaustiveChars {
 /// Generates all ASCII [`char`]s, in a friendly order, so that more familiar [`char`]s come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters,
-/// 2. Uppercase ASCII letters,
-/// 3. ASCII digits,
-/// 4. Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
-///    whitespace,
-/// 5. All remaining ASCII [`char`]s.
+/// - Lowercase ASCII letters,
+/// - Uppercase ASCII letters,
+/// - ASCII digits,
+/// - Graphic ASCII [`char`]s (not alphanumeric and not control), including `' '` but no other
+///   whitespace,
+/// - All remaining ASCII [`char`]s.
 ///
 /// Within each group, the [`char`]s are ordered according to their usual order.
 ///
@@ -198,14 +198,14 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
 /// Generates all [`char`]s, in a friendly order, so that more familiar [`char`]s come first.
 ///
 /// The order is
-/// 1. Lowercase ASCII letters,
-/// 2. Uppercase ASCII letters,
-/// 3. ASCII digits,
-/// 4. Graphic ASCII [`char`] (not alphanumeric and not control), including `' '` but no other
-///    whitespace,
-/// 5. Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose
-///    [`Debug`](std::fmt::Debug) representations don't start with `'\'`,
-/// 6. All remaining [`char`]s.
+/// - Lowercase ASCII letters,
+/// - Uppercase ASCII letters,
+/// - ASCII digits,
+/// - Graphic ASCII [`char`] (not alphanumeric and not control), including `' '` but no other
+///   whitespace,
+/// - Graphic Non-ASCII [`char`]s; all non-ASCII [`char`]s whose [`Debug`](std::fmt::Debug)
+///   representations don't start with `'\'`,
+/// - All remaining [`char`]s.
 ///
 /// Within each group, the [`char`]s are ordered according to their usual order.
 ///

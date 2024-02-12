@@ -388,20 +388,17 @@ pub_test! {limbs_count_ones<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }}
 
-// Fills bit_array with the characteristic function of composite
-// numbers up to the parameter n. I.e. a bit set to "1" represent a
-// composite, a "0" represent a prime.
+// Fills bit_array with the characteristic function of composite numbers up to the parameter n. I.e.
+// a bit set to "1" represent a composite, a "0" represent a prime.
 //
-// The primesieve_size(n) limbs pointed to by bit_array are
-// overwritten. The returned value counts prime integers in the
-// interval [4, n]. Note that n > 4.
+// The primesieve_size(n) limbs pointed to by bit_array are overwritten. The returned value counts
+// prime integers in the interval [4, n]. Note that n > 4.
 //
-// Even numbers and multiples of 3 are excluded "a priori", only
-// numbers equivalent to +/- 1 mod 6 have their bit in the array.
+// Even numbers and multiples of 3 are excluded "a priori", only numbers equivalent to +/- 1 mod 6
+// have their bit in the array.
 //
-// Once sieved, if the bit b is ZERO it represent a prime, the
-// represented prime is bit_to_n(b), if the LSbit is bit 0, or
-// id_to_n(b), if you call "1" the first bit.
+// Once sieved, if the bit b is ZERO it represent a prime, the represented prime is bit_to_n(b), if
+// the LSbit is bit 0, or id_to_n(b), if you call "1" the first bit.
 //
 // # Worst-case complexity
 // $T(n) = O(n\log\log n)$
