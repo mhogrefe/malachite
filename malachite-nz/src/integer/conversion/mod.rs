@@ -358,6 +358,9 @@ pub mod primitive_float_from_integer;
 /// assert_eq!(i32::convertible_from(&-Integer::from(10u32).pow(12)), false);
 /// ```
 pub mod primitive_int_from_integer;
+/// Implementations of traits for conversions between Python integers and [`Integer`](crate::integer::Integer)s.
+/// [pyo3](https://pyo3.rs/).
+pub mod pyo3;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;

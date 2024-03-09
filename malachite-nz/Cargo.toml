@@ -26,6 +26,8 @@ libm = { version = "0.2.8", default-features = false }
 malachite-base = { version = "0.4.5", default-features = false }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
+indoc = { version = "2.0.4", optional = true}
+pyo3 = { version = "0.20.3", optional = true }
 serde_json = { version = "1.0.105", optional = true }
 num = { version = "0.4.1", optional = true, features = ["serde"] }
 rug = { version = "1.21.0", default-features = false, optional = true, features = ["integer", "serde"] }
@@ -35,11 +37,15 @@ embed-doc-image = { version = "0.1.4", optional = true }
 [dev-dependencies]
 malachite-nz = { path = ".", features = ["test_build"] }
 
+[build-dependencies]
+pyo3-build-config = { version = "0.20.3", features = ["resolve-config"] }
+
 [features]
 32_bit_limbs = []
 random = ["malachite-base/random"]
+enable_pyo3 = ["pyo3"]
 enable_serde = ["serde"]
-test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug"]
+test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug", "pyo3", "indoc"]
 bin_build = ["test_build"]
 float_helpers = []
 doc-images = ["embed-doc-image"]

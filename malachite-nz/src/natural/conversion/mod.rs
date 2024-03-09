@@ -455,6 +455,9 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(i64::convertible_from(&(Natural::ONE << 100)), false);
 /// ```
 pub mod primitive_int_from_natural;
+/// Implementations of traits for conversions between Python integers and [`Natural`](crate::natural::Natural)s.
+/// [pyo3](https://pyo3.rs/).
+pub mod pyo3;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;
