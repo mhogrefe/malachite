@@ -1,6 +1,5 @@
 #![cfg(feature = "enable_pyo3")]
 
-//! Conversions between [`Natural`](crate::natural::Natural)s and Python integers.
 //!
 //! This is useful for converting Python integers when they may not fit in Rust's built-in integer types.
 //!
@@ -13,7 +12,7 @@
 //! in which case it will fail its conversion and raise `OverflowError`.
 //! ```rust
 //! use malachite::Natural;
-//! use malachite::num::basic::traits::One
+//! use malachite::num::basic::traits::One;
 //! use pyo3::prelude::*;
 //!
 //! #[pyfunction]

@@ -18,7 +18,7 @@
 //!     modulo a power of 2, like
 //!     [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add) and
 //!     [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow);
-//!   - Various functions for logic and bit manipulation, like [`BitAnd`](std::ops::BitAnd) and
+//!   - Various functions for logic and bit manipulation, like [`BitAnd`](core::ops::BitAnd) and
 //!     [`BitAccess`](malachite_base::num::logic::traits::BitAccess).
 //! - The implementations of these functions use high-performance algorithms that work efficiently
 //!   for large numbers. For example, multiplication uses the naive quadratic algorithm, or one of
@@ -41,9 +41,9 @@
 //!   first [`Natural`](natural::Natural) to store the result, and this is what the
 //!   `Natural + &Natural` implementation does. On the other hand, if we can only take the second
 //!   (smaller) [`Natural`](natural::Natural) by value, then we only have 500 bits of memory
-//!   available, which is not enough to store the sum. In this case, the [`Vec`] containing the
+//!   available, which is not enough to store the sum. In this case, the [`Vec`](alloc::vec::Vec) containing the
 //!   smaller [`Natural`](natural::Natural)'s data can be extended to hold 1000 bits, in hopes that
-//!   this will be more efficient than allocating 1000 bits in a completely new [`Vec`]. Finally,
+//!   this will be more efficient than allocating 1000 bits in a completely new [`Vec`](alloc::vec::Vec). Finally,
 //!   if both [`Natural`](natural::Natural)s are taken by value, then the `Natural + Natural`
 //!   implementation chooses to reuse the memory of the larger one.
 //!
@@ -56,7 +56,7 @@
 //!
 //! # Limbs
 //! Large [`Natural`](natural::Natural)s and [`Integer`](integer::Integer)s store their data as
-//! [`Vec`]s of some primitive type. The elements of these [`Vec`]s are called "limbs" in GMP
+//! [`Vec`](alloc::vec::Vec)s of some primitive type. The elements of these [`Vec`](alloc::vec::Vec)s are called "limbs" in GMP
 //! terminology, since they're large digits. By default, the type of a `Limb` is [`u64`], but you
 //! can set it to [`u32`] using the `32_bit_limbs` feature.
 //!

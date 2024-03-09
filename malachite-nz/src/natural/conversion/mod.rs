@@ -455,14 +455,13 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(i64::convertible_from(&(Natural::ONE << 100)), false);
 /// ```
 pub mod primitive_int_from_natural;
-/// Implementations of traits for conversions between Python integers and [`Natural`](crate::natural::Natural)s.
-/// [pyo3](https://pyo3.rs/).
+/// Implementations of traits for conversions between Python integers and [`Natural`](crate::natural::Natural)s using [pyo3](https://pyo3.rs/).
 pub mod pyo3;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;
 /// Implementations of traits for converting [`Natural`](crate::natural::Natural)s to and from
-/// [`String`]s.
+/// [`String`](alloc::string::String)s.
 pub mod string;
 /// Functions for extracting [`Limb`](crate#limbs)s from a [`Natural`](crate::natural::Natural).
 pub mod to_limbs;

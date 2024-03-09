@@ -17,7 +17,7 @@ impl Add<Integer> for Integer {
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`](alloc::vec::Vec) needs to reallocate)
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
     /// other.significant_bits())`.
@@ -210,7 +210,7 @@ impl AddAssign<Integer> for Integer {
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    /// $M(n) = O(n)$ (only if the underlying [`Vec`](alloc::vec::Vec) needs to reallocate)
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
     /// other.significant_bits())`.
