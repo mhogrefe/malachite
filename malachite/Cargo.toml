@@ -21,6 +21,7 @@ serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 [features]
 default = [ "naturals_and_integers", "rationals" ]
+enable_pyo3 = [ "malachite-nz/enable_pyo3" ]
 enable_serde = [ "malachite-nz/enable_serde", "malachite-q/enable_serde", "malachite-float/enable_serde" ]
 random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random", "malachite-float/random"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs", "malachite-q/32_bit_limbs", "malachite-float/32_bit_limbs"]
