@@ -2,7 +2,7 @@
 
 //!
 //! This is useful for converting Python integers when they may not fit in Rust's built-in integer types.
-//! 
+//!
 //! To use this enable the `enable_pyo3` feature.
 //!
 //! ## Examples
@@ -37,14 +37,13 @@
 //! assert n + 1 == value
 //! ```
 
+use crate::integer::Integer;
 use alloc::vec::Vec;
+use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    ffi, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult,
-    Python, ToPyObject, intern,
+    ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult, Python, ToPyObject,
 };
-use malachite_base::num::basic::traits::Zero;
-use crate::integer::Integer;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Integer {

@@ -38,14 +38,14 @@
 //! assert n + 1 == value
 //! ```
 
+use crate::natural::Natural;
 use alloc::vec::Vec;
+use malachite_base::num::basic::traits::Zero;
 #[allow(unused_imports)]
 use pyo3::{
-    exceptions::PyValueError, ffi, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject, PyResult,
-    Python, ToPyObject, intern,
+    exceptions::PyValueError, ffi, intern, types::*, FromPyObject, IntoPy, Py, PyErr, PyObject,
+    PyResult, Python, ToPyObject,
 };
-use malachite_base::num::basic::traits::Zero;
-use crate::natural::Natural;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "enable_pyo3")))]
 impl<'source> FromPyObject<'source> for Natural {
