@@ -13,4 +13,4 @@ match MPFR's behavior.
 
 <https://www.malachite.rs/>
 
-Copyright © 2023 Mikhail Hogrefe
+Copyright © 2024 Mikhail Hogrefe

@@ -38,7 +38,7 @@ impl DoubleEndedIterator for ExhaustiveNaturalRange {
 
 /// Generates all [`Natural`]s greater than or equal to some [`Natural`], in ascending order.
 ///
-/// This `struct` is created by p`exhaustive_natural_range_to_infinity`]; see its documentation for
+/// This `struct` is created by [`exhaustive_natural_range_to_infinity`]; see its documentation for
 /// more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRangeToInfinity {

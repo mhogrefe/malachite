@@ -240,7 +240,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_basecase(n: Limb, k: Limb) -> Li
             - TABLE_2N_MINUS_POPC_2N[(diff >> 1) - 1])
 }}
 
-pub const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
+pub(crate) const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
 
 // Recursively exploit the relation bin(n, k) = bin(n, k >> 1) * bin(n - k >> 1, k - k >> 1) /
 // bin(k, k >> 1).
@@ -315,7 +315,7 @@ fn limbs_approx_sqrt(x: Limb) -> Limb {
     (Limb::power_of_2(s) + (x >> s)) >> 1
 }
 
-pub const BIN_GOETGHELUCK_THRESHOLD: Limb = 512;
+pub(crate) const BIN_GOETGHELUCK_THRESHOLD: Limb = 512;
 
 // Implementation of the algorithm by P. Goetgheluck, "Computing Binomial Coefficients", The
 // American Mathematical Monthly, Vol. 94, No. 4 (April 1987), pp. 360-365.

@@ -204,11 +204,14 @@ echo "Step 96. Building malachite-float lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
 echo "Step 97. Building malachite-float lib for wasm with 32_bit_limbs" &&
 cargo build --lib --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
+cd ../malachite &&
+echo "Step 98. Documenting malachite" &&
+RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features random &&
 cd ../malachite-criterion-bench &&
-echo "Step 98. Updating malachite-criterion-bench" &&
+echo "Step 99. Updating malachite-criterion-bench" &&
 cargo update &&
-echo "Step 99. Formatting malachite-criterion-bench" &&
+echo "Step 100. Formatting malachite-criterion-bench" &&
 bash ../superfmt.sh &&
 cd .. &&
-echo "Step 100. Running additional-lints" &&
+echo "Step 101. Running additional-lints" &&
 python3 additional-lints.py

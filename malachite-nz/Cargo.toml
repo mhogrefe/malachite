@@ -1,6 +1,6 @@
 [package]
 name = "malachite-nz"
-version = "0.4.5"
+version = "0.4.6"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -23,7 +23,7 @@ path = "src/bin.rs"
 [dependencies]
 itertools = { version = "0.11.0", default-features = false, features = ["use_alloc"] }
 libm = { version = "0.2.8", default-features = false }
-malachite-base = { version = "0.4.5", default-features = false }
+malachite-base = { version = "0.4.6", default-features = false }
 serde = { version = "1.0.188", optional = true, default-features = false, features = ["alloc", "derive"] }
 
 serde_json = { version = "1.0.105", optional = true }
@@ -47,5 +47,5 @@ doc-images = ["embed-doc-image"]
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
 # ensure that it will render any images that we may have in inner attribute documentation.
-features = ["doc-images"]
+features = ["doc-images", "random"]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]

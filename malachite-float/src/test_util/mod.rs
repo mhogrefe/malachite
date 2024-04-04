@@ -1,3 +1,4 @@
+pub mod arithmetic;
 pub mod bench;
 pub mod common;
 pub mod exhaustive;

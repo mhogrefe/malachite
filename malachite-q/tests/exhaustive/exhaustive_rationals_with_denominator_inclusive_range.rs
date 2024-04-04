@@ -10,7 +10,7 @@ use std::str::FromStr;
 fn helper(d: &str, a: &str, b: &str, out: &str) {
     assert_eq!(
         exhaustive_rationals_with_denominator_inclusive_range(
-            &Natural::from_str(d).unwrap(),
+            Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
             Rational::from_str(b).unwrap()
         )
@@ -103,7 +103,7 @@ fn test_exhaustive_rationals_with_denominator_inclusive_range() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_inclusive_range_fail_1() {
     exhaustive_rationals_with_denominator_inclusive_range(
-        &Natural::ZERO,
+        Natural::ZERO,
         Rational::from_unsigneds(1u32, 3),
         Rational::from_unsigneds(1u32, 2),
     );
@@ -113,7 +113,7 @@ fn exhaustive_rationals_with_denominator_inclusive_range_fail_1() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_inclusive_range_fail_2() {
     exhaustive_rationals_with_denominator_inclusive_range(
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 2),
         Rational::from_unsigneds(1u32, 3),
     );

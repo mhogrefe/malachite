@@ -18,7 +18,10 @@ fn demo_denominators_in_closed_interval(gm: GenMode, config: &GenConfig, limit: 
             "denominators_in_closed_interval({}, {}) = {}",
             a,
             b,
-            prefix_to_string(Rational::denominators_in_closed_interval(&a, &b), 20)
+            prefix_to_string(
+                Rational::denominators_in_closed_interval(a.clone(), b.clone()),
+                20
+            )
         );
     }
 }
@@ -38,7 +41,7 @@ fn benchmark_denominators_in_closed_interval(
         file_name,
         &pair_2_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(a, b)| {
-            no_out!(Rational::denominators_in_closed_interval(&a, &b))
+            no_out!(Rational::denominators_in_closed_interval(a, b))
         })],
     );
 }

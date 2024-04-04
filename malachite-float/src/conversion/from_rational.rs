@@ -272,11 +272,11 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(), prec)`.
     ///
     /// # Examples
     /// ```

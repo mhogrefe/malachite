@@ -62,6 +62,12 @@ pub mod eq_mod_power_of_2;
 /// [`Multifactorial`](malachite_base::num::arithmetic::traits::Multifactorial), and
 /// [`Subfactorial`](malachite_base::num::arithmetic::traits::Subfactorial).
 pub mod factorial;
+#[cfg(feature = "float_helpers")]
+pub mod float_add;
+#[cfg(feature = "float_helpers")]
+pub mod float_extras;
+#[cfg(feature = "float_helpers")]
+pub mod float_sub;
 /// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.

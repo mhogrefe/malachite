@@ -43,10 +43,12 @@ extern crate malachite_base;
 
 pub mod arithmetic {
     pub mod abs;
+    pub mod add;
     pub mod is_power_of_2;
     pub mod neg;
     pub mod power_of_2;
     pub mod sign;
+    pub mod sub;
 }
 
 pub mod basic {

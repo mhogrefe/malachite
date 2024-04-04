@@ -16,3 +16,5 @@ This crate defines
 [`Float`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html)s.
 
 TODO
+
+Copyright © 2024 Mikhail Hogrefe

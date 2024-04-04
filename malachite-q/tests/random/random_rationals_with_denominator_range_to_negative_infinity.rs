@@ -21,7 +21,7 @@ fn random_rationals_with_denominator_range_to_negative_infinity_helper(
     random_rationals_helper_helper(
         random_rationals_with_denominator_range_to_negative_infinity(
             EXAMPLE_SEED,
-            &Natural::from_str(d).unwrap(),
+            Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
             mean_bits_numerator,
             mean_bits_denominator,
@@ -301,7 +301,7 @@ fn test_random_rationals_with_denominator_range_to_negative_infinity() {
 fn random_rationals_with_denominator_range_to_negative_infinity_fail_1() {
     random_rationals_with_denominator_range_to_negative_infinity(
         EXAMPLE_SEED,
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
         10,
         0,
@@ -313,7 +313,7 @@ fn random_rationals_with_denominator_range_to_negative_infinity_fail_1() {
 fn random_rationals_with_denominator_range_to_negative_infinity_fail_2() {
     random_rationals_with_denominator_range_to_negative_infinity(
         EXAMPLE_SEED,
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_signeds(-1i32, 3),
         2,
         3,

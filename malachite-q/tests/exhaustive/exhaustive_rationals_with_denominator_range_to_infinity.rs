@@ -9,7 +9,7 @@ fn helper(d: &str, a: &str, out: &str) {
     assert_eq!(
         prefix_to_string(
             exhaustive_rationals_with_denominator_range_to_infinity(
-                &Natural::from_str(d).unwrap(),
+                Natural::from_str(d).unwrap(),
                 Rational::from_str(a).unwrap()
             ),
             20
@@ -169,7 +169,7 @@ fn test_exhaustive_rationals_with_denominator_range_to_infinity() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_range_to_infinity_fail() {
     exhaustive_rationals_with_denominator_range_to_infinity(
-        &Natural::ZERO,
+        Natural::ZERO,
         Rational::from_unsigneds(1u32, 3),
     );
 }

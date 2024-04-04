@@ -16,7 +16,7 @@ fn test_denominators_in_closed_interval() {
         let a = Rational::from_str(a).unwrap();
         let b = Rational::from_str(b).unwrap();
         assert_eq!(
-            prefix_to_string(Rational::denominators_in_closed_interval(&a, &b), 20),
+            prefix_to_string(Rational::denominators_in_closed_interval(a, b), 20),
             out
         );
     };
@@ -55,34 +55,36 @@ fn test_denominators_in_closed_interval() {
 #[test]
 #[should_panic]
 fn denominators_in_closed_interval_fail_1() {
-    Rational::denominators_in_closed_interval(&Rational::ONE, &Rational::ONE);
+    Rational::denominators_in_closed_interval(Rational::ONE, Rational::ONE);
 }
 
 #[test]
 #[should_panic]
 fn denominators_in_closed_interval_fail_2() {
-    Rational::denominators_in_closed_interval(&Rational::ONE, &Rational::ZERO);
+    Rational::denominators_in_closed_interval(Rational::ONE, Rational::ZERO);
 }
 
 #[test]
 fn simplest_denominators_in_closed_interval_properties() {
     rational_pair_gen_var_3().test_properties(|(a, b)| {
-        let ds = Rational::denominators_in_closed_interval(&a, &b)
+        let ds = Rational::denominators_in_closed_interval(a.clone(), b.clone())
             .take(20)
             .collect_vec();
         assert!(is_strictly_ascending(ds.iter()));
         for d in &ds {
-            assert!(
-                exhaustive_rationals_with_denominator_inclusive_range(d, a.clone(), b.clone())
-                    .next()
-                    .is_some()
-            );
+            assert!(exhaustive_rationals_with_denominator_inclusive_range(
+                d.clone(),
+                a.clone(),
+                b.clone()
+            )
+            .next()
+            .is_some());
         }
         for d in 1u32..=20 {
             let d = Natural::from(d);
             if !ds.contains(&d) {
                 assert!(exhaustive_rationals_with_denominator_inclusive_range(
-                    &d,
+                    d.clone(),
                     a.clone(),
                     b.clone(),
                 )
@@ -94,7 +96,7 @@ fn simplest_denominators_in_closed_interval_properties() {
 
     rational_gen().test_properties(|a| {
         assert!(
-            Rational::denominators_in_closed_interval(&a, &(&a + Rational::ONE))
+            Rational::denominators_in_closed_interval(a.clone(), a + Rational::ONE)
                 .take(20)
                 .eq(exhaustive_positive_naturals().take(20))
         );

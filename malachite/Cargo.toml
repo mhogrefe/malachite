@@ -1,6 +1,6 @@
 [package]
 name = "malachite"
-version = "0.4.5"
+version = "0.4.6"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 rust-version = "1.61.0"
 edition = "2021"
@@ -13,10 +13,10 @@ keywords = ["mathematics", "math", "numerics", "bignum"]
 categories = ["mathematics"]
 
 [dependencies]
-malachite-base = { version = "0.4.5", default_features = false }
-malachite-nz = { version = "0.4.5", default_features = false, optional = true }
-malachite-q = { version = "0.4.5", default_features = false, optional = true }
-malachite-float = { version = "0.4.5", default_features = false, optional = true }
+malachite-base = { version = "0.4.6", default_features = false }
+malachite-nz = { version = "0.4.6", default_features = false, optional = true }
+malachite-q = { version = "0.4.6", default_features = false, optional = true }
+malachite-float = { version = "0.4.6", default_features = false, optional = true }
 serde = { version = "1.0.188", optional = true, features = ["derive"] }
 
 [features]
@@ -32,5 +32,5 @@ floats = [ "malachite-float" ]
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we
 # ensure that it will render any images that we may have in inner attribute documentation.
-features = ["malachite-nz/doc-images"]
+features = ["malachite-nz/doc-images", "random"]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
