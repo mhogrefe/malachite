@@ -1,3 +1,21 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1996, 1998, 2000-2004, 2008, 2010 Free Software Foundation, Inc.
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2008 Peter Shrimpton
+//
+//      Copyright © 2009 William Hart
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::fail_on_untested_path;
 use crate::num::arithmetic::traits::{
     JacobiSymbol, KroneckerSymbol, LegendreSymbol, ModPowerOf2, NegAssign, Parity, UnsignedAbs,

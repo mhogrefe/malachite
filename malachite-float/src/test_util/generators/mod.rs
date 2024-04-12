@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::test_util::generators::common::{
     float_float_rounding_mode_triple_rm, float_integer_pair_rm, float_natural_pair_rm,
     float_pair_rm, float_primitive_float_pair_rm, float_primitive_int_pair_rm,

@@ -1,3 +1,18 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_mul` and `TOOM44_OK` contributed to the GNU project by Torbjörn Granlund.
+//
+//      Copyright © 1991—1994, 1996, 1996-2003, 2005-2007, 2008, 2009, 2010, 2012, 2014, 2019
+//      Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mul::fft::{

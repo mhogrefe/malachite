@@ -1,3 +1,15 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1991, 1993, 1994, 1996, 2000-2002 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::platform::Limb;
@@ -140,7 +152,7 @@ pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 // Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
 // equal to `Limb::WIDTH`.
 //
-// This is equivalent to `mpn_lshiftc` from `mpn/generic/mpn_lshiftc`, GMP 6.2.1.
+// This is equivalent to `mpn_lshiftc` from `mpn/generic/lshift.c`, GMP 6.2.1.
 pub_crate_test! {limbs_shl_with_complement_to_out(
     out: &mut [Limb],
     xs: &[Limb],

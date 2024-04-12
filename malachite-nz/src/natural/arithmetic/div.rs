@@ -1,3 +1,25 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_dcpi1_divappr_q`, `mpn_dcpi1_divappr_q_n`, `mpn_div_q`, `mpn_mu_divappr_q`,
+//      `mpn_mu_divappr_q_choose_in`, `mpn_mu_divappr_q_itch`, `mpn_preinv_mu_divappr_q`,
+//      `mpn_sbpi1_div_q`, and `mpn_sbpi1_divappr_q` contributed to the GNU project by Torbjörn
+//      Granlund.
+//
+//      `mpn_dcpi1_div_q`, `mpn_mu_div_q`, and `mpn_mu_div_q_itch` contributed to the GNU project by
+//      Torbjörn Granlund and Marco Bodrato.
+//
+//      `mpn_div_qr_1` contributed to the GNU project by Niels Möller and Torbjörn Granlund.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,

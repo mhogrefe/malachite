@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2010 William Hart
+//
+//      Copyright © 2021 Fredrik Johansson
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::arithmetic::traits::{ModNeg, ModNegAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -33,7 +47,7 @@ macro_rules! impl_mod_neg {
             /// # Examples
             /// See [here](super::mod_neg#mod_neg).
             ///
-            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1.
+            /// This is equivalent to `nmod_neg` from `nmod.h`, FLINT 2.7.1.
             #[inline]
             fn mod_neg(self, m: $t) -> $t {
                 mod_neg(self, m)
@@ -52,7 +66,7 @@ macro_rules! impl_mod_neg {
             /// # Examples
             /// See [here](super::mod_neg#mod_neg_assign).
             ///
-            /// This is equivalent to `nmod_neg` from `nmod_vec.h`, FLINT 2.7.1, where the output is
+            /// This is equivalent to `nmod_neg` from `nmod.h`, FLINT 2.7.1, where the output is
             /// assigned to `a`.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {

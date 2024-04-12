@@ -1,3 +1,15 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2009, 2016 William Hart
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::arithmetic::traits::{Gcd, GcdAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use core::cmp::min;
@@ -34,7 +46,6 @@ pub fn gcd_binary<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     }
 }
 
-// This is equivalent to the first version of `n_gcd` from `ulong_extras/gcd.c`, FLINT 2.7.1.
 pub_test! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
     if x == T::ZERO {
         return y;
@@ -60,7 +71,7 @@ pub_test! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
 }}
 
 #[cfg(feature = "test_build")]
-// This is equivalent to the second version of `n_gcd` from `ulong_extras/gcd.c`, FLINT 2.7.1.
+// This is a modified version of `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1.
 pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
     let mut v;
     if x >= y {

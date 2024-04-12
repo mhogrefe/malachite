@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MPFR Library.
+//
+//      Copyright © 2004-2022 Free Software Foundation, Inc.
+//
+//      Contributed by the AriC and Caramba projects, INRIA.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out_aliased_2,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -949,7 +963,7 @@ fn add_float_significands_same_prec_lt_w(
             let round_bit = sum & (shift_bit >> 1);
             (sum & !mask, (sum & mask) ^ round_bit, round_bit)
         } else if exp_diff < Limb::WIDTH {
-            // shift <= exp_diff < GMP_NUMB_BITS
+            // shift <= exp_diff < Limb::WIDTH
             let mut sticky_bit = y << (Limb::WIDTH - exp_diff); // bits from y[-1] after shift
             let (mut sum, overflow) = x.overflowing_add(y >> exp_diff);
             if overflow {
@@ -965,8 +979,8 @@ fn add_float_significands_same_prec_lt_w(
                 round_bit,
             )
         } else {
-            // - exp_diff >= GMP_NUMB_BITS
-            // - round_bit == 0 since prec < GMP_NUMB_BITS
+            // - exp_diff >= Limb::WIDTH
+            // - round_bit == 0 since prec < Limb::WIDTH
             // - sticky_bit == 1 since y != 0
             (x, 1, 0)
         }

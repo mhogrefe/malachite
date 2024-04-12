@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MPFR Library.
+//
+//      Copyright © 1999-2022 Free Software Foundation, Inc.
+//
+//      Contributed by the AriC and Caramba projects, INRIA.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
@@ -1182,7 +1196,7 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
         let neg = if a1 == 0 && a0 == 0 {
             return (0, 0, 0, Ordering::Equal, false);
         } else if a1 >= x_1 {
-            // out = x - y mod 2 ^ (2*GMP_NUMB_BITS)
+            // out = x - y mod 2 ^ (2 * Limb::WIDTH)
             let overflow = a0.overflowing_neg_assign();
             a1.wrapping_neg_assign();
             if overflow {
@@ -1763,7 +1777,7 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 // a = a2, a1, a0 cannot become zero here, since:
                 // - if exp_diff >= 2, then a2 >= 2 ^ (w - 1) - (2 ^ (w - 2) - 1) with w =
                 //   Limb::WIDTH, thus a2 - 1 >= 2 ^ (w - 2),
-                // - if exp_diff = 1, then since prec < 3 * GMP_NUMB_BITS we have sticky_bit = 0.
+                // - if exp_diff = 1, then since prec < 3 * Limb::WIDTH we have sticky_bit = 0.
                 assert!(a2 > 0 || a1 > 0 || a0 > 0);
                 // 2 ^ Limb::WIDTH - sticky_bit
                 sticky_bit.wrapping_neg_assign();
@@ -4012,7 +4026,7 @@ fn sub_float_significands_general<'a>(
         &shifted_y
     };
     // here we have shift_y = (diff_exp - cancel) % Limb::WIDTH, 0 <= shift_y < Limb::WIDTH, thus we
-    // want cancel2 = ceil((cancel - diff_exp) / GMP_NUMB_BITS)
+    // want cancel2 = ceil((cancel - diff_exp) / Limb::WIDTH)
     let cancel2 = if cancel >= exp_diff {
         // Note that cancel is signed and will be converted to mpfr_uexp_t (type of diff_exp) in the
         // expression below, so that this will work even if cancel is very large and diff_exp = 0.

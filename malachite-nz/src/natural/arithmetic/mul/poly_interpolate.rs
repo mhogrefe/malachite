@@ -1,3 +1,23 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `DO_mpn_sublsh_n`, `DO_mpn_subrsh`, `mpn_toom_interpolate_6pts`,
+//      `mpn_toom_interpolate_8pts`, `mpn_toom_interpolate_12pts`, and `mpn_toom_interpolate_16pts`
+//      contributed to the GNU project by Marco Bodrato.
+//
+//      `mpn_toom_interpolate_5pts` and `mpn_toom_interpolate_7pts` contributed to the GNU project
+//      by Robert Harley, with improvements by Paul Zimmermann and Marco Bodrato.
+//
+//      Copyright © 2000-2003, 2005-2007, 2009, 2010, 2011, 2012, 2015, 2020 Free Software
+//      Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -430,8 +450,8 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
 const WANT_ASSERT: bool = true;
 
 // Interpolation for toom4, using the evaluation points 0, infinity, 1, -1, 2, -2, 1 / 2. More
-// precisely, we want to compute f(2 ^ (GMP_NUMB_BITS * n)) for a polynomial f of degree 6, given
-// the seven values
+// precisely, we want to compute f(2 ^ (Limb::WIDTH * n)) for a polynomial f of degree 6, given the
+// seven values
 // - w0 = f(0),
 // - w1 = f(-2),
 // - w2 = f(1),

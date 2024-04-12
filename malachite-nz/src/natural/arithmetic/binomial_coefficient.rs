@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Contributed to the GNU project by Torbjörn Granlund and Marco Bodrato.
+//
+//      Copyright © 1998-2012, 2013, 2015-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::div::limbs_hensel_div_limb_in_place;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook_in_place, limbs_modular_invert_limb,

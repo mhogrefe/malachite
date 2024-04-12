@@ -1,3 +1,15 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1991-2019 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
@@ -253,8 +265,8 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
     a.n = n + 1;
 }}
 
-// Multiply M by M1 from the right. Since the M1 elements fit in GMP_NUMB_BITS - 1 bits, M grows by
-// at most one limb. Needs temporary space M->n
+// Multiply M by M1 from the right. Since the M1 elements fit in Limb::WIDTH - 1 bits, M grows by at
+// most one limb. Needs temporary space M->n
 //
 // # Worst-case complexity
 // $T(n) = O(n)$

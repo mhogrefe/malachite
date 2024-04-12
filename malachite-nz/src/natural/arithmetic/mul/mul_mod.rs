@@ -1,3 +1,19 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_bc_mulmod_bnm1`, `mpn_bc_mulmod_bnp1`, `mpn_mulmod_bnm1`, and
+//      `mpn_mulmod_bnm1_next_size` contributed to the GNU project by Niels Möller, Torbjörn
+//      Granlund and Marco Bodrato.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,

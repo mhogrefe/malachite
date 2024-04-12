@@ -1,3 +1,20 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_div_qr_1n_pi1` contributed to the GNU project by Niels Möller.
+//
+//      `mpn_div_qr_1` contributed to the GNU project by Niels Möller and Torbjörn Granlund.
+//
+//      Copyright © 1991, 1993, 1994, 1996, 1998-2000, 2002, 2003, 2013 Free Software Foundation,
+//      Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::div::div_by_preinversion;
 use crate::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};

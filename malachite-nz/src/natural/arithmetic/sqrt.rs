@@ -1,3 +1,19 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Contributed to the GNU project by Paul Zimmermann (most code), Torbjörn Granlund
+//      (`mpn_sqrtrem1`) and Marco Bodrato (`mpn_dc_sqrt`).
+//
+//      Copyright © 1999-2002, 2004, 2005, 2008, 2010, 2012, 2015, 2017 Free Software Foundation,
+//      Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_limb_in_place,

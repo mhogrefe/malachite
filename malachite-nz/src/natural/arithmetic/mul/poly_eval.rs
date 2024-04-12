@@ -1,3 +1,24 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_toom_eval_dgr3_pm2`, `mpn_toom_eval_dgr3_pm1`, `mpn_toom_eval_pm1`, and
+//      `mpn_toom_eval_pm2exp` contributed to the GNU project by Niels Möller.
+//
+//      `DO_addlsh2` and `mpn_toom_eval_pm2` contributed to the GNU project by Niels Möller and
+//      Marco Bodrato.
+//
+//      `DO_mpn_addlsh_n` and `mpn_toom_eval_pm2rexp` contributed to the GNU project by Marco
+//      Bodrato.
+//
+//      Copyright © 2009 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,

@@ -1,3 +1,15 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::div_exact::MAX_OVER_3;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
@@ -10,7 +22,7 @@ const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH 
 
 /// Benchmarks show that this algorithm is always worse than the default.
 ///
-/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic diveby3.c`, GMP 6.2.1, with
+/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 /// `DIVEXACT_BY3_METHOD == 1`, no carry-in, and no return value.
 pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
     let len = ns.len();
@@ -38,7 +50,7 @@ pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
 
 /// Benchmarks show that this algorithm is always worse than the default.
 ///
-/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic diveby3.c`, GMP 6.2.1, with
+/// This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 /// `DIVEXACT_BY3_METHOD == 1`, no carry-in, and no return value, where `rp == up`.
 pub fn limbs_div_exact_3_in_place_alt(ns: &mut [Limb]) {
     let len = ns.len();

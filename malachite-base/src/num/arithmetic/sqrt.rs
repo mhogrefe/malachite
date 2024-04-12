@@ -1,3 +1,22 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_sqrtrem1` contributed to the GNU project by Torbjörn Granlund.
+//
+//      Copyright © 1999-2002, 2004, 2005, 2008, 2010, 2012, 2015, 2017 Free Software Foundation,
+//      Inc.
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2009 William Hart
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, Ln,
     RoundToMultipleOfPowerOf2, ShrRound, Sqrt, SqrtAssign, SqrtAssignRem, SqrtRem,

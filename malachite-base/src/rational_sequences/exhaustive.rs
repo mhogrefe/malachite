@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::exhaustive::PrimitiveIntIncreasingRange;
 use crate::rational_sequences::{rational_sequence_is_reduced, RationalSequence};
 use crate::tuples::exhaustive::{exhaustive_pairs_from_single, ExhaustivePairs1Input};

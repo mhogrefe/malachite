@@ -1,3 +1,18 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `getbits`, `MPN_REDC_1`, `win_size`, `redcify`, `mpn_powm`, and `mpz_powm` contributed to
+//      the GNU project by Torbjörn Granlund.
+//
+//      Copyright (C) 2000-2002, 2004, 2007–2012 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_same_length_in_place_left,
