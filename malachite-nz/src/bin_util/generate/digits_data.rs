@@ -1,3 +1,16 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1991, 1993, 1994, 1996, 2000, 2001, 2002, 2004, 2011, 2012, 2015-2018 Free
+//      Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use malachite_base::num::arithmetic::traits::{FloorSqrt, ModPowerOf2, Parity, Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};

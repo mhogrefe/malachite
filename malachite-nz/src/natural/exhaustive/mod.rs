@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::Natural;
 use malachite_base::num::basic::traits::{One, Zero};
 
@@ -38,7 +46,7 @@ impl DoubleEndedIterator for ExhaustiveNaturalRange {
 
 /// Generates all [`Natural`]s greater than or equal to some [`Natural`], in ascending order.
 ///
-/// This `struct` is created by p`exhaustive_natural_range_to_infinity`]; see its documentation for
+/// This `struct` is created by [`exhaustive_natural_range_to_infinity`]; see its documentation for
 /// more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRangeToInfinity {

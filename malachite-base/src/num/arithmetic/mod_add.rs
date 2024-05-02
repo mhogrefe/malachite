@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2010 William Hart
+//
+//      Copyright © 2021 Fredrik Johansson
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::arithmetic::traits::{ModAdd, ModAddAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -42,7 +56,7 @@ macro_rules! impl_mod_add {
             /// # Examples
             /// See [here](super::mod_add#mod_add).
             ///
-            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1.
+            /// This is equivalent to `nmod_add` from `nmod.h`, FLINT 2.7.1.
             #[inline]
             fn mod_add(self, other: $t, m: $t) -> $t {
                 mod_add(self, other, m)
@@ -64,7 +78,7 @@ macro_rules! impl_mod_add {
             /// # Examples
             /// See [here](super::mod_add#mod_add_assign).
             ///
-            /// This is equivalent to `nmod_add` from `nmod_vec.h`, FLINT 2.7.1, where the result is
+            /// This is equivalent to `nmod_add` from `nmod.h`, FLINT 2.7.1, where the result is
             /// assigned to `a`.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {

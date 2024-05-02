@@ -1,3 +1,24 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+//      Free Software Foundation, Inc.
+//
+//      Copyright © 2006, 2007, 2008, 2009, 2010, 2015, 2016 William Hart
+//
+//      Copyright © 2010, 2011, 2021 Fredrik Johansson
+//
+//      Copyright © 2008, Peter Shrimpton
+//
+//      Copyright © 2009, Tom Boothby
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOf2,
     WrappingSubAssign,
@@ -480,7 +501,7 @@ macro_rules! impl_mod_mul {
             /// # Examples
             /// See [here](super::mod_mul#mod_mul).
             ///
-            /// This is equivalent to `nmod_mul` from `nmod_vec.h`, FLINT 2.7.1.
+            /// This is equivalent to `nmod_mul` from `nmod.h`, FLINT 2.7.1.
             #[inline]
             fn mod_mul(self, other: $t, m: $t) -> $t {
                 naive_mod_mul(self, other, m)
@@ -502,7 +523,7 @@ macro_rules! impl_mod_mul {
             /// # Panics
             /// Panics if `self` or `other` are greater than or equal to `m`.
             ///
-            /// This is equivalent to `nmod_mul` from `nmod_vec.h`, FLINT 2.7.1, where the result is
+            /// This is equivalent to `nmod_mul` from `nmod.h`, FLINT 2.7.1, where the result is
             /// assigned to `a`.
             #[inline]
             fn mod_mul_assign(&mut self, other: $t, m: $t) {

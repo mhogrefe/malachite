@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 2002, 2010-2018 Free Software Foundation, Inc.
+//
+//      `mpz/bin_uiui.c` contributed to the GNU project by Torbjörn Granlund and Marco Bodrato.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, BinomialCoefficient, CheckedDoubleFactorial, DivExactAssign, FloorRoot,
     ModPowerOf2Inverse, OverflowingMulAssign, WrappingMulAssign,

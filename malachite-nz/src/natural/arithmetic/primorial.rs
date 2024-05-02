@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Contributed to the GNU project by Marco Bodrato.
+//
+//      Copyright © 2012, 2015, 2016 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::factorial::log_n_max;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::Natural;

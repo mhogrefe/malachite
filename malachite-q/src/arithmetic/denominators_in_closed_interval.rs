@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::arithmetic::traits::{DenominatorsInClosedInterval, SimplestRationalInInterval};
 use crate::exhaustive::{
     exhaustive_rationals_with_denominator_inclusive_range,
@@ -40,16 +48,16 @@ fn smallest_likely_denominator(interval_diameter: &Rational) -> Natural {
 /// This `struct` is created by [`DenominatorsInClosedInterval::denominators_in_closed_interval`];
 /// see its documentation for more.
 #[derive(Clone, Debug)]
-pub struct DenominatorsInClosedRationalInterval<'a, 'b> {
-    a: &'a Rational,
-    b: &'b Rational,
+pub struct DenominatorsInClosedRationalInterval {
+    a: Rational,
+    b: Rational,
     low_threshold: Natural,
     high_threshold: Natural,
     current: Natural,
     points: BTreeSet<Rational>,
 }
 
-impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
+impl Iterator for DenominatorsInClosedRationalInterval {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
@@ -62,7 +70,7 @@ impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
             loop {
                 self.current += Natural::ONE;
                 if exhaustive_rationals_with_denominator_inclusive_range(
-                    &self.current,
+                    self.current.clone(),
                     self.a.clone(),
                     self.b.clone(),
                 )
@@ -77,7 +85,9 @@ impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
             self.points.insert(self.a.clone());
             self.points.insert(self.b.clone());
             self.points
-                .insert(Rational::simplest_rational_in_open_interval(self.a, self.b));
+                .insert(Rational::simplest_rational_in_open_interval(
+                    &self.a, &self.b,
+                ));
             let mut min_denominator = self.a.denominator_ref();
             for p in &self.points {
                 let pd = p.denominator_ref();
@@ -87,7 +97,7 @@ impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
             }
             self.current = min_denominator.clone();
             for p in exhaustive_rationals_with_denominator_range(
-                &self.current,
+                self.current.clone(),
                 self.a.clone(),
                 self.b.clone(),
             ) {
@@ -125,7 +135,7 @@ impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
             }
             self.current = min_denominator;
             for p in exhaustive_rationals_with_denominator_range(
-                &self.current,
+                self.current.clone(),
                 self.a.clone(),
                 self.b.clone(),
             ) {
@@ -136,8 +146,8 @@ impl<'a, 'b> Iterator for DenominatorsInClosedRationalInterval<'a, 'b> {
     }
 }
 
-impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
-    type Denominators = DenominatorsInClosedRationalInterval<'a, 'b>;
+impl DenominatorsInClosedInterval for Rational {
+    type Denominators = DenominatorsInClosedRationalInterval;
 
     /// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a
     /// closed interval.
@@ -170,8 +180,8 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// assert_eq!(
     ///     prefix_to_string(
     ///         Rational::denominators_in_closed_interval(
-    ///             &Rational::ONE,
-    ///             &Rational::TWO
+    ///             Rational::ONE,
+    ///             Rational::TWO
     ///         ),
     ///         20
     ///     ),
@@ -180,8 +190,8 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// assert_eq!(
     ///     prefix_to_string(
     ///         Rational::denominators_in_closed_interval(
-    ///             &Rational::from_signeds(1, 3),
-    ///             &Rational::from_signeds(1, 2)
+    ///             Rational::from_signeds(1, 3),
+    ///             Rational::from_signeds(1, 2)
     ///         ),
     ///         20
     ///     ),
@@ -190,8 +200,8 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// assert_eq!(
     ///     prefix_to_string(
     ///         Rational::denominators_in_closed_interval(
-    ///             &Rational::from_signeds(1, 1000001),
-    ///             &Rational::from_signeds(1, 1000000)
+    ///             Rational::from_signeds(1, 1000001),
+    ///             Rational::from_signeds(1, 1000000)
     ///         ),
     ///         20
     ///     ),
@@ -201,11 +211,11 @@ impl<'a, 'b> DenominatorsInClosedInterval<'a, 'b> for Rational {
     /// );
     /// ```
     fn denominators_in_closed_interval(
-        a: &'a Rational,
-        b: &'b Rational,
-    ) -> DenominatorsInClosedRationalInterval<'a, 'b> {
+        a: Rational,
+        b: Rational,
+    ) -> DenominatorsInClosedRationalInterval {
         assert!(a < b);
-        let diameter = b - a;
+        let diameter = &b - &a;
         let (mut low_threshold, high_threshold) = if diameter >= 1u32 {
             (Natural::ZERO, Natural::ZERO)
         } else {

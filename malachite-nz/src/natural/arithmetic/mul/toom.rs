@@ -1,3 +1,32 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `TOOM22_MUL_REC`, `TOOM22_MUL_N_REC`, and `mpn_toom22_mul` contributed to the GNU project by
+//      Torbjörn Granlund.
+//
+//      `mpn_toom32_mul` contributed to the GNU project by Torbjörn Granlund, with improvements by
+//      Marco Bodrato and Niels Möller.
+//
+//      `TOOM33_MUL_N_REC`, `mpn_toom33_mul`, and `mpn_toom42_mul` contributed to the GNU project by
+//      Torbjörn Granlund, with additional improvements by Marco Bodrato.
+//
+//      `mpn_toom43_mul`, `mpn_toom52_mul`, `mpn_toom54_mul`, `abs_sub_n`, `abs_sub_add_n`,
+//      `mpn_toom63_mul`, `TOOM6H_MUL_N_REC`, `mpn_toom6h_mul`, `TOOM8H_MUL_N_REC`,
+//      `mpn_toom8h_mul`, and `mpn_toom_couple_handling` contributed to the GNU project by Marco
+//      Bodrato.
+//
+//      `mpn_toom44_mul`, `mpn_toom53_mul`, and `mpn_toom62_mul` contributed to the GNU project by
+//      Torbjörn Granlund and Marco Bodrato.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_to_out, limbs_add_to_out_aliased,

@@ -1,3 +1,15 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 2000–2002, 2005, 2009, 2014, 2017, 2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_mod_barrett, limbs_modular_div_mod_barrett_scratch_len,
     limbs_modular_div_mod_divide_and_conquer, limbs_modular_div_mod_schoolbook,

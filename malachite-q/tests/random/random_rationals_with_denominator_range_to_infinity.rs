@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
@@ -21,7 +29,7 @@ fn random_rationals_with_denominator_range_to_infinity_helper(
     random_rationals_helper_helper(
         random_rationals_with_denominator_range_to_infinity(
             EXAMPLE_SEED,
-            &Natural::from_str(d).unwrap(),
+            Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
             mean_bits_numerator,
             mean_bits_denominator,
@@ -301,7 +309,7 @@ fn test_random_rationals_with_denominator_range_to_infinity() {
 fn random_rationals_with_denominator_range_to_infinity_fail_1() {
     random_rationals_with_denominator_range_to_infinity(
         EXAMPLE_SEED,
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
         10,
         0,
@@ -313,7 +321,7 @@ fn random_rationals_with_denominator_range_to_infinity_fail_1() {
 fn random_rationals_with_denominator_range_to_infinity_fail_2() {
     random_rationals_with_denominator_range_to_infinity(
         EXAMPLE_SEED,
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
         2,
         3,

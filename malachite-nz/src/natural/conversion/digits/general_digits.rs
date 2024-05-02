@@ -1,3 +1,19 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_bc_get_str`, `mpn_dc_get_str`, `mpn_get_str`, `mpn_bc_set_str`, `mpn_dc_set_str`,
+//      `mpn_set_str`, `powtab_decide`, `mpn_compute_powtab_mul`, `mpn_compute_powtab_div`, and
+//      `mpn_compute_powtab` contributed to the GNU project by Torbjörn Granlund.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -261,7 +277,7 @@ pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     zero_len + nonzero_len
 }}
 
-// This is equivalent to `powers` from `gmp-impl.c`, GMP 6.2.1.
+// This is equivalent to `powers` from `gmp-impl.h`, GMP 6.2.1.
 struct PowerTableIndicesRow {
     start: usize, // actual power value
     len: usize,

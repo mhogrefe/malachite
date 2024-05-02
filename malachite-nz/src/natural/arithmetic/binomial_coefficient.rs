@@ -1,3 +1,17 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Contributed to the GNU project by Torbjörn Granlund and Marco Bodrato.
+//
+//      Copyright © 1998-2012, 2013, 2015-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::div::limbs_hensel_div_limb_in_place;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook_in_place, limbs_modular_invert_limb,
@@ -240,7 +254,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_basecase(n: Limb, k: Limb) -> Li
             - TABLE_2N_MINUS_POPC_2N[(diff >> 1) - 1])
 }}
 
-pub const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
+pub(crate) const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
 
 // Recursively exploit the relation bin(n, k) = bin(n, k >> 1) * bin(n - k >> 1, k - k >> 1) /
 // bin(k, k >> 1).
@@ -315,7 +329,7 @@ fn limbs_approx_sqrt(x: Limb) -> Limb {
     (Limb::power_of_2(s) + (x >> s)) >> 1
 }
 
-pub const BIN_GOETGHELUCK_THRESHOLD: Limb = 512;
+pub(crate) const BIN_GOETGHELUCK_THRESHOLD: Limb = 512;
 
 // Implementation of the algorithm by P. Goetgheluck, "Computing Binomial Coefficients", The
 // American Mathematical Monthly, Vol. 94, No. 4 (April 1987), pp. 360-365.

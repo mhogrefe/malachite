@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
@@ -9,7 +17,7 @@ fn helper(d: &str, a: &str, out: &str) {
     assert_eq!(
         prefix_to_string(
             exhaustive_rationals_with_denominator_range_to_negative_infinity(
-                &Natural::from_str(d).unwrap(),
+                Natural::from_str(d).unwrap(),
                 Rational::from_str(a).unwrap()
             ),
             20
@@ -172,7 +180,7 @@ fn test_exhaustive_rationals_with_denominator_range_to_negative_infinity() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_range_to_negative_infinity_fail() {
     exhaustive_rationals_with_denominator_range_to_negative_infinity(
-        &Natural::ZERO,
+        Natural::ZERO,
         Rational::from_unsigneds(1u32, 3),
     );
 }

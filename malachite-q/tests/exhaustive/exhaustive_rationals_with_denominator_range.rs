@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use itertools::Itertools;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
@@ -10,7 +18,7 @@ use std::str::FromStr;
 fn helper(d: &str, a: &str, b: &str, out: &str) {
     assert_eq!(
         exhaustive_rationals_with_denominator_range(
-            &Natural::from_str(d).unwrap(),
+            Natural::from_str(d).unwrap(),
             Rational::from_str(a).unwrap(),
             Rational::from_str(b).unwrap()
         )
@@ -96,7 +104,7 @@ fn test_exhaustive_rationals_with_denominator_range() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_range_fail_1() {
     exhaustive_rationals_with_denominator_range(
-        &Natural::ZERO,
+        Natural::ZERO,
         Rational::from_unsigneds(1u32, 3),
         Rational::from_unsigneds(1u32, 2),
     );
@@ -106,7 +114,7 @@ fn exhaustive_rationals_with_denominator_range_fail_1() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_range_fail_2() {
     exhaustive_rationals_with_denominator_range(
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 3),
         Rational::from_unsigneds(1u32, 3),
     );
@@ -116,7 +124,7 @@ fn exhaustive_rationals_with_denominator_range_fail_2() {
 #[should_panic]
 fn exhaustive_rationals_with_denominator_range_fail_3() {
     exhaustive_rationals_with_denominator_range(
-        &Natural::ONE,
+        Natural::ONE,
         Rational::from_unsigneds(1u32, 2),
         Rational::from_unsigneds(1u32, 3),
     );

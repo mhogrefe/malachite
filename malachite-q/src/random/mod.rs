@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::exhaustive::RationalsWithDenominator;
 use crate::Rational;
 use malachite_base::bools::random::{random_bools, RandomBools};
@@ -692,7 +700,7 @@ pub fn striped_random_rationals(
 ///     prefix_to_string(
 ///         random_rationals_with_denominator_range_to_infinity(
 ///             EXAMPLE_SEED,
-///             &Natural::from(3u32),
+///             Natural::from(3u32),
 ///             Rational::from_signeds(-3i32, 2),
 ///             3,
 ///             1
@@ -704,16 +712,16 @@ pub fn striped_random_rationals(
 /// ```
 pub fn random_rationals_with_denominator_range_to_infinity(
     seed: Seed,
-    d: &Natural,
+    d: Natural,
     a: Rational,
     mean_numerator_bits_numerator: u64,
     mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRangeToInfinity> {
-    assert_ne!(*d, 0u32);
+    assert_ne!(d, 0u32);
     RationalsWithDenominator {
         numerators: random_integer_range_to_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(d), RoundingMode::Ceiling).0,
+            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Ceiling).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -754,7 +762,7 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 ///     prefix_to_string(
 ///         random_rationals_with_denominator_range_to_negative_infinity(
 ///             EXAMPLE_SEED,
-///             &Natural::from(3u32),
+///             Natural::from(3u32),
 ///             Rational::from_unsigneds(3u32, 2),
 ///             3,
 ///             1
@@ -766,16 +774,16 @@ pub fn random_rationals_with_denominator_range_to_infinity(
 /// ```
 pub fn random_rationals_with_denominator_range_to_negative_infinity(
     seed: Seed,
-    d: &Natural,
+    d: Natural,
     a: Rational,
     mean_numerator_bits_numerator: u64,
     mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRangeToInfinity> {
-    assert_ne!(*d, 0u32);
+    assert_ne!(d, 0u32);
     RationalsWithDenominator {
         numerators: random_integer_range_to_negative_infinity(
             seed,
-            Integer::rounding_from(a * Rational::from(d), RoundingMode::Floor).0,
+            Integer::rounding_from(a * Rational::from(&d), RoundingMode::Floor).0,
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
         ),
@@ -826,7 +834,7 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 ///     prefix_to_string(
 ///         random_rationals_with_denominator_range(
 ///             EXAMPLE_SEED,
-///             &Natural::from(100u32),
+///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
 ///             Rational::from_unsigneds(1u32, 2),
 ///             3,
@@ -839,17 +847,17 @@ pub fn random_rationals_with_denominator_range_to_negative_infinity(
 /// ```
 pub fn random_rationals_with_denominator_range(
     seed: Seed,
-    d: &Natural,
+    d: Natural,
     a: Rational,
     b: Rational,
     mean_numerator_bits_numerator: u64,
     mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRange> {
-    assert_ne!(*d, 0u32);
+    assert_ne!(d, 0u32);
     assert!(a < b);
-    let q_d = Rational::from(d);
+    let q_d = Rational::from(&d);
     let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
-    let upper_included = b.denominator_ref() == d;
+    let upper_included = b.denominator_ref() == &d;
     let mut b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0;
     if !upper_included {
         b_i += Integer::ONE;
@@ -907,7 +915,7 @@ pub fn random_rationals_with_denominator_range(
 ///     prefix_to_string(
 ///         random_rationals_with_denominator_inclusive_range(
 ///             EXAMPLE_SEED,
-///             &Natural::from(100u32),
+///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
 ///             Rational::from_unsigneds(1u32, 2),
 ///             3,
@@ -920,15 +928,15 @@ pub fn random_rationals_with_denominator_range(
 /// ```
 pub fn random_rationals_with_denominator_inclusive_range(
     seed: Seed,
-    d: &Natural,
+    d: Natural,
     a: Rational,
     b: Rational,
     mean_numerator_bits_numerator: u64,
     mean_numerator_bits_denominator: u64,
 ) -> RationalsWithDenominator<RandomIntegerRange> {
-    assert_ne!(*d, 0u32);
+    assert_ne!(d, 0u32);
     assert!(a <= b);
-    let q_d = Rational::from(d);
+    let q_d = Rational::from(&d);
     let a_i = Integer::rounding_from(a * &q_d, RoundingMode::Ceiling).0;
     let b_i = Integer::rounding_from(b * q_d, RoundingMode::Floor).0 + Integer::ONE;
     RationalsWithDenominator {

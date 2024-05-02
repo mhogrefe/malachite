@@ -1,3 +1,16 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      Copyright © 1991-1994, 1996, 1997, 2000-2005, 2008, 2009, 2010, 2011, 2012, 2015 Free
+//      Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
@@ -196,7 +209,7 @@ limbs_square_low_divide_and_conquer(
     let (out_lo, out_hi) = out.split_at_mut(len_big);
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(len);
     out_lo.copy_from_slice(&scratch_lo[..len_big]);
-    // x1 * x0 * 2^(n2 GMP_NUMB_BITS)
+    // x1 * x0 * 2^(n2 Limb::WIDTH)
     if len_small < MULLO_BASECASE_THRESHOLD {
         limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, xs_lo);
     } else if len_small < MULLO_DC_THRESHOLD {

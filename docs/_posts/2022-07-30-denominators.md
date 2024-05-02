@@ -122,6 +122,6 @@ Let's go back to our example interval, $$[268876667/98914198, 245850922/78256779
 
 Malachite generates the rationals contained in the interval in this order:
 
-3, 14/5, 11/4, 23/8, 17/6, 25/8, 20/7, 35/12, 25/9, 29/10, 26/9, 30/11, 28/9, 31/11, 31/10, 41/15, 32/11, 37/12, 34/11, 39/14, ... .
+3, 11/4, 14/5, 20/7, 17/6, 23/8, 25/8, 30/11, 25/9, 29/10, 26/9, 31/11, 28/9, 31/10, 32/11, 41/15, 34/11, 35/12, 37/12, 39/14, ... .
 
 [^1]: Hans-Joachim Kanold, *Über eine zahlentheoretische Funktion von Jacobsthal*, Mathematische Annalen 170.4 (1967): 314-326

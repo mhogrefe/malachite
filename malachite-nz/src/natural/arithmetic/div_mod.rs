@@ -1,3 +1,26 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `mpn_dcpi1_div_qr`, `mpn_dcpi1_div_qr_n`, `mpn_preinv_mu_div_qr_itch`,
+//      `mpn_preinv_mu_div_qr`, `mpn_mu_div_qr_choose_in`, `mpn_mu_div_qr2`, `mpn_mu_div_qr`,
+//      `mpn_mu_div_qr_itch`, and `mpn_sbpi1_div_qr` contributed to the GNU project by Torbjorn
+//      Granlund.
+//
+//      `mpn_invertappr`, `mpn_bc_invertappr`, and `mpn_ni_invertappr` contributed to the GNU
+//      project by Marco Bodrato. The algorithm used here was inspired by ApproximateReciprocal from
+//      "Modern Computer Arithmetic", by Richard P. Brent and Paul Zimmermann. Special thanks to
+//      Paul Zimmermann for his very valuable suggestions on all the theoretical aspects during the
+//      work on this code.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_with_carry_in_to_out,

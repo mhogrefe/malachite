@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 #![allow(
     unstable_name_collisions,
     clippy::bool_assert_comparison,
@@ -43,10 +51,12 @@ extern crate malachite_base;
 
 pub mod arithmetic {
     pub mod abs;
+    pub mod add;
     pub mod is_power_of_2;
     pub mod neg;
     pub mod power_of_2;
     pub mod sign;
+    pub mod sub;
 }
 
 pub mod basic {

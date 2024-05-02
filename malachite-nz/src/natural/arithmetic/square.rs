@@ -1,3 +1,31 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// Uses code adopted from the GNU MP Library.
+//
+//      `MAYBE_sqr_toom2`, `TOOM2_SQR_REC`, and `mpn_toom2_sqr` contributed to the GNU project by
+//      Torbjörn Granlund.
+//
+//      `SQR_TOOM6_MAX`, `MAYBE_sqr_basecase`, `MAYBE_sqr_toom2`, `MAYBE_sqr_above_toom2`,
+//      `MAYBE_sqr_toom3`, `MAYBE_sqr_above_toom3`, `MAYBE_sqr_above_toom4`, `TOOM6_SQR_REC`,
+//      `mpn_toom6_sqr`, `SQR_TOOM8_MAX`, `MAYBE_sqr_basecase`, `MAYBE_sqr_above_basecase`,
+//      `MAYBE_sqr_toom2`, `MAYBE_sqr_above_toom2`, `MAYBE_sqr_toom3`, `MAYBE_sqr_above_toom3`,
+//      `MAYBE_sqr_toom4`, `MAYBE_sqr_above_toom4`, `MAYBE_sqr_above_toom6`, `TOOM8_SQR_REC`, and
+//      `mpn_toom8_sqr` contributed to the GNU project by Marco Bodrato.
+//
+//      `MAYBE_sqr_toom3`, `MAYBE_sqr_basecase`, `TOOM3_SQR_REC`, and `mpn_toom3_sqr` contributed to
+//      the GNU project by Torbjörn Granlund, with additional improvements by Marco Bodrato.
+//
+//      `MAYBE_sqr_toom2`, `MAYBE_sqr_toom4`, `TOOM4_SQR_REC`, and `mpn_toom4_sqr` contributed to
+//      the GNU project by Torbjörn Granlund and Marco Bodrato.
+//
+//      Copyright © 1991-2018 Free Software Foundation, Inc.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,

@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 #![allow(
     unstable_name_collisions,
     clippy::bool_assert_comparison,
@@ -144,6 +152,10 @@ pub mod exhaustive {
     pub mod exhaustive_non_negative_rationals;
     pub mod exhaustive_nonzero_rationals;
     pub mod exhaustive_positive_rationals;
+    pub mod exhaustive_rational_inclusive_range;
+    pub mod exhaustive_rational_range;
+    pub mod exhaustive_rational_range_to_infinity;
+    pub mod exhaustive_rational_range_to_negative_infinity;
     pub mod exhaustive_rationals;
     pub mod exhaustive_rationals_with_denominator_inclusive_range;
     pub mod exhaustive_rationals_with_denominator_range;

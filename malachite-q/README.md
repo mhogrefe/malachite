@@ -84,3 +84,5 @@ browsing through
   enables `random`.
 - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
   takes a long time to build. Enabling this feature also enables `test_build` and `random`.
+
+Copyright © 2024 Mikhail Hogrefe

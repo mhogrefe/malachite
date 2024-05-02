@@ -93,4 +93,4 @@ linear-time affair. Interestingly, `rug` is the slowest of the bunch. I find it 
 believe that GMP is slower than `num` or Malachite, so maybe there's some overhead
 associated with FFI.
 
-Copyright © 2023 Mikhail Hogrefe
+Copyright © 2024 Mikhail Hogrefe

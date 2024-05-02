@@ -1,3 +1,11 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -18,7 +26,10 @@ fn demo_denominators_in_closed_interval(gm: GenMode, config: &GenConfig, limit: 
             "denominators_in_closed_interval({}, {}) = {}",
             a,
             b,
-            prefix_to_string(Rational::denominators_in_closed_interval(&a, &b), 20)
+            prefix_to_string(
+                Rational::denominators_in_closed_interval(a.clone(), b.clone()),
+                20
+            )
         );
     }
 }
@@ -38,7 +49,7 @@ fn benchmark_denominators_in_closed_interval(
         file_name,
         &pair_2_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(a, b)| {
-            no_out!(Rational::denominators_in_closed_interval(&a, &b))
+            no_out!(Rational::denominators_in_closed_interval(a, b))
         })],
     );
 }
