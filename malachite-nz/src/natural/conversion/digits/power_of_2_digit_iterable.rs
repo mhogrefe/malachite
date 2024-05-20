@@ -525,7 +525,7 @@ macro_rules! iterables {
             /// order is ascending, so that less significant digits appear first. There are no
             /// trailing zero digits going forward, or leading zero digits going backward.
             ///
-            /// If it's necessary to get a [`Vec`](alloc::vec::Vec) of all the digits, consider using
+            /// If it's necessary to get a [`Vec`] of all the digits, consider using
             /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
             /// or
             /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)
@@ -830,7 +830,7 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// forward order is ascending, so that less significant digits appear first. There are no
     /// trailing zero digits going forward, or leading zero digits going backward.
     ///
-    /// If it's necessary to get a [`Vec`](alloc::vec::Vec) of all the digits, consider using
+    /// If it's necessary to get a [`Vec`] of all the digits, consider using
     /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
     /// or
     /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)

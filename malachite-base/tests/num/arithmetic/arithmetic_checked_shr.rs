@@ -48,7 +48,7 @@ fn test_arithmetic_checked_shr() {
     clippy::multiple_bound_locations
 )]
 fn arithmetic_checked_shr_properties_helper_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T> + PrimitiveUnsigned,
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
     U: PrimitiveSigned,
 >()
 where

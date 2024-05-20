@@ -4939,7 +4939,9 @@ fn add_round_fail() {
     assert_panic!(
         parse_hex_string("0x1.0#1").add_round_val_ref(&parse_hex_string("0x1.8#2"), Exact)
     );
-    assert_panic!(parse_hex_string("0x1.0#1").add_round_ref_val(parse_hex_string("0x1.8#2"), Exact));
+    assert_panic!({
+        parse_hex_string("0x1.0#1").add_round_ref_val(parse_hex_string("0x1.8#2"), Exact)
+    });
     assert_panic!(
         parse_hex_string("0x1.0#1").add_round_ref_ref(&parse_hex_string("0x1.8#2"), Exact)
     );

@@ -92,7 +92,7 @@ where
     clippy::multiple_bound_locations
 )]
 fn arithmetic_checked_shl_properties_helper_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T> + PrimitiveUnsigned,
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
     U: PrimitiveSigned,
 >()
 where

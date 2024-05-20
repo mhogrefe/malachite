@@ -381,7 +381,7 @@ lex_tuples!(
 /// }
 ///
 /// lex_custom_tuples! {
-///     (pub(crate)),
+///     (pub),
 ///     LexTriplesXXY,
 ///     (X, X, Y),
 ///     (None, None, None),
@@ -391,7 +391,7 @@ lex_tuples!(
 ///     [Y, J, ys, [2, y_2]]
 /// }
 /// lex_custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     LexTriplesXYX,
 ///     (X, Y, X),
 ///     (None, None, None),
@@ -401,7 +401,7 @@ lex_tuples!(
 ///     [Y, J, ys, [1, y_1]]
 /// );
 /// lex_custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     LexTriplesXYY,
 ///     (X, Y, Y),
 ///     (None, None, None),
@@ -1122,7 +1122,7 @@ exhaustive_tuples!(
 /// }
 ///
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveTriplesXXY,
 ///     (X, X, Y),
 ///     (None, None, None),
@@ -1133,7 +1133,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [2, output_type_ys_2]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveTriplesXYX,
 ///     (X, Y, X),
 ///     (None, None, None),
@@ -1144,7 +1144,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [1, output_type_xs_2]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveTriplesXYY,
 ///     (X, Y, Y),
 ///     (None, None, None),
@@ -1155,7 +1155,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXXXY,
 ///     (X, X, X, Y),
 ///     (None, None, None, None),
@@ -1166,7 +1166,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [3, output_type_ys_3]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXXYX,
 ///     (X, X, Y, X),
 ///     (None, None, None, None),
@@ -1177,7 +1177,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [2, output_type_ys_2]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXXYZ,
 ///     (X, X, Y, Z),
 ///     (None, None, None, None),
@@ -1189,7 +1189,7 @@ exhaustive_tuples!(
 ///     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXYXZ,
 ///     (X, Y, X, Z),
 ///     (None, None, None, None),
@@ -1201,7 +1201,7 @@ exhaustive_tuples!(
 ///     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXYYX,
 ///     (X, Y, Y, X),
 ///     (None, None, None, None),
@@ -1212,7 +1212,7 @@ exhaustive_tuples!(
 ///     [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXYYZ,
 ///     (X, Y, Y, Z),
 ///     (None, None, None, None),
@@ -1224,7 +1224,7 @@ exhaustive_tuples!(
 ///     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuadruplesXYZZ,
 ///     (X, Y, Z, Z),
 ///     (None, None, None, None),
@@ -1236,7 +1236,7 @@ exhaustive_tuples!(
 ///     [Z, K, zs, zs_done, [2, output_type_zs_2], [3, output_type_zs_3]]
 /// );
 /// custom_tuples!(
-///     (pub(crate)),
+///     (pub),
 ///     ExhaustiveQuintuplesXYYYZ,
 ///     (X, Y, Y, Y, Z),
 ///     (None, None, None, None, None),
@@ -1842,7 +1842,7 @@ impl<
 /// use std::slice::Iter;
 ///
 /// #[derive(Clone, Debug)]
-/// struct MultiplesGeneratorHelper {
+/// pub struct MultiplesGeneratorHelper {
 ///     u: u64,
 ///     step: u64,
 /// }
@@ -2013,7 +2013,7 @@ pub const fn exhaustive_dependent_pairs<
 /// use std::slice::Iter;
 ///
 /// #[derive(Clone, Debug)]
-/// struct MultiplesGeneratorHelper {
+/// pub struct MultiplesGeneratorHelper {
 ///     u: u64,
 ///     step: u64,
 /// }

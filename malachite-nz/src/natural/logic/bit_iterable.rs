@@ -139,7 +139,7 @@ impl<'a> BitIterable for &'a Natural {
     /// The forward order is ascending, so that less significant bits appear first. There are no
     /// trailing false bits going forward, or leading falses going backward.
     ///
-    /// If it's necessary to get a [`Vec`](alloc::vec::Vec) of all the bits, consider using
+    /// If it's necessary to get a [`Vec`] of all the bits, consider using
     /// [`to_bits_asc`](malachite_base::num::logic::traits::BitConvertible::to_bits_asc) or
     /// [`to_bits_desc`](malachite_base::num::logic::traits::BitConvertible::to_bits_desc) instead.
     ///

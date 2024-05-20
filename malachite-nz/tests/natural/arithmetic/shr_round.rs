@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "32_bit_limbs"))]
+use core::cmp::Ordering::*;
+#[cfg(feature = "32_bit_limbs")]
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShr, DivRound, DivisibleByPowerOf2, ShlRound, ShrRound, ShrRoundAssign,
 };
@@ -34,7 +38,6 @@ use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_4,
     natural_unsigned_rounding_mode_triple_gen_var_1,
 };
-use std::cmp::Ordering::*;
 use std::ops::Shl;
 use std::panic::catch_unwind;
 use std::str::FromStr;

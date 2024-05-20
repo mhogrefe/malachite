@@ -6533,9 +6533,13 @@ fn test_sub_round() {
 #[test]
 fn sub_round_fail() {
     assert_panic!(Float::one_prec(1).sub_round(Float::from_unsigned_prec(4u8, 1).0, Exact));
-    assert_panic!(Float::one_prec(1).sub_round_val_ref(&Float::from_unsigned_prec(4u8, 1).0, Exact));
+    assert_panic!({
+        Float::one_prec(1).sub_round_val_ref(&Float::from_unsigned_prec(4u8, 1).0, Exact)
+    });
     assert_panic!(Float::one_prec(1).sub_round_ref_val(Float::from_unsigned_prec(4u8, 1).0, Exact));
-    assert_panic!(Float::one_prec(1).sub_round_ref_ref(&Float::from_unsigned_prec(4u8, 1).0, Exact));
+    assert_panic!({
+        Float::one_prec(1).sub_round_ref_ref(&Float::from_unsigned_prec(4u8, 1).0, Exact)
+    });
 
     assert_panic!(parse_hex_string("0x1.0#1").sub_round(parse_hex_string("0x0.001#1"), Exact));
     assert_panic!(
@@ -6648,7 +6652,9 @@ fn sub_round_fail() {
     assert_panic!(
         parse_hex_string("0x0.8#1").sub_round_val_ref(&parse_hex_string("0x3.0#2"), Exact)
     );
-    assert_panic!(parse_hex_string("0x0.8#1").sub_round_ref_val(parse_hex_string("0x3.0#2"), Exact));
+    assert_panic!({
+        parse_hex_string("0x0.8#1").sub_round_ref_val(parse_hex_string("0x3.0#2"), Exact)
+    });
     assert_panic!(
         parse_hex_string("0x0.8#1").sub_round_ref_ref(&parse_hex_string("0x3.0#2"), Exact)
     );

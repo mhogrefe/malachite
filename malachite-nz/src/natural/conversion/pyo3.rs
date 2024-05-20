@@ -1,14 +1,25 @@
+// Copyright © 2024 Mikhail Hogrefe
+//
+// PyO3 integration contributed by Antonio Mamić.
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
 #![cfg(feature = "enable_pyo3")]
 
 //!
-//! This is useful for converting Python integers when they may not fit in Rust's built-in integer types.
+//! This is useful for converting Python integers when they may not fit in Rust's built-in integer
+//! types.
 //!
 //! To use this enable the `enable_pyo3` feature.
 //!
 //! ## Examples
 //!
-//! Using [`Natural`](crate::natural::Natural) to correctly increment an arbitrary precision integer.
-//! This is not possible with Rust's native integers if the Python integer is too large,
+//! Using [`Natural`](crate::natural::Natural) to correctly increment an arbitrary precision
+//! integer. This is not possible with Rust's native integers if the Python integer is too large,
 //! in which case it will fail its conversion and raise `OverflowError`.
 //! ```rust
 //! use malachite::Natural;
@@ -186,9 +197,9 @@ fn limbs_to_bytes(limbs: impl Iterator<Item = u64>, limb_count: u64) -> Vec<u8> 
     bytes
 }
 
-/// Converts a Python integer to a vector of 32-bit limbs (little endian).
-/// Takes number of bytes to convert to. Multiple of 4.
-/// If `is_signed` is true, the integer is treated as signed, and two's complement is returned.
+/// Converts a Python integer to a vector of 32-bit limbs (little endian). Takes number of bytes to
+/// convert to. Multiple of 4. If `is_signed` is true, the integer is treated as signed, and two's
+/// complement is returned.
 #[cfg(all(not(Py_LIMITED_API), feature = "32_bit_limbs"))]
 #[inline]
 fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u32>> {
@@ -213,9 +224,9 @@ fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<
     Ok(buffer)
 }
 
-/// Converts a Python integer to a vector of 64-bit limbs (little endian).
-/// Takes number of bytes to convert to. Multiple of 8.
-/// If `is_signed` is true, the integer is treated as signed, and two's complement is returned.
+/// Converts a Python integer to a vector of 64-bit limbs (little endian). Takes number of bytes to
+/// convert to. Multiple of 8. If `is_signed` is true, the integer is treated as signed, and two's
+/// complement is returned.
 #[cfg(all(not(Py_LIMITED_API), not(feature = "32_bit_limbs")))]
 #[inline]
 fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<u64>> {
@@ -240,9 +251,9 @@ fn int_to_limbs(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<Vec<
     Ok(buffer)
 }
 
-/// Converts a Python integer to a Python bytes object. Bytes are in little endian order.
-/// Takes number of bytes to convert to (can be calculated from the number of bits in the integer).
-/// If `is_signed` is true, the integer is treated as signed, and two's complement is returned.
+/// Converts a Python integer to a Python bytes object. Bytes are in little endian order. Takes
+/// number of bytes to convert to (can be calculated from the number of bits in the integer). If
+/// `is_signed` is true, the integer is treated as signed, and two's complement is returned.
 #[cfg(Py_LIMITED_API)]
 #[inline]
 fn int_to_py_bytes(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<&PyBytes> {
@@ -269,9 +280,9 @@ fn int_to_py_bytes(long: &PyLong, n_bytes: usize, is_signed: bool) -> PyResult<&
     Ok(bytes.downcast()?)
 }
 
-/// Returns the number of bits in the absolute value of the given integer.
-/// The number of bits returned is the smallest number of bits that can represent the integer,
-/// not the multiple of 8 (bytes) that it would take up in memory.
+/// Returns the number of bits in the absolute value of the given integer. The number of bits
+/// returned is the smallest number of bits that can represent the integer, not the multiple of 8
+/// (bytes) that it would take up in memory.
 #[inline]
 fn int_n_bits(long: &PyLong) -> PyResult<usize> {
     let py = long.py();
@@ -342,8 +353,8 @@ mod tests {
         PyModule::from_code(py, index_code, "index.py", "index").unwrap()
     }
 
-    /// Test conversion to and from Natural
-    /// Tests the first 2000 numbers in the fibonacci sequence
+    /// - Test conversion to and from Natural
+    /// - Tests the first 2000 numbers in the fibonacci sequence
     #[test]
     fn convert_natural() {
         prepare_python();
