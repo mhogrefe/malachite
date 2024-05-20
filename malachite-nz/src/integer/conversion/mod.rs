@@ -462,11 +462,13 @@ pub mod primitive_float_from_integer;
 /// assert_eq!(i32::convertible_from(&-Integer::from(10u32).pow(12)), false);
 /// ```
 pub mod primitive_int_from_integer;
+/// Implementations of traits for conversions between Python integers and [`Integer`](crate::integer::Integer)s using [pyo3](https://pyo3.rs/).
+pub mod pyo3;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;
 /// Implementations of traits for converting [`Integer`](crate::integer::Integer)s to and from
-/// [`String`]s.
+/// [`String`](alloc::string::String)s.
 pub mod string;
 /// Functions for extracting two's complement [`Limb`](crate#limbs)s from an
 /// [`Integer`](crate::integer::Integer).

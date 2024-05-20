@@ -254,7 +254,7 @@ impl<'a> BitIterable for &'a Integer {
     /// trailing false bits going forward, or leading falses going backward, except for possibly a
     /// most-significant sign-extension bit.
     ///
-    /// If it's necessary to get a [`Vec`] of all the bits, consider using
+    /// If it's necessary to get a [`Vec`](alloc::vec::Vec) of all the bits, consider using
     /// [`to_bits_asc`](malachite_base::num::logic::traits::BitConvertible::to_bits_asc) or
     /// [`to_bits_desc`](malachite_base::num::logic::traits::BitConvertible::to_bits_desc) instead.
     ///
