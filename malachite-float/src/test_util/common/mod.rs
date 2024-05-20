@@ -146,6 +146,7 @@ pub fn to_hex_string(x: &Float) -> String {
     format!("{:#x}", ComparableFloatRef(x))
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 pub fn emulate_primitive_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> Float>(f: F, x: T) -> T
 where
     Float: From<T> + PartialOrd<T>,

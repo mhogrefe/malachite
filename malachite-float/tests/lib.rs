@@ -18,7 +18,8 @@
     clippy::suspicious_op_assign_impl,
     clippy::too_many_arguments,
     clippy::float_cmp,
-    clippy::type_complexity
+    clippy::type_complexity,
+    clippy::multiple_bound_locations
 )]
 #![warn(
     clippy::cast_lossless,

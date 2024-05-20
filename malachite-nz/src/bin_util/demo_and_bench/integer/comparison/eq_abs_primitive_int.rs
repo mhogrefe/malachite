@@ -37,9 +37,9 @@ fn demo_integer_partial_eq_unsigned<T: PrimitiveUnsigned>(
 {
     for (n, u) in integer_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         if n.eq_abs(&u) {
-            println!("|{}| = |{}|", n, u);
+            println!("|{n}| = |{u}|");
         } else {
-            println!("|{}| ≠ |{}|", n, u);
+            println!("|{n}| ≠ |{u}|");
         }
     }
 }
@@ -50,9 +50,9 @@ where
 {
     for (n, i) in integer_signed_pair_gen::<T>().get(gm, config).take(limit) {
         if n.eq_abs(&i) {
-            println!("|{}| = |{}|", n, i);
+            println!("|{n}| = |{i}|");
         } else {
-            println!("|{}| ≠ |{}|", n, i);
+            println!("|{n}| ≠ |{i}|");
         }
     }
 }
@@ -64,9 +64,9 @@ fn demo_unsigned_partial_eq_integer<T: EqAbs<Integer> + PrimitiveUnsigned>(
 ) {
     for (n, u) in integer_unsigned_pair_gen::<T>().get(gm, config).take(limit) {
         if u.eq_abs(&n) {
-            println!("|{}| = |{}|", u, n);
+            println!("|{u}| = |{n}|");
         } else {
-            println!("|{}| ≠ |{}|", u, n);
+            println!("|{u}| ≠ |{n}|");
         }
     }
 }
@@ -78,9 +78,9 @@ fn demo_signed_partial_eq_integer<T: EqAbs<Integer> + PrimitiveSigned>(
 ) {
     for (n, i) in integer_signed_pair_gen::<T>().get(gm, config).take(limit) {
         if i.eq_abs(&n) {
-            println!("|{}| = |{}|", i, n);
+            println!("|{i}| = |{n}|");
         } else {
-            println!("|{}| ≠ |{}|", i, n);
+            println!("|{i}| ≠ |{n}|");
         }
     }
 }

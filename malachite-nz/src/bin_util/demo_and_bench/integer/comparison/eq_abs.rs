@@ -21,9 +21,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_eq_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_pair_gen().get(gm, config).take(limit) {
         if x.eq_abs(&y) {
-            println!("|{}| = |{}|", x, y);
+            println!("|{x}| = |{y}|");
         } else {
-            println!("|{}| ≠ |{}|", x, y);
+            println!("|{x}| ≠ |{y}|");
         }
     }
 }

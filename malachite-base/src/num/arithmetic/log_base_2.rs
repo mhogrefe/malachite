@@ -12,6 +12,13 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::SciMantissaAndExponent;
 use crate::num::logic::traits::{LeadingZeros, TrailingZeros};
 
+fn floor_log_base_2<T: PrimitiveUnsigned>(x: T) -> u64 {
+    if x == T::ZERO {
+        panic!("Cannot take the base-2 logarithm of 0.");
+    }
+    x.significant_bits() - 1
+}
+
 fn ceiling_log_base_2<T: PrimitiveUnsigned>(x: T) -> u64 {
     let floor_log_base_2 = x.floor_log_base_2();
     if x.is_power_of_2() {
@@ -53,7 +60,8 @@ macro_rules! impl_log_base_2_unsigned {
             /// See [here](super::log_base_2#floor_log_base_2).
             #[inline]
             fn floor_log_base_2(self) -> u64 {
-                u64::from(self.ilog2())
+                // TODO use ilog2 once stabilized
+                floor_log_base_2(self)
             }
         }
 

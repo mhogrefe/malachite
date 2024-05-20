@@ -46,7 +46,7 @@ macro_rules! impl_shl {
             type Output = Float;
 
             /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking it by value.
-            /// 
+            ///
             /// `NaN`, infinities, and zeros are unchanged.
             ///
             /// $$
@@ -76,7 +76,7 @@ macro_rules! impl_shl {
             /// Left-shifts a [`Float`] (multiplies it by a power of 2), taking it by value.
             ///
             /// `NaN`, infinities, and zeros are unchanged.
-            /// 
+            ///
             /// $$
             /// f(x, k) = x2^k.
             /// $$
@@ -101,7 +101,7 @@ macro_rules! impl_shl {
             /// Left-shifts a [`Float`] (multiplies it by a power of 2), in place.
             ///
             /// `NaN`, infinities, and zeros are unchanged.
-            /// 
+            ///
             /// $$
             /// x \gets x2^k.
             /// $$

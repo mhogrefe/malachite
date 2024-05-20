@@ -9,10 +9,9 @@
 use core::cmp::Ordering;
 use rug::float::Round;
 
-pub fn rug_square_round(x: rug::Float, rm: Round) -> (rug::Float, Ordering) {
-    let mut square = x;
-    let o = (&mut square).square_round(rm);
-    (square, o)
+pub fn rug_square_round(mut x: rug::Float, rm: Round) -> (rug::Float, Ordering) {
+    let o = x.square_round(rm);
+    (x, o)
 }
 
 pub fn rug_square(x: rug::Float) -> rug::Float {

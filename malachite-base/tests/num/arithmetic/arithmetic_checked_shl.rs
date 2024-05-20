@@ -86,9 +86,13 @@ where
 }
 
 // Type repetition to avoid long line
-#[allow(clippy::type_repetition_in_bounds)]
+#[allow(
+    clippy::type_repetition_in_bounds,
+    clippy::trait_duplication_in_bounds,
+    clippy::multiple_bound_locations
+)]
 fn arithmetic_checked_shl_properties_helper_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T> + PrimitiveUnsigned,
     U: PrimitiveSigned,
 >()
 where

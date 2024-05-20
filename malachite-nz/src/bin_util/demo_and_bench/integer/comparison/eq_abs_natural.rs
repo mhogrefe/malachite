@@ -24,9 +24,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_eq_abs_natural(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         if x.eq_abs(&y) {
-            println!("|{}| = |{}|", x, y);
+            println!("|{x}| = |{y}|");
         } else {
-            println!("|{}| ≠ |{}|", x, y);
+            println!("|{x}| ≠ |{y}|");
         }
     }
 }
@@ -34,9 +34,9 @@ fn demo_integer_eq_abs_natural(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_natural_eq_abs_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_natural_pair_gen().get(gm, config).take(limit) {
         if y.eq_abs(&x) {
-            println!("|{}| = |{}|", y, x);
+            println!("|{y}| = |{x}|");
         } else {
-            println!("|{}| ≠ |{}|", y, x);
+            println!("|{y}| ≠ |{x}|");
         }
     }
 }

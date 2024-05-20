@@ -123,7 +123,8 @@
     clippy::suspicious_op_assign_impl,
     clippy::too_many_arguments,
     clippy::type_complexity,
-    clippy::upper_case_acronyms
+    clippy::upper_case_acronyms,
+    clippy::multiple_bound_locations
 )]
 #![warn(
     clippy::cast_lossless,

@@ -413,7 +413,7 @@ where
         assert_eq!(Some(Integer::from(i).cmp_abs(&n)), cmp_rev);
         assert_eq!((-&n).partial_cmp_abs(&i), cmp);
         if i != T::MIN {
-            assert_eq!((&n).partial_cmp_abs(&-i), cmp);
+            assert_eq!(n.partial_cmp_abs(&-i), cmp);
             assert_eq!((-n).partial_cmp_abs(&-i), cmp);
         }
     });

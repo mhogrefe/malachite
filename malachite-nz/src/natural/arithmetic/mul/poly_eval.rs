@@ -249,7 +249,7 @@ fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &
 // $M(m) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $m$ is `n * degree`.
-///
+//
 // This is equivalent to `mpn_toom_eval_pm2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, where
 // `hn` is omitted from the inputs because it can be determined from `xp` and `n`.
 pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
